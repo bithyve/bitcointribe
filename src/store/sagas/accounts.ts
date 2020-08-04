@@ -1,7 +1,7 @@
 import { call, put, select, delay, all } from 'redux-saga/effects';
 import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
-  FETCH_ADDR,
+  // FETCH_ADDR,
   addressFetched,
   FETCH_BALANCE,
   balanceFetched,
@@ -40,6 +40,7 @@ import {
   SYNC_DERIVATIVE_ACCOUNTS,
   syncDerivativeAccounts,
   STARTUP_SYNC,
+  REMOVE_TWO_FA,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -55,37 +56,40 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import { trustedChannelsSyncWorker } from './trustedContacts';
 import config from '../../bitcoin/HexaConfig';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
-function* fetchAddrWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-  const service = yield select(
-    (state) => state.accounts[payload.serviceType].service,
-  );
-  const preFetchAddress =
-    payload.serviceType === SECURE_ACCOUNT
-      ? service.secureHDWallet.receivingAddress
-      : service.hdWallet.receivingAddress;
-  const res = yield call(service.getAddress);
-  const postFetchAddress =
-    res.status === 200 ? res.data.address : preFetchAddress;
-  if (
-    res.status === 200 &&
-    JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
-  ) {
-    yield put(addressFetched(payload.serviceType, postFetchAddress));
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [payload.serviceType]: JSON.stringify(service),
-    };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-  }
-}
+// function* fetchAddrWorker({ payload }) {
+//   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
+//   const service = yield select(
+//     (state) => state.accounts[payload.serviceType].service,
+//   );
+//   const preFetchAddress =
+//     payload.serviceType === SECURE_ACCOUNT
+//       ? service.secureHDWallet.receivingAddress
+//       : service.hdWallet.receivingAddress;
+//   const res = yield call(service.getAddress);
+//   const postFetchAddress =
+//     res.status === 200 ? res.data.address : preFetchAddress;
+//   if (
+//     res.status === 200 &&
+//     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
+//   ) {
+//     yield put(addressFetched(payload.serviceType, postFetchAddress));
+//     const { SERVICES } = yield select((state) => state.storage.database);
+//     const updatedSERVICES = {
+//       ...SERVICES,
+//       [payload.serviceType]: JSON.stringify(service),
+//     };
+//     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+//   } else {
+//     if (res.err === 'ECONNABORTED') requestTimedout();
+//     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
+//   }
+// }
 
-export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
+// export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -253,29 +257,36 @@ function* fetchBalanceTxWorker({ payload }) {
     ? payload.options.service
     : yield select((state) => state.accounts[payload.serviceType].service);
 
-  const preFetchBalances =
+  const preFetchBalances = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
-      : service.hdWallet.balances;
-  const preFetchTransactions =
+      : service.hdWallet.balances,
+  );
+
+  const preFetchTransactions = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.transactions
-      : service.hdWallet.transactions;
+      : service.hdWallet.transactions,
+  );
 
   const res = yield call(service.getBalanceTransactions, {
     restore: payload.options.restore,
   });
 
   const postFetchBalances =
-    res.status === 200 ? res.data.balances : preFetchBalances;
+    res.status === 200 ? JSON.stringify(res.data.balances) : preFetchBalances;
   const postFetchTransactions =
-    res.status === 200 ? res.data.transactions : preFetchTransactions;
+    res.status === 200
+      ? JSON.stringify(res.data.transactions)
+      : preFetchTransactions;
 
+  let parentSynched = false;
   if (
     res.status === 200 &&
-    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    (preFetchBalances !== postFetchBalances ||
+      preFetchTransactions !== postFetchTransactions)
   ) {
+    parentSynched = true;
     if (
       !payload.options.shouldNotInsert &&
       !payload.options.syncTrustedDerivative
@@ -287,7 +298,7 @@ function* fetchBalanceTxWorker({ payload }) {
       };
       yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
-  } else {
+  } else if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log('Failed to fetch balance/transactions from the indexer');
   }
@@ -299,7 +310,7 @@ function* fetchBalanceTxWorker({ payload }) {
   ) {
     try {
       yield call(syncDerivativeAccountsWorker, {
-        payload: { serviceTypes: [payload.serviceType] },
+        payload: { serviceTypes: [payload.serviceType], parentSynched },
       });
     } catch (err) {
       console.log({ err });
@@ -361,7 +372,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
       [serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } else {
+  } else if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to fetch balance/transactions from the indexer');
   }
@@ -399,7 +410,10 @@ function* syncDerivativeAccountsWorker({ payload }) {
     );
 
     if (res.status === 200) {
-      if (postFetchDerivativeAccounts !== preFetchDerivativeAccounts) {
+      if (
+        postFetchDerivativeAccounts !== preFetchDerivativeAccounts ||
+        payload.parentSynched
+      ) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
@@ -423,13 +437,21 @@ export const syncDerivativeAccountsWatcher = createWatcher(
 
 function* processRecipients(
   recipients: [{ id: string; address: string; amount: number }],
+  serviceType: string,
 ) {
   const addressedRecipients = [];
+  const testAccount: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
   const regularAccount: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+
+  const trustedContactsServices: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
   );
 
   for (const recipient of recipients) {
@@ -439,35 +461,77 @@ function* processRecipients(
       if (!recipient.id) throw new Error('Invalid recipient');
       if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
         // recipient: sibling account
-        const instance =
-          recipient.id === REGULAR_ACCOUNT ? regularAccount : secureAccount;
         const subInstance =
           recipient.id === REGULAR_ACCOUNT
             ? regularAccount.hdWallet
             : secureAccount.secureHDWallet;
         let { receivingAddress } = subInstance; // available based on serviceType
         if (!receivingAddress) {
-          const res = yield call(instance.getAddress);
-          if (res.status === 200) {
-            receivingAddress = res.data.address;
-          } else {
-            throw new Error(
-              `Failed to generate receiving address for recipient: ${recipient.id}`,
-            );
-          }
+          throw new Error(
+            `Failed to generate receiving address for recipient: ${recipient.id}`,
+          );
         }
         recipient.address = receivingAddress;
         addressedRecipients.push(recipient);
       } else {
         // recipient: Trusted Contact
         const contactName = recipient.id;
+        let res;
 
-        const res = yield call(
-          regularAccount.getDerivativeAccAddress,
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        );
+        const accountNumber =
+          regularAccount.hdWallet.trustedContactToDA[
+            contactName.toLowerCase().trim()
+          ];
+        if (accountNumber) {
+          const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ][accountNumber] as TrustedContactDerivativeAccountElements;
+
+          if (serviceType !== TEST_ACCOUNT) {
+            if (contactDetails && contactDetails.xpub) {
+              res = yield call(
+                regularAccount.getDerivativeAccAddress,
+                TRUSTED_CONTACTS,
+                null,
+                contactName,
+              );
+            } else {
+              const {
+                trustedAddress,
+              } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ];
+              if (trustedAddress)
+                res = { status: 200, data: { address: trustedAddress } };
+              else
+                throw new Error('Failed fetch contact address, xpub missing');
+            }
+          } else {
+            if (contactDetails && contactDetails.tpub) {
+              res = yield call(
+                testAccount.deriveReceivingAddress,
+                contactDetails.tpub,
+              );
+            } else {
+              const {
+                trustedTestAddress,
+              } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ];
+              if (trustedTestAddress)
+                res = { status: 200, data: { address: trustedTestAddress } };
+              else
+                throw new Error(
+                  'Failed fetch contact testnet address, tpub missing',
+                );
+            }
+          }
+        } else {
+          throw new Error(
+            'Failed fetch testnet address, accountNumber missing',
+          );
+        }
+
         console.log({ res });
         if (res.status === 200) {
           const receivingAddress = res.data.address;
@@ -491,9 +555,9 @@ function* transferST1Worker({ payload }) {
   console.log({ recipients });
 
   try {
-    recipients = yield call(processRecipients, recipients);
+    recipients = yield call(processRecipients, recipients, payload.serviceType);
   } catch (err) {
-    yield put(failedST1(payload.serviceType));
+    yield put(failedST1(payload.serviceType, { err }));
     return;
   }
   console.log({ recipients });
@@ -504,7 +568,7 @@ function* transferST1Worker({ payload }) {
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST1(payload.serviceType));
+    yield put(failedST1(payload.serviceType, { ...res }));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
@@ -650,8 +714,8 @@ function* testcoinsWorker({ payload }) {
   const res = yield call(service.getTestcoins);
   console.log({ res });
   if (res.status === 200) {
-    console.log('testcoins received');
-    yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
+    // console.log('testcoins received');
+    // yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
     // yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
     // yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
     // yield put(fetchTransactions(payload.serviceType, service));
@@ -663,6 +727,8 @@ function* testcoinsWorker({ payload }) {
       [payload.serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    yield put(accountsSynched(true)); // initial sync: test-acc only (turns the amount text to black)
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to get testcoins');
@@ -773,6 +839,31 @@ function* resetTwoFAWorker({ payload }) {
 }
 
 export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
+
+function* removeTwoFAWorker() {
+  const service: SecureAccount = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+
+  const { removed } = yield call(service.removeTwoFADetails);
+
+  if (removed) {
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [SECURE_ACCOUNT]: JSON.stringify(service),
+    };
+
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } else {
+    console.log('Failed to remove 2FA details');
+  }
+}
+
+export const removeTwoFAWatcher = createWatcher(
+  removeTwoFAWorker,
+  REMOVE_TWO_FA,
+);
 
 function* accountsSyncWorker({ payload }) {
   try {

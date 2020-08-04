@@ -81,6 +81,12 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface ShareUploadables {
+  encryptedMetaShare: string;
+  messageId: string;
+  encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+}
+
 export interface DerivativeAccountElements {
   xpub: string;
   xpriv: string;
@@ -111,6 +117,7 @@ export interface TrustedContactDerivativeAccountElements {
   contactName: string;
   contactDetails?: {
     xpub: string;
+    tpub?: string;
     receivingAddress?: string;
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
@@ -118,8 +125,8 @@ export interface TrustedContactDerivativeAccountElements {
   xpub: string;
   xpriv: string;
   ypub?: string;
+  nextFreeAddressIndex: number;
   usedAddresses?: string[];
-  nextFreeAddressIndex?: number;
   receivingAddress?: string;
   balances?: {
     balance: number;
@@ -164,8 +171,8 @@ export interface INotification {
 } // corresponds to the notification schema
 
 // TRUSTED CONTACTS
-export interface EphemeralData {
-  publicKey?: string; // pubKeys serves as the identifier as it can be public
+export interface EphemeralDataElements {
+  publicKey?: string;
   walletID?: string;
   FCM?: string;
   DHInfo?: {
@@ -186,12 +193,39 @@ export interface EphemeralData {
       paymentURI?: string;
     };
   };
+  trustedAddress?: string;
+  trustedTestAddress?: string;
+}
+
+export interface EphemeralData {
+  publicKey: string;
+  data: EphemeralDataElements;
+}
+
+export interface EncryptedEphemeralData {
+  publicKey: string;
+  encryptedData: string; // encrypted EphemeralData
+  // add ons for optimisation
+  walletID?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
+}
+
+export enum trustedChannelActions {
+  downloadShare = 'downloadShare',
 }
 
 export interface TrustedDataElements {
   xpub?: string;
+  tpub?: string;
   walletID?: string;
   FCM?: string;
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
 }
 export interface TrustedData {
   publicKey: string;
@@ -207,7 +241,9 @@ export interface Contacts {
   [contactName: string]: {
     privateKey: string;
     publicKey: string;
+    encKey: string;
     symmetricKey?: string;
+    secondaryKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;
     isWard?: Boolean;
@@ -217,12 +253,14 @@ export interface Contacts {
     ephemeralChannel?: {
       address: string;
       initiatedAt?: number;
-      data?: EphemeralData[];
+      data?: EphemeralDataElements[];
     };
     trustedChannel?: {
       address: string;
       data?: TrustedData[];
     };
+    trustedAddress?: string;
+    trustedTestAddress?: string;
   };
 }
 

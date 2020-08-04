@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet, Linking } from 'react-native';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Linking,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,148 +18,108 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TestAccountHelpContents(props) {
-
-    const openLink = (url) => {
-        Linking.canOpenURL(url).then(supported => {
-          if (supported) {
-            Linking.openURL(url);
-          } else {
-            console.log("Don't know how to open URI: " + url);
-          }
-        })
-    }
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
 
   return (
-    <ScrollView
-        style={styles.modalContainer}
+    <View style={styles.modalContainer}>
+      <AppBottomSheetTouchableWrapper
+        style={{ justifyContent: 'center', alignItems: 'center' }}
+        activeOpacity={10}
+        onPress={() => props.titleClicked && props.titleClicked()}
+      >
+        <Text style={styles.headerText}>Test Account</Text>
+      </AppBottomSheetTouchableWrapper>
+      <View style={styles.headerSeparator} />
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: Colors.blue,
+        }}
         snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        fontFamily: Fonts.FiraSansMedium,
-                        fontSize: RFValue(20),
-                        marginTop: hp('1%'),
-                        marginBottom: hp('1%'),
-                    }}
-                >
-                    Test Account
-                </Text>
-            </View>
-            <View
-                style={{
-                backgroundColor: Colors.homepageButtonColor,
-                height: 1,
-                marginLeft: wp('5%'),
-                marginRight: wp('5%'),
-                }}
+        decelerationRate="fast"
+      >
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('10%'),
+              marginBottom: wp('3%')
+            }}
+          >
+            The Test Account is designed as an account that enables people
+            to experience Bitcoin without buying bitcoin. It comes
+            preloaded with test bitcoin that you can send to other 
+            users on Bitcoin Testnet
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/test_account_info_1.png')}
+              style={styles.helperImage}
             />
-            <Text
+          </View>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginBottom: wp('15%'),
             }}
-            >
-            The Test Account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying bitcoin. It comes preloaded{'\n'}with test bitcoin that you can send to other{'\n'}users on Bitcoin Testnet
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/test_account_info_1.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+          >
+            The Bitcoin Testnet is similar to Bitcoin Mainnet and has Test
+            bitcoin for people to experiment with. Test bitcoin can not be
+            sent to wallets that only support Bitcoin Mainnet
+          </Text>
+          <View
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              borderStyle: 'dotted',
+              borderWidth: 1,
+              borderRadius: 1,
+              borderColor: Colors.white,
+              ...styles.separatorView,
             }}
-            >
-                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test bitcoin for people to experiment{'\n'}with. Test bitcoin can not be sent to wallets{'\n'}that only support Bitcoin Mainnet
-            </Text>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
+          />
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
-            <Text
+        <View style={styles.ElementView}>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginTop: wp('7%'),
             }}
-            >
-                Test Account addresses start with “2”{'\n'}compared with “1”, “3” or “bc1” for Bitcoin{'\n'}Mainnet. If you are sending Test bitcoin to{'\n'}your friend, please make sure to verify this
+          >
+            The Test Account is designed as an account that enables people to experience Bitcoin without buying bitcoin. It comes preloaded with test bitcoin.
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/test_account_info_1.png')}
+              style={styles.helperImage}
+            />
+          </View>
+          <View style={styles.bottomLinkView}>
+            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
+              Use the Test Account to learn all the features of the Checking Account
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/test_account_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
+            <View style={{...styles.linkView, marginTop: wp('7%')}}>
+              <Text style={styles.toKnowMoreText}>To know more,</Text>
+              <AppBottomSheetTouchableWrapper
+                style={{ marginLeft: 5 }}
+                onPress={() =>
+                  openLink('https://en.bitcoin.it/wiki/Testnet')
+                }
+              >
+                <Text style={styles.clickHereText}>click here</Text>
+              </AppBottomSheetTouchableWrapper>
             </View>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                bitcoin sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
-            </Text>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                This is because a{'\n'}Test Bitcoin address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
-            </Text>
-            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        // textAlign: 'center',
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                    }}
-                >
-                    To read more,
-                </Text>
-                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://en.bitcoin.it/wiki/Testnet")}> 
-                    <Text
-                        style={{
-                            color: Colors.white,
-                            fontSize: RFValue(12),
-                            fontFamily: Fonts.FiraSansRegular,
-                            textDecorationLine: 'underline',
-                            textAlign: 'center',
-                        }}
-                    >
-                        click here
-                    </Text>
-                </TouchableOpacity>
-            </View>
+          </View>
+          <View style={{...styles.separatorView, marginBottom: wp('7%')}} />
         </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -161,10 +128,66 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp('1%'),
+  },
+  infoText: {
+    textAlign: 'center',
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+  },
+  clickHereText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  toKnowMoreText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  linkView: {
+    flexDirection: 'row',
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  ElementView: {
+    height: hp('89%'),
+    justifyContent: 'space-between',
+  },
+  separatorView: {
+    width: wp('70%'),
+    height: 0,
+    alignSelf: 'center',
+    marginBottom: wp('1%'),
+  },
+  helperImage: {
+    width: wp('80%'),
+    height: wp('65%'),
+    resizeMode: 'contain',
+  },
+  bottomLinkView: {
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    marginBottom: wp('15%'),
   },
 });

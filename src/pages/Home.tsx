@@ -113,7 +113,7 @@ import {
 } from '../store/actions/accounts';
 import {
   TrustedContactDerivativeAccount,
-  EphemeralData,
+  EphemeralDataElements,
 } from '../bitcoin/utilities/Interface';
 import * as RNLocalize from 'react-native-localize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -1395,7 +1395,6 @@ export default function Home(props) {
           props.navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
           });
           break;
 
@@ -1414,8 +1413,9 @@ export default function Home(props) {
           props.navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
-            bitcoinAmount: options.amount ? `${options.amount}` : '',
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
           });
           break;
 
@@ -2608,8 +2608,9 @@ export default function Home(props) {
       props.navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        netBalance: balances.regularBalance,
-        bitcoinAmount: options.amount ? `${options.amount}` : '',
+        bitcoinAmount: options.amount
+          ? `${Math.round(options.amount * 1e8)}`
+          : '',
       });
     }
   }, [paymentDetails]);

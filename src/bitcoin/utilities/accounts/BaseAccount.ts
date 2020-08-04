@@ -125,6 +125,8 @@ export default class BaseAccount {
     }
   };
 
+  public getTestXpub = (): string => this.hdWallet.getTestXPub();
+
   public getPaymentURI = (
     address: string,
     options?: {
@@ -315,7 +317,9 @@ export default class BaseAccount {
     }
   };
 
-  public getAddress = async (): Promise<
+  public deriveReceivingAddress = async (
+    xpub: string,
+  ): Promise<
     | {
         status: number;
         data: {
@@ -334,44 +338,70 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.getReceivingAddress(),
+        data: await this.hdWallet.deriveReceivingAddress(xpub),
       };
     } catch (err) {
       return { status: 0o1, err: err.message, message: ErrMap[0o1] };
     }
   };
 
+  // public getAddress = async (): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         address: string;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.hdWallet.getReceivingAddress(),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o1, err: err.message, message: ErrMap[0o1] };
+  //   }
+  // };
+
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.hdWallet.isValidAddress(recipientAddress);
 
-  public getBalance = async (options?: {
-    restore?;
-  }): Promise<
-    | {
-        status: number;
-        data: {
-          balance: number;
-          unconfirmedBalance: number;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalance(options),
-      };
-    } catch (err) {
-      return { status: 0o2, err: err.message, message: ErrMap[0o2] };
-    }
-  };
+  // public getBalance = async (options?: {
+  //   restore?;
+  // }): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         balance: number;
+  //         unconfirmedBalance: number;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.hdWallet.fetchBalance(options),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o2, err: err.message, message: ErrMap[0o2] };
+  //   }
+  // };
 
   public getBalanceTransactions = async (options?: {
     restore?;
@@ -421,47 +451,47 @@ export default class BaseAccount {
     }
   };
 
-  public getTransactions = async (): Promise<
-    | {
-        status: number;
-        data: {
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactions(),
-      };
-    } catch (err) {
-      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
-    }
-  };
+  // public getTransactions = async (): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         transactions: {
+  //           totalTransactions: number;
+  //           confirmedTransactions: number;
+  //           unconfirmedTransactions: number;
+  //           transactionDetails: Array<{
+  //             txid: string;
+  //             status: string;
+  //             confirmations: number;
+  //             fee: string;
+  //             date: string;
+  //             transactionType: string;
+  //             amount: number;
+  //             accountType: string;
+  //             recipientAddresses?: string[];
+  //             senderAddresses?: string[];
+  //           }>;
+  //         };
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.hdWallet.fetchTransactions(),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+  //   }
+  // };
 
   public getTransactionDetails = async (
     txHash: string,
@@ -533,7 +563,14 @@ export default class BaseAccount {
         err?: undefined;
         message?: undefined;
       }
-    | { status: number; err: string; message: string; data?: undefined }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        fee?: number;
+        netAmount?: number;
+        data?: undefined;
+      }
   > => {
     try {
       // if (this.hdWallet.isValidAddress(recipientAddress)) {
@@ -561,8 +598,9 @@ export default class BaseAccount {
       if (balance < netAmount + fee) {
         return {
           status: 0o6,
-          err:
-            'Insufficient balance to compensate for transfer amount and the txn fee',
+          err: `Insufficient balance`,
+          fee,
+          netAmount,
           message: ErrMap[0o6],
         };
       }

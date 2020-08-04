@@ -12,7 +12,15 @@ import {
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
 } from '../actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralData,
+  EphemeralDataElements,
+} from '../../bitcoin/utilities/Interface';
+import {
+  UPDATE_ADDRESS_BOOK_LOCALLY,
+  UPDATE_TRUSTED_CONTACT_INFO,
+} from '../constants';
+import { chain } from 'icepick';
 
 const initialState: {
   service: TrustedContactsService;
@@ -24,7 +32,7 @@ const initialState: {
     };
   };
   ephemeralChannel: {
-    [contactName: string]: { updated: Boolean; data?: EphemeralData };
+    [contactName: string]: { updated: Boolean; data?: EphemeralDataElements };
   };
   trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
   paymentDetails: {
@@ -34,8 +42,11 @@ const initialState: {
 
   loading: {
     updateEphemeralChannel: Boolean;
+    updateTrustedChannel: Boolean;
     trustedChannelsSync: Boolean;
   };
+  addressBook: any;
+  trustedContactsInfo: any;
 } = {
   service: null,
   serviceEnriched: false,
@@ -46,8 +57,11 @@ const initialState: {
   paymentDetails: null,
   loading: {
     updateEphemeralChannel: false,
+    updateTrustedChannel: false,
     trustedChannelsSync: false,
   },
+  addressBook: null,
+  trustedContactsInfo: null,
 };
 
 export default (state = initialState, action) => {
@@ -147,6 +161,14 @@ export default (state = initialState, action) => {
           ],
         },
       };
+
+    case UPDATE_ADDRESS_BOOK_LOCALLY:
+      return chain(state).setIn(['addressBook'], action.payload).value();
+
+    case UPDATE_TRUSTED_CONTACT_INFO:
+      return chain(state)
+        .setIn(['trustedContactsInfo'], action.payload.trustedContactInfo)
+        .value();
   }
 
   return state;

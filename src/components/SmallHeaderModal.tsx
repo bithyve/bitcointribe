@@ -16,7 +16,7 @@ import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper
 export default function SmallHeaderModal(props) {
     return <AppBottomSheetTouchableWrapper
     activeOpacity={10}
-    onPress={() => props.onPressHeader()}
+    onPress={() => props.onPressHeader && props.onPressHeader()}
     style={{...styles.modalHeaderContainer, backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.white, borderLeftColor:props.borderColor? props.borderColor: Colors.borderColor, borderRightColor: props.borderColor? props.borderColor:Colors.borderColor, borderTopColor: props.borderColor? props.borderColor:Colors.borderColor}}
   >
     <View style={styles.modalHeaderHandle} />

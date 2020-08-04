@@ -49,16 +49,24 @@ import {
   uploadRequestedShare,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../store/actions/trustedContacts';
 
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
+  fetchTrustedChannel,
   clearPaymentDetails,
 } from '../store/actions/trustedContacts';
 import {
   updateFCMTokens,
   fetchNotifications,
+  notificationsUpdated,
 } from '../store/actions/notifications';
+import { storeFbtcData } from '../store/actions/fbtc';
+import {
+  setCurrencyCode,
+  setCurrencyToggleValue,
+} from '../store/actions/preferences';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -86,17 +94,34 @@ import {
   addTransferDetails,
 } from '../store/actions/accounts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
-import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import {
+  TrustedContactDerivativeAccount,
+  trustedChannelActions,
+} from '../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
+import semver from 'semver';
+import {
+  updatePreference,
+  setFCMToken,
+  setSecondaryDeviceAddress,
+} from '../store/actions/preferences';
+import * as Permissions from 'expo-permissions';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
 }
 
 export const isCompatible = async (method: string, version: string) => {
-  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+  if (!semver.valid(version)) {
+    // handling exceptions: off standard versioning
+    if (version === '0.9') version = '0.9.0';
+    else if (version === '1.0') version = '1.0.0';
+  }
+
+  if (version && semver.gt(version, DeviceInfo.getVersion())) {
     // checking compatibility via Relay
     const res = await RelayServices.checkCompatibility(method, version);
     if (res.status !== 200) {
@@ -154,7 +179,7 @@ const TrustedContactRequestContent = ({
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
-  isRequestModalOpened
+  isRequestModalOpened,
 }) => {
   if (!trustedContactRequest && !recoveryRequest) return;
   let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
@@ -222,6 +247,8 @@ interface HomeStateTypes {
   isCameraOpen: boolean;
   isLoading: boolean;
   isRequestModalOpened: boolean;
+  isBalanceLoading: boolean;
+  addContactModalOpened: boolean;
 }
 
 interface HomePropsTypes {
@@ -235,6 +262,7 @@ interface HomePropsTypes {
   updateFCMTokens: any;
   downloadMShare: any;
   approveTrustedContact: any;
+  fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
   s3Service: any;
@@ -246,6 +274,20 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
+  notificationListNew: any;
+  notificationsUpdated: any;
+  FBTCAccountData: any;
+  storeFbtcData: any;
+  setCurrencyCode: any;
+  currencyCode: any;
+  setCurrencyToggleValue: any;
+  currencyToggleValue: any;
+  updatePreference: any;
+  fcmTokenValue: any;
+  setFCMToken: any;
+  setSecondaryDeviceAddress: any;
+  secondaryDeviceAddressValue: any;
+  releaseCasesValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -301,13 +343,37 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationLoading: true,
       isLoading: true,
       isRequestModalOpened: false,
+      isBalanceLoading: true,
+      addContactModalOpened: false,
     };
   }
 
-  onPressNotifications = () => {
+  onPressNotifications = async () => {
+    let notificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    let tmpList = [];
+    if (notificationList) {
+      for (let i = 0; i < notificationList.length; i++) {
+        const element = notificationList[i];
+        let obj = {
+          ...element,
+          read: element.isMandatory ? false : true,
+        };
+        tmpList.push(obj);
+      }
+    }
+    await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+    tmpList.sort(function (left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    this.setState({
+      notificationData: tmpList,
+      notificationDataChange: !this.state.notificationDataChange,
+    });
     setTimeout(() => {
       this.setState({ notificationLoading: false });
-    }, 2000);
+    }, 500);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
 
@@ -339,12 +405,20 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: (balances || {}).regularBalance,
           });
           break;
 
         case 'paymentURI':
-          const { address, options } = regularService.decodePaymentURI(qrData);
+          let address, options;
+          try {
+            const res = regularService.decodePaymentURI(qrData);
+            address = res.address;
+            options = res.options;
+          } catch (err) {
+            Alert.alert('Unable to decode payment URI');
+            return;
+          }
+
           item = {
             id: address,
           };
@@ -356,8 +430,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
-            bitcoinAmount: options.amount ? `${options.amount}` : '',
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
           });
           break;
 
@@ -378,11 +453,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         case 'trustedGuardian':
           const trustedGruardianRequest = {
             isGuardian: scannedData.isGuardian,
+            approvedTC: scannedData.approvedTC,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
           this.setState(
             {
@@ -417,9 +495,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isGuardian: scannedData.isGuardian,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -454,8 +534,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           const tcRequest = {
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -491,8 +573,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isPaymentRequest: true,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -630,7 +714,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
-    this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
       if (appState === nextAppState) return;
@@ -643,10 +726,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             this.scheduleNotification();
           }
           if (nextAppState === 'inactive' || nextAppState == 'background') {
-            await AsyncStorage.setItem(
-              'isInternetModalCome',
-              JSON.stringify(false),
-            );
+            this.props.updatePreference({
+              key: 'isInternetModalCome',
+              value: false,
+            });
+            // TODO -- fix this part
+            // await AsyncStorage.setItem(
+            //   'isInternetModalCome',
+            //   JSON.stringify(false),
+            // );
           }
         },
       );
@@ -703,6 +791,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
+    const { notificationListNew } = this.props;
     let newTransactions = [];
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
@@ -721,6 +810,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       newTransactions.push(...newTransactionsSecure);
 
     if (newTransactions.length) {
+      // let asyncNotification = notificationListNew;
       let asyncNotification = JSON.parse(
         await AsyncStorage.getItem('notificationList'),
       );
@@ -735,7 +825,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < newTransactions.length; i++) {
         let present = false;
         for (const tx of asyncNotificationList) {
-          if (newTransactions[i].txid === tx.notificationsData.txid)
+          if (
+            tx.notificationsData &&
+            newTransactions[i].txid === tx.notificationsData.txid
+          )
             present = true;
         }
         if (present) continue;
@@ -759,7 +852,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         };
         this.localNotification(notificationDetails);
       }
-
+      //this.props.notificationsUpdated(asyncNotificationList);
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -805,13 +898,27 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps) => {
-    if (prevProps.notificationList !== this.props.notificationList) {
+    if (
+      prevProps.notificationList !== this.props.notificationList ||
+      prevProps.releaseCasesValue !== this.props.releaseCasesValue
+    ) {
       this.setupNotificationList();
     }
 
     if (prevProps.accounts !== this.props.accounts) {
       this.getBalances();
       this.getNewTransactionNotifications();
+    }
+
+    if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
+      this.storeFCMToken();
+    }
+
+    if (
+      prevProps.secondaryDeviceAddressValue !==
+      this.props.secondaryDeviceAddressValue
+    ) {
+      this.setSecondaryDeviceAddresses();
     }
 
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
@@ -827,11 +934,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       let { address, paymentURI } = paymentDetails;
       let options: any = {};
       if (paymentURI) {
-        const details = accounts[serviceType].service.decodePaymentURI(
-          paymentURI,
-        );
-        address = details.address;
-        options = details.options;
+        try {
+          const details = accounts[serviceType].service.decodePaymentURI(
+            paymentURI,
+          );
+          address = details.address;
+          options = details.options;
+        } catch (err) {
+          Alert.alert('Unable to decode payment URI');
+          return;
+        }
       }
 
       const item = {
@@ -847,8 +959,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        netBalance: balances.regularBalance,
-        bitcoinAmount: options.amount ? `${options.amount}` : '',
+        bitcoinAmount: options.amount
+          ? `${Math.round(options.amount * 1e8)}`
+          : '',
       });
     }
   };
@@ -912,7 +1025,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
 
     if (userKey) {
-      this.props.navigation.navigate('VoucherScanner', { userKey });
+      this.props.navigation.navigate('PairNewWallet', { userKey });
       return;
     }
 
@@ -936,36 +1049,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.notificationOpenedListener();
     }
   }
-
-  handleAppStateChange = async (nextAppState) => {
-    let limit = 15;
-    const { isContactOpen, isCameraOpen } = this.state;
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
-      this.setState({ lastActiveTime: moment().toISOString() });
-    } else {
-      let { lastActiveTime } = this.state;
-      let diff = moment().diff(moment(lastActiveTime), 'seconds');
-      if (diff >= limit) {
-        this.setState(
-          {
-            lastActiveTime: moment().toISOString(),
-          },
-          () => {
-            this.props.navigation.navigate('ReLogin');
-          },
-        );
-      } else {
-        this.setState({
-          lastActiveTime: moment().toISOString(),
-        });
-        return;
-      }
-    }
-  };
 
   handleDeepLink = async (event) => {
     const { navigation, isFocused } = this.props;
@@ -1026,11 +1109,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           },
         );
       }
-    } else if (
-      splits[4] === 'tc' ||
-      splits[4] === 'tcg' ||
-      splits[4] === 'ptc'
-    ) {
+    } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
@@ -1045,13 +1124,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         }
 
         const trustedContactRequest = {
-          isGuardian: splits[4] === 'tcg' ? true : false,
+          isGuardian: ['tcg', 'atcg'].includes(splits[4]),
+          approvedTC: splits[4] === 'atcg' ? true : false,
           isPaymentRequest: splits[4] === 'ptc' ? true : false,
           requester: splits[5],
           encryptedKey: splits[6],
           hintType: splits[7],
           hint: splits[8],
           uploadedAt: splits[9],
+          version,
         };
 
         this.setState(
@@ -1108,7 +1189,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (event.url.includes('fastbitcoins')) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-      navigation.navigate('VoucherScanner', { userKey });
+      navigation.navigate('PairNewWallet', { userKey });
     }
   };
 
@@ -1137,16 +1218,18 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   checkFastBitcoin = async () => {
-    let getFBTCAccount =
-      JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    const { FBTCAccountData } = this.props;
+    let getFBTCAccount = FBTCAccountData || {};
+    // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
     this.setState({ fbBTCAccount: getFBTCAccount });
     return;
   };
 
   setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
+    // JSON.parse(
+    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
+    // );
     if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
@@ -1156,36 +1239,32 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
-      await AsyncStorage.setItem(
-        'secondaryDeviceAddress',
-        JSON.stringify(secondaryDeviceOtpTemp),
-      );
+      this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
+      // await AsyncStorage.setItem(
+      //   'secondaryDeviceAddress',
+      //   JSON.stringify(secondaryDeviceOtpTemp),
+      // );
     }
   };
 
   getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-
     // TODO -- need to check this
     let AssociatedContact = JSON.parse(
       await AsyncStorage.getItem('AssociatedContacts'),
     );
     // setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
     this.setSecondaryDeviceAddresses();
-    this.setState({
-      selectedContact: SelectedContacts,
-    });
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    const { currencyCode, currencyToggleValue } = this.props;
+    let currencyCodeTmp = currencyCode;
     if (!currencyCodeTmp) {
-      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    }
+    if (!currencyCodeTmp) {
+      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
+      //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
       });
@@ -1194,10 +1273,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         currencyCode: currencyCodeTmp,
       });
     }
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
-
+    let currencyToggleValueTmp = currencyToggleValue;
+    if (!currencyToggleValueTmp) {
+      currencyToggleValueTmp = await AsyncStorage.getItem(
+        'currencyToggleValue',
+      );
+    }
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
     });
@@ -1232,11 +1313,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
-    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+    let fcmTokenFromAsync = this.props.fcmTokenValue;
+    if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     } else if (!fcmTokenFromAsync) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     }
@@ -1310,6 +1395,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1318,7 +1405,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (content.notificationType == 'release') {
-      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      let releaseCases = this.props.releaseCasesValue;
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
         readStatus = true;
       } else if (releaseCases.remindMeLaterClick) {
@@ -1338,6 +1426,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationId: content.notificationId,
     };
     asyncNotificationList.push(obj);
+    // this.props.notificationsUpdated(asyncNotificationList);
+
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotificationList),
@@ -1349,12 +1439,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationData: asyncNotificationList,
       notificationDataChange: !this.state.notificationDataChange,
     });
+    this.onPressNotifications();
   };
 
   getBalances = () => {
     const { accounts } = this.props;
 
-    const testBalance = accounts[TEST_ACCOUNT].service
+    let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
@@ -1362,6 +1453,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     const testTransactions = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
+
+    if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
@@ -1489,6 +1582,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         accumulativeBalance,
       },
       transactions: accumulativeTransactions,
+      isBalanceLoading: false,
     });
 
     // if (balancesParam) {
@@ -1521,13 +1615,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressSettingsElements = async (type, currencycode) => {
-    const { navigation } = this.props;
+    const { navigation, currencyCode } = this.props;
     if (type == 'ManagePin') {
       return navigation.navigate('SettingManagePin', {
         managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency = await AsyncStorage.getItem('currencyCode');
+      let currency = currencyCode;
+      //await AsyncStorage.getItem('currencyCode');
       navigation.navigate('ChangeCurrency');
       this.setState({
         currencyCode: currency,
@@ -1549,6 +1644,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1561,6 +1658,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           );
         }
       }
+      // this.props.notificationsUpdated(asyncNotificationList);
+
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -1677,11 +1776,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     let {
       requester,
       isGuardian,
+      approvedTC,
       encryptedKey,
       publicKey,
+      info,
       isQR,
       uploadedAt,
       isRecovery,
+      version,
     } = trustedContactRequest || recoveryRequest;
     const {
       UNDER_CUSTODY,
@@ -1689,6 +1791,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation,
       approveTrustedContact,
       fetchEphemeralChannel,
+      fetchTrustedChannel,
       walletName,
       trustedContacts,
     } = this.props;
@@ -1698,7 +1801,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Toast('Cannot be your own Contact/Guardian');
         return;
       }
-      if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+
+      let expiry = config.TC_REQUEST_EXPIRY;
+      if (!semver.valid(version)) {
+        // expiry support for 0.7, 0.9 and 1.0
+        expiry = config.LEGACY_TC_REQUEST_EXPIRY;
+      }
+
+      if (uploadedAt && Date.now() - uploadedAt > expiry) {
         Alert.alert(
           `${isQR ? 'QR' : 'Link'} expired!`,
           `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
@@ -1709,8 +1819,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       } else {
         if (isGuardian && UNDER_CUSTODY[requester]) {
           Alert.alert(
-            'Failed to store',
-            'You cannot custody multiple shares of the same user.',
+            'Failed to accept',
+            `You already custody a share against the wallet name: ${requester}`,
           );
           this.setState({
             loading: false,
@@ -1720,50 +1830,83 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             try {
               publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
                 .decryptedPub;
+              info = key;
             } catch (err) {
               Alert.alert(
                 'Invalid Number/Email',
                 'Decryption failed due to invalid input, try again.',
               );
+              return;
             }
           }
 
-          let pubExists = false;
+          let existingContact, existingContactName;
           Object.keys(trustedContacts.tc.trustedContacts).forEach(
             (contactName) => {
               const contact = trustedContacts.tc.trustedContacts[contactName];
               if (contact.contactsPubKey === publicKey) {
-                pubExists = true;
+                existingContactName = contactName;
+                existingContact = contact;
               }
             },
           );
-          if (pubExists) {
+          if (existingContactName && !approvedTC) {
             Toast('Contact already exists against this request');
             return;
           }
 
           if (publicKey && !rejected) {
-            navigation.navigate('ContactsListForAssociateContact', {
-              postAssociation: (contact) => {
-                const contactName = `${contact.firstName} ${
-                  contact.lastName ? contact.lastName : ''
-                }`.toLowerCase();
-                if (isGuardian) {
-                  approveTrustedContact(
+            if (!approvedTC) {
+              navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
+
+                  if (!semver.valid(version)) {
+                    // for 0.7, 0.9 and 1.0: info remains null
+                    info = null;
+                  }
+
+                  const contactInfo = {
                     contactName,
-                    publicKey,
-                    true,
-                    requester,
-                  );
-                } else {
-                  approveTrustedContact(contactName, publicKey, true);
-                }
-              },
-              isGuardian,
-            });
+                    info,
+                  };
+                  if (isGuardian) {
+                    approveTrustedContact(
+                      contactInfo,
+                      publicKey,
+                      true,
+                      requester,
+                    );
+                  } else {
+                    approveTrustedContact(contactInfo, publicKey, true);
+                  }
+                },
+                isGuardian,
+              });
+            } else {
+              if (!existingContactName) {
+                Alert.alert(
+                  'Invalid Link/QR',
+                  'You are not a valid trusted contact for approving this request',
+                );
+                return;
+              }
+              const contactInfo = {
+                contactName: existingContactName,
+                info,
+              };
+
+              fetchTrustedChannel(
+                contactInfo,
+                trustedChannelActions.downloadShare,
+                requester,
+              );
+            }
           } else if (publicKey && rejected) {
             // don't associate; only fetch the payment details from EC
-            fetchEphemeralChannel(null, null, publicKey);
+            // fetchEphemeralChannel(null, null, publicKey);
           }
         }
       }
@@ -1774,11 +1917,17 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }
 
       if (!UNDER_CUSTODY[requester]) {
-        Alert.alert('Failed to send!', 'You do not host any key for this user');
-
-        this.setState({
-          loading: false,
-        });
+        this.setState(
+          {
+            loading: false,
+            errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
+            errorMessage: `Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore`,
+            buttonText: 'Okay',
+          },
+          () => {
+            (this.refs.errorBottomSheet as any).snapTo(1);
+          },
+        );
       } else {
         if (!publicKey) {
           try {
@@ -1839,6 +1988,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
+    const { notificationListNew } = this.props;
+    //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1864,6 +2015,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[i].read = true;
       }
     }
+    // this.props.notificationsUpdated(asyncNotifications);
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotifications),
@@ -1873,6 +2025,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationData: tempNotificationData,
       notificationDataChange: !this.state.notificationDataChange,
     });
+
+    if (value.info.includes('Trusted Contact request accepted by')) {
+      navigation.navigate('AddressBookContents');
+      return;
+    }
 
     if (value.type == 'release') {
       RelayServices.fetchReleases(value.info.split(' ')[1])
@@ -1895,7 +2052,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         });
     }
     if (value.type == 'contact') {
-      (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      setTimeout(() => {
+        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      }, 2);
       this.selectTab('Transactions');
     }
   };
@@ -1922,6 +2081,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
+    const { notificationListNew } = this.props;
+    // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1939,9 +2100,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = JSON.parse(
-            await AsyncStorage.getItem('releaseCases'),
-          );
+          let releaseCases = this.props.releaseCasesValue;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('releaseCases'),
+          // );
           if (element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
@@ -2004,6 +2166,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           tmpList.push(obj);
         }
       }
+      //this.props.notificationsUpdated(tmpList);
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -2014,6 +2177,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         notificationDataChange: !this.state.notificationDataChange,
       });
     }
+  };
+
+  setCurrencyToggleValue = (temp) => {
+    this.props.setCurrencyToggleValue(temp);
   };
 
   render() {
@@ -2047,6 +2214,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoadContacts,
       isLoading,
       isRequestModalOpened,
+      isBalanceLoading,
+      addContactModalOpened,
     } = this.state;
     const {
       navigation,
@@ -2085,6 +2254,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             navigation={this.props.navigation}
             overallHealth={overallHealth}
             onSwitchToggle={this.onSwitchToggle}
+            setCurrencyToggleValue={this.setCurrencyToggleValue}
           />
         </View>
 
@@ -2104,6 +2274,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
               renderItem={(Items) => (
                 <HomeList
+                  isBalanceLoading={isBalanceLoading}
                   Items={Items}
                   navigation={navigation}
                   getIconByAccountType={getIconByAccountType}
@@ -2168,6 +2339,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              infoBoxInfoText={''}
+              isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
               AtCloseEnd={atCloseEnd}
@@ -2218,8 +2391,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
                   this.props.navigation.navigate('VoucherScanner');
-                } else if (type == 'pairAccount') {
-                  this.props.navigation.navigate('PairNewWallet');
                 } else if (type == 'addContact') {
                   this.setState(
                     {
@@ -2468,7 +2639,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               });
             }
             this.setState({
-              isRequestModalOpened: false
+              isRequestModalOpened: false,
             });
           }}
           onOpenEnd={() => {
@@ -2479,7 +2650,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             }
             this.setState({
               deepLinkModalOpen: true,
-              isRequestModalOpened: true
+              isRequestModalOpened: true,
             });
           }}
           enabledInnerScrolling={true}
@@ -2786,9 +2957,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
 
         <BottomSheet
+          onCloseEnd={() => {
+            this.setState({
+              addContactModalOpened: false,
+            });
+          }}
           onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
+              addContactModalOpened: true,
             });
           }}
           onOpenStart={() => {
@@ -2811,16 +2988,18 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <AddContactAddressBook
+              addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
               modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
-                navigation.navigate('AddContactSendRequest', {
-                  SelectedContact: selectedContact,
-                });
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
-                  0,
-                );
+                if (selectedContact && selectedContact.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: selectedContact,
+                  });
+                  (this.refs
+                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+                }
               }}
               onSelectContact={(selectedContact) => {
                 this.setState({
@@ -2890,7 +3069,22 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onOpenEnd={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onOpenStart={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onCloseStart={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
+          }}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -2906,9 +3100,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
-              }}
+            // onPressHeader={() => {
+            //   (this.NoInternetBottomSheet as any).current.snapTo(0);
+            // }}
             />
           )}
         />
@@ -2932,6 +3126,16 @@ const mapStateToProps = (state) => {
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
+    notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
+    secondaryDeviceAddressValue: idx(
+      state,
+      (_) => _.preferences.secondaryDeviceAddressValue,
+    ),
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
   };
 };
 
@@ -2942,11 +3146,20 @@ export default withNavigationFocus(
     updateFCMTokens,
     downloadMShare,
     approveTrustedContact,
+    fetchTrustedChannel,
     uploadRequestedShare,
     initHealthCheck,
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
+    notificationsUpdated,
+    storeFbtcData,
+    setCurrencyCode,
+    setCurrencyToggleValue,
+    updatePreference,
+    setFCMToken,
+    setSecondaryDeviceAddress,
+    updateAddressBookLocally,
   })(HomeUpdated),
 );
 

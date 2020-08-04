@@ -45,7 +45,7 @@ export default function TestAccountHelperModalContents(props) {
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: RFValue(12),
+                  fontSize: RFValue(13),
                   fontFamily: Fonts.FiraSansMedium,
                 }}
               >
@@ -62,7 +62,7 @@ export default function TestAccountHelperModalContents(props) {
             <Text
               style={{
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >

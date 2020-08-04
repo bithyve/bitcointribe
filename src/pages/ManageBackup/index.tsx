@@ -41,6 +41,7 @@ import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function ManageBackup(props) {
   const [
@@ -181,6 +182,9 @@ export default function ManageBackup(props) {
   ]);
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
   // const { databaseSSS } = useSelector(state => state.storage);
   const [overallHealth, setOverallHealth] = useState(null);
   const health = useSelector((state) => state.sss.overallHealth);
@@ -249,17 +253,23 @@ export default function ManageBackup(props) {
       //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <ManageBackupHelpContents />
+      <ManageBackupHelpContents
+        titleClicked={() => {
+          if (WalletBackupAndRecoveryBottomSheet.current)
+            (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   };
 
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
-      <ModalHeader
+      <SmallHeaderModal
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+          if (WalletBackupAndRecoveryBottomSheet.current)
+            (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -446,8 +456,7 @@ export default function ManageBackup(props) {
     ) {
       title = 'Reshare Recovery Key\nwith Keeper';
       info = 'Did your Keeper not receive the Recovery Key?';
-      note =
-        'You can reshare the Recovery Key with your Keeper';
+      note = 'You can reshare the Recovery Key with your Keeper';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
@@ -677,9 +686,6 @@ export default function ManageBackup(props) {
       securityAns,
     } = autoHighlightFlags;
 
-    console.log('@AutoHighlight');
-    console.log({ autoHighlightFlags });
-
     if (!overallHealth) {
       if (!secondaryDevice) {
         setSelectedType('secondaryDevice');
@@ -785,13 +791,8 @@ export default function ManageBackup(props) {
     }
   };
 
-  const setContactsFromAsync = async () => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-
+  const setContactsFromAsync = useCallback(() => {
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setContacts(selectedContacts);
 
@@ -803,39 +804,15 @@ export default function ManageBackup(props) {
       }
       setPageData([...pageData]);
     }
+  }, [trustedContactsInfo]);
 
-    // let contactList = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-
-    // setContacts(contactList);
-    // if (contactList.length) {
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
-    //     -1
-    //   ) {
-    //     pageData[1].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact1')
-    //       ];
-    //   }
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
-    //     -1
-    //   ) {
-    //     pageData[2].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact2')
-    //       ];
-    //   }
-    // }
-    // setPageData([...pageData]);
-  };
+  useEffect(() => {
+    setContactsFromAsync();
+  }, [trustedContactsInfo]);
 
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
-      console.log('Setting autoHighlight flags');
       setAutoHighlightFlags(JSON.parse(highlightFlags));
     }
   };
@@ -857,15 +834,15 @@ export default function ManageBackup(props) {
     setAutoHighlightFlagsFromAsync();
   }, []);
 
-  // useEffect(() => {
-  //   if (autoHighlightFlags) {
-  //     autoHighlight();
-  //     AsyncStorage.setItem(
-  //       'AutoHighlightFlags',
-  //       JSON.stringify(autoHighlightFlags),
-  //     );
-  //   }
-  // }, [autoHighlightFlags, overallHealth]);
+  useEffect(() => {
+    if (autoHighlightFlags) {
+      autoHighlight();
+      AsyncStorage.setItem(
+        'AutoHighlightFlags',
+        JSON.stringify(autoHighlightFlags),
+      );
+    }
+  }, [autoHighlightFlags, overallHealth]);
 
   useEffect(() => {
     if (overallHealth) {
@@ -910,7 +887,7 @@ export default function ManageBackup(props) {
         JSON.stringify(autoHighlightFlags)
       ) {
         setAutoHighlightFlags(updatedAutoHighlightFlags);
-
+        // TODO -- replace this
         AsyncStorage.setItem(
           'AutoHighlightFlags',
           JSON.stringify(updatedAutoHighlightFlags),
@@ -919,9 +896,9 @@ export default function ManageBackup(props) {
     }
   }, [overallHealth]);
 
-  useEffect(() => {
-    autoHighlight();
-  }, [autoHighlightFlags]);
+  // useEffect(() => {
+  //   autoHighlight();
+  // }, [autoHighlightFlags]);
 
   useEffect(() => {
     // dispatch(fetchSSSFromDB());
@@ -1366,6 +1343,7 @@ export default function ManageBackup(props) {
           );
           if (!intialHealthSync) {
             dispatch(checkMSharesHealth());
+            // TODO -- replace this
             AsyncStorage.setItem('initalHealthSync', 'true');
           }
         })();
@@ -1378,24 +1356,87 @@ export default function ManageBackup(props) {
 
   const getStatusIcon = (item) => {
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
-      return getIconByStatus(item.status);
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
-    return require('../../assets/images/icons/settings.png');
+    return {
+      icon: require('../../assets/images/icons/icon_error_gray.png'),
+      color: Colors.lightTextColor,
+    };
   };
 
   const getImageIcon = (item) => {
@@ -1507,7 +1548,7 @@ export default function ManageBackup(props) {
       if (item.status === 'Ugly') {
         return 'Secure your Recovery Key as a file (pdf)';
       }
-      return 'The PDFs are locked with your Security Answers';
+      return 'The PDFs are locked with your Security Answer';
     }
 
     return 'Last Backup ';
@@ -1702,14 +1743,7 @@ export default function ManageBackup(props) {
                         }}
                         style={{
                           ...styles.manageBackupCard,
-                          borderColor:
-                            item.status == 'Ugly'
-                              ? Colors.red
-                              : item.status == 'Bad'
-                              ? Colors.yellow
-                              : item.status == 'Good'
-                              ? Colors.green
-                              : Colors.blue,
+                          borderColor: getStatusIcon(item).color,
                           elevation:
                             selectedType && item.type == selectedType ? 10 : 0,
                           shadowColor:
@@ -1750,7 +1784,7 @@ export default function ManageBackup(props) {
                         </View>
                         <Image
                           style={styles.cardIconImage}
-                          source={getStatusIcon(item)}
+                          source={getStatusIcon(item).icon}
                         />
                       </TouchableOpacity>
                     </View>
@@ -1930,5 +1964,38 @@ const styles = StyleSheet.create({
     height: 14,
     resizeMode: 'contain',
     marginLeft: 'auto',
+  },
+  modalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 7,
+  },
+  modalHeaderContainer: {
+    borderTopLeftRadius: 10,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    backgroundColor: Colors.blue,
+    borderLeftColor: Colors.blue,
+    borderRightColor: Colors.blue,
+    borderTopColor: Colors.blue,
+  },
+  healthOfAppText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  healthOfAppDivider: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp('1%'),
   },
 });

@@ -1,4 +1,6 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
+import { AsyncStorage as storage } from 'react-native'
+import thunk from "redux-thunk";
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { call, all, spawn } from 'redux-saga/effects';
@@ -11,6 +13,16 @@ import sssReducer from './reducers/sss';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
+import { persistStore, persistReducer } from "redux-persist";
+import preferencesReducer from './reducers/preferences';
+
+
+const config = {
+  key: "root", // key is required
+  storage, // storage is now required
+  blacklist: ['setupAndAuth']
+};
+
 
 import {
   initDBWatcher,
@@ -28,7 +40,7 @@ import {
 } from './sagas/setupAndAuth';
 
 import {
-  fetchAddrWatcher,
+  // fetchAddrWatcher,
   fetchBalanceWatcher,
   fetchTransactionsWatcher,
   transferST1Watcher,
@@ -47,6 +59,7 @@ import {
   fetchDerivativeAccAddressWatcher,
   syncDerivativeAccountsWatcher,
   startupSyncWatcher,
+  removeTwoFAWatcher,
 } from './sagas/accounts';
 
 import {
@@ -82,7 +95,7 @@ import {
 
 import {
   updateFCMTokensWatcher,
-  sendNotificationWatcher,
+  // sendNotificationWatcher,
   fetchNotificationsWatcher,
 } from './sagas/notifications';
 
@@ -94,6 +107,7 @@ import {
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
   trustedChannelsSyncWatcher,
+  removeTrustedContactWatcher,
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
@@ -132,7 +146,7 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchAddrWatcher,
+    // fetchAddrWatcher,
     fetchBalanceWatcher,
     fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
@@ -146,6 +160,7 @@ const rootSaga = function* () {
     exchangeRateWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
+    removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
@@ -184,11 +199,12 @@ const rootSaga = function* () {
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
-    sendNotificationWatcher,
+    // sendNotificationWatcher,
 
     // Trusted Contacts
     initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
+    removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
@@ -220,13 +236,19 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
+  preferences: preferencesReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
+
+const reducers = persistReducer(config, rootReducer);
+
 const store = createStore(
-  rootReducer,
-  composeWithDevTools(applyMiddleware(sagaMiddleware)),
+  reducers,
+  composeWithDevTools(applyMiddleware(sagaMiddleware, thunk)),
 );
 sagaMiddleware.run(rootSaga);
+const persistor = persistStore(store);
 
-export { store, Provider };
+
+export { store, Provider, persistor };

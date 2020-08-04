@@ -45,8 +45,14 @@ import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendShareModal from '../ManageBackup/SendShareModal';
-import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  EphemeralDataElements,
+  MetaShare,
+} from '../../bitcoin/utilities/Interface';
+import {
+  updateEphemeralChannel,
+  removeTrustedContact,
+} from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
   const [isSendDisabled, setIsSendDisabled] = useState(false);
@@ -117,6 +123,7 @@ export default function ContactDetails(props) {
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
   );
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
   const errorSending = useSelector((state) => state.sss.errorSending);
   const uploadSuccessfull = useSelector(
     (state) => state.sss.uploadSuccessfully,
@@ -181,7 +188,9 @@ export default function ContactDetails(props) {
 
   const onPressResendRequest = () => {
     if (index < 3) {
-      (ReshareBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        (ReshareBottomSheet as any).current.snapTo(1);
+      }, 2);
     } else {
       props.navigation.navigate('AddContactSendRequest', {
         SelectedContact: [Contact],
@@ -543,10 +552,10 @@ export default function ContactDetails(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -574,10 +583,10 @@ export default function ContactDetails(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -605,10 +614,10 @@ export default function ContactDetails(props) {
   const renderExitKeyQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (ExitKeyQRBottomSheet.current)
-            (ExitKeyQRBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   if (ExitKeyQRBottomSheet.current)
+      //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -632,9 +641,9 @@ export default function ContactDetails(props) {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -664,9 +673,9 @@ export default function ContactDetails(props) {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -683,7 +692,8 @@ export default function ContactDetails(props) {
         (Contact.emails && Contact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       const contactName = `${Contact.firstName} ${
@@ -691,7 +701,23 @@ export default function ContactDetails(props) {
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
@@ -741,7 +767,7 @@ export default function ContactDetails(props) {
       ) {
         setTrustedLink('');
         setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactName, data));
+        dispatch(uploadEncMShare(index, contactInfo, data));
       } else if (
         trustedContact &&
         !trustedContact.symmetricKey &&
@@ -754,7 +780,7 @@ export default function ContactDetails(props) {
         setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -975,13 +1001,15 @@ export default function ContactDetails(props) {
               ) : null}
             </View>
             {Contact.hasTrustedChannel &&
-            !Contact.hasXpub ? null : Contact.contactName ===
-                'Secondary Device' && !Contact.hasXpub ? null : (
+            !(
+              Contact.hasXpub || Contact.hasTrustedAddress
+            ) ? null : Contact.contactName === 'Secondary Device' &&
+              !(Contact.hasXpub || Contact.hasTrustedAddress) ? null : (
               <TouchableOpacity
                 disabled={isSendDisabled}
                 onPress={() => {
                   setIsSendDisabled(true);
-                  Contact.hasXpub
+                  Contact.hasXpub || Contact.hasTrustedAddress
                     ? onPressSend()
                     : Contact.contactName != 'Secondary Device'
                     ? onPressResendRequest()
@@ -1001,7 +1029,7 @@ export default function ContactDetails(props) {
                   paddingRight: wp('1.5%'),
                 }}
               >
-                {Contact.hasXpub && (
+                {(Contact.hasXpub || Contact.hasTrustedAddress) && (
                   <Image
                     source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                     style={{
@@ -1019,7 +1047,7 @@ export default function ContactDetails(props) {
                     marginLeft: 2,
                   }}
                 >
-                  {Contact.hasXpub
+                  {Contact.hasXpub || Contact.hasTrustedAddress
                     ? 'Send'
                     : index < 3
                     ? 'Reshare'
@@ -1197,7 +1225,7 @@ export default function ContactDetails(props) {
             )}
           </View>
         )}
-        {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (
+        {contactsType == "I'm Keeper of" && (
           <View
             style={{
               flexDirection: 'row',
@@ -1217,7 +1245,7 @@ export default function ContactDetails(props) {
               onPress={onHelpRestore}
             >
               <Image
-                source={require('../../assets/images/icons/icon_sell.png')}
+                source={require('../../assets/images/icons/icon_restore.png')}
                 style={styles.buttonImage}
               />
               <View>
@@ -1231,35 +1259,57 @@ export default function ContactDetails(props) {
                 </Text> */}
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-                opacity: encryptedExitKey ? 1 : 0.5,
-              }}
-              disabled={encryptedExitKey ? false : true}
-              onPress={() => {
-                if (encryptedExitKey) {
-                  (ExitKeyQRBottomSheet as any).current.snapTo(1);
-                }
-              }}
-            >
-              <Image
-                source={require('../../assets/images/icons/icon_buy.png')}
-                style={styles.buttonImage}
-              />
-              <View>
-                <Text style={styles.buttonText}>
-                  {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
-                </Text>
-                {encryptedExitKey ? <Text numberOfLines={1} style={styles.buttonInfo}>
-                  {'Help restore PDF'}
-                </Text> : null}
-              </View>
-            </TouchableOpacity>
+            {encryptedExitKey ? (
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                  opacity: encryptedExitKey ? 1 : 0.5,
+                }}
+                disabled={encryptedExitKey ? false : true}
+                onPress={() => {
+                  if (encryptedExitKey) {
+                    (ExitKeyQRBottomSheet as any).current.snapTo(1);
+                  }
+                }}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_request.png')}
+                  style={styles.buttonImage}
+                />
+                <View>
+                  <Text style={styles.buttonText}>
+                    {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
+                  </Text>
+                  {encryptedExitKey ? (
+                    <Text numberOfLines={1} style={styles.buttonInfo}>
+                      {'Help restore PDF'}
+                    </Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            ) : null}
           </View>
         )}
+        {Contact.isRemovable &&
+        Date.now() - Contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+        !Contact.hasTrustedChannel ? (
+          <TouchableOpacity
+            style={{
+              ...styles.bottomButton,
+            }}
+            onPress={() => {
+              dispatch(removeTrustedContact(contact.contactName));
+              props.navigation.goBack();
+            }}
+          >
+            <View>
+              <Text style={styles.buttonText}>Remove</Text>
+            </View>
+          </TouchableOpacity>
+        ) : null}
       </View>
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -1270,6 +1320,7 @@ export default function ContactDetails(props) {
         renderHeader={renderSendViaLinkHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
@@ -1280,6 +1331,7 @@ export default function ContactDetails(props) {
         renderHeader={renderSendViaQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ExitKeyQRBottomSheet as any}
         snapPoints={[
@@ -1290,6 +1342,7 @@ export default function ContactDetails(props) {
         renderHeader={renderExitKeyQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ReshareBottomSheet as any}
         snapPoints={[
@@ -1300,6 +1353,7 @@ export default function ContactDetails(props) {
         renderHeader={renderReshareHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -1404,7 +1458,6 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
-    tintColor: Colors.blue,
   },
   buttonText: {
     color: Colors.black,

@@ -15,6 +15,7 @@ import {
   ImageBackground,
   FlatList,
   Alert,
+  InteractionManager,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Colors from '../../common/Colors';
@@ -37,25 +38,28 @@ import {
 } from '../../common/constants/serviceTypes';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { UsNumberFormat } from '../../common/utilities';
-import { nameToInitials } from '../../common/CommonFunctions';
-import { RNCamera } from 'react-native-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
   addTransferDetails,
   clearTransfer,
+  removeTwoFA,
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendHelpContents from '../../components/Helper/SendHelpContents';
 import Toast from '../../components/Toast';
+import config from '../../bitcoin/HexaConfig';
+import Loader from '../../components/loader';
+import QRCodeThumbnail from './QRCodeThumbnail';
+import ContactListSend from './ContactListSend';
+import AccountsListSend from './AccountsListSend';
 
 export default function Send(props) {
   const dispatch = useDispatch();
   let [trustedContacts, setTrustedContacts] = useState([]);
+  let [isLoading, setIsLoading] = useState(true);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
@@ -66,7 +70,7 @@ export default function Send(props) {
       : REGULAR_ACCOUNT,
   );
   const sweepSecure = props.navigation.getParam('sweepSecure');
-  let netBalance = props.navigation.getParam('netBalance');
+  let spendableBalance = props.navigation.getParam('spendableBalance');
 
   const service = useSelector((state) => state.accounts[serviceType].service);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
@@ -92,15 +96,64 @@ export default function Send(props) {
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const secureBalance = accounts[SECURE_ACCOUNT].service
+    let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
+
+    let derivativeBalance = 0;
+    if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        let derivativeAccount;
+
+        // calculating opposite accounts derivative balance for account tiles
+        if (serviceType !== REGULAR_ACCOUNT) {
+          derivativeAccount =
+            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+              dAccountType
+            ];
+        } else if (serviceType !== SECURE_ACCOUNT) {
+          derivativeAccount =
+            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+              dAccountType
+            ];
+        }
+
+        if (
+          serviceType !== SECURE_ACCOUNT &&
+          dAccountType === TRUSTED_CONTACTS
+        ) {
+          continue;
+        }
+
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            // console.log({
+            //   accountNumber,
+            //   balances: trustedAccounts[accountNumber].balances,
+            //   transactions: trustedAccounts[accountNumber].transactions,
+            // });
+            if (derivativeAccount[accountNumber].balances) {
+              derivativeBalance +=
+                derivativeAccount[accountNumber].balances.balance +
+                derivativeAccount[accountNumber].balances.unconfirmedBalance;
+            }
+          }
+        }
+      }
+    }
+
+    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
+    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
     setBalances({
       testBalance,
       regularBalance,
@@ -143,26 +196,36 @@ export default function Send(props) {
     if (serviceType === SECURE_ACCOUNT) twoFASetupMethod();
     checkNShowHelperModal();
     if (!averageTxFees) storeAverageTxFees();
+    if (isLoading) {
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      });
+      InteractionManager.setDeadline(3);
+    }
   }, []);
 
   const twoFASetupMethod = async () => {
     if (
       !(await AsyncStorage.getItem('twoFASetup')) &&
-      !(await AsyncStorage.getItem('walletRecovered'))
+      service.secureHDWallet.twoFASetup
     ) {
       props.navigation.navigate('TwoFASetup', {
         twoFASetup: service.secureHDWallet.twoFASetup,
       });
+      dispatch(removeTwoFA());
       await AsyncStorage.setItem('twoFASetup', 'true');
     }
   };
 
   const storeAverageTxFees = async () => {
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
+    const storedAverageTxFees = JSON.parse(
+      await AsyncStorage.getItem('storedAverageTxFees'),
     );
-    if (storedAverageTxFees) {
-      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+
       if (Date.now() - lastFetched < 1800000) {
         setAverageTxFees(averageTxFees);
         return;
@@ -173,16 +236,16 @@ export default function Send(props) {
     setAverageTxFees(averageTxFees);
     await AsyncStorage.setItem(
       'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+      JSON.stringify({
+        ...storedAverageTxFees,
+        [serviceType]: { averageTxFees, lastFetched: Date.now() },
+      }),
     );
   };
 
   const updateAddressBook = async () => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
+    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts);
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
         const sendableTrustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
@@ -208,26 +271,44 @@ export default function Send(props) {
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-            if (
-              trustedContact.contactDetails &&
-              trustedContact.contactDetails.xpub
-            ) {
-              hasXpub = true;
+            if (serviceType === TEST_ACCOUNT) {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.tpub
+              ) {
+                hasXpub = true;
+              }
+            } else {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.xpub
+              ) {
+                hasXpub = true;
+              }
             }
           }
 
-          const isWard =
-            trustedContactsService.tc.trustedContacts[
-              contactName.toLowerCase().trim()
-            ].isWard;
+          const {
+            isWard,
+            trustedAddress,
+            trustedTestAddress,
+          } = trustedContactsService.tc.trustedContacts[
+            contactName.toLowerCase().trim()
+          ];
+
+          let hasTrustedAddress = false;
+          if (serviceType === TEST_ACCOUNT)
+            hasTrustedAddress = !!trustedTestAddress;
+          else hasTrustedAddress = !!trustedAddress;
 
           const isGuardian = index < 3 ? true : false;
-          if (hasXpub) {
+          if (hasXpub || hasTrustedAddress) {
             // sendable
             sendableTrustedContacts.push({
               contactName,
               connectedVia,
               hasXpub,
+              hasTrustedAddress,
               isGuardian,
               isWard,
               ...contactInfo,
@@ -292,7 +373,12 @@ export default function Send(props) {
       //       (SendHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <SendHelpContents />
+      <SendHelpContents
+        titleClicked={() => {
+          if (SendHelperBottomSheet.current)
+            (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   };
   const renderSendHelperHeader = () => {
@@ -317,19 +403,56 @@ export default function Send(props) {
   };
 
   useEffect(() => {
-    const instance = service.hdWallet || service.secureHDWallet;
-    let isAddressValid = instance.isValidAddress(recipientAddress);
-    if (isAddressValid) {
-      let item = {
-        id: recipientAddress, // address serves as the id during manual addition
-      };
-      onSelectContact(item);
+    const { type } = service.addressDiff(recipientAddress.trim());
+    if (type) {
+      let item;
+      switch (type) {
+        case 'address':
+          item = {
+            id: recipientAddress.trim(), // address serves as the id during manual addition
+          };
+          onSelectContact(item);
+          break;
+
+        case 'paymentURI':
+          let address, options;
+          try {
+            const res = service.decodePaymentURI(recipientAddress.trim());
+            address = res.address;
+            options = res.options;
+          } catch (err) {
+            Alert.alert('Unable to decode payment URI');
+            return;
+          }
+
+          item = {
+            id: address,
+          };
+
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            sweepSecure,
+            spendableBalance,
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
+          });
+          break;
+      }
     }
   }, [recipientAddress]);
 
   const barcodeRecognized = async (barcodes) => {
+    console.log('barcodes', barcodes);
     if (barcodes.data) {
-      const { type } = service.addressDiff(barcodes.data);
+      const { type } = service.addressDiff(barcodes.data.trim());
       if (type) {
         let item;
         switch (type) {
@@ -342,9 +465,16 @@ export default function Send(props) {
             break;
 
           case 'paymentURI':
-            const { address, options } = service.decodePaymentURI(
-              barcodes.data,
-            );
+            let address, options;
+            try {
+              const res = service.decodePaymentURI(barcodes.data);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
+
             item = {
               id: address,
             };
@@ -359,13 +489,10 @@ export default function Send(props) {
               selectedContact: item,
               serviceType,
               sweepSecure,
-              netBalance:
-                serviceType === TEST_ACCOUNT
-                  ? balances.testBalance
-                  : serviceType === REGULAR_ACCOUNT
-                  ? balances.regularBalance
-                  : balances.secureBalance,
-              bitcoinAmount: options.amount ? `${options.amount}` : '',
+              spendableBalance,
+              bitcoinAmount: options.amount
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
             });
             break;
 
@@ -379,117 +506,6 @@ export default function Send(props) {
         setIsInvalidAddress(true);
       }
     }
-  };
-
-  const renderQRCodeThumbnail = () => {
-    if (openCameraFlag) {
-      return (
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <View style={styles.cameraView}>
-            <RNCamera
-              ref={(ref) => {
-                this.cameraRef = ref;
-              }}
-              style={styles.camera}
-              onBarCodeRead={barcodeRecognized}
-              captureAudio={false}
-            >
-              <View style={{ flex: 1 }}>
-                <View style={styles.topCornerView}>
-                  <View style={styles.topLeftCornerView} />
-                  <View style={styles.topRightCornerView} />
-                </View>
-                <View style={styles.bottomCornerView}>
-                  <View style={styles.bottomLeftCornerView} />
-                  <View style={styles.bottomRightCornerView} />
-                </View>
-              </View>
-            </RNCamera>
-          </View>
-        </View>
-      );
-    }
-
-    return (
-      <TouchableOpacity
-        style={{ justifyContent: 'center', alignItems: 'center' }}
-        onPress={() => setOpenCameraFlag(true)}
-      >
-        <ImageBackground
-          source={require('../../assets/images/icons/iPhone-QR.png')}
-          style={{
-            width: wp('90%'),
-            height: wp('70%'),
-            overflow: 'hidden',
-            borderRadius: 20,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingTop: 12,
-              paddingRight: 12,
-              paddingLeft: 12,
-              width: '100%',
-            }}
-          >
-            <View
-              style={{
-                borderLeftWidth: 1,
-                borderTopColor: 'white',
-                borderLeftColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                borderTopWidth: 1,
-              }}
-            />
-            <View
-              style={{
-                borderTopWidth: 1,
-                borderRightWidth: 1,
-                borderRightColor: 'white',
-                borderTopColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                marginLeft: 'auto',
-              }}
-            />
-          </View>
-          <View
-            style={{
-              marginTop: 'auto',
-              flexDirection: 'row',
-              paddingBottom: 12,
-              paddingRight: 12,
-              paddingLeft: 12,
-              width: '100%',
-            }}
-          >
-            <View
-              style={{
-                borderLeftWidth: 1,
-                borderBottomColor: 'white',
-                borderLeftColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                borderBottomWidth: 1,
-              }}
-            />
-            <View
-              style={{
-                borderBottomWidth: 1,
-                borderRightWidth: 1,
-                borderRightColor: 'white',
-                borderBottomColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                marginLeft: 'auto',
-              }}
-            />
-          </View>
-        </ImageBackground>
-      </TouchableOpacity>
-    );
   };
 
   const onSelectContact = (item, bitcoinAmount?) => {
@@ -509,7 +525,7 @@ export default function Send(props) {
         serviceType,
         averageTxFees,
         sweepSecure,
-        netBalance,
+        spendableBalance,
         bitcoinAmount,
       });
     } else {
@@ -531,179 +547,10 @@ export default function Send(props) {
           serviceType,
           averageTxFees,
           sweepSecure,
-          netBalance,
+          spendableBalance,
           bitcoinAmount,
         });
       }
-    }
-  };
-
-  const getImageIcon = (item) => {
-    if (item) {
-      if (item.image) {
-        return <Image source={item.image} style={styles.circleShapeView} />;
-      } else {
-        return (
-          <View
-            style={{
-              ...styles.circleShapeView,
-              backgroundColor: Colors.shadowBlue,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 13, //... One for top and one for bottom alignment
-              }}
-            >
-              {item
-                ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
-                : ''}
-            </Text>
-          </View>
-        );
-      }
-    }
-  };
-
-  const renderContacts = ({ item, index }) => {
-    return (
-      <TouchableOpacity onPress={() => onSelectContact(item)}>
-        <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
-          {transfer.details &&
-            transfer.details.length > 0 &&
-            transfer.details.map((contact) => {
-              if (contact.selectedContact.id === item.id) {
-                return (
-                  <Image
-                    style={styles.checkmarkStyle}
-                    source={require('../../assets/images/icons/checkmark.png')}
-                    resizeMode="contain"
-                  />
-                );
-              }
-            })}
-          {getImageIcon(item)}
-          <Text numberOfLines={1} style={styles.contactName}>
-            {item.name}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderAccounts = ({ item, index }) => {
-    let checked = false;
-    for (let i = 0; i < transfer.details.length; i++) {
-      const element = transfer.details[i].selectedContact;
-      if (element.id == item.id) {
-        checked = true;
-      }
-    }
-    if (item.type != serviceType) {
-      return (
-        <TouchableOpacity
-          style={{
-            height: wp('40%'),
-            justifyContent: 'center',
-            shadowOffset: {
-              width: 4,
-              height: 4,
-            },
-            shadowOpacity: 0.7,
-            shadowRadius: 10,
-            shadowColor: Colors.borderColor,
-            elevation: 10,
-          }}
-          onPress={() => onSelectContact(item)}
-        >
-          <CardView
-            cornerRadius={10}
-            opacity={1}
-            style={{
-              ...styles.card,
-              backgroundColor: checked ? Colors.lightBlue : Colors.white,
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                marginLeft: 2,
-                marginRight: 2,
-              }}
-            >
-              <Image
-                style={{
-                  width: wp('10%'),
-                  height: wp('10%'),
-                  alignSelf: 'center',
-                }}
-                source={item.image}
-              />
-              <Text
-                style={{
-                  color: checked ? Colors.white : Colors.black,
-                  fontSize: RFValue(10),
-                  fontWeight: '500',
-                  textAlign: 'center',
-                  alignSelf: 'center',
-                }}
-              >
-                {item.account_name}
-              </Text>
-              <Text
-                style={{
-                  color: checked ? Colors.white : Colors.borderColor,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  marginTop: 5,
-                  alignSelf: 'center',
-                }}
-              >
-                {item.type === REGULAR_ACCOUNT
-                  ? '$' + UsNumberFormat(balances.regularBalance)
-                  : '$' + UsNumberFormat(balances.secureBalance)}
-              </Text>
-              <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
-                <TouchableOpacity
-                  onPress={() => onSelectContact(item)}
-                  style={{
-                    height: wp('5%'),
-                    width: wp('5%'),
-                    borderRadius: wp('5%') / 2,
-                    borderWidth: 1,
-                    borderColor: checked ? Colors.blue : Colors.borderColor,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: checked ? Colors.blue : Colors.white,
-                  }}
-                >
-                  {checked && (
-                    <Entypo
-                      name={'check'}
-                      size={RFValue(12)}
-                      color={Colors.white}
-                    />
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </CardView>
-        </TouchableOpacity>
-      );
     }
   };
 
@@ -791,7 +638,10 @@ export default function Send(props) {
                   ) : null}
                 </View>
               </View>
-              {renderQRCodeThumbnail()}
+              <QRCodeThumbnail
+                isOpenCameraFlag={openCameraFlag}
+                onQrScan={(qrData) => barcodeRecognized(qrData)}
+              />
               <View
                 style={{
                   paddingLeft: 20,
@@ -845,7 +695,7 @@ export default function Send(props) {
                         fontFamily: Fonts.FiraSansItalic,
                       }}
                     >
-                      Send it to a sample address
+                      Send it to a sample address !
                     </Text>
                   </TouchableOpacity>
                 ) : null}
@@ -854,52 +704,64 @@ export default function Send(props) {
                     <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
-                {serviceType != TEST_ACCOUNT ? (
-                  <View style={{ paddingTop: wp('3%') }}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(13),
-                          fontFamily: Fonts.FiraSansRegular,
-                          marginBottom: wp('3%'),
-                        }}
-                      >
-                        Send to Contact
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={{
-                          height: 20,
-                          width: 20,
-                          justifyContent: 'center',
-                          marginLeft: 'auto',
-                        }}
-                      >
-                        <SimpleLineIcons
-                          name="options-vertical"
-                          color={Colors.blue}
-                          size={RFValue(13)}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {trustedContacts.length ? (
+                <View style={{ paddingTop: wp('3%') }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text
+                      style={{
+                        color: Colors.blue,
+                        fontSize: RFValue(13),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginBottom: wp('3%'),
+                      }}
+                    >
+                      Send to Contact
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        justifyContent: 'center',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      <SimpleLineIcons
+                        name="options-vertical"
+                        color={Colors.blue}
+                        size={RFValue(13)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {trustedContacts.length ? (
+                    <View
+                      style={{
+                        ...styles.textBoxView,
+                        paddingTop: hp('1%'),
+                        paddingBottom: hp('1%'),
+                        height: hp('15%'),
+                        justifyContent: 'center',
+                        backgroundColor: Colors.backgroundColor,
+                        borderColor: Colors.backgroundColor,
+                      }}
+                    >
                       <View
                         style={{
-                          ...styles.textBoxView,
-                          paddingTop: hp('1%'),
-                          paddingBottom: hp('1%'),
-                          height: hp('15%'),
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          borderColor: Colors.backgroundColor,
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }}
                       >
-                        <View
+                        <TouchableOpacity
                           style={{
-                            flex: 1,
-                            flexDirection: 'row',
+                            backgroundColor: Colors.white,
+                            height: wp('12%'),
+                            width: wp('6%'),
+                            justifyContent: 'center',
                             alignItems: 'center',
+                            alignSelf: 'center',
+                            borderRadius: 5,
+                            marginLeft: 10,
+                            marginRight: 15,
                           }}
                         >
                           <TouchableOpacity
@@ -926,31 +788,37 @@ export default function Send(props) {
                             nestedScrollEnabled={true}
                             showsHorizontalScrollIndicator={false}
                             data={trustedContacts}
-                            renderItem={renderContacts}
+                            renderItem={(Items) => (
+                              <ContactListSend
+                                Items={Items.item}
+                                transfer={transfer}
+                                onSelectContact={onSelectContact}
+                              />
+                            )}
                             extraData={transfer.details}
                             keyExtractor={(item, index) => index.toString()}
                           />
-                        </View>
+                        </TouchableOpacity>
                       </View>
-                    ) : (
-                      <View
-                        style={{
-                          marginBottom: -25,
-                          padding: -20,
-                          marginLeft: -20,
-                          marginRight: -20,
-                        }}
-                      >
-                        <BottomInfoBox
-                          title={'You have not added any Contact'}
-                          infoText={
-                            'Add a Contact to send them sats without having to scan an address'
-                          }
-                        />
-                      </View>
-                    )}
-                  </View>
-                ) : null}
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        marginBottom: -25,
+                        padding: -20,
+                        marginLeft: -20,
+                        marginRight: -20,
+                      }}
+                    >
+                      <BottomInfoBox
+                        title={'You have not added any Contact'}
+                        infoText={
+                          'Add a Contact to send them sats without having to scan an address'
+                        }
+                      />
+                    </View>
+                  )}
+                </View>
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
@@ -1013,8 +881,26 @@ export default function Send(props) {
                         nestedScrollEnabled={true}
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
-                        renderItem={renderAccounts}
-                        extraData={transfer.details}
+                        renderItem={(Items) => {
+                          let checked = false;
+                          for (let i = 0; i < transfer.details.length; i++) {
+                            const element = transfer.details[i].selectedContact;
+                            if (element.id == Items.item.id) {
+                              checked = true;
+                            }
+                          }
+                          if (Items.item.type != serviceType) {
+                            return (
+                              <AccountsListSend
+                                accounts={Items.item}
+                                balances={balances}
+                                checkedItem={checked}
+                                onSelectContact={onSelectContact}
+                              />
+                            );
+                          }
+                        }}
+                        extraData={{ details: transfer.details, balances }}
                         //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
@@ -1025,6 +911,7 @@ export default function Send(props) {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+      {isLoading ? <Loader /> : null}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={SendHelperBottomSheet}
@@ -1033,8 +920,32 @@ export default function Send(props) {
           hp('89%'),
           // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={renderSendHelperContents}
-        renderHeader={renderSendHelperHeader}
+        renderContent={() => {
+          <SendHelpContents
+            titleClicked={() => {
+              if (SendHelperBottomSheet.current)
+                (SendHelperBottomSheet as any).current.snapTo(0);
+            }}
+          />;
+        }}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.blue}
+            backgroundColor={Colors.blue}
+            onPressHeader={() => {
+              if (isSendHelperDone) {
+                if (SendHelperBottomSheet.current)
+                  (SendHelperBottomSheet as any).current.snapTo(1);
+                setTimeout(() => {
+                  setIsSendHelperDone(false);
+                }, 10);
+              } else {
+                if (SendHelperBottomSheet.current)
+                  (SendHelperBottomSheet as any).current.snapTo(0);
+              }
+            }}
+          />
+        )}
       />
     </View>
   );
@@ -1098,15 +1009,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowColor: Colors.borderColor,
     elevation: 10,
-  },
-  card: {
-    width: wp('30%'),
-    height: wp('35%'),
-    marginLeft: 15,
-    flexDirection: 'row',
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   checkmarkStyle: {
     position: 'absolute',
@@ -1175,13 +1077,5 @@ const styles = StyleSheet.create({
     height: hp('5%'),
     width: hp('5%'),
     marginLeft: 'auto',
-  },
-  contactName: {
-    width: wp('14%'),
-    color: Colors.black,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'center',
-    marginTop: 5,
   },
 });

@@ -406,6 +406,18 @@ export default class SSS {
       .update(JSON.stringify(encryptedSecret))
       .digest('hex');
 
+  public static strechKey = (password: string): string => {
+    return crypto
+      .pbkdf2Sync(
+        password,
+        config.HEXA_ID,
+        config.KEY_STRECH_ITERATIONS,
+        SSS.cipherSpec.keyLength / 2,
+        'sha256',
+      )
+      .toString('hex');
+  };
+
   public static generateKey = (length: number): string => {
     let result = '';
     const characters =
@@ -558,19 +570,72 @@ export default class SSS {
     return { shares };
   };
 
-  public uploadShare = async (
+  // public uploadShare = async (
+  //   shareIndex: number,
+  //   contactName: string,
+  //   dynamicNonPMDD?: MetaShare[],
+  // ): Promise<{
+  //   otp: string;
+  //   encryptedKey: string;
+  // }> => {
+  //   if (!this.metaShares.length) {
+  //     throw new Error('Generate MetaShares prior uploading');
+  //   }
+
+  //   let res: AxiosResponse;
+  //   this.metaShares[
+  //     shareIndex
+  //   ].meta.guardian = contactName.toLowerCase().trim();
+  //   const metaShare: MetaShare = this.metaShares[shareIndex];
+  //   const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
+  //     metaShare,
+  //   );
+
+  //   let encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  //   if (dynamicNonPMDD) {
+  //     encryptedDynamicNonPMDD = {
+  //       encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+  //         .encryptedDynamicNonPMDD,
+  //       updatedAt: Date.now(),
+  //     };
+  //   }
+
+  //   try {
+  //     res = await BH_AXIOS.post('uploadShare', {
+  //       HEXA_ID,
+  //       share: encryptedMetaShare,
+  //       messageId,
+  //       encryptedDynamicNonPMDD,
+  //     });
+  //   } catch (err) {
+  //     if (err.response) throw new Error(err.response.data.err);
+  //     if (err.code) throw new Error(err.code);
+  //   }
+
+  //   const { success } = res.data;
+  //   if (!success) {
+  //     throw new Error('Unable to upload share');
+  //   }
+  //   const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+  //   return { otp, encryptedKey: otpEncryptedData };
+  // };
+
+  public prepareShareUploadables = (
     shareIndex: number,
     contactName: string,
     dynamicNonPMDD?: MetaShare[],
-  ): Promise<{
+  ): {
     otp: string;
     encryptedKey: string;
-  }> => {
+    encryptedMetaShare: string;
+    messageId: string;
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  } => {
     if (!this.metaShares.length) {
       throw new Error('Generate MetaShares prior uploading');
     }
 
-    let res: AxiosResponse;
+    // let res: AxiosResponse;
     this.metaShares[
       shareIndex
     ].meta.guardian = contactName.toLowerCase().trim();
@@ -588,24 +653,30 @@ export default class SSS {
       };
     }
 
-    try {
-      res = await BH_AXIOS.post('uploadShare', {
-        HEXA_ID,
-        share: encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
-    }
+    // try {
+    //   res = await BH_AXIOS.post('uploadShare', {
+    //     HEXA_ID,
+    //     share: encryptedMetaShare,
+    //     messageId,
+    //     encryptedDynamicNonPMDD,
+    //   });
+    // } catch (err) {
+    //   if (err.response) throw new Error(err.response.data.err);
+    //   if (err.code) throw new Error(err.code);
+    // }
 
-    const { success } = res.data;
-    if (!success) {
-      throw new Error('Unable to upload share');
-    }
+    // const { success } = res.data;
+    // if (!success) {
+    //   throw new Error('Unable to upload share');
+    // }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    return { otp, encryptedKey: otpEncryptedData };
+    return {
+      otp,
+      encryptedKey: otpEncryptedData,
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    };
   };
 
   public initializeHealthcheck = async (): Promise<{
@@ -634,6 +705,13 @@ export default class SSS {
     }
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
+
+      for (let index = 0; index <= shareIDs.length; index++) {
+        this.healthCheckStatus[index] = {
+          shareId: shareIDs[index],
+          updatedAt: 0,
+        };
+      }
     }
     return {
       success: res.data.initSuccessful,

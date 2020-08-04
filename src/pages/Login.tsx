@@ -33,6 +33,7 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
+import { initMigration } from '../store/actions/preferences';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Satoshis or Sats');
@@ -54,6 +55,10 @@ export default function Login(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
+  const releaseCasesValue = useSelector(
+    (state) => state.preferences.releaseCasesValue,
+  );
+  const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
   //       {
   //           "build": "40",
@@ -117,6 +122,12 @@ export default function Login(props) {
     },
     [passcode],
   );
+
+  useEffect(() => {
+    if (passcode.length == 4) {
+      setIsDisabledProceed(false);
+    }
+  }, [passcode]);
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -182,7 +193,7 @@ export default function Login(props) {
   const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
-    if (s3Service) {
+    if (s3Service && s3Service.checkHealth) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
@@ -190,11 +201,16 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
+  const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
     // HC up-streaming
     if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+      if (
+        Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length &&
+        !updatedHealth
+      ) {
         dispatch(updateMSharesHealth());
+        setUpdatedHealth(true);
       }
     }
   }, [DECENTRALIZED_BACKUP]);
@@ -230,9 +246,10 @@ export default function Login(props) {
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
         console.log('Release note', res.data.releases);
-        let releaseCases = JSON.parse(
-          await AsyncStorage.getItem('releaseCases'),
-        );
+        let releaseCases = releaseCasesValue;
+        // JSON.parse(
+        //   await AsyncStorage.getItem('releaseCases'),
+        // );
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()
@@ -285,9 +302,15 @@ export default function Login(props) {
     'trustedContactRequest',
   );
   const userKey = props.navigation.getParam('userKey');
+  const isMigrated = useSelector(state => state.preferences.isMigrated)
+  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
 
   useEffect(() => {
     if (isAuthenticated) {
+      // migrate async keys
+      if (!isMigrated) {
+        dispatch(initMigration())
+      }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
@@ -442,8 +465,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -471,8 +494,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -500,8 +523,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -529,8 +552,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -541,8 +564,12 @@ export default function Login(props) {
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
-                disabled={passcode.length == 4 ? false : true}
+                disabled={isDisabledProceed}
                 onPress={() => {
+                  setTimeout(() => {
+                    setIsDisabledProceed(true);
+                    setElevation(0);
+                  }, 2);
                   loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
                     setMessage('Hexa Test Account');
@@ -552,17 +579,15 @@ export default function Login(props) {
                     setSubTextMessage2(
                       'Best place to start if you are new to Bitcoin',
                     );
+                    dispatch(credsAuth(passcode));
                   }, 3000);
-                  setTimeout(() => {
-                    setElevation(0);
-                  }, 2);
-                  dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
                   elevation: Elevation,
-                  backgroundColor:
-                    passcode.length == 4 ? Colors.blue : Colors.lightBlue,
+                  backgroundColor: isDisabledProceed
+                    ? Colors.lightBlue
+                    : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -706,7 +731,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

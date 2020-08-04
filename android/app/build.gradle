@@ -106,8 +106,8 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 63
-        versionName "0.9"                     
+        versionCode 84
+        versionName "1.1.0"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
@@ -135,7 +135,8 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
 
         }
     }

@@ -19,6 +19,7 @@ import {
   CheckBox,
   ActivityIndicator,
   Alert,
+  InteractionManager,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
@@ -48,10 +49,12 @@ import {
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { fetchAddress } from '../../store/actions/accounts';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
+import {
+  EphemeralDataElements,
   TrustedContactDerivativeAccount,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
@@ -59,12 +62,16 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import config from '../../bitcoin/HexaConfig';
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import Loader from '../../components/loader';
+import TwoFASetupWarningModal from './TwoFASetupWarningModal';
 
 export default function Receive(props) {
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
+  // let [isLoading, setIsLoading] = useState(true);
+
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
@@ -128,7 +135,7 @@ export default function Receive(props) {
         let receiveAt = receivingAddress;
         if (amount) {
           receiveAt = service.getPaymentURI(receiveAt, {
-            amount: parseInt(amount),
+            amount: parseInt(amount) / 1e8,
           }).paymentURI;
         }
         setReceiveLink(receiveAt);
@@ -148,9 +155,17 @@ export default function Receive(props) {
     }
   }, [AsTrustedContact]);
 
-  useEffect(() => {
-    dispatch(fetchAddress(serviceType));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchAddress(serviceType));
+  //   if (isLoading) {
+  //     InteractionManager.runAfterInteractions(() => {
+  //       setTimeout(() => {
+  //         setIsLoading(false);
+  //       }, 2000);
+  //     });
+  //     InteractionManager.setDeadline(3);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!AsTrustedContact) return;
@@ -242,10 +257,24 @@ export default function Receive(props) {
       }
 
       if (!receiveQR) {
+        let info = '';
+        if (
+          selectedContact.phoneNumbers &&
+          selectedContact.phoneNumbers.length
+        ) {
+          const phoneNumber = selectedContact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (selectedContact.emails && selectedContact.emails.length) {
+          info = selectedContact.emails[0].email;
+        }
+
         setReceiveQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'paymentTrustedContactQR',
             ver: appVersion,
@@ -263,13 +292,10 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
+    let { trustedContactsInfo } = useSelector(
+      (state) => state.trustedContacts.trustedContacts,
     );
-    console.log({ trustedContactsInfo });
-
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
@@ -298,11 +324,11 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    console.log({ trustedContactsInfo });
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   const createTrustedContact = useCallback(async () => {
@@ -314,6 +340,21 @@ export default function Receive(props) {
       }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (selectedContact.phoneNumbers && selectedContact.phoneNumbers.length) {
+        const phoneNumber = selectedContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (selectedContact.emails && selectedContact.emails.length) {
+        info = selectedContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const { receivingAddress } =
@@ -324,7 +365,7 @@ export default function Receive(props) {
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
 
@@ -338,9 +379,7 @@ export default function Receive(props) {
           contactName,
         );
         if (res.status !== 200) {
-          console.log(
-            'Err occurred while generating derivative account',
-          );
+          console.log('Err occurred while generating derivative account');
         } else {
           // refresh the account number
           accountNumber =
@@ -356,7 +395,7 @@ export default function Receive(props) {
       let trustedPaymentURI;
       if (amount) {
         trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
 
@@ -365,7 +404,7 @@ export default function Receive(props) {
           const walletID = await AsyncStorage.getItem('walletID');
           const FCM = await AsyncStorage.getItem('fcmToken');
 
-          const data: EphemeralData = {
+          const data: EphemeralDataElements = {
             walletID,
             FCM,
             paymentDetails: {
@@ -379,7 +418,7 @@ export default function Receive(props) {
               },
             },
           };
-          dispatch(updateEphemeralChannel(contactName, data));
+          dispatch(updateEphemeralChannel(contactInfo, data));
         })();
       } else if (
         !trustedContact.symmetricKey &&
@@ -392,7 +431,7 @@ export default function Receive(props) {
 
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -409,7 +448,7 @@ export default function Receive(props) {
             .paymentURI === paymentURI
         )
           return;
-        const data: EphemeralData = {
+        const data: EphemeralDataElements = {
           paymentDetails: {
             trusted: {
               address: trustedReceivingAddress,
@@ -421,7 +460,7 @@ export default function Receive(props) {
             },
           },
         };
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       }
     }
   }, [
@@ -474,11 +513,10 @@ export default function Receive(props) {
 
   const renderAddContactAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
+      <ModalHeader
+      // onPressHeader={() => {
+      //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   };
@@ -500,6 +538,10 @@ export default function Receive(props) {
           setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
+          setTimeout(() => {
+            setAsTrustedContact(!AsTrustedContact);
+            setSelectedContact({});
+          }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -522,6 +564,15 @@ export default function Receive(props) {
         info={
           'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
         }
+        infoText={
+          receiveLink.includes('https://hexawallet.io')
+            ? `Click here to accept contact request from ${
+                WALLET_SETUP.walletName
+              } Hexa wallet - link will expire in ${
+                config.TC_REQUEST_EXPIRY / (60000 * 60)
+              } hours`
+            : null
+        }
         amount={amount === '' ? null : amount}
         link={receiveLink}
         serviceType={serviceType}
@@ -539,10 +590,10 @@ export default function Receive(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -553,7 +604,7 @@ export default function Receive(props) {
       <SendViaQR
         isFromReceive={true}
         headerText={'QR'}
-        subHeaderText={'Scan bitcoin address'}
+        subHeaderText={'Scan QR for contact request'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
@@ -575,10 +626,10 @@ export default function Receive(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -603,7 +654,12 @@ export default function Receive(props) {
       //     }
       //   }}
       // />
-      <ReceiveHelpContents />
+      <ReceiveHelpContents
+        titleClicked={() => {
+          if (ReceiveHelperBottomSheet.current)
+            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   }, [serviceType]);
 
@@ -631,79 +687,13 @@ export default function Receive(props) {
 
   const renderSecureReceiveWarningContents = useCallback(() => {
     return (
-      <View style={styles.modalContainer}>
-        <ScrollView>
-          <View
-            style={{
-              height: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: hp('2%'),
-            }}
-          >
-            <BottomInfoBox
-              title={'Note'}
-              infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
-              }
-            />
-
-            <View
-              style={{
-                paddingLeft: 20,
-                paddingRight: 20,
-                flexDirection: 'row',
-                marginTop: hp('1%'),
-                marginBottom: hp('1%'),
-              }}
-            >
-              <AppBottomSheetTouchableWrapper
-                onPress={() => {
-                  if (SecureReceiveWarningBottomSheet.current)
-                    (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-                }}
-                style={{
-                  ...styles.confirmButtonView,
-                  backgroundColor: Colors.blue,
-                  elevation: 10,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  marginRight: 5,
-                  shadowOffset: { width: 15, height: 15 },
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.white,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Ok, I understand
-                </Text>
-              </AppBottomSheetTouchableWrapper>
-              <AppBottomSheetTouchableWrapper
-                onPress={() => props.navigation.replace('ManageBackup')}
-                style={{
-                  ...styles.confirmButtonView,
-                  width: wp('30%'),
-                  marginLeft: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Manage Backup
-                </Text>
-              </AppBottomSheetTouchableWrapper>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
+      <TwoFASetupWarningModal
+        onPressOk={() => {
+          if (SecureReceiveWarningBottomSheet.current)
+            (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+        }}
+        onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+      />
     );
   }, [serviceType]);
 
@@ -712,10 +702,10 @@ export default function Receive(props) {
       <SmallHeaderModal
         borderColor={Colors.borderColor}
         backgroundColor={Colors.white}
-        onPressHeader={() => {
-          if (SecureReceiveWarningBottomSheet.current)
-            (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SecureReceiveWarningBottomSheet.current)
+        //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -821,7 +811,7 @@ export default function Receive(props) {
                   </View>
                   <TextInput
                     style={{ ...styles.textBox, paddingLeft: 10 }}
-                    placeholder={'Enter Amount in sats'}
+                    placeholder={'Enter amount in sats'}
                     value={amount}
                     returnKeyLabel="Done"
                     returnKeyType="done"
@@ -1092,6 +1082,7 @@ export default function Receive(props) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+      {/* {isLoading ? <Loader /> : null} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}
@@ -1104,6 +1095,7 @@ export default function Receive(props) {
         renderHeader={renderReceiveHelperHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
@@ -1114,6 +1106,7 @@ export default function Receive(props) {
         renderHeader={renderAddContactAddressBookHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -1124,6 +1117,7 @@ export default function Receive(props) {
         renderHeader={renderSendViaLinkHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
@@ -1134,6 +1128,7 @@ export default function Receive(props) {
         renderHeader={renderSendViaQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SecureReceiveWarningBottomSheet as any}
         snapPoints={[
@@ -1279,11 +1274,36 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-  confirmButtonView: {
+  TwoFAWarningButtonView: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: 'row',
+    marginTop: hp('1%'),
+    marginBottom: hp('2%'),
+    marginLeft: hp('2%'),
+  },
+  TwoFAWarningButton: {
     width: wp('40%'),
     height: wp('13%'),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    backgroundColor: Colors.blue,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    marginRight: 5,
+    shadowOffset: { width: 15, height: 15 },
+  },
+  TwoFAWarningButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  TwoFAWarningView: {
+    height: '100%',
+    alignItems: 'center',
+    marginTop: hp('2%'),
+    flex: 1,
   },
 });

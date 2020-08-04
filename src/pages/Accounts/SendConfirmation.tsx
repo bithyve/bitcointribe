@@ -11,7 +11,10 @@ import {
   StatusBar,
   ActivityIndicator,
   AsyncStorage,
+  Alert,
+  Platform,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -49,6 +52,8 @@ import {
   notificationType,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -65,10 +70,11 @@ export default function SendConfirmation(props) {
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const sweepSecure = props.navigation.getParam('sweepSecure');
-  const netBalance = props.navigation.getParam('netBalance');
+  const spendableBalance = props.navigation.getParam('spendableBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
@@ -78,6 +84,10 @@ export default function SendConfirmation(props) {
     React.createRef<BottomSheet>(),
   );
   const [SelectedContactId, setSelectedContactId] = useState(0);
+  const [KnowMoreBottomSheet, setKnowMoreBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   // const [amount, setAmount] = useState('');
 
   // useEffect(() => {
@@ -107,7 +117,7 @@ export default function SendConfirmation(props) {
     if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
     descriptionHistory[txid] = description;
 
-    console.log(descriptionHistory[txid]);
+    //console.log(descriptionHistory[txid]);
     await AsyncStorage.setItem(
       'descriptionHistory',
       JSON.stringify(descriptionHistory),
@@ -135,7 +145,11 @@ export default function SendConfirmation(props) {
           .trim();
         const recipient =
           trustedContactsService.tc.trustedContacts[contactName];
-        receivers.push({ walletId: recipient.walletID, FCMs: recipient.FCMs });
+        if (recipient.walletID && recipient.FCMs.length)
+          receivers.push({
+            walletId: recipient.walletID,
+            FCMs: recipient.FCMs,
+          });
       }
     });
     const notification: INotification = {
@@ -149,7 +163,7 @@ export default function SendConfirmation(props) {
   }, []);
 
   useEffect(() => {
-    console.log('transfer', transfer);
+    //console.log('transfer', transfer);
     if (transfer.stage2.failed) {
       setTimeout(() => {
         SendUnSuccessBottomSheet.current.snapTo(1);
@@ -160,7 +174,18 @@ export default function SendConfirmation(props) {
         updateDescription(transfer.txid, transfer.details[0].note);
       }
       storeTrustedContactsHistory(transfer.details);
-      SendSuccessBottomSheet.current.snapTo(1);
+      dispatch(
+        fetchBalanceTx(serviceType, {
+          loader: true,
+          syncTrustedDerivative:
+            serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        }),
+      );
+      setTimeout(() => {
+        SendSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
@@ -214,6 +239,10 @@ export default function SendConfirmation(props) {
   };
 
   const onConfirm = useCallback(() => {
+    setTimeout(() => {
+      setIsConfirmDisabled(true);
+    }, 1);
+    dispatch(clearTransfer(serviceType, 'stage2'));
     const txPriority =
       sliderValueText === 'Low Fee'
         ? 'low'
@@ -270,6 +299,7 @@ export default function SendConfirmation(props) {
         }}
         item={item}
         SelectedContactId={SelectedContactId}
+        serviceType={serviceType}
       />
     );
   };
@@ -289,13 +319,15 @@ export default function SendConfirmation(props) {
     );
   };
 
-  const getTotalAmount = () => {
-    let totalAmount = 0;
-    transfer.details.map((item) => {
-      totalAmount += parseInt(item.bitcoinAmount);
-    });
-    return totalAmount;
-  };
+  useEffect(() => {
+    if (transfer.details) {
+      let totalAmount = 0;
+      transfer.details.map((item) => {
+        totalAmount += parseInt(item.bitcoinAmount);
+      });
+      if (totalAmount) setTotalAmount(totalAmount);
+    }
+  }, [transfer]);
 
   const renderBitCoinAmountText = () => {
     return (
@@ -321,7 +353,7 @@ export default function SendConfirmation(props) {
             marginLeft: 10,
           }}
         >
-          {getTotalAmount()}
+          {totalAmount}
         </Text>
         <Text
           style={{
@@ -331,7 +363,7 @@ export default function SendConfirmation(props) {
             marginRight: 5,
           }}
         >
-          {' sats'}
+          {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
         </Text>
       </View>
     );
@@ -355,37 +387,59 @@ export default function SendConfirmation(props) {
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
         isCancel={false}
-        onPressOk={() => {
-          if (SendSuccessBottomSheet.current)
-            SendSuccessBottomSheet.current.snapTo(0);
-
-          dispatch(clearTransfer(serviceType));
-          // dispatch(fetchTransactions(serviceType));
-          dispatch(
-            fetchBalanceTx(serviceType, {
-              loader: true,
-              syncTrustedDerivative:
-                serviceType === REGULAR_ACCOUNT ||
-                serviceType === SECURE_ACCOUNT
-                  ? true
-                  : false,
-            }),
-          );
-          props.navigation.navigate('Accounts');
-        }}
+        onPressOk={() => onTransactionStage1Success()}
         isSuccess={true}
+        serviceType={serviceType}
       />
     );
+  };
+
+  const onTransactionStage1Success = () => {
+    if (SendSuccessBottomSheet.current)
+      SendSuccessBottomSheet.current.snapTo(0);
+
+    dispatch(clearTransfer(serviceType));
+    // dispatch(fetchTransactions(serviceType));
+    // dispatch(
+    //   fetchBalanceTx(serviceType, {
+    //     loader: true,
+    //     syncTrustedDerivative:
+    //       serviceType === REGULAR_ACCOUNT ||
+    //       serviceType === SECURE_ACCOUNT
+    //         ? true
+    //         : false,
+    //   }),
+    // );
+
+    props.navigation.navigate('Accounts', {
+      serviceType,
+      index:
+        serviceType === TEST_ACCOUNT
+          ? 0
+          : serviceType === REGULAR_ACCOUNT
+          ? 1
+          : 2,
+      spendableBalance: spendableBalance - totalAmount,
+    });
   };
 
   const renderSendSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendSuccessBottomSheet.current)
-            SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
-        }}
+        // onPressHeader={() => {
+        //   if (SendSuccessBottomSheet.current)
+        //     SendSuccessBottomSheet.current.snapTo(0);
+        //   props.navigation.navigate('Accounts', {
+        //     serviceType,
+        //     index:
+        //       serviceType === TEST_ACCOUNT
+        //         ? 0
+        //         : serviceType === REGULAR_ACCOUNT
+        //         ? 1
+        //         : 2,
+        //     spendableBalance: spendableBalance - totalAmount,
+        //   });
+        // }}
       />
     );
   };
@@ -394,7 +448,7 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={'Something went wrong, please try again'}
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
@@ -420,14 +474,50 @@ export default function SendConfirmation(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if (SendUnSuccessBottomSheet.current)
-            SendUnSuccessBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   //  dispatch(clearTransfer(serviceType));
+        //   if (SendUnSuccessBottomSheet.current)
+        //     SendUnSuccessBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   };
+
+  const renderKnowMoreContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={'Note'}
+        // image={require('../../assets/images/icons/regular.png')}
+        boldPara={''}
+        helperInfo={
+          'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
+        }
+        // continueButtonText={'Ok, got it'}
+        // onPressContinue={() => {
+        //   if (KnowMoreBottomSheet.current)
+        //     (KnowMoreBottomSheet as any).current.snapTo(0);
+        // }}
+      />
+    );
+  };
+
+  const renderKnowMoreHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          KnowMoreBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
 
   return (
     <View
@@ -443,6 +533,7 @@ export default function SendConfirmation(props) {
       <View style={styles.modalHeaderTitleView}>
         <View
           style={{
+            flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
           }}
@@ -450,6 +541,7 @@ export default function SendConfirmation(props) {
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack();
+              dispatch(clearTransfer(serviceType, 'stage1'));
             }}
             style={{
               height: 30,
@@ -487,6 +579,22 @@ export default function SendConfirmation(props) {
                 : 'Savings Account'}
             </Text>
           </View>
+          <TouchableOpacity
+            onPress={() => {
+              KnowMoreBottomSheet.current.snapTo(1);
+            }}
+            style={{ marginLeft: 'auto' }}
+          >
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                // marginLeft: 'auto',
+              }}
+            >
+              Know more
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView>
@@ -528,13 +636,13 @@ export default function SendConfirmation(props) {
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {serviceType == 'Test Account'
-                ? UsNumberFormat(netBalance)
+              {serviceType == TEST_ACCOUNT
+                ? UsNumberFormat(spendableBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
+                ? UsNumberFormat(spendableBalance)
                 : exchangeRates
                 ? (
-                    (netBalance / 1e8) *
+                    (spendableBalance / 1e8) *
                     exchangeRates[CurrencyCode].last
                   ).toFixed(2)
                 : null}
@@ -546,7 +654,7 @@ export default function SendConfirmation(props) {
                 fontFamily: Fonts.FiraSansMediumItalic,
               }}
             >
-              {serviceType == 'Test Account'
+              {serviceType == TEST_ACCOUNT
                 ? ' t-sats )'
                 : switchOn
                 ? ' sats )'
@@ -697,7 +805,7 @@ export default function SendConfirmation(props) {
                 {transfer.stage1.txPrerequisites
                   ? transfer.stage1.txPrerequisites['low'].fee
                   : ''}
-                {' sats'})
+                {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
               </Text>
               <Text
                 style={{
@@ -735,14 +843,14 @@ export default function SendConfirmation(props) {
             </View>
           </View>
         </View>
-        <View style={{ marginTop: hp('3%') }}>
+        {/* <View style={{ marginTop: hp('3%') }}>
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
             }
           />
-        </View>
+        </View> */}
 
         <View
           style={{
@@ -755,18 +863,21 @@ export default function SendConfirmation(props) {
         >
           <TouchableOpacity
             onPress={onConfirm}
-            disabled={loading.transfer}
+            disabled={isConfirmDisabled || loading.transfer}
             style={{
               ...styles.confirmButtonView,
-              backgroundColor: Colors.blue,
+              backgroundColor: isConfirmDisabled
+                ? Colors.lightBlue
+                : Colors.blue,
               elevation: 10,
               shadowColor: Colors.shadowBlue,
               shadowOpacity: 1,
               shadowOffset: { width: 15, height: 15 },
             }}
           >
-            {loading.transfer ? (
-              <ActivityIndicator size="small" />
+            {(!isConfirmDisabled && loading.transfer) ||
+            (isConfirmDisabled && loading.transfer) ? (
+              <ActivityIndicator size="small" color={Colors.white} />
             ) : (
               <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
             )}
@@ -777,6 +888,7 @@ export default function SendConfirmation(props) {
               width: wp('30%'),
             }}
             onPress={() => {
+              dispatch(clearTransfer(serviceType, 'stage1'));
               props.navigation.goBack();
             }}
           >
@@ -787,7 +899,8 @@ export default function SendConfirmation(props) {
         </View>
       </ScrollView>
       <BottomSheet
-        onCloseStart={() => {}}
+        onCloseStart={() => onTransactionStage1Success()}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -799,11 +912,26 @@ export default function SendConfirmation(props) {
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
         renderContent={renderSendUnSuccessContents}
         renderHeader={renderSendUnSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={false}
+        ref={KnowMoreBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('20%')
+            : Platform.OS == 'android'
+            ? hp('21%')
+            : hp('20%'),
+        ]}
+        renderContent={renderKnowMoreContents}
+        renderHeader={renderKnowMoreHeader}
       />
     </View>
   );

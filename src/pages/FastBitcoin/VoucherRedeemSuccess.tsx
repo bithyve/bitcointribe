@@ -15,10 +15,10 @@ export default function VoucherRedeemSuccess(props) {
       <View>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.modalTitleText}>
-          Voucher redeemed successfully
+            Voucher redeemed successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-          Congratulations, you have successfully redeemed the voucher
+            Congratulations, the voucher has been redeemed successfully but bitcoin will be delivered and they should receive an email when that happens
           </Text>
         </View>
         <View style={styles.box}>
@@ -35,7 +35,7 @@ export default function VoucherRedeemSuccess(props) {
             style={{
               flexDirection: 'row',
               alignItems: 'flex-end',
-              marginTop:15
+              marginTop: 15
             }}
           >
             <Image
@@ -56,7 +56,7 @@ export default function VoucherRedeemSuccess(props) {
             marginBottom: wp('8%'),
           }}
         >
-          You can view the transaction in the account when the funds are delivered by FastBitcoins
+          The funds will be available in your Checking Account after you receive a transaction confirmation email from FastBitcoins.
         </Text>
         <View
           style={{
@@ -72,17 +72,17 @@ export default function VoucherRedeemSuccess(props) {
             {props.loading && props.loading == true ? (
               <ActivityIndicator size="small" />
             ) : (
-              <Text style={styles.proceedButtonText}>View Account</Text>
-            )}
+                <Text style={styles.proceedButtonText}>View Account</Text>
+              )}
           </AppBottomSheetTouchableWrapper>
-            <Image
-              source={
-                props.bottomImage
-                  ? props.bottomImage
-                  : require('../../assets/images/icons/illustration.png')
-              }
-              style={styles.successModalImage}
-            />
+          <Image
+            source={
+              props.bottomImage
+                ? props.bottomImage
+                : require('../../assets/images/icons/illustration.png')
+            }
+            style={styles.successModalImage}
+          />
         </View>
       </View>
     </View>

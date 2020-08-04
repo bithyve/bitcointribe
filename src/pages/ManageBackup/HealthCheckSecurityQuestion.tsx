@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import QuestionList from '../../common/QuestionList';
@@ -16,11 +17,16 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
+import { withNavigation } from 'react-navigation';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
-export default function HealthCheckSecurityQuestion(props) {
+function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
@@ -36,6 +42,10 @@ export default function HealthCheckSecurityQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [KnowMoreBottomSheet, setKnowMoreBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
 
   const setConfirm = () => {
     if (answer.length > 0 && answer != securityAnswer) {
@@ -43,6 +53,7 @@ export default function HealthCheckSecurityQuestion(props) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
         } else {
+          props.navigation.navigate('ReLogin');
           setAnswer(securityAnswer);
           setErrorText('');
           return;
@@ -88,6 +99,11 @@ export default function HealthCheckSecurityQuestion(props) {
     setDropdownBoxOpenClose(false);
   };
 
+  useEffect(()=>{
+    if((!errorText && !answer && answer && dropdownBoxValue.id) || (dropdownBoxValue.id && answer)) setIsDisabled(false)
+    else setIsDisabled(true)
+  }, [answer, errorText, dropdownBoxValue.id])
+
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View style={styles.modalContentContainer}>
@@ -102,6 +118,20 @@ export default function HealthCheckSecurityQuestion(props) {
                 the time of setting up the wallet
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => {
+                  KnowMoreBottomSheet.current.snapTo(1);
+              }}
+              style={{ marginLeft: 'auto' }}>
+              <Text
+                style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                // marginLeft: 'auto',
+                }}>
+                  Know more
+                </Text>
+              </TouchableOpacity>
           </View>
           <ScrollView style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
             <AppBottomSheetTouchableWrapper
@@ -231,10 +261,10 @@ export default function HealthCheckSecurityQuestion(props) {
                   {errorText}
                 </Text>
               ) : null}
-              <Text style={styles.modalInfoText}>
+              {/* <Text style={styles.modalInfoText}>
                 Security question and answer is never stored anywhere{'\n'}and
                 even your contacts don’t know this answer
-              </Text>
+              </Text> */}
             </View>
           </ScrollView>
           
@@ -248,7 +278,7 @@ export default function HealthCheckSecurityQuestion(props) {
             }}
           >
             <AppBottomSheetTouchableWrapper
-              disabled={errorText || !answer ? true : false}
+              disabled={isDisabled}
               onPress={() => {
                 setConfirm();
                 if (answer.trim() == securityAnswer.trim()) {
@@ -261,18 +291,52 @@ export default function HealthCheckSecurityQuestion(props) {
                 } else {
                   setErrorText('Answer is incorrect');
                 }
+                setIsDisabled(false);
               }}
-              style={styles.questionConfirmButton}
+              style={{...styles.questionConfirmButton, backgroundColor: isDisabled? Colors.lightBlue: Colors.blue}}
             >
               <Text style={styles.proceedButtonText}>
-                {errorText || !answer ? 'Try Again' : 'Confirm'}
+                {!errorText ? 'Confirm' : 'Try Again'}
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
       </View>
+      <BottomSheet
+        onCloseStart={() => {
+            KnowMoreBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={false}
+        ref={KnowMoreBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('32%')
+          : hp('36%'),
+        ]}
+        renderContent={() => (
+          <TestAccountHelperModalContents
+            topButtonText={'Note'}
+            boldPara={''}
+            helperInfo={
+              'Security question and answer is never stored anywhere and even your contacts don’t know this answer'
+            }
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.blue}
+            backgroundColor={Colors.blue}
+            onPressHeader={() => {
+              KnowMoreBottomSheet.current.snapTo(0);
+            }}
+          />
+        )}
+      />
     </View>
   );
 }
+
+export default withNavigation(HealthCheckSecurityQuestion);
 
 const styles = StyleSheet.create({
   modalContentContainer: {
@@ -352,7 +416,6 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
   },
   inputBox: {
     borderWidth: 0.5,

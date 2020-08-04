@@ -20,9 +20,11 @@ import HomePageShield from '../../components/HomePageShield';
 const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR', 'EUR'];
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
+
     return (
         <View style={{
             marginRight: 5,
@@ -48,7 +50,8 @@ const HomeHeader = ({
     CurrencyCode,
     navigation,
     overallHealth,
-    onSwitchToggle
+    onSwitchToggle,
+    setCurrencyToggleValue
 }) => {
     return (
         <View style={{ ...styles.headerViewContainer, flex: 1 }}>
@@ -156,7 +159,8 @@ const HomeHeader = ({
                         onpress={async () => {
                             onSwitchToggle(!switchOn)
                             let temp = !switchOn ? 'true' : '';
-                            await AsyncStorage.setItem('currencyToggleValue', temp);
+                            setCurrencyToggleValue(temp);
+                            //await AsyncStorage.setItem('currencyToggleValue', temp);
                         }}
                         toggle={switchOn}
                     />

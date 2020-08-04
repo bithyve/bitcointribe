@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   AsyncStorage,
+  Linking,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -102,10 +103,27 @@ export default function TransactionDetails(props) {
     }
   };
 
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        //console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <Text style={styles.modalHeaderTitleText}>
             {'Transaction Details'}
           </Text>
@@ -246,18 +264,22 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              To Address
+              {txDetails.recipientAddresses.length > 1
+                ? 'To Addresses'
+                : 'To Address'}
             </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.recipientAddresses[0]}
-            </Text>
+            {txDetails.recipientAddresses.map((address) => (
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                {address}
+              </Text>
+            ))}
           </View>
         ) : null}
         {txDetails.senderAddresses ? (
@@ -269,18 +291,22 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              From Address
+              {txDetails.senderAddresses.length > 1
+                ? 'From Addresses'
+                : 'From Address'}
             </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.senderAddresses[0]}
-            </Text>
+            {txDetails.senderAddresses.map((address) => (
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                {address}
+              </Text>
+            ))}
           </View>
         ) : null}
         <View style={styles.infoCardView}>
@@ -338,16 +364,26 @@ export default function TransactionDetails(props) {
           >
             Transaction ID
           </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12),
-              marginTop: hp('0.5%'),
-            }}
+          <AppBottomSheetTouchableWrapper
+            onPress={() =>
+              openLink(
+                `https://blockstream.info${
+                  txDetails.accountType === 'Test Account' ? '/testnet' : ''
+                }/tx/${txDetails.txid}`,
+              )
+            }
           >
-            {txDetails.txid}
-          </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('0.5%'),
+              }}
+            >
+              {txDetails.txid}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
         </View>
         <View style={styles.infoCardView}>
           <Text
@@ -367,7 +403,15 @@ export default function TransactionDetails(props) {
               marginTop: hp('0.5%'),
             }}
           >
-            {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
+            {txDetails.accountType === 'Test Account'
+              ? txDetails.confirmations < 6
+                ? txDetails.confirmations
+                : txDetails.confirmations === '-' // for testnet faucet tx
+                ? txDetails.confirmations
+                : '6+'
+              : txDetails.confirmations < 6
+              ? txDetails.confirmations
+              : '6+'}
           </Text>
         </View>
       </View>

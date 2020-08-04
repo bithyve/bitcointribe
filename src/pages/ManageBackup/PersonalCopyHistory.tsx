@@ -114,6 +114,8 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
+  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(React.createRef());
+
   useEffect(() => {
     if (personalCopiesGenerated === false) {
       Alert.alert(
@@ -135,6 +137,9 @@ const PersonalCopyHistory = (props) => {
     (async () => {
       const blockPCShare = await AsyncStorage.getItem('blockPCShare');
       if (blockPCShare) {
+        setBlockReshare(blockPCShare);
+      } else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+        AsyncStorage.setItem('blockPCShare', 'true');
         setBlockReshare(blockPCShare);
       }
     })();
@@ -303,9 +308,9 @@ const PersonalCopyHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -449,8 +454,40 @@ const PersonalCopyHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <PersonalCopyHelpContents />;
+    return <PersonalCopyHelpContents 
+    titleClicked={()=>{
+      if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+    }}/>;
   };
+
+  const renderMailOptionsHeader = () => {
+    return(
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (mailOptionsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const renderMailOptionsContent = () => {
+    return(
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
+          <Image style={{}} source={require('../../assets/images/icons/icon_email.png')} />
+          <Text style={{}}>Default App</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
+          <Image style={{}} source={require('../../assets/images/icons/openlink.png')} />
+          <Text style={{}}>Default App</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -533,7 +570,7 @@ const PersonalCopyHistory = (props) => {
                   ? getIconByStatus(
                       props.navigation.state.params.selectedStatus,
                     )
-                  : require('../../assets/images/icons/settings.png')
+                  : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
           </View>
@@ -579,6 +616,7 @@ const PersonalCopyHistory = (props) => {
         renderHeader={renderPersonalCopyShareModalHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
