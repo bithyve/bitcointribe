@@ -219,63 +219,50 @@ const HistoryPageComponent = (props) => {
           </View>
         </View>
       )}
-
       <View
         style={{
-          justifyContent: 'center',
-          height: hp('20%'),
-          backgroundColor: Colors.white,
+          height: hp('18%'),
+          flexDirection: 'row',
+          marginTop: 'auto',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginLeft: wp('8%'),
+          marginRight: wp('8%'),
         }}
       >
-        {/* <TouchableOpacity
-            onPress={() => {
-              props.onPressConfirm();
-            }}
+        <TouchableOpacity
+          onPress={() => {
+            props.onPressConfirm();
+          }}
+          style={styles.successModalButtonView}
+        >
+          <Text
             style={{
-              backgroundColor: Colors.blue,
+              ...styles.proceedButtonText,
+              color: Colors.white,
+            }}
+          >
+            Confirm Question
+          </Text>
+        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.onPressIgnore()}
+            style={{
               height: wp('13%'),
               width: wp('40%'),
               justifyContent: 'center',
               alignItems: 'center',
-              borderRadius: 10,
-              marginTop: hp('3%'),
-              marginBottom: hp('3%'),
-              elevation: 10,
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text
               style={{
-                color: Colors.white,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansMedium,
+                ...styles.proceedButtonText,
+                color: Colors.blue,
               }}
             >
-              Confirm Question
+              Change Question
             </Text>
-            </TouchableOpacity> */}
-        <View style={styles.bottomButtonInnerView}>
-          <TouchableOpacity
-            onPress={() => {
-              props.onPressConfirm();
-            }}
-            style={styles.buttonInnerView}
-          >
-            <Text style={styles.buttonText}>Confirm Question</Text>
           </TouchableOpacity>
-          <View
-            style={{
-              width: 1,
-              height: 30,
-              backgroundColor: Colors.white,
-            }}
-          />
-          <TouchableOpacity style={styles.buttonInnerView} onPress={() => {props.onPressChangeQuestion()}}>
-            <Text style={styles.buttonText}>Change Question</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
@@ -308,5 +295,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: wp('30%'),
+  },
+  successModalButtonView: {
+    height: wp('13%'),
+    width: wp('40%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
   },
 });

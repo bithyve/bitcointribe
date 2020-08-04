@@ -147,8 +147,18 @@ class ManageBackup extends Component<
         this.setState({ selectedId: levelData[a].id });
     }
     let level = 1;
-    if(levelData.findIndex(value=>value.status=='ugly' || value.status=='')) level = levelData[levelData.findIndex(value=>value.status=='ugly' || value.status=='')-1].id
-    this.setState({securityAtLevel: level })
+    if (
+      levelData.findIndex(
+        (value) => value.status == 'ugly' || value.status == '',
+      )
+    )
+      level =
+        levelData[
+          levelData.findIndex(
+            (value) => value.status == 'ugly' || value.status == '',
+          ) - 1
+        ].id;
+    this.setState({ securityAtLevel: level });
   };
 
   componentDidMount = () => {
@@ -247,7 +257,8 @@ class ManageBackup extends Component<
                     shadowOpacity:
                       selectedId && selectedId == value.id ? 10 : 0,
                     shadowOffset: { width: 5, height: 5 },
-                    elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
+                    elevation:
+                      selectedId == value.id || selectedId == 0 ? 10 : 0,
                     opacity:
                       selectedId == value.id || selectedId == 0 ? 1 : 0.3,
                   }}
@@ -258,7 +269,10 @@ class ManageBackup extends Component<
                         <View
                           style={{
                             ...styles.cardHealthImageView,
-                            elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
+                            elevation:
+                              selectedId == value.id || selectedId == 0
+                                ? 10
+                                : 0,
                             backgroundColor:
                               value.status == 'ugly'
                                 ? Colors.red
@@ -442,7 +456,7 @@ class ManageBackup extends Component<
                                     position: 'absolute',
                                     top: 0,
                                     right: 0,
-                                    borderRadius: wp('1%')/2
+                                    borderRadius: wp('1%') / 2,
                                   }}
                                 />
                               </ImageBackground>
@@ -665,18 +679,19 @@ class ManageBackup extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('60%'),
+              ? hp('60%')
+              : hp('70'),
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
-            onPressOk={()=>{navigation.navigate('KeeperFeatures');
-            (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
-          }
-            onPressContinue={() =>
-              {navigation.navigate('KeeperFeatures');
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
-              }
+              onPressBack={() => {
+                navigation.navigate('KeeperFeatures');
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
+              onPressContinue={() => {
+                navigation.navigate('KeeperFeatures');
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
             />
           )}
           renderHeader={() => (

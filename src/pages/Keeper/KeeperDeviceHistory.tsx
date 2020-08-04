@@ -391,8 +391,8 @@ const KeeperDeviceHistory = (props) => {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('75%'),
+              ? hp('60%')
+              : hp('70%'),
           ]}
           renderContent={() => (
             <ApproveSetup

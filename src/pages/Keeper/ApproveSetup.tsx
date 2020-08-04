@@ -10,6 +10,7 @@ import {
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import CountDown from '../../components/CountDown';
 
 export default function ApproveSetup(props) {
   return (
@@ -31,7 +32,7 @@ export default function ApproveSetup(props) {
             nonumy eirmod
           </Text>
         </View>
-        <ScrollView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <View style={styles.grayBox}>
             <View style={styles.grayBoxImageView}>
               <Image
@@ -77,13 +78,38 @@ export default function ApproveSetup(props) {
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
-        </ScrollView>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
-          }
+        </View>
+        <View style={{marginBottom: hp('4%')}}>
+        <View
+          style={{
+            height: 0.5,
+            backgroundColor: Colors.borderColor,
+            marginLeft: wp('10%'),
+            marginRight: wp('10%'),
+            marginBottom: wp('10%')
+          }}
         />
+        <CountDown
+          size={15}
+          until={600}
+          // onFinish={() => props.onPressContinue()}
+          digitStyle={{
+            backgroundColor: '#FFF',
+            borderWidth: 0,
+            borderColor: '#FFF',
+            margin: -10,
+          }}
+          digitTxtStyle={{
+            color: Colors.blue,
+            fontSize: RFValue(19),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+          separatorStyle={{ color: Colors.blue }}
+          timeToShow={['M', 'S']}
+          timeLabels={{ m: null, s: null }}
+          showSeparator
+        />
+        </View>
       </View>
     </View>
   );
@@ -164,6 +190,6 @@ const styles = StyleSheet.create({
   bottomButtonView: {
     height: 'auto',
     paddingBottom: wp('8%'),
-    marginTop: wp('5%')
+    marginTop: 'auto',
   },
 });

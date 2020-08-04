@@ -8,6 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import CopyThisText from '../../components/CopyThisText';
 
 export default function SetupPrimaryKeeper(props) {
   return (
@@ -36,44 +37,53 @@ export default function SetupPrimaryKeeper(props) {
             style={{ width: wp('85%'), height: wp('15%'), resizeMode: 'cover' }}
           />
         </AppBottomSheetTouchableWrapper>
-        <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressContinue()}
-          activeOpacity={10}
-          style={{
-            ...styles.grayBox,
-            width: wp('85%'),
-            height: wp('15%'),
-          }}
-        >
-          <Text numberOfLines={1} style={styles.grayBoxLinkText}>
-            http://hexawallet.io/keeperapp
+        <CopyThisText text={'http://hexawallet.io/keeperapp'}/>
+        <View style={styles.successModalHeaderView}>
+          <Text style={styles.modalInfoText}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore.
           </Text>
-        </AppBottomSheetTouchableWrapper>
-
-        <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressOk()}
+        </View>
+        <View
           style={{
-            backgroundColor: Colors.blue,
-            borderRadius: 10,
-            width: wp('50%'),
-            height: wp('13%'),
-            justifyContent: 'center',
+            height: hp('18%'),
+            flexDirection: 'row',
+            marginTop: 'auto',
             alignItems: 'center',
-            alignSelf: 'center',
-            marginTop: hp('3%'),
-            marginBottom: hp('3%'),
           }}
         >
-          <Text
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onPressContinue()}
+            style={styles.successModalButtonView}
+          >
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+              Proceed
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onPressBack()}
             style={{
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansMedium,
+              height: wp('13%'),
+              width: wp('35%'),
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            Yes, I have downloaded
-          </Text>
-        </AppBottomSheetTouchableWrapper>
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.blue,
+              }}
+            >
+              Back
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        </View>
       </View>
     </View>
   );
@@ -108,11 +118,23 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
   },
-  grayBoxLinkText: {
-    fontFamily: Fonts.FiraSansRegular,
-    width: wp('70%'),
-    textAlign: 'center',
-    color: Colors.blue,
+  successModalButtonView: {
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+    marginLeft: wp('8%'),
+  },
+  proceedButtonText: {
+    color: Colors.white,
     fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
   },
 });

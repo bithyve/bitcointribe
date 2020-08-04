@@ -28,6 +28,7 @@ import HistoryPageComponent from './HistoryPageComponent';
 import ModalHeader from '../../components/ModalHeader';
 import HealthCheckSecurityQuestion from '../ManageBackup/HealthCheckSecurityQuestion';
 import BottomSheet from 'reanimated-bottom-sheet';
+import SecurityQuestion from './SecurityQuestion';
 
 const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
@@ -66,32 +67,29 @@ const SecurityQuestionHistory = (props) => {
   const next = props.navigation.getParam('next');
   const dispatch = useDispatch();
 
-    const renderSecurityQuestionContent = useCallback(() => {
-      return (
-        <HealthCheckSecurityQuestion
-          bottomSheetRef={SecurityQuestionBottomSheet}
-          onPressConfirm={async () => {
-            Keyboard.dismiss();
-            updateAutoHighlightFlags();
-            saveConfirmationHistory();
-            setTimeout(() => {
-              (SecurityQuestionBottomSheet as any).current.snapTo(0);
-            }, 2);
-            (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
-          }}
-        />
-      );
-    }, []);
-
-    const renderSecurityQuestionHeader = useCallback(() => {
-      return (
-        <ModalHeader
-          onPressHeader={() => {
+  const renderSecurityQuestionContent = useCallback(() => {
+    return (
+      <SecurityQuestion
+        bottomSheetRef={SecurityQuestionBottomSheet}
+        onPressConfirm={async () => {
+          Keyboard.dismiss();
+          setTimeout(() => {
             (SecurityQuestionBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    }, []);
+          }, 2);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSecurityQuestionHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (SecurityQuestionBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   //   const renderHealthCheckSuccessModalContent = useCallback(() => {
   //     return (
@@ -245,20 +243,12 @@ const SecurityQuestionHistory = (props) => {
           type={'security'}
           IsReshare
           data={sortedHistory(securityQuestionsHistory)}
-          // reshareInfo={
-          //   'Want to send the Recovery Key again to the same destination? '
-          // }
-            onPressConfirm={() => {
-              // ConfirmBottomSheet.current.snapTo(1);
-              // alert('confirm');
-              (SecurityQuestionBottomSheet as any).current.snapTo(1);
-            }}
-            onPressChangeQuestion={()=>{
-              props.navigation.navigate('NewOwnQuestions');
-            }}
-          //   onPressContinue={() => {
-          //     (SecurityQuestionBottomSheet as any).current.snapTo(1);
-          //   }}
+          onPressConfirm={() => {
+            (SecurityQuestionBottomSheet as any).current.snapTo(1);
+          }}
+          onPressChangeQuestion={()=>{
+            props.navigation.navigate('NewOwnQuestions');
+          }}
         />
        </View>
        <BottomSheet
@@ -268,17 +258,6 @@ const SecurityQuestionHistory = (props) => {
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
-     {/* <BottomSheet
-         enabledGestureInteraction={false}
-         enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderHealthCheckSuccessModalContent}
-        renderHeader={renderHealthCheckSuccessModalHeader}
-      /> */}
     </View>
   );
 };
