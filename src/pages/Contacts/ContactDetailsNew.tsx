@@ -999,13 +999,12 @@ class ContactDetailsNew extends PureComponent<
                   }}
                   style={styles.resendContainer}
                 >
-                  {this.Contact.hasXpub ||
-                    (this.Contact.hasTrustedAddress && (
-                      <Image
-                        source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                        style={styles.bitcoinIconStyle}
-                      />
-                    ))}
+                  {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
+                    <Image
+                      source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                      style={styles.bitcoinIconStyle}
+                    />
+                  ) : null}
                   <Text style={styles.sendTextStyle}>
                     {this.Contact.hasXpub || this.Contact.hasTrustedAddress
                       ? 'Send'
@@ -1050,7 +1049,7 @@ class ContactDetailsNew extends PureComponent<
                 backgroundColor={Colors.white}
                 title={'Note'}
                 infoText={
-                  'The details of your friend and Family will come here.'
+                  'The details of your contact will appear here.'
                 }
               />
             </View>
@@ -1130,7 +1129,7 @@ class ContactDetailsNew extends PureComponent<
                   backgroundColor={Colors.white}
                   title={'Note'}
                   infoText={
-                    'The details of your friend and Family will come here.'
+                    'The details of your contact will appear here.'
                   }
                 />
               )}

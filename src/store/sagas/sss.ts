@@ -441,7 +441,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
-    Toast(`${tag}'s share uploaded`);
+    Toast(`${tag}'s Recovery Key sent.`);
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
@@ -905,12 +905,18 @@ function* updateMSharesHealthWorker({ payload }) {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
+  const trustedContactsService: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
   let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
   if (!DECENTRALIZED_BACKUP) {
     DECENTRALIZED_BACKUP = yield select(
       (state) => state.storage.database.DECENTRALIZED_BACKUP,
     );
   }
+
+  const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
   const metaShares = Object.keys(UNDER_CUSTODY).map(
@@ -936,17 +942,36 @@ function* updateMSharesHealthWorker({ payload }) {
           if (info.removeShare) {
             if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
               delete UNDER_CUSTODY[tag];
+
+              for (const contactName of Object.keys(
+                trustedContactsService.tc.trustedContacts,
+              )) {
+                const contact =
+                  trustedContactsService.tc.trustedContacts[contactName];
+                if (contact.walletID === info.walletId) {
+                  contact.isWard = false;
+                }
+              }
             }
           }
         }
       }
     });
+
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+    };
+
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       UNDER_CUSTODY,
     };
     yield call(insertDBWorker, {
-      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup,
+        SERVICES: updatedSERVICES,
+      },
     });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -1613,6 +1638,10 @@ function* updateWalletImageWorker({ payload }) {
 
   if (walletImageHashes) {
     const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    console.log({
+      previousDBHash: hashesWI.DECENTRALIZED_BACKUP,
+      currentDBHash,
+    });
     if (
       !hashesWI.DECENTRALIZED_BACKUP ||
       currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
@@ -1622,6 +1651,10 @@ function* updateWalletImageWorker({ payload }) {
     }
 
     const currentSHash = hash(SERVICES);
+    console.log({
+      previousSHash: hashesWI.SERVICES,
+      currentSHash,
+    });
     if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
       walletImage['SERVICES'] = SERVICES;
       hashesWI.SERVICES = currentSHash;
@@ -1630,6 +1663,10 @@ function* updateWalletImageWorker({ payload }) {
     const ASYNC_DATA = yield call(asyncDataToBackup);
     if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
+      console.log({
+        previousAsyncHash: hashesWI.ASYNC_DATA,
+        currentAsyncHash,
+      });
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
         hashesWI.ASYNC_DATA = currentAsyncHash;
