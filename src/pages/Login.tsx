@@ -318,7 +318,7 @@ export default function Login(props) {
             dispatch(calculateExchangeRate());
             setTimeout(() => {
               loaderBottomSheet.current.snapTo(0);
-              props.navigation.navigate('Home', {
+              props.navigation.navigate('RestoreWithICloud', {
                 custodyRequest,
                 recoveryRequest,
                 trustedContactRequest,

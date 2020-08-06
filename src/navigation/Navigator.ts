@@ -87,6 +87,7 @@ import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
 import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
 import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
+import RestoreWithICloud from "../pages/RestoreHexaWithKeeper/RestoreWithICloud";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -220,6 +221,7 @@ const HomeNavigator = createStackNavigator(
     KeeperDeviceHistory,
     PersonalCopyHistoryKeeper,
     NewOwnQuestions,
+    RestoreWithICloud,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
