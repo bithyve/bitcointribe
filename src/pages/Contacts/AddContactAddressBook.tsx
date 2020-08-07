@@ -462,7 +462,7 @@ export default function AddContactAddressBook(props) {
                   ) {
                     selected = true;
                   }
-                  if (item.phoneNumbers || item.emails) {
+                  // if (item.phoneNumbers || item.emails) {
                     return (
                       <AppBottomSheetTouchableWrapper
                         onPress={() => onContactSelect(index)}
@@ -488,9 +488,9 @@ export default function AddContactAddressBook(props) {
                         </Text>
                       </AppBottomSheetTouchableWrapper>
                     );
-                  } else {
-                    return null;
-                  }
+                  // } else {
+                  //   return null;
+                  // }
                 }}
               />
             ) : null}
