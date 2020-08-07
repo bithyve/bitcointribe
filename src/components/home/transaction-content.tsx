@@ -130,7 +130,7 @@ const TransactionsContent = ({
                       >
                         <Text style={styles.transactionModalTitleText}>
                           {item.accountType == FAST_BITCOINS
-                            ? 'FastBitcoins'
+                            ? 'FastBitcoins.com'
                             : item.accountType}{' '}
                         </Text>
                         <Text style={styles.transactionModalDateText}>

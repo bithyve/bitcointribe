@@ -680,7 +680,7 @@ export default function Receive(props) {
                     )}
                   </View>
                 </TouchableOpacity>
-                {!isEmpty(selectedContact) && (
+                {!isEmpty(selectedContact) && AsTrustedContact && (
                   <View style={styles.contactProfileView}>
                     <View
                       style={{ flexDirection: 'row', alignItems: 'center' }}
