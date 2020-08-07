@@ -71,7 +71,7 @@ export default function AddContactSendRequest(props) {
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
     : [];
-
+    console.log("SelectedContact",SelectedContact);
   const [Contact, setContact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
@@ -436,6 +436,13 @@ export default function AddContactSendRequest(props) {
     );
   }, []);
 
+  const setPhoneNumber = () =>{
+    let phoneNumber = Contact.phoneNumbers[0].number;
+    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+    number = number.slice(number.length - 10); // last 10 digits only
+    return number;
+  }
+  
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -558,7 +565,8 @@ export default function AddContactSendRequest(props) {
                       paddingTop: 3,
                     }}
                   >
-                    {Contact.phoneNumbers[0].digits}
+                    {setPhoneNumber()}
+                    {/* {Contact.phoneNumbers[0].digits} */}
                   </Text>
                 ) : Contact.emails && Contact.emails.length ? (
                   <Text
