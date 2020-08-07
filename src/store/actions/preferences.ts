@@ -111,11 +111,29 @@ const initAsyncMigrationFailed = createAction(INIT_ASYNC_MIGRATION_FAILED);
 export const initMigration = () => {
   return async dispatch => {
     dispatch(initAsyncMigrationRequest());
-    let data = await AsyncStorage.multiGet(["TrustedContactsInfo"])
+    let data = await AsyncStorage.multiGet(["TrustedContactsInfo", "currencyCode"])
     if (data && data[0] && data[0][1]) {
       let trustedContacts = data[0][1]
       dispatch(updateTrustedContactInfoLocally(JSON.parse(trustedContacts)))
     }
+    if (data && data[1]) {
+      let currencyCode = JSON.parse(data[1][1]) || 'USD'
+      dispatch(updatePreference(
+        {
+          key: 'currencyCode',
+          value: currencyCode,
+        }
+      ))
+    } else {
+      let currencyCode = 'USD'
+      dispatch(updatePreference(
+        {
+          key: 'currencyCode',
+          value: currencyCode,
+        }
+      ))
+    }
+
     dispatch(initAsyncMigrationSuccess());
   };
 }
