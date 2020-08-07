@@ -421,8 +421,12 @@ class SendToContact extends Component<
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
-    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
-      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+      ? 'MAINNET'
+      : 'TESTNET';
+
+    if (storedAverageTxFees && storedAverageTxFees[network]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[network];
       if (Date.now() - lastFetched < 1800000) {
         this.setState({ averageTxFees: averageTxFees });
         return;
@@ -435,7 +439,7 @@ class SendToContact extends Component<
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
       ...storedAverageTxFees,
-      [serviceType]: {
+      [network]: {
         averageTxFees,
         lastFetched: Date.now(),
       },

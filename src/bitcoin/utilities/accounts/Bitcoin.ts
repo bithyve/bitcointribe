@@ -15,6 +15,24 @@ const { TESTNET, MAINNET } = API_URLS;
 
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 export default class Bitcoin {
+  public static networkType = (scannedStr: string) => {
+    let address = scannedStr;
+    if (scannedStr.slice(0, 8) === 'bitcoin:') {
+      address = bip21.decode(scannedStr).address;
+    }
+    try {
+      bitcoinJS.address.toOutputScript(address, bitcoinJS.networks.bitcoin);
+      return 'MAINNET';
+    } catch (err) {
+      try {
+        bitcoinJS.address.toOutputScript(address, bitcoinJS.networks.testnet);
+        return 'TESTNET';
+      } catch (err) {
+        return '';
+      }
+    }
+  };
+
   public network: bitcoinJS.Network;
   public client: Client;
   public isTest: boolean = false; // flag for test account
