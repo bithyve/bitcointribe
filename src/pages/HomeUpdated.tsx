@@ -109,6 +109,7 @@ import {
   setSecondaryDeviceAddress,
 } from '../store/actions/preferences';
 import * as Permissions from 'expo-permissions';
+import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -385,63 +386,67 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   processQRData = async (qrData) => {
     const { accounts, addTransferDetails, navigation } = this.props;
-    const { balances } = this.state;
 
-    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
-    const { type } = regularService.addressDiff(qrData);
-    if (type) {
-      const serviceType = REGULAR_ACCOUNT; // default service type
-      let item;
-      switch (type) {
-        case 'address':
-          const recipientAddress = qrData;
-          item = {
-            id: recipientAddress,
-          };
+    const network = Bitcoin.networkType(qrData);
+    if (network) {
+      const serviceType =
+        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-          addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
-          navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-          });
-          break;
+      const service = accounts[serviceType].service;
+      const { type } = service.addressDiff(qrData);
+      if (type) {
+        let item;
+        switch (type) {
+          case 'address':
+            const recipientAddress = qrData;
+            item = {
+              id: recipientAddress,
+            };
 
-        case 'paymentURI':
-          let address, options;
-          try {
-            const res = regularService.decodePaymentURI(qrData);
-            address = res.address;
-            options = res.options;
-          } catch (err) {
-            Alert.alert('Unable to decode payment URI');
-            return;
-          }
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            });
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+            });
+            break;
 
-          item = {
-            id: address,
-          };
+          case 'paymentURI':
+            let address, options;
+            try {
+              const res = service.decodePaymentURI(qrData);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
 
-          addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
+            item = {
+              id: address,
+            };
 
-          navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-            bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
-              : '',
-          });
-          break;
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            });
 
-        default:
-          Toast('Invalid QR');
-          break;
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+              bitcoinAmount: options.amount
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
+            });
+            break;
+
+          default:
+            Toast('Invalid QR');
+            break;
+        }
+
+        return;
       }
-
-      return;
     }
 
     try {
