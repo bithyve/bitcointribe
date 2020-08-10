@@ -35,7 +35,7 @@ export default function PersonalCopyShareModal(props) {
       title: 'Sending Email',
       type: 'Email',
       flagShare: false,
-      info: 'Only native email app is supported for the email option. For other email apps, use ‘other options’',
+      info: 'Make sure that you delete the message from your device once it is sent',
       imageIcon: Icons.manageBackup.PersonalCopy.email,
     },
     {

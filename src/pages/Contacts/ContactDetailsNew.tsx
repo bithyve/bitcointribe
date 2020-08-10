@@ -967,9 +967,9 @@ class ContactDetailsNew extends PureComponent<
                 />
               </TouchableOpacity>
               {getImageIcon(contact)}
-              <View>
+              <View style={{flex: 1, marginRight: 5}}>
                 <Text style={styles.contactTypeText}>{this.contactsType}</Text>
-                <Text style={styles.contactText}>
+                <Text style={styles.contactText} ellipsizeMode="clip" numberOfLines={1}>
                   {this.Contact.contactName == 'Secondary Device'
                     ? 'Keeper Device'
                     : contact.contactName}
@@ -1335,7 +1335,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingRight: 10,
+    // paddingRight: 10,
     paddingBottom: 15,
     paddingTop: 10,
     marginLeft: 20,
@@ -1444,7 +1444,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.lightBlue,
     marginLeft: 'auto',
-    marginBottom: 10,
+    // marginBottom: 10,
     borderRadius: 4,
     flexDirection: 'row',
     alignSelf: 'flex-end',

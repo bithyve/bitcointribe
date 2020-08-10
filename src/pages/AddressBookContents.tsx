@@ -574,7 +574,7 @@ class AddressBookContents extends PureComponent<
             <View style={{ marginTop: wp('5%') }}>
               <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
-                Contacts who I can help restore their wallets
+                Contacts whose wallets I can help restore.
               </Text>
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
