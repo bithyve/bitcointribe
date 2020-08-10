@@ -242,6 +242,7 @@ export interface Contacts {
     privateKey: string;
     publicKey: string;
     encKey: string;
+    otp?: string;
     symmetricKey?: string;
     secondaryKey?: string;
     contactsPubKey?: string;

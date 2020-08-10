@@ -71,7 +71,7 @@ export default function AddContactSendRequest(props) {
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
     : [];
-    console.log("SelectedContact",SelectedContact);
+  console.log('SelectedContact', SelectedContact);
   const [Contact, setContact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
@@ -242,8 +242,9 @@ export default function AddContactSendRequest(props) {
         return;
       }
 
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
       const requester = WALLET_SETUP.walletName;
       const appVersion = DeviceInfo.getVersion();
       if (!trustedLink) {
@@ -290,11 +291,24 @@ export default function AddContactSendRequest(props) {
 
           console.log({ emailDL });
           setTrustedLink(emailDL);
+        } else if (otp) {
+          const otpHintType = 'otp';
+          const otpHint = 'xxx';
+          const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+            .encryptedPub;
+          const otpDL =
+            `https://hexawallet.io/${config.APP_STAGE}/tc` +
+            `/${requester}` +
+            `/${otpEncPubKey}` +
+            `/${otpHintType}` +
+            `/${otpHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
+            `/v${appVersion}`;
+
+          console.log({ otpDL });
+          setTrustedLink(otpDL);
         } else {
-          Alert.alert(
-            'Invalid Contact',
-            'Cannot add a contact without phone-num/email as a entity',
-          );
+          Alert.alert('Invalid Contact', 'Something went wrong.');
           return;
         }
         updateTrustedContactsInfo(Contact); // Contact initialized to become TC
@@ -309,6 +323,8 @@ export default function AddContactSendRequest(props) {
           info = number;
         } else if (Contact.emails && Contact.emails.length) {
           info = Contact.emails[0].email;
+        } else if (otp) {
+          info = otp;
         }
 
         setTrustedQR(
@@ -436,13 +452,13 @@ export default function AddContactSendRequest(props) {
     );
   }, []);
 
-  const setPhoneNumber = () =>{
+  const setPhoneNumber = () => {
     let phoneNumber = Contact.phoneNumbers[0].number;
     let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
     number = number.slice(number.length - 10); // last 10 digits only
     return number;
-  }
-  
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />

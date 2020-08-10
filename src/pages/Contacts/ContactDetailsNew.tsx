@@ -272,13 +272,28 @@ class ContactDetailsNew extends PureComponent<
 
       this.createDeepLink();
 
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
+
+      let info = '';
+      if (this.Contact.phoneNumbers && this.Contact.phoneNumbers.length) {
+        const phoneNumber = this.Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (this.Contact.emails && this.Contact.emails.length) {
+        info = this.Contact.emails[0].email;
+      } else if (otp) {
+        info = otp;
+      }
+
       this.setState({
         trustedQR: JSON.stringify({
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info,
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,
@@ -712,7 +727,7 @@ class ContactDetailsNew extends PureComponent<
       return;
     }
 
-    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const { publicKey, otp } = trustedContacts.tc.trustedContacts[contactName];
     const requester = WALLET_SETUP.walletName;
     const appVersion = DeviceInfo.getVersion();
     if (this.Contact.phoneNumbers && this.Contact.phoneNumbers.length) {
@@ -756,11 +771,27 @@ class ContactDetailsNew extends PureComponent<
       this.setState({
         trustedLink: emailDL,
       });
+    } else if (otp) {
+      const otpHintType = 'otp';
+      const otpHint = 'xxx';
+      const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+        .encryptedPub;
+      const otpDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tc` +
+        `/${requester}` +
+        `/${otpEncPubKey}` +
+        `/${otpHintType}` +
+        `/${otpHint}` +
+        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
+        `/v${appVersion}`;
+
+      console.log({ otpDL });
+      this.setState({
+        trustedLink: otpDL,
+      });
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a entity',
-      );
+      Alert.alert('Invalid Contact', 'Something went wrong.');
+      return;
     }
   };
 
@@ -1048,9 +1079,7 @@ class ContactDetailsNew extends PureComponent<
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={'Note'}
-                infoText={
-                  'The details of your contact will appear here.'
-                }
+                infoText={'The details of your contact will appear here.'}
               />
             </View>
           ) : (
@@ -1128,9 +1157,7 @@ class ContactDetailsNew extends PureComponent<
                 <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={'Note'}
-                  infoText={
-                    'The details of your contact will appear here.'
-                  }
+                  infoText={'The details of your contact will appear here.'}
                 />
               )}
             </View>

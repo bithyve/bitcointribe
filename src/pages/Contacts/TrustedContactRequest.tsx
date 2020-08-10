@@ -377,7 +377,7 @@ export default function TrustedContactRequest(props) {
                   ? 'mobile number, '
                   : props.inputType === 'email'
                   ? 'email address, '
-                  : null}
+                  : 'otp, '}
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   to accept the request
                 </Text>
@@ -418,7 +418,7 @@ export default function TrustedContactRequest(props) {
                     ? PhoneNumber
                     : props.inputType === 'email'
                     ? EmailId
-                    : null;
+                    : passcode.toUpperCase();
                 setTimeout(() => {
                   setPhoneNumber('');
                 }, 2);
