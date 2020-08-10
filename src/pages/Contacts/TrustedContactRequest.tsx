@@ -377,7 +377,7 @@ export default function TrustedContactRequest(props) {
                   ? 'mobile number, '
                   : props.inputType === 'email'
                   ? 'email address, '
-                  : null}
+                  : 'otp, '}
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   to accept the request
                 </Text>

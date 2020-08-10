@@ -14,6 +14,7 @@ import config from '../HexaConfig';
 import { ec as EC } from 'elliptic';
 import { BH_AXIOS } from '../../services/api';
 import { AxiosResponse } from 'axios';
+import SSS from './sss/SSS';
 var ec = new EC('curve25519');
 
 const { HEXA_ID } = config;
@@ -52,21 +53,8 @@ export default class TrustedContacts {
 
   public static encryptPub = (
     publicKey: string,
-    key?: string,
-  ):
-    | {
-        encryptedPub: string;
-        otp: string;
-      }
-    | {
-        encryptedPub: string;
-        otp?: undefined;
-      } => {
-    let usedOTP = false;
-    if (!key) {
-      key = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-      usedOTP = true;
-    }
+    key: string,
+  ): { encryptedPub: string } => {
     const encryptionKey = TrustedContacts.getDerivedKey(key);
 
     const cipher = crypto.createCipheriv(
@@ -79,14 +67,7 @@ export default class TrustedContacts {
     let encryptedPub = cipher.update(prefix + publicKey, 'utf8', 'hex');
     encryptedPub += cipher.final('hex');
 
-    if (usedOTP) {
-      return {
-        encryptedPub,
-        otp: key,
-      };
-    } else {
-      return { encryptedPub };
-    }
+    return { encryptedPub };
   };
 
   public static decryptPub = (
@@ -179,10 +160,18 @@ export default class TrustedContacts {
       .update(publicKey)
       .digest('hex');
 
+    let otp;
+    if (!encKey) {
+      // contact with no phone-number/email
+      otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+      encKey = SSS.strechKey(otp);
+    }
+
     this.trustedContacts[contactName] = {
       privateKey,
       publicKey,
       encKey,
+      otp,
       ephemeralChannel: { address: ephemeralAddress },
     };
 

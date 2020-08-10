@@ -728,7 +728,7 @@ const TrustedContactHistory = (props) => {
       return;
     }
 
-    const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
+    const { publicKey, symmetricKey, otp } = trustedContacts.tc.trustedContacts[
       contactName
     ];
     const requester = WALLET_SETUP.walletName;
@@ -788,11 +788,31 @@ const TrustedContactHistory = (props) => {
       console.log({ emailDL });
       setTrustedLink(emailDL);
       setActivateReshare(true);
+    } else if (otp) {
+      const otpHintType = 'otp';
+      const otpHint = 'xxx';
+      const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+        .encryptedPub;
+      const uploadedAt = symmetricKey
+        ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
+        : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+            .initiatedAt;
+
+      const otpDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tc` +
+        `/${requester}` +
+        `/${otpEncPubKey}` +
+        `/${otpHintType}` +
+        `/${otpHint}` +
+        `/${uploadedAt}` +
+        `/v${appVersion}`;
+
+      console.log({ otpDL });
+      setTrustedLink(otpDL);
+      setActivateReshare(true);
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
-      );
+      Alert.alert('Invalid Contact', 'Something went wrong.');
+      return;
     }
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
@@ -992,6 +1012,12 @@ const TrustedContactHistory = (props) => {
 
       createDeepLink();
 
+      const {
+        publicKey,
+        symmetricKey,
+        otp,
+      } = trustedContacts.tc.trustedContacts[contactName];
+
       let info = '';
       if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
         const phoneNumber = chosenContact.phoneNumbers[0].number;
@@ -1000,11 +1026,10 @@ const TrustedContactHistory = (props) => {
         info = number;
       } else if (chosenContact.emails && chosenContact.emails.length) {
         info = chosenContact.emails[0].email;
+      } else if (otp) {
+        info = otp;
       }
 
-      const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
-        contactName
-      ];
       if (publicKey)
         setTrustedQR(
           JSON.stringify({
