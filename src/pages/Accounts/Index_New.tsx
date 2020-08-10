@@ -1281,7 +1281,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee : (
+                        Tran Fee : (~
                         {switchOn || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
                               ? averageTxFees['medium'].averageTxFee
