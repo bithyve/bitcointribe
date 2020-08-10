@@ -799,7 +799,9 @@ const TrustedContactHistory = (props) => {
             .initiatedAt;
 
       const otpDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tc` +
+        `https://hexawallet.io/${config.APP_STAGE}/${
+          symmetricKey ? 'atcg' : 'tcg'
+        }` +
         `/${requester}` +
         `/${otpEncPubKey}` +
         `/${otpHintType}` +
@@ -865,127 +867,114 @@ const TrustedContactHistory = (props) => {
 
   const createGuardian = useCallback(async () => {
     if (!Object.keys(chosenContact).length) return;
-    if (
-      chosenContact.firstName &&
-      ((chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) ||
-        (chosenContact.emails && chosenContact.emails.length))
-    ) {
-      const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = fcmTokenValue;
-      //await AsyncStorage.getItem('fcmToken');
-      console.log({ walletID, FCM });
 
-      const contactName = `${chosenContact.firstName} ${
-        chosenContact.lastName ? chosenContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim();
+    const walletID = await AsyncStorage.getItem('walletID');
+    const FCM = fcmTokenValue;
+    //await AsyncStorage.getItem('fcmToken');
+    console.log({ walletID, FCM });
 
-      let info = '';
-      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
-        const phoneNumber = chosenContact.phoneNumbers[0].number;
-        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-        number = number.slice(number.length - 10); // last 10 digits only
-        info = number;
-      } else if (chosenContact.emails && chosenContact.emails.length) {
-        info = chosenContact.emails[0].email;
-      }
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
 
-      const contactInfo = {
+    let info = '';
+    if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+      const phoneNumber = chosenContact.phoneNumbers[0].number;
+      let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      number = number.slice(number.length - 10); // last 10 digits only
+      info = number;
+    } else if (chosenContact.emails && chosenContact.emails.length) {
+      info = chosenContact.emails[0].email;
+    }
+
+    const contactInfo = {
+      contactName,
+      info: info.trim(),
+    };
+
+    let accountNumber = regularAccount.hdWallet.trustedContactToDA[contactName];
+    if (!accountNumber) {
+      // initialize a trusted derivative account against the following account
+      const res = regularAccount.getDerivativeAccXpub(
+        TRUSTED_CONTACTS,
+        null,
         contactName,
-        info: info.trim(),
-      };
+      );
+      if (res.status !== 200) {
+        console.log('Err occurred while generating derivative account');
+      } else {
+        // refresh the account number
+        accountNumber = regularAccount.hdWallet.trustedContactToDA[contactName];
+      }
+    }
 
-      let accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[contactName];
-      if (!accountNumber) {
-        // initialize a trusted derivative account against the following account
-        const res = regularAccount.getDerivativeAccXpub(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        );
-        if (res.status !== 200) {
-          console.log('Err occurred while generating derivative account');
+    const trustedReceivingAddress = (regularAccount.hdWallet.derivativeAccounts[
+      TRUSTED_CONTACTS
+    ][accountNumber] as TrustedContactDerivativeAccountElements)
+      .receivingAddress;
+
+    let data: EphemeralDataElements = {
+      walletID,
+      FCM,
+      trustedAddress: trustedReceivingAddress,
+      trustedTestAddress: testAccount.hdWallet.receivingAddress,
+    };
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+    const hasTrustedChannel =
+      trustedContact && trustedContact.symmetricKey ? true : false;
+    if (changeContact) {
+      setTrustedLink('');
+      setTrustedQR('');
+      // remove the previous TC
+
+      let previousGuardianName;
+      if (trustedContactsInfo) {
+        const previousGuardian = trustedContactsInfo[index];
+        if (previousGuardian) {
+          previousGuardianName = `${previousGuardian.firstName} ${
+            previousGuardian.lastName ? previousGuardian.lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
         } else {
-          // refresh the account number
-          accountNumber =
-            regularAccount.hdWallet.trustedContactToDA[contactName];
+          console.log('Previous guardian details missing');
         }
       }
 
-      const trustedReceivingAddress = (regularAccount.hdWallet
-        .derivativeAccounts[TRUSTED_CONTACTS][
-        accountNumber
-      ] as TrustedContactDerivativeAccountElements).receivingAddress;
-
-      let data: EphemeralDataElements = {
-        walletID,
-        FCM,
-        trustedAddress: trustedReceivingAddress,
-        trustedTestAddress: testAccount.hdWallet.receivingAddress,
-      };
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const hasTrustedChannel =
-        trustedContact && trustedContact.symmetricKey ? true : false;
-      if (changeContact) {
-        setTrustedLink('');
-        setTrustedQR('');
-        // remove the previous TC
-
-        let previousGuardianName;
-        if (trustedContactsInfo) {
-          const previousGuardian = trustedContactsInfo[index];
-          if (previousGuardian) {
-            previousGuardianName = `${previousGuardian.firstName} ${
-              previousGuardian.lastName ? previousGuardian.lastName : ''
-            }`
-              .toLowerCase()
-              .trim();
-          } else {
-            console.log('Previous guardian details missing');
-          }
-        }
-
-        dispatch(
-          uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
-        );
-        updateTrustedContactsInfo(chosenContact);
-        onOTPShare(index); // enables reshare
-        setChangeContact(false);
-      } else if (
-        !SHARES_TRANSFER_DETAILS[index] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        setTrustedLink('');
-        setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactInfo, data));
-        updateTrustedContactsInfo(chosenContact);
-        onOTPShare(index); // enables reshare
-      } else if (
-        trustedContact &&
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY &&
-        !hasTrustedChannel
-      ) {
-        setTrustedLink('');
-        setTrustedQR('');
-        dispatch(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[0],
-          ),
-        );
-      }
-    } else {
-      console.log({ chosenContact });
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
+      dispatch(
+        uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
+      );
+      updateTrustedContactsInfo(chosenContact);
+      onOTPShare(index); // enables reshare
+      setChangeContact(false);
+    } else if (
+      !SHARES_TRANSFER_DETAILS[index] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
+    ) {
+      setTrustedLink('');
+      setTrustedQR('');
+      dispatch(uploadEncMShare(index, contactInfo, data));
+      updateTrustedContactsInfo(chosenContact);
+      onOTPShare(index); // enables reshare
+    } else if (
+      trustedContact &&
+      !trustedContact.symmetricKey &&
+      trustedContact.ephemeralChannel &&
+      trustedContact.ephemeralChannel.initiatedAt &&
+      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+        config.TC_REQUEST_EXPIRY &&
+      !hasTrustedChannel
+    ) {
+      setTrustedLink('');
+      setTrustedQR('');
+      dispatch(
+        updateEphemeralChannel(
+          contactInfo,
+          trustedContact.ephemeralChannel.data[0],
+        ),
       );
     }
   }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);

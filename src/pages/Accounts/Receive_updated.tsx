@@ -265,7 +265,7 @@ export default function Receive(props) {
           const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
             .encryptedPub;
           const otpDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
             `/${requester}` +
             `/${otpEncPubKey}` +
             `/${otpHintType}` +
