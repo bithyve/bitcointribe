@@ -326,6 +326,9 @@ export default class TrustedContacts {
         this.initializeContact(contactName, encKey);
       }
 
+      if (this.trustedContacts[contactName].encKey)
+        encKey = this.trustedContacts[contactName].encKey;
+
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
       dataElements.publicKey = publicKey;
 

@@ -418,7 +418,7 @@ export default function TrustedContactRequest(props) {
                     ? PhoneNumber
                     : props.inputType === 'email'
                     ? EmailId
-                    : null;
+                    : passcode.toUpperCase();
                 setTimeout(() => {
                   setPhoneNumber('');
                 }, 2);
