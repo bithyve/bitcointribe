@@ -247,16 +247,6 @@ class SendToContact extends Component<
     }
 
     if (
-      prevProps.accounts[this.state.serviceType].loading.transfer !==
-      this.props.accounts[this.state.serviceType].loading.transfer
-    ) {
-      if (
-        !this.props.accounts[this.state.serviceType].loading.transfer.transfer
-      )
-        this.setState({ isConfirmDisabled: false });
-    }
-
-    if (
       prevState.bitcoinAmount !== this.state.bitcoinAmount ||
       prevState.currencyAmount !== this.state.currencyAmount ||
       prevState.spendableBalance !== this.state.spendableBalance ||
@@ -586,9 +576,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
-    this.setState({ isConfirmDisabled: true });
     clearTransfer(serviceType, 'stage1');
-    this.setState({ isConfirmDisabled: false });
     if (
       transfer[serviceType].transfer.details &&
       transfer[serviceType].transfer.details.length
@@ -1123,6 +1111,7 @@ class SendToContact extends Component<
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
+                    this.setState({ isConfirmDisabled: true });
                     this.onConfirm();
                   }}
                   disabled={isConfirmDisabled}
@@ -1135,7 +1124,6 @@ class SendToContact extends Component<
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
                     shadowOffset: { width: 15, height: 15 },
-                    opacity: isConfirmDisabled ? 0.5 : 1,
                   }}
                 >
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
