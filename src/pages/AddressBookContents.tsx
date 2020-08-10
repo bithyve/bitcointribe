@@ -85,16 +85,16 @@ const getImageIcon = (item) => {
           <Text style={styles.imageIconText}>
             {item
               ? nameToInitials(
-                item.firstName == 'Secondary' && item.lastName == 'Device'
-                  ? 'Keeper Device'
-                  : item.firstName && item.lastName
+                  item.firstName == 'Secondary' && item.lastName == 'Device'
+                    ? 'Keeper Device'
+                    : item.firstName && item.lastName
                     ? item.firstName + ' ' + item.lastName
                     : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-              )
+                    ? item.firstName
+                    : !item.firstName && item.lastName
+                    ? item.lastName
+                    : '',
+                )
               : ''}
           </Text>
         </View>
@@ -106,7 +106,7 @@ const getImageIcon = (item) => {
 class AddressBookContents extends PureComponent<
   AddressBookContentsPropTypes,
   AddressBookContentsStateTypes
-  > {
+> {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
   focusListener: any;
@@ -184,7 +184,7 @@ class AddressBookContents extends PureComponent<
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -215,7 +215,7 @@ class AddressBookContents extends PureComponent<
             trustedAddress,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           const hasTrustedAddress = !!trustedAddress;
 
@@ -337,16 +337,16 @@ class AddressBookContents extends PureComponent<
             >
               {item
                 ? nameToInitials(
-                  item.firstName == 'Secondary' && item.lastName == 'Device'
-                    ? 'Keeper Device'
-                    : item.firstName && item.lastName
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                )
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>
@@ -388,14 +388,14 @@ class AddressBookContents extends PureComponent<
             {contact.firstName && contact.firstName != 'Secondary'
               ? contact.firstName + ' '
               : contact.firstName && contact.firstName == 'Secondary'
-                ? 'Keeper '
-                : ''}
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.lastName && contact.lastName != 'Device'
                 ? contact.lastName + ' '
                 : contact.lastName && contact.lastName == 'Device'
-                  ? 'Device '
-                  : ''}
+                ? 'Device '
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -403,9 +403,10 @@ class AddressBookContents extends PureComponent<
           ) : null}
         </View>
         <View style={styles.getImageView}>
-          {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? <View>
-            {!(contact.hasXpub || contact.hasTrustedAddress) &&
-              (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+          {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? (
+            <View>
+              {!(contact.hasXpub || contact.hasTrustedAddress) &&
+                (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
                 !contact.hasTrustedChannel ? (
                   <View
                     style={{
@@ -426,7 +427,7 @@ class AddressBookContents extends PureComponent<
                       }}
                     >
                       Expired
-                </Text>
+                    </Text>
                   </View>
                 ) : (
                   <CountDown
@@ -453,8 +454,8 @@ class AddressBookContents extends PureComponent<
                     showSeparator
                   />
                 ))}
-
-          </View> : null}
+            </View>
+          ) : null}
           <View style={styles.xpubIconView}>
             <Ionicons
               name="ios-arrow-forward"
@@ -566,8 +567,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'My Keepers');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -583,8 +584,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, "I'm Keeper of");
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -601,8 +602,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'Other Contacts');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                   <TouchableOpacity
                     onPress={() => {
                       setTimeout(() => {

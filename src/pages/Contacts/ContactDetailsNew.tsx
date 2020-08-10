@@ -998,9 +998,13 @@ class ContactDetailsNew extends PureComponent<
                 />
               </TouchableOpacity>
               {getImageIcon(contact)}
-              <View style={{flex: 1, marginRight: 5}}>
+              <View style={{ flex: 1, marginRight: 5 }}>
                 <Text style={styles.contactTypeText}>{this.contactsType}</Text>
-                <Text style={styles.contactText} ellipsizeMode="clip" numberOfLines={1}>
+                <Text
+                  style={styles.contactText}
+                  ellipsizeMode="clip"
+                  numberOfLines={1}
+                >
                   {this.Contact.contactName == 'Secondary Device'
                     ? 'Keeper Device'
                     : contact.contactName}
@@ -1219,8 +1223,8 @@ class ContactDetailsNew extends PureComponent<
             </View>
           )}
           {this.Contact.isRemovable &&
-          Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-          !this.Contact.hasTrustedChannel ? (
+          (Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY ||
+            this.Contact.hasTrustedChannel) ? (
             <TouchableOpacity
               style={{
                 ...styles.bottomButton,
