@@ -1,3 +1,5 @@
+import { NativeModules } from "react-native";
+
 export const nameToInitials = fullName => {
   const namesArray = fullName.split(' ');
   if (namesArray.length === 1) return `${namesArray[0].charAt(0)}`;
@@ -39,6 +41,13 @@ export const getCurrencyImageName = (currencyCodeValue) => {
 
 export const isEmpty = (obj) => {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+}
+//export const isPackageInstalled = NativeModules.CheckPackageInstallation.isPackageInstalled;
+
+export const APP_LIST = {
+  "WhatsApp": {pkgName: "com.whatsapp", urlScheme: "whatsapp", urlParams: "app"}, // fa
+  "Telegram": {pkgName: "org.telegram.messenger", urlScheme: "tg", urlParams: "share/url?url="}, // fa
+  "Messenger": {pkgName: "com.facebook.orca", urlScheme: "fb-messenger", urlParams: "user-thread/{user-id}"}, // fa: facebook
 }
 
 export const getCurrencyImageByRegion = (currencyCode, type) => {
