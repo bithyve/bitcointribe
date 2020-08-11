@@ -857,15 +857,15 @@ export default class SecureHDWallet extends Bitcoin {
             for (const utxo of addressSpecificUTXOs) {
               const { value, Address, status, vout, txid } = utxo;
 
-              UTXOs.push({
-                txId: txid,
-                vout,
-                value,
-                address: Address,
-                status,
-              });
-
               if (addressInUse.includes(Address)) {
+                UTXOs.push({
+                  txId: txid,
+                  vout,
+                  value,
+                  address: Address,
+                  status,
+                });
+
                 if (status.confirmed) balances.balance += value;
                 // else if (changeAddresses && changeAddresses.includes(Address))
                 //   balances.balance += value;

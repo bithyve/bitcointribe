@@ -645,15 +645,15 @@ export default class HDSegwitWallet extends Bitcoin {
             for (const utxo of addressSpecificUTXOs) {
               const { value, Address, status, vout, txid } = utxo;
 
-              UTXOs.push({
-                txId: txid,
-                vout,
-                value,
-                address: Address,
-                status,
-              });
-
               if (addressInUse.includes(Address)) {
+                UTXOs.push({
+                  txId: txid,
+                  vout,
+                  value,
+                  address: Address,
+                  status,
+                });
+
                 if (status.confirmed) balances.balance += value;
                 // else if (changeAddresses && changeAddresses.includes(Address))
                 //   balances.balance += value;
@@ -930,6 +930,7 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses = [recipientAddress];
       // this.balances = { balance: amount * 1e8, unconfirmedBalance: 0 }; // assumption: we don't call testFaucet twice (spendable exception: 1st receive test-utxo)
       const {
+        UTXOs,
         balances,
         transactions,
         nextFreeAddressIndex,
@@ -940,6 +941,26 @@ export default class HDSegwitWallet extends Bitcoin {
         this.nextFreeAddressIndex - 1,
         'Test Account',
       );
+
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (
+            this.isTest &&
+            utxo.address === this.getExternalAddressByIndex(0)
+          ) {
+            confirmedUTXOs.push(utxo); // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue;
+          }
+
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+      this.confirmedUTXOs = confirmedUTXOs;
+
       this.nextFreeAddressIndex = nextFreeAddressIndex;
       this.receivingAddress = this.getExternalAddressByIndex(
         this.nextFreeAddressIndex,
