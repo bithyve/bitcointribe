@@ -656,6 +656,9 @@ export default class SecureAccount {
     }
   };
 
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.secureHDWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
   public transferST1 = async (
     recipients: {
       address: string;

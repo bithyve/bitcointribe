@@ -110,6 +110,7 @@ interface SendToContactStateTypes {
   bitcoinAmount: string;
   currencyAmount: string;
   isConfirmDisabled: boolean;
+  isAddRecipientDisabled: boolean;
   note: string;
   InputStyle: any;
   InputStyle1: any;
@@ -147,6 +148,7 @@ class SendToContact extends Component<
         : '',
       currencyAmount: '',
       isConfirmDisabled: true,
+      isAddRecipientDisabled: false,
       note: '',
       InputStyle: styles.textBoxView,
       InputStyle1: styles.textBoxView,
@@ -526,19 +528,18 @@ class SendToContact extends Component<
       averageTxFees,
     );
 
-    const max = spendableBalance - amountStacked - fee;
+    if (spendableBalance) {
+      const max = spendableBalance - amountStacked - fee;
 
-    if (!switchOn) {
       this.setState(
         {
-          switchOn: true,
+          switchOn: !switchOn ? true : switchOn,
+          isAddRecipientDisabled: true,
         },
         () => {
           this.convertBitCoinToCurrency(max.toString());
         },
       );
-    } else {
-      this.convertBitCoinToCurrency(max.toString());
     }
   };
 
@@ -689,6 +690,7 @@ class SendToContact extends Component<
       bitcoinAmount,
       currencyAmount,
       isConfirmDisabled,
+      isAddRecipientDisabled,
       note,
       InputStyle,
       InputStyle1,
@@ -1216,7 +1218,7 @@ class SendToContact extends Component<
                     width: wp('30%'),
                     marginLeft: 10,
                   }}
-                  disabled={isConfirmDisabled}
+                  disabled={isConfirmDisabled || isAddRecipientDisabled}
                   onPress={() => {
                     if (
                       transfer[serviceType].transfer.details &&
