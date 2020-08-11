@@ -48,8 +48,14 @@ import {
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function AddContactSendRequest(props) {
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [OTP, setOTP] = useState('');
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
@@ -304,7 +310,7 @@ export default function AddContactSendRequest(props) {
             `/${otpHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-
+            setOTP(otp);
           console.log({ otpDL });
           setTrustedLink(otpDL);
         } else {
@@ -375,8 +381,12 @@ export default function AddContactSendRequest(props) {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
           onPressDone={async () => {
+            setTimeout(() => {
+              setRenderTimer(true);
+            }, 2);
             (SendViaLinkBottomSheet as any).current.snapTo(0);
-            openTimer();
+            shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+            // openTimer();
           }}
         />
       );
@@ -458,6 +468,33 @@ export default function AddContactSendRequest(props) {
     number = number.slice(number.length - 10); // last 10 digits only
     return number;
   };
+
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        renderTimer={renderTimer}
+        onPressOk={(index) => {
+          setRenderTimer(false);
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+          props.navigation.goBack();
+        }}
+        onPressBack={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        OTP={OTP}
+      />
+    );
+  }, [ OTP, renderTimer]);
+
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -751,6 +788,18 @@ export default function AddContactSendRequest(props) {
           ]}
           renderContent={renderTimerModalContents}
           renderHeader={renderTimerModalHeader}
+        />
+        <BottomSheet
+          onCloseEnd={() => {
+            if (SelectedContact.length > 0) {
+              setRenderTimer(false)
+            }
+          }}
+          enabledInnerScrolling={true}
+          ref={shareOtpWithTrustedContactBottomSheet}
+          snapPoints={[-30, hp('65%')]}
+          renderContent={renderShareOtpWithTrustedContactContent}
+          renderHeader={renderShareOtpWithTrustedContactHeader}
         />
       </View>
     </SafeAreaView>

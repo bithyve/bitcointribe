@@ -680,6 +680,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   scheduleNotification = async () => {
+    const channelId = new firebase.notifications.Android.Channel("Default", "Default", firebase.notifications.Android.Importance.High);
+    firebase.notifications().android.createChannel(channelId);
     const notification = new firebase.notifications.Notification()
       .setTitle('We have not seen you in a while!')
       .setBody(
