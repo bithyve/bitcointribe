@@ -12,8 +12,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import Toast from '../../components/Toast';
 import CountDown from 'react-native-countdown-component';
+import Config from '../../bitcoin/HexaConfig';
 
 export default function ShareOtpWithTrustedContact(props) {
+  const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
   const OTP = props.OTP;
   const index = props.index;
   const writeToClipboard = () => {
@@ -81,20 +83,19 @@ export default function ShareOtpWithTrustedContact(props) {
             <Ionicons color={Colors.blue} size={17} name={'md-time'} />
             {props.renderTimer ? 
             <CountDown
-              size={15}
-              until={600}
+              size={13}
+              until={TC_REQUEST_EXPIRY}
               digitStyle={{
                 backgroundColor: '#FFF',
                 borderWidth: 0,
                 borderColor: '#FFF',
-                margin: -10,
-                
+                margin: -5,
               }}
-              digitTxtStyle={{ color: Colors.blue,fontSize: RFValue(19),
+              digitTxtStyle={{ color: Colors.blue,fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular, }}
               separatorStyle={{ color: Colors.blue, }}
-              timeToShow={['M', 'S']}
-              timeLabels={{ m: null, s: null }}
+              timeToShow={['H', 'M', 'S']}
+              timeLabels={{h:null, m: null, s: null }}
               showSeparator
             /> : null}
             {/* <Text style={styles.timerText}>09 : 12</Text> */}
