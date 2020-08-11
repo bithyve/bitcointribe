@@ -45,6 +45,13 @@ export default class SecureHDWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  private confirmedUTXOs: Array<{
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }>;
   public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
 
@@ -93,6 +100,13 @@ export default class SecureHDWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -151,6 +165,10 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.transactions
         ? stateVars.transactions
         : this.transactions;
+    this.confirmedUTXOs =
+      stateVars && stateVars.confirmedUTXOs
+        ? stateVars.confirmedUTXOs
+        : this.confirmedUTXOs;
     this.twoFASetup =
       stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined;
     this.derivativeAccounts =
@@ -468,6 +486,7 @@ export default class SecureHDWallet extends Bitcoin {
     ]; // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const {
+      UTXOs,
       balances,
       transactions,
       nextFreeAddressIndex,
@@ -479,6 +498,22 @@ export default class SecureHDWallet extends Bitcoin {
       'Savings Account',
     );
 
+    const confirmedUTXOs = [];
+    for (const utxo of UTXOs) {
+      if (utxo.status) {
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        else {
+          if (internalAddresses.includes(utxo.address)) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push(utxo);
+          }
+        }
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+    this.confirmedUTXOs = confirmedUTXOs;
     this.nextFreeAddressIndex = nextFreeAddressIndex;
     this.receivingAddress = this.createSecureMultiSig(
       this.nextFreeAddressIndex,
@@ -667,7 +702,18 @@ export default class SecureHDWallet extends Bitcoin {
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
-    const { balances, transactions } = res;
+    const { balances, transactions, UTXOs } = res;
+
+    const confirmedUTXOs = [];
+    for (const utxo of UTXOs) {
+      if (utxo.status) {
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+    this.confirmedUTXOs.push(...confirmedUTXOs); // pushing confirmed derivative utxos to the pre-existing utxo pool from parent acc
 
     const lastSyncTime =
       this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
@@ -787,6 +833,7 @@ export default class SecureHDWallet extends Bitcoin {
         (addressSpecificTxs) => !!addressSpecificTxs.TotalTransactions,
       );
 
+      const UTXOs = [];
       const addressesInfo = Txs;
       console.log({ addressesInfo });
 
@@ -808,7 +855,16 @@ export default class SecureHDWallet extends Bitcoin {
           const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
           for (const addressSpecificUTXOs of Utxos) {
             for (const utxo of addressSpecificUTXOs) {
-              const { value, Address, status } = utxo;
+              const { value, Address, status, vout, txid } = utxo;
+
+              UTXOs.push({
+                txId: txid,
+                vout,
+                value,
+                address: Address,
+                status,
+              });
+
               if (addressInUse.includes(Address)) {
                 if (status.confirmed) balances.balance += value;
                 // else if (changeAddresses && changeAddresses.includes(Address))
@@ -948,6 +1004,18 @@ export default class SecureHDWallet extends Bitcoin {
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
+
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+      this.confirmedUTXOs.push(...confirmedUTXOs);
+
       return { synched: true };
     } catch (err) {
       console.log(
@@ -1249,7 +1317,7 @@ export default class SecureHDWallet extends Bitcoin {
         balance?: undefined;
       }
   > => {
-    const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
+    const inputUTXOs = this.confirmedUTXOs; // confirmed + unconfirmed UTXOs
     console.log('Input UTXOs:', inputUTXOs);
 
     const outputUTXOs = [];
