@@ -555,6 +555,9 @@ export default class BaseAccount {
     }
   };
 
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
   public transferST1 = async (
     recipients: {
       address: string;

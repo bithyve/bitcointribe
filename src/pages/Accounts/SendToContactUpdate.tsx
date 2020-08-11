@@ -110,6 +110,7 @@ interface SendToContactStateTypes {
   bitcoinAmount: string;
   currencyAmount: string;
   isConfirmDisabled: boolean;
+  isAddRecipientDisabled: boolean;
   note: string;
   InputStyle: any;
   InputStyle1: any;
@@ -122,7 +123,7 @@ interface SendToContactStateTypes {
 class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
-  > {
+> {
   constructor(props) {
     super(props);
     this.state = {
@@ -147,6 +148,7 @@ class SendToContact extends Component<
         : '',
       currencyAmount: '',
       isConfirmDisabled: true,
+      isAddRecipientDisabled: false,
       note: '',
       InputStyle: styles.textBoxView,
       InputStyle1: styles.textBoxView,
@@ -177,9 +179,9 @@ class SendToContact extends Component<
       if (bitcoinAmount) {
         const currency = this.state.exchangeRates
           ? (
-            (parseInt(bitcoinAmount) / 1e8) *
-            this.state.exchangeRates[this.state.CurrencyCode].last
-          ).toFixed(2)
+              (parseInt(bitcoinAmount) / 1e8) *
+              this.state.exchangeRates[this.state.CurrencyCode].last
+            ).toFixed(2)
           : 0;
 
         this.setState({
@@ -251,7 +253,7 @@ class SendToContact extends Component<
       prevState.currencyAmount !== this.state.currencyAmount ||
       prevState.spendableBalance !== this.state.spendableBalance ||
       prevProps.transfer[this.state.serviceType].transfer.details.length !==
-      this.props.transfer[this.state.serviceType].transfer.details.length
+        this.props.transfer[this.state.serviceType].transfer.details.length
     ) {
       this.amountCalculation();
     }
@@ -271,18 +273,18 @@ class SendToContact extends Component<
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      0;
+        0;
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      0;
+        0;
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -301,8 +303,8 @@ class SendToContact extends Component<
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
       : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      //      .unconfirmedBalance
-      0;
+        //      .unconfirmedBalance
+        0;
 
     // secure derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
@@ -310,7 +312,7 @@ class SendToContact extends Component<
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -373,7 +375,7 @@ class SendToContact extends Component<
             i
           ].selectedContact.hasOwnProperty('currencyAmount') &&
           selectedContact.id ==
-          transfer[serviceType].transfer.details[i].selectedContact.id
+            transfer[serviceType].transfer.details[i].selectedContact.id
         ) {
           removeTransferDetails(
             serviceType,
@@ -499,6 +501,48 @@ class SendToContact extends Component<
     }
   };
 
+  sendMaxHandler = () => {
+    const {
+      selectedContact,
+      averageTxFees,
+      serviceType,
+      spendableBalance,
+      switchOn,
+    } = this.state;
+    const { transfer } = this.props;
+
+    const recipientsList = [];
+    let amountStacked = 0;
+    transfer[serviceType].transfer.details.forEach((instance) => {
+      if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id !== selectedContact.id
+      ) {
+        amountStacked += parseInt(instance.bitcoinAmount);
+        recipientsList.push(instance);
+      }
+    });
+
+    const { fee } = this.props.service[serviceType].service.calculateSendMaxFee(
+      recipientsList.length + 1, // +1 for the current instance
+      averageTxFees,
+    );
+
+    if (spendableBalance) {
+      const max = spendableBalance - amountStacked - fee;
+
+      this.setState(
+        {
+          switchOn: !switchOn ? true : switchOn,
+          isAddRecipientDisabled: true,
+        },
+        () => {
+          this.convertBitCoinToCurrency(max.toString());
+        },
+      );
+    }
+  };
+
   handleTrasferST1 = () => {
     const {
       selectedContact,
@@ -554,7 +598,7 @@ class SendToContact extends Component<
           // recipient: trusted contact
           const contactName = `${item.selectedContact.firstName} ${
             item.selectedContact.lastName ? item.selectedContact.lastName : ''
-            }`.toLowerCase();
+          }`.toLowerCase();
           recipients.push({
             id: contactName,
             address: null,
@@ -626,10 +670,10 @@ class SendToContact extends Component<
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(balance)
       : switchOn
-        ? UsNumberFormat(balance)
-        : exchangeRates
-          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-          : null;
+      ? UsNumberFormat(balance)
+      : exchangeRates
+      ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+      : null;
   };
 
   render() {
@@ -646,6 +690,7 @@ class SendToContact extends Component<
       bitcoinAmount,
       currencyAmount,
       isConfirmDisabled,
+      isAddRecipientDisabled,
       note,
       InputStyle,
       InputStyle1,
@@ -693,8 +738,8 @@ class SendToContact extends Component<
                 serviceType == TEST_ACCOUNT
                   ? require('../../assets/images/icons/icon_test.png')
                   : serviceType == REGULAR_ACCOUNT
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : require('../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -704,8 +749,8 @@ class SendToContact extends Component<
                 {serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : serviceType == REGULAR_ACCOUNT
-                    ? 'Checking Account'
-                    : 'Savings Account'}
+                  ? 'Checking Account'
+                  : 'Savings Account'}
               </Text>
             </View>
           </View>
@@ -729,12 +774,12 @@ class SendToContact extends Component<
               {serviceType == 'TEST_ACCOUNT'
                 ? 'Test Account'
                 : serviceType == 'SECURE_ACCOUNT'
-                  ? 'Savings Account'
-                  : serviceType == 'REGULAR_ACCOUNT'
-                    ? 'Checking Account'
-                    : serviceType == 'S3_SERVICE'
-                      ? 'S3 Service'
-                      : ''}
+                ? 'Savings Account'
+                : serviceType == 'REGULAR_ACCOUNT'
+                ? 'Checking Account'
+                : serviceType == 'S3_SERVICE'
+                ? 'S3 Service'
+                : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -743,8 +788,8 @@ class SendToContact extends Component<
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
                   : switchOn
-                    ? ' sats )'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats )'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
             {isFromAddressBook && (
@@ -759,134 +804,134 @@ class SendToContact extends Component<
         </View>
         <View style={{ width: wp('85%'), alignSelf: 'center' }}>
           {transfer[serviceType].transfer.details &&
-            transfer[serviceType].transfer.details.length > 0 ? (
-              <ScrollView horizontal={true}>
-                {transfer[serviceType].transfer.details.map((item) => {
-                  //console.log('ITEM in list', item);
-                  return (
-                    <View style={styles.view1}>
-                      <View style={{ flexDirection: 'row' }}>
-                        {item.selectedContact &&
-                          item.selectedContact.account_name ? (
-                            <Image
-                              source={
-                                item.selectedContact.account_name ===
-                                  'Checking Account'
-                                  ? require('../../assets/images/icons/icon_regular.png')
-                                  : item.selectedContact.account_name ===
-                                    'Savings Account'
-                                    ? require('../../assets/images/icons/icon_secureaccount.png')
-                                    : item.selectedContact.account_name ===
-                                      'Test Account'
-                                      ? require('../../assets/images/icons/icon_test_white.png')
-                                      : require('../../assets/images/icons/icon_user.png')
-                              }
-                              style={styles.circleShapeView}
-                            />
-                          ) : item.selectedContact.image ? (
-                            <Image
-                              source={item.selectedContact.image}
-                              style={styles.circleShapeView}
-                            />
-                          ) : (
-                              <View
-                                style={{
-                                  ...styles.circleShapeView,
-                                  backgroundColor: Colors.shadowBlue,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                {item.selectedContact &&
-                                  item.selectedContact.firstName ? (
-                                    <Text
-                                      style={{
-                                        textAlign: 'center',
-                                        fontSize: 13,
-                                        lineHeight: 13, //... One for top and one for bottom alignment
-                                      }}
-                                    >
-                                      {item && item.selectedContact
-                                        ? nameToInitials(
-                                          item.selectedContact.firstName &&
-                                            item.selectedContact.lastName
-                                            ? item.selectedContact.firstName +
-                                            ' ' +
-                                            item.selectedContact.lastName
-                                            : item.selectedContact.firstName &&
-                                              !item.selectedContact.lastName
-                                              ? item.selectedContact.firstName
-                                              : !item.selectedContact.firstName &&
-                                                item.selectedContact.lastName
-                                                ? item.selectedContact.lastName
-                                                : '',
-                                        )
-                                        : ''}
-                                    </Text>
-                                  ) : item &&
-                                    item.selectedContact &&
-                                    item.selectedContact.id ? (
-                                      <Text
-                                        style={{
-                                          textAlign: 'center',
-                                          fontSize: 18,
-                                          lineHeight: 18, //... One for top and one for bottom alignment
-                                        }}
-                                      >
-                                        @
-                                      </Text>
-                                    ) : (
-                                      <Image
-                                        source={require('../../assets/images/icons/icon_user.png')}
-                                        style={styles.circleShapeView}
-                                      />
-                                    )}
-                              </View>
-                            )}
-                        {/* {getImageIcon(item.selectedContact)} */}
-                        <TouchableOpacity
-                          style={styles.closeMarkStyle}
-                          onPress={() => {
-                            setTimeout(() => {
-                              this.setState({ removeItem: item });
-                            }, 2);
-                            (this.refs.RemoveBottomSheet as any).snapTo(1);
+          transfer[serviceType].transfer.details.length > 0 ? (
+            <ScrollView horizontal={true}>
+              {transfer[serviceType].transfer.details.map((item) => {
+                //console.log('ITEM in list', item);
+                return (
+                  <View style={styles.view1}>
+                    <View style={{ flexDirection: 'row' }}>
+                      {item.selectedContact &&
+                      item.selectedContact.account_name ? (
+                        <Image
+                          source={
+                            item.selectedContact.account_name ===
+                            'Checking Account'
+                              ? require('../../assets/images/icons/icon_regular.png')
+                              : item.selectedContact.account_name ===
+                                'Savings Account'
+                              ? require('../../assets/images/icons/icon_secureaccount.png')
+                              : item.selectedContact.account_name ===
+                                'Test Account'
+                              ? require('../../assets/images/icons/icon_test_white.png')
+                              : require('../../assets/images/icons/icon_user.png')
+                          }
+                          style={styles.circleShapeView}
+                        />
+                      ) : item.selectedContact.image ? (
+                        <Image
+                          source={item.selectedContact.image}
+                          style={styles.circleShapeView}
+                        />
+                      ) : (
+                        <View
+                          style={{
+                            ...styles.circleShapeView,
+                            backgroundColor: Colors.shadowBlue,
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          <AntDesign
-                            size={16}
-                            color={Colors.blue}
-                            name={'closecircle'}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={styles.name} numberOfLines={1}>
-                        {item.selectedContact.name ||
-                          item.selectedContact.account_name ||
-                          item.selectedContact.id}
-                      </Text>
-                      <Text style={styles.amountText}>
-                        {switchOn
-                          ? `${
-                          item.bitcoinAmount
-                            ? item.bitcoinAmount
-                            : bitcoinAmount
+                          {item.selectedContact &&
+                          item.selectedContact.firstName ? (
+                            <Text
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 13,
+                                lineHeight: 13, //... One for top and one for bottom alignment
+                              }}
+                            >
+                              {item && item.selectedContact
+                                ? nameToInitials(
+                                    item.selectedContact.firstName &&
+                                      item.selectedContact.lastName
+                                      ? item.selectedContact.firstName +
+                                          ' ' +
+                                          item.selectedContact.lastName
+                                      : item.selectedContact.firstName &&
+                                        !item.selectedContact.lastName
+                                      ? item.selectedContact.firstName
+                                      : !item.selectedContact.firstName &&
+                                        item.selectedContact.lastName
+                                      ? item.selectedContact.lastName
+                                      : '',
+                                  )
+                                : ''}
+                            </Text>
+                          ) : item &&
+                            item.selectedContact &&
+                            item.selectedContact.id ? (
+                            <Text
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 18,
+                                lineHeight: 18, //... One for top and one for bottom alignment
+                              }}
+                            >
+                              @
+                            </Text>
+                          ) : (
+                            <Image
+                              source={require('../../assets/images/icons/icon_user.png')}
+                              style={styles.circleShapeView}
+                            />
+                          )}
+                        </View>
+                      )}
+                      {/* {getImageIcon(item.selectedContact)} */}
+                      <TouchableOpacity
+                        style={styles.closeMarkStyle}
+                        onPress={() => {
+                          setTimeout(() => {
+                            this.setState({ removeItem: item });
+                          }, 2);
+                          (this.refs.RemoveBottomSheet as any).snapTo(1);
+                        }}
+                      >
+                        <AntDesign
+                          size={16}
+                          color={Colors.blue}
+                          name={'closecircle'}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.name} numberOfLines={1}>
+                      {item.selectedContact.name ||
+                        item.selectedContact.account_name ||
+                        item.selectedContact.id}
+                    </Text>
+                    <Text style={styles.amountText}>
+                      {switchOn
+                        ? `${
+                            item.bitcoinAmount
+                              ? item.bitcoinAmount
+                              : bitcoinAmount
                           }` +
                           `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
-                          : CurrencySymbol +
+                        : CurrencySymbol +
                           ' ' +
                           `${
-                          item.currencyAmount
-                            ? item.currencyAmount
-                            : currencyAmount
+                            item.currencyAmount
+                              ? item.currencyAmount
+                              : currencyAmount
                           }`}
-                      </Text>
-                    </View>
-                  );
-                })}
-                {/* renderMultipleContacts(item))} */}
-              </ScrollView>
-            ) : null}
+                    </Text>
+                  </View>
+                );
+              })}
+              {/* renderMultipleContacts(item))} */}
+            </ScrollView>
+          ) : null}
         </View>
         <View style={styles.dividerView} />
         <KeyboardAvoidingView
@@ -911,7 +956,7 @@ class SendToContact extends Component<
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                  // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       {currencyCode.includes(CurrencyCode) ? (
@@ -923,16 +968,16 @@ class SendToContact extends Component<
                           />
                         </View>
                       ) : (
-                          <Image
-                            style={{
-                              ...styles.textBoxImage,
-                            }}
-                            source={getCurrencyImageByRegion(
-                              CurrencyCode,
-                              'gray',
-                            )}
-                          />
-                        )}
+                        <Image
+                          style={{
+                            ...styles.textBoxImage,
+                          }}
+                          source={getCurrencyImageByRegion(
+                            CurrencyCode,
+                            'gray',
+                          )}
+                        />
+                      )}
                       {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
@@ -975,13 +1020,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {!switchOn && (<Text style={{
-                      color: Colors.blue,
-                      textAlign: 'center',
-                      paddingHorizontal: 10,
-                      fontSize: RFValue(10),
-                      fontFamily: Fonts.FiraSansItalic,
-                    }}>Enter Max</Text>)}
+                    {!switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderUSDInputText()} */}
                   {isInvalidBalance ? (
@@ -1002,7 +1053,7 @@ class SendToContact extends Component<
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                  // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1025,8 +1076,8 @@ class SendToContact extends Component<
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
                           : serviceType == TEST_ACCOUNT
-                            ? 'Converted amount in t-sats'
-                            : 'Converted amount in sats'
+                          ? 'Converted amount in t-sats'
+                          : 'Converted amount in sats'
                       }
                       editable={switchOn}
                       value={bitcoinAmount}
@@ -1051,13 +1102,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {switchOn && (<Text style={{
-                      color: Colors.blue,
-                      textAlign: 'center',
-                      paddingHorizontal: 10,
-                      fontSize: RFValue(10),
-                      fontFamily: Fonts.FiraSansItalic,
-                    }}>Enter Max</Text>)}
+                    {switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderBitCoinInputText()} */}
                 </View>
@@ -1147,12 +1204,12 @@ class SendToContact extends Component<
                       ) : ( */}
                   {(!isConfirmDisabled &&
                     loading[serviceType].loading.transfer) ||
-                    (isConfirmDisabled &&
-                      loading[serviceType].loading.transfer) ? (
-                      <ActivityIndicator size="small" />
-                    ) : (
-                      <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
-                    )}
+                  (isConfirmDisabled &&
+                    loading[serviceType].loading.transfer) ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                  )}
                   {/* )} */}
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -1161,7 +1218,7 @@ class SendToContact extends Component<
                     width: wp('30%'),
                     marginLeft: 10,
                   }}
-                  disabled={isConfirmDisabled}
+                  disabled={isConfirmDisabled || isAddRecipientDisabled}
                   onPress={() => {
                     if (
                       transfer[serviceType].transfer.details &&
@@ -1262,19 +1319,19 @@ class SendToContact extends Component<
               title={'Sent Unsuccessful'}
               info={
                 'There seems to be a problem' +
-                  '\n' +
-                  transfer[serviceType].transfer.stage1.failed
+                '\n' +
+                transfer[serviceType].transfer.stage1.failed
                   ? transfer[serviceType].transfer.stage1.err ===
                     'Insufficient balance'
                     ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
-                    //   `\n\nPlease reduce the transfer amount by ${(
-                    //     parseFloat(netAmount) +
-                    //     parseFloat(fee) -
-                    //     parseFloat(balance)
-                    //   ).toFixed(
-                    //     switchOn ? 0 : 2,
-                    //   )} in order to conduct this transaction`
-                    'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
+                      //   `\n\nPlease reduce the transfer amount by ${(
+                      //     parseFloat(netAmount) +
+                      //     parseFloat(fee) -
+                      //     parseFloat(balance)
+                      //   ).toFixed(
+                      //     switchOn ? 0 : 2,
+                      //   )} in order to conduct this transaction`
+                      'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
                     : 'Something went wrong, please try again'
                   : 'Something went wrong, please try again'
               }

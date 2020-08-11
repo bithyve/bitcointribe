@@ -1299,6 +1299,35 @@ export default class SecureHDWallet extends Bitcoin {
   //   }
   // };
 
+  public calculateSendMaxFee = (
+    numberOfRecipients,
+    averageTxFees,
+  ): { fee: number } => {
+    const inputUTXOs = this.confirmedUTXOs;
+    const outputUTXOs = [];
+    for (let index = 0; index < numberOfRecipients; index++) {
+      // using random outputs for send all fee calculation
+      outputUTXOs.push({
+        address: bitcoinJS.payments.p2sh({
+          redeem: bitcoinJS.payments.p2wpkh({
+            pubkey: bitcoinJS.ECPair.makeRandom().publicKey,
+            network: this.network,
+          }),
+          network: this.network,
+        }).address,
+        value: Math.floor(this.balances.balance / numberOfRecipients),
+      });
+    }
+    const { fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      averageTxFees['medium'].feePerByte,
+    );
+    console.log({ inputUTXOs, outputUTXOs, fee });
+
+    return { fee };
+  };
+
   public transactionPrerequisites = async (
     recipients: {
       address: string;
