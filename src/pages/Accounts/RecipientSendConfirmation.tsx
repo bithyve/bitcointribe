@@ -31,192 +31,121 @@ function RecipientSendConfirmation(props) {
 
   const getCorrectAmountCurrency = () => {
     const switchOn = currencyToggleValue ? true : false;
-    if(!switchOn) {
+    if (!switchOn) {
       return props.item.currencyAmount && (props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase());
     } else {
       return props.item.bitcoinAmount && props.item.bitcoinAmount + (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats');
     }
   }
-
+  const { item } = props;
   return (
     <TouchableOpacity
-      onPress={() => props.onPressElement()}
+      // onPress={() => props.onPressElement()}
       activeOpacity={10}
-      style={{
-        flex: 1,
-        marginRight: wp('6%'),
-        marginLeft: wp('6%'),
-        borderRadius: 10,
-        marginTop: hp('1.2%'),
-        // height:
-        //   props.SelectedContactId == props.item.selectedContact.id
-        //     ? wp('50%')
-        //     : wp('25%'),
-        backgroundColor: Colors.shadowBlue,
-      }}
     >
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginVertical: 5,
-          // height: wp('25%'),
-        }}
-      >
-        <View style={{ marginLeft: 10, marginRight: 10 }}>
-          {props.item.selectedContact.imageAvailable ? (
-            <Image
-              source={props.item.selectedContact.image}
-              style={styles.circleShapeView}
-            />
-          ) : (
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.shadowBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {props.item.selectedContact && props.item.selectedContact.name ? (
-                <Text
+      <View style={{
+        marginRight: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: wp('15%'),
+      }}>
+        <View style={{ flexDirection: 'row' }}>
+          {item.selectedContact &&
+            item.selectedContact.account_name ? (
+              <Image
+                source={
+                  item.selectedContact.account_name ===
+                    'Checking Account'
+                    ? require('../../assets/images/icons/icon_regular.png')
+                    : item.selectedContact.account_name ===
+                      'Savings Account'
+                      ? require('../../assets/images/icons/icon_secureaccount.png')
+                      : item.selectedContact.account_name ===
+                        'Test Account'
+                        ? require('../../assets/images/icons/icon_test_white.png')
+                        : require('../../assets/images/icons/icon_user.png')
+                }
+                style={styles.circleShapeView}
+              />
+            ) : item.selectedContact.image ? (
+              <Image
+                source={item.selectedContact.image}
+                style={styles.circleShapeView}
+              />
+            ) : (
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(12),
-                    lineHeight: RFValue(12), //... One for top and one for bottom alignment
+                    ...styles.circleShapeView,
+                    backgroundColor: Colors.shadowBlue,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  {nameToInitials(
-                    props.item.selectedContact.firstName &&
-                      props.item.selectedContact.lastName
-                      ? props.item.selectedContact.firstName +
-                          ' ' +
-                          props.item.selectedContact.lastName
-                      : props.item.selectedContact.firstName &&
-                        !props.item.selectedContact.lastName
-                      ? props.item.selectedContact.firstName
-                      : !props.item.selectedContact.firstName &&
-                        props.item.selectedContact.lastName
-                      ? props.item.selectedContact.lastName
-                      : '',
-                  )}
-                </Text>
-              ) : (
-                props.item && props.item.selectedContact.id ? 
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: RFValue(12),
-                  lineHeight: RFValue(12), //... One for top and one for bottom alignment
-                }}
-              >@</Text> :
-                <Image
-                  source={require('../../assets/images/icons/icon_user.png')}
-                  style={styles.circleShapeView}
-                />
+                  {item.selectedContact &&
+                    item.selectedContact.firstName ? (
+                      <Text
+                        style={{
+                          textAlign: 'center',
+                          fontSize: 13,
+                          lineHeight: 13, //... One for top and one for bottom alignment
+                        }}
+                      >
+                        {item && item.selectedContact
+                          ? nameToInitials(
+                            item.selectedContact.firstName &&
+                              item.selectedContact.lastName
+                              ? item.selectedContact.firstName +
+                              ' ' +
+                              item.selectedContact.lastName
+                              : item.selectedContact.firstName &&
+                                !item.selectedContact.lastName
+                                ? item.selectedContact.firstName
+                                : !item.selectedContact.firstName &&
+                                  item.selectedContact.lastName
+                                  ? item.selectedContact.lastName
+                                  : '',
+                          )
+                          : ''}
+                      </Text>
+                    ) : item &&
+                      item.selectedContact &&
+                      item.selectedContact.id ? (
+                        <Text
+                          style={{
+                            textAlign: 'center',
+                            fontSize: 18,
+                            lineHeight: 18, //... One for top and one for bottom alignment
+                          }}
+                        >
+                          @
+                        </Text>
+                      ) : (
+                        <Image
+                          source={require('../../assets/images/icons/icon_user.png')}
+                          style={styles.circleShapeView}
+                        />
+                      )}
+                </View>
               )}
-            </View>
-          )}
         </View>
-        <View style={{ marginRight: 20, flexDirection: 'row' }}>
-          {/* <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(11),
-              paddingTop: 5,
-              paddingBottom: 3,
-            }}
-          >
-            Sending to:
-          </Text> */}
-          <Text style={styles.contactNameText} numberOfLines={1}>
-            {props.item.selectedContact.name ||
-              props.item.selectedContact.account_name ||
-              props.item.selectedContact.id}
-          </Text>
-          {props.item.hasOwnProperty('bitcoinAmount') ||
-          props.item.hasOwnProperty('currencyAmount') ? (
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontSize: RFValue(12),
-                textAlign: 'center',
-                // paddingTop: 3,
-              }}
-            >
-              {getCorrectAmountCurrency()}
-              {/* {props.item.bitcoinAmount
-                ? `${props.item.bitcoinAmount}` + `${props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
-                : '$ ' + props.item.currencyAmount
-                ? props.item.currencyAmount
-                : ''} */}
-            </Text>
-          ) : null}
-        </View>
-        <Ionicons
-          style={{ marginLeft: 'auto', marginRight: 10 }}
-          name={
-            props.SelectedContactId == props.item.selectedContact.id
-              ? 'ios-arrow-up'
-              : 'ios-arrow-down'
-          }
-          size={20}
-          color={Colors.blue}
-        />
+        <Text style={styles.name} numberOfLines={1}>
+          {item.selectedContact.name ||
+            item.selectedContact.account_name ||
+            item.selectedContact.id}
+        </Text>
+        <Text style={styles.amountText}>
+          {getCorrectAmountCurrency()}
+        </Text>
       </View>
-      {props.SelectedContactId == props.item.selectedContact.id && (
-        <View
-          style={{
-            height: wp('20%'),
-            justifyContent: 'center',
-          }}
-        >
-          <View
-            style={{
-              height: wp('15%'),
-              width: wp('78%'),
-              paddingHorizontal: wp('4%'),
-              paddingVertical: wp('2%'),
-              alignSelf: 'center',
-              backgroundColor: Colors.white,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Note
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={{
-                width: wp('70%'),
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: 5,
-              }}
-            >
-              {props.item.note}
-            </Text>
-          </View>
-        </View>
-      )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   circleShapeView: {
-    width: wp('8%'),
-    height: wp('8%'),
-    borderRadius: wp('8%') / 2,
+    width: wp('14%'),
+    height: wp('14%'),
+    borderRadius: wp('14%') / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     alignItems: 'center',
@@ -239,6 +168,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: 'cover',
+  },
+  name: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+    marginTop: 5,
+    width: wp('15%'),
+  },
+  amountText: {
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
   },
 });
 export default memo(RecipientSendConfirmation);

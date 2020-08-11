@@ -455,12 +455,12 @@ class SendConfirmation_updated extends Component<
         </View>
         <ScrollView>
           <View style={styles.availableBalanceView}>
-            <Text style={styles.accountTypeTextBalanceView}>
+            {/* <Text style={styles.accountTypeTextBalanceView}>
               {this.getServiceTypeAccount()}
-            </Text>
-            <Text style={styles.availableToSpendText}>
-              {' (Available to spend '}
-              <Text style={styles.availableBalanceText}>
+            </Text> */}
+            <Text style={styles.accountTypeTextBalanceView}>
+              {'Available to spend '}
+              <Text style={styles.accountTypeTextBalanceView}>
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : switchOn
@@ -472,21 +472,60 @@ class SendConfirmation_updated extends Component<
                       ).toFixed(2)
                       : null}
               </Text>
-              <Text style={styles.availableBalanceUnitText}>
+              <Text style={styles.accountTypeTextBalanceView}>
                 {this.serviceType == TEST_ACCOUNT
-                  ? ' t-sats )'
+                  ? ' t-sats'
                   : switchOn
-                    ? ' sats )'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                    ? ' sats'
+                    : ' ' + CurrencyCode.toLocaleLowerCase()}
               </Text>
             </Text>
           </View>
+          {this.serviceType === SECURE_ACCOUNT &&
+            this.props.accounts[this.serviceType].service.secureHDWallet.secondaryXpriv && 
+            (<View style={{
+                flex: 1,
+                borderRadius: 8,
+                marginTop: wp('1%'),
+                marginBottom: wp('2%'),
+                marginHorizontal: wp('6%'),
+                backgroundColor: Colors.white,
+                borderColor: Colors.backgroundColor,
+                borderWidth: 2,
+              }}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingVertical: hp('1.5%'),
+                    paddingHorizontal: hp('1.5%')
+                  }}
+                >
+                  <Text style={styles.accountTypeTextBalanceView}>Exit key used</Text>
+                  <View
+                    style={{
+                      paddingHorizontal: 5,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Image style={{
+                      width: 12,
+                      height: 14,
+                      resizeMode: 'contain',
+                      marginLeft: 'auto',
+                    }} source={require('../../assets/images/icons/icon_check.png')} />
+                  </View>
+                </View>
+              </View>)}
           {transfer.details && transfer.details.length > 0 ? (
-            <ScrollView>
-              <View style={{ flex: 1, flexDirection: 'row', marginRight: wp('8%'), marginLeft: wp('8%') }}>
+            <ScrollView horizontal={true} style={{ marginLeft: wp('6%') }}>
+              {/* <View style={{ flex: 1, flexDirection: 'row', marginRight: wp('8%'), marginLeft: wp('8%') }}>
                 <Text style={{ ...styles.tableHeadingText, width: '50%', marginLeft: 10 }}>To</Text>
                 <Text style={{ ...styles.tableHeadingText, width: '50%', justifyContent: 'flex-end', textAlign: 'center' }}>Amount</Text>
-              </View>
+              </View> */}
               {transfer.details.map((item) => (
                 <RecipientSendConfirmation
                   onPressElement={() => {
@@ -609,7 +648,7 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
-            <View style={{ ...styles.priorityTableContainer, borderBottomWidth: this.state.customAmount !== '' ? 0.5 : 0}}>
+            <View style={{ ...styles.priorityTableContainer, borderBottomWidth: this.state.customAmount !== '' ? 0.5 : 0 }}>
               <View style={{ ...styles.priorityDataContainer, justifyContent: 'flex-start' }}>
                 <RadioButton
                   size={20}
@@ -632,7 +671,7 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
-            {this.state.customAmount !== '' && 
+            {this.state.customAmount !== '' &&
               (<View style={{ ...styles.priorityTableContainer, borderBottomWidth: 0 }}>
                 <View style={{ ...styles.priorityDataContainer, justifyContent: 'flex-start' }}>
                   <RadioButton
@@ -1133,7 +1172,7 @@ const styles = StyleSheet.create({
   totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('2%'),
+    // marginTop: hp('1.2%'),
     marginRight: wp('6%'),
     marginLeft: wp('6%'),
     // borderTopWidth: 1,
