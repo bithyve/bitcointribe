@@ -94,33 +94,30 @@ export default function RestoreByCloudQrCodeContents(props) {
     if (qrDataArray.length <= 8) {
       tempArray.push(qrData);
       setQrDataArray(tempArray);
-      let temp =
-        counter == 1
-          ? counter + 'st'
-          : counter == 2
-          ? counter + 'nd'
-          : counter == 3
-          ? counter + 'rd'
-          : counter == 9
-          ? 8
-          : counter + 'th';
-          setTimeout(() => {
-            setErrorMessageHeader('Scan QR code');
-            setErrorMessage(
-              temp + ' QR code scanned, please scan the next one'
-            );
-            setProcessButtonText('Okay')
-          }, 2);
-          (ErrorBottomSheet as any).current.snapTo(1);
+      // let temp =
+      //   counter == 1
+      //     ? counter + 'st'
+      //     : counter == 2
+      //     ? counter + 'nd'
+      //     : counter == 3
+      //     ? counter + 'rd'
+      //     : counter == 9
+      //     ? 8
+      //     : counter + 'th';
+          // setTimeout(() => {
+          //   setErrorMessageHeader('Scan QR code');
+          //   setErrorMessage(
+          //     temp + ' QR code scanned, please scan the next one'
+          //   );
+          //   setProcessButtonText('Okay')
+          // }, 2);
+          // (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert(temp + ' QR code scanned, please scan the next one');
       counter++;
       setCounter(counter);
       startNumberCounter++;
       setStartNumberCounter(startNumberCounter);
     }
-    console.log('tempArray', tempArray);
-    console.log('qrDataArray', qrDataArray);
-    console.log({ length: qrDataArray.length });
     if (qrDataArray.length === 8) {
       dispatch(restoreShareFromQR(qrDataArray));
       setQrDataArray([]);
