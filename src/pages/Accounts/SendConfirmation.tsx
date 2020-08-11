@@ -54,6 +54,8 @@ import {
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import RecipientSendConfirmation from './RecipientSendConfirmation';
+import RadioButton from '../../components/RadioButton';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -289,7 +291,7 @@ export default function SendConfirmation(props) {
 
   const renderContacts = (item) => {
     return (
-      <RecipientComponent
+      <RecipientSendConfirmation
         onPressElement={() => {
           if (item.note) {
             if (SelectedContactId == item.selectedContact.id)
@@ -519,6 +521,10 @@ export default function SendConfirmation(props) {
     }
   }, [loading.transfer]);
 
+  const onPrioritySelect = (priority) => {
+    setSliderValueText(priority);
+  }
+
   return (
     <View
       style={{
@@ -664,6 +670,10 @@ export default function SendConfirmation(props) {
         </View>
         {transfer.details && transfer.details.length > 0 ? (
           <ScrollView>
+            <View style={{flex: 1, flexDirection: 'row', marginRight: wp('8%'), marginLeft: wp('8%')}}>
+              <Text style={{...styles.tableHeadingText, width: '50%', marginLeft: 10}}>To</Text>
+              <Text style={{...styles.tableHeadingText, width: '50%', justifyContent: 'flex-end', textAlign: 'center'}}>Amount</Text>
+            </View>
             {transfer.details.map((item) => renderContacts(item))}
           </ScrollView>
         ) : null}
@@ -675,11 +685,11 @@ export default function SendConfirmation(props) {
             marginTop: hp('2%'),
             marginRight: wp('6%'),
             marginLeft: wp('6%'),
-            borderTopWidth: 1,
+            // borderTopWidth: 1,
             borderBottomWidth: 1,
             borderColor: Colors.borderColor,
-            paddingBottom: hp('1.5%'),
-            paddingTop: hp('1.5%'),
+            paddingBottom: hp('1%'),
+            // paddingTop: hp('1%'),
           }}
         >
           <Text
@@ -713,14 +723,14 @@ export default function SendConfirmation(props) {
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(13),
+              fontSize: RFValue(18),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: 5,
             }}
           >
             Transaction Priority
           </Text>
-          <Text
+          {/* <Text
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue(12),
@@ -729,116 +739,82 @@ export default function SendConfirmation(props) {
             }}
           >
             Set priority for your transaction
-          </Text>
-
-          <View
-            style={{
-              ...styles.textBoxView,
-              flexDirection: 'column',
-              height: 'auto',
-              marginTop: hp('2%'),
-              alignItems: 'center',
-              paddingLeft: 10,
-              paddingRight: 10,
-            }}
-          >
-            <View
-              style={{ flexDirection: 'row' }}
-              ref={viewRef}
-              collapsable={false}
-            >
-              <TouchableWithoutFeedback onPressIn={tapSliderHandler}>
-                <Slider
-                  style={{ flex: 1 }}
-                  minimumValue={0}
-                  maximumValue={10}
-                  step={5}
-                  minimumTrackTintColor={Colors.blue}
-                  maximumTrackTintColor={Colors.borderColor}
-                  thumbStyle={{
-                    borderWidth: 5,
-                    borderColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    height: 30,
-                    width: 30,
-                    borderRadius: 15,
-                  }}
-                  trackStyle={{ height: 8, borderRadius: 10 }}
-                  thumbTouchSize={{
-                    width: 30,
-                    height: 30,
-                    backgroundColor: 'blue',
-                  }}
-                  value={sliderValue}
-                  onValueChange={(value) => {
-                    setSliderValue(value);
-                  }}
-                  onSlidingComplete={(value) => {
-                    value == 0
-                      ? setSliderValueText('Low Fee')
-                      : value == 5
-                      ? setSliderValueText('In the middle')
-                      : setSliderValueText('Fast Transaction');
-                  }}
-                />
-              </TouchableWithoutFeedback>
+          </Text> */}
+          <View style={styles.priorityTableHeadingContainer}>
+            <View style={{ flex: 1, paddingLeft: 10}}>
+              <Text style={styles.tableHeadingText}>Priority</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                  marginRight: 5,
-                }}
-              >
-                {'Low Fee\n'} (
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.tableHeadingText}>Arrival Time</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={{...styles.tableHeadingText, textAlign: 'center'}}>Fee</Text>
+            </View>
+          </View>
+          <View style={styles.priorityTableContainer}>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('High')}
+                onpress={() => onPrioritySelect('High Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>High</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>10 - 20 minutes</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>
+                {transfer.stage1.txPrerequisites
+                  ? transfer.stage1.txPrerequisites['high'].fee
+                  : ''}{' sats'}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.priorityTableContainer}>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('Medium')}
+                onpress={() => onPrioritySelect('Medium Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>Medium</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>
+                {transfer.stage1.txPrerequisites
+                  ? transfer.stage1.txPrerequisites['medium'].fee
+                  : ''}{' sats'}
+              </Text>
+            </View>
+          </View>
+          <View style={{...styles.priorityTableContainer, borderBottomWidth: 0}}>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('Low')}
+                onpress={() => onPrioritySelect('Low Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>Low</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+            </View>
+            <View style={styles.priorityDataContainer}>
+              <Text style={styles.priorityTableText}>
                 {transfer.stage1.txPrerequisites
                   ? transfer.stage1.txPrerequisites['low'].fee
                   : ''}
-                {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                  marginRight: 5,
-                }}
-              >
-                {'In the middle\n'} (
-                {transfer.stage1.txPrerequisites
-                  ? transfer.stage1.txPrerequisites['medium'].fee
-                  : ''}
-                {' sats'})
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                }}
-              >
-                {'Fast Transaction\n'} (
-                {transfer.stage1.txPrerequisites
-                  ? transfer.stage1.txPrerequisites['high'].fee
-                  : ''}
-                {' sats'})
+                {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
               </Text>
             </View>
           </View>
@@ -1032,4 +1008,39 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
   },
+  tableHeadingText: {
+    color: Colors.greyTextColor,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  priorityTableText: {
+    fontSize: RFValue(12),
+    lineHeight: RFValue(12),
+    color: Colors.greyTextColor,
+    textAlign: 'center',
+  },
+  priorityTableHeadingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('2%'),
+    paddingBottom: hp('1.5%')
+  },
+  priorityTableContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1.5%'),
+    paddingBottom: hp('1.5%')
+  },
+  priorityDataContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
 });
