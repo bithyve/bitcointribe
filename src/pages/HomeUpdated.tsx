@@ -10,7 +10,6 @@ import {
   Platform,
   AsyncStorage,
   Linking,
-  NativeModules,
   Alert,
 } from 'react-native';
 import Fonts from './../common/Fonts';
@@ -2084,6 +2083,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }, 10);
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
+    } else if (item.title === 'Hexa Community (Telegram)') {
+      let url = 'https://t.me/HexaWallet'
+      Linking.openURL(url)
+        .then((data) => {
+        })
+        .catch((e) => {
+          alert('Make sure Telegram installed on your device');
+        });
+      return
     }
   };
 
