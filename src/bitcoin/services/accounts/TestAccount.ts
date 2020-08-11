@@ -23,6 +23,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -41,6 +42,13 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -58,6 +66,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -80,6 +89,13 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];

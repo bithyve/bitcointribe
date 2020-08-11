@@ -27,6 +27,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -50,6 +51,13 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -73,6 +81,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -102,6 +111,13 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       twoFASetup: {
         qrData: string;
         secret: string;

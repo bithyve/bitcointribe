@@ -284,6 +284,13 @@ export default class Bitcoin {
     accountType: string,
     contactName?: string,
   ): Promise<{
+    UTXOs: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+      status?: any;
+    }>;
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
     nextFreeAddressIndex: number;
@@ -312,9 +319,18 @@ export default class Bitcoin {
         unconfirmedBalance: 0,
       };
 
+      const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
         for (const utxo of addressSpecificUTXOs) {
-          const { value, Address, status } = utxo;
+          const { value, Address, status, vout, txid } = utxo;
+
+          UTXOs.push({
+            txId: txid,
+            vout,
+            value,
+            address: Address,
+            status,
+          });
 
           if (
             accountType === 'Test Account' &&
@@ -416,6 +432,7 @@ export default class Bitcoin {
       }
 
       return {
+        UTXOs,
         balances,
         transactions,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
