@@ -100,7 +100,7 @@ export default function CustomPriorityContent(props) {
         }}
       >
         <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressOk()}
+          onPress={() => props.onPressOk(amount)}
           style={{ ...styles.successModalButtonView }}
         >
           <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
