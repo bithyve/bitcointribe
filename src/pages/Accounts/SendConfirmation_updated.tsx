@@ -161,14 +161,6 @@ class SendConfirmation_updated extends Component<
     ) {
       this.setState({ loading: this.props.accounts[this.serviceType].loading });
     }
-
-    if (
-      prevProps.accounts[this.serviceType].loading.transfer !==
-      this.props.accounts[this.serviceType].loading.transfer
-    ) {
-      if (!this.props.accounts[this.serviceType].loading.transfer)
-        this.setState({ isConfirmDisabled: false });
-    }
   };
 
   updateDescription = async (txid, description) => {
@@ -227,6 +219,7 @@ class SendConfirmation_updated extends Component<
     }
 
     if (transfer.stage2 && transfer.stage2.failed) {
+      this.setState({ isConfirmDisabled: false });
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
@@ -301,9 +294,6 @@ class SendConfirmation_updated extends Component<
 
   onConfirm = () => {
     let { sliderValueText } = this.state;
-    setTimeout(() => {
-      this.setState({ isConfirmDisabled: true });
-    }, 1);
     this.props.clearTransfer(this.serviceType, 'stage2');
     const txPriority =
       sliderValueText === 'Low Fee'
@@ -771,7 +761,10 @@ class SendConfirmation_updated extends Component<
 
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
-              onPress={this.onConfirm}
+              onPress={() => {
+                this.setState({ isConfirmDisabled: true });
+                this.onConfirm();
+              }}
               disabled={isConfirmDisabled}
               style={{
                 ...styles.confirmButtonView,

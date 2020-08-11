@@ -103,7 +103,7 @@ const TrustedContactHistory = (props) => {
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState(React.createRef<BottomSheet>());
   const [LoadContacts, setLoadContacts] = useState(false);
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
@@ -136,6 +136,7 @@ const TrustedContactHistory = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+  const [isOTPType, setIsOTPType] = useState(false);
 
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
@@ -340,9 +341,8 @@ const TrustedContactHistory = (props) => {
         onPressOk={(index) => {
           setRenderTimer(false);
           onOTPShare(index);
-          if (next) {
-            props.navigation.goBack();
-          }
+          setOTP('');
+          props.navigation.goBack();
         }}
         onPressBack={() => {
           (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
@@ -614,7 +614,7 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (overallHealth) {
-      if (overallHealth.sharesInfo[index].updatedAt) {
+      if (overallHealth.sharesInfo[index] && overallHealth.sharesInfo[index].updatedAt) {
         setShared(true);
       }
     }
@@ -760,6 +760,7 @@ const TrustedContactHistory = (props) => {
         `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ numberDL });
+      setIsOTPType(false);
       setTrustedLink(numberDL);
       setActivateReshare(true);
     } else if (chosenContact.emails && chosenContact.emails.length) {
@@ -786,6 +787,7 @@ const TrustedContactHistory = (props) => {
         `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ emailDL });
+      setIsOTPType(false);
       setTrustedLink(emailDL);
       setActivateReshare(true);
     } else if (otp) {
@@ -808,8 +810,8 @@ const TrustedContactHistory = (props) => {
         `/${otpHint}` +
         `/${uploadedAt}` +
         `/v${appVersion}`;
-
-      console.log({ otpDL });
+      setIsOTPType(true);
+      setOTP(otp);
       setTrustedLink(otpDL);
       setActivateReshare(true);
     } else {
@@ -1056,12 +1058,14 @@ const TrustedContactHistory = (props) => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0)
             // setChosenContactIndex(index);
           }}
           onPressViaLink={(index) => {
             createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0)
             // setChosenContactIndex(index);
           }}
         />
@@ -1099,6 +1103,12 @@ const TrustedContactHistory = (props) => {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
           onPressDone={() => {
+            setTimeout(() => {
+              setRenderTimer(true);
+            }, 2);
+            if(isOTPType){
+              (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+            }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -1313,12 +1323,11 @@ const TrustedContactHistory = (props) => {
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
             setRenderTimer(false);
-            // onOTPShare(index); commented: causing intransit history to re-iterate
           }
         }}
         enabledInnerScrolling={true}
         ref={shareOtpWithTrustedContactBottomSheet as any}
-        snapPoints={[-30, hp('70%')]}
+        snapPoints={[-30, hp('65%')]}
         renderContent={renderShareOtpWithTrustedContactContent}
         renderHeader={renderShareOtpWithTrustedContactHeader}
       />

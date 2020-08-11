@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Linking,
   Clipboard,
+  NativeModules,
+  Platform
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -16,7 +18,7 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import { nameToInitials } from '../common/CommonFunctions';
+import { APP_LIST, nameToInitials } from '../common/CommonFunctions';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from '../components/Toast';
 import {
@@ -25,6 +27,7 @@ import {
   SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+//var isPackageInstalled = require('NativeModules').CheckPackageInstallation.isPackageInstalled;
 
 export default function SendViaLink(props) {
   const [contactName, setContactName] = useState('');
@@ -32,24 +35,7 @@ export default function SendViaLink(props) {
   const [shareLink, setShareLink] = useState('');
   const [infoText, setInfoText] = useState('');
   const [stateUpdate, setStateUpdate] = useState(false);
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxList, setDropdownBoxList] = useState([
-    {
-      id: '1',
-      account_name: 'Test Account',
-      type: TEST_ACCOUNT,
-    },
-    {
-      id: '2',
-      account_name: 'Checking Account',
-      type: REGULAR_ACCOUNT,
-    },
-    {
-      id: '3',
-      account_name: 'Saving Account',
-      type: SECURE_ACCOUNT,
-    },
-  ]);
+  
   const [serviceType, setServiceType] = useState(
     props.serviceType ? props.serviceType : '',
   );
@@ -63,7 +49,7 @@ export default function SendViaLink(props) {
     {
       title: `Telegram`,
       image: require('../assets/images/icons/telegram.png'),
-      url: 'telegram.me://',
+      url: 'https://telegram.me/share/url?url=',
       isAvailable: false,
     },
     {
@@ -102,14 +88,17 @@ export default function SendViaLink(props) {
   }, [props.serviceType]);
 
   useEffect(() => {
-    ////console.log("Contact SEND VIA LINK1 ", contact);
     setContact(props.contact);
     (async () => {
       for (let i = 0; i < shareApps.length; i++) {
         if (shareApps[i].url) {
-          let supported = await Linking.canOpenURL(shareApps[i].url);
-          shareApps[i].isAvailable = supported;
-          //// console.log("supported", supported,shareApps);
+      isAppInstalled(shareApps[i].title)
+    .then((isInstalled) => {
+      console.log("isInstalled", isInstalled);
+      shareApps[i].isAvailable = Boolean(isInstalled);
+        // isInstalled is true if the app is installed or false if not
+    });
+          //let supported = await Linking.canOpenURL(shareApps[i].url);
         }
       }
       setTimeout(() => {
@@ -127,6 +116,47 @@ export default function SendViaLink(props) {
     }
     Toast('Copied Successfully');
   }
+ 
+  const checkPackageName = (packagename) => {
+    return new Promise(async (resolve, reject) => {
+      
+      NativeModules.CheckPackageInstallation.isPackageInstalled(packagename, (isInstalled) => {
+        console.log("RESOLVE", packagename, resolve);
+            resolve(isInstalled);
+        });
+    });
+}
+
+function checkURLScheme(proto, query) {
+  return new Promise((resolve, reject) => {
+      Linking
+          .canOpenURL(proto + '://' + query || '')
+          .then((isInstalled) => {
+              resolve(isInstalled);
+          })
+          .catch((err) => {
+              reject(err);
+          });
+  });
+}
+
+const isAppInstalled = (key) => {
+  let isAppInstalled = Platform.select({
+    ios: () => { return isAppInstalledIOS(key); },
+    android: () => { return isAppInstalledAndroid(key); }
+})();
+console.log("isAppInstalled", isAppInstalled)
+  return isAppInstalled;
+}
+
+function isAppInstalledAndroid(key) {
+  return checkPackageName(APP_LIST[key].pkgName);
+}
+
+function isAppInstalledIOS(key) {
+  //console.log("isAppInstalledIOS", checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams))
+  return checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams);
+}
 
   const renderVerticalDivider = () => {
     return (
@@ -177,15 +207,15 @@ export default function SendViaLink(props) {
   const openMessenger = (appUrl) => {
     if (shareLink) {
       let url = appUrl;
-      Linking.openURL(url)
-        .then((data) => {
-          ////console.log('Messenger Opened');
-        })
-        .catch(() => {
-          alert('Make sure Facebook Messenger installed on your device');
-        });
-    }
-  };
+          Linking.openURL(url)
+          .then((data) => {
+            ////console.log('Messenger Opened');
+          })
+          .catch(() => {
+            alert('Make sure Facebook Messenger installed on your device');
+          });
+      }
+  }
 
   const setPhoneNumber = () =>{
     let phoneNumber = Contact.phoneNumbers[0].number;
