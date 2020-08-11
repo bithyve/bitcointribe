@@ -69,6 +69,7 @@ interface SendConfirmationStateTypes {
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
+  customAmount: string;
 }
 
 interface SendConfirmationPropsTypes {
@@ -118,6 +119,7 @@ class SendConfirmation_updated extends Component<
       transfer: {},
       loading: {},
       isConfirmDisabled: false,
+      customAmount: '',
     };
   }
 
@@ -607,7 +609,7 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
-            <View style={{ ...styles.priorityTableContainer, borderBottomWidth: 0 }}>
+            <View style={{ ...styles.priorityTableContainer, borderBottomWidth: this.state.customAmount !== '' ? 0.5 : 0}}>
               <View style={{ ...styles.priorityDataContainer, justifyContent: 'flex-start' }}>
                 <RadioButton
                   size={20}
@@ -630,6 +632,31 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
+            {this.state.customAmount !== '' && 
+              (<View style={{ ...styles.priorityTableContainer, borderBottomWidth: 0 }}>
+                <View style={{ ...styles.priorityDataContainer, justifyContent: 'flex-start' }}>
+                  <RadioButton
+                    size={20}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={this.state.sliderValueText.includes('Custom')}
+                    onpress={() => this.onPrioritySelect('Custom Fee')}
+                  />
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>Custom</Text>
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>
+                    {this.state.customAmount}{' ' + this.getCorrectCurrencySymbol()}
+                    {/* {this.convertBitCoinToCurrency(
+                      transfer.stage1 && transfer.stage1.txPrerequisites
+                        ? transfer.stage1.txPrerequisites['low'].fee
+                        : '')}{' ' + this.getCorrectCurrencySymbol()} */}
+                  </Text>
+                </View>
+              </View>)}
             <TouchableOpacity style={{
               flex: 1,
               borderRadius: 8,
@@ -969,9 +996,14 @@ class SendConfirmation_updated extends Component<
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
-              onPressOk={() => {
+              onPressOk={(amount) => {
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
+                setTimeout(() => {
+                  this.setState({
+                    customAmount: amount
+                  });
+                }, 50);
               }}
               onPressCancel={() => {
                 if (this.refs.CustomPriorityBottomSheet as any)

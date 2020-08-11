@@ -19,6 +19,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
+import Toast from '../../components/Toast';
 
 
 export default function RestoreByCloudQrCodeContents(props) {
@@ -94,16 +95,16 @@ export default function RestoreByCloudQrCodeContents(props) {
     if (qrDataArray.length <= 8) {
       tempArray.push(qrData);
       setQrDataArray(tempArray);
-      // let temp =
-      //   counter == 1
-      //     ? counter + 'st'
-      //     : counter == 2
-      //     ? counter + 'nd'
-      //     : counter == 3
-      //     ? counter + 'rd'
-      //     : counter == 9
-      //     ? 8
-      //     : counter + 'th';
+      let temp =
+        counter == 1
+          ? counter + 'st'
+          : counter == 2
+          ? counter + 'nd'
+          : counter == 3
+          ? counter + 'rd'
+          : counter == 9
+          ? 8
+          : counter + 'th';
           // setTimeout(() => {
           //   setErrorMessageHeader('Scan QR code');
           //   setErrorMessage(
@@ -113,6 +114,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           // }, 2);
           // (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert(temp + ' QR code scanned, please scan the next one');
+      Toast(temp + ' QR code scanned, please scan the next one');
       counter++;
       setCounter(counter);
       startNumberCounter++;
