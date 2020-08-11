@@ -29,6 +29,13 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
