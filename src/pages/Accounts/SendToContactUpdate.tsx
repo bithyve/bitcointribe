@@ -525,9 +525,8 @@ class SendToContact extends Component<
       recipientsList.length + 1, // +1 for the current instance
       averageTxFees,
     );
-    console.log({ spendableBalance, amountStacked, fee });
+
     const max = spendableBalance - amountStacked - fee;
-    console.log({ max });
 
     if (!switchOn) {
       this.setState(
@@ -535,11 +534,11 @@ class SendToContact extends Component<
           switchOn: true,
         },
         () => {
-          this.convertBitCoinToCurrency(max);
+          this.convertBitCoinToCurrency(max.toString());
         },
       );
     } else {
-      this.convertBitCoinToCurrency(max);
+      this.convertBitCoinToCurrency(max.toString());
     }
   };
 
@@ -1052,7 +1051,7 @@ class SendToContact extends Component<
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                    // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1111,7 +1110,7 @@ class SendToContact extends Component<
                           fontFamily: Fonts.FiraSansItalic,
                         }}
                       >
-                        Enter Max
+                        Send Max
                       </Text>
                     )}
                   </TouchableOpacity>
