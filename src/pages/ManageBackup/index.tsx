@@ -1537,22 +1537,27 @@ export default function ManageBackup(props) {
       if (item.personalInfo) {
         return 'Friends and Family';
       }
-      return 'Select a Friend or Family member as a Keeper';
+      return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
+        : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
+        : item.status == 'Good' ? 'The Recovery Key is accessible'
+        : 'Select a contact as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
-      if (item.status === 'Ugly') {
-        return 'Another device running Hexa app that you own';
-      }
-      return 'Last Backup ';
+      return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
+        : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
+        : item.status == 'Good' ? 'The Recovery Key is accessible'
+        : 'Use one of your other device with Hexa';
     }
     if (item.type === 'copy1' || item.type === 'copy2') {
-      if (item.status === 'Ugly') {
-        return 'Secure your Recovery Key as a file (pdf)';
-      }
-      return 'The PDFs are locked with your Security Answer';
+      return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
+        : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
+        : item.status == 'Good' ? 'The Recovery Key is accessible'
+        : 'Secure your Recovery Key as a file (pdf)';
     }
-
-    return 'Last Backup ';
+    return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
+        : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
+        : item.status == 'Good' ? 'Security Question and Answer are confirmed'
+        : 'Last Backup';
   };
 
   return (
