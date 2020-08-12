@@ -70,6 +70,7 @@ interface SendConfirmationStateTypes {
   loading: any;
   isConfirmDisabled: boolean;
   customAmount: string;
+  averageTxFees: any;
 }
 
 interface SendConfirmationPropsTypes {
@@ -84,6 +85,7 @@ interface SendConfirmationPropsTypes {
   transferST2: any;
   currencyCode: any;
   currencyToggleValue: any;
+  averageTxFees: any;
 }
 class SendConfirmation_updated extends Component<
   SendConfirmationPropsTypes,
@@ -120,6 +122,7 @@ class SendConfirmation_updated extends Component<
       loading: {},
       isConfirmDisabled: false,
       customAmount: '',
+      averageTxFees: this.props.averageTxFees,
     };
   }
 
@@ -786,7 +789,22 @@ class SendConfirmation_updated extends Component<
                   </Text>
                 </View>
                 <View style={styles.priorityDataContainer}>
-                  <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+                  {transfer &&
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites &&
+                  this.state.averageTxFees ? (
+                    <Text style={styles.priorityTableText}>
+                      {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
+                        10}{' '}
+                      -{' '}
+                      {this.state.averageTxFees[
+                        this.serviceType === TEST_ACCOUNT
+                          ? 'TESTNET'
+                          : 'MAINNET'
+                      ].averageTxFees['minimum'].estimatedBlocks * 10}{' '}
+                      minutes
+                    </Text>
+                  ) : null}
                 </View>
                 <View style={styles.priorityDataContainer}>
                   <Text style={styles.priorityTableText}>
@@ -1144,7 +1162,13 @@ class SendConfirmation_updated extends Component<
               cancelButtonText={'Back'}
               isCancel={true}
               onPressOk={(amount) => {
-                if (amount <= transfer.stage1.txPrerequisites['high'].fee) {
+                if (
+                  amount >=
+                    this.state.averageTxFees[
+                      this.serviceType === TEST_ACCOUNT ? 'TESTNET' : 'MAINNET'
+                    ].averageTxFees['minimum'].averageTxFee &&
+                  amount <= transfer.stage1.txPrerequisites['high'].fee
+                ) {
                   if (this.refs.CustomPriorityBottomSheet as any)
                     (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
                   setTimeout(() => {
@@ -1182,6 +1206,7 @@ const mapStateToProps = (state) => {
     WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP) || '',
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
   };
 };
 

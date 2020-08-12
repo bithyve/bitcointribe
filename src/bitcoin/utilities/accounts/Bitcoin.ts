@@ -935,6 +935,7 @@ export default class Bitcoin {
     high: { feePerByte: number; estimatedBlocks: number };
     medium: { feePerByte: number; estimatedBlocks: number };
     low: { feePerByte: number; estimatedBlocks: number };
+    minimum: { feePerByte: number; estimatedBlocks: number };
   }> => {
     try {
       let rates;
@@ -991,47 +992,51 @@ export default class Bitcoin {
         estimatedBlocks: 36,
       }; // low: within 36 blocks
 
+      const minimum = {
+        feePerByte: Math.round(rates['144']),
+        estimatedBlocks: 144,
+      };
+
       const feeRatesByPriority = {
         high,
         medium,
         low,
+        minimum,
       };
 
       return feeRatesByPriority;
     } catch (err) {
-      console.log(
-        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
-      );
-      try {
-        const chainInfo = await this.fetchChainInfo();
-        const {
-          high_fee_per_kb,
-          medium_fee_per_kb,
-          low_fee_per_kb,
-        } = chainInfo;
+      console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
+      // try {
+      //   const chainInfo = await this.fetchChainInfo();
+      //   const {
+      //     high_fee_per_kb,
+      //     medium_fee_per_kb,
+      //     low_fee_per_kb,
+      //   } = chainInfo;
 
-        const high = {
-          feePerByte: Math.round(high_fee_per_kb / 1000),
-          estimatedBlocks: 2,
-        };
-        const medium = {
-          feePerByte: Math.round(medium_fee_per_kb / 1000),
-          estimatedBlocks: 4,
-        };
-        const low = {
-          feePerByte: Math.round(low_fee_per_kb / 1000),
-          estimatedBlocks: 6,
-        };
+      //   const high = {
+      //     feePerByte: Math.round(high_fee_per_kb / 1000),
+      //     estimatedBlocks: 2,
+      //   };
+      //   const medium = {
+      //     feePerByte: Math.round(medium_fee_per_kb / 1000),
+      //     estimatedBlocks: 4,
+      //   };
+      //   const low = {
+      //     feePerByte: Math.round(low_fee_per_kb / 1000),
+      //     estimatedBlocks: 6,
+      //   };
 
-        const feeRatesByPriority = {
-          high,
-          medium,
-          low,
-        };
-        return feeRatesByPriority;
-      } catch (err) {
-        throw new Error('Falied to fetch feeRates');
-      }
+      //   const feeRatesByPriority = {
+      //     high,
+      //     medium,
+      //     low,
+      //   };
+      //   return feeRatesByPriority;
+      // } catch (err) {
+      //   throw new Error('Falied to fetch feeRates');
+      // }
     }
   };
 
@@ -1062,6 +1067,13 @@ export default class Bitcoin {
         ),
         feePerByte: feeRatesByPriority['low'].feePerByte,
         estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
+      },
+      minimum: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['minimum'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['minimum'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['minimum'].estimatedBlocks,
       },
     };
   };
