@@ -1467,6 +1467,25 @@ export default class HDSegwitWallet extends Bitcoin {
     return { fee };
   };
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ): { customFee: number } => {
+    const inputUTXOs = this.confirmedUTXOs;
+
+    const { inputs, fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      customTxFeePerByte,
+    );
+
+    if (!inputs) return { customFee: null };
+    return { customFee: fee };
+  };
+
   public transactionPrerequisites = async (
     recipients: {
       address: string;
@@ -1578,7 +1597,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customFee?: number,
+    customFeePerByte?: number,
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
@@ -1586,16 +1605,15 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       let inputs, outputs;
       if (txnPriority === 'custom') {
-        inputs = txPrerequisites['high'].inputs;
-        outputs = txPrerequisites['high'].outputs;
+        const inputUTXOs = this.confirmedUTXOs;
+        const outputUTXOs = txPrerequisites['high'].outputs.filter(
+          (output) => output.address,
+        ); // removing change utxo in order to get the original set of outUTXOs
 
-        // deduct the custom fee
-        outputs.forEach((output) => {
-          if (!output.address) {
-            output.value =
-              output.value + txPrerequisites['high'].fee - customFee;
-          }
-        });
+        const assets = coinselect(inputUTXOs, outputUTXOs, customFeePerByte);
+
+        inputs = assets.inputs;
+        outputs = assets.outputs;
       } else {
         inputs = txPrerequisites[txnPriority].inputs;
         outputs = txPrerequisites[txnPriority].outputs;

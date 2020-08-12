@@ -558,6 +558,15 @@ export default class BaseAccount {
   public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
     this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ): { customFee: number } =>
+    this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+
   public transferST1 = async (
     recipients: {
       address: string;

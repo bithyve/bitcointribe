@@ -643,7 +643,7 @@ export const generateSecondaryXprivWatcher = createWatcher(
 );
 
 function* alternateTransferST2Worker({ payload }) {
-  const { serviceType, txnPriority, nSequence } = payload;
+  const { serviceType, txnPriority, customFee, nSequence } = payload;
   if (serviceType !== SECURE_ACCOUNT) return;
 
   yield put(switchLoader(serviceType, 'transfer'));
@@ -661,6 +661,7 @@ function* alternateTransferST2Worker({ payload }) {
     service.alternateTransferST2,
     txPrerequisites,
     txnPriority,
+    customFee,
     nSequence,
   );
   if (res.status === 200) {

@@ -1328,6 +1328,24 @@ export default class SecureHDWallet extends Bitcoin {
     return { fee };
   };
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ): { customFee: number } => {
+    const inputUTXOs = this.confirmedUTXOs;
+    const { inputs, fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      customTxFeePerByte,
+    );
+
+    if (!inputs) return { customFee: null };
+    return { customFee: fee };
+  };
+
   public transactionPrerequisites = async (
     recipients: {
       address: string;

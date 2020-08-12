@@ -659,6 +659,15 @@ export default class SecureAccount {
   public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
     this.secureHDWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ): { customFee: number } =>
+    this.secureHDWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+
   public transferST1 = async (
     recipients: {
       address: string;
@@ -838,6 +847,7 @@ export default class SecureAccount {
   public alternateTransferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -859,6 +869,7 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
       const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
