@@ -950,20 +950,46 @@ export default class Bitcoin {
         rates = res.data;
       }
 
+      // high fee: 30 minutes
+      const highFeePerByte =
+        rates['2'] - rates['3'] >= 10
+          ? 0.4 * rates['2'] + 0.6 * rates['3']
+          : rates['3'];
+
       const high = {
-        feePerByte: Math.round(rates['2'] + rates['3']) / 2,
+        feePerByte: Math.round(highFeePerByte),
         estimatedBlocks: 3,
       }; // high: within 3 blocks
 
+      // medium fee: 2 hours
+      let mediumFeePerByte;
+      if (rates['6'] - rates['10'] >= 10) {
+        if (rates['10'] - rates['20'] <= 10) {
+          mediumFeePerByte = 0.6 * rates['10'] + 0.2 * rates['6'];
+        } else {
+          mediumFeePerByte =
+            0.1 * rates['20'] + 0.5 * rates['10'] + 0.2 * rates['6'];
+        }
+      } else {
+        if (rates['10'] - rates['20'] <= 10) {
+          mediumFeePerByte = 0.85 * rates['10'];
+        } else {
+          mediumFeePerByte = 0.2 * rates['20'] + 0.7 * rates['10'];
+        }
+      }
+
       const medium = {
-        feePerByte: Math.round((rates['4'] + rates['5'] + rates['6']) / 3),
-        estimatedBlocks: 8,
-      }; // medium: within 8 blocks
+        feePerByte: Math.round(mediumFeePerByte),
+        estimatedBlocks: 12,
+      }; // medium: within 12 blocks
+
+      //low fee: 6 hours
+      const lowFeePerByte = 0.7 * rates['25'] + 0.3 * rates['144'];
 
       const low = {
-        feePerByte: Math.round((rates['6'] + rates['10'] + rates['20']) / 3),
-        estimatedBlocks: 12,
-      }; // low: within 12 blocks
+        feePerByte: Math.round(lowFeePerByte),
+        estimatedBlocks: 36,
+      }; // low: within 36 blocks
 
       const feeRatesByPriority = {
         high,

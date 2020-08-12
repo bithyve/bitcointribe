@@ -771,7 +771,9 @@ export default class SecureAccount {
         customFee,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[
+        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
+      ];
 
       const {
         signedTxb,

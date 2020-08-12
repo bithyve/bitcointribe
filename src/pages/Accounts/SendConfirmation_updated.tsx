@@ -642,7 +642,19 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
               <View style={styles.priorityDataContainer}>
-                <Text style={styles.priorityTableText}>10 - 20 minutes</Text>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['high'].estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text style={styles.priorityTableText}>
@@ -674,7 +686,20 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
               <View style={styles.priorityDataContainer}>
-                <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['medium'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['medium']
+                      .estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text style={styles.priorityTableText}>
@@ -711,7 +736,19 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
               <View style={styles.priorityDataContainer}>
-                <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['low'].estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text style={styles.priorityTableText}>
