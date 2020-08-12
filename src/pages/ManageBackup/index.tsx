@@ -1534,9 +1534,9 @@ export default function ManageBackup(props) {
 
   const getCardSubText = (item) => {
     if (item.type === 'contact1' || item.type === 'contact2') {
-      if (item.personalInfo) {
-        return 'Friends and Family';
-      }
+      // if (item.personalInfo) {
+      //   return 'Friends and Family';
+      // }
       return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
         : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
         : item.status == 'Good' ? 'The Recovery Key is accessible'
