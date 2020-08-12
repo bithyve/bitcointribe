@@ -1584,19 +1584,22 @@ export default class HDSegwitWallet extends Bitcoin {
     txb: bitcoinJS.TransactionBuilder;
   }> => {
     try {
-      let inputs, outputs, fee;
+      let inputs, outputs;
       if (txnPriority === 'custom') {
-        // barring the custom fee w/ fee at high priority
         inputs = txPrerequisites['high'].inputs;
         outputs = txPrerequisites['high'].outputs;
-        fee = customFee;
+
+        // deduct the custom fee
+        outputs.forEach((output) => {
+          if (!output.address) {
+            output.value =
+              output.value + txPrerequisites['high'].fee - customFee;
+          }
+        });
       } else {
         inputs = txPrerequisites[txnPriority].inputs;
         outputs = txPrerequisites[txnPriority].outputs;
-        fee = txPrerequisites[txnPriority].fee;
       }
-
-      console.log({ inputs, outputs, fee });
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
@@ -1605,15 +1608,6 @@ export default class HDSegwitWallet extends Bitcoin {
       inputs.forEach((input) =>
         txb.addInput(input.txId, input.vout, nSequence),
       );
-
-      // adjusting fee according to selected priority
-      const defaultTxPriority = 'low'; // default deducted fee
-      outputs.forEach((output) => {
-        if (!output.address) {
-          output.value =
-            output.value + txPrerequisites[defaultTxPriority].fee - fee;
-        }
-      });
 
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
