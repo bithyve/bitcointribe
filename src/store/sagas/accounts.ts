@@ -579,7 +579,7 @@ export const transferST1Watcher = createWatcher(
 );
 
 function* transferST2Worker({ payload }) {
-  const { serviceType, txnPriority, nSequence } = payload;
+  const { serviceType, txnPriority, customFee, nSequence } = payload;
 
   yield put(switchLoader(serviceType, 'transfer'));
   const { service, transfer } = yield select(
@@ -595,6 +595,7 @@ function* transferST2Worker({ payload }) {
     service.transferST2,
     txPrerequisites,
     txnPriority,
+    customFee,
     nSequence,
   );
   if (res.status === 200) {

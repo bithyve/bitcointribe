@@ -21,5 +21,6 @@ export default {
   currencyGray: '#d0d0d0',
   seaBlue: '#CFE8F8',
   deepBlue: '#04578B',
-  babyGray: '#BCB6B6'
+  babyGray: '#BCB6B6',
+  greyTextColor: '#656565'
 };

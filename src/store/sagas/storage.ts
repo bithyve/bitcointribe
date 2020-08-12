@@ -97,9 +97,17 @@ function* servicesEnricherWorker({ payload }) {
 
     let dbVersion = database.VERSION
     let appVersion = DeviceInfo.getVersion()
+    if (appVersion === "0.7") {
+      appVersion = "0.7.0"
+    }
+    if (appVersion === "0.8") {
+      appVersion = "0.8.0"
+    }
     if (appVersion === "0.9") {
       appVersion = "0.9.0"
     }
+
+
 
 
     const {
@@ -113,6 +121,7 @@ function* servicesEnricherWorker({ payload }) {
     let services;
     let migrated = false;
     if (!database.VERSION) { dbVersion = '0.7.0' }
+    else if (database.VERSION === '0.8') { dbVersion = '0.8.0' }
     else if (database.VERSION === '0.9') { dbVersion = '0.9.0' }
     else if (database.VERSION === '1.0') { dbVersion = '1.0.0' }
     if (semver.gt(appVersion, dbVersion)) {

@@ -29,6 +29,13 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -548,6 +555,9 @@ export default class BaseAccount {
     }
   };
 
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
   public transferST1 = async (
     recipients: {
       address: string;
@@ -627,6 +637,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -648,9 +659,12 @@ export default class BaseAccount {
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[
+        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
+      ];
 
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       console.log('---- Transaction Signed ----');

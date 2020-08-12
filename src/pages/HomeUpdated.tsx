@@ -10,7 +10,6 @@ import {
   Platform,
   AsyncStorage,
   Linking,
-  NativeModules,
   Alert,
 } from 'react-native';
 import Fonts from './../common/Fonts';
@@ -109,6 +108,7 @@ import {
   setSecondaryDeviceAddress,
 } from '../store/actions/preferences';
 import * as Permissions from 'expo-permissions';
+import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -385,63 +385,67 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   processQRData = async (qrData) => {
     const { accounts, addTransferDetails, navigation } = this.props;
-    const { balances } = this.state;
 
-    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
-    const { type } = regularService.addressDiff(qrData);
-    if (type) {
-      const serviceType = REGULAR_ACCOUNT; // default service type
-      let item;
-      switch (type) {
-        case 'address':
-          const recipientAddress = qrData;
-          item = {
-            id: recipientAddress,
-          };
+    const network = Bitcoin.networkType(qrData);
+    if (network) {
+      const serviceType =
+        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-          addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
-          navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-          });
-          break;
+      const service = accounts[serviceType].service;
+      const { type } = service.addressDiff(qrData);
+      if (type) {
+        let item;
+        switch (type) {
+          case 'address':
+            const recipientAddress = qrData;
+            item = {
+              id: recipientAddress,
+            };
 
-        case 'paymentURI':
-          let address, options;
-          try {
-            const res = regularService.decodePaymentURI(qrData);
-            address = res.address;
-            options = res.options;
-          } catch (err) {
-            Alert.alert('Unable to decode payment URI');
-            return;
-          }
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            });
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+            });
+            break;
 
-          item = {
-            id: address,
-          };
+          case 'paymentURI':
+            let address, options;
+            try {
+              const res = service.decodePaymentURI(qrData);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
 
-          addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
+            item = {
+              id: address,
+            };
 
-          navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-            bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
-              : '',
-          });
-          break;
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            });
 
-        default:
-          Toast('Invalid QR');
-          break;
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+              bitcoinAmount: options.amount
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
+            });
+            break;
+
+          default:
+            Toast('Invalid QR');
+            break;
+        }
+
+        return;
       }
-
-      return;
     }
 
     try {
@@ -675,6 +679,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   scheduleNotification = async () => {
+    const channelId = new firebase.notifications.Android.Channel("Default", "Default", firebase.notifications.Android.Importance.High);
+    firebase.notifications().android.createChannel(channelId);
     const notification = new firebase.notifications.Notification()
       .setTitle('We have not seen you in a while!')
       .setBody(
@@ -2077,6 +2083,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }, 10);
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
+    } else if (item.title === 'Hexa Community (Telegram)') {
+      let url = 'https://t.me/HexaWallet'
+      Linking.openURL(url)
+        .then((data) => {
+        })
+        .catch((e) => {
+          alert('Make sure Telegram installed on your device');
+        });
+      return
     }
   };
 
@@ -3128,7 +3143,7 @@ const mapStateToProps = (state) => {
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
-    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
     secondaryDeviceAddressValue: idx(

@@ -272,7 +272,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Exit/Regenerate 2FA Key:",
                 catFont));
         preface.add(new Paragraph(
-                "Use this key to reset the 2FA if you have lost your authenticator app or for exiting your funds from Savings account if the BitHyve server is not responding",
+                "Use this key to reset the 2FA if you have lost your authenticator app or for transferring your funds from Savings account if the BitHyve server is not responding",
                 smallBold));
         document.add(preface);
         barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), (int)qrImageSize, (int)qrImageSize, null);

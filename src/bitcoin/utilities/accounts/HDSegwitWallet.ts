@@ -55,6 +55,13 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  private confirmedUTXOs: Array<{
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }>;
   public derivativeAccounts:
     | DerivativeAccounts
     | TrustedContactDerivativeAccount = config.DERIVATIVE_ACC;
@@ -76,6 +83,13 @@ export default class HDSegwitWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -135,6 +149,11 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.transactions
         ? stateVars.transactions
         : this.transactions;
+
+    this.confirmedUTXOs =
+      stateVars && stateVars.confirmedUTXOs
+        ? stateVars.confirmedUTXOs
+        : this.confirmedUTXOs;
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
         ? stateVars.derivativeAccounts
@@ -476,7 +495,18 @@ export default class HDSegwitWallet extends Bitcoin {
       contactName,
     );
 
-    const { balances, transactions } = res;
+    const { balances, transactions, UTXOs } = res;
+
+    const confirmedUTXOs = [];
+    for (const utxo of UTXOs) {
+      if (utxo.status) {
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+    this.confirmedUTXOs.push(...confirmedUTXOs); // pushing confirmed derivative utxos to the pre-existing utxo pool from parent acc
 
     const lastSyncTime =
       this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
@@ -593,6 +623,7 @@ export default class HDSegwitWallet extends Bitcoin {
         (addressSpecificTxs) => !!addressSpecificTxs.TotalTransactions,
       );
 
+      const UTXOs = [];
       const addressesInfo = Txs;
       console.log({ addressesInfo });
 
@@ -612,8 +643,17 @@ export default class HDSegwitWallet extends Bitcoin {
           const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
           for (const addressSpecificUTXOs of Utxos) {
             for (const utxo of addressSpecificUTXOs) {
-              const { value, Address, status } = utxo;
+              const { value, Address, status, vout, txid } = utxo;
+
               if (addressInUse.includes(Address)) {
+                UTXOs.push({
+                  txId: txid,
+                  vout,
+                  value,
+                  address: Address,
+                  status,
+                });
+
                 if (status.confirmed) balances.balance += value;
                 // else if (changeAddresses && changeAddresses.includes(Address))
                 //   balances.balance += value;
@@ -760,6 +800,18 @@ export default class HDSegwitWallet extends Bitcoin {
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
+
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+      this.confirmedUTXOs.push(...confirmedUTXOs);
+
       return { synched: true };
     } catch (err) {
       console.log(
@@ -800,50 +852,6 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  // public getReceivingAddress = async (): Promise<{ address: string }> => {
-  //   try {
-  //     // // finding free external address
-  //     // let freeAddress = '';
-  //     // let itr;
-  //     // for (itr = 0; itr < this.gapLimit + 1; itr++) {
-  //     //   if (this.nextFreeAddressIndex + itr < 0) {
-  //     //     continue;
-  //     //   }
-  //     //   console.log({ itr });
-  //     //   const address = this.getExternalAddressByIndex(
-  //     //     this.nextFreeAddressIndex + itr,
-  //     //   );
-  //     //   this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
-  //     //   const txCounts = await this.getTxCounts([address]); // ensuring availability
-  //     //   if (txCounts[address] === 0) {
-  //     //     // free address found
-  //     //     freeAddress = address;
-  //     //     this.nextFreeAddressIndex += itr;
-  //     //     break;
-  //     //   }
-  //     // }
-
-  //     // if (!freeAddress) {
-  //     //   console.log(
-  //     //     'Failed to find a free address in the external address cycle, using the next address without checking',
-  //     //   );
-  //     //   // giving up as we couldn't find a free address in the above cycle
-  //     //   freeAddress = this.getExternalAddressByIndex(
-  //     //     this.nextFreeAddressIndex + itr,
-  //     //   ); // not checking this one, it might be free
-  //     //   this.nextFreeAddressIndex += itr + 1;
-  //     // }
-  //     //   this.receivingAddress = freeAddress;
-
-  //     this.receivingAddress = this.getExternalAddressByIndex(
-  //       this.nextFreeAddressIndex,
-  //     );
-  //     return { address: this.receivingAddress };
-  //   } catch (err) {
-  //     throw new Error(`Unable to generate receiving address: ${err.message}`);
-  //   }
-  // };
-
   public testnetFaucet = async (): Promise<{
     txid: any;
     funded: any;
@@ -878,6 +886,7 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses = [recipientAddress];
       // this.balances = { balance: amount * 1e8, unconfirmedBalance: 0 }; // assumption: we don't call testFaucet twice (spendable exception: 1st receive test-utxo)
       const {
+        UTXOs,
         balances,
         transactions,
         nextFreeAddressIndex,
@@ -888,6 +897,26 @@ export default class HDSegwitWallet extends Bitcoin {
         this.nextFreeAddressIndex - 1,
         'Test Account',
       );
+
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (
+            this.isTest &&
+            utxo.address === this.getExternalAddressByIndex(0)
+          ) {
+            confirmedUTXOs.push(utxo); // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue;
+          }
+
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+      this.confirmedUTXOs = confirmedUTXOs;
+
       this.nextFreeAddressIndex = nextFreeAddressIndex;
       this.receivingAddress = this.getExternalAddressByIndex(
         this.nextFreeAddressIndex,
@@ -1264,6 +1293,7 @@ export default class HDSegwitWallet extends Bitcoin {
     ]; // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const {
+      UTXOs,
       balances,
       transactions,
       nextFreeAddressIndex,
@@ -1274,6 +1304,28 @@ export default class HDSegwitWallet extends Bitcoin {
       this.nextFreeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
     );
+
+    const confirmedUTXOs = [];
+    for (const utxo of UTXOs) {
+      if (utxo.status) {
+        if (this.isTest && utxo.address === this.getExternalAddressByIndex(0)) {
+          confirmedUTXOs.push(utxo); // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+          continue;
+        }
+
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        else {
+          if (internalAddresses.includes(utxo.address)) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push(utxo);
+          }
+        }
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+    this.confirmedUTXOs = confirmedUTXOs;
     this.nextFreeAddressIndex = nextFreeAddressIndex;
     this.receivingAddress = this.getExternalAddressByIndex(
       this.nextFreeAddressIndex,
@@ -1386,6 +1438,35 @@ export default class HDSegwitWallet extends Bitcoin {
   //   }
   // };
 
+  public calculateSendMaxFee = (
+    numberOfRecipients,
+    averageTxFees,
+  ): { fee: number } => {
+    const inputUTXOs = this.confirmedUTXOs;
+    const outputUTXOs = [];
+    for (let index = 0; index < numberOfRecipients; index++) {
+      // using random outputs for send all fee calculation
+      outputUTXOs.push({
+        address: bitcoinJS.payments.p2sh({
+          redeem: bitcoinJS.payments.p2wpkh({
+            pubkey: bitcoinJS.ECPair.makeRandom().publicKey,
+            network: this.network,
+          }),
+          network: this.network,
+        }).address,
+        value: Math.floor(this.balances.balance / numberOfRecipients),
+      });
+    }
+    const { fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      averageTxFees['medium'].feePerByte,
+    );
+    console.log({ inputUTXOs, outputUTXOs, fee });
+
+    return { fee };
+  };
+
   public transactionPrerequisites = async (
     recipients: {
       address: string;
@@ -1404,7 +1485,7 @@ export default class HDSegwitWallet extends Bitcoin {
         balance?: undefined;
       }
   > => {
-    const inputUTXOs = await this.fetchUtxo();
+    const inputUTXOs = this.confirmedUTXOs;
     console.log('Input UTXOs:', inputUTXOs);
 
     const outputUTXOs = [];
@@ -1415,81 +1496,78 @@ export default class HDSegwitWallet extends Bitcoin {
       });
     }
     console.log('Output UTXOs:', outputUTXOs);
-    let balance: number = 0;
-    inputUTXOs.forEach((utxo) => {
-      balance += utxo.value;
-    });
 
-    const defaultTxPriority = 'low'; // doing  base calculation with low fee
-    let feePerByte, estimatedBlocks;
+    const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
+    let defaultFeePerByte, defaultEstimatedBlocks;
     console.log({ averageTxFees });
     if (averageTxFees) {
-      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
     } else {
       const averageTxFees = await this.averageTransactionFee();
-      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
     }
 
-    const { inputs, outputs, fee } = coinselect(
-      inputUTXOs,
-      outputUTXOs,
-      feePerByte,
-    );
+    const assets = coinselect(inputUTXOs, outputUTXOs, defaultFeePerByte);
+    const defaultPriorityInputs = assets.inputs;
+    const defaultPriorityOutputs = assets.outputs;
+    const defaultPriorityFee = assets.fee;
 
     console.log('-------Transaction--------');
-    console.log('\tDynamic Fee', fee);
-    console.log('\tInputs:', inputs);
-    console.log('\tOutputs:', outputs);
-
-    if (!inputs) {
-      // insufficient input utxos to compensate for output utxos + fee
-      return { fee, balance };
-    }
+    console.log('\tDynamic Fee', defaultPriorityFee);
+    console.log('\tInputs:', defaultPriorityInputs);
+    console.log('\tOutputs:', defaultPriorityOutputs);
 
     let netAmount = 0;
     recipients.forEach((recipient) => {
       netAmount += recipient.amount;
     });
+    const defaultDebitedAmount = netAmount + defaultPriorityFee;
+    if (
+      !defaultPriorityInputs ||
+      defaultDebitedAmount > this.balances.balance
+    ) {
+      // insufficient input utxos to compensate for output utxos + lowest priority fee
+      return { fee: defaultPriorityFee, balance: this.balances.balance };
+    }
 
     const txPrerequisites: TransactionPrerequisite = {};
     for (const priority of Object.keys(averageTxFees)) {
-      const debitedAmount = netAmount + fee;
-      if (debitedAmount <= balance) {
-        let netFeeByPriority;
-        let estimatedBlocks;
-        if (debitedAmount === balance) {
-          // fee defaults across priority
-          netFeeByPriority = Math.round(
-            (fee / feePerByte) * averageTxFees[defaultTxPriority].feePerByte,
-          );
-          estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-        } else {
-          netFeeByPriority = Math.round(
-            (fee / feePerByte) * averageTxFees[priority].feePerByte,
-          );
-          estimatedBlocks = averageTxFees[priority].estimatedBlocks;
-        }
-
+      if (
+        priority === defaultTxPriority ||
+        defaultDebitedAmount === this.balances.balance
+      ) {
         txPrerequisites[priority] = {
-          inputs,
-          outputs,
-          fee: netFeeByPriority,
-          estimatedBlocks,
+          inputs: defaultPriorityInputs,
+          outputs: defaultPriorityOutputs,
+          fee: defaultPriorityFee,
+          estimatedBlocks: defaultEstimatedBlocks,
         };
       } else {
-        const netFeeByPriority = Math.round(
-          (fee / feePerByte) * averageTxFees[priority].feePerByte,
+        // re-computing inputs with a non-default priority fee
+        const { inputs, outputs, fee } = coinselect(
+          inputUTXOs,
+          outputUTXOs,
+          averageTxFees[priority].feePerByte,
         );
-        const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
-
-        txPrerequisites[priority] = {
-          inputs: null, // if null >> insufficient balance to pay with fee corresponding to this tx priority
-          outputs,
-          fee: netFeeByPriority,
-          estimatedBlocks,
-        };
+        const debitedAmount = netAmount + fee;
+        if (!inputs || debitedAmount > this.balances.balance) {
+          // to default priorty assets
+          txPrerequisites[priority] = {
+            inputs: defaultPriorityInputs,
+            outputs: defaultPriorityOutputs,
+            fee: defaultPriorityFee,
+            estimatedBlocks: defaultEstimatedBlocks,
+          };
+        } else {
+          txPrerequisites[priority] = {
+            inputs,
+            outputs,
+            fee,
+            estimatedBlocks: averageTxFees[priority].estimatedBlocks,
+          };
+        }
       }
     }
 
@@ -1500,12 +1578,28 @@ export default class HDSegwitWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
   }> => {
     try {
-      const { inputs, outputs, fee } = txPrerequisites[txnPriority];
+      let inputs, outputs;
+      if (txnPriority === 'custom') {
+        inputs = txPrerequisites['high'].inputs;
+        outputs = txPrerequisites['high'].outputs;
+
+        // deduct the custom fee
+        outputs.forEach((output) => {
+          if (!output.address) {
+            output.value =
+              output.value + txPrerequisites['high'].fee - customFee;
+          }
+        });
+      } else {
+        inputs = txPrerequisites[txnPriority].inputs;
+        outputs = txPrerequisites[txnPriority].outputs;
+      }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
@@ -1514,15 +1608,6 @@ export default class HDSegwitWallet extends Bitcoin {
       inputs.forEach((input) =>
         txb.addInput(input.txId, input.vout, nSequence),
       );
-
-      // adjusting fee according to selected priority
-      const defaultTxPriority = 'low'; // default deducted fee
-      outputs.forEach((output) => {
-        if (!output.address) {
-          output.value =
-            output.value + txPrerequisites[defaultTxPriority].fee - fee;
-        }
-      });
 
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {

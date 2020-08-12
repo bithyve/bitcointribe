@@ -27,6 +27,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -50,6 +51,13 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -73,6 +81,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -102,6 +111,13 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -640,6 +656,9 @@ export default class SecureAccount {
     }
   };
 
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.secureHDWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
   public transferST1 = async (
     recipients: {
       address: string;
@@ -720,6 +739,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -748,9 +768,12 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[
+        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
+      ];
 
       const {
         signedTxb,

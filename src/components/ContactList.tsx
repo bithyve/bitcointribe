@@ -175,8 +175,14 @@ export default function ContactList(props) {
       let filterContactsForDisplay = [];
       for (let i = 0; i < contactData.length; i++) {
         if (
-          contactData[i].name &&
-          contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())
+          (contactData[i].firstName &&
+            contactData[i].firstName
+              .toLowerCase()
+              .startsWith(keyword.toLowerCase())) ||
+          (contactData[i].lastName &&
+            contactData[i].lastName
+              .toLowerCase()
+              .startsWith(keyword.toLowerCase()))
         ) {
           filterContactsForDisplay.push(contactData[i]);
         }
@@ -399,7 +405,7 @@ export default function ContactList(props) {
               if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
                 selected = true;
               }
-              if (item.phoneNumbers || item.emails) {
+            //  if (item.phoneNumbers || item.emails) {
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
@@ -421,10 +427,10 @@ export default function ContactList(props) {
                     </Text>
                   </AppBottomSheetTouchableWrapper>
                 );
-              }
-              else {
-                return null;
-              }
+              // }
+              // else {
+              //   return null;
+              // }
             }}
           />
         ) : null}

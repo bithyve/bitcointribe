@@ -110,6 +110,7 @@ interface SendToContactStateTypes {
   bitcoinAmount: string;
   currencyAmount: string;
   isConfirmDisabled: boolean;
+  isAddRecipientDisabled: boolean;
   note: string;
   InputStyle: any;
   InputStyle1: any;
@@ -147,6 +148,7 @@ class SendToContact extends Component<
         : '',
       currencyAmount: '',
       isConfirmDisabled: true,
+      isAddRecipientDisabled: false,
       note: '',
       InputStyle: styles.textBoxView,
       InputStyle1: styles.textBoxView,
@@ -244,16 +246,6 @@ class SendToContact extends Component<
       this.setState({
         exchangeRates: this.props.accounts && this.props.accounts.exchangeRates,
       });
-    }
-
-    if (
-      prevProps.accounts[this.state.serviceType].loading.transfer !==
-      this.props.accounts[this.state.serviceType].loading.transfer
-    ) {
-      if (
-        !this.props.accounts[this.state.serviceType].loading.transfer.transfer
-      )
-        this.setState({ isConfirmDisabled: false });
     }
 
     if (
@@ -421,8 +413,12 @@ class SendToContact extends Component<
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
-    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
-      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+      ? 'MAINNET'
+      : 'TESTNET';
+
+    if (storedAverageTxFees && storedAverageTxFees[network]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[network];
       if (Date.now() - lastFetched < 1800000) {
         this.setState({ averageTxFees: averageTxFees });
         return;
@@ -435,7 +431,7 @@ class SendToContact extends Component<
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
       ...storedAverageTxFees,
-      [serviceType]: {
+      [network]: {
         averageTxFees,
         lastFetched: Date.now(),
       },
@@ -502,6 +498,48 @@ class SendToContact extends Component<
           averageTxFees,
         });
       }
+    }
+  };
+
+  sendMaxHandler = () => {
+    const {
+      selectedContact,
+      averageTxFees,
+      serviceType,
+      spendableBalance,
+      switchOn,
+    } = this.state;
+    const { transfer } = this.props;
+
+    const recipientsList = [];
+    let amountStacked = 0;
+    transfer[serviceType].transfer.details.forEach((instance) => {
+      if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id !== selectedContact.id
+      ) {
+        amountStacked += parseInt(instance.bitcoinAmount);
+        recipientsList.push(instance);
+      }
+    });
+
+    const { fee } = this.props.service[serviceType].service.calculateSendMaxFee(
+      recipientsList.length + 1, // +1 for the current instance
+      averageTxFees,
+    );
+
+    if (spendableBalance) {
+      const max = spendableBalance - amountStacked - fee;
+
+      this.setState(
+        {
+          switchOn: !switchOn ? true : switchOn,
+          isAddRecipientDisabled: true,
+        },
+        () => {
+          this.convertBitCoinToCurrency(max.toString());
+        },
+      );
     }
   };
 
@@ -582,9 +620,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
-    this.setState({ isConfirmDisabled: true });
     clearTransfer(serviceType, 'stage1');
-    this.setState({ isConfirmDisabled: false });
     if (
       transfer[serviceType].transfer.details &&
       transfer[serviceType].transfer.details.length
@@ -654,6 +690,7 @@ class SendToContact extends Component<
       bitcoinAmount,
       currencyAmount,
       isConfirmDisabled,
+      isAddRecipientDisabled,
       note,
       InputStyle,
       InputStyle1,
@@ -914,11 +951,12 @@ class SendToContact extends Component<
                       flexDirection: 'row',
                       width: wp('70%'),
                       height: wp('13%'),
+                      alignItems: 'center',
                       backgroundColor: !switchOn
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                    // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       {currencyCode.includes(CurrencyCode) ? (
@@ -982,6 +1020,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
+                    {!switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderUSDInputText()} */}
                   {isInvalidBalance ? (
@@ -995,13 +1046,14 @@ class SendToContact extends Component<
                       marginBottom: wp('1.5%'),
                       marginTop: wp('1.5%'),
                       flexDirection: 'row',
+                      alignItems: 'center',
                       width: wp('70%'),
                       height: wp('13%'),
                       backgroundColor: switchOn
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                    // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1050,6 +1102,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
+                    {switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderBitCoinInputText()} */}
                 </View>
@@ -1119,6 +1184,7 @@ class SendToContact extends Component<
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
+                    this.setState({ isConfirmDisabled: true });
                     this.onConfirm();
                   }}
                   disabled={isConfirmDisabled}
@@ -1131,7 +1197,6 @@ class SendToContact extends Component<
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
                     shadowOffset: { width: 15, height: 15 },
-                    opacity: isConfirmDisabled ? 0.5 : 1,
                   }}
                 >
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
@@ -1153,7 +1218,7 @@ class SendToContact extends Component<
                     width: wp('30%'),
                     marginLeft: 10,
                   }}
-                  disabled={isConfirmDisabled}
+                  disabled={isConfirmDisabled || isAddRecipientDisabled}
                   onPress={() => {
                     if (
                       transfer[serviceType].transfer.details &&

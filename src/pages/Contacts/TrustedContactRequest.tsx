@@ -39,16 +39,14 @@ export default function TrustedContactRequest(props) {
     }
   }, [props.isRequestModalOpened]);
 
-  function onPressNumber(text) {
-    let tmpPasscode = passcodeArray;
-    if (text) {
-      tmpPasscode.push(text);
-    } else {
-      tmpPasscode.pop();
-    }
-    setPasscodeArray(tmpPasscode);
-    if (tmpPasscode.length == 6) {
-      setPasscode(tmpPasscode.join(''));
+  function onPressNumber(text, i) {
+    let tempPasscode = passcodeArray;
+    tempPasscode[i] = text;
+    setTimeout(() => {
+      setPasscodeArray(tempPasscode);
+    }, 2);
+    if (passcodeArray.join('').length == 6) {
+      setPasscode(tempPasscode.join(''));
     }
   }
 
@@ -188,30 +186,59 @@ export default function TrustedContactRequest(props) {
                 }}
                 style={getStyle(i)}
                 onChangeText={(value) => {
-                  onPressNumber(value);
-                  if (value && i == 0) this.textInput2.focus();
-                  if (value && i == 1) this.textInput3.focus();
-                  if (value && i == 2) this.textInput4.focus();
-                  if (value && i == 3) this.textInput5.focus();
-                  if (value && i == 4) this.textInput6.focus();
-                  if (value && i == 5) this.textInput6.focus();
+                  if (value && i == 0) {
+                    onPressNumber(value, 0);
+                    this.textInput2.focus();
+                  }
+                  if (value && i == 1) {
+                    onPressNumber(value, 1);
+                    this.textInput3.focus();
+                  }
+                  if (value && i == 2) {
+                    onPressNumber(value, 2);
+                    this.textInput4.focus();
+                  }
+                  if (value && i == 3) {
+                    onPressNumber(value, 3);
+                    this.textInput5.focus();
+                  }
+                  if (value && i == 4) {
+                    onPressNumber(value, 4);
+                    this.textInput6.focus();
+                  }
+                  if (value && i == 5) {
+                    onPressNumber(value, 5);
+                    this.textInput6.focus();
+                  }
                 }}
                 onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace' && i == 0)
+                  if (e.nativeEvent.key === 'Backspace' && i == 0){
                     this.textInput.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i == 1)
+                    onPressNumber('', 0);
+                  }
+                  if (e.nativeEvent.key === 'Backspace' && i == 1){
                     this.textInput.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i == 2)
+                    onPressNumber('', 1);
+                  }
+                  if (e.nativeEvent.key === 'Backspace' && i == 2){
                     this.textInput2.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i == 3)
+                    onPressNumber('', 2);
+                  }
+                  if (e.nativeEvent.key === 'Backspace' && i == 3){
                     this.textInput3.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i == 4)
+                    onPressNumber('', 3);
+                  }
+                  if (e.nativeEvent.key === 'Backspace' && i == 4){
                     this.textInput4.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i == 5)
+                    onPressNumber('', 4);
+                  }
+                  if (e.nativeEvent.key === 'Backspace' && i == 5){
                     this.textInput5.focus();
+                    onPressNumber('', 5);
+                  }
                 }}
                 onFocus={() => {
-                  if (passcode.length == 0 && i == 0) {
+                  if (passcodeArray.length == 0 && i == 0) {
                     props.bottomSheetRef.snapTo(2);
                   } else {
                     props.bottomSheetRef.snapTo(2);
@@ -219,13 +246,13 @@ export default function TrustedContactRequest(props) {
                 }}
                 onBlur={() => {
                   if (
-                    (passcode.length == 0 || passcode.length == 6) &&
+                    (passcodeArray.length == 0 || passcodeArray.length == 6) &&
                     i == 5
                   ) {
                     props.bottomSheetRef.snapTo(1);
                   }
                 }}
-                value={passcodeArray[i] ? passcodeArray[i] : ''}
+                //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
               />
             );
           })}
@@ -377,7 +404,7 @@ export default function TrustedContactRequest(props) {
                   ? 'mobile number, '
                   : props.inputType === 'email'
                   ? 'email address, '
-                  : null}
+                  : 'otp, '}
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   to accept the request
                 </Text>
@@ -418,7 +445,7 @@ export default function TrustedContactRequest(props) {
                     ? PhoneNumber
                     : props.inputType === 'email'
                     ? EmailId
-                    : null;
+                    : passcode.toUpperCase();
                 setTimeout(() => {
                   setPhoneNumber('');
                 }, 2);

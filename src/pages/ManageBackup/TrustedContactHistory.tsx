@@ -103,7 +103,7 @@ const TrustedContactHistory = (props) => {
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState(React.createRef<BottomSheet>());
   const [LoadContacts, setLoadContacts] = useState(false);
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
@@ -136,6 +136,7 @@ const TrustedContactHistory = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+  const [isOTPType, setIsOTPType] = useState(false);
 
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
@@ -340,9 +341,8 @@ const TrustedContactHistory = (props) => {
         onPressOk={(index) => {
           setRenderTimer(false);
           onOTPShare(index);
-          if (next) {
-            props.navigation.goBack();
-          }
+          setOTP('');
+          props.navigation.goBack();
         }}
         onPressBack={() => {
           (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
@@ -614,7 +614,7 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (overallHealth) {
-      if (overallHealth.sharesInfo[index].updatedAt) {
+      if (overallHealth.sharesInfo[index] && overallHealth.sharesInfo[index].updatedAt) {
         setShared(true);
       }
     }
@@ -728,7 +728,7 @@ const TrustedContactHistory = (props) => {
       return;
     }
 
-    const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
+    const { publicKey, symmetricKey, otp } = trustedContacts.tc.trustedContacts[
       contactName
     ];
     const requester = WALLET_SETUP.walletName;
@@ -760,6 +760,7 @@ const TrustedContactHistory = (props) => {
         `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ numberDL });
+      setIsOTPType(false);
       setTrustedLink(numberDL);
       setActivateReshare(true);
     } else if (chosenContact.emails && chosenContact.emails.length) {
@@ -786,13 +787,36 @@ const TrustedContactHistory = (props) => {
         `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ emailDL });
+      setIsOTPType(false);
       setTrustedLink(emailDL);
       setActivateReshare(true);
+    } else if (otp) {
+      const otpHintType = 'otp';
+      const otpHint = 'xxx';
+      const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+        .encryptedPub;
+      const uploadedAt = symmetricKey
+        ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
+        : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+            .initiatedAt;
+
+      const otpDL =
+        `https://hexawallet.io/${config.APP_STAGE}/${
+          symmetricKey ? 'atcg' : 'tcg'
+        }` +
+        `/${requester}` +
+        `/${otpEncPubKey}` +
+        `/${otpHintType}` +
+        `/${otpHint}` +
+        `/${uploadedAt}` +
+        `/v${appVersion}`;
+      setIsOTPType(true);
+      setOTP(otp);
+      setTrustedLink(otpDL);
+      setActivateReshare(true);
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
-      );
+      Alert.alert('Invalid Contact', 'Something went wrong.');
+      return;
     }
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
@@ -845,127 +869,114 @@ const TrustedContactHistory = (props) => {
 
   const createGuardian = useCallback(async () => {
     if (!Object.keys(chosenContact).length) return;
-    if (
-      chosenContact.firstName &&
-      ((chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) ||
-        (chosenContact.emails && chosenContact.emails.length))
-    ) {
-      const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = fcmTokenValue;
-      //await AsyncStorage.getItem('fcmToken');
-      console.log({ walletID, FCM });
 
-      const contactName = `${chosenContact.firstName} ${
-        chosenContact.lastName ? chosenContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim();
+    const walletID = await AsyncStorage.getItem('walletID');
+    const FCM = fcmTokenValue;
+    //await AsyncStorage.getItem('fcmToken');
+    console.log({ walletID, FCM });
 
-      let info = '';
-      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
-        const phoneNumber = chosenContact.phoneNumbers[0].number;
-        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-        number = number.slice(number.length - 10); // last 10 digits only
-        info = number;
-      } else if (chosenContact.emails && chosenContact.emails.length) {
-        info = chosenContact.emails[0].email;
-      }
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
 
-      const contactInfo = {
+    let info = '';
+    if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+      const phoneNumber = chosenContact.phoneNumbers[0].number;
+      let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      number = number.slice(number.length - 10); // last 10 digits only
+      info = number;
+    } else if (chosenContact.emails && chosenContact.emails.length) {
+      info = chosenContact.emails[0].email;
+    }
+
+    const contactInfo = {
+      contactName,
+      info: info.trim(),
+    };
+
+    let accountNumber = regularAccount.hdWallet.trustedContactToDA[contactName];
+    if (!accountNumber) {
+      // initialize a trusted derivative account against the following account
+      const res = regularAccount.getDerivativeAccXpub(
+        TRUSTED_CONTACTS,
+        null,
         contactName,
-        info: info.trim(),
-      };
+      );
+      if (res.status !== 200) {
+        console.log('Err occurred while generating derivative account');
+      } else {
+        // refresh the account number
+        accountNumber = regularAccount.hdWallet.trustedContactToDA[contactName];
+      }
+    }
 
-      let accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[contactName];
-      if (!accountNumber) {
-        // initialize a trusted derivative account against the following account
-        const res = regularAccount.getDerivativeAccXpub(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        );
-        if (res.status !== 200) {
-          console.log('Err occurred while generating derivative account');
+    const trustedReceivingAddress = (regularAccount.hdWallet.derivativeAccounts[
+      TRUSTED_CONTACTS
+    ][accountNumber] as TrustedContactDerivativeAccountElements)
+      .receivingAddress;
+
+    let data: EphemeralDataElements = {
+      walletID,
+      FCM,
+      trustedAddress: trustedReceivingAddress,
+      trustedTestAddress: testAccount.hdWallet.receivingAddress,
+    };
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+    const hasTrustedChannel =
+      trustedContact && trustedContact.symmetricKey ? true : false;
+    if (changeContact) {
+      setTrustedLink('');
+      setTrustedQR('');
+      // remove the previous TC
+
+      let previousGuardianName;
+      if (trustedContactsInfo) {
+        const previousGuardian = trustedContactsInfo[index];
+        if (previousGuardian) {
+          previousGuardianName = `${previousGuardian.firstName} ${
+            previousGuardian.lastName ? previousGuardian.lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
         } else {
-          // refresh the account number
-          accountNumber =
-            regularAccount.hdWallet.trustedContactToDA[contactName];
+          console.log('Previous guardian details missing');
         }
       }
 
-      const trustedReceivingAddress = (regularAccount.hdWallet
-        .derivativeAccounts[TRUSTED_CONTACTS][
-        accountNumber
-      ] as TrustedContactDerivativeAccountElements).receivingAddress;
-
-      let data: EphemeralDataElements = {
-        walletID,
-        FCM,
-        trustedAddress: trustedReceivingAddress,
-        trustedTestAddress: testAccount.hdWallet.receivingAddress,
-      };
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const hasTrustedChannel =
-        trustedContact && trustedContact.symmetricKey ? true : false;
-      if (changeContact) {
-        setTrustedLink('');
-        setTrustedQR('');
-        // remove the previous TC
-
-        let previousGuardianName;
-        if (trustedContactsInfo) {
-          const previousGuardian = trustedContactsInfo[index];
-          if (previousGuardian) {
-            previousGuardianName = `${previousGuardian.firstName} ${
-              previousGuardian.lastName ? previousGuardian.lastName : ''
-            }`
-              .toLowerCase()
-              .trim();
-          } else {
-            console.log('Previous guardian details missing');
-          }
-        }
-
-        dispatch(
-          uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
-        );
-        updateTrustedContactsInfo(chosenContact);
-        onOTPShare(index); // enables reshare
-        setChangeContact(false);
-      } else if (
-        !SHARES_TRANSFER_DETAILS[index] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        setTrustedLink('');
-        setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactInfo, data));
-        updateTrustedContactsInfo(chosenContact);
-        onOTPShare(index); // enables reshare
-      } else if (
-        trustedContact &&
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY &&
-        !hasTrustedChannel
-      ) {
-        setTrustedLink('');
-        setTrustedQR('');
-        dispatch(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[0],
-          ),
-        );
-      }
-    } else {
-      console.log({ chosenContact });
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
+      dispatch(
+        uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
+      );
+      updateTrustedContactsInfo(chosenContact);
+      onOTPShare(index); // enables reshare
+      setChangeContact(false);
+    } else if (
+      !SHARES_TRANSFER_DETAILS[index] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
+    ) {
+      setTrustedLink('');
+      setTrustedQR('');
+      dispatch(uploadEncMShare(index, contactInfo, data));
+      updateTrustedContactsInfo(chosenContact);
+      onOTPShare(index); // enables reshare
+    } else if (
+      trustedContact &&
+      !trustedContact.symmetricKey &&
+      trustedContact.ephemeralChannel &&
+      trustedContact.ephemeralChannel.initiatedAt &&
+      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+        config.TC_REQUEST_EXPIRY &&
+      !hasTrustedChannel
+    ) {
+      setTrustedLink('');
+      setTrustedQR('');
+      dispatch(
+        updateEphemeralChannel(
+          contactInfo,
+          trustedContact.ephemeralChannel.data[0],
+        ),
       );
     }
   }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
@@ -992,6 +1003,12 @@ const TrustedContactHistory = (props) => {
 
       createDeepLink();
 
+      const {
+        publicKey,
+        symmetricKey,
+        otp,
+      } = trustedContacts.tc.trustedContacts[contactName];
+
       let info = '';
       if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
         const phoneNumber = chosenContact.phoneNumbers[0].number;
@@ -1000,11 +1017,10 @@ const TrustedContactHistory = (props) => {
         info = number;
       } else if (chosenContact.emails && chosenContact.emails.length) {
         info = chosenContact.emails[0].email;
+      } else if (otp) {
+        info = otp;
       }
 
-      const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
-        contactName
-      ];
       if (publicKey)
         setTrustedQR(
           JSON.stringify({
@@ -1042,12 +1058,14 @@ const TrustedContactHistory = (props) => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0)
             // setChosenContactIndex(index);
           }}
           onPressViaLink={(index) => {
             createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0)
             // setChosenContactIndex(index);
           }}
         />
@@ -1085,6 +1103,12 @@ const TrustedContactHistory = (props) => {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
           onPressDone={() => {
+            setTimeout(() => {
+              setRenderTimer(true);
+            }, 2);
+            if(isOTPType){
+              (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+            }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -1299,12 +1323,11 @@ const TrustedContactHistory = (props) => {
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
             setRenderTimer(false);
-            // onOTPShare(index); commented: causing intransit history to re-iterate
           }
         }}
         enabledInnerScrolling={true}
         ref={shareOtpWithTrustedContactBottomSheet as any}
-        snapPoints={[-30, hp('70%')]}
+        snapPoints={[-30, hp('65%')]}
         renderContent={renderShareOtpWithTrustedContactContent}
         renderHeader={renderShareOtpWithTrustedContactHeader}
       />

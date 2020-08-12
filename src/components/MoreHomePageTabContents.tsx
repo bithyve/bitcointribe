@@ -19,11 +19,6 @@ import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouc
 export default function MoreHomePageTabContents(props) {
   const [addData, setAddData] = useState([
     {
-      title: `Backup Health`,
-      image: require('../assets/images/icons/health.png'),
-      info: `Setup and manage your wallet backup`,
-    },
-    {
       title: 'Friends and Family',
       image: require('../assets/images/icons/addressbook.png'),
       info: `View and manage your contacts`,
@@ -32,6 +27,11 @@ export default function MoreHomePageTabContents(props) {
       title: 'Funding Sources',
       image: require('../assets/images/icons/existing_saving_method.png'),
       info: 'Buying methods integrated in your wallet',
+    },
+    {
+      title: `Hexa Community (Telegram)`,
+      image: require('../assets/images/icons/telegram.png'),
+      info: `Questions, feedback and more`,
     },
     {
       title: 'Wallet Settings',

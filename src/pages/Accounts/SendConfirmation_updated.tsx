@@ -21,6 +21,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   transferST2,
   clearTransfer,
@@ -33,7 +34,6 @@ import Slider from 'react-native-slider';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
-import RecipientComponent from './RecipientComponent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import {
@@ -54,6 +54,9 @@ import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import RecipientSendConfirmation from './RecipientSendConfirmation';
+import RadioButton from '../../components/RadioButton';
+import CustomPriorityContent from './CustomPriorityContent';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -66,6 +69,7 @@ interface SendConfirmationStateTypes {
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
+  customAmount: string;
 }
 
 interface SendConfirmationPropsTypes {
@@ -115,6 +119,7 @@ class SendConfirmation_updated extends Component<
       transfer: {},
       loading: {},
       isConfirmDisabled: false,
+      customAmount: '',
     };
   }
 
@@ -157,14 +162,6 @@ class SendConfirmation_updated extends Component<
       this.props.accounts[this.serviceType].loading
     ) {
       this.setState({ loading: this.props.accounts[this.serviceType].loading });
-    }
-
-    if (
-      prevProps.accounts[this.serviceType].loading.transfer !==
-      this.props.accounts[this.serviceType].loading.transfer
-    ) {
-      if (!this.props.accounts[this.serviceType].loading.transfer)
-        this.setState({ isConfirmDisabled: false });
     }
   };
 
@@ -224,6 +221,7 @@ class SendConfirmation_updated extends Component<
     }
 
     if (transfer.stage2 && transfer.stage2.failed) {
+      this.setState({ isConfirmDisabled: false });
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
@@ -298,25 +296,32 @@ class SendConfirmation_updated extends Component<
 
   onConfirm = () => {
     let { sliderValueText } = this.state;
-    setTimeout(() => {
-      this.setState({ isConfirmDisabled: true });
-    }, 1);
     this.props.clearTransfer(this.serviceType, 'stage2');
-    const txPriority =
-      sliderValueText === 'Low Fee'
-        ? 'low'
-        : sliderValueText === 'In the middle'
-        ? 'medium'
-        : 'high';
+    let txPriority, customFee;
+    switch (sliderValueText) {
+      case 'Low Fee':
+        txPriority = 'low';
+        break;
+      case 'Medium Fee':
+        txPriority = 'medium';
+        break;
+      case 'High Fee':
+        txPriority = 'high';
+        break;
+      case 'Custom Fee':
+        txPriority = 'custom';
+        customFee = parseInt(this.state.customAmount);
+        break;
+    }
 
     if (
       this.serviceType === SECURE_ACCOUNT &&
       this.props.accounts[this.serviceType].service.secureHDWallet
         .secondaryXpriv
     ) {
-      this.props.alternateTransferST2(this.serviceType, txPriority);
+      this.props.alternateTransferST2(this.serviceType, txPriority, customFee);
     } else {
-      this.props.transferST2(this.serviceType, txPriority);
+      this.props.transferST2(this.serviceType, txPriority, customFee);
     }
   };
 
@@ -379,6 +384,12 @@ class SendConfirmation_updated extends Component<
       : switchOn
       ? 'sats'
       : CurrencyCode.toLocaleLowerCase();
+  };
+
+  onPrioritySelect = (priority) => {
+    this.setState({
+      sliderValueText: priority,
+    });
   };
 
   render() {
@@ -454,12 +465,12 @@ class SendConfirmation_updated extends Component<
         </View>
         <ScrollView>
           <View style={styles.availableBalanceView}>
-            <Text style={styles.accountTypeTextBalanceView}>
+            {/* <Text style={styles.accountTypeTextBalanceView}>
               {this.getServiceTypeAccount()}
-            </Text>
-            <Text style={styles.availableToSpendText}>
-              {' (Available to spend '}
-              <Text style={styles.availableBalanceText}>
+            </Text> */}
+            <Text style={styles.accountTypeTextBalanceView}>
+              {'Available to spend '}
+              <Text style={styles.accountTypeTextBalanceView}>
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : switchOn
@@ -471,19 +482,71 @@ class SendConfirmation_updated extends Component<
                     ).toFixed(2)
                   : null}
               </Text>
-              <Text style={styles.availableBalanceUnitText}>
+              <Text style={styles.accountTypeTextBalanceView}>
                 {this.serviceType == TEST_ACCOUNT
-                  ? ' t-sats )'
+                  ? ' t-sats'
                   : switchOn
-                  ? ' sats )'
-                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats'
+                  : ' ' + CurrencyCode.toLocaleLowerCase()}
               </Text>
             </Text>
           </View>
+          {this.serviceType === SECURE_ACCOUNT &&
+            this.props.accounts[this.serviceType].service.secureHDWallet
+              .secondaryXpriv && (
+              <View
+                style={{
+                  flex: 1,
+                  borderRadius: 8,
+                  marginTop: wp('1%'),
+                  marginBottom: wp('2%'),
+                  marginHorizontal: wp('6%'),
+                  backgroundColor: Colors.white,
+                  borderColor: Colors.backgroundColor,
+                  borderWidth: 2,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingVertical: hp('1.5%'),
+                    paddingHorizontal: hp('1.5%'),
+                  }}
+                >
+                  <Text style={styles.accountTypeTextBalanceView}>
+                    Exit key used
+                  </Text>
+                  <View
+                    style={{
+                      paddingHorizontal: 5,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: 12,
+                        height: 14,
+                        resizeMode: 'contain',
+                        marginLeft: 'auto',
+                      }}
+                      source={require('../../assets/images/icons/icon_check.png')}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
           {transfer.details && transfer.details.length > 0 ? (
-            <ScrollView>
+            <ScrollView horizontal={true} style={{ marginLeft: wp('6%') }}>
+              {/* <View style={{ flex: 1, flexDirection: 'row', marginRight: wp('8%'), marginLeft: wp('8%') }}>
+                <Text style={{ ...styles.tableHeadingText, width: '50%', marginLeft: 10 }}>To</Text>
+                <Text style={{ ...styles.tableHeadingText, width: '50%', justifyContent: 'flex-end', textAlign: 'center' }}>Amount</Text>
+              </View> */}
               {transfer.details.map((item) => (
-                <RecipientComponent
+                <RecipientSendConfirmation
                   onPressElement={() => {
                     if (item.note) {
                       if (SelectedContactId == item.selectedContact.id)
@@ -542,11 +605,244 @@ class SendConfirmation_updated extends Component<
             <Text style={styles.transactionPriorityText}>
               Transaction Priority
             </Text>
-            <Text style={styles.transactionPriorityInfoText}>
+            {/* <Text style={styles.transactionPriorityInfoText}>
               Set priority for your transaction
-            </Text>
-
+            </Text> */}
+            <View style={styles.priorityTableHeadingContainer}>
+              <View style={{ flex: 1, paddingLeft: 10 }}>
+                <Text style={styles.tableHeadingText}>Priority</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.tableHeadingText}>Arrival Time</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text
+                  style={{ ...styles.tableHeadingText, textAlign: 'center' }}
+                >
+                  Fee
+                </Text>
+              </View>
+            </View>
+            <View style={styles.priorityTableContainer}>
+              <View
+                style={{
+                  ...styles.priorityDataContainer,
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('High')}
+                  onpress={() => this.onPrioritySelect('High Fee')}
+                />
+                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                  High
+                </Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['high'].estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['high'].fee
+                      : '',
+                  )}
+                  {' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.priorityTableContainer}>
+              <View
+                style={{
+                  ...styles.priorityDataContainer,
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('Medium')}
+                  onpress={() => this.onPrioritySelect('Medium Fee')}
+                />
+                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                  Medium
+                </Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['medium'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['medium']
+                      .estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['medium'].fee
+                      : '',
+                  )}
+                  {' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
             <View
+              style={{
+                ...styles.priorityTableContainer,
+                borderBottomWidth: this.state.customAmount !== '' ? 0.5 : 0,
+              }}
+            >
+              <View
+                style={{
+                  ...styles.priorityDataContainer,
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('Low')}
+                  onpress={() => this.onPrioritySelect('Low Fee')}
+                />
+                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                  Low
+                </Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                {transfer &&
+                transfer.stage1 &&
+                transfer.stage1.txPrerequisites ? (
+                  <Text style={styles.priorityTableText}>
+                    {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
+                      10}{' '}
+                    -{' '}
+                    {(transfer.stage1.txPrerequisites['low'].estimatedBlocks +
+                      1) *
+                      10}{' '}
+                    minutes
+                  </Text>
+                ) : null}
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['low'].fee
+                      : '',
+                  )}
+                  {' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
+            {this.state.customAmount !== '' && (
+              <View
+                style={{
+                  ...styles.priorityTableContainer,
+                  borderBottomWidth: 0,
+                }}
+              >
+                <View
+                  style={{
+                    ...styles.priorityDataContainer,
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <RadioButton
+                    size={20}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={this.state.sliderValueText.includes('Custom')}
+                    onpress={() => this.onPrioritySelect('Custom Fee')}
+                  />
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                    Custom
+                  </Text>
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>
+                    {this.state.customAmount}
+                    {' ' + this.getCorrectCurrencySymbol()}
+                    {/* {this.convertBitCoinToCurrency(
+                      transfer.stage1 && transfer.stage1.txPrerequisites
+                        ? transfer.stage1.txPrerequisites['low'].fee
+                        : '')}{' ' + this.getCorrectCurrencySymbol()} */}
+                  </Text>
+                </View>
+              </View>
+            )}
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                borderRadius: 8,
+                marginTop: hp('1.2%'),
+                backgroundColor: Colors.white,
+                borderColor: Colors.backgroundColor,
+                borderWidth: 2,
+              }}
+              onPress={() => {
+                (this.refs.CustomPriorityBottomSheet as any).snapTo(1);
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: hp('1.5%'),
+                  paddingHorizontal: hp('1.5%'),
+                }}
+              >
+                <Text style={styles.accountTypeTextBalanceView}>
+                  Custom Priority
+                </Text>
+                <View
+                  style={{
+                    paddingHorizontal: 5,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons
+                    name="ios-arrow-forward"
+                    color={Colors.textColorGrey}
+                    size={12}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            {/* <View
               style={{
                 ...styles.textBoxView,
                 flexDirection: 'column',
@@ -608,7 +904,6 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['low'].fee
                       : '',
                   )}
-                  {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text style={styles.sliderText}>
@@ -618,7 +913,6 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['medium'].fee
                       : '',
                   )}
-                  {/* {' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text
@@ -633,24 +927,18 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['high'].fee
                       : '',
                   )}
-                  {/* {' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
               </View>
-            </View>
+            </View> */}
           </View>
-          {/* <View style={{ marginTop: hp('3%') }}>
-            <BottomInfoBox
-              title={'Note'}
-              infoText={
-                'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
-              }
-            />
-          </View> */}
 
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
-              onPress={this.onConfirm}
+              onPress={() => {
+                this.setState({ isConfirmDisabled: true });
+                this.onConfirm();
+              }}
               disabled={isConfirmDisabled}
               style={{
                 ...styles.confirmButtonView,
@@ -841,6 +1129,46 @@ class SendConfirmation_updated extends Component<
             />
           )}
         />
+        <BottomSheet
+          onCloseStart={() => {
+            (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
+          }}
+          enabledInnerScrolling={true}
+          ref={'CustomPriorityBottomSheet'}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={() => (
+            <CustomPriorityContent
+              title={'Custom Priority'}
+              info={''}
+              okButtonText={'Confirm'}
+              cancelButtonText={'Back'}
+              isCancel={true}
+              onPressOk={(amount) => {
+                if (amount <= transfer.stage1.txPrerequisites['high'].fee) {
+                  if (this.refs.CustomPriorityBottomSheet as any)
+                    (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
+                  setTimeout(() => {
+                    this.setState({
+                      customAmount: amount,
+                    });
+                  }, 50);
+                }
+              }}
+              onPressCancel={() => {
+                if (this.refs.CustomPriorityBottomSheet as any)
+                  (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                if (this.refs.CustomPriorityBottomSheet as any)
+                  (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+        />
       </View>
     );
   }
@@ -954,14 +1282,14 @@ const styles = StyleSheet.create({
   totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('2%'),
+    // marginTop: hp('1.2%'),
     marginRight: wp('6%'),
     marginLeft: wp('6%'),
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1.5%'),
+    paddingBottom: hp('1%'),
+    // paddingTop: hp('1.5%'),
   },
   totalAmountText: {
     color: Colors.blue,
@@ -1006,7 +1334,7 @@ const styles = StyleSheet.create({
   },
   transactionPriorityText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
@@ -1036,5 +1364,40 @@ const styles = StyleSheet.create({
     marginBottom: hp('5%'),
     marginLeft: wp('6%'),
     marginRight: wp('6%'),
+  },
+  tableHeadingText: {
+    color: Colors.greyTextColor,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  priorityTableText: {
+    fontSize: RFValue(12),
+    lineHeight: RFValue(12),
+    color: Colors.greyTextColor,
+    textAlign: 'center',
+  },
+  priorityTableHeadingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('2%'),
+    paddingBottom: hp('1.5%'),
+  },
+  priorityTableContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1.5%'),
+    paddingBottom: hp('1.5%'),
+  },
+  priorityDataContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
