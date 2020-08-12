@@ -739,6 +739,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -767,9 +768,12 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[
+        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
+      ];
 
       const {
         signedTxb,

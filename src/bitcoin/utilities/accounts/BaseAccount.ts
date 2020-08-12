@@ -637,6 +637,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -658,9 +659,12 @@ export default class BaseAccount {
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[
+        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
+      ];
 
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       console.log('---- Transaction Signed ----');
