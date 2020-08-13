@@ -869,8 +869,10 @@ function* sharePersonalCopyWorker({ payload }) {
         try {
           yield call(Share.open, shareOptions);
         } catch (err) {
-          console.log({ err });
-          throw new Error(`Share failed: ${err}`);
+          let errorMessage = idx(err, _ => _.message)
+          if (errorMessage !== "User did not share") {
+            throw new Error(`Share failed: ${err}`);
+          }
         }
         break;
 
