@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Platform,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -61,7 +61,7 @@ export default function CustomPriorityContent(props) {
             height: wp('13%'),
             width: wp('45%'),
           }}
-          placeholder={'Min Amount'}
+          placeholder={'sats/byte'}
           value={amount}
           returnKeyLabel="Done"
           returnKeyType="done"
@@ -72,31 +72,46 @@ export default function CustomPriorityContent(props) {
           placeholderTextColor={Colors.borderColor}
         />
       </TouchableOpacity>
-      <View style={{
-        flexDirection: 'row',
-        marginBottom: wp('1.5%'),
-        marginTop: 20,
-        marginRight: wp('8%'),
-        marginLeft: wp('8%'),
-      }}>
-        <Text style={{
-          color: Colors.black,
-          fontSize: RFValue(11),
-          fontFamily: Fonts.FiraSansMedium,
-          marginRight: 5
-        }}>Arrival Time</Text>
-        <Text style={{
-          color: Colors.textColorGrey,
-          fontSize: RFValue(11),
-          fontFamily: Fonts.FiraSansItalic,
-        }}>Calculating...</Text>
+      {props.err ? (
+        <View style={{ marginRight: wp('8%'), marginLeft: wp('8%') }}>
+          <Text style={styles.errorText}>{props.err}</Text>
+        </View>
+      ) : null}
+      <View
+        style={{
+          flexDirection: 'row',
+          marginBottom: wp('1.5%'),
+          marginTop: 20,
+          marginRight: wp('8%'),
+          marginLeft: wp('8%'),
+        }}
+      >
+        <Text
+          style={{
+            color: Colors.black,
+            fontSize: RFValue(11),
+            fontFamily: Fonts.FiraSansMedium,
+            marginRight: 5,
+          }}
+        >
+          Arrival Time
+        </Text>
+        <Text
+          style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue(11),
+            fontFamily: Fonts.FiraSansItalic,
+          }}
+        >
+          Calculating...
+        </Text>
       </View>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           marginBottom: wp('15%'),
-          marginTop: 30
+          marginTop: 30,
         }}
       >
         <AppBottomSheetTouchableWrapper
@@ -190,5 +205,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11),
+    fontStyle: 'italic',
   },
 });

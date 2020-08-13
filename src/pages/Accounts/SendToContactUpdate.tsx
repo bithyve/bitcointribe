@@ -110,7 +110,6 @@ interface SendToContactStateTypes {
   bitcoinAmount: string;
   currencyAmount: string;
   isConfirmDisabled: boolean;
-  isAddRecipientDisabled: boolean;
   note: string;
   InputStyle: any;
   InputStyle1: any;
@@ -118,6 +117,7 @@ interface SendToContactStateTypes {
   isInvalidBalance: boolean;
   recipients: any[];
   spendableBalances: any;
+  isSendMax: boolean;
 }
 
 class SendToContact extends Component<
@@ -148,7 +148,6 @@ class SendToContact extends Component<
         : '',
       currencyAmount: '',
       isConfirmDisabled: true,
-      isAddRecipientDisabled: false,
       note: '',
       InputStyle: styles.textBoxView,
       InputStyle1: styles.textBoxView,
@@ -160,6 +159,7 @@ class SendToContact extends Component<
         regularBalance: 0,
         secureBalance: 0,
       },
+      isSendMax: false,
     };
   }
 
@@ -480,6 +480,7 @@ class SendToContact extends Component<
       sweepSecure,
       spendableBalance,
       averageTxFees,
+      isSendMax,
     } = this.state;
     const { transfer } = this.props;
     if (!recipients.length) return;
@@ -496,6 +497,7 @@ class SendToContact extends Component<
           spendableBalance,
           recipients,
           averageTxFees,
+          isSendMax,
         });
       }
     }
@@ -534,7 +536,7 @@ class SendToContact extends Component<
       this.setState(
         {
           switchOn: !switchOn ? true : switchOn,
-          isAddRecipientDisabled: true,
+          isSendMax: true,
         },
         () => {
           this.convertBitCoinToCurrency(max.toString());
@@ -690,7 +692,7 @@ class SendToContact extends Component<
       bitcoinAmount,
       currencyAmount,
       isConfirmDisabled,
-      isAddRecipientDisabled,
+      isSendMax,
       note,
       InputStyle,
       InputStyle1,
@@ -1003,6 +1005,9 @@ class SendToContact extends Component<
                       returnKeyType="done"
                       keyboardType={'numeric'}
                       onChangeText={(value) => {
+                        if (this.state.isSendMax) {
+                          this.setState({ isSendMax: false });
+                        }
                         this.convertBitCoinToCurrency(value);
                       }}
                       placeholderTextColor={Colors.borderColor}
@@ -1085,6 +1090,9 @@ class SendToContact extends Component<
                       returnKeyType="done"
                       keyboardType={'numeric'}
                       onChangeText={(value) => {
+                        if (this.state.isSendMax) {
+                          this.setState({ isSendMax: false });
+                        }
                         this.convertBitCoinToCurrency(value);
                       }}
                       placeholderTextColor={Colors.borderColor}
@@ -1218,7 +1226,7 @@ class SendToContact extends Component<
                     width: wp('30%'),
                     marginLeft: 10,
                   }}
-                  disabled={isConfirmDisabled || isAddRecipientDisabled}
+                  disabled={isConfirmDisabled || isSendMax}
                   onPress={() => {
                     if (
                       transfer[serviceType].transfer.details &&
@@ -1249,7 +1257,13 @@ class SendToContact extends Component<
                     }
                   }}
                 >
-                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                  <Text
+                    style={{
+                      ...styles.buttonText,
+                      color: Colors.blue,
+                      opacity: isSendMax ? 0.5 : 1,
+                    }}
+                  >
                     Add Recipient
                   </Text>
                 </TouchableOpacity>
