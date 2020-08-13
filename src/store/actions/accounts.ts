@@ -63,24 +63,24 @@ export const transferST1 = (serviceType, recipients, averageTxFees?) => {
 export const transferST2 = (
   serviceType,
   txnPriority,
-  customFee?,
+  customTxPrerequisites?,
   nSequence?,
 ) => {
   return {
     type: TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customFee, nSequence },
+    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
   };
 };
 
 export const alternateTransferST2 = (
   serviceType,
   txnPriority,
-  customFee?,
+  customTxPrerequisites?,
   nSequence?,
 ) => {
   return {
     type: ALTERNATE_TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customFee, nSequence },
+    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
   };
 };
 
