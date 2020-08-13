@@ -175,7 +175,9 @@ export default function TrustedContactRequest(props) {
                 maxLength={1}
                 returnKeyType="done"
                 returnKeyLabel="Done"
-                keyboardType="number-pad"
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 ref={(input) => {
                   if (i == 0) this.textInput = input;
                   if (i == 1) this.textInput2 = input;
