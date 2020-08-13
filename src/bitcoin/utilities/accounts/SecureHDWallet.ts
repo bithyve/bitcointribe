@@ -1328,6 +1328,24 @@ export default class SecureHDWallet extends Bitcoin {
     return { fee };
   };
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ) => {
+    const inputUTXOs = this.confirmedUTXOs;
+    const { inputs, outputs, fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      customTxFeePerByte,
+    );
+
+    if (!inputs) return { fee, balance: this.balances.balance };
+    return { inputs, outputs, fee, balance: this.balances.balance };
+  };
+
   public transactionPrerequisites = async (
     recipients: {
       address: string;
@@ -1439,29 +1457,21 @@ export default class SecureHDWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customFee?: number,
+    customTxPrerequisites?: any,
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
   }> => {
     try {
       let inputs, outputs;
-      if (txnPriority === 'custom') {
-        inputs = txPrerequisites['high'].inputs;
-        outputs = txPrerequisites['high'].outputs;
-
-        // deduct the custom fee
-        outputs.forEach((output) => {
-          if (!output.address) {
-            output.value =
-              output.value + txPrerequisites['high'].fee - customFee;
-          }
-        });
+      if (txnPriority === 'custom' && customTxPrerequisites) {
+        inputs = customTxPrerequisites.inputs;
+        outputs = customTxPrerequisites.outputs;
       } else {
         inputs = txPrerequisites[txnPriority].inputs;
         outputs = txPrerequisites[txnPriority].outputs;
       }
-
+      console.log({ inputs, outputs });
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
       );

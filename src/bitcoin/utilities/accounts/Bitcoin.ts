@@ -999,9 +999,7 @@ export default class Bitcoin {
 
       return feeRatesByPriority;
     } catch (err) {
-      console.log(
-        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
-      );
+      console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
       try {
         const chainInfo = await this.fetchChainInfo();
         const {

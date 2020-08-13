@@ -558,6 +558,14 @@ export default class BaseAccount {
   public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
     this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
 
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ) => this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+
   public transferST1 = async (
     recipients: {
       address: string;
@@ -637,7 +645,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customFee?: number,
+    customTxPrerequisites?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -659,12 +667,16 @@ export default class BaseAccount {
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
-        customFee,
+        customTxPrerequisites,
         nSequence,
       );
-      const { inputs } = txPrerequisites[
-        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
-      ];
+
+      let inputs;
+      if (txnPriority === 'custom' && customTxPrerequisites) {
+        inputs = customTxPrerequisites.inputs;
+      } else {
+        inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
+      }
 
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       console.log('---- Transaction Signed ----');
