@@ -77,7 +77,7 @@ export default function CustomPriorityContent(props) {
           <Text style={styles.errorText}>{props.err}</Text>
         </View>
       ) : null}
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           marginBottom: wp('1.5%'),
@@ -105,7 +105,7 @@ export default function CustomPriorityContent(props) {
         >
           Calculating...
         </Text>
-      </View>
+      </View> */}
       <View
         style={{
           flexDirection: 'row',

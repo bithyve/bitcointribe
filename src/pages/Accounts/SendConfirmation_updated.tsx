@@ -839,22 +839,7 @@ class SendConfirmation_updated extends Component<
                   </Text>
                 </View>
                 <View style={styles.priorityDataContainer}>
-                  {transfer &&
-                  transfer.stage1 &&
-                  transfer.stage1.txPrerequisites &&
-                  this.state.averageTxFees ? (
-                    <Text style={styles.priorityTableText}>
-                      {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
-                        10}{' '}
-                      -{' '}
-                      {this.state.averageTxFees[
-                        this.serviceType === TEST_ACCOUNT
-                          ? 'TESTNET'
-                          : 'MAINNET'
-                      ].averageTxFees['minimum'].estimatedBlocks * 10}{' '}
-                      minutes
-                    </Text>
-                  ) : null}
+                  <Text style={styles.priorityTableText}>-</Text>
                 </View>
                 <View style={styles.priorityDataContainer}>
                   <Text style={styles.priorityTableText}>
