@@ -1539,25 +1539,25 @@ export default function ManageBackup(props) {
       // }
       return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
         : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
-        : item.status == 'Good' ? 'The Recovery Key is accessible'
-        : 'Select a contact as a Keeper';
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Select a contact as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
       return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
         : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
-        : item.status == 'Good' ? 'The Recovery Key is accessible'
-        : 'Use one of your other device with Hexa';
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Use one of your other device with Hexa';
     }
     if (item.type === 'copy1' || item.type === 'copy2') {
       return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
         : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
-        : item.status == 'Good' ? 'The Recovery Key is accessible'
-        : 'Secure your Recovery Key as a file (pdf)';
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Secure your Recovery Key as a file (pdf)';
     }
     return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
-        : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
+      : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
         : item.status == 'Good' ? 'Security Question and Answer are confirmed'
-        : 'Last Backup';
+          : 'Last Backup';
   };
 
   return (
@@ -1767,26 +1767,29 @@ export default function ManageBackup(props) {
                         }}
                       >
                         {getImageIcon(item)}
-                        <View style={{ marginLeft: 15 }}>
+                        <View style={{ flex: 1, marginHorizontal: 15 }}>
                           <Text style={styles.cardTitleText}>
                             {getCardTitle(item)}
                           </Text>
-                          <Text style={styles.cardTimeText}>
-                            {getCardSubText(item)}
-                            {(item.type === 'security' ||
-                              (item.type === 'secondaryDevice' &&
+                          <View style={{ flex: 1, flexDirection: 'row' }}>
+                            <Text style={styles.cardTimeText}>
+                              {getCardSubText(item)}
+                              {(item.type === 'security' || (item.type === 'secondaryDevice' &&
                                 item.status !== 'Ugly')) && (
-                                <Text
-                                  style={{
-                                    fontFamily: Fonts.FiraSansMediumItalic,
-                                    fontWeight: 'bold',
-                                    fontStyle: 'italic',
-                                  }}
-                                >
-                                  {getTime(item.time)}
-                                </Text>
-                              )}
-                          </Text>
+                                  <Text
+                                    style={{
+                                      color: Colors.textColorGrey,
+                                      fontSize: RFValue(10),
+                                      fontFamily: Fonts.FiraSansMediumItalic,
+                                      fontWeight: 'bold',
+                                      fontStyle: 'italic',
+                                    }}
+                                  >
+                                    {' '}{getTime(item.time)}
+                                  </Text>
+                                )}
+                            </Text>
+                          </View>
                         </View>
                         <Image
                           style={styles.cardIconImage}
@@ -1940,6 +1943,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   manageBackupCard: {
+    flex: 1,
     padding: 20,
     borderWidth: 1,
     borderRadius: 10,
