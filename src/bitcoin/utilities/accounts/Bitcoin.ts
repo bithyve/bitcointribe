@@ -374,39 +374,78 @@ export default class Bitcoin {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
-            this.categorizeTx(tx, ownedAddresses, accountType);
-            const transaction = {
-              txid: tx.txid,
-              confirmations:
-                accountType === 'Test Account' &&
-                tx.transactionType === 'Received' &&
-                addressInfo.Address === externalAddresses[0] &&
-                tx.NumberofConfirmations < 1
-                  ? '-'
-                  : tx.NumberofConfirmations,
-              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-              fee: tx.fee,
-              date: tx.Status.block_time
-                ? new Date(tx.Status.block_time * 1000).toUTCString()
-                : new Date(Date.now()).toUTCString(),
-              transactionType:
-                tx.transactionType === 'Self' ? 'Sent' : tx.transactionType, // injecting sent(1) tx when tx is from and to self
-              amount:
-                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
-              accountType:
-                tx.accountType === TRUSTED_CONTACTS
-                  ? contactName
-                      .split(' ')
-                      .map((word) => word[0].toUpperCase() + word.substring(1))
-                      .join(' ')
-                  : tx.accountType,
-              recipientAddresses: tx.recipientAddresses,
-              senderAddresses:
-                tx.transactionType === 'Self' ? [] : tx.senderAddresses,
-              blockTime: tx.Status.block_time, // only available when tx is confirmed
-            };
+            this.categorizeTx(
+              tx,
+              ownedAddresses,
+              accountType,
+              externalAddresses,
+            );
 
-            transactions.transactionDetails.push(transaction);
+            if (tx.transactionType === 'Self') {
+              const outgoingTx = {
+                txid: tx.txid,
+                confirmations: tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: 'Sent',
+                amount: tx.sentAmount,
+                accountType: tx.accountType,
+                recipientAddresses: tx.recipientAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
+
+              const incomingTx = {
+                txid: tx.txid,
+                confirmations: tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: 'Received',
+                amount: tx.receivedAmount,
+                accountType: tx.accountType,
+                senderAddresses: tx.senderAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
+              console.log({ outgoingTx, incomingTx });
+              transactions.transactionDetails.push(...[outgoingTx, incomingTx]);
+            } else {
+              const transaction = {
+                txid: tx.txid,
+                confirmations:
+                  accountType === 'Test Account' &&
+                  tx.transactionType === 'Received' &&
+                  addressInfo.Address === externalAddresses[0] &&
+                  tx.NumberofConfirmations < 1
+                    ? '-'
+                    : tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: tx.transactionType,
+                amount: tx.amount,
+                accountType:
+                  tx.accountType === TRUSTED_CONTACTS
+                    ? contactName
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ')
+                    : tx.accountType,
+                recipientAddresses: tx.recipientAddresses,
+                senderAddresses: tx.senderAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
+
+              transactions.transactionDetails.push(transaction);
+            }
 
             // if (tx.transactionType === 'Self') {
             //   // injecting receive(2) tx when tx is from and to self
@@ -489,142 +528,142 @@ export default class Bitcoin {
     };
   };
 
-  public fetchTransactionsByAddresses = async (
-    addresses: string[],
-    accountType: string,
-  ): Promise<{
-    transactions: Transactions;
-  }> => {
-    const transactions: Transactions = {
-      totalTransactions: 0,
-      confirmedTransactions: 0,
-      unconfirmedTransactions: 0,
-      transactionDetails: [],
-    };
-    try {
-      let res: AxiosResponse;
-      try {
-        if (this.network === bitcoinJS.networks.testnet) {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
-            {
-              addresses,
-            },
-          );
-        } else {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
-            {
-              addresses,
-            },
-          );
-        }
-      } catch (err) {
-        throw new Error(err.response.data.err);
-      }
+  // public fetchTransactionsByAddresses = async (
+  //   addresses: string[],
+  //   accountType: string,
+  // ): Promise<{
+  //   transactions: Transactions;
+  // }> => {
+  //   const transactions: Transactions = {
+  //     totalTransactions: 0,
+  //     confirmedTransactions: 0,
+  //     unconfirmedTransactions: 0,
+  //     transactionDetails: [],
+  //   };
+  //   try {
+  //     let res: AxiosResponse;
+  //     try {
+  //       if (this.network === bitcoinJS.networks.testnet) {
+  //         res = await bitcoinAxios.post(
+  //           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
+  //           {
+  //             addresses,
+  //           },
+  //         );
+  //       } else {
+  //         res = await bitcoinAxios.post(
+  //           config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
+  //           {
+  //             addresses,
+  //           },
+  //         );
+  //       }
+  //     } catch (err) {
+  //       throw new Error(err.response.data.err);
+  //     }
 
-      const addressesInfo = res.data;
-      const txMap = new Map();
-      for (const addressInfo of addressesInfo) {
-        console.log(
-          `Appending transactions corresponding to ${addressInfo.Address}`,
-        );
-        if (addressInfo.TotalTransactions === 0) {
-          continue;
-        }
-        transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
-        transactions.unconfirmedTransactions +=
-          addressInfo.UnconfirmedTransactions;
+  //     const addressesInfo = res.data;
+  //     const txMap = new Map();
+  //     for (const addressInfo of addressesInfo) {
+  //       console.log(
+  //         `Appending transactions corresponding to ${addressInfo.Address}`,
+  //       );
+  //       if (addressInfo.TotalTransactions === 0) {
+  //         continue;
+  //       }
+  //       transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
+  //       transactions.unconfirmedTransactions +=
+  //         addressInfo.UnconfirmedTransactions;
 
-        if (
-          addressInfo.ConfirmedTransactions +
-            addressInfo.UnconfirmedTransactions >
-          addressInfo.totalTransactions
-        ) {
-          transactions.totalTransactions +=
-            addressInfo.ConfirmedTransactions +
-            addressInfo.UnconfirmedTransactions;
-        } else {
-          transactions.totalTransactions += addressInfo.TotalTransactions;
-        }
+  //       if (
+  //         addressInfo.ConfirmedTransactions +
+  //           addressInfo.UnconfirmedTransactions >
+  //         addressInfo.totalTransactions
+  //       ) {
+  //         transactions.totalTransactions +=
+  //           addressInfo.ConfirmedTransactions +
+  //           addressInfo.UnconfirmedTransactions;
+  //       } else {
+  //         transactions.totalTransactions += addressInfo.TotalTransactions;
+  //       }
 
-        addressInfo.Transactions.forEach((tx) => {
-          if (!txMap.has(tx.txid)) {
-            // check for duplicate tx (fetched against sending and  then again for change address)
-            txMap.set(tx.txid, true);
-            this.categorizeTx(tx, addresses, accountType);
-            transactions.transactionDetails.push({
-              txid: tx.txid,
-              confirmations: tx.NumberofConfirmations,
-              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-              fee: tx.fee,
-              date: tx.Status.block_time
-                ? new Date(tx.Status.block_time * 1000).toUTCString()
-                : new Date(Date.now()).toUTCString(),
-              transactionType: tx.transactionType,
-              amount:
-                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
-              accountType: tx.accountType,
-              recipientAddresses: tx.recipientAddresses,
-              senderAddresses: tx.senderAddresses,
-              blockTime: tx.Status.block_time, // only available when tx is confirmed
-            });
-          }
-        });
-      }
+  //       addressInfo.Transactions.forEach((tx) => {
+  //         if (!txMap.has(tx.txid)) {
+  //           // check for duplicate tx (fetched against sending and  then again for change address)
+  //           txMap.set(tx.txid, true);
+  //           this.categorizeTx(tx, addresses, accountType, exter);
+  //           transactions.transactionDetails.push({
+  //             txid: tx.txid,
+  //             confirmations: tx.NumberofConfirmations,
+  //             status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+  //             fee: tx.fee,
+  //             date: tx.Status.block_time
+  //               ? new Date(tx.Status.block_time * 1000).toUTCString()
+  //               : new Date(Date.now()).toUTCString(),
+  //             transactionType: tx.transactionType,
+  //             amount:
+  //               tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
+  //             accountType: tx.accountType,
+  //             recipientAddresses: tx.recipientAddresses,
+  //             senderAddresses: tx.senderAddresses,
+  //             blockTime: tx.Status.block_time, // only available when tx is confirmed
+  //           });
+  //         }
+  //       });
+  //     }
 
-      return { transactions };
-    } catch (err) {
-      console.log(
-        `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
-      );
-      console.log('Using Blockcypher fallback');
+  //     return { transactions };
+  //   } catch (err) {
+  //     console.log(
+  //       `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
+  //     );
+  //     console.log('Using Blockcypher fallback');
 
-      try {
-        const txMap = new Map();
-        for (const address of addresses) {
-          console.log(`Fetching transactions corresponding to ${address}`);
-          const txns = await this.fetchTransactionsByAddress(address);
+  //     try {
+  //       const txMap = new Map();
+  //       for (const address of addresses) {
+  //         console.log(`Fetching transactions corresponding to ${address}`);
+  //         const txns = await this.fetchTransactionsByAddress(address);
 
-          transactions.totalTransactions += txns.transactions.totalTransactions;
-          transactions.confirmedTransactions +=
-            txns.transactions.confirmedTransactions;
-          transactions.unconfirmedTransactions +=
-            txns.transactions.unconfirmedTransactions;
+  //         transactions.totalTransactions += txns.transactions.totalTransactions;
+  //         transactions.confirmedTransactions +=
+  //           txns.transactions.confirmedTransactions;
+  //         transactions.unconfirmedTransactions +=
+  //           txns.transactions.unconfirmedTransactions;
 
-          txns.transactions.transactionDetails.forEach((tx) => {
-            if (!txMap.has(tx.hash)) {
-              // check for duplicate tx (fetched against sending and  then again for change address)
-              txMap.set(tx.hash, true);
-              this.categorizeTx(tx, addresses, accountType),
-                transactions.transactionDetails.push({
-                  txid: tx.hash,
-                  confirmations: tx.confirmations,
-                  status: tx.confirmations ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fees,
-                  date: new Date(tx.confirmed).toUTCString(),
-                  transactionType: tx.transactionType,
-                  amount:
-                    tx.transactionType === 'Sent'
-                      ? tx.amount + tx.fees
-                      : tx.amount,
-                  accountType: tx.accountType,
-                  recipientAddresses: tx.recipientAddresses,
-                  senderAddresses: tx.senderAddresses,
-                });
-            }
-          });
-        }
+  //         txns.transactions.transactionDetails.forEach((tx) => {
+  //           if (!txMap.has(tx.hash)) {
+  //             // check for duplicate tx (fetched against sending and  then again for change address)
+  //             txMap.set(tx.hash, true);
+  //             this.categorizeTx(tx, addresses, accountType),
+  //               transactions.transactionDetails.push({
+  //                 txid: tx.hash,
+  //                 confirmations: tx.confirmations,
+  //                 status: tx.confirmations ? 'Confirmed' : 'Unconfirmed',
+  //                 fee: tx.fees,
+  //                 date: new Date(tx.confirmed).toUTCString(),
+  //                 transactionType: tx.transactionType,
+  //                 amount:
+  //                   tx.transactionType === 'Sent'
+  //                     ? tx.amount + tx.fees
+  //                     : tx.amount,
+  //                 accountType: tx.accountType,
+  //                 recipientAddresses: tx.recipientAddresses,
+  //                 senderAddresses: tx.senderAddresses,
+  //               });
+  //           }
+  //         });
+  //       }
 
-        return { transactions };
-      } catch (err) {
-        console.log(
-          `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
-        );
-        throw new Error('Transaction fetching failed');
-      }
-    }
-  };
+  //       return { transactions };
+  //     } catch (err) {
+  //       console.log(
+  //         `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
+  //       );
+  //       throw new Error('Transaction fetching failed');
+  //     }
+  //   }
+  // };
 
   public getTxCounts = async (addresses: string[]) => {
     const txCounts = {};
@@ -1367,12 +1406,16 @@ export default class Bitcoin {
     tx: any,
     inUseAddresses: string[],
     accountType: string,
+    externalAddresses: string[],
   ) => {
     const inputs = tx.vin || tx.inputs;
     const outputs = tx.Vout || tx.outputs;
     let value: number = 0;
+    let amountToSelf = 0;
     const probableRecipientList: string[] = [];
     const probableSenderList: string[] = [];
+    const selfRecipientList: string[] = [];
+    const selfSenderList: string[] = [];
 
     inputs.forEach((input) => {
       if (!input.addresses && !input.prevout) {
@@ -1384,6 +1427,7 @@ export default class Bitcoin {
 
         if (this.ownedAddress(address, inUseAddresses)) {
           value -= input.prevout ? input.prevout.value : input.output_value;
+          selfSenderList.push(address);
         } else {
           probableSenderList.push(address);
         }
@@ -1399,38 +1443,32 @@ export default class Bitcoin {
 
         if (this.ownedAddress(address, inUseAddresses)) {
           value += output.value;
+          if (this.ownedAddress(address, externalAddresses)) {
+            amountToSelf += output.value;
+            selfRecipientList.push(address);
+          }
         } else {
           probableRecipientList.push(address); // could be the change address of the sender (in context of incoming tx)
         }
       }
     });
 
-    // if (value + (tx.fee | tx.fees) === 0) {
-    //   // tx from and to self
-    //   tx.transactionType = 'Self';
-    //   selfAmount += tx.fee ? tx.fee : tx.fees;
-    //   tx.amount = Math.abs(selfAmount);
-    //   tx.recipientAddresses = probableRecipientList;
-    //   tx.senderAddresses = probableSenderList;
-    // } else {
-    // tx.transactionType = value > 0 ? 'Received' : 'Sent';
-    // if (tx.transactionType === 'Sent') {
-    //   value += tx.fee ? tx.fee : tx.fees;
-    //   tx.recipientAddresses = probableRecipientList;
-    // } else {
-    //   tx.senderAddresses = probableSenderList;
-    // }
-    // tx.amount = Math.abs(value);
-    // tx.accountType = accountType;
-    // return tx;
-    // }
-    tx.transactionType = value > 0 ? 'Received' : 'Sent';
-    if (tx.transactionType === 'Sent') {
-      value += tx.fee ? tx.fee : tx.fees;
-      tx.recipientAddresses = probableRecipientList;
-    } else {
+    if (value > 0) {
+      tx.transactionType = 'Received';
       tx.senderAddresses = probableSenderList;
+    } else {
+      if (value + (tx.fee | tx.fees) === 0) {
+        tx.transactionType = 'Self';
+        tx.sentAmount = Math.abs(amountToSelf) + (tx.fee | tx.fees);
+        tx.receivedAmount = Math.abs(amountToSelf);
+        tx.senderAddresses = selfSenderList;
+        tx.recipientAddresses = selfRecipientList;
+      } else {
+        tx.transactionType = 'Sent';
+        tx.recipientAddresses = probableRecipientList;
+      }
     }
+
     tx.amount = Math.abs(value);
     tx.accountType = accountType;
     return tx;
