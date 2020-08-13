@@ -113,6 +113,11 @@ class SendConfirmation_updated extends Component<
     this.sweepSecure = props.navigation.getParam('sweepSecure');
     this.spendableBalance = props.navigation.getParam('spendableBalance');
     this.isSendMax = props.navigation.getParam('isSendMax');
+    if (this.isSendMax) {
+      setTimeout(() => {
+        this.onPrioritySelect('Medium Fee');
+      }, 2);
+    }
     this.viewRef = React.createRef();
     this.state = {
       switchOn: true,
@@ -676,50 +681,53 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
-            <View style={styles.priorityTableContainer}>
-              <View
-                style={{
-                  ...styles.priorityDataContainer,
-                  justifyContent: 'flex-start',
-                }}
-              >
-                <RadioButton
-                  size={20}
-                  color={Colors.lightBlue}
-                  borderColor={Colors.borderColor}
-                  isChecked={this.state.sliderValueText.includes('High')}
-                  onpress={() => this.onPrioritySelect('High Fee')}
-                />
-                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
-                  High
-                </Text>
-              </View>
-              <View style={styles.priorityDataContainer}>
-                {transfer &&
-                transfer.stage1 &&
-                transfer.stage1.txPrerequisites ? (
-                  <Text style={styles.priorityTableText}>
-                    {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
-                      10}{' '}
-                    -{' '}
-                    {(transfer.stage1.txPrerequisites['high'].estimatedBlocks +
-                      1) *
-                      10}{' '}
-                    minutes
+            {!this.isSendMax ? (
+              <View style={styles.priorityTableContainer}>
+                <View
+                  style={{
+                    ...styles.priorityDataContainer,
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <RadioButton
+                    size={20}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={this.state.sliderValueText.includes('High')}
+                    onpress={() => this.onPrioritySelect('High Fee')}
+                  />
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                    High
                   </Text>
-                ) : null}
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  {transfer &&
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      {transfer.stage1.txPrerequisites['high'].estimatedBlocks *
+                        10}{' '}
+                      -{' '}
+                      {(transfer.stage1.txPrerequisites['high']
+                        .estimatedBlocks +
+                        1) *
+                        10}{' '}
+                      minutes
+                    </Text>
+                  ) : null}
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>
+                    {this.convertBitCoinToCurrency(
+                      transfer.stage1 && transfer.stage1.txPrerequisites
+                        ? transfer.stage1.txPrerequisites['high'].fee
+                        : '',
+                    )}
+                    {' ' + this.getCorrectCurrencySymbol()}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.priorityDataContainer}>
-                <Text style={styles.priorityTableText}>
-                  {this.convertBitCoinToCurrency(
-                    transfer.stage1 && transfer.stage1.txPrerequisites
-                      ? transfer.stage1.txPrerequisites['high'].fee
-                      : '',
-                  )}
-                  {' ' + this.getCorrectCurrencySymbol()}
-                </Text>
-              </View>
-            </View>
+            ) : null}
             <View style={styles.priorityTableContainer}>
               <View
                 style={{
@@ -739,20 +747,24 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
               <View style={styles.priorityDataContainer}>
-                {transfer &&
-                transfer.stage1 &&
-                transfer.stage1.txPrerequisites ? (
-                  <Text style={styles.priorityTableText}>
-                    {transfer.stage1.txPrerequisites['medium'].estimatedBlocks *
-                      10}{' '}
-                    -{' '}
-                    {(transfer.stage1.txPrerequisites['medium']
-                      .estimatedBlocks +
-                      1) *
-                      10}{' '}
-                    minutes
-                  </Text>
-                ) : null}
+                {!this.isSendMax ? (
+                  transfer &&
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      {transfer.stage1.txPrerequisites['medium']
+                        .estimatedBlocks * 10}{' '}
+                      -{' '}
+                      {(transfer.stage1.txPrerequisites['medium']
+                        .estimatedBlocks +
+                        1) *
+                        10}{' '}
+                      minutes
+                    </Text>
+                  ) : null
+                ) : (
+                  <Text>120 - 130</Text>
+                )}
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text style={styles.priorityTableText}>
@@ -765,55 +777,58 @@ class SendConfirmation_updated extends Component<
                 </Text>
               </View>
             </View>
-            <View
-              style={{
-                ...styles.priorityTableContainer,
-                borderBottomWidth: this.state.customFeePerByte !== '' ? 0.5 : 0,
-              }}
-            >
+            {!this.isSendMax ? (
               <View
                 style={{
-                  ...styles.priorityDataContainer,
-                  justifyContent: 'flex-start',
+                  ...styles.priorityTableContainer,
+                  borderBottomWidth:
+                    this.state.customFeePerByte !== '' ? 0.5 : 0,
                 }}
               >
-                <RadioButton
-                  size={20}
-                  color={Colors.lightBlue}
-                  borderColor={Colors.borderColor}
-                  isChecked={this.state.sliderValueText.includes('Low')}
-                  onpress={() => this.onPrioritySelect('Low Fee')}
-                />
-                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
-                  Low
-                </Text>
-              </View>
-              <View style={styles.priorityDataContainer}>
-                {transfer &&
-                transfer.stage1 &&
-                transfer.stage1.txPrerequisites ? (
-                  <Text style={styles.priorityTableText}>
-                    {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
-                      10}{' '}
-                    -{' '}
-                    {(transfer.stage1.txPrerequisites['low'].estimatedBlocks +
-                      1) *
-                      10}{' '}
-                    minutes
+                <View
+                  style={{
+                    ...styles.priorityDataContainer,
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <RadioButton
+                    size={20}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={this.state.sliderValueText.includes('Low')}
+                    onpress={() => this.onPrioritySelect('Low Fee')}
+                  />
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                    Low
                   </Text>
-                ) : null}
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  {transfer &&
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
+                        10}{' '}
+                      -{' '}
+                      {(transfer.stage1.txPrerequisites['low'].estimatedBlocks +
+                        1) *
+                        10}{' '}
+                      minutes
+                    </Text>
+                  ) : null}
+                </View>
+                <View style={styles.priorityDataContainer}>
+                  <Text style={styles.priorityTableText}>
+                    {this.convertBitCoinToCurrency(
+                      transfer.stage1 && transfer.stage1.txPrerequisites
+                        ? transfer.stage1.txPrerequisites['low'].fee
+                        : '',
+                    )}
+                    {' ' + this.getCorrectCurrencySymbol()}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.priorityDataContainer}>
-                <Text style={styles.priorityTableText}>
-                  {this.convertBitCoinToCurrency(
-                    transfer.stage1 && transfer.stage1.txPrerequisites
-                      ? transfer.stage1.txPrerequisites['low'].fee
-                      : '',
-                  )}
-                  {' ' + this.getCorrectCurrencySymbol()}
-                </Text>
-              </View>
-            </View>
+            ) : null}
             {this.state.customFeePerByte !== '' && (
               <View
                 style={{
