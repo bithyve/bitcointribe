@@ -18,7 +18,6 @@ export default class SecureAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
       secondaryXpriv,
@@ -39,7 +38,6 @@ export default class SecureAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;
@@ -74,7 +72,6 @@ export default class SecureAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
       secondaryXpriv,
@@ -101,7 +98,6 @@ export default class SecureAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;

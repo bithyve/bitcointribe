@@ -15,9 +15,6 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
@@ -60,9 +57,6 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
@@ -84,9 +78,6 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      internalAddresssesCache: {};
-      externalAddressesCache: {};
-      addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;

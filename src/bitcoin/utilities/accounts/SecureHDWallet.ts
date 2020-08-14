@@ -63,7 +63,6 @@ export default class SecureHDWallet extends Bitcoin {
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
-  private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
   private derivativeGapLimit: number;
@@ -87,7 +86,6 @@ export default class SecureHDWallet extends Bitcoin {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;
@@ -140,8 +138,6 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.nextFreeChangeAddressIndex
         ? stateVars.nextFreeChangeAddressIndex
         : 0;
-    this.multiSigCache =
-      stateVars && stateVars.multiSigCache ? stateVars.multiSigCache : {};
     this.signingEssentialsCache =
       stateVars && stateVars.signingEssentialsCache
         ? stateVars.signingEssentialsCache
@@ -387,19 +383,8 @@ export default class SecureHDWallet extends Bitcoin {
     transactions: Transactions;
   }> => {
     if (options && options.restore) {
-      if (!(await this.isWalletEmpty())) {
-        console.log('Executing internal binary search');
-        this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-          config.BSI.INIT_INDEX,
-        );
-        console.log('Executing external binary search');
-        this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-          config.BSI.INIT_INDEX,
-        );
-      }
+      // WI helps with restoration
     }
-
-    // await this.gapLimitCatchUp();
 
     // this.consumedAddresses = [];
     // // generating all consumed addresses:
@@ -1660,64 +1645,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  private gapLimitCatchUp = async () => {
-    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-
-    const externalAddress = this.createSecureMultiSig(
-      this.nextFreeAddressIndex + this.gapLimit - 1,
-    ).address;
-
-    const internalAddress = this.createSecureMultiSig(
-      this.nextFreeChangeAddressIndex + this.gapLimit - 1,
-      true,
-    ).address;
-
-    const txCounts = await this.getTxCounts([externalAddress, internalAddress]);
-
-    if (txCounts[externalAddress] > 0) {
-      this.nextFreeAddressIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if (txCounts[internalAddress] > 0) {
-      this.nextFreeChangeAddressIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if (tryAgain) {
-      return this.gapLimitCatchUp();
-    }
-  };
-
-  private isWalletEmpty = async (): Promise<boolean> => {
-    if (
-      this.nextFreeChangeAddressIndex === 0 &&
-      this.nextFreeAddressIndex === 0
-    ) {
-      // assuming that this is freshly created wallet, with no funds and default internal variables
-      let emptyWallet = false;
-      const initialExternalAddress = this.createSecureMultiSig(0).address;
-      const initialInternalAddress = this.createSecureMultiSig(0).address;
-
-      const txCounts = await this.getTxCounts([
-        initialExternalAddress,
-        initialInternalAddress,
-      ]);
-
-      if (
-        txCounts[initialExternalAddress] === 0 &&
-        txCounts[initialInternalAddress] === 0
-      ) {
-        emptyWallet = true;
-      }
-
-      return emptyWallet;
-    } else {
-      return false;
-    }
-  };
-
   private binarySearchIterationForConsumedAddresses = async (
     index: number,
     maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
@@ -1754,83 +1681,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return this.binarySearchIterationForConsumedAddresses(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private binarySearchIterationForInternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.createSecureMultiSig(index, true).address;
-    const adjacentAddress = this.createSecureMultiSig(index + 1, true).address;
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForInternalAddress(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private binarySearchIterationForExternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.createSecureMultiSig(index).address;
-    const adjacentAddress = this.createSecureMultiSig(index + 1).address;
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForExternalAddress(
       index,
       maxUsedIndex,
       minUnusedIndex,
@@ -1921,12 +1771,6 @@ export default class SecureHDWallet extends Bitcoin {
     };
     address: string;
   } => {
-    // if (!derivativeXpub && this.multiSigCache[childIndex]) {
-    //   return this.multiSigCache[childIndex];
-    // } // cache hit
-
-    // console.log(`creating multiSig against index: ${childIndex}`);
-
     let childPrimaryPub;
     if (!derivativeXpub)
       childPrimaryPub = this.getPub(
@@ -1957,9 +1801,7 @@ export default class SecureHDWallet extends Bitcoin {
       },
       address: multiSig.address,
     };
-    // if (!derivativeXpub) {
-    //   this.multiSigCache[childIndex] = construct;
-    // }
+
     return construct;
   };
 
@@ -1971,39 +1813,6 @@ export default class SecureHDWallet extends Bitcoin {
       key = hash.update(key).digest('hex');
     }
     return key.slice(key.length - this.cipherSpec.keyLength);
-  };
-
-  private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
-    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
-      accountNumber
-    ];
-    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].nextFreeAddressIndex = 0;
-
-    const multiSig = this.createSecureMultiSig(
-      this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-        this.derivativeGapLimit -
-        1,
-      false,
-      this.derivativeAccounts[accountType][accountNumber].xpub,
-    );
-
-    const txCounts = await this.getTxCounts([multiSig.address]);
-
-    if (txCounts[multiSig.address] > 0) {
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].nextFreeAddressIndex += this.derivativeGapLimit;
-      tryAgain = true;
-    }
-
-    if (tryAgain) {
-      return this.derivativeAccGapLimitCatchup(accountType, accountNumber);
-    }
   };
 
   private generateDerivativeXpub = (

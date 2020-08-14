@@ -56,9 +56,6 @@ export default class HDSegwitWallet extends Bitcoin {
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private gapLimit: number;
-  private internalAddresssesCache: {};
-  private externalAddressesCache: {};
-  private addressToWIFCache: {};
   private lastBalTxSync: number = 0;
   private derivativeGapLimit: number;
   private confirmedUTXOs: Array<{
@@ -77,9 +74,6 @@ export default class HDSegwitWallet extends Bitcoin {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      internalAddresssesCache: {};
-      externalAddressesCache: {};
-      addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
@@ -126,18 +120,6 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.nextFreeChangeAddressIndex
         ? stateVars.nextFreeChangeAddressIndex
         : 0;
-    this.internalAddresssesCache =
-      stateVars && stateVars.internalAddresssesCache
-        ? stateVars.internalAddresssesCache
-        : {}; // index => address
-    this.externalAddressesCache =
-      stateVars && stateVars.externalAddressesCache
-        ? stateVars.externalAddressesCache
-        : {}; // index => address
-    this.addressToWIFCache =
-      stateVars && stateVars.addressToWIFCache
-        ? stateVars.addressToWIFCache
-        : {};
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
     this.derivativeGapLimit = this.gapLimit / 2;
@@ -913,172 +895,6 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  private binarySearchIterationForInternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.getInternalAddressByIndex(index);
-    const adjacentAddress = this.getInternalAddressByIndex(index + 1);
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForInternalAddress(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private binarySearchIterationForExternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.getExternalAddressByIndex(index);
-    const adjacentAddress = this.getExternalAddressByIndex(index + 1);
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForExternalAddress(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
-    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
-      accountNumber
-    ];
-
-    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].nextFreeAddressIndex = 0;
-
-    const externalAddress = this.getExternalAddressByIndex(
-      this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-        this.derivativeGapLimit -
-        1,
-      this.derivativeAccounts[accountType][accountNumber].xpub,
-    );
-
-    const txCounts = await this.getTxCounts([externalAddress]);
-
-    if (txCounts[externalAddress] > 0) {
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].nextFreeAddressIndex += this.derivativeGapLimit;
-      tryAgain = true;
-    }
-
-    if (tryAgain) {
-      return this.derivativeAccGapLimitCatchup(accountType, accountNumber);
-    }
-  };
-
-  private gapLimitCatchUp = async () => {
-    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-    const externalAddress = this.getExternalAddressByIndex(
-      this.nextFreeAddressIndex + this.gapLimit - 1,
-    );
-
-    const internalAddress = this.getInternalAddressByIndex(
-      this.nextFreeChangeAddressIndex + this.gapLimit - 1,
-    );
-
-    const txCounts = await this.getTxCounts([externalAddress, internalAddress]);
-
-    if (txCounts[externalAddress] > 0) {
-      this.nextFreeAddressIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if (txCounts[internalAddress] > 0) {
-      this.nextFreeChangeAddressIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if (tryAgain) {
-      return this.gapLimitCatchUp();
-    }
-  };
-
-  private isWalletEmpty = async (): Promise<boolean> => {
-    if (
-      this.nextFreeChangeAddressIndex === 0 &&
-      this.nextFreeAddressIndex === 0
-    ) {
-      // assuming that this is freshly created wallet, with no funds and default internal variables
-      let emptyWallet = false;
-      const initialExternalAddress = this.getExternalAddressByIndex(0);
-      const initialInternalAddress = this.getInternalAddressByIndex(0);
-
-      const txCounts = await this.getTxCounts([
-        initialExternalAddress,
-        initialInternalAddress,
-      ]);
-
-      if (
-        txCounts[initialExternalAddress] === 0 &&
-        txCounts[initialInternalAddress] === 0
-      ) {
-        emptyWallet = true;
-      }
-
-      return emptyWallet;
-    } else {
-      return false;
-    }
-  };
-
   public averageTransactionFee = async () => {
     const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
     // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
@@ -1139,19 +955,9 @@ export default class HDSegwitWallet extends Bitcoin {
     transactions: Transactions;
   }> => {
     if (options && options.restore) {
-      if (!(await this.isWalletEmpty())) {
-        console.log('Executing internal binary search');
-        this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-          config.BSI.INIT_INDEX,
-        );
-        console.log('Executing external binary search');
-        this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-          config.BSI.INIT_INDEX,
-        );
-      }
+      // WI helps with restoration
     }
 
-    // await this.gapLimitCatchUp();
     const externalAddresses = [];
     for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
       externalAddresses.push(this.getExternalAddressByIndex(itr));
@@ -1601,9 +1407,6 @@ export default class HDSegwitWallet extends Bitcoin {
         const address = this.getInternalAddressByIndex(
           this.nextFreeChangeAddressIndex + itr,
         );
-        this.internalAddresssesCache[
-          this.nextFreeChangeAddressIndex + itr
-        ] = address; // updating cache just for any case
 
         const txCounts = await this.getTxCounts([address]); // ensuring availability
 
@@ -1695,10 +1498,6 @@ export default class HDSegwitWallet extends Bitcoin {
     index: number,
     derivativeXpub?: string,
   ): string => {
-    if (!derivativeXpub && this.externalAddressesCache[index]) {
-      return this.externalAddressesCache[index];
-    } // cache hit
-
     const node = bip32.fromBase58(
       derivativeXpub ? derivativeXpub : this.getXpub(),
       this.network,
@@ -1707,9 +1506,6 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const address = this.getAddress(keyPair, this.purpose);
 
-    if (!derivativeXpub) {
-      this.externalAddressesCache[index] = address;
-    }
     return address;
   };
 
@@ -1717,10 +1513,6 @@ export default class HDSegwitWallet extends Bitcoin {
     index: number,
     derivativeXpub?: string,
   ): string => {
-    if (!derivativeXpub && this.internalAddresssesCache[index]) {
-      return this.internalAddresssesCache[index];
-    } // cache hit
-
     const node = bip32.fromBase58(
       derivativeXpub ? derivativeXpub : this.getXpub(),
       this.network,
@@ -1728,36 +1520,10 @@ export default class HDSegwitWallet extends Bitcoin {
     const keyPair = node.derive(1).derive(index);
     const address = this.getAddress(keyPair, this.purpose);
 
-    if (!derivativeXpub) {
-      this.internalAddresssesCache[index] = address;
-    }
     return address;
   };
 
   private getWifForAddress = (address: string): string => {
-    // contains address to WIF mapping (including derivative acc)
-    if (this.addressToWIFCache[address]) {
-      return this.addressToWIFCache[address];
-    } // cache hit
-
-    // fast approach, first lets iterate over all addresses we have in cache
-    // for (const index of Object.keys(this.internalAddresssesCache)) {
-    //   if (this.getInternalAddressByIndex(parseInt(index, 10)) === address) {
-    //     return (this.addressToWIFCache[address] = this.getInternalWIFByIndex(
-    //       parseInt(index, 10),
-    //     ));
-    //   }
-    // }
-
-    // for (const index of Object.keys(this.externalAddressesCache)) {
-    //   if (this.getExternalAddressByIndex(parseInt(index, 10)) === address) {
-    //     return (this.addressToWIFCache[address] = this.getExternalWIFByIndex(
-    //       parseInt(index, 10),
-    //     ));
-    //   }
-    // }
-
-    // cache miss: lets iterate over all addresses we have up to first unused address index
     for (
       let itr = 0;
       itr <= this.nextFreeChangeAddressIndex + this.gapLimit;
