@@ -90,7 +90,6 @@ export interface ShareUploadables {
 export interface DerivativeAccountElements {
   xpub: string;
   xpriv: string;
-  ypub?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   receivingAddress?: string;
@@ -124,7 +123,6 @@ export interface TrustedContactDerivativeAccountElements {
   };
   xpub: string;
   xpriv: string;
-  ypub?: string;
   nextFreeAddressIndex: number;
   usedAddresses?: string[];
   receivingAddress?: string;

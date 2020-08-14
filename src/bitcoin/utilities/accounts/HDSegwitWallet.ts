@@ -1437,11 +1437,9 @@ export default class HDSegwitWallet extends Bitcoin {
       }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();
-      const ypub = this.xpubToYpub(xpub, null, this.network);
       this.derivativeAccounts[accountType][accountNumber] = {
         xpriv,
         xpub,
-        ypub,
         nextFreeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;
