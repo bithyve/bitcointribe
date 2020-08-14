@@ -228,15 +228,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
-    // console.log({ baseXpub });
-    // const node = bip32.fromBase58(baseXpub, this.network);
-    // const address = this.getAddress(node.derive(0).derive(0), this.purpose);
-    // console.log({ address });
     return baseXpub;
-    // const child = node.derive(0).neutered(); //external chain
-    // const receivingXpub = child.toBase58();
-    // console.log({ receivingXpub });
-    // return receivingXpub;
   };
 
   public getTrustedContactDerivativeAccXpub = (
@@ -725,23 +717,6 @@ export default class HDSegwitWallet extends Bitcoin {
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
                 };
 
-                // // update balance based on tx
-                // if (transaction.status === 'Confirmed') {
-                //   if (transaction.transactionType === 'Received') {
-                //     balances.balance += transaction.amount;
-                //   } else {
-                //     const debited = transaction.amount + transaction.fee;
-                //     balances.balance -= debited;
-                //   }
-                // } else {
-                //   if (transaction.transactionType === 'Received') {
-                //     balances.unconfirmedBalance += transaction.amount;
-                //   } else {
-                //     const debited = transaction.amount + transaction.fee;
-                //     balances.unconfirmedBalance -= debited;
-                //   }
-                // }
-
                 // over-ride sent transaction's accountType variable for derivative accounts
                 // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
                 if (transaction.transactionType === 'Sent')
@@ -1104,113 +1079,6 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  // public fetchBalance = async (): Promise<{
-  //   balance: number;
-  //   unconfirmedBalance: number;
-  // }> => {
-  //   try {
-  //     if (!(await this.isWalletEmpty())) {
-  //       console.log('Executing internal binary search');
-  //       this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-  //         config.BSI.INIT_INDEX,
-  //       );
-  //       console.log('Executing external binary search');
-  //       this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-  //         config.BSI.INIT_INDEX,
-  //       );
-  //     }
-
-  //     await this.gapLimitCatchUp();
-
-  //     this.usedAddresses = [];
-  //     // generating all involved addresses (TD: include gap limit?)
-  //     for (
-  //       let itr = 0;
-  //       itr < this.nextFreeAddressIndex + this.gapLimit;
-  //       itr++
-  //     ) {
-  //       this.usedAddresses.push(this.getExternalAddressByIndex(itr));
-  //     }
-  //     for (
-  //       let itr = 0;
-  //       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-  //       itr++
-  //     ) {
-  //       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
-  //     }
-
-  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
-  //       this.usedAddresses,
-  //     );
-  //     return (this.balances = { balance, unconfirmedBalance });
-  //   } catch (err) {
-  //     throw new Error(`Unable to get balance: ${err.message}`);
-  //   }
-  // };
-
-  // public fetchBalance = async (options?: {
-  //   restore?;
-  // }): Promise<{
-  //   balance: number;
-  //   unconfirmedBalance: number;
-  // }> => {
-  //   try {
-  //     if (options && options.restore) {
-  //       if (!(await this.isWalletEmpty())) {
-  //         console.log('Executing internal binary search');
-  //         this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-  //           config.BSI.INIT_INDEX,
-  //         );
-  //         console.log('Executing external binary search');
-  //         this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-  //           config.BSI.INIT_INDEX,
-  //         );
-  //       }
-  //     }
-
-  //     await this.gapLimitCatchUp();
-
-  //     this.usedAddresses = [];
-  //     for (
-  //       let itr = 0;
-  //       itr < this.nextFreeAddressIndex + this.gapLimit;
-  //       itr++
-  //     ) {
-  //       this.usedAddresses.push(this.getExternalAddressByIndex(itr));
-  //     }
-  //     for (
-  //       let itr = 0;
-  //       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-  //       itr++
-  //     ) {
-  //       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
-  //     }
-
-  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
-  //       this.usedAddresses,
-  //     );
-  //     return (this.balances = { balance, unconfirmedBalance });
-  //   } catch (err) {
-  //     throw new Error(`Unable to get balance: ${err.message}`);
-  //   }
-  // };
-
-  // public fetchTransactions = async (): Promise<{
-  //   transactions: Transactions;
-  // }> => {
-  //   if (this.usedAddresses.length === 0) {
-  //     // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-  //     await this.fetchBalance();
-  //   }
-
-  //   const { transactions } = await this.fetchTransactionsByAddresses(
-  //     this.usedAddresses,
-  //     this.isTest ? 'Test Account' : 'Checking Account',
-  //   );
-  //   this.transactions = transactions;
-  //   return { transactions };
-  // };
-
   public averageTransactionFee = async () => {
     const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
     // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
@@ -1375,105 +1243,6 @@ export default class HDSegwitWallet extends Bitcoin {
     console.log({ balances, transactions });
     return { balances, transactions };
   };
-
-  // public createHDTransaction = async (
-  //   recipients: {
-  //     address: string;
-  //     amount: number;
-  //   }[],
-  //   txnPriority: string,
-  //   averageTxFees?: any,
-  //   nSequence?: number,
-  // ): Promise<
-  //   | {
-  //       fee: number;
-  //       balance: number;
-  //       estimatedBlocks?: undefined;
-  //       inputs?: undefined;
-  //       txb?: undefined;
-  //     }
-  //   | {
-  //       inputs: Array<{
-  //         txId: string;
-  //         vout: number;
-  //         value: number;
-  //         address: string;
-  //       }>;
-  //       txb: bitcoinJS.TransactionBuilder;
-  //       fee: number;
-  //       balance: number;
-  //       estimatedBlocks: number;
-  //     }
-  // > => {
-  //   try {
-  //     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
-  //     console.log('Input UTXOs:', inputUTXOs);
-
-  //     const outputUTXOs = [];
-  //     for (const recipient of recipients) {
-  //       outputUTXOs.push({
-  //         address: recipient.address,
-  //         value: recipient.amount,
-  //       });
-  //     }
-  //     console.log('Output UTXOs:', outputUTXOs);
-  //     let balance: number = 0;
-  //     inputUTXOs.forEach((utxo) => {
-  //       balance += utxo.value;
-  //     });
-
-  //     let feePerByte, estimatedBlocks;
-  //     console.log({ averageTxFees });
-  //     if (averageTxFees) {
-  //       feePerByte = averageTxFees[txnPriority].feePerByte;
-  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-  //     } else {
-  //       const averageTxFees = await this.averageTransactionFee();
-  //       feePerByte = averageTxFees[txnPriority].feePerByte;
-  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-  //     }
-
-  //     const { inputs, outputs, fee } = coinselect(
-  //       inputUTXOs,
-  //       outputUTXOs,
-  //       feePerByte,
-  //     );
-
-  //     console.log('-------Transaction--------');
-  //     console.log('\tDynamic Fee', fee);
-  //     console.log('\tInputs:', inputs);
-  //     console.log('\tOutputs:', outputs);
-
-  //     if (!inputs) {
-  //       // insufficient input utxos to compensate for output utxos + fee
-  //       return { fee, balance };
-  //     }
-
-  //     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-  //       this.network,
-  //     );
-
-  //     inputs.forEach((input) =>
-  //       txb.addInput(input.txId, input.vout, nSequence),
-  //     );
-
-  //     const sortedOuts = await this.sortOutputs(outputs);
-  //     sortedOuts.forEach((output) => {
-  //       console.log('Adding Output:', output);
-  //       txb.addOutput(output.address, output.value);
-  //     });
-
-  //     return {
-  //       inputs,
-  //       txb,
-  //       fee,
-  //       balance,
-  //       estimatedBlocks,
-  //     };
-  //   } catch (err) {
-  //     throw new Error(`Transaction creation failed: ${err.message}`);
-  //   }
-  // };
 
   public calculateSendMaxFee = (
     numberOfRecipients,
