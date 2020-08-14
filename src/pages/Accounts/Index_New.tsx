@@ -241,7 +241,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
     this.getServiceType(serviceType);
     this.getBalance();
-    this.setAverageTransactionFees();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
       accounts[serviceType].loading.derivativeBalanceTx;
@@ -250,6 +249,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
         ? service.secureHDWallet
         : service.hdWallet;
+    this.setAverageTransactionFees();
     this.checkFastBitcoin();
     // if (this.wallet.transactions.transactionDetails.length) {
     //   this.wallet.transactions.transactionDetails.sort(function (left, right) {
@@ -362,6 +362,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     let { serviceType } = this.state;
     let { accounts } = this.props;
     const service = accounts[serviceType].service;
+    const instance = service.hdWallet || service.secureHDWallet;
     const storedAverageTxFees = this.props.averageTxFees;
     // const storedAverageTxFees = JSON.parse(
     //   await AsyncStorage.getItem('storedAverageTxFees'),
@@ -373,14 +374,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       : 'TESTNET';
     if (storedAverageTxFees && storedAverageTxFees[network]) {
       const { averageTxFees, lastFetched } = storedAverageTxFees[network];
-      if (Date.now() - lastFetched < 1800000) {
+      if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
         // maintaining a half an hour difference b/w fetches
         this.setState({ averageTxFees: averageTxFees });
         return;
       }
     }
     console.log('Fetching average fee...', network);
-    const instance = service.hdWallet || service.secureHDWallet;
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({

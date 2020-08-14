@@ -982,7 +982,7 @@ export default class Bitcoin {
       let rates;
       if (this.network === bitcoinJS.networks.testnet) {
         const res: AxiosResponse = await bitcoinAxios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
         );
         rates = res.data;
       } else {

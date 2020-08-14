@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Image,
@@ -21,6 +21,45 @@ import DeviceInfo from 'react-native-device-info';
 export default function CustomPriorityContent(props) {
   const [amount, setAmount] = useState('');
   const [customEstimatedBlock, setCustomEstimatedBlock] = useState(0);
+
+  const onCustomFeeChange = useCallback(
+    (value) => {
+      const { feeRates } =
+        props.service.hdWallet || props.service.secureHDWallet;
+
+      if (feeRates) {
+        const customFeeRatePerByte = parseInt(value);
+        let customEstimatedBlock = 0;
+        // handling extremes
+        if (customFeeRatePerByte > feeRates['2']) {
+          customEstimatedBlock = 1;
+        } else if (customFeeRatePerByte < feeRates['144']) {
+          customEstimatedBlock = 200;
+        } else {
+          const closestFeeRatePerByte = Object.values(feeRates).reduce(
+            function (prev, curr) {
+              return Math.abs(curr - customFeeRatePerByte) <
+                Math.abs(prev - customFeeRatePerByte)
+                ? curr
+                : prev;
+            },
+          );
+
+          const etimatedBlock = Object.keys(feeRates).find(
+            (key) => feeRates[key] === closestFeeRatePerByte,
+          );
+          customEstimatedBlock = parseInt(etimatedBlock);
+        }
+
+        if (parseInt(value) >= 1) setCustomEstimatedBlock(customEstimatedBlock);
+        else setCustomEstimatedBlock(0);
+      }
+
+      setAmount(value);
+    },
+    [props.service],
+  );
+
   return (
     <View style={{ height: '100%', backgroundColor: Colors.white }}>
       <View
@@ -67,38 +106,7 @@ export default function CustomPriorityContent(props) {
           returnKeyLabel="Done"
           returnKeyType="done"
           keyboardType={'numeric'}
-          onChangeText={(value) => {
-            const { feeRates } =
-              props.service.hdWallet || props.service.secureHDWallet;
-
-            const customFeeRatePerByte = parseInt(value);
-            let customEstimatedBlock = 0;
-            // handling extremes
-            if (customFeeRatePerByte > feeRates['2']) {
-              customEstimatedBlock = 1;
-            } else if (customFeeRatePerByte < feeRates['144']) {
-              customEstimatedBlock = 150;
-            } else {
-              const closestFeeRatePerByte = Object.values(feeRates).reduce(
-                function (prev, curr) {
-                  return Math.abs(curr - customFeeRatePerByte) <
-                    Math.abs(prev - customFeeRatePerByte)
-                    ? curr
-                    : prev;
-                },
-              );
-
-              const etimatedBlock = Object.keys(feeRates).find(
-                (key) => feeRates[key] === closestFeeRatePerByte,
-              );
-              customEstimatedBlock = parseInt(etimatedBlock);
-            }
-
-            setAmount(value);
-            if (parseInt(value) >= 1)
-              setCustomEstimatedBlock(customEstimatedBlock);
-            else setCustomEstimatedBlock(0);
-          }}
+          onChangeText={(value) => onCustomFeeChange(value)}
           placeholderTextColor={Colors.borderColor}
         />
       </TouchableOpacity>
