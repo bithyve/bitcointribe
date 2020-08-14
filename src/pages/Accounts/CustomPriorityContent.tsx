@@ -20,6 +20,7 @@ import DeviceInfo from 'react-native-device-info';
 
 export default function CustomPriorityContent(props) {
   const [amount, setAmount] = useState('');
+  const [customEstimatedBlock, setCustomEstimatedBlock] = useState(0);
   return (
     <View style={{ height: '100%', backgroundColor: Colors.white }}>
       <View
@@ -67,7 +68,36 @@ export default function CustomPriorityContent(props) {
           returnKeyType="done"
           keyboardType={'numeric'}
           onChangeText={(value) => {
+            const { feeRates } =
+              props.service.hdWallet || props.service.secureHDWallet;
+
+            const customFeeRatePerByte = parseInt(value);
+            let customEstimatedBlock = 0;
+            // handling extremes
+            if (customFeeRatePerByte > feeRates['2']) {
+              customEstimatedBlock = 1;
+            } else if (customFeeRatePerByte < feeRates['144']) {
+              customEstimatedBlock = 150;
+            } else {
+              const closestFeeRatePerByte = Object.values(feeRates).reduce(
+                function (prev, curr) {
+                  return Math.abs(curr - customFeeRatePerByte) <
+                    Math.abs(prev - customFeeRatePerByte)
+                    ? curr
+                    : prev;
+                },
+              );
+
+              const etimatedBlock = Object.keys(feeRates).find(
+                (key) => feeRates[key] === closestFeeRatePerByte,
+              );
+              customEstimatedBlock = parseInt(etimatedBlock);
+            }
+
             setAmount(value);
+            if (parseInt(value) >= 1)
+              setCustomEstimatedBlock(customEstimatedBlock);
+            else setCustomEstimatedBlock(0);
           }}
           placeholderTextColor={Colors.borderColor}
         />
@@ -77,7 +107,7 @@ export default function CustomPriorityContent(props) {
           <Text style={styles.errorText}>{props.err}</Text>
         </View>
       ) : null}
-      {/* <View
+      <View
         style={{
           flexDirection: 'row',
           marginBottom: wp('1.5%'),
@@ -103,9 +133,13 @@ export default function CustomPriorityContent(props) {
             fontFamily: Fonts.FiraSansItalic,
           }}
         >
-          Calculating...
+          {customEstimatedBlock
+            ? `${customEstimatedBlock * 10} - ${
+                (customEstimatedBlock + 1) * 10
+              } minutes`
+            : 'Calculating...'}
         </Text>
-      </View> */}
+      </View>
       <View
         style={{
           flexDirection: 'row',
@@ -115,7 +149,7 @@ export default function CustomPriorityContent(props) {
         }}
       >
         <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressOk(amount)}
+          onPress={() => props.onPressOk(amount, customEstimatedBlock)}
           style={{ ...styles.successModalButtonView }}
         >
           <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>

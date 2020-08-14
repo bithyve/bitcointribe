@@ -532,7 +532,11 @@ class SendToContact extends Component<
 
     if (spendableBalance) {
       const max = spendableBalance - amountStacked - fee;
-
+      if (max <= 0) {
+        // fee greater than remaining spendable(spendable - amountStacked)
+        this.setState({ isInvalidBalance: true });
+        return;
+      }
       this.setState(
         {
           switchOn: !switchOn ? true : switchOn,
