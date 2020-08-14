@@ -267,8 +267,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     try {
-      // looking for free external address
-      let freeAddress = '';
+      let availableAddress = '';
       let itr;
 
       const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
@@ -298,8 +297,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
         const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
-          // free address found
-          freeAddress = address;
+          availableAddress = address;
           this.derivativeAccounts[accountType][
             accountNumber
           ].nextFreeAddressIndex += itr;
@@ -307,19 +305,14 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
-      if (!freeAddress) {
-        // giving up as we could find a free address in the above cycle
-
-        console.log(
-          'Failed to find a free address in the above cycle, using the next address without checking',
-        );
+      if (!availableAddress) {
         const address = this.getAddress(
           false,
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex + itr,
           this.derivativeAccounts[accountType][accountNumber].xpub,
         );
-        freeAddress = address; // not checking this one, it might be free
+        availableAddress = address; // defaulting to following address
         this.derivativeAccounts[accountType][
           accountNumber
         ].nextFreeAddressIndex += itr + 1;
@@ -327,8 +320,8 @@ export default class HDSegwitWallet extends Bitcoin {
 
       this.derivativeAccounts[accountType][
         accountNumber
-      ].receivingAddress = freeAddress;
-      return { address: freeAddress };
+      ].receivingAddress = availableAddress;
+      return { address: availableAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -358,8 +351,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     try {
-      // looking for free external address
-      let freeAddress = '';
+      let availableAddress = '';
       let itr;
 
       const { nextFreeAddressIndex } = account.contactDetails;
@@ -379,30 +371,24 @@ export default class HDSegwitWallet extends Bitcoin {
 
         const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
-          // free address found
-          freeAddress = address;
+          availableAddress = address;
           account.contactDetails.nextFreeAddressIndex += itr;
           break;
         }
       }
 
-      if (!freeAddress) {
-        // giving up as we could find a free address in the above cycle
-
-        console.log(
-          'Failed to find a free address in the above cycle, using the next address without checking',
-        );
+      if (!availableAddress) {
         const address = this.getAddress(
           false,
           account.contactDetails.nextFreeAddressIndex + itr,
           account.contactDetails.xpub,
         );
-        freeAddress = address;
+        availableAddress = address;
         account.contactDetails.nextFreeAddressIndex += itr + 1;
       }
 
-      account.contactDetails.receivingAddress = freeAddress;
-      return { address: freeAddress };
+      account.contactDetails.receivingAddress = availableAddress;
+      return { address: availableAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -474,6 +460,7 @@ export default class HDSegwitWallet extends Bitcoin {
       externalAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
         1,
+      0,
       accountType,
       contactName,
     );
@@ -795,28 +782,26 @@ export default class HDSegwitWallet extends Bitcoin {
     xpub: string,
   ): Promise<{ address: string }> => {
     try {
-      // finding free external address
-      let freeAddress = '';
+      let availableAddress = '';
       let itr;
       for (itr = 0; itr < this.gapLimit + 1; itr++) {
         const address = this.getAddress(false, itr, xpub);
         const txCounts = await this.getTxCounts([address]); // ensuring availability
         if (txCounts[address] === 0) {
           // free address found
-          freeAddress = address;
+          availableAddress = address;
           break;
         }
       }
 
-      if (!freeAddress) {
+      if (!availableAddress) {
         console.log(
           'Failed to find a free address in the external address cycle, using the next address without checking',
         );
-        // giving up as we couldn't find a free address in the above cycle
-        freeAddress = this.getAddress(false, itr); // not checking this one, it might be free
+        availableAddress = this.getAddress(false, itr);
       }
 
-      return { address: freeAddress };
+      return { address: availableAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -860,11 +845,13 @@ export default class HDSegwitWallet extends Bitcoin {
         balances,
         transactions,
         nextFreeAddressIndex,
+        nextFreeChangeAddressIndex,
       } = await this.fetchBalanceTransactionsByAddresses(
         this.usedAddresses,
         [],
         this.usedAddresses,
         this.nextFreeAddressIndex - 1,
+        this.nextFreeChangeAddressIndex - 1,
         'Test Account',
       );
 
@@ -885,6 +872,7 @@ export default class HDSegwitWallet extends Bitcoin {
       this.confirmedUTXOs = confirmedUTXOs;
 
       this.nextFreeAddressIndex = nextFreeAddressIndex;
+      this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex;
       this.receivingAddress = this.getAddress(false, this.nextFreeAddressIndex);
 
       this.balances = balances;
@@ -1011,11 +999,13 @@ export default class HDSegwitWallet extends Bitcoin {
       balances,
       transactions,
       nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
       externalAddresses,
       internalAddresses,
       ownedAddresses,
       this.nextFreeAddressIndex - 1,
+      this.nextFreeChangeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
     );
 
@@ -1041,6 +1031,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
     this.confirmedUTXOs = confirmedUTXOs;
     this.nextFreeAddressIndex = nextFreeAddressIndex;
+    this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex;
     this.receivingAddress = this.getAddress(false, this.nextFreeAddressIndex);
 
     this.setNewTransactions(transactions);
@@ -1280,48 +1271,6 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  private getChangeAddress = async (): Promise<{ address: string }> => {
-    try {
-      // looking for free internal address
-      let freeAddress = '';
-      let itr;
-      for (itr = 0; itr < this.gapLimit; itr++) {
-        if (this.nextFreeChangeAddressIndex + itr < 0) {
-          continue;
-        }
-        const address = this.getAddress(
-          true,
-          this.nextFreeChangeAddressIndex + itr,
-        );
-
-        const txCounts = await this.getTxCounts([address]); // ensuring availability
-
-        if (txCounts[address] === 0) {
-          // free address found
-          freeAddress = address;
-          this.nextFreeChangeAddressIndex += itr;
-          break;
-        }
-      }
-
-      if (!freeAddress) {
-        console.log(
-          'Failed to find a free address in the change address cycle, using the next address without checking',
-        );
-        // giving up as we could find a free address in the above cycle
-        freeAddress = this.getAddress(
-          true,
-          this.nextFreeChangeAddressIndex + itr,
-        ); // not checking this one, it might be free
-        this.nextFreeChangeAddressIndex += itr + 1;
-      }
-
-      return { address: freeAddress };
-    } catch (err) {
-      throw new Error(`Change address generation failed: ${err.message}`);
-    }
-  };
-
   private sortOutputs = async (
     outputs: Array<{
       address: string;
@@ -1335,8 +1284,7 @@ export default class HDSegwitWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        const { address } = await this.getChangeAddress();
-        output.address = address;
+        output.address = this.getAddress(true, this.nextFreeChangeAddressIndex);
         console.log(`adding the change address: ${output.address}`);
       }
     }
@@ -1441,7 +1389,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
-    throw new Error('Could not find WIF for ' + address);
+    throw new Error('Could not find private key for: ' + address);
   };
 
   private getXpub = () => {

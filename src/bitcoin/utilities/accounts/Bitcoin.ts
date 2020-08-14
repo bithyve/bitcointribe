@@ -281,6 +281,7 @@ export default class Bitcoin {
     internalAddresses: string[],
     ownedAddresses: string[],
     lastUsedAddressIndex: number,
+    lastUsedChangeAddressIndex: number,
     accountType: string,
     contactName?: string,
   ): Promise<{
@@ -294,6 +295,7 @@ export default class Bitcoin {
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
     nextFreeAddressIndex: number;
+    nextFreeChangeAddressIndex: number;
   }> => {
     let res: AxiosResponse;
     try {
@@ -446,18 +448,6 @@ export default class Bitcoin {
 
               transactions.transactionDetails.push(transaction);
             }
-
-            // if (tx.transactionType === 'Self') {
-            //   // injecting receive(2) tx when tx is from and to self
-            //   const txObj2 = {
-            //     ...txObj,
-            //     transactionType: 'Received',
-            //     recipientAddresses: [],
-            //     senderAddresses: tx.senderAddresses,
-            //   };
-
-            //   transactions.transactionDetails.push(txObj2);
-            // }
           }
         });
 
@@ -467,6 +457,16 @@ export default class Bitcoin {
             addressIndex > lastUsedAddressIndex
               ? addressIndex
               : lastUsedAddressIndex;
+        } else {
+          const changeAddressIndex = internalAddresses.indexOf(
+            addressInfo.Address,
+          );
+          if (changeAddressIndex > -1) {
+            lastUsedChangeAddressIndex =
+              changeAddressIndex > lastUsedChangeAddressIndex
+                ? changeAddressIndex
+                : lastUsedChangeAddressIndex;
+          }
         }
       }
 
@@ -475,6 +475,7 @@ export default class Bitcoin {
         balances,
         transactions,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
+        nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
       };
     } catch (err) {
       console.log(
