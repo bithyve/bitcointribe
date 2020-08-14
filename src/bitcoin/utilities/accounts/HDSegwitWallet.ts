@@ -28,6 +28,24 @@ const { HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 
 export default class HDSegwitWallet extends Bitcoin {
+  public balances: { balance: number; unconfirmedBalance: number } = {
+    balance: 0,
+    unconfirmedBalance: 0,
+  };
+  public receivingAddress: string;
+  public transactions: Transactions = {
+    totalTransactions: 0,
+    confirmedTransactions: 0,
+    unconfirmedTransactions: 0,
+    transactionDetails: [],
+  };
+  public derivativeAccounts:
+    | DerivativeAccounts
+    | TrustedContactDerivativeAccount = config.DERIVATIVE_ACC;
+  public newTransactions: Array<TransactionDetails> = [];
+  public trustedContactToDA: { [contactName: string]: number } = {};
+  public feeRates: any;
+
   private mnemonic: string;
   private passphrase: string;
   private purpose: number;
@@ -43,18 +61,6 @@ export default class HDSegwitWallet extends Bitcoin {
   private addressToWIFCache: {};
   private lastBalTxSync: number = 0;
   private derivativeGapLimit: number;
-
-  public balances: { balance: number; unconfirmedBalance: number } = {
-    balance: 0,
-    unconfirmedBalance: 0,
-  };
-  public receivingAddress: string;
-  public transactions: Transactions = {
-    totalTransactions: 0,
-    confirmedTransactions: 0,
-    unconfirmedTransactions: 0,
-    transactionDetails: [],
-  };
   private confirmedUTXOs: Array<{
     txId: string;
     vout: number;
@@ -62,11 +68,6 @@ export default class HDSegwitWallet extends Bitcoin {
     address: string;
     status?: any;
   }>;
-  public derivativeAccounts:
-    | DerivativeAccounts
-    | TrustedContactDerivativeAccount = config.DERIVATIVE_ACC;
-  public newTransactions: Array<TransactionDetails> = [];
-  public trustedContactToDA: { [contactName: string]: number } = {};
 
   constructor(
     mnemonic?: string,
@@ -94,6 +95,7 @@ export default class HDSegwitWallet extends Bitcoin {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -170,6 +172,8 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.trustedContactToDA
         ? stateVars.trustedContactToDA
         : this.trustedContactToDA;
+    this.feeRates =
+      stateVars && stateVars.feeRates ? stateVars.feeRates : this.feeRates;
   };
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -691,6 +695,7 @@ export default class HDSegwitWallet extends Bitcoin {
                   tx,
                   derivativeAccounts[accountNumber].usedAddresses,
                   dAccountType,
+                  derivativeAccounts[accountNumber].usedAddresses,
                 );
 
                 const transaction = {
@@ -1205,6 +1210,38 @@ export default class HDSegwitWallet extends Bitcoin {
   //   this.transactions = transactions;
   //   return { transactions };
   // };
+
+  public averageTransactionFee = async () => {
+    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
+    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
+
+    const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
+    this.feeRates = rates;
+    console.log({ feeRates: this.feeRates });
+    return {
+      high: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['high'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['high'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
+      },
+      medium: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['medium'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['medium'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
+      },
+      low: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['low'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['low'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
+      },
+    };
+  };
 
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter

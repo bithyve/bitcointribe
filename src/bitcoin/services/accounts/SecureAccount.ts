@@ -32,6 +32,7 @@ export default class SecureAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      feeRates,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -65,6 +66,7 @@ export default class SecureAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      feeRates: any;
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -86,6 +88,7 @@ export default class SecureAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      feeRates,
     });
   };
 
@@ -125,6 +128,7 @@ export default class SecureAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      feeRates: any;
     },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);

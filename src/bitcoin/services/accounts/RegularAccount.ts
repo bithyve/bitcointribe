@@ -27,6 +27,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -52,6 +53,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
@@ -70,6 +72,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     });
   };
 
@@ -99,6 +102,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);
