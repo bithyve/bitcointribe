@@ -971,9 +971,12 @@ export default class Bitcoin {
   };
 
   public feeRatesPerByte = async (): Promise<{
-    high: { feePerByte: number; estimatedBlocks: number };
-    medium: { feePerByte: number; estimatedBlocks: number };
-    low: { feePerByte: number; estimatedBlocks: number };
+    feeRatesByPriority: {
+      high: { feePerByte: number; estimatedBlocks: number };
+      medium: { feePerByte: number; estimatedBlocks: number };
+      low: { feePerByte: number; estimatedBlocks: number };
+    };
+    rates: any;
   }> => {
     try {
       let rates;
@@ -1036,71 +1039,40 @@ export default class Bitcoin {
         low,
       };
 
-      return feeRatesByPriority;
+      return { feeRatesByPriority, rates };
     } catch (err) {
       console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
-      try {
-        const chainInfo = await this.fetchChainInfo();
-        const {
-          high_fee_per_kb,
-          medium_fee_per_kb,
-          low_fee_per_kb,
-        } = chainInfo;
+      // try {
+      //   const chainInfo = await this.fetchChainInfo();
+      //   const {
+      //     high_fee_per_kb,
+      //     medium_fee_per_kb,
+      //     low_fee_per_kb,
+      //   } = chainInfo;
 
-        const high = {
-          feePerByte: Math.round(high_fee_per_kb / 1000),
-          estimatedBlocks: 2,
-        };
-        const medium = {
-          feePerByte: Math.round(medium_fee_per_kb / 1000),
-          estimatedBlocks: 4,
-        };
-        const low = {
-          feePerByte: Math.round(low_fee_per_kb / 1000),
-          estimatedBlocks: 6,
-        };
+      //   const high = {
+      //     feePerByte: Math.round(high_fee_per_kb / 1000),
+      //     estimatedBlocks: 2,
+      //   };
+      //   const medium = {
+      //     feePerByte: Math.round(medium_fee_per_kb / 1000),
+      //     estimatedBlocks: 4,
+      //   };
+      //   const low = {
+      //     feePerByte: Math.round(low_fee_per_kb / 1000),
+      //     estimatedBlocks: 6,
+      //   };
 
-        const feeRatesByPriority = {
-          high,
-          medium,
-          low,
-        };
-        return feeRatesByPriority;
-      } catch (err) {
-        throw new Error('Falied to fetch feeRates');
-      }
+      //   const feeRatesByPriority = {
+      //     high,
+      //     medium,
+      //     low,
+      //   };
+      //   return feeRatesByPriority;
+      // } catch (err) {
+      //   throw new Error('Falied to fetch feeRates');
+      // }
     }
-  };
-
-  public averageTransactionFee = async () => {
-    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
-    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
-
-    const feeRatesByPriority = await this.feeRatesPerByte();
-
-    return {
-      high: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['high'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['high'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
-      },
-      medium: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['medium'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['medium'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
-      },
-      low: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['low'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['low'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
-      },
-    };
   };
 
   public isValidAddress = (address: string): boolean => {

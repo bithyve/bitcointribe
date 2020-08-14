@@ -295,14 +295,15 @@ export default function Accounts(props) {
       const storedAverageTxFees = JSON.parse(
         await AsyncStorage.getItem('storedAverageTxFees'),
       );
+      const instance = service.hdWallet || service.secureHDWallet;
+
       //console.log({ storedAverageTxFees });
       if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
         const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
-        if (Date.now() - lastFetched < 1800000) {
+        if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
           // maintaining a half an hour difference b/w fetches
           setAverageTxFees(averageTxFees);
         } else {
-          const instance = service.hdWallet || service.secureHDWallet;
           const averageTxFees = await instance.averageTransactionFee();
 
           setAverageTxFees(averageTxFees);

@@ -40,6 +40,7 @@ export default class BaseAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
     network?: Network,
   ) {

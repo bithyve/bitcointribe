@@ -70,6 +70,7 @@ interface SendConfirmationStateTypes {
   loading: any;
   isConfirmDisabled: boolean;
   customFeePerByte: string;
+  customEstimatedBlock: number;
   customFeePerByteErr: string;
   averageTxFees: any;
   customTxPrerequisites: any;
@@ -132,6 +133,7 @@ class SendConfirmation_updated extends Component<
       isConfirmDisabled: false,
       customFeePerByte: '',
       customFeePerByteErr: '',
+      customEstimatedBlock: 0,
       averageTxFees: this.props.averageTxFees,
       customTxPrerequisites: null,
     };
@@ -308,7 +310,7 @@ class SendConfirmation_updated extends Component<
     }
   };
 
-  handleCustomFee = (amount) => {
+  handleCustomFee = (amount, customEstimatedBlock) => {
     if (parseInt(amount) < 1) {
       this.setState({
         customFeePerByte: '',
@@ -316,6 +318,7 @@ class SendConfirmation_updated extends Component<
       });
       return;
     }
+
     const { service, transfer } = this.props.accounts[this.serviceType];
     const outputs = transfer.stage1.txPrerequisites['high'].outputs.filter(
       (output) => output.address,
@@ -334,6 +337,7 @@ class SendConfirmation_updated extends Component<
           customTxPrerequisites: customTxPrerequisites,
           customFeePerByte: customTxPrerequisites.fee,
           customFeePerByteErr: '',
+          customEstimatedBlock,
         });
       }, 2);
     } else {
@@ -854,7 +858,10 @@ class SendConfirmation_updated extends Component<
                   </Text>
                 </View>
                 <View style={styles.priorityDataContainer}>
-                  <Text style={styles.priorityTableText}>-</Text>
+                  <Text style={styles.priorityTableText}>
+                    {this.state.customEstimatedBlock * 10} -{' '}
+                    {(this.state.customEstimatedBlock + 1) * 10} minutes
+                  </Text>
                 </View>
                 <View style={styles.priorityDataContainer}>
                   <Text style={styles.priorityTableText}>
@@ -1211,10 +1218,13 @@ class SendConfirmation_updated extends Component<
               title={'Custom Priority'}
               info={''}
               err={this.state.customFeePerByteErr}
+              service={this.props.accounts[this.serviceType].service}
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
-              onPressOk={(amount) => this.handleCustomFee(amount)}
+              onPressOk={(amount, customEstimatedBlock) =>
+                this.handleCustomFee(amount, customEstimatedBlock)
+              }
               onPressCancel={() => {
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);

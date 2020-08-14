@@ -410,6 +410,9 @@ class SendToContact extends Component<
     const { service } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
+    const instance =
+      service[serviceType].service.hdWallet ||
+      service[serviceType].service.secureHDWallet;
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
@@ -419,14 +422,12 @@ class SendToContact extends Component<
 
     if (storedAverageTxFees && storedAverageTxFees[network]) {
       const { averageTxFees, lastFetched } = storedAverageTxFees[network];
-      if (Date.now() - lastFetched < 1800000) {
+      if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
         this.setState({ averageTxFees: averageTxFees });
         return;
       } // maintaining a half an hour difference b/w fetches
     }
-    const instance =
-      service[serviceType].service.hdWallet ||
-      service[serviceType].service.secureHDWallet;
+
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
@@ -532,7 +533,11 @@ class SendToContact extends Component<
 
     if (spendableBalance) {
       const max = spendableBalance - amountStacked - fee;
-
+      if (max <= 0) {
+        // fee greater than remaining spendable(spendable - amountStacked)
+        this.setState({ isInvalidBalance: true });
+        return;
+      }
       this.setState(
         {
           switchOn: !switchOn ? true : switchOn,

@@ -45,6 +45,11 @@ export default class SecureHDWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  public feeRates: any;
+  public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
+  public newTransactions: Array<TransactionDetails> = [];
+
+  private lastBalTxSync: number = 0;
   private confirmedUTXOs: Array<{
     txId: string;
     vout: number;
@@ -52,11 +57,6 @@ export default class SecureHDWallet extends Bitcoin {
     address: string;
     status?: any;
   }>;
-  public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
-  public newTransactions: Array<TransactionDetails> = [];
-
-  private lastBalTxSync: number = 0;
-
   private primaryMnemonic: string;
   private walletID: string;
   private usedAddresses: string[];
@@ -114,6 +114,7 @@ export default class SecureHDWallet extends Bitcoin {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      feeRates: any;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -183,6 +184,8 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.newTransactions
         ? stateVars.newTransactions
         : this.newTransactions;
+    this.feeRates =
+      stateVars && stateVars.feeRates ? stateVars.feeRates : this.feeRates;
   };
 
   public importBHXpub = async (
@@ -390,6 +393,38 @@ export default class SecureHDWallet extends Bitcoin {
   //   this.transactions = transactions;
   //   return { transactions };
   // };
+
+  public averageTransactionFee = async () => {
+    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
+    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
+
+    const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
+    this.feeRates = rates;
+
+    return {
+      high: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['high'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['high'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
+      },
+      medium: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['medium'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['medium'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
+      },
+      low: {
+        averageTxFee: Math.round(
+          averageTxSize * feeRatesByPriority['low'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['low'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
+      },
+    };
+  };
 
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
@@ -902,6 +937,7 @@ export default class SecureHDWallet extends Bitcoin {
                   tx,
                   derivativeAccounts[accountNumber].usedAddresses,
                   dAccountType,
+                  derivativeAccounts[accountNumber].usedAddresses,
                 );
 
                 const transaction = {
