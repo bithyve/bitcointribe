@@ -47,7 +47,7 @@ export default class Bitcoin {
 
   public utcNow = (): number => Math.floor(Date.now() / 1000);
 
-  public getAddress = (
+  public deriveAddress = (
     keyPair: bip32.BIP32Interface,
     standard: number,
   ): string => {
@@ -85,7 +85,7 @@ export default class Bitcoin {
     return bs58check.encode(data);
   };
 
-  // public getAddress = (keyPair: ECPair): string =>
+  // public deriveAddress = (keyPair: ECPair): string =>
   //   bitcoinJS.payments.p2pkh({ pubkey: keyPair.publicKey }).address
 
   public generateHDWallet = (
@@ -111,7 +111,7 @@ export default class Bitcoin {
     const child1 = root.derivePath(path);
 
     const privateKey = child1.toWIF();
-    const address = this.getAddress(child1, config.STANDARD.BIP49);
+    const address = this.deriveAddress(child1, config.STANDARD.BIP49);
 
     console.log(`Mnemonic: ${mnemonic}`);
     console.log(`Address: ${address}`);

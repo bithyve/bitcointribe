@@ -63,7 +63,6 @@ export default class SecureHDWallet extends Bitcoin {
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
-  private signingEssentialsCache;
   private gapLimit: number;
   private derivativeGapLimit: number;
 
@@ -86,7 +85,6 @@ export default class SecureHDWallet extends Bitcoin {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;
       xpubs: {
@@ -138,10 +136,6 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.nextFreeChangeAddressIndex
         ? stateVars.nextFreeChangeAddressIndex
         : 0;
-    this.signingEssentialsCache =
-      stateVars && stateVars.signingEssentialsCache
-        ? stateVars.signingEssentialsCache
-        : {};
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
     this.derivativeGapLimit = this.gapLimit / 2;
@@ -1479,13 +1473,6 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   private getSigningEssentials = (address: string) => {
-    if (!this.secondaryXpriv) {
-      // refresh if secondaryXpriv is present: sweeping
-      if (this.signingEssentialsCache[address]) {
-        return this.signingEssentialsCache[address];
-      } // cache hit
-    }
-
     for (
       let itr = 0;
       itr <= this.nextFreeChangeAddressIndex + this.gapLimit;
@@ -1494,7 +1481,7 @@ export default class SecureHDWallet extends Bitcoin {
       const internal = true;
       const multiSig = this.createSecureMultiSig(itr, internal);
       if (multiSig.address === address) {
-        return (this.signingEssentialsCache[address] = {
+        return {
           multiSig,
           primaryPriv: this.derivePrimaryChildXKey(
             this.primaryXpriv,
@@ -1505,21 +1492,21 @@ export default class SecureHDWallet extends Bitcoin {
             ? this.deriveChildXKey(this.secondaryXpriv, itr)
             : null,
           childIndex: itr,
-        });
+        };
       }
     }
 
     for (let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++) {
       const multiSig = this.createSecureMultiSig(itr);
       if (multiSig.address === address) {
-        return (this.signingEssentialsCache[address] = {
+        return {
           multiSig,
           primaryPriv: this.derivePrimaryChildXKey(this.primaryXpriv, itr),
           secondaryPriv: this.secondaryXpriv
             ? this.deriveChildXKey(this.secondaryXpriv, itr)
             : null,
           childIndex: itr,
-        });
+        };
       }
     }
 
@@ -1550,7 +1537,7 @@ export default class SecureHDWallet extends Bitcoin {
               );
               const possibleAddress = multiSig.address;
               if (possibleAddress === address) {
-                return (this.signingEssentialsCache[address] = {
+                return {
                   multiSig,
                   primaryPriv: this.deriveDerivativeChildXKey(
                     derivativeInstance.xpriv,
@@ -1560,7 +1547,7 @@ export default class SecureHDWallet extends Bitcoin {
                     ? this.deriveChildXKey(this.secondaryXpriv, itr)
                     : null,
                   childIndex: itr,
-                });
+                };
               }
             }
           }
@@ -1569,123 +1556,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     throw new Error('Could not find WIF for ' + address);
-  };
-
-  private fetchUtxo = async (): Promise<
-    Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>
-  > => {
-    try {
-      if (this.usedAddresses.length === 0) {
-        // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-        await this.fetchBalanceTransaction();
-      }
-
-      const batchedDerivativeAddresses = [];
-
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-        if (dAccountType === TRUSTED_CONTACTS) continue; // TC not supported
-        const derivativeAccount = this.derivativeAccounts[dAccountType];
-        if (derivativeAccount.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= derivativeAccount.instance.using;
-            accountNumber++
-          ) {
-            const derivativeInstance = derivativeAccount[accountNumber];
-            if (
-              derivativeInstance.usedAddresses &&
-              derivativeInstance.usedAddresses.length
-            ) {
-              batchedDerivativeAddresses.push(
-                ...derivativeInstance.usedAddresses,
-              );
-            }
-          }
-        }
-      }
-
-      const ownedAddresses = [
-        ...this.usedAddresses,
-        ...batchedDerivativeAddresses,
-      ];
-      const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
-
-      const changeAddresses = [];
-      for (
-        let itr = 0;
-        itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-        itr++
-      ) {
-        changeAddresses.push(this.createSecureMultiSig(itr, true).address);
-      }
-      const confirmedUTXOs = [];
-      for (const utxo of UTXOs) {
-        if (utxo.status) {
-          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
-          else {
-            if (changeAddresses.includes(utxo.address)) {
-              // defaulting utxo's on the change branch to confirmed
-              confirmedUTXOs.push(utxo);
-            }
-          }
-        } else {
-          // utxo's from fallback won't contain status var (defaulting them as confirmed)
-          confirmedUTXOs.push(utxo);
-        }
-      }
-
-      return confirmedUTXOs;
-    } catch (err) {
-      throw new Error(`Fetch UTXOs failed: ${err.message}`);
-    }
-  };
-
-  private binarySearchIterationForConsumedAddresses = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ) => {
-    console.log({ depth });
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexMultiSig = this.createSecureMultiSig(index);
-    const adjacentMultiSig = this.createSecureMultiSig(index + 1);
-
-    const txCounts = await this.getTxCounts([
-      indexMultiSig.address,
-      adjacentMultiSig.address,
-    ]);
-
-    if (txCounts[indexMultiSig.address] === 0) {
-      console.log({ index });
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentMultiSig.address] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForConsumedAddresses(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
   };
 
   private getRecoverableXKey = (
