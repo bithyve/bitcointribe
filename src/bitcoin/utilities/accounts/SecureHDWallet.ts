@@ -327,73 +327,6 @@ export default class SecureHDWallet extends Bitcoin {
     return { isValid: res.data.isValid };
   };
 
-  // public fetchBalance = async (options?: {
-  //   restore?;
-  // }): Promise<{
-  //   balance: number;
-  //   unconfirmedBalance: number;
-  // }> => {
-  //   try {
-  //     if (options && options.restore) {
-  //       if (!(await this.isWalletEmpty())) {
-  //         console.log('Executing consumed binary search');
-  //         this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
-  //           config.BSI.INIT_INDEX,
-  //         );
-  //       }
-  //     }
-
-  //     await this.gapLimitCatchUp();
-
-  //     this.consumedAddresses = [];
-  //     // generating all consumed addresses:
-  //     for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
-  //       const multiSig = this.createSecureMultiSig(itr);
-  //       this.consumedAddresses.push(multiSig.address);
-  //     }
-
-  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
-  //       this.consumedAddresses,
-  //     );
-
-  //     return (this.balances = { balance, unconfirmedBalance });
-  //   } catch (err) {
-  //     throw new Error(`Unable to get balance: ${err.message}`);
-  //   }
-  // };
-
-  // public fetchTransactions = async (): Promise<{
-  //   transactions: {
-  //     totalTransactions: number;
-  //     confirmedTransactions: number;
-  //     unconfirmedTransactions: number;
-  //     transactionDetails: Array<{
-  //       txid: string;
-  //       status: string;
-  //       confirmations: number;
-  //       fee: string;
-  //       date: string;
-  //       transactionType: string;
-  //       amount: number;
-  //       accountType: string;
-  //       recipientAddresses?: string[];
-  //       senderAddresses?: string[];
-  //     }>;
-  //   };
-  // }> => {
-  //   if (this.consumedAddresses.length === 0) {
-  //     // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-  //     await this.fetchBalance();
-  //   }
-
-  //   const { transactions } = await this.fetchTransactionsByAddresses(
-  //     this.consumedAddresses,
-  //     'Savings Account',
-  //   );
-  //   this.transactions = transactions;
-  //   return { transactions };
-  // };
-
   public averageTransactionFee = async () => {
     const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
     // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
@@ -560,52 +493,6 @@ export default class SecureHDWallet extends Bitcoin {
     this.transactions = transactions;
     return { balances, transactions };
   };
-
-  // public getReceivingAddress = async (): Promise<{ address: string }> => {
-  //   try {
-  //     //   // looking for free external address
-  //     //   let freeAddress = '';
-  //     //   let itr;
-  //     //   for (itr = 0; itr < this.gapLimit + 1; itr++) {
-  //     //     if (this.nextFreeAddressIndex + itr < 0) {
-  //     //       continue;
-  //     //     }
-  //     //     const { address } = this.createSecureMultiSig(
-  //     //       this.nextFreeAddressIndex + itr,
-  //     //     );
-
-  //     //     const txCounts = await this.getTxCounts([address]);
-  //     //     if (txCounts[address] === 0) {
-  //     //       // free address found
-  //     //       freeAddress = address;
-  //     //       this.nextFreeAddressIndex += itr;
-  //     //       break;
-  //     //     }
-  //     //   }
-
-  //     //   if (!freeAddress) {
-  //     //     // giving up as we could find a free address in the above cycle
-
-  //     //     console.log(
-  //     //       'Failed to find a free address in the above cycle, using the next address without checking',
-  //     //     );
-  //     //     const multiSig = this.createSecureMultiSig(
-  //     //       this.nextFreeAddressIndex + itr,
-  //     //     );
-  //     //     freeAddress = multiSig.address; // not checking this one, it might be free
-  //     //     this.nextFreeAddressIndex += itr + 1;
-  //     //   }
-
-  //     //   this.receivingAddress = freeAddress;
-
-  //     this.receivingAddress = this.createSecureMultiSig(
-  //       this.nextFreeAddressIndex,
-  //     ).address;
-  //     return { address: this.receivingAddress };
-  //   } catch (err) {
-  //     throw new Error(`Unable to generate receiving address: ${err.message}`);
-  //   }
-  // };
 
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
@@ -959,23 +846,6 @@ export default class SecureHDWallet extends Bitcoin {
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
                 };
 
-                // // update balance based on tx
-                // if (transaction.status === 'Confirmed') {
-                //   if (transaction.transactionType === 'Received') {
-                //     balances.balance += transaction.amount;
-                //   } else {
-                //     const debited = transaction.amount + transaction.fee;
-                //     balances.balance -= debited;
-                //   }
-                // } else {
-                //   if (transaction.transactionType === 'Received') {
-                //     balances.unconfirmedBalance += transaction.amount;
-                //   } else {
-                //     const debited = transaction.amount + transaction.fee;
-                //     balances.unconfirmedBalance -= debited;
-                //   }
-                // }
-
                 // over-ride sent transaction's accountType variable for derivative accounts
                 // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
                 if (transaction.transactionType === 'Sent')
@@ -1099,26 +969,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  // public resetTwoFA = async (
-  //   token: number,
-  // ): Promise<{
-  //   qrData: any;
-  //   secret: any;
-  // }> => {
-  //   let res: AxiosResponse;
-  //   try {
-  //     res = await BH_AXIOS.post('resetTwoFA', {
-  //       HEXA_ID,
-  //       walletID: this.walletID,
-  //       token,
-  //     });
-  //   } catch (err) {
-  //     throw new Error(err.response.data.err);
-  //   }
-  //   const { qrData, secret } = res.data;
-  //   return { qrData, secret };
-  // };
-
   public resetTwoFA = async (
     secondaryMnemonic: string,
   ): Promise<{
@@ -1236,104 +1086,6 @@ export default class SecureHDWallet extends Bitcoin {
 
     return outputs;
   };
-
-  // public createHDTransaction = async (
-  //   recipients: {
-  //     address: string;
-  //     amount: number;
-  //   }[],
-  //   txnPriority: string,
-  //   averageTxFees?: any,
-  //   nSequence?: number,
-  // ): Promise<
-  //   | {
-  //       fee: number;
-  //       balance: number;
-  //       inputs?: undefined;
-  //       txb?: undefined;
-  //       estimatedBlocks?: undefined;
-  //     }
-  //   | {
-  //       inputs: Array<{
-  //         txId: string;
-  //         vout: number;
-  //         value: number;
-  //         address: string;
-  //       }>;
-  //       txb: bitcoinJS.TransactionBuilder;
-  //       fee: number;
-  //       balance: number;
-  //       estimatedBlocks: number;
-  //     }
-  // > => {
-  //   try {
-  //     const inputUTXOs = await this.fetchUtxo();
-  //     console.log('Input UTXOs:', inputUTXOs);
-
-  //     const outputUTXOs = [];
-  //     for (const recipient of recipients) {
-  //       outputUTXOs.push({
-  //         address: recipient.address,
-  //         value: recipient.amount,
-  //       });
-  //     }
-  //     console.log('Output UTXOs:', outputUTXOs);
-  //     // const txnFee = await this.feeRatesPerByte(txnPriority);
-
-  //     let feePerByte, estimatedBlocks;
-  //     if (averageTxFees) {
-  //       feePerByte = averageTxFees[txnPriority].feePerByte;
-  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-  //     } else {
-  //       const averageTxFees = await this.averageTransactionFee();
-  //       feePerByte = averageTxFees[txnPriority].feePerByte;
-  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-  //     }
-
-  //     let balance: number = 0;
-  //     inputUTXOs.forEach((utxo) => {
-  //       balance += utxo.value;
-  //     });
-  //     const { inputs, outputs, fee } = coinselect(
-  //       inputUTXOs,
-  //       outputUTXOs,
-  //       feePerByte,
-  //     );
-  //     console.log('-------Transaction--------');
-  //     console.log('\tFee', fee);
-  //     console.log('\tInputs:', inputs);
-  //     console.log('\tOutputs:', outputs);
-
-  //     if (!inputs) {
-  //       // insufficient input utxos to compensate for output utxos + fee
-  //       return { fee, balance };
-  //     }
-
-  //     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-  //       this.network,
-  //     );
-
-  //     inputs.forEach((input) =>
-  //       txb.addInput(input.txId, input.vout, nSequence),
-  //     );
-
-  //     const sortedOuts = await this.sortOutputs(outputs);
-  //     sortedOuts.forEach((output) => {
-  //       console.log('Adding Output:', output);
-  //       txb.addOutput(output.address, output.value);
-  //     });
-
-  //     return {
-  //       inputs,
-  //       txb,
-  //       fee,
-  //       balance,
-  //       estimatedBlocks,
-  //     };
-  //   } catch (err) {
-  //     throw new Error(`Transaction creation failed: ${err.message}`);
-  //   }
-  // };
 
   public calculateSendMaxFee = (
     numberOfRecipients,

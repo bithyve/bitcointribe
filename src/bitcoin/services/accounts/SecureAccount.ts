@@ -410,105 +410,8 @@ export default class SecureAccount {
     };
   } => this.secureHDWallet.decodePaymentURI(paymentURI);
 
-  // public getAddress = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         address: string;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.getReceivingAddress(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o1, err: err.message, message: ErrMap[0o1] };
-  //   }
-  // };
-
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);
-
-  // public getBalance = async (options?: {
-  //   restore?;
-  // }): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         balance: number;
-  //         unconfirmedBalance: number;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.fetchBalance(options),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o2, err: err.message, message: ErrMap[0o2] };
-  //   }
-  // };
-
-  // public getTransactions = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         transactions: {
-  //           totalTransactions: number;
-  //           confirmedTransactions: number;
-  //           unconfirmedTransactions: number;
-  //           transactionDetails: Array<{
-  //             txid: string;
-  //             status: string;
-  //             confirmations: number;
-  //             fee: string;
-  //             date: string;
-  //             transactionType: string;
-  //             amount: number;
-  //             accountType: string;
-  //             recipientAddresses?: string[];
-  //             senderAddresses?: string[];
-  //           }>;
-  //         };
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.fetchTransactions(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o3, err: err.message, message: ErrMap[0o3] };
-  //   }
-  // };
 
   public getBalanceTransactions = async (options?: {
     restore?;
@@ -617,34 +520,6 @@ export default class SecureAccount {
       return { status: 0o4, err: err.message, message: ErrMap[0o4] };
     }
   };
-
-  // public getTestcoins = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         txid: any;
-  //         funded: any;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     const { address } = await this.secureHDWallet.getReceivingAddress();
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.testnetFaucet(address),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o5, err: err.message, message: ErrMap[0o5] };
-  //   }
-  // };
 
   public generateSecondaryXpriv = (
     secondaryMnemonic: string,
