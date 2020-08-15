@@ -7,7 +7,6 @@ import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import config from '../../HexaConfig';
 import { Transactions } from '../Interface';
-import bs58check from 'bs58check';
 import { TRUSTED_CONTACTS } from '../../../common/constants/serviceTypes';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
@@ -47,7 +46,7 @@ export default class Bitcoin {
 
   public utcNow = (): number => Math.floor(Date.now() / 1000);
 
-  public getAddress = (
+  public deriveAddress = (
     keyPair: bip32.BIP32Interface,
     standard: number,
   ): string => {
@@ -72,72 +71,6 @@ export default class Bitcoin {
     }
   };
 
-  public xpubToYpub = (xpub?, xpriv?, network = bitcoinJS.networks.bitcoin) => {
-    let data = bs58check.decode(xpub || xpriv);
-    data = data.slice(4);
-    let versionBytes;
-    if (network == bitcoinJS.networks.bitcoin) {
-      versionBytes = xpub ? '049d7cb2' : '049d7878';
-    } else {
-      versionBytes = xpub ? '044a5262' : '044a4e28';
-    }
-    data = Buffer.concat([Buffer.from(versionBytes, 'hex'), data]);
-    return bs58check.encode(data);
-  };
-
-  // public getAddress = (keyPair: ECPair): string =>
-  //   bitcoinJS.payments.p2pkh({ pubkey: keyPair.publicKey }).address
-
-  public generateHDWallet = (
-    mnemonic: string,
-    passphrase?: string,
-  ): {
-    mnemonic: string;
-    keyPair: bip32.BIP32Interface;
-    address: string;
-    privateKey: string;
-  } => {
-    // generates a HD-Wallet from the provided mnemonic-passphrase pair
-
-    if (!bip39.validateMnemonic(mnemonic)) {
-      throw new Error('Invalid mnemonic');
-    }
-
-    const seed: Buffer = passphrase
-      ? bip39.mnemonicToSeedSync(mnemonic, passphrase)
-      : bip39.mnemonicToSeedSync(mnemonic);
-    const path: string = "m/44'/1'/0'/0/0";
-    const root = bip32.fromSeed(seed, this.network);
-    const child1 = root.derivePath(path);
-
-    const privateKey = child1.toWIF();
-    const address = this.getAddress(child1, config.STANDARD.BIP49);
-
-    console.log(`Mnemonic: ${mnemonic}`);
-    console.log(`Address: ${address}`);
-
-    return {
-      mnemonic,
-      keyPair: child1,
-      address,
-      privateKey,
-    };
-  };
-
-  public createHDWallet = (
-    passphrase?: string,
-  ): {
-    mnemonic: string;
-    keyPair: bip32.BIP32Interface;
-    address: string;
-    privateKey: string;
-  } => {
-    // creates a new HD Wallet
-
-    const mnemonic = bip39.generateMnemonic(256);
-    return this.generateHDWallet(mnemonic, passphrase);
-  };
-
   public getP2SH = (keyPair: bitcoinJS.ECPairInterface): bitcoinJS.Payment =>
     bitcoinJS.payments.p2sh({
       redeem: bitcoinJS.payments.p2wpkh({
@@ -146,122 +79,6 @@ export default class Bitcoin {
       }),
       network: this.network,
     });
-
-  public getBalance = async (
-    address: string,
-  ): Promise<
-    | {
-        status: number;
-        errorMessage: string;
-        balanceData?: undefined;
-      }
-    | {
-        status: number;
-        balanceData: any;
-        errorMessage?: undefined;
-      }
-  > => {
-    // fetches balance corresponding to the supplied address
-
-    let res: AxiosResponse;
-    if (this.network === bitcoinJS.networks.testnet) {
-      try {
-        res = await bitcoinAxios.get(
-          `${TESTNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
-        );
-      } catch (err) {
-        console.log('Error:', err.response.data);
-        return {
-          status: err.response.status,
-          errorMessage: err.response.data,
-        };
-      }
-    } else {
-      // throttled endPoint (required: full node/corresponding paid service));
-      try {
-        res = await bitcoinAxios.get(
-          `${MAINNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
-        );
-      } catch (err) {
-        console.log('Error:', err.response.data);
-        return {
-          status: err.response.status,
-          errorMessage: err.response.data,
-        };
-      }
-    }
-
-    return {
-      status: res.status,
-      balanceData: res.data,
-    };
-  };
-
-  public blockcypherBalFallback = async (
-    addresses: string[],
-  ): Promise<{
-    bal: number;
-    unconfirmedBal: number;
-  }> => {
-    let bal = 0;
-    let unconfirmedBal = 0;
-    for (const addr of addresses) {
-      const { balanceData } = await this.getBalance(addr);
-      bal += balanceData.balance;
-      unconfirmedBal += balanceData.unconfirmed_balance;
-    }
-
-    return { bal, unconfirmedBal };
-  };
-
-  public getBalanceByAddresses = async (
-    addresses: string[],
-  ): Promise<{
-    balance: number;
-    unconfirmedBalance: number;
-  }> => {
-    let res: AxiosResponse;
-    try {
-      if (this.network === bitcoinJS.networks.testnet) {
-        // throw new Error("fabricated error");
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCE,
-          {
-            addresses,
-          },
-        );
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCE,
-          {
-            addresses,
-          },
-        );
-      }
-
-      return {
-        balance: res.data.Balance,
-        unconfirmedBalance: res.data.UnconfirmedBalance,
-      };
-    } catch (err) {
-      console.log(
-        `An error occurred while fetching balance via Esplora: ${err.response.data.err}`,
-      );
-      console.log('Using Blockcypher fallback');
-      try {
-        const { bal, unconfirmedBal } = await this.blockcypherBalFallback(
-          addresses,
-        );
-        return {
-          balance: bal,
-          unconfirmedBalance: unconfirmedBal,
-        };
-      } catch (err) {
-        console.log('Blockcypher fallback failed aswell!');
-        throw new Error('fetching balance by addresses failed');
-      }
-    }
-  };
 
   public fetchAddressInfo = async (address: string): Promise<any> => {
     // fetches information corresponding to the  supplied address (including txns)
@@ -281,6 +98,7 @@ export default class Bitcoin {
     internalAddresses: string[],
     ownedAddresses: string[],
     lastUsedAddressIndex: number,
+    lastUsedChangeAddressIndex: number,
     accountType: string,
     contactName?: string,
   ): Promise<{
@@ -294,6 +112,7 @@ export default class Bitcoin {
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
     nextFreeAddressIndex: number;
+    nextFreeChangeAddressIndex: number;
   }> => {
     let res: AxiosResponse;
     try {
@@ -446,18 +265,6 @@ export default class Bitcoin {
 
               transactions.transactionDetails.push(transaction);
             }
-
-            // if (tx.transactionType === 'Self') {
-            //   // injecting receive(2) tx when tx is from and to self
-            //   const txObj2 = {
-            //     ...txObj,
-            //     transactionType: 'Received',
-            //     recipientAddresses: [],
-            //     senderAddresses: tx.senderAddresses,
-            //   };
-
-            //   transactions.transactionDetails.push(txObj2);
-            // }
           }
         });
 
@@ -467,6 +274,16 @@ export default class Bitcoin {
             addressIndex > lastUsedAddressIndex
               ? addressIndex
               : lastUsedAddressIndex;
+        } else {
+          const changeAddressIndex = internalAddresses.indexOf(
+            addressInfo.Address,
+          );
+          if (changeAddressIndex > -1) {
+            lastUsedChangeAddressIndex =
+              changeAddressIndex > lastUsedChangeAddressIndex
+                ? changeAddressIndex
+                : lastUsedChangeAddressIndex;
+          }
         }
       }
 
@@ -475,6 +292,7 @@ export default class Bitcoin {
         balances,
         transactions,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
+        nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
       };
     } catch (err) {
       console.log(
@@ -931,59 +749,6 @@ export default class Bitcoin {
     return { type: null };
   };
 
-  public signTransaction = (
-    inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
-    keyPairs: bitcoinJS.ECPairInterface[],
-    redeemScript: any,
-    witnessScript?: any,
-  ): bitcoinJS.TransactionBuilder => {
-    console.log('------ Transaction Signing ----------');
-    let vin = 0;
-    inputs.forEach((input) => {
-      console.log('Signing Input:', input);
-      keyPairs.forEach((keyPair) => {
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript, // multiSig.p2sh.redeem.output
-          null,
-          input.value,
-          witnessScript, // multiSig.p2wsh.redeem.output
-        );
-      });
-      vin += 1;
-    });
-
-    return txb;
-  };
-
-  public signPartialTxn = (
-    inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
-    keyPairs: bitcoinJS.ECPairInterface[],
-    redeemScript: any,
-    witnessScript?: any,
-  ): bitcoinJS.Transaction => {
-    let vin = 0;
-    inputs.forEach((input) => {
-      keyPairs.forEach((keyPair) => {
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript, // multiSig.p2sh.redeem.output
-          null,
-          input.value,
-          witnessScript, // multiSig.p2wsh.redeem.output
-        );
-      });
-      vin += 1;
-    });
-
-    const txHex = txb.buildIncomplete();
-    return txHex;
-  };
-
   public broadcastTransaction = async (
     txHex: string,
   ): Promise<{
@@ -1032,99 +797,8 @@ export default class Bitcoin {
     }
   };
 
-  public estimateSmartFee = async (
-    blockNo: number,
-  ): Promise<{ feerate: number; blocks: number }> => {
-    try {
-      const res = await this.client.estimateSmartFee(blockNo);
-      return { feerate: res.feerate, blocks: res.blocks };
-    } catch (err) {
-      throw new Error('Failed to fetch transaction fee');
-    }
-  };
-
-  public decodeTransaction = async (txHash: string): Promise<void> => {
-    if (this.network === bitcoinJS.networks.testnet) {
-      const { data } = await bitcoinAxios.post(TESTNET.TX_DECODE, {
-        hex: txHash,
-      });
-      console.log(JSON.stringify(data, null, 4));
-    } else {
-      const { data } = await bitcoinAxios.post(MAINNET.TX_DECODE, {
-        hex: txHash,
-      });
-      console.log(JSON.stringify(data, null, 4));
-    }
-  };
-
-  public recoverInputsFromTxHex = async (
-    txHex: string,
-  ): Promise<Array<{ txId: string; vout: number; value: number }>> => {
-    const regenTx: bitcoinJS.Transaction = bitcoinJS.Transaction.fromHex(txHex);
-    const recoveredInputs = [];
-    await Promise.all(
-      regenTx.ins.map(async (inp) => {
-        const txId = inp.hash.toString('hex').match(/.{2}/g).reverse().join('');
-        const vout = inp.index;
-        const data = await this.fetchTransactionDetails(txId);
-        const value = data.outputs[vout].value;
-        recoveredInputs.push({ txId, vout, value });
-      }),
-    );
-    return recoveredInputs;
-  };
-
   public fromOutputScript = (output: Buffer): string => {
     return bitcoinJS.address.fromOutputScript(output, this.network);
-  };
-
-  public cltvCheckSigOutput = (
-    keyPair: bitcoinJS.ECPairInterface,
-    lockTime: number,
-  ): Buffer => {
-    return bitcoinJS.script.compile([
-      bitcoinJS.script.number.encode(lockTime),
-      bitcoinJS.opcodes.OP_CHECKLOCKTIMEVERIFY,
-      bitcoinJS.opcodes.OP_DROP,
-      keyPair.publicKey,
-      bitcoinJS.opcodes.OP_CHECKSIG,
-    ]);
-  };
-
-  public createTLC = async (
-    keyPair: bitcoinJS.ECPairInterface,
-    time: number,
-    blockHeight: number,
-  ): Promise<{
-    address: string;
-    lockTime: number;
-  }> => {
-    let lockTime: any;
-    if (time && blockHeight) {
-      throw new Error("You can't specify time and block height together");
-    } else if (time) {
-      lockTime = bip65.encode({ utc: this.utcNow() + time }); // time should be specified in seconds (ex: 3600 * 3)
-    } else if (blockHeight) {
-      const chainInfo = await this.fetchChainInfo();
-      lockTime = bip65.encode({ blocks: chainInfo.height + blockHeight });
-    } else {
-      throw new Error('Please specify time or block height');
-    }
-
-    const redeemScript = this.cltvCheckSigOutput(keyPair, lockTime);
-    console.log({ redeemScript });
-
-    console.log({ redeemScript: redeemScript.toString('hex') });
-
-    const p2sh = bitcoinJS.payments.p2sh({
-      redeem: { output: redeemScript, network: this.network },
-      network: this.network,
-    });
-
-    return {
-      address: p2sh.address,
-      lockTime,
-    };
   };
 
   public generatePaymentURI = (
