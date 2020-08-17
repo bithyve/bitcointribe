@@ -328,8 +328,10 @@ export default function Login(props) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
-              loaderBottomSheet.current.snapTo(0);
-              props.navigation.navigate('RestoreWithICloud', {
+              if (loaderBottomSheet.current) {
+                loaderBottomSheet.current.snapTo(0);
+              }
+              props.navigation.navigate('Home', {
                 custodyRequest,
                 recoveryRequest,
                 trustedContactRequest,
