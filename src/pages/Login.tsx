@@ -378,6 +378,7 @@ export default function Login(props) {
     if (authenticationFailed) {
       setCheckAuth(true);
       checkPasscode();
+      setPasscode('');
     } else {
       setCheckAuth(false);
     }
@@ -568,6 +569,7 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={isDisabledProceed}
                 onPress={() => {
+                  setCheckAuth(false);
                   setTimeout(() => {
                     setIsDisabledProceed(true);
                     setElevation(0);

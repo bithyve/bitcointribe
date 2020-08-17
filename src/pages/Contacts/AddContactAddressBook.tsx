@@ -302,7 +302,7 @@ export default function AddContactAddressBook(props) {
         Contacts.openContactForm(newPerson, (err, contact) => {
           if (err) return;
           if (contact) {
-            console.log('contact', contact);
+            console.log('contact---', contact);
             getContactsAsync();
           }
         });
