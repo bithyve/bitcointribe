@@ -638,7 +638,6 @@ export default function AddContactSendRequest(props) {
                     }}
                   >
                     {setPhoneNumber()}
-                    {/* {Contact.phoneNumbers[0].digits} */}
                   </Text>
                 ) : Contact.emails && Contact.emails.length ? (
                   <Text
