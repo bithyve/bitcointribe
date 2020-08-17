@@ -18,8 +18,6 @@ export default class SecureAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      multiSigCache,
-      signingEssentialsCache,
       primaryXpriv,
       secondaryXpriv,
       xpubs,
@@ -32,14 +30,13 @@ export default class SecureAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      feeRates,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      multiSigCache: {};
-      signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;
       xpubs: {
@@ -65,6 +62,7 @@ export default class SecureAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      feeRates: any;
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -72,8 +70,6 @@ export default class SecureAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      multiSigCache,
-      signingEssentialsCache,
       primaryXpriv,
       secondaryXpriv,
       xpubs,
@@ -86,6 +82,7 @@ export default class SecureAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      feeRates,
     });
   };
 
@@ -98,8 +95,6 @@ export default class SecureAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      multiSigCache: {};
-      signingEssentialsCache: {};
       primaryXpriv: string;
       secondaryXpriv?: string;
       xpubs: {
@@ -125,6 +120,7 @@ export default class SecureAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      feeRates: any;
     },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
@@ -406,105 +402,8 @@ export default class SecureAccount {
     };
   } => this.secureHDWallet.decodePaymentURI(paymentURI);
 
-  // public getAddress = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         address: string;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.getReceivingAddress(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o1, err: err.message, message: ErrMap[0o1] };
-  //   }
-  // };
-
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);
-
-  // public getBalance = async (options?: {
-  //   restore?;
-  // }): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         balance: number;
-  //         unconfirmedBalance: number;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.fetchBalance(options),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o2, err: err.message, message: ErrMap[0o2] };
-  //   }
-  // };
-
-  // public getTransactions = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         transactions: {
-  //           totalTransactions: number;
-  //           confirmedTransactions: number;
-  //           unconfirmedTransactions: number;
-  //           transactionDetails: Array<{
-  //             txid: string;
-  //             status: string;
-  //             confirmations: number;
-  //             fee: string;
-  //             date: string;
-  //             transactionType: string;
-  //             amount: number;
-  //             accountType: string;
-  //             recipientAddresses?: string[];
-  //             senderAddresses?: string[];
-  //           }>;
-  //         };
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.fetchTransactions(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o3, err: err.message, message: ErrMap[0o3] };
-  //   }
-  // };
 
   public getBalanceTransactions = async (options?: {
     restore?;
@@ -614,34 +513,6 @@ export default class SecureAccount {
     }
   };
 
-  // public getTestcoins = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         txid: any;
-  //         funded: any;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     const { address } = await this.secureHDWallet.getReceivingAddress();
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.testnetFaucet(address),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o5, err: err.message, message: ErrMap[0o5] };
-  //   }
-  // };
-
   public generateSecondaryXpriv = (
     secondaryMnemonic: string,
   ): { generated: Boolean } => {
@@ -658,6 +529,14 @@ export default class SecureAccount {
 
   public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
     this.secureHDWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ) => this.secureHDWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
 
   public transferST1 = async (
     recipients: {
@@ -739,7 +618,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customFee?: number,
+    customTxPrerequisites?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -768,12 +647,16 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
-        customFee,
+        customTxPrerequisites,
         nSequence,
       );
-      const { inputs } = txPrerequisites[
-        txnPriority === 'custom' ? 'high' : txnPriority.toLowerCase()
-      ];
+
+      let inputs;
+      if (txnPriority === 'custom' && customTxPrerequisites) {
+        inputs = customTxPrerequisites.inputs;
+      } else {
+        inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
+      }
 
       const {
         signedTxb,
@@ -838,6 +721,7 @@ export default class SecureAccount {
   public alternateTransferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -859,6 +743,7 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customFee,
         nSequence,
       );
       const { inputs } = txPrerequisites[txnPriority.toLowerCase()];

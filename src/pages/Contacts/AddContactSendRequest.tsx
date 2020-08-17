@@ -52,6 +52,7 @@ import ShareContactRequest from '../../components/ShareContactRequest';
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function AddContactSendRequest(props) {
+  const [isOTPType, setIsOTPType] = useState(false);
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
@@ -274,8 +275,7 @@ export default function AddContactSendRequest(props) {
             `/${numHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-
-          console.log({ numberDL });
+          setIsOTPType(false);
           setTrustedLink(numberDL);
         } else if (Contact.emails && Contact.emails.length) {
           const email = Contact.emails[0].email;
@@ -295,8 +295,7 @@ export default function AddContactSendRequest(props) {
             `/${emailHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-
-          console.log({ emailDL });
+          setIsOTPType(false);
           setTrustedLink(emailDL);
         } else if (otp) {
           const otpHintType = 'otp';
@@ -311,8 +310,8 @@ export default function AddContactSendRequest(props) {
             `/${otpHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-            setOTP(otp);
-          console.log({ otpDL });
+          setIsOTPType(true);
+          setOTP(otp);
           setTrustedLink(otpDL);
         } else {
           Alert.alert('Invalid Contact', 'Something went wrong.');
@@ -385,9 +384,9 @@ export default function AddContactSendRequest(props) {
             setTimeout(() => {
               setRenderTimer(true);
             }, 2);
+            if(isOTPType){ shareOtpWithTrustedContactBottomSheet.current.snapTo(1); }
+            else{ openTimer(); }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
-            shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
-            // openTimer();
           }}
         />
       );

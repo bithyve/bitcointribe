@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Image,
@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Platform,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -20,6 +20,46 @@ import DeviceInfo from 'react-native-device-info';
 
 export default function CustomPriorityContent(props) {
   const [amount, setAmount] = useState('');
+  const [customEstimatedBlock, setCustomEstimatedBlock] = useState(0);
+
+  const onCustomFeeChange = useCallback(
+    (value) => {
+      const { feeRates } =
+        props.service.hdWallet || props.service.secureHDWallet;
+
+      if (feeRates) {
+        const customFeeRatePerByte = parseInt(value);
+        let customEstimatedBlock = 0;
+        // handling extremes
+        if (customFeeRatePerByte > feeRates['2']) {
+          customEstimatedBlock = 1;
+        } else if (customFeeRatePerByte < feeRates['144']) {
+          customEstimatedBlock = 200;
+        } else {
+          const closestFeeRatePerByte = Object.values(feeRates).reduce(
+            function (prev, curr) {
+              return Math.abs(curr - customFeeRatePerByte) <
+                Math.abs(prev - customFeeRatePerByte)
+                ? curr
+                : prev;
+            },
+          );
+
+          const etimatedBlock = Object.keys(feeRates).find(
+            (key) => feeRates[key] === closestFeeRatePerByte,
+          );
+          customEstimatedBlock = parseInt(etimatedBlock);
+        }
+
+        if (parseInt(value) >= 1) setCustomEstimatedBlock(customEstimatedBlock);
+        else setCustomEstimatedBlock(0);
+      }
+
+      setAmount(value);
+    },
+    [props.service],
+  );
+
   return (
     <View style={{ height: '100%', backgroundColor: Colors.white }}>
       <View
@@ -61,46 +101,63 @@ export default function CustomPriorityContent(props) {
             height: wp('13%'),
             width: wp('45%'),
           }}
-          placeholder={'Min Amount'}
+          placeholder={'sats/byte'}
           value={amount}
           returnKeyLabel="Done"
           returnKeyType="done"
           keyboardType={'numeric'}
-          onChangeText={(value) => {
-            setAmount(value);
-          }}
+          onChangeText={(value) => onCustomFeeChange(value)}
           placeholderTextColor={Colors.borderColor}
         />
       </TouchableOpacity>
-      <View style={{
-        flexDirection: 'row',
-        marginBottom: wp('1.5%'),
-        marginTop: 20,
-        marginRight: wp('8%'),
-        marginLeft: wp('8%'),
-      }}>
-        <Text style={{
-          color: Colors.black,
-          fontSize: RFValue(11),
-          fontFamily: Fonts.FiraSansMedium,
-          marginRight: 5
-        }}>Arrival Time</Text>
-        <Text style={{
-          color: Colors.textColorGrey,
-          fontSize: RFValue(11),
-          fontFamily: Fonts.FiraSansItalic,
-        }}>Calculating...</Text>
+      {props.err ? (
+        <View style={{ marginRight: wp('8%'), marginLeft: wp('8%') }}>
+          <Text style={styles.errorText}>{props.err}</Text>
+        </View>
+      ) : null}
+      <View
+        style={{
+          flexDirection: 'row',
+          marginBottom: wp('1.5%'),
+          marginTop: 20,
+          marginRight: wp('8%'),
+          marginLeft: wp('8%'),
+        }}
+      >
+        <Text
+          style={{
+            color: Colors.black,
+            fontSize: RFValue(11),
+            fontFamily: Fonts.FiraSansMedium,
+            marginRight: 5,
+          }}
+        >
+          Arrival Time
+        </Text>
+        <Text
+          style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue(11),
+            fontFamily: Fonts.FiraSansItalic,
+          }}
+        >
+          {customEstimatedBlock
+            ? `${customEstimatedBlock * 10} - ${
+                (customEstimatedBlock + 1) * 10
+              } minutes`
+            : 'Calculating...'}
+        </Text>
       </View>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           marginBottom: wp('15%'),
-          marginTop: 30
+          marginTop: 30,
         }}
       >
         <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressOk(amount)}
+          onPress={() => props.onPressOk(amount, customEstimatedBlock)}
           style={{ ...styles.successModalButtonView }}
         >
           <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
@@ -190,5 +247,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11),
+    fontStyle: 'italic',
   },
 });

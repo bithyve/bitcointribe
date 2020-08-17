@@ -7,7 +7,6 @@ import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import config from '../../HexaConfig';
 import { Transactions } from '../Interface';
-import bs58check from 'bs58check';
 import { TRUSTED_CONTACTS } from '../../../common/constants/serviceTypes';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
@@ -47,7 +46,7 @@ export default class Bitcoin {
 
   public utcNow = (): number => Math.floor(Date.now() / 1000);
 
-  public getAddress = (
+  public deriveAddress = (
     keyPair: bip32.BIP32Interface,
     standard: number,
   ): string => {
@@ -72,72 +71,6 @@ export default class Bitcoin {
     }
   };
 
-  public xpubToYpub = (xpub?, xpriv?, network = bitcoinJS.networks.bitcoin) => {
-    let data = bs58check.decode(xpub || xpriv);
-    data = data.slice(4);
-    let versionBytes;
-    if (network == bitcoinJS.networks.bitcoin) {
-      versionBytes = xpub ? '049d7cb2' : '049d7878';
-    } else {
-      versionBytes = xpub ? '044a5262' : '044a4e28';
-    }
-    data = Buffer.concat([Buffer.from(versionBytes, 'hex'), data]);
-    return bs58check.encode(data);
-  };
-
-  // public getAddress = (keyPair: ECPair): string =>
-  //   bitcoinJS.payments.p2pkh({ pubkey: keyPair.publicKey }).address
-
-  public generateHDWallet = (
-    mnemonic: string,
-    passphrase?: string,
-  ): {
-    mnemonic: string;
-    keyPair: bip32.BIP32Interface;
-    address: string;
-    privateKey: string;
-  } => {
-    // generates a HD-Wallet from the provided mnemonic-passphrase pair
-
-    if (!bip39.validateMnemonic(mnemonic)) {
-      throw new Error('Invalid mnemonic');
-    }
-
-    const seed: Buffer = passphrase
-      ? bip39.mnemonicToSeedSync(mnemonic, passphrase)
-      : bip39.mnemonicToSeedSync(mnemonic);
-    const path: string = "m/44'/1'/0'/0/0";
-    const root = bip32.fromSeed(seed, this.network);
-    const child1 = root.derivePath(path);
-
-    const privateKey = child1.toWIF();
-    const address = this.getAddress(child1, config.STANDARD.BIP49);
-
-    console.log(`Mnemonic: ${mnemonic}`);
-    console.log(`Address: ${address}`);
-
-    return {
-      mnemonic,
-      keyPair: child1,
-      address,
-      privateKey,
-    };
-  };
-
-  public createHDWallet = (
-    passphrase?: string,
-  ): {
-    mnemonic: string;
-    keyPair: bip32.BIP32Interface;
-    address: string;
-    privateKey: string;
-  } => {
-    // creates a new HD Wallet
-
-    const mnemonic = bip39.generateMnemonic(256);
-    return this.generateHDWallet(mnemonic, passphrase);
-  };
-
   public getP2SH = (keyPair: bitcoinJS.ECPairInterface): bitcoinJS.Payment =>
     bitcoinJS.payments.p2sh({
       redeem: bitcoinJS.payments.p2wpkh({
@@ -146,122 +79,6 @@ export default class Bitcoin {
       }),
       network: this.network,
     });
-
-  public getBalance = async (
-    address: string,
-  ): Promise<
-    | {
-        status: number;
-        errorMessage: string;
-        balanceData?: undefined;
-      }
-    | {
-        status: number;
-        balanceData: any;
-        errorMessage?: undefined;
-      }
-  > => {
-    // fetches balance corresponding to the supplied address
-
-    let res: AxiosResponse;
-    if (this.network === bitcoinJS.networks.testnet) {
-      try {
-        res = await bitcoinAxios.get(
-          `${TESTNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
-        );
-      } catch (err) {
-        console.log('Error:', err.response.data);
-        return {
-          status: err.response.status,
-          errorMessage: err.response.data,
-        };
-      }
-    } else {
-      // throttled endPoint (required: full node/corresponding paid service));
-      try {
-        res = await bitcoinAxios.get(
-          `${MAINNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
-        );
-      } catch (err) {
-        console.log('Error:', err.response.data);
-        return {
-          status: err.response.status,
-          errorMessage: err.response.data,
-        };
-      }
-    }
-
-    return {
-      status: res.status,
-      balanceData: res.data,
-    };
-  };
-
-  public blockcypherBalFallback = async (
-    addresses: string[],
-  ): Promise<{
-    bal: number;
-    unconfirmedBal: number;
-  }> => {
-    let bal = 0;
-    let unconfirmedBal = 0;
-    for (const addr of addresses) {
-      const { balanceData } = await this.getBalance(addr);
-      bal += balanceData.balance;
-      unconfirmedBal += balanceData.unconfirmed_balance;
-    }
-
-    return { bal, unconfirmedBal };
-  };
-
-  public getBalanceByAddresses = async (
-    addresses: string[],
-  ): Promise<{
-    balance: number;
-    unconfirmedBalance: number;
-  }> => {
-    let res: AxiosResponse;
-    try {
-      if (this.network === bitcoinJS.networks.testnet) {
-        // throw new Error("fabricated error");
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCE,
-          {
-            addresses,
-          },
-        );
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCE,
-          {
-            addresses,
-          },
-        );
-      }
-
-      return {
-        balance: res.data.Balance,
-        unconfirmedBalance: res.data.UnconfirmedBalance,
-      };
-    } catch (err) {
-      console.log(
-        `An error occurred while fetching balance via Esplora: ${err.response.data.err}`,
-      );
-      console.log('Using Blockcypher fallback');
-      try {
-        const { bal, unconfirmedBal } = await this.blockcypherBalFallback(
-          addresses,
-        );
-        return {
-          balance: bal,
-          unconfirmedBalance: unconfirmedBal,
-        };
-      } catch (err) {
-        console.log('Blockcypher fallback failed aswell!');
-        throw new Error('fetching balance by addresses failed');
-      }
-    }
-  };
 
   public fetchAddressInfo = async (address: string): Promise<any> => {
     // fetches information corresponding to the  supplied address (including txns)
@@ -281,6 +98,7 @@ export default class Bitcoin {
     internalAddresses: string[],
     ownedAddresses: string[],
     lastUsedAddressIndex: number,
+    lastUsedChangeAddressIndex: number,
     accountType: string,
     contactName?: string,
   ): Promise<{
@@ -294,6 +112,7 @@ export default class Bitcoin {
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
     nextFreeAddressIndex: number;
+    nextFreeChangeAddressIndex: number;
   }> => {
     let res: AxiosResponse;
     try {
@@ -374,51 +193,78 @@ export default class Bitcoin {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
-            this.categorizeTx(tx, ownedAddresses, accountType);
-            const transaction = {
-              txid: tx.txid,
-              confirmations:
-                accountType === 'Test Account' &&
-                tx.transactionType === 'Received' &&
-                addressInfo.Address === externalAddresses[0] &&
-                tx.NumberofConfirmations < 1
-                  ? '-'
-                  : tx.NumberofConfirmations,
-              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-              fee: tx.fee,
-              date: tx.Status.block_time
-                ? new Date(tx.Status.block_time * 1000).toUTCString()
-                : new Date(Date.now()).toUTCString(),
-              transactionType:
-                tx.transactionType === 'Self' ? 'Sent' : tx.transactionType, // injecting sent(1) tx when tx is from and to self
-              amount:
-                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
-              accountType:
-                tx.accountType === TRUSTED_CONTACTS
-                  ? contactName
-                      .split(' ')
-                      .map((word) => word[0].toUpperCase() + word.substring(1))
-                      .join(' ')
-                  : tx.accountType,
-              recipientAddresses: tx.recipientAddresses,
-              senderAddresses:
-                tx.transactionType === 'Self' ? [] : tx.senderAddresses,
-              blockTime: tx.Status.block_time, // only available when tx is confirmed
-            };
+            this.categorizeTx(
+              tx,
+              ownedAddresses,
+              accountType,
+              externalAddresses,
+            );
 
-            transactions.transactionDetails.push(transaction);
+            if (tx.transactionType === 'Self') {
+              const outgoingTx = {
+                txid: tx.txid,
+                confirmations: tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: 'Sent',
+                amount: tx.sentAmount,
+                accountType: tx.accountType,
+                recipientAddresses: tx.recipientAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
 
-            // if (tx.transactionType === 'Self') {
-            //   // injecting receive(2) tx when tx is from and to self
-            //   const txObj2 = {
-            //     ...txObj,
-            //     transactionType: 'Received',
-            //     recipientAddresses: [],
-            //     senderAddresses: tx.senderAddresses,
-            //   };
+              const incomingTx = {
+                txid: tx.txid,
+                confirmations: tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: 'Received',
+                amount: tx.receivedAmount,
+                accountType: tx.accountType,
+                senderAddresses: tx.senderAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
+              console.log({ outgoingTx, incomingTx });
+              transactions.transactionDetails.push(...[outgoingTx, incomingTx]);
+            } else {
+              const transaction = {
+                txid: tx.txid,
+                confirmations:
+                  accountType === 'Test Account' &&
+                  tx.transactionType === 'Received' &&
+                  addressInfo.Address === externalAddresses[0] &&
+                  tx.NumberofConfirmations < 1
+                    ? '-'
+                    : tx.NumberofConfirmations,
+                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                fee: tx.fee,
+                date: tx.Status.block_time
+                  ? new Date(tx.Status.block_time * 1000).toUTCString()
+                  : new Date(Date.now()).toUTCString(),
+                transactionType: tx.transactionType,
+                amount: tx.amount,
+                accountType:
+                  tx.accountType === TRUSTED_CONTACTS
+                    ? contactName
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ')
+                    : tx.accountType,
+                recipientAddresses: tx.recipientAddresses,
+                senderAddresses: tx.senderAddresses,
+                blockTime: tx.Status.block_time, // only available when tx is confirmed
+              };
 
-            //   transactions.transactionDetails.push(txObj2);
-            // }
+              transactions.transactionDetails.push(transaction);
+            }
           }
         });
 
@@ -428,6 +274,16 @@ export default class Bitcoin {
             addressIndex > lastUsedAddressIndex
               ? addressIndex
               : lastUsedAddressIndex;
+        } else {
+          const changeAddressIndex = internalAddresses.indexOf(
+            addressInfo.Address,
+          );
+          if (changeAddressIndex > -1) {
+            lastUsedChangeAddressIndex =
+              changeAddressIndex > lastUsedChangeAddressIndex
+                ? changeAddressIndex
+                : lastUsedChangeAddressIndex;
+          }
         }
       }
 
@@ -436,6 +292,7 @@ export default class Bitcoin {
         balances,
         transactions,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
+        nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
       };
     } catch (err) {
       console.log(
@@ -489,143 +346,6 @@ export default class Bitcoin {
     };
   };
 
-  public fetchTransactionsByAddresses = async (
-    addresses: string[],
-    accountType: string,
-  ): Promise<{
-    transactions: Transactions;
-  }> => {
-    const transactions: Transactions = {
-      totalTransactions: 0,
-      confirmedTransactions: 0,
-      unconfirmedTransactions: 0,
-      transactionDetails: [],
-    };
-    try {
-      let res: AxiosResponse;
-      try {
-        if (this.network === bitcoinJS.networks.testnet) {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
-            {
-              addresses,
-            },
-          );
-        } else {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
-            {
-              addresses,
-            },
-          );
-        }
-      } catch (err) {
-        throw new Error(err.response.data.err);
-      }
-
-      const addressesInfo = res.data;
-      const txMap = new Map();
-      for (const addressInfo of addressesInfo) {
-        console.log(
-          `Appending transactions corresponding to ${addressInfo.Address}`,
-        );
-        if (addressInfo.TotalTransactions === 0) {
-          continue;
-        }
-        transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
-        transactions.unconfirmedTransactions +=
-          addressInfo.UnconfirmedTransactions;
-
-        if (
-          addressInfo.ConfirmedTransactions +
-            addressInfo.UnconfirmedTransactions >
-          addressInfo.totalTransactions
-        ) {
-          transactions.totalTransactions +=
-            addressInfo.ConfirmedTransactions +
-            addressInfo.UnconfirmedTransactions;
-        } else {
-          transactions.totalTransactions += addressInfo.TotalTransactions;
-        }
-
-        addressInfo.Transactions.forEach((tx) => {
-          if (!txMap.has(tx.txid)) {
-            // check for duplicate tx (fetched against sending and  then again for change address)
-            txMap.set(tx.txid, true);
-            this.categorizeTx(tx, addresses, accountType);
-            transactions.transactionDetails.push({
-              txid: tx.txid,
-              confirmations: tx.NumberofConfirmations,
-              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-              fee: tx.fee,
-              date: tx.Status.block_time
-                ? new Date(tx.Status.block_time * 1000).toUTCString()
-                : new Date(Date.now()).toUTCString(),
-              transactionType: tx.transactionType,
-              amount:
-                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
-              accountType: tx.accountType,
-              recipientAddresses: tx.recipientAddresses,
-              senderAddresses: tx.senderAddresses,
-              blockTime: tx.Status.block_time, // only available when tx is confirmed
-            });
-          }
-        });
-      }
-
-      return { transactions };
-    } catch (err) {
-      console.log(
-        `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
-      );
-      console.log('Using Blockcypher fallback');
-
-      try {
-        const txMap = new Map();
-        for (const address of addresses) {
-          console.log(`Fetching transactions corresponding to ${address}`);
-          const txns = await this.fetchTransactionsByAddress(address);
-
-          transactions.totalTransactions += txns.transactions.totalTransactions;
-          transactions.confirmedTransactions +=
-            txns.transactions.confirmedTransactions;
-          transactions.unconfirmedTransactions +=
-            txns.transactions.unconfirmedTransactions;
-
-          txns.transactions.transactionDetails.forEach((tx) => {
-            if (!txMap.has(tx.hash)) {
-              // check for duplicate tx (fetched against sending and  then again for change address)
-              txMap.set(tx.hash, true);
-              this.categorizeTx(tx, addresses, accountType),
-                transactions.transactionDetails.push({
-                  txid: tx.hash,
-                  confirmations: tx.confirmations,
-                  status: tx.confirmations ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fees,
-                  date: new Date(tx.confirmed).toUTCString(),
-                  transactionType: tx.transactionType,
-                  amount:
-                    tx.transactionType === 'Sent'
-                      ? tx.amount + tx.fees
-                      : tx.amount,
-                  accountType: tx.accountType,
-                  recipientAddresses: tx.recipientAddresses,
-                  senderAddresses: tx.senderAddresses,
-                });
-            }
-          });
-        }
-
-        return { transactions };
-      } catch (err) {
-        console.log(
-          `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
-        );
-        throw new Error('Transaction fetching failed');
-      }
-    }
-  };
-
   public getTxCounts = async (addresses: string[]) => {
     const txCounts = {};
     try {
@@ -676,43 +396,6 @@ export default class Bitcoin {
       }
     }
   };
-
-  // public fundTestNetAddress = async (address: string) => {
-  //   const funderAddress = '2N6aazKqLgqBRLisjeEU1DoLuieoZbDmiB8';
-  //   const funderPriv = 'cSB5QV1Tesqtou1FDZhgfKYiEH4m55H1jT1xM8hu9xKNzWSFFgAR';
-  //   const { balanceData } = await this.getBalance(funderAddress);
-  //   const { final_balance } = balanceData;
-  //   if (final_balance < 7000) {
-  //     throw new Error('Funding address is out of funds');
-  //   }
-  //   const transfer = {
-  //     senderAddress: funderAddress,
-  //     recipientAddress: address,
-  //     amount: 6000,
-  //   };
-
-  //   const txnObj = await this.createTransaction(
-  //     transfer.senderAddress,
-  //     transfer.recipientAddress,
-  //     transfer.amount,
-  //   );
-  //   console.log('---- Transaction Created ----');
-
-  //   const keyPair = this.getKeyPair(funderPriv);
-  //   const p2sh = this.getP2SH(keyPair);
-  //   const txb = this.signTransaction(
-  //     txnObj.inputs,
-  //     txnObj.txb,
-  //     [keyPair],
-  //     p2sh.redeem.output,
-  //   );
-  //   console.log('---- Transaction Signed ----');
-
-  //   const txHex = txb.build().toHex();
-  //   const res = await this.broadcastTransaction(txHex);
-  //   console.log('---- Transaction Broadcasted ----');
-  //   return res;
-  // };
 
   public generateMultiSig = (
     required: number,
@@ -932,9 +615,12 @@ export default class Bitcoin {
   };
 
   public feeRatesPerByte = async (): Promise<{
-    high: { feePerByte: number; estimatedBlocks: number };
-    medium: { feePerByte: number; estimatedBlocks: number };
-    low: { feePerByte: number; estimatedBlocks: number };
+    feeRatesByPriority: {
+      high: { feePerByte: number; estimatedBlocks: number };
+      medium: { feePerByte: number; estimatedBlocks: number };
+      low: { feePerByte: number; estimatedBlocks: number };
+    };
+    rates: any;
   }> => {
     try {
       let rates;
@@ -997,73 +683,40 @@ export default class Bitcoin {
         low,
       };
 
-      return feeRatesByPriority;
+      return { feeRatesByPriority, rates };
     } catch (err) {
-      console.log(
-        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
-      );
-      try {
-        const chainInfo = await this.fetchChainInfo();
-        const {
-          high_fee_per_kb,
-          medium_fee_per_kb,
-          low_fee_per_kb,
-        } = chainInfo;
+      console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
+      // try {
+      //   const chainInfo = await this.fetchChainInfo();
+      //   const {
+      //     high_fee_per_kb,
+      //     medium_fee_per_kb,
+      //     low_fee_per_kb,
+      //   } = chainInfo;
 
-        const high = {
-          feePerByte: Math.round(high_fee_per_kb / 1000),
-          estimatedBlocks: 2,
-        };
-        const medium = {
-          feePerByte: Math.round(medium_fee_per_kb / 1000),
-          estimatedBlocks: 4,
-        };
-        const low = {
-          feePerByte: Math.round(low_fee_per_kb / 1000),
-          estimatedBlocks: 6,
-        };
+      //   const high = {
+      //     feePerByte: Math.round(high_fee_per_kb / 1000),
+      //     estimatedBlocks: 2,
+      //   };
+      //   const medium = {
+      //     feePerByte: Math.round(medium_fee_per_kb / 1000),
+      //     estimatedBlocks: 4,
+      //   };
+      //   const low = {
+      //     feePerByte: Math.round(low_fee_per_kb / 1000),
+      //     estimatedBlocks: 6,
+      //   };
 
-        const feeRatesByPriority = {
-          high,
-          medium,
-          low,
-        };
-        return feeRatesByPriority;
-      } catch (err) {
-        throw new Error('Falied to fetch feeRates');
-      }
+      //   const feeRatesByPriority = {
+      //     high,
+      //     medium,
+      //     low,
+      //   };
+      //   return feeRatesByPriority;
+      // } catch (err) {
+      //   throw new Error('Falied to fetch feeRates');
+      // }
     }
-  };
-
-  public averageTransactionFee = async () => {
-    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
-    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
-
-    const feeRatesByPriority = await this.feeRatesPerByte();
-
-    return {
-      high: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['high'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['high'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
-      },
-      medium: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['medium'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['medium'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
-      },
-      low: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['low'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['low'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
-      },
-    };
   };
 
   public isValidAddress = (address: string): boolean => {
@@ -1094,108 +747,6 @@ export default class Bitcoin {
       return { type: 'address' };
     }
     return { type: null };
-  };
-
-  // public createTransaction = async (
-  //   senderAddress: string,
-  //   recipientAddress: string,
-  //   amount: number,
-  //   nSequence?: number,
-  //   txnPriority?: string,
-  // ): Promise<{
-  //   inputs: object[];
-  //   txb: bitcoinJS.TransactionBuilder;
-  //   fee: number;
-  // }> => {
-  //   console.log({ senderAddress });
-  //   const res = await this.multiFetchUnspentOutputs([senderAddress]);
-  //   const inputUTXOs = res.UTXOs;
-  //   console.log('Fetched the inputs');
-  //   const outputUTXOs = [{ address: recipientAddress, value: amount }];
-
-  //   const { feePerByte } = await this.feeRatesPerByte(txnPriority);
-
-  //   const { inputs, outputs, fee } = coinselect(
-  //     inputUTXOs,
-  //     outputUTXOs,
-  //     feePerByte,
-  //   );
-  //   console.log('-------Transaction--------');
-  //   console.log('\tFee', fee);
-  //   console.log('\tInputs:', inputs);
-  //   console.log('\tOutputs:', outputs);
-
-  //   const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-  //     this.network,
-  //   );
-
-  //   inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
-  //   outputs.forEach(output => {
-  //     if (!output.address) {
-  //       output.address = senderAddress;
-  //     }
-  //     console.log('Added Output:', output);
-  //     txb.addOutput(output.address, output.value);
-  //   });
-
-  //   return {
-  //     inputs,
-  //     txb,
-  //     fee,
-  //   };
-  // };
-
-  public signTransaction = (
-    inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
-    keyPairs: bitcoinJS.ECPairInterface[],
-    redeemScript: any,
-    witnessScript?: any,
-  ): bitcoinJS.TransactionBuilder => {
-    console.log('------ Transaction Signing ----------');
-    let vin = 0;
-    inputs.forEach((input) => {
-      console.log('Signing Input:', input);
-      keyPairs.forEach((keyPair) => {
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript, // multiSig.p2sh.redeem.output
-          null,
-          input.value,
-          witnessScript, // multiSig.p2wsh.redeem.output
-        );
-      });
-      vin += 1;
-    });
-
-    return txb;
-  };
-
-  public signPartialTxn = (
-    inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
-    keyPairs: bitcoinJS.ECPairInterface[],
-    redeemScript: any,
-    witnessScript?: any,
-  ): bitcoinJS.Transaction => {
-    let vin = 0;
-    inputs.forEach((input) => {
-      keyPairs.forEach((keyPair) => {
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript, // multiSig.p2sh.redeem.output
-          null,
-          input.value,
-          witnessScript, // multiSig.p2wsh.redeem.output
-        );
-      });
-      vin += 1;
-    });
-
-    const txHex = txb.buildIncomplete();
-    return txHex;
   };
 
   public broadcastTransaction = async (
@@ -1246,99 +797,8 @@ export default class Bitcoin {
     }
   };
 
-  public estimateSmartFee = async (
-    blockNo: number,
-  ): Promise<{ feerate: number; blocks: number }> => {
-    try {
-      const res = await this.client.estimateSmartFee(blockNo);
-      return { feerate: res.feerate, blocks: res.blocks };
-    } catch (err) {
-      throw new Error('Failed to fetch transaction fee');
-    }
-  };
-
-  public decodeTransaction = async (txHash: string): Promise<void> => {
-    if (this.network === bitcoinJS.networks.testnet) {
-      const { data } = await bitcoinAxios.post(TESTNET.TX_DECODE, {
-        hex: txHash,
-      });
-      console.log(JSON.stringify(data, null, 4));
-    } else {
-      const { data } = await bitcoinAxios.post(MAINNET.TX_DECODE, {
-        hex: txHash,
-      });
-      console.log(JSON.stringify(data, null, 4));
-    }
-  };
-
-  public recoverInputsFromTxHex = async (
-    txHex: string,
-  ): Promise<Array<{ txId: string; vout: number; value: number }>> => {
-    const regenTx: bitcoinJS.Transaction = bitcoinJS.Transaction.fromHex(txHex);
-    const recoveredInputs = [];
-    await Promise.all(
-      regenTx.ins.map(async (inp) => {
-        const txId = inp.hash.toString('hex').match(/.{2}/g).reverse().join('');
-        const vout = inp.index;
-        const data = await this.fetchTransactionDetails(txId);
-        const value = data.outputs[vout].value;
-        recoveredInputs.push({ txId, vout, value });
-      }),
-    );
-    return recoveredInputs;
-  };
-
   public fromOutputScript = (output: Buffer): string => {
     return bitcoinJS.address.fromOutputScript(output, this.network);
-  };
-
-  public cltvCheckSigOutput = (
-    keyPair: bitcoinJS.ECPairInterface,
-    lockTime: number,
-  ): Buffer => {
-    return bitcoinJS.script.compile([
-      bitcoinJS.script.number.encode(lockTime),
-      bitcoinJS.opcodes.OP_CHECKLOCKTIMEVERIFY,
-      bitcoinJS.opcodes.OP_DROP,
-      keyPair.publicKey,
-      bitcoinJS.opcodes.OP_CHECKSIG,
-    ]);
-  };
-
-  public createTLC = async (
-    keyPair: bitcoinJS.ECPairInterface,
-    time: number,
-    blockHeight: number,
-  ): Promise<{
-    address: string;
-    lockTime: number;
-  }> => {
-    let lockTime: any;
-    if (time && blockHeight) {
-      throw new Error("You can't specify time and block height together");
-    } else if (time) {
-      lockTime = bip65.encode({ utc: this.utcNow() + time }); // time should be specified in seconds (ex: 3600 * 3)
-    } else if (blockHeight) {
-      const chainInfo = await this.fetchChainInfo();
-      lockTime = bip65.encode({ blocks: chainInfo.height + blockHeight });
-    } else {
-      throw new Error('Please specify time or block height');
-    }
-
-    const redeemScript = this.cltvCheckSigOutput(keyPair, lockTime);
-    console.log({ redeemScript });
-
-    console.log({ redeemScript: redeemScript.toString('hex') });
-
-    const p2sh = bitcoinJS.payments.p2sh({
-      redeem: { output: redeemScript, network: this.network },
-      network: this.network,
-    });
-
-    return {
-      address: p2sh.address,
-      lockTime,
-    };
   };
 
   public generatePaymentURI = (
@@ -1369,12 +829,16 @@ export default class Bitcoin {
     tx: any,
     inUseAddresses: string[],
     accountType: string,
+    externalAddresses: string[],
   ) => {
     const inputs = tx.vin || tx.inputs;
     const outputs = tx.Vout || tx.outputs;
     let value: number = 0;
+    let amountToSelf = 0;
     const probableRecipientList: string[] = [];
     const probableSenderList: string[] = [];
+    const selfRecipientList: string[] = [];
+    const selfSenderList: string[] = [];
 
     inputs.forEach((input) => {
       if (!input.addresses && !input.prevout) {
@@ -1386,6 +850,7 @@ export default class Bitcoin {
 
         if (this.ownedAddress(address, inUseAddresses)) {
           value -= input.prevout ? input.prevout.value : input.output_value;
+          selfSenderList.push(address);
         } else {
           probableSenderList.push(address);
         }
@@ -1401,38 +866,32 @@ export default class Bitcoin {
 
         if (this.ownedAddress(address, inUseAddresses)) {
           value += output.value;
+          if (this.ownedAddress(address, externalAddresses)) {
+            amountToSelf += output.value;
+            selfRecipientList.push(address);
+          }
         } else {
           probableRecipientList.push(address); // could be the change address of the sender (in context of incoming tx)
         }
       }
     });
 
-    // if (value + (tx.fee | tx.fees) === 0) {
-    //   // tx from and to self
-    //   tx.transactionType = 'Self';
-    //   selfAmount += tx.fee ? tx.fee : tx.fees;
-    //   tx.amount = Math.abs(selfAmount);
-    //   tx.recipientAddresses = probableRecipientList;
-    //   tx.senderAddresses = probableSenderList;
-    // } else {
-    // tx.transactionType = value > 0 ? 'Received' : 'Sent';
-    // if (tx.transactionType === 'Sent') {
-    //   value += tx.fee ? tx.fee : tx.fees;
-    //   tx.recipientAddresses = probableRecipientList;
-    // } else {
-    //   tx.senderAddresses = probableSenderList;
-    // }
-    // tx.amount = Math.abs(value);
-    // tx.accountType = accountType;
-    // return tx;
-    // }
-    tx.transactionType = value > 0 ? 'Received' : 'Sent';
-    if (tx.transactionType === 'Sent') {
-      value += tx.fee ? tx.fee : tx.fees;
-      tx.recipientAddresses = probableRecipientList;
-    } else {
+    if (value > 0) {
+      tx.transactionType = 'Received';
       tx.senderAddresses = probableSenderList;
+    } else {
+      if (value + (tx.fee | tx.fees) === 0) {
+        tx.transactionType = 'Self';
+        tx.sentAmount = Math.abs(amountToSelf) + (tx.fee | tx.fees);
+        tx.receivedAmount = Math.abs(amountToSelf);
+        tx.senderAddresses = selfSenderList;
+        tx.recipientAddresses = selfRecipientList;
+      } else {
+        tx.transactionType = 'Sent';
+        tx.recipientAddresses = probableRecipientList;
+      }
     }
+
     tx.amount = Math.abs(value);
     tx.accountType = accountType;
     return tx;

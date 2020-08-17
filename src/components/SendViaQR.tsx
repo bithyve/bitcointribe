@@ -63,10 +63,10 @@ export default function SendViaQR(props) {
       Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
-        ? Contact.firstName
-        : Contact && !Contact.firstName && Contact.lastName
-        ? Contact.lastName
-        : '';
+          ? Contact.firstName
+          : Contact && !Contact.firstName && Contact.lastName
+            ? Contact.lastName
+            : '';
     setContactName(contactName);
   }, [Contact]);
 
@@ -85,7 +85,7 @@ export default function SendViaQR(props) {
     );
   };
 
-  const setPhoneNumber = () =>{
+  const setPhoneNumber = () => {
     let phoneNumber = Contact.phoneNumbers[0].number;
     let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
     number = number.slice(number.length - 10); // last 10 digits only
@@ -135,8 +135,8 @@ export default function SendViaQR(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{
-              height: wp('8%'),
-              width: wp('18%'),
+              height: wp('6%'),
+              width: wp('10%'),
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: Colors.lightBlue,
@@ -148,16 +148,16 @@ export default function SendViaQR(props) {
             <Text
               style={{
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(14),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Done
+              X
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{ flex: 1}}>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
         <View
           style={{
             marginLeft: 20,
@@ -205,36 +205,36 @@ export default function SendViaQR(props) {
                           </Text>
                         ) : null}
                         {Contact &&
-                        Contact.phoneNumbers &&
-                        Contact.phoneNumbers.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                            }}
-                          >
-                            {setPhoneNumber()}
-                            {/* {Contact && Contact.phoneNumbers[0].digits} */}
-                          </Text>
-                        ) : Contact &&
-                          Contact.emails &&
-                          Contact.emails.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                              paddingBottom: 5,
-                            }}
-                          >
-                            {Contact && Contact.emails[0].email}
-                          </Text>
-                        ) : null}
+                          Contact.phoneNumbers &&
+                          Contact.phoneNumbers.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 25,
+                                paddingTop: 3,
+                              }}
+                            >
+                              {setPhoneNumber()}
+                              {/* {Contact && Contact.phoneNumbers[0].digits} */}
+                            </Text>
+                          ) : Contact &&
+                            Contact.emails &&
+                            Contact.emails.length ? (
+                              <Text
+                                style={{
+                                  color: Colors.textColorGrey,
+                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontSize: RFValue(10),
+                                  marginLeft: 25,
+                                  paddingTop: 3,
+                                  paddingBottom: 5,
+                                }}
+                              >
+                                {Contact && Contact.emails[0].email}
+                              </Text>
+                            ) : null}
                       </View>
                     </View>
                     {Contact && Contact.imageAvailable ? (
@@ -255,33 +255,33 @@ export default function SendViaQR(props) {
                         />
                       </View>
                     ) : (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          width: 70,
-                          height: 70,
-                          borderRadius: 70 / 2,
-                          shadowColor: Colors.shadowBlue,
-                          shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
-                        }}
-                      >
-                        <Text
+                        <View
                           style={{
-                            textAlign: 'center',
-                            fontSize: RFValue(20),
-                            lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                            position: 'absolute',
+                            marginLeft: 15,
+                            marginRight: 15,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: Colors.backgroundColor,
+                            width: 70,
+                            height: 70,
+                            borderRadius: 70 / 2,
+                            shadowColor: Colors.shadowBlue,
+                            shadowOpacity: 1,
+                            shadowOffset: { width: 2, height: 2 },
                           }}
                         >
-                          {nameToInitials(contactName)}
-                        </Text>
-                      </View>
-                    )}
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              fontSize: RFValue(20),
+                              lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                            }}
+                          >
+                            {nameToInitials(contactName)}
+                          </Text>
+                        </View>
+                      )}
                   </View>
                 </View>
               )}
@@ -313,10 +313,10 @@ export default function SendViaQR(props) {
                       {serviceType && serviceType == TEST_ACCOUNT
                         ? '  Test Account'
                         : serviceType && serviceType == REGULAR_ACCOUNT
-                        ? '  Checking Account'
-                        : serviceType && serviceType == SECURE_ACCOUNT
-                        ? '  Saving Account'
-                        : ''}
+                          ? '  Checking Account'
+                          : serviceType && serviceType == SECURE_ACCOUNT
+                            ? '  Saving Account'
+                            : ''}
                     </Text>
                   </Text>
                   {/* <Ionicons
@@ -399,10 +399,33 @@ export default function SendViaQR(props) {
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={props.QR} size={hp('27%')} />
-            )}
+                <QRCode value={props.QR} size={hp('27%')} />
+              )}
           </View>
-          </View>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onPressDone()}
+            style={{
+              backgroundColor: Colors.blue,
+              borderRadius: 10,
+              width: wp('50%'),
+              height: wp('13%'),
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: hp('3%'),
+              marginBottom: hp('3%'),
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              Yes, this was scanned
+          </Text>
+          </AppBottomSheetTouchableWrapper>
+        </View>
       </ScrollView>
 
       {!props.isFromReceive ? (

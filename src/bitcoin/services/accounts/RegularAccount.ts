@@ -15,9 +15,6 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
@@ -27,6 +24,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -52,15 +50,13 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
@@ -70,6 +66,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     });
   };
 
@@ -81,9 +78,6 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      internalAddresssesCache: {};
-      externalAddressesCache: {};
-      addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
@@ -99,6 +93,7 @@ export default class RegularAccount extends BaseAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);
