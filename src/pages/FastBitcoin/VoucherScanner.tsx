@@ -533,8 +533,7 @@ const VoucherScanner = (props) => {
     let data = {
       user_key: FBTCAccountData.user_key,
       quote_type: 'voucher',
-      currency: 'USD',
-      voucher_code: voucherData ? voucherData.voucher_code : '',
+      voucher_code: voucherData ? voucherData.voucher_code : ''
     };
     dispatch(getQuote(data));
   };
@@ -769,7 +768,7 @@ const VoucherScanner = (props) => {
         quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
         delivery_type: '1',
-        delivery_destination: bitcoinAddress,
+        delivery_destination: bitcoinAddress
       };
       setQuote(QuoteDetails);
       dispatch(executeOrder(data));
