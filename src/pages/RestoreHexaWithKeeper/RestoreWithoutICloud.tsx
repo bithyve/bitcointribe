@@ -8,7 +8,8 @@ import {
   StatusBar,
   Image,
   ScrollView,
-  Platform
+  Platform,
+  ImageBackground,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -26,59 +27,56 @@ import {
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
 import idx from 'idx';
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
-import moment from 'moment';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
-import RestoreFromICloud from './RestoreFromICloud';
 import DeviceInfo from 'react-native-device-info';
-import RestoreSuccess from './RestoreSuccess';
-import ICloudBackupNotFound from './ICloudBackupNotFound';
+import WalletName from './WalletName';
 
-interface RestoreWithICloudStateTypes {
-  levelData: any;
+interface RestoreWithoutICloudStateTypes {
+  listData: any[];
   selectedIds: any[];
 }
 
-interface RestoreWithICloudPropsTypes {
+interface RestoreWithoutICloudPropsTypes {
   navigation: any;
 }
 
-class RestoreWithICloud extends Component<
-  RestoreWithICloudPropsTypes,
-  RestoreWithICloudStateTypes
+class RestoreWithoutICloud extends Component<
+  RestoreWithoutICloudPropsTypes,
+  RestoreWithoutICloudStateTypes
 > {
   constructor(props) {
     super(props);
     this.state = {
       selectedIds: [],
-      levelData: [
+      listData: [
         {
-          type: 'health',
-          title: 'Show Backup Health',
-          info: 'Keep an eye on your wallet health',
+          type: 'contact',
+          title: 'Keeper Contact',
+          info: 'Last backup not available',
           id: 1,
+          image: require('../../assets/images/icons/icon_contact.png'),
         },
         {
-          type: 'balance',
-          title: 'Show Balances',
-          info: 'View balances of your wallet accounts',
+          type: 'device',
+          title: 'Keeper Contact',
+          info: 'Last backup not available',
+          id: 2,
+          image: require('../../assets/images/icons/icon_secondarydevice.png'),
+        },
+        {
+          type: 'pdf',
+          title: 'PDF Keeper',
+          info: 'Last backup not available',
           id: 3,
-        },
-        {
-          type: 'receive',
-          title: 'Receive Bitcoins',
-          info: 'Generate receive bitcoin address',
-          id: 4,
+          image: require('../../assets/images/icons/icon_secondarydevice.png'),
         },
       ],
     };
   }
 
-  componentDidMount = () => {};
-
   render() {
-    const { levelData, selectedIds } = this.state;
+    const { listData, selectedIds } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -108,8 +106,50 @@ class RestoreWithICloud extends Component<
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-         
+          {listData.map((item, index) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  ...styles.cardsView,
+                  borderBottomWidth: index == 2 ? 0 : 4,
+                }}
+              >
+                <ImageBackground
+                  source={require('../../assets/images/icons/Ellipse.png')}
+                  style={styles.cardsImageView}
+                >
+                  <Image source={item.image} style={styles.cardImage} />
+                </ImageBackground>
+                <View style={{ marginLeft: 10 }}>
+                  <Text
+                    style={{
+                      ...styles.cardsInfoText,
+                      fontSize: RFValue(18),
+                    }}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text style={styles.cardsInfoText}>{item.title}</Text>
+                  <Text style={styles.cardsInfoText}>{item.info}</Text>
+                </View>
+                <View style={styles.statusTextView}>
+                  <Text style={styles.statusText}>Waiting for Key</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
+        <Text
+          numberOfLines={2}
+          style={{
+            ...styles.modalHeaderInfoText,
+            margin: wp('8%'),
+            marginBottom: wp('8%'),
+          }}
+        >
+          Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit amet,
+          consetetur Lorem ipsum dolor sit amet, consetetur
+        </Text>
         <View
           style={{
             flexDirection: 'row',
@@ -127,7 +167,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <TouchableOpacity
-            onPress={() => (this.refs.RestoreSuccess as any).snapTo(1)}
+            // onPress={() => (this.refs.RestoreSuccess as any).snapTo(1)}
             style={styles.buttonInnerView}
           >
             <Image
@@ -142,7 +182,7 @@ class RestoreWithICloud extends Component<
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              (this.refs.BackupNotFound as any).snapTo(1)
+              (this.refs.WalletName as any).snapTo(1);
             }}
           >
             <Image
@@ -154,79 +194,30 @@ class RestoreWithICloud extends Component<
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreFromICloud'}
+          ref={'WalletName'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('50%')
               : hp('60%'),
-          ]}
-          renderContent={() => (
-            <RestoreFromICloud
-              modalRef={this.refs.RestoreFromICloud}
-              onPressProceed={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0)
-              }}
-              onPressBack={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0)
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => (this.refs.RestoreFromICloud as any).snapTo(0)}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'RestoreSuccess'}
-          snapPoints={[
-            -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('60%'),
+              ? hp('80%')
+              : hp('90%'),
           ]}
           renderContent={() => (
-            <RestoreSuccess
-              modalRef={this.refs.RestoreSuccess}
+            <WalletName
+              modalRef={this.refs.WalletName}
               onPressProceed={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0)
+                (this.refs.WalletName as any).snapTo(0);
               }}
               onPressBack={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0)
+                (this.refs.WalletName as any).snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => (this.refs.RestoreSuccess as any).snapTo(0)}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'BackupNotFound'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('40%')
-              : hp('50%'),
-          ]}
-          renderContent={() => (
-            <ICloudBackupNotFound
-              modalRef={this.refs.BackupNotFound}
-              onPressProceed={() => {
-                (this.refs.BackupNotFound as any).snapTo(0)
-              }}
-              onPressBack={() => {
-                (this.refs.BackupNotFound as any).snapTo(0)
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => (this.refs.BackupNotFound as any).snapTo(0)}
+              onPressHeader={() => (this.refs.WalletName as any).snapTo(0)}
             />
           )}
         />
@@ -249,7 +240,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
-  })(RestoreWithICloud),
+  })(RestoreWithoutICloud),
 );
 
 const styles = StyleSheet.create({
@@ -297,5 +288,43 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
+  },
+  cardsInfoText: {
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
+  },
+  cardsView: {
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: Colors.backgroundColor,
+  },
+  cardsImageView: {
+    width: wp('20%'),
+    height: wp('20%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardImage: {
+    width: wp('7%'),
+    height: wp('7%'),
+    resizeMode: 'contain',
+    marginBottom: wp('1%'),
+  },
+  statusTextView: {
+    padding: 5,
+    backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginLeft: 'auto',
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  statusText: {
+    fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
   },
 });
