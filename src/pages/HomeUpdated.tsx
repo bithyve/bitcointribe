@@ -38,7 +38,6 @@ import {
   FAST_BITCOINS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
-import SettingsContents from '../components/SettingsContents';
 import { connect } from 'react-redux';
 import NoInternetModalContents from '../components/NoInternetModalContents';
 import NetInfo from '@react-native-community/netinfo';
@@ -1620,23 +1619,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // }
   };
 
-  onPressSettingsElements = async (type, currencycode) => {
-    const { navigation, currencyCode } = this.props;
-    if (type == 'ManagePin') {
-      return navigation.navigate('SettingManagePin', {
-        managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
-      });
-    } else if (type == 'ChangeCurrency') {
-      let currency = currencyCode;
-      //await AsyncStorage.getItem('currencyCode');
-      navigation.navigate('ChangeCurrency');
-      this.setState({
-        currencyCode: currency,
-      });
-    } else if (type == 'ChangeWalletName') {
-      navigation.navigate('SettingWalletNameChange');
-    }
-  };
 
   managePinSuccessProceed = (pin) => {
     this.setState(
@@ -2075,12 +2057,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('AddressBookContents');
       return;
     } else if (item.title == 'Wallet Settings') {
-      (this.refs.settingsBottomSheet as any).snapTo(1);
-      setTimeout(() => {
-        this.setState({
-          tabBarIndex: 0,
-        });
-      }, 10);
+      navigation.navigate('SettingsContents');
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
     } else if (item.title === 'Hexa Community (Telegram)') {
@@ -2862,66 +2839,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             />
           )}
         />
-
-        {knowMoreBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-            }}
-            onCloseEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-            }}
-            enabledInnerScrolling={true}
-            ref={'settingsBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-            ]}
-            renderContent={() => (
-              <SettingsContents
-                currencyCode={CurrencyCode}
-                onPressManagePin={(type, currencycode) =>
-                  this.onPressSettingsElements(type, currencycode)
-                }
-                onPressBack={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => {
-                      (this.refs.settingsBottomSheet as any).snapTo(0);
-                    },
-                  );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => (this.refs.settingsBottomSheet as any).snapTo(0),
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
-
         <BottomSheet
           onOpenEnd={() => {
             this.setState({

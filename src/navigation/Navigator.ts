@@ -89,6 +89,9 @@ import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import RestoreWithICloud from "../pages/RestoreHexaWithKeeper/RestoreWithICloud";
 import RestoreWithoutICloud from "../pages/RestoreHexaWithKeeper/RestoreWithoutICloud";
+import SettingsContents from '../pages/SettingsContents';
+import SweepFunds from '../pages/SweepFunds/SweepFunds';
+import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -224,6 +227,9 @@ const HomeNavigator = createStackNavigator(
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
+    SettingsContents,
+    SweepFunds,
+    SweepFundsEnterAmount,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

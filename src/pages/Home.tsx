@@ -52,7 +52,7 @@ import {
   TRUSTED_CONTACTS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
-import SettingsContents from '../components/SettingsContents';
+import SettingsContents from './SettingsContents';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkMSharesHealth,
