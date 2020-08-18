@@ -266,65 +266,11 @@ export default class HDSegwitWallet extends Bitcoin {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
-    try {
-      let availableAddress = '';
-      let itr;
-
-      const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
-        accountNumber
-      ];
-      if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].nextFreeAddressIndex = 0;
-
-      for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
-        if (
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex +
-            itr <
-          0
-        ) {
-          continue;
-        }
-
-        const address = this.getAddress(
-          false,
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex + itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        );
-
-        const txCounts = await this.getTxCounts([address]);
-        if (txCounts[address] === 0) {
-          availableAddress = address;
-          this.derivativeAccounts[accountType][
-            accountNumber
-          ].nextFreeAddressIndex += itr;
-          break;
-        }
-      }
-
-      if (!availableAddress) {
-        const address = this.getAddress(
-          false,
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex + itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        );
-        availableAddress = address; // defaulting to following address
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].nextFreeAddressIndex += itr + 1;
-      }
-
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].receivingAddress = availableAddress;
-      return { address: availableAddress };
-    } catch (err) {
-      throw new Error(`Unable to generate receiving address: ${err.message}`);
-    }
+    // receiving address updates during balance sync
+    return {
+      address: this.derivativeAccounts[accountType][accountNumber]
+        .receivingAddress,
+    };
   };
 
   public getTrustedContactDerivativeAccReceivingAddress = async (
