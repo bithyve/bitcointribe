@@ -1533,31 +1533,66 @@ export default function ManageBackup(props) {
   };
 
   const getCardSubText = (item) => {
-    if (item.type === 'contact1' || item.type === 'contact2') {
-      // if (item.personalInfo) {
-      //   return 'Friends and Family';
-      // }
-      return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
-        : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
-          : item.status == 'Good' ? 'The Recovery Key is accessible'
-            : 'Select a contact as a Keeper';
+    if (item.type == 'secondaryDevice') {
+      if (autoHighlightFlags.secondaryDevice) {
+        return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
+          : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
+            : item.status == 'Good' ? 'The Recovery Key is accessible'
+              : 'Use one of your other device with Hexa';
+      } else {
+        return 'Use one of your other device with Hexa';
+      }
     }
-    if (item.type === 'secondaryDevice') {
-      return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
-        : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
-          : item.status == 'Good' ? 'The Recovery Key is accessible'
-            : 'Use one of your other device with Hexa';
+    if (item.type == 'contact1') {
+      if (autoHighlightFlags.trustedContact1) {
+        return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
+          : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
+            : item.status == 'Good' ? 'The Recovery Key is accessible'
+              : 'Select a contact as a Keeper';
+      } else {
+        return 'Select a contact as a Keeper';
+      }
     }
-    if (item.type === 'copy1' || item.type === 'copy2') {
-      return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
-        : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
-          : item.status == 'Good' ? 'The Recovery Key is accessible'
-            : 'Secure your Recovery Key as a file (pdf)';
+    if (item.type == 'contact2') {
+      if (autoHighlightFlags.trustedContact2) {
+        return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
+          : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
+            : item.status == 'Good' ? 'The Recovery Key is accessible'
+              : 'Select a contact as a Keeper';
+      } else {
+        return 'Select a contact as a Keeper';
+      }
     }
-    return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
-      : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
-        : item.status == 'Good' ? 'Security Question and Answer are confirmed'
-          : 'Last Backup';
+    if (item.type == 'copy1') {
+      if (autoHighlightFlags.personalCopy1) {
+        return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
+            : item.status == 'Good' ? 'The Recovery Key is accessible'
+              : 'Secure your Recovery Key as a file (pdf)';
+      } else {
+        return 'Secure your Recovery Key as a file (pdf)';
+      }
+    }
+    if (item.type == 'copy2') {
+      if (autoHighlightFlags.personalCopy2) {
+        return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
+            : item.status == 'Good' ? 'The Recovery Key is accessible'
+              : 'Secure your Recovery Key as a file (pdf)';
+      } else {
+        return 'Secure your Recovery Key as a file (pdf)';
+      }
+    }
+    if (item.type == 'security') {
+      if (autoHighlightFlags.securityAns) {
+        return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
+          : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
+            : item.status == 'Good' ? 'Security Question and Answer are confirmed'
+              : 'Last Backup';
+      } else {
+        return 'Last Backup';
+      }
+    }
   };
 
   return (
