@@ -1105,10 +1105,7 @@ const VoucherScanner = (props) => {
             })}
           </View>
         ) : null}
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.navigate('PairNewWallet');
-          }}
+        {!isUserRegistered ? (<View
           style={{
             marginBottom: -20,
           }}
@@ -1142,26 +1139,13 @@ const VoucherScanner = (props) => {
                   color: Colors.textColorGrey,
                   fontSize: RFValue(12),
                   fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                }}
-                onPress={() => {
-                  props.navigation.navigate('PairNewWallet');
                 }}
               >
-                {'Click here'}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {' to link your Hexa wallet'}
+                {'Go to your FastBitcoins.com account on this device and choose Hexa from "Linked Wallets"'}
               </Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View> ) : null}
         <Text
           style={{
             marginTop: 'auto',

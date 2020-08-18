@@ -23,10 +23,12 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -41,10 +43,18 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -58,10 +68,12 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     });
   };
 
@@ -80,10 +92,18 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;

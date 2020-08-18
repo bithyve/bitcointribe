@@ -117,6 +117,7 @@ interface SendToContactStateTypes {
   isInvalidBalance: boolean;
   recipients: any[];
   spendableBalances: any;
+  isSendMax: boolean;
 }
 
 class SendToContact extends Component<
@@ -158,6 +159,7 @@ class SendToContact extends Component<
         regularBalance: 0,
         secureBalance: 0,
       },
+      isSendMax: false,
     };
   }
 
@@ -244,16 +246,6 @@ class SendToContact extends Component<
       this.setState({
         exchangeRates: this.props.accounts && this.props.accounts.exchangeRates,
       });
-    }
-
-    if (
-      prevProps.accounts[this.state.serviceType].loading.transfer !==
-      this.props.accounts[this.state.serviceType].loading.transfer
-    ) {
-      if (
-        !this.props.accounts[this.state.serviceType].loading.transfer.transfer
-      )
-        this.setState({ isConfirmDisabled: false });
     }
 
     if (
@@ -418,24 +410,29 @@ class SendToContact extends Component<
     const { service } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
+    const instance =
+      service[serviceType].service.hdWallet ||
+      service[serviceType].service.secureHDWallet;
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
-    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
-      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
-      if (Date.now() - lastFetched < 1800000) {
+    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+      ? 'MAINNET'
+      : 'TESTNET';
+
+    if (storedAverageTxFees && storedAverageTxFees[network]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[network];
+      if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
         this.setState({ averageTxFees: averageTxFees });
         return;
       } // maintaining a half an hour difference b/w fetches
     }
-    const instance =
-      service[serviceType].service.hdWallet ||
-      service[serviceType].service.secureHDWallet;
+
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
       ...storedAverageTxFees,
-      [serviceType]: {
+      [network]: {
         averageTxFees,
         lastFetched: Date.now(),
       },
@@ -484,6 +481,7 @@ class SendToContact extends Component<
       sweepSecure,
       spendableBalance,
       averageTxFees,
+      isSendMax,
     } = this.state;
     const { transfer } = this.props;
     if (!recipients.length) return;
@@ -500,8 +498,55 @@ class SendToContact extends Component<
           spendableBalance,
           recipients,
           averageTxFees,
+          isSendMax,
         });
       }
+    }
+  };
+
+  sendMaxHandler = () => {
+    const {
+      selectedContact,
+      averageTxFees,
+      serviceType,
+      spendableBalance,
+      switchOn,
+    } = this.state;
+    const { transfer } = this.props;
+
+    const recipientsList = [];
+    let amountStacked = 0;
+    transfer[serviceType].transfer.details.forEach((instance) => {
+      if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id !== selectedContact.id
+      ) {
+        amountStacked += parseInt(instance.bitcoinAmount);
+        recipientsList.push(instance);
+      }
+    });
+
+    const { fee } = this.props.service[serviceType].service.calculateSendMaxFee(
+      recipientsList.length + 1, // +1 for the current instance
+      averageTxFees,
+    );
+
+    if (spendableBalance) {
+      const max = spendableBalance - amountStacked - fee;
+      if (max <= 0) {
+        // fee greater than remaining spendable(spendable - amountStacked)
+        this.setState({ isInvalidBalance: true });
+        return;
+      }
+      this.setState(
+        {
+          switchOn: !switchOn ? true : switchOn,
+          isSendMax: true,
+        },
+        () => {
+          this.convertBitCoinToCurrency(max.toString());
+        },
+      );
     }
   };
 
@@ -582,9 +627,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
-    this.setState({ isConfirmDisabled: true });
     clearTransfer(serviceType, 'stage1');
-    this.setState({ isConfirmDisabled: false });
     if (
       transfer[serviceType].transfer.details &&
       transfer[serviceType].transfer.details.length
@@ -654,6 +697,7 @@ class SendToContact extends Component<
       bitcoinAmount,
       currencyAmount,
       isConfirmDisabled,
+      isSendMax,
       note,
       InputStyle,
       InputStyle1,
@@ -914,11 +958,12 @@ class SendToContact extends Component<
                       flexDirection: 'row',
                       width: wp('70%'),
                       height: wp('13%'),
+                      alignItems: 'center',
                       backgroundColor: !switchOn
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                    // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       {currencyCode.includes(CurrencyCode) ? (
@@ -965,6 +1010,9 @@ class SendToContact extends Component<
                       returnKeyType="done"
                       keyboardType={'numeric'}
                       onChangeText={(value) => {
+                        if (this.state.isSendMax) {
+                          this.setState({ isSendMax: false });
+                        }
                         this.convertBitCoinToCurrency(value);
                       }}
                       placeholderTextColor={Colors.borderColor}
@@ -982,6 +1030,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
+                    {!switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderUSDInputText()} */}
                   {isInvalidBalance ? (
@@ -995,13 +1056,14 @@ class SendToContact extends Component<
                       marginBottom: wp('1.5%'),
                       marginTop: wp('1.5%'),
                       flexDirection: 'row',
+                      alignItems: 'center',
                       width: wp('70%'),
                       height: wp('13%'),
                       backgroundColor: switchOn
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
-                    // onPress={()=>setSwitchOn(!switchOn)}
+                    onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1033,6 +1095,9 @@ class SendToContact extends Component<
                       returnKeyType="done"
                       keyboardType={'numeric'}
                       onChangeText={(value) => {
+                        if (this.state.isSendMax) {
+                          this.setState({ isSendMax: false });
+                        }
                         this.convertBitCoinToCurrency(value);
                       }}
                       placeholderTextColor={Colors.borderColor}
@@ -1050,6 +1115,19 @@ class SendToContact extends Component<
                         }
                       }}
                     />
+                    {switchOn && (
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          textAlign: 'center',
+                          paddingHorizontal: 10,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        Send Max
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   {/* {renderBitCoinInputText()} */}
                 </View>
@@ -1119,6 +1197,7 @@ class SendToContact extends Component<
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
+                    this.setState({ isConfirmDisabled: true });
                     this.onConfirm();
                   }}
                   disabled={isConfirmDisabled}
@@ -1131,7 +1210,6 @@ class SendToContact extends Component<
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
                     shadowOffset: { width: 15, height: 15 },
-                    opacity: isConfirmDisabled ? 0.5 : 1,
                   }}
                 >
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
@@ -1153,7 +1231,7 @@ class SendToContact extends Component<
                     width: wp('30%'),
                     marginLeft: 10,
                   }}
-                  disabled={isConfirmDisabled}
+                  disabled={isConfirmDisabled || isSendMax}
                   onPress={() => {
                     if (
                       transfer[serviceType].transfer.details &&
@@ -1184,7 +1262,13 @@ class SendToContact extends Component<
                     }
                   }}
                 >
-                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                  <Text
+                    style={{
+                      ...styles.buttonText,
+                      color: Colors.blue,
+                      opacity: isSendMax ? 0.5 : 1,
+                    }}
+                  >
                     Add Recipient
                   </Text>
                 </TouchableOpacity>

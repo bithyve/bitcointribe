@@ -31,7 +31,7 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore?},
+  options?: { loader?; fetchTransactionsSync?; restore? },
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -60,17 +60,27 @@ export const transferST1 = (serviceType, recipients, averageTxFees?) => {
   };
 };
 
-export const transferST2 = (serviceType, txnPriority, nSequence?) => {
+export const transferST2 = (
+  serviceType,
+  txnPriority,
+  customTxPrerequisites?,
+  nSequence?,
+) => {
   return {
     type: TRANSFER_ST2,
-    payload: { serviceType, txnPriority, nSequence },
+    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
   };
 };
 
-export const alternateTransferST2 = (serviceType, txnPriority, nSequence?) => {
+export const alternateTransferST2 = (
+  serviceType,
+  txnPriority,
+  customTxPrerequisites?,
+  nSequence?,
+) => {
   return {
     type: ALTERNATE_TRANSFER_ST2,
-    payload: { serviceType, txnPriority, nSequence },
+    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
   };
 };
 

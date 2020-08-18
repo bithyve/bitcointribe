@@ -41,6 +41,12 @@ export default function SendShareModal(props) {
   // useEffect(() => {
   //   if (props.changeContact) setChangeContact(true);
   // }, [props.changeContact]);
+  const setPhoneNumber = () =>{
+    let phoneNumber = Contact.phoneNumbers[0].number;
+    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+    number = number.slice(number.length - 10); // last 10 digits only
+    return number;
+  }
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -103,7 +109,8 @@ export default function SendShareModal(props) {
                       paddingTop: 3,
                     }}
                   >
-                    {Contact.phoneNumbers[0].digits}
+                    {setPhoneNumber()}
+                    {/* {Contact.phoneNumbers[0].digits} */}
                   </Text>
                 ) : Contact && Contact.emails && Contact.emails.length ? (
                   <Text

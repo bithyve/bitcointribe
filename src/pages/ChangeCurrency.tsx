@@ -37,11 +37,10 @@ export default function ChangeCurrency(props) {
 
   useEffect(() => {
     (async () => {
-      let currencyCode = CurrencyCode;
-      //await AsyncStorage.getItem('currencyCode');
+      let currencyCode = CurrencyCode || 'USD';
       setCurrency(
         currencyList[
-          currencyList.findIndex((value) => value.code == currencyCode)
+        currencyList.findIndex((value) => value.code == currencyCode)
         ],
       );
     })();
@@ -114,7 +113,7 @@ export default function ChangeCurrency(props) {
                 color: Colors.textColorGrey,
               }}
             >
-              {currency.symbol}
+              {currency ? currency.symbol : ''}
             </Text>
           </View>
           <View
@@ -128,7 +127,7 @@ export default function ChangeCurrency(props) {
                 marginLeft: wp('3%'),
               }}
             >
-              {currency.code}
+              {currency ? currency.code : ''}
             </Text>
           </View>
           <View

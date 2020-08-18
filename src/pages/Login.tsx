@@ -313,18 +313,20 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
+          setTimeout(() => {
+            if (loaderBottomSheet.current) {
+              loaderBottomSheet.current.snapTo(0);
+            }
+            props.navigation.navigate('Home', {
+              custodyRequest,
+              recoveryRequest,
+              trustedContactRequest,
+              userKey,
+            });
+          }, 2);
           if (dbFetched) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
-            setTimeout(() => {
-              loaderBottomSheet.current.snapTo(0);
-              props.navigation.navigate('Home', {
-                custodyRequest,
-                recoveryRequest,
-                trustedContactRequest,
-                userKey,
-              });
-            }, 2500);
             dispatch(startupSync());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');

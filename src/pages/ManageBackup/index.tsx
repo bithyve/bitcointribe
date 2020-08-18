@@ -637,7 +637,7 @@ export default function ManageBackup(props) {
           }, 2);
           (PersonalCopyQRScannerBottomSheet as any).current.snapTo(0);
         }}
-        onPressProceed={() => {}}
+        onPressProceed={() => { }}
         onPressIgnore={() => {
           setTimeout(() => {
             setLoadCamera(false);
@@ -823,6 +823,7 @@ export default function ManageBackup(props) {
     });
     let focusListener = props.navigation.addListener('didFocus', () => {
       setContactsFromAsync();
+      dispatch(checkMSharesHealth());
       // setAutoHighlightFlagsFromAsync();
     });
     return () => {
@@ -1310,7 +1311,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[1].personalInfo =
           contacts[
-            contacts.findIndex((value) => value && value.type == 'contact1')
+          contacts.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
@@ -1318,7 +1319,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[2].personalInfo =
           contacts[
-            contacts.findIndex((value) => value && value.type == 'contact2')
+          contacts.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
@@ -1362,10 +1363,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
@@ -1375,10 +1376,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
@@ -1388,10 +1389,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
@@ -1401,10 +1402,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
@@ -1414,10 +1415,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
@@ -1427,10 +1428,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     return {
@@ -1475,18 +1476,18 @@ export default function ManageBackup(props) {
               >
                 {item.personalInfo
                   ? nameToInitials(
-                      item.personalInfo.firstName && item.personalInfo.lastName
-                        ? item.personalInfo.firstName +
-                            ' ' +
-                            item.personalInfo.lastName
-                        : item.personalInfo.firstName &&
-                          !item.personalInfo.lastName
+                    item.personalInfo.firstName && item.personalInfo.lastName
+                      ? item.personalInfo.firstName +
+                      ' ' +
+                      item.personalInfo.lastName
+                      : item.personalInfo.firstName &&
+                        !item.personalInfo.lastName
                         ? item.personalInfo.firstName
                         : !item.personalInfo.firstName &&
                           item.personalInfo.lastName
-                        ? item.personalInfo.lastName
-                        : '',
-                    )
+                          ? item.personalInfo.lastName
+                          : '',
+                  )
                   : ''}
               </Text>
             </View>
@@ -1533,25 +1534,30 @@ export default function ManageBackup(props) {
 
   const getCardSubText = (item) => {
     if (item.type === 'contact1' || item.type === 'contact2') {
-      if (item.personalInfo) {
-        return 'Friends and Family';
-      }
-      return 'Select a Friend or Family member as a Keeper';
+      // if (item.personalInfo) {
+      //   return 'Friends and Family';
+      // }
+      return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
+        : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Select a contact as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
-      if (item.status === 'Ugly') {
-        return 'Another device running Hexa app that you own';
-      }
-      return 'Last Backup ';
+      return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
+        : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Use one of your other device with Hexa';
     }
     if (item.type === 'copy1' || item.type === 'copy2') {
-      if (item.status === 'Ugly') {
-        return 'Secure your Recovery Key as a file (pdf)';
-      }
-      return 'The PDFs are locked with your Security Answer';
+      return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
+        : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Good' ? 'The Recovery Key is accessible'
+            : 'Secure your Recovery Key as a file (pdf)';
     }
-
-    return 'Last Backup ';
+    return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
+      : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
+        : item.status == 'Good' ? 'Security Question and Answer are confirmed'
+          : 'Last Backup';
   };
 
   return (
@@ -1647,12 +1653,12 @@ export default function ManageBackup(props) {
                       shieldStatus={overallHealth.overallStatus}
                     />
                   ) : (
-                    <HomePageShield
-                      circleShadowColor={Colors.borderColor}
-                      shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                      shieldStatus={0}
-                    />
-                  )}
+                      <HomePageShield
+                        circleShadowColor={Colors.borderColor}
+                        shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                        shieldStatus={0}
+                      />
+                    )}
                 </View>
               </View>
               <View style={{ marginBottom: 10 }}>
@@ -1761,26 +1767,29 @@ export default function ManageBackup(props) {
                         }}
                       >
                         {getImageIcon(item)}
-                        <View style={{ marginLeft: 15 }}>
+                        <View style={{ flex: 1, marginHorizontal: 15 }}>
                           <Text style={styles.cardTitleText}>
                             {getCardTitle(item)}
                           </Text>
-                          <Text style={styles.cardTimeText}>
-                            {getCardSubText(item)}
-                            {(item.type === 'security' ||
-                              (item.type === 'secondaryDevice' &&
+                          <View style={{ flex: 1, flexDirection: 'row' }}>
+                            <Text style={styles.cardTimeText}>
+                              {getCardSubText(item)}
+                              {(item.type === 'security' || (item.type === 'secondaryDevice' &&
                                 item.status !== 'Ugly')) && (
-                              <Text
-                                style={{
-                                  fontFamily: Fonts.FiraSansMediumItalic,
-                                  fontWeight: 'bold',
-                                  fontStyle: 'italic',
-                                }}
-                              >
-                                {getTime(item.time)}
-                              </Text>
-                            )}
-                          </Text>
+                                  <Text
+                                    style={{
+                                      color: Colors.textColorGrey,
+                                      fontSize: RFValue(10),
+                                      fontFamily: Fonts.FiraSansMediumItalic,
+                                      fontWeight: 'bold',
+                                      fontStyle: 'italic',
+                                    }}
+                                  >
+                                    {' '}{getTime(item.time)}
+                                  </Text>
+                                )}
+                            </Text>
+                          </View>
                         </View>
                         <Image
                           style={styles.cardIconImage}
@@ -1902,24 +1911,24 @@ export default function ManageBackup(props) {
                 }}
               >
                 {autoHighlightFlags.secondaryDevice &&
-                autoHighlightFlags.trustedContact1 &&
-                autoHighlightFlags.trustedContact2 &&
-                autoHighlightFlags.personalCopy1 &&
-                autoHighlightFlags.personalCopy2 &&
-                autoHighlightFlags.securityAns
+                  autoHighlightFlags.trustedContact1 &&
+                  autoHighlightFlags.trustedContact2 &&
+                  autoHighlightFlags.personalCopy1 &&
+                  autoHighlightFlags.personalCopy2 &&
+                  autoHighlightFlags.securityAns
                   ? 'Confirm Shares'
                   : 'Complete Setup'}
               </Text>
             </TouchableOpacity>
           </View>
         ) : (
-          <ScrollView
-            contentContainerStyle={{
-              backgroundColor: Colors.backgroundColor,
-            }}
-            refreshControl={<RefreshControl refreshing={!is_initiated} />}
-          />
-        )}
+            <ScrollView
+              contentContainerStyle={{
+                backgroundColor: Colors.backgroundColor,
+              }}
+              refreshControl={<RefreshControl refreshing={!is_initiated} />}
+            />
+          )}
       </View>
     </View>
   );
@@ -1934,6 +1943,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   manageBackupCard: {
+    flex: 1,
     padding: 20,
     borderWidth: 1,
     borderRadius: 10,

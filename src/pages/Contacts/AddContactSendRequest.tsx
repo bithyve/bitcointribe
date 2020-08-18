@@ -48,8 +48,15 @@ import {
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function AddContactSendRequest(props) {
+  const [isOTPType, setIsOTPType] = useState(false);
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [OTP, setOTP] = useState('');
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
@@ -71,7 +78,7 @@ export default function AddContactSendRequest(props) {
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
     : [];
-
+  console.log('SelectedContact', SelectedContact);
   const [Contact, setContact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
@@ -242,8 +249,9 @@ export default function AddContactSendRequest(props) {
         return;
       }
 
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
       const requester = WALLET_SETUP.walletName;
       const appVersion = DeviceInfo.getVersion();
       if (!trustedLink) {
@@ -266,8 +274,7 @@ export default function AddContactSendRequest(props) {
             `/${numHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-
-          console.log({ numberDL });
+          setIsOTPType(false);
           setTrustedLink(numberDL);
         } else if (Contact.emails && Contact.emails.length) {
           const email = Contact.emails[0].email;
@@ -287,14 +294,26 @@ export default function AddContactSendRequest(props) {
             `/${emailHint}` +
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
-
-          console.log({ emailDL });
+          setIsOTPType(false);
           setTrustedLink(emailDL);
+        } else if (otp) {
+          const otpHintType = 'otp';
+          const otpHint = 'xxx';
+          const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+            .encryptedPub;
+          const otpDL =
+            `https://hexawallet.io/${config.APP_STAGE}/tc` +
+            `/${requester}` +
+            `/${otpEncPubKey}` +
+            `/${otpHintType}` +
+            `/${otpHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
+            `/v${appVersion}`;
+          setIsOTPType(true);
+          setOTP(otp);
+          setTrustedLink(otpDL);
         } else {
-          Alert.alert(
-            'Invalid Contact',
-            'Cannot add a contact without phone-num/email as a entity',
-          );
+          Alert.alert('Invalid Contact', 'Something went wrong.');
           return;
         }
         updateTrustedContactsInfo(Contact); // Contact initialized to become TC
@@ -309,6 +328,8 @@ export default function AddContactSendRequest(props) {
           info = number;
         } else if (Contact.emails && Contact.emails.length) {
           info = Contact.emails[0].email;
+        } else if (otp) {
+          info = otp;
         }
 
         setTrustedQR(
@@ -359,8 +380,12 @@ export default function AddContactSendRequest(props) {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
           onPressDone={async () => {
+            setTimeout(() => {
+              setRenderTimer(true);
+            }, 2);
+            if(isOTPType){ shareOtpWithTrustedContactBottomSheet.current.snapTo(1); }
+            else{ openTimer(); }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
-            openTimer();
           }}
         />
       );
@@ -432,6 +457,40 @@ export default function AddContactSendRequest(props) {
       //   if (SendViaQRBottomSheet.current)
       //     (SendViaQRBottomSheet as any).current.snapTo(0);
       // }}
+      />
+    );
+  }, []);
+
+  const setPhoneNumber = () => {
+    let phoneNumber = Contact.phoneNumbers[0].number;
+    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+    number = number.slice(number.length - 10); // last 10 digits only
+    return number;
+  };
+
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        renderTimer={renderTimer}
+        onPressOk={(index) => {
+          setRenderTimer(false);
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+          props.navigation.goBack();
+        }}
+        onPressBack={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        OTP={OTP}
+      />
+    );
+  }, [ OTP, renderTimer]);
+
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -558,7 +617,8 @@ export default function AddContactSendRequest(props) {
                       paddingTop: 3,
                     }}
                   >
-                    {Contact.phoneNumbers[0].digits}
+                    {setPhoneNumber()}
+                    {/* {Contact.phoneNumbers[0].digits} */}
                   </Text>
                 ) : Contact.emails && Contact.emails.length ? (
                   <Text
@@ -727,6 +787,18 @@ export default function AddContactSendRequest(props) {
           ]}
           renderContent={renderTimerModalContents}
           renderHeader={renderTimerModalHeader}
+        />
+        <BottomSheet
+          onCloseEnd={() => {
+            if (SelectedContact.length > 0) {
+              setRenderTimer(false)
+            }
+          }}
+          enabledInnerScrolling={true}
+          ref={shareOtpWithTrustedContactBottomSheet}
+          snapPoints={[-30, hp('65%')]}
+          renderContent={renderShareOtpWithTrustedContactContent}
+          renderHeader={renderShareOtpWithTrustedContactHeader}
         />
       </View>
     </SafeAreaView>
