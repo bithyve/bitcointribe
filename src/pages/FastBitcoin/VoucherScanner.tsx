@@ -533,8 +533,7 @@ const VoucherScanner = (props) => {
     let data = {
       user_key: FBTCAccountData.user_key,
       quote_type: 'voucher',
-      currency: 'USD',
-      voucher_code: voucherData ? voucherData.voucher_code : '',
+      voucher_code: voucherData ? voucherData.voucher_code : ''
     };
     dispatch(getQuote(data));
   };
@@ -769,7 +768,7 @@ const VoucherScanner = (props) => {
         quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
         delivery_type: '1',
-        delivery_destination: bitcoinAddress,
+        delivery_destination: bitcoinAddress
       };
       setQuote(QuoteDetails);
       dispatch(executeOrder(data));
@@ -1105,10 +1104,7 @@ const VoucherScanner = (props) => {
             })}
           </View>
         ) : null}
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.navigate('PairNewWallet');
-          }}
+        {!isUserRegistered ? (<View
           style={{
             marginBottom: -20,
           }}
@@ -1142,26 +1138,13 @@ const VoucherScanner = (props) => {
                   color: Colors.textColorGrey,
                   fontSize: RFValue(12),
                   fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                }}
-                onPress={() => {
-                  props.navigation.navigate('PairNewWallet');
                 }}
               >
-                {'Click here'}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {' to link your Hexa wallet'}
+                {'Go to your FastBitcoins.com account on this device and choose Hexa from "Linked Wallets"'}
               </Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View> ) : null}
         <Text
           style={{
             marginTop: 'auto',

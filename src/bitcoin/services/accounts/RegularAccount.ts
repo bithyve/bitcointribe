@@ -15,17 +15,16 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -40,27 +39,34 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-      internalAddresssesCache,
-      externalAddressesCache,
-      addressToWIFCache,
       gapLimit,
       balances,
       receivingAddress,
       transactions,
+      confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
+      feeRates,
     });
   };
 
@@ -72,17 +78,22 @@ export default class RegularAccount extends BaseAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      internalAddresssesCache: {};
-      externalAddressesCache: {};
-      addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);

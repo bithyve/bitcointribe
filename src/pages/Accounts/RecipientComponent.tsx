@@ -27,7 +27,7 @@ import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientComponent(props) {
   const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue);
+  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue) || 'USD';
 
   const getCorrectAmountCurrency = () => {
     const switchOn = currencyToggleValue ? true : false;

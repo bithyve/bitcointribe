@@ -22,17 +22,22 @@ export default class BaseAccount {
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
-      internalAddresssesCache: {};
-      externalAddressesCache: {};
-      addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
+      feeRates: any;
     },
     network?: Network,
   ) {
@@ -345,63 +350,8 @@ export default class BaseAccount {
     }
   };
 
-  // public getAddress = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         address: string;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.hdWallet.getReceivingAddress(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o1, err: err.message, message: ErrMap[0o1] };
-  //   }
-  // };
-
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.hdWallet.isValidAddress(recipientAddress);
-
-  // public getBalance = async (options?: {
-  //   restore?;
-  // }): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         balance: number;
-  //         unconfirmedBalance: number;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.hdWallet.fetchBalance(options),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o2, err: err.message, message: ErrMap[0o2] };
-  //   }
-  // };
 
   public getBalanceTransactions = async (options?: {
     restore?;
@@ -450,48 +400,6 @@ export default class BaseAccount {
       return { status: 0o3, err: err.message, message: ErrMap[0o3] };
     }
   };
-
-  // public getTransactions = async (): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         transactions: {
-  //           totalTransactions: number;
-  //           confirmedTransactions: number;
-  //           unconfirmedTransactions: number;
-  //           transactionDetails: Array<{
-  //             txid: string;
-  //             status: string;
-  //             confirmations: number;
-  //             fee: string;
-  //             date: string;
-  //             transactionType: string;
-  //             amount: number;
-  //             accountType: string;
-  //             recipientAddresses?: string[];
-  //             senderAddresses?: string[];
-  //           }>;
-  //         };
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.hdWallet.fetchTransactions(),
-  //     };
-  //   } catch (err) {
-  //     return { status: 0o3, err: err.message, message: ErrMap[0o3] };
-  //   }
-  // };
 
   public getTransactionDetails = async (
     txHash: string,
@@ -547,6 +455,17 @@ export default class BaseAccount {
       return { status: 0o5, err: err.message, message: ErrMap[0o5] };
     }
   };
+
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+
+  public calculateCustomFee = (
+    outputUTXOs: {
+      address: string;
+      value: number;
+    }[],
+    customTxFeePerByte: number,
+  ) => this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
 
   public transferST1 = async (
     recipients: {
@@ -627,6 +546,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
+    customTxPrerequisites?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -648,9 +568,16 @@ export default class BaseAccount {
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
+        customTxPrerequisites,
         nSequence,
       );
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+
+      let inputs;
+      if (txnPriority === 'custom' && customTxPrerequisites) {
+        inputs = customTxPrerequisites.inputs;
+      } else {
+        inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
+      }
 
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       console.log('---- Transaction Signed ----');

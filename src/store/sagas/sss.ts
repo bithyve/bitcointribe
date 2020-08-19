@@ -83,6 +83,7 @@ import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
+import idx from 'idx';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -194,7 +195,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-          payload.contactInfo.contactName
+        payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -214,8 +215,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-            .UPLOADED_AT <
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -636,7 +637,8 @@ function* generatePersonalCopyWorker({ payload }) {
     const pdfPath = yield call(
       generatePDF,
       pdfData,
-      `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
+      `Hexa_Recovery_Key_${walletName}_${shareIndex - 2}.pdf`,
+      // `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
       // `Hexa Share ${shareIndex + 1}`,
       `Hexa Recovery Key for ${walletName}'s Wallet`,
       security.answer,
@@ -756,13 +758,13 @@ function* sharePersonalCopyWorker({ payload }) {
               subject: selectedPersonalCopy.title,
               body: `<b>Please find attached the personal copy ${
                 selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-              } share pdf, it is password protected by the answer to the security question.</b>`,
+                } share pdf, it is password protected by the answer to the security question.</b>`,
               isHTML: true,
               attachment: {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[selectedPersonalCopy.type].path
+                    personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -784,11 +786,11 @@ function* sharePersonalCopyWorker({ payload }) {
             title: selectedPersonalCopy.title,
             message: `Please find attached the personal copy ${
               selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-            } share pdf, it is password protected by the answer to the security question.`,
+              } share pdf, it is password protected by the answer to the security question.`,
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                  personalCopyDetails[selectedPersonalCopy.type].path
+                personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -798,8 +800,10 @@ function* sharePersonalCopyWorker({ payload }) {
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {
-            console.log({ err });
-            throw new Error(`Share failed: ${err}`);
+            let errorMessage = idx(err, _ => _.message)
+            if (errorMessage !== "User did not share") {
+              throw new Error(`Share failed: ${err}`);
+            }
           }
         }
         break;
@@ -852,7 +856,7 @@ function* sharePersonalCopyWorker({ payload }) {
           title: selectedPersonalCopy.title,
           message: `Please find attached the personal copy ${
             selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-          } share pdf, it is password protected by the answer to the security question.`,
+            } share pdf, it is password protected by the answer to the security question.`,
           url:
             Platform.OS == 'android'
               ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
@@ -865,8 +869,10 @@ function* sharePersonalCopyWorker({ payload }) {
         try {
           yield call(Share.open, shareOptions);
         } catch (err) {
-          console.log({ err });
-          throw new Error(`Share failed: ${err}`);
+          let errorMessage = idx(err, _ => _.message)
+          if (errorMessage !== "User did not share") {
+            throw new Error(`Share failed: ${err}`);
+          }
         }
         break;
 

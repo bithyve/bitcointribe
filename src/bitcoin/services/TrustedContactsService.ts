@@ -23,16 +23,8 @@ export default class TrustedContactsService {
 
   public static encryptPub = (
     publicKey: string,
-    key?: string,
-  ):
-    | {
-        encryptedPub: string;
-        otp: string;
-      }
-    | {
-        encryptedPub: string;
-        otp?: undefined;
-      } => TrustedContacts.encryptPub(publicKey, key);
+    key: string,
+  ): { encryptedPub: string } => TrustedContacts.encryptPub(publicKey, key);
 
   public static decryptPub = (
     encryptedPub: string,

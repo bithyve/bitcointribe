@@ -474,21 +474,26 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { service } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
-    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
-      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
-      if (Date.now() - lastFetched < 1800000) {
+    const instance =
+      service[serviceType].service.hdWallet ||
+      service[serviceType].service.secureHDWallet;
+    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+      ? 'MAINNET'
+      : 'TESTNET';
+
+    if (storedAverageTxFees && storedAverageTxFees[network]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[network];
+      if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
         this.setState({ averageTxFees: averageTxFees });
         return;
       } // maintaining a half an hour difference b/w fetches
     }
-    const instance =
-      service[serviceType].service.hdWallet ||
-      service[serviceType].service.secureHDWallet;
+
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
       ...storedAverageTxFees,
-      [serviceType]: {
+      [network]: {
         averageTxFees,
         lastFetched: Date.now(),
       },
