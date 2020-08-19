@@ -21,7 +21,7 @@ import {
 import { keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
 import { insertDBWorker } from './storage';
-import { timer } from '../../utils'
+// import { timer } from '../../utils'
 
 function* initSetupWorker({ payload }) {
   yield put(switchSetupLoader('initializing'));
@@ -111,7 +111,7 @@ export const credentialStorageWatcher = createWatcher(
 
 function* credentialsAuthWorker({ payload }) {
   console.clear()
-  let t = timer('credentialsAuthWorker')
+  // let t = timer('credentialsAuthWorker')
   yield put(switchSetupLoader('authenticating'));
   let key;
   try {
@@ -130,7 +130,7 @@ function* credentialsAuthWorker({ payload }) {
     yield put(switchReLogin(true));
   } else {
     yield put(credsAuthenticated(true));
-    t.stop()
+    // t.stop()
     yield put(keyFetched(key));
     yield put(fetchFromDB());
   }
