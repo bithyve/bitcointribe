@@ -19,7 +19,7 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
-import { SIGNING_AXIOS } from '../../../services/api';
+import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
@@ -871,20 +871,45 @@ export default class SecureHDWallet extends Bitcoin {
     accountNumber: number = 1,
     donee: string,
     description: string,
-    config: {
+    configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
   ) => {
+    if (this.derivativeAccounts[accountType][accountNumber]) {
+      return;
+    }
+
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,
       description,
-      config,
+      configuration,
     };
 
-    return xpub;
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('setupDonationAccount', {
+        HEXA_ID,
+        walletID: this.getWalletId().walletId,
+        details: {
+          donee,
+          description,
+          id: crypto.createHash('sha256').update(xpub).digest('hex'),
+          xpubs: [xpub, this.xpubs.secondary, this.xpubs.bh],
+          configuration,
+        },
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { setupSuccessful } = res.data;
+    if (!setupSuccessful) {
+      throw new Error('Donation account setup failed');
+    }
   };
 
   public setupSecureAccount = async (): Promise<{

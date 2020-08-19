@@ -139,7 +139,7 @@ export interface DonationDerivativeAccountElements
   donee: string;
   id: string;
   description: string;
-  config: {
+  configuration: {
     displayBalance: boolean;
     displayTransactions: boolean;
   };

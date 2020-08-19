@@ -487,6 +487,49 @@ export default class SecureAccount {
     }
   };
 
+  public setupDonationAccount = async (
+    accountType: string,
+    accountNumber: number,
+    donee: string,
+    description: string,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<
+    | {
+        status: number;
+        data: void;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.setupDonationAccount(
+          accountType,
+          accountNumber,
+          donee,
+          description,
+          configuration,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to setup donation account',
+      };
+    }
+  };
+
   public getTransactionDetails = async (
     txHash: string,
   ): Promise<

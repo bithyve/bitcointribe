@@ -744,20 +744,45 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber: number = 1,
     donee: string,
     description: string,
-    config: {
+    configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
   ) => {
+    if (this.derivativeAccounts[accountType][accountNumber]) {
+      return;
+    }
+
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,
       description,
-      config,
+      configuration,
     };
 
-    return xpub;
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('setupDonationAccount', {
+        HEXA_ID,
+        walletID: this.getWalletId().walletId,
+        details: {
+          donee,
+          description,
+          id: crypto.createHash('sha256').update(xpub).digest('hex'),
+          xpubs: [xpub],
+          configuration,
+        },
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { setupSuccessful } = res.data;
+    if (!setupSuccessful) {
+      throw new Error('Donation account setup failed');
+    }
   };
 
   public deriveReceivingAddress = async (
