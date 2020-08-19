@@ -354,7 +354,7 @@ class SweepFunds extends Component<SweepFundsPropsTypes, SweepFundsStateTypes> {
             </View>
             <View style={styles.confirmView}>
               <TouchableOpacity
-                onPress={() => {}}
+                onPress={() => {this.props.navigation.navigate('SweepFundUseExitKey')}}
                 style={{
                   ...styles.confirmButtonView,
                   backgroundColor: Colors.blue,

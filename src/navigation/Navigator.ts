@@ -92,6 +92,8 @@ import RestoreWithoutICloud from "../pages/RestoreHexaWithKeeper/RestoreWithoutI
 import SettingsContents from '../pages/SettingsContents';
 import SweepFunds from '../pages/SweepFunds/SweepFunds';
 import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount';
+import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey';
+import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -230,6 +232,8 @@ const HomeNavigator = createStackNavigator(
     SettingsContents,
     SweepFunds,
     SweepFundsEnterAmount,
+    SweepFundUseExitKey,
+    SweepConfirmation,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansRegular
   },
   modalInfoText: {
     color: Colors.textColorGrey,

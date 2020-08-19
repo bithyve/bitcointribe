@@ -20,7 +20,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomInfoBox from './BottomInfoBox';
-import QRCodeThumbnail from '../pages/Accounts/QRCodeThumbnail';
 import { SECURE_ACCOUNT } from '../common/constants/serviceTypes';
 import { useSelector } from 'react-redux';
 import { RNCamera } from 'react-native-camera';
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.FiraSansRegular,
   },
   modalContentView: {
     flex: 1,

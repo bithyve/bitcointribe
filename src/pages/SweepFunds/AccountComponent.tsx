@@ -52,11 +52,23 @@ function AccountComponent(props) {
               paddingBottom: 3,
             }}
           >
-            Sending to:
+            {props.textHeading ? props.textHeading : 'Sending to: '}
           </Text>
           <Text style={styles.contactNameText} numberOfLines={1}>
             {props.item.account_name}
           </Text>
+          {props.item.hasOwnProperty('balance') ? (
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansMediumItalic,
+                fontSize: RFValue(10),
+                paddingTop: 3,
+              }}
+            >
+             {props.item.balance + 'sats'}
+            </Text>
+          ) : null}
         </View>
        
       </View>
