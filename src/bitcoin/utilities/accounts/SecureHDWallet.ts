@@ -11,11 +11,13 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  DonationDerivativeAccount,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { SIGNING_AXIOS } from '../../../services/api';
 
@@ -46,7 +48,8 @@ export default class SecureHDWallet extends Bitcoin {
     transactionDetails: [],
   };
   public feeRates: any;
-  public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
+  public derivativeAccounts: DerivativeAccounts | DonationDerivativeAccount =
+    config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
 
   private lastBalTxSync: number = 0;
@@ -484,8 +487,18 @@ export default class SecureHDWallet extends Bitcoin {
     if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccounts[accountType][accountNumber]) {
-      this.generateDerivativeXpub(accountType, accountNumber);
+    switch (accountType) {
+      case DONATION_ACCOUNT:
+        if (!this.derivativeAccounts[accountType][accountNumber])
+          throw new Error(`Donation account(${accountNumber}) doesn't exist`);
+
+        break;
+
+      default:
+        if (!this.derivativeAccounts[accountType][accountNumber])
+          this.generateDerivativeXpub(accountType, accountNumber);
+
+        break;
     }
 
     // receiving address updates during balance sync
@@ -851,6 +864,27 @@ export default class SecureHDWallet extends Bitcoin {
       );
       throw new Error('Fetching balance-txn by addresses failed');
     }
+  };
+
+  public setupDonationAccount = async (
+    accountType: string,
+    accountNumber: number = 1,
+    donee: string,
+    description: string,
+    config: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ) => {
+    const xpub = this.generateDerivativeXpub(accountType, accountNumber);
+    this.derivativeAccounts[accountType][accountNumber] = {
+      ...this.derivativeAccounts[accountType][accountNumber],
+      donee,
+      description,
+      config,
+    };
+
+    return xpub;
   };
 
   public setupSecureAccount = async (): Promise<{
