@@ -172,7 +172,7 @@ class HexaConfig {
     },
   };
 
-  DONATION_ACCOUNTS: DonationDerivativeAccount = {
+  DONATION_ACCOUNT: DonationDerivativeAccount = {
     series: parseInt(Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10),
@@ -183,7 +183,7 @@ class HexaConfig {
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
-    DONATION_ACCOUNTS: this.DONATION_ACCOUNTS,
+    DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
   constructor(env: string) {

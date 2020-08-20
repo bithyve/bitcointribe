@@ -12,6 +12,7 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   DonationDerivativeAccount,
+  DonationDerivativeAccountElements,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import {
@@ -875,15 +876,18 @@ export default class SecureHDWallet extends Bitcoin {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
-  ) => {
+  ): Promise<{ setupSuccessful: Boolean }> => {
     if (this.derivativeAccounts[accountType][accountNumber]) {
       return;
     }
 
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
+    const id = crypto.createHash('sha256').update(xpub).digest('hex');
+
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,
+      id,
       description,
       configuration,
     };
@@ -892,11 +896,11 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       res = await BH_AXIOS.post('setupDonationAccount', {
         HEXA_ID,
+        donationId: id,
         walletID: this.getWalletId().walletId,
         details: {
           donee,
           description,
-          id: crypto.createHash('sha256').update(xpub).digest('hex'),
           xpubs: [xpub, this.xpubs.secondary, this.xpubs.bh],
           configuration,
         },
@@ -910,6 +914,8 @@ export default class SecureHDWallet extends Bitcoin {
     if (!setupSuccessful) {
       throw new Error('Donation account setup failed');
     }
+
+    return { setupSuccessful };
   };
 
   public setupSecureAccount = async (): Promise<{
@@ -948,6 +954,42 @@ export default class SecureHDWallet extends Bitcoin {
         );
       }
     }
+  };
+
+  public updateDonationPreferences = async (
+    accountNumber: number,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<{ updated: Boolean }> => {
+    const donationAcc: DonationDerivativeAccountElements = this
+      .derivativeAccounts[DONATION_ACCOUNT][accountNumber];
+    if (!donationAcc) {
+      throw new Error(
+        `Donation account do not exist (instance id:${accountNumber})`,
+      );
+    }
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('updatePreferences', {
+        HEXA_ID,
+        donationId: donationAcc.id,
+        walletID: this.getWalletId().walletId,
+        configuration,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { updated } = res.data;
+    if (!updated) {
+      throw new Error('Preference updation failed');
+    }
+
+    return { updated };
   };
 
   public resetTwoFA = async (

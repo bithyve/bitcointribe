@@ -499,13 +499,15 @@ export default class SecureAccount {
   ): Promise<
     | {
         status: number;
-        data: void;
+        data: {
+          setupSuccessful: Boolean;
+        };
         err?: undefined;
         message?: undefined;
       }
     | {
         status: number;
-        err: string;
+        err: any;
         message: string;
         data?: undefined;
       }
@@ -526,6 +528,45 @@ export default class SecureAccount {
         status: 0o3,
         err: err.message,
         message: 'Failed to setup donation account',
+      };
+    }
+  };
+
+  public updateDonationPreferences = async (
+    accountNumber: number,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.updateDonationPreferences(
+          accountNumber,
+          configuration,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to update donation account preferences',
       };
     }
   };
