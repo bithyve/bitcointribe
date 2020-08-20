@@ -1402,24 +1402,14 @@ class SendToContact extends Component<
                 (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
               }}
               onPressConfirm={(type) => {
-                if (transfer.details && transfer.details.length) {
-                  for (let i = 0; i < transfer.details.length; i++) {
-                    if (
-                      transfer.details[i].selectedContact.id ==
-                      selectedContact.id
-                    ) {
-                      this.props.removeTransferDetails(
-                        serviceType,
-                        transfer.details[i],
-                      );
-                      break;
-                    }
-                  }
-                  this.props.addTransferDetails(type, {
+                if (
+                  accounts[type].transfer.details &&
+                  accounts[type].transfer.details.length
+                ) {
+                  // do nothing (transfer details already exist)
+                } else {
+                  addTransferDetails(type, {
                     selectedContact,
-                    bitcoinAmount,
-                    currencyAmount,
-                    note,
                   });
                 }
                 (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
