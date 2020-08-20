@@ -80,6 +80,7 @@ import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
+import NewOwnQuestions from '../pages/NewOwnQuestions';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -98,6 +99,7 @@ const SetupNavigator = createStackNavigator(
     RecoveryCommunication,
     ShareRecoveryOTP,
     RecoveryQrScanner: QrScanner,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -205,6 +207,7 @@ const HomeNavigator = createStackNavigator(
     ContactDetailsNew,
     Receive,
     PairNewWallet,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
