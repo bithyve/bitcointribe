@@ -76,33 +76,10 @@ function HealthCheckSecurityQuestion(props) {
     }
   }, [answer]);
 
-  const onQuestionSelect = value => {
-    if (securityQuestion != value.question) {
-      if (QuestionCounter < 2) {
-        QuestionCounter++;
-        setQuestionCounter(QuestionCounter);
-      } else {
-        setDropdownBoxValue(
-          dropdownBoxList[
-            dropdownBoxList.findIndex(tmp => tmp.question == securityQuestion)
-          ],
-        );
-        setDropdownBoxOpenClose(false);
-        setErrorText('');
-        return;
-      }
-      setErrorText('Wrong question selected');
-    } else {
-      setErrorText('');
-    }
-    setDropdownBoxValue(value);
-    setDropdownBoxOpenClose(false);
-  };
-
   useEffect(()=>{
-    if((!errorText && !answer && answer && dropdownBoxValue.id) || (dropdownBoxValue.id && answer)) setIsDisabled(false)
-    else setIsDisabled(true)
-  }, [answer, errorText, dropdownBoxValue.id])
+    if ((!errorText && !answer && answer) || answer) setIsDisabled(false);
+    else setIsDisabled(true);
+  }, [answer, errorText])
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -134,86 +111,14 @@ function HealthCheckSecurityQuestion(props) {
               </TouchableOpacity>
           </View>
           <ScrollView style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
-            <AppBottomSheetTouchableWrapper
-              activeOpacity={10}
-              style={[
-                dropdownBoxOpenClose
-                  ? styles.dropdownBoxOpened
-                  : styles.dropdownBox,
-                {
-                  borderColor:
-                    errorText == 'Wrong question selected'
-                      ? Colors.red
-                      : Colors.borderColor,
-                },
-              ]}
-              onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-              }}
-            >
-              <Text
-                style={{
-                  ...styles.dropdownBoxText,
-                  color: dropdownBoxValue.question
-                    ? Colors.textColorGrey
-                    : Colors.borderColor,
-                }}
-              >
-                {dropdownBoxValue.question
-                  ? dropdownBoxValue.question
-                  : 'Select Security Question'}
-              </Text>
-              <Ionicons
-                style={{ marginLeft: 'auto' }}
-                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-                size={15}
-                color={Colors.borderColor}
-              />
-            </AppBottomSheetTouchableWrapper>
-            <View style={{ position: 'relative' }}>
-              {dropdownBoxOpenClose && (
-                <View style={styles.dropdownBoxModal}>
-                  <ScrollView>
-                    {dropdownBoxList.map((value, index) => (
-                      <AppBottomSheetTouchableWrapper
-                        onPress={() => onQuestionSelect(value)}
-                        style={{
-                          ...styles.dropdownBoxModalElementView,
-                          borderTopLeftRadius: index == 0 ? 10 : 0,
-                          borderTopRightRadius: index == 0 ? 10 : 0,
-                          borderBottomLeftRadius:
-                            index == dropdownBoxList.length - 1 ? 10 : 0,
-                          borderBottomRightRadius:
-                            index == dropdownBoxList.length - 1 ? 10 : 0,
-                          paddingTop: index == 0 ? 5 : 0,
-                          backgroundColor:
-                            dropdownBoxValue.id == value.id
-                              ? Colors.lightBlue
-                              : Colors.white,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color:
-                              dropdownBoxValue.id == value.id
-                                ? Colors.blue
-                                : Colors.black,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(12),
-                          }}
-                        >
-                          {value.question}
-                        </Text>
-                      </AppBottomSheetTouchableWrapper>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
+            <View style={styles.dropdownBox}>
+              <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
+            </View>
+            <View style={{}}>
               <TextInput
                 style={{
                   ...styles.inputBox,
                   width: '100%',
-                  marginTop: 15,
                   marginBottom: hp('1%'),
                   borderColor:
                     errorText == 'Answer is incorrect'
@@ -227,26 +132,26 @@ function HealthCheckSecurityQuestion(props) {
                 autoCompleteType="off"
                 autoCorrect={false}
                 autoCapitalize="none"
-                onKeyPress={event => {
+                onKeyPress={(event) => {
                   setBackspace(event);
                 }}
-                onChangeText={text => {
-                  text = text.replace(/[^a-z]/g, '')
+                onChangeText={(text) => {
+                  
                   setAnswer(text);
                 }}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-                onSubmitEditing={event => setConfirm()}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                onSubmitEditing={(event) => setConfirm()}
                 onFocus={() => {
                   if (Platform.OS == 'ios') {
                     props.bottomSheetRef.current.snapTo(2);
                   }
-                  setDropdownBoxOpenClose(false);
                 }}
                 onBlur={() => {
                   if (Platform.OS == 'ios') {
                     props.bottomSheetRef.current.snapTo(1);
                   }
-                  setDropdownBoxOpenClose(false);
                 }}
               />
               {errorText ? (
@@ -261,10 +166,6 @@ function HealthCheckSecurityQuestion(props) {
                   {errorText}
                 </Text>
               ) : null}
-              {/* <Text style={styles.modalInfoText}>
-                Security question and answer is never stored anywhere{'\n'}and
-                even your contacts don’t know this answer
-              </Text> */}
             </View>
           </ScrollView>
           
@@ -357,6 +258,7 @@ const styles = StyleSheet.create({
   dropdownBoxText: {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13),
+    color: Colors.black,
   },
   dropdownBoxModal: {
     borderRadius: 10,
@@ -382,14 +284,9 @@ const styles = StyleSheet.create({
   },
   dropdownBox: {
     marginTop: hp('2%'),
-    flexDirection: 'row',
-    borderWidth: 0.5,
-    borderRadius: 10,
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    alignItems: 'center',
-    backgroundColor: Colors.white,
   },
   dropdownBoxOpened: {
     marginTop: hp('2%'),
