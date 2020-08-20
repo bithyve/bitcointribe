@@ -28,6 +28,7 @@ import RadioButton from '../../components/RadioButton';
 import idx from 'idx';
 import ModalHeader from '../../components/ModalHeader';
 import CustomPriorityContent from '../../components/CustomPriorityContent';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 interface SweepConfirmationStateTypes {
   accountData: any;
@@ -219,6 +220,7 @@ class SweepConfirmation extends Component<
             })}
           </ScrollView>
         </View>
+        <ScrollView style={{marginBottom: 20}}>
         <View style={styles.availableToSpendView}>
           <Text style={styles.sweepingFromText}>Sweeping From: </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -265,15 +267,15 @@ class SweepConfirmation extends Component<
               Set priority for your transaction
             </Text> */}
             <View style={styles.priorityTableHeadingContainer}>
-              <View style={{ paddingLeft: 10 }}>
-                <Text style={styles.tableHeadingText}>Priority</Text>
+            <View style={styles.priorityDataContainer}>
+                <Text style={{...styles.tableHeadingText, paddingLeft: 15}}>Priority</Text>
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text style={styles.tableHeadingText}>Arrival Time</Text>
               </View>
               <View style={styles.priorityDataContainer}>
                 <Text
-                  style={{ ...styles.tableHeadingText, textAlign: 'center' }}
+                  style={{...styles.tableHeadingText, paddingRight: 20}}
                 >
                   Fee
                 </Text>
@@ -284,6 +286,7 @@ class SweepConfirmation extends Component<
                 <View
                   style={{
                     ...styles.priorityDataContainer,
+                    flex: 1,
                     justifyContent: 'flex-start',
                   }}
                 >
@@ -294,16 +297,17 @@ class SweepConfirmation extends Component<
                     isChecked={this.state.sliderValueText.includes('High')}
                     onpress={() => this.onPrioritySelect('High Fee')}
                   />
-                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10,}}>
                     High
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={{...styles.priorityDataContainer, flex:1}}>
                   <Text style={styles.priorityTableText}>
                   {'10 - 20 minutes'}
                     </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={{...styles.priorityDataContainer , flex:1,
+                justifyContent: 'flex-end', paddingRight: 20}}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -319,6 +323,7 @@ class SweepConfirmation extends Component<
               <View
                 style={{
                   ...styles.priorityDataContainer,
+                  flex:1,
                   justifyContent: 'flex-start',
                 }}
               >
@@ -329,11 +334,11 @@ class SweepConfirmation extends Component<
                   isChecked={this.state.sliderValueText.includes('Medium')}
                   onpress={() => this.onPrioritySelect('Medium Fee')}
                 />
-                <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                <Text style={{ ...styles.priorityTableText, marginLeft: 10}}>
                   Medium
                 </Text>
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={{...styles.priorityDataContainer, flex:1}}>
                 {!this.isSendMax ? (
                     <Text style={styles.priorityTableText}>
                       {'10 - 20 minutes'}
@@ -342,7 +347,7 @@ class SweepConfirmation extends Component<
                   <Text>120 - 130</Text>
                 )}
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={{...styles.priorityDataContainer , flex:1, justifyContent: 'flex-end', paddingRight: 20}}>
                 <Text style={styles.priorityTableText}>
                   {this.convertBitCoinToCurrency(
                     transfer.stage1 && transfer.stage1.txPrerequisites
@@ -364,6 +369,7 @@ class SweepConfirmation extends Component<
                 <View
                   style={{
                     ...styles.priorityDataContainer,
+                    flex:1,
                     justifyContent: 'flex-start',
                   }}
                 >
@@ -374,16 +380,16 @@ class SweepConfirmation extends Component<
                     isChecked={this.state.sliderValueText.includes('Low')}
                     onpress={() => this.onPrioritySelect('Low Fee')}
                   />
-                  <Text style={{ ...styles.priorityTableText, marginLeft: 10 }}>
+                  <Text style={{ ...styles.priorityTableText, marginLeft: 10}}>
                     Low
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={{...styles.priorityDataContainer , flex:1}}>
                   <Text style={styles.priorityTableText}>
                       {'10 - 20 minutes'}
                     </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={{...styles.priorityDataContainer , flex:1, justifyContent: 'flex-end', paddingRight: 20}}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -478,6 +484,49 @@ class SweepConfirmation extends Component<
               </View>
             </TouchableOpacity>
           </View>
+          </ScrollView>
+          <View style={{marginTop: 'auto'}}>
+          <BottomInfoBox
+                backgroundColor={Colors.backgroundColor1}
+                title={'Note'}
+                infoText={
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+                }
+              />
+              <View
+          style={{
+            flexDirection: "row",
+            marginTop: "auto",
+            alignItems: "center",
+            marginBottom: hp('2%')
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+            }}
+            style={{ ...styles.successModalButtonView }}
+          >
+            {/* {props.loading && props.loading==true ? 
+              <ActivityIndicator size="small" />: */}
+               <Text style={styles.proceedButtonText}>{'Confirm & Send'}</Text>
+            {/* } */}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={{
+              height: wp("13%"),
+              width: wp("35%"),
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+              Back
+            </Text>
+          </TouchableOpacity>
+        </View>
+        </View>
+        
           <BottomSheet
           onCloseStart={() => {
             (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
@@ -531,6 +580,25 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
+  successModalButtonView: {
+    height: wp("13%"),
+    width: wp("35%"),
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    alignSelf: "center",
+    marginLeft: wp("8%")
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium
+  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
@@ -662,6 +730,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   transactionPriorityView: {
+    flex: 1,
     marginRight: wp('6%'),
     marginLeft: wp('6%'),
     marginTop: hp('2%'),
@@ -703,13 +772,12 @@ const styles = StyleSheet.create({
     color: Colors.greyTextColor,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansMedium,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   priorityTableText: {
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
     color: Colors.greyTextColor,
-    textAlign: 'center',
   },
   priorityTableHeadingContainer: {
     flexDirection: 'row',
@@ -722,15 +790,14 @@ const styles = StyleSheet.create({
   },
   priorityTableContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center',
     borderBottomWidth: 0.5,
     borderColor: Colors.borderColor,
     marginTop: hp('1.5%'),
     paddingBottom: hp('1.5%'),
   },
   priorityDataContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

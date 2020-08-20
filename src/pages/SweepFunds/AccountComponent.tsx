@@ -66,7 +66,7 @@ function AccountComponent(props) {
                 paddingTop: 3,
               }}
             >
-             {props.item.balance + 'sats'}
+             {props.item.balance + ' sats'}
             </Text>
           ) : null}
         </View>
