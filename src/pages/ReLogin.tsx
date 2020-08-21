@@ -23,7 +23,7 @@ export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  
+
   function onPressNumber(text) {
     let tmpPasscode = passcode;
     if (passcode.length < 4) {
@@ -44,7 +44,7 @@ export default function Login(props) {
   );
 
   if (reLogin) {
-    props.navigation.pop();
+    props.navigation.pop(2);
     dispatch(switchReLogin(false, true));
   }
 
@@ -67,7 +67,7 @@ export default function Login(props) {
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View style={{alignSelf:'baseline'}}>
+            <View style={{ alignSelf: 'baseline' }}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -101,8 +101,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -130,8 +130,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -159,8 +159,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -188,18 +188,18 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
               {checkAuth ? (
-            <View style={{marginLeft: 'auto'}}>
-              <Text style={styles.errorText}>
-              Incorrect passcode, try again!
+                <View style={{ marginLeft: 'auto' }}>
+                  <Text style={styles.errorText}>
+                    Incorrect passcode, try again!
               </Text>
-            </View>
-          ) : null}
+                </View>
+              ) : null}
             </View>
           </View>
           {passcode.length == 4 ? (

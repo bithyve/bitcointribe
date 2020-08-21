@@ -80,6 +80,8 @@ import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
+import Intermediate from '../pages/Intermediate';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -139,6 +141,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    Intermediate,
     Accounts,
     ManageBackup,
     SecondaryDevice,

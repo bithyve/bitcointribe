@@ -41,49 +41,31 @@ export default function Launch(props) {
   }, []);
 
 
-  // useEffect(() => {
-  //   AppState.addEventListener("change", handleAppStateChange);
-  // }, []);
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+  }, []);
 
 
 
-  // // Commented for now
-  // let isContactOpen = false;
-  // let isCameraOpen = false;
-  // const handleAppStateChange = async (nextAppState) => {
-  //   // no need to trigger login screen if accounts are not synced yet
-  //   // which means user hasn't logged in yet
-  //   let walletExists = await AsyncStorage.getItem("walletExists")
-  //   if (!walletExists) {
-  //     return
-  //   }
+  // Commented for now
+  const handleAppStateChange = async (nextAppState) => {
+    // no need to trigger login screen if accounts are not synced yet
+    // which means user hasn't logged in yet
+    let walletExists = await AsyncStorage.getItem("walletExists")
+    if (!walletExists) {
+      return
+    }
 
-  //   AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
-  //     (response) => {
-  //       isContactOpen = JSON.parse(response[0][1]);
-  //       isCameraOpen = JSON.parse(response[1][1]);
-  //     },
-  //   );
-  //   let keyArray = [
-  //     ['isCameraOpen', JSON.stringify(true)],
-  //     ['isContactOpen', JSON.stringify(true)],
-  //   ];
-  //   if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
-  //   if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
-  //   if (isContactOpen || isContactOpen) {
-  //     AsyncStorage.multiSet(keyArray, () => { });
-  //     return;
-  //   }
-  //   if (Platform.OS === 'android' && nextAppState === 'background') {
-  //     props.navigation.navigate('ReLogin');
-  //     return
-  //   }
+    if (Platform.OS === 'android' && nextAppState === 'background') {
+      props.navigation.navigate('Intermediate');
+      return
+    }
 
-  //   if (Platform.OS === 'ios' && (nextAppState === 'inactive' || nextAppState == 'background')) {
-  //     props.navigation.navigate('ReLogin');
-  //     return
-  //   }
-  // };
+    if (Platform.OS === 'ios' && (nextAppState === 'inactive' || nextAppState == 'background')) {
+      props.navigation.navigate('Intermediate');
+      return
+    }
+  };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -145,8 +127,7 @@ export default function Launch(props) {
                 if (splits[3] !== config.APP_STAGE) {
                   Alert.alert(
                     'Invalid deeplink',
-                    `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                    splits[3]
+                    `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
                     }`,
                   );
                 } else {
