@@ -41,11 +41,12 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
 
     handleAppStateChange = async (nextAppState) => {
+        const TIME_OUT = 15000
         if (Platform.OS === 'ios' && nextAppState === 'active') {
             let now: any = new Date()
             let diff = Math.abs(now - this.props.lastSeen)
             const { canLock } = this.state
-            if (diff > 3000) {
+            if (diff > TIME_OUT) {
                 if (canLock) {
                     this.setState({
                         canLock: false
