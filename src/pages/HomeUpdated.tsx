@@ -2237,7 +2237,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }}
         >
           <HomeHeader
-            onPressNotifications={()=>navigation.navigate('RestoreWithoutICloud')}
+            onPressNotifications={()=>navigation.navigate('RestoreWithICloud')}
             // onPressNotifications={this.onPressNotifications}
             notificationData={notificationData}
             walletName={walletName}

@@ -94,6 +94,7 @@ import SweepFunds from '../pages/SweepFunds/SweepFunds';
 import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount';
 import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey';
 import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation';
+import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -113,7 +114,6 @@ const SetupNavigator = createStackNavigator(
     ShareRecoveryOTP,
     NewOwnQuestions,
     RecoveryQrScanner: QrScanner,
-    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -235,6 +235,7 @@ const HomeNavigator = createStackNavigator(
     SweepFundsEnterAmount,
     SweepFundUseExitKey,
     SweepConfirmation,
+    ScanRecoveryKey,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

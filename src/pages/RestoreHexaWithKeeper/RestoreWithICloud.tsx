@@ -8,7 +8,8 @@ import {
   StatusBar,
   Image,
   ScrollView,
-  Platform
+  Platform,
+  ImageBackground,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -34,10 +35,13 @@ import RestoreFromICloud from './RestoreFromICloud';
 import DeviceInfo from 'react-native-device-info';
 import RestoreSuccess from './RestoreSuccess';
 import ICloudBackupNotFound from './ICloudBackupNotFound';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { requestTimedout } from '../../store/utils/utilities';
+import RestoreWallet from './RestoreWallet';
 
 interface RestoreWithICloudStateTypes {
-  levelData: any;
   selectedIds: any[];
+  listData: any[];
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -52,33 +56,44 @@ class RestoreWithICloud extends Component<
     super(props);
     this.state = {
       selectedIds: [],
-      levelData: [
+      listData: [
         {
-          type: 'health',
-          title: 'Show Backup Health',
-          info: 'Keep an eye on your wallet health',
+          type: 'contact',
+          title: 'Jessica P.',
+          info: '+34 000 000 0000',
+          time: '2 weeks',
+          status: 'waiting',
+          image: require('../../assets/images/icons/pexels-photo.png'),
           id: 1,
         },
         {
-          type: 'balance',
-          title: 'Show Balances',
-          info: 'View balances of your wallet accounts',
-          id: 3,
+          type: 'device',
+          title: 'Keeper Contact',
+          info: 'iMac Pro',
+          time: '2 weeks',
+          status: 'received',
+          image: null,
+          id: 2,
         },
         {
-          type: 'receive',
-          title: 'Receive Bitcoins',
-          info: 'Generate receive bitcoin address',
-          id: 4,
+          type: 'contact',
+          title: 'Rachel Z.',
+          info: 'zaner@bithyve.com',
+          time: '2 weeks',
+          status: 'waiting',
+          image: null,
+          id: 3,
         },
       ],
     };
   }
+  // image: require('../../assets/images/icons/icon_contact.png'),
+  // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
   componentDidMount = () => {};
 
   render() {
-    const { levelData, selectedIds } = this.state;
+    const { listData, selectedIds } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -108,7 +123,116 @@ class RestoreWithICloud extends Component<
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-         
+          {listData.map((item, index) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  ...styles.cardsView,
+                  borderBottomWidth: index == 2 ? 0 : 4,
+                }}
+              >
+                {item.type == 'contact' && item.image ? (
+                  <View
+                    style={{
+                      borderRadius: wp('15%') / 2,
+                      borderColor: Colors.white,
+                      borderWidth: 1,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowOffset: {
+                        width: 2,
+                        height: 2,
+                      },
+                      shadowOpacity: 0.8,
+                      shadowColor: Colors.textColorGrey,
+                      shadowRadius: 5,
+                      elevation: 10,
+                      marginRight: 15,
+                      marginLeft: 5,
+                    }}
+                  >
+                    <Image
+                      source={item.image}
+                      style={{
+                        width: wp('15%'),
+                        height: wp('15%'),
+                        borderRadius: wp('15%') / 2,
+                      }}
+                    />
+                  </View>
+                ) : (
+                  <ImageBackground
+                    source={require('../../assets/images/icons/Ellipse.png')}
+                    style={{ ...styles.cardsImageView, marginRight: 10 }}
+                  >
+                    <Image
+                      source={
+                        item.type == 'contact'
+                          ? require('../../assets/images/icons/icon_contact.png')
+                          : item.type == 'device'
+                          ? require('../../assets/images/icons/icon_secondarydevice.png')
+                          : require('../../assets/images/icons/icon_contact.png')
+                      }
+                      style={styles.cardImage}
+                    />
+                  </ImageBackground>
+                )}
+                <View style={{}}>
+                  <Text
+                    style={{
+                      ...styles.cardsInfoText,
+                      fontSize: RFValue(18),
+                    }}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text style={styles.cardsInfoText}>{item.info}</Text>
+                  <Text style={styles.cardsInfoText}>
+                    Last backup {item.time} ago
+                  </Text>
+                </View>
+                {item.status == 'received' ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    <View
+                      style={{
+                        ...styles.statusTextView,
+                        backgroundColor: Colors.lightGreen,
+                      }}
+                    >
+                      <Text style={styles.statusText}>Key Received</Text>
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: Colors.lightGreen,
+                        width: wp('5%'),
+                        height: wp('5%'),
+                        borderRadius: wp('5%') / 2,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginLeft: 5,
+                      }}
+                    >
+                      <AntDesign
+                        name={'check'}
+                        size={RFValue(10)}
+                        color={Colors.darkGreen}
+                      />
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.statusTextView}>
+                    <Text style={styles.statusText}>Waiting for Key</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
         <View
           style={{
@@ -127,7 +251,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <TouchableOpacity
-            onPress={() => (this.refs.RestoreSuccess as any).snapTo(1)}
+            onPress={() => (this.refs.RestoreWallet as any).snapTo(1)}
             style={styles.buttonInnerView}
           >
             <Image
@@ -142,7 +266,7 @@ class RestoreWithICloud extends Component<
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              (this.refs.BackupNotFound as any).snapTo(1)
+              (this.refs.BackupNotFound as any).snapTo(1);
             }}
           >
             <Image
@@ -165,16 +289,18 @@ class RestoreWithICloud extends Component<
             <RestoreFromICloud
               modalRef={this.refs.RestoreFromICloud}
               onPressProceed={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0)
+                (this.refs.RestoreFromICloud as any).snapTo(0);
               }}
               onPressBack={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0)
+                (this.refs.RestoreFromICloud as any).snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => (this.refs.RestoreFromICloud as any).snapTo(0)}
+              onPressHeader={() =>
+                (this.refs.RestoreFromICloud as any).snapTo(0)
+              }
             />
           )}
         />
@@ -191,10 +317,10 @@ class RestoreWithICloud extends Component<
             <RestoreSuccess
               modalRef={this.refs.RestoreSuccess}
               onPressProceed={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0)
+                (this.refs.RestoreSuccess as any).snapTo(0);
               }}
               onPressBack={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0)
+                (this.refs.RestoreSuccess as any).snapTo(0);
               }}
             />
           )}
@@ -217,16 +343,42 @@ class RestoreWithICloud extends Component<
             <ICloudBackupNotFound
               modalRef={this.refs.BackupNotFound}
               onPressProceed={() => {
-                (this.refs.BackupNotFound as any).snapTo(0)
+                (this.refs.BackupNotFound as any).snapTo(0);
               }}
               onPressBack={() => {
-                (this.refs.BackupNotFound as any).snapTo(0)
+                (this.refs.BackupNotFound as any).snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => (this.refs.BackupNotFound as any).snapTo(0)}
+            />
+          )}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'RestoreWallet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('70%'),
+          ]}
+          renderContent={() => (
+            <RestoreWallet
+              modalRef={this.refs.RestoreWallet}
+              onPressProceed={() => {
+                (this.refs.RestoreWallet as any).snapTo(0);
+              }}
+              onPressBack={() => {
+                (this.refs.RestoreWallet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => (this.refs.RestoreWallet as any).snapTo(0)}
             />
           )}
         />
@@ -297,5 +449,44 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
+  },
+  cardsInfoText: {
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
+  },
+  cardsView: {
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: Colors.backgroundColor,
+  },
+  cardsImageView: {
+    width: wp('20%'),
+    height: wp('20%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardImage: {
+    width: wp('7%'),
+    height: wp('7%'),
+    resizeMode: 'contain',
+    marginBottom: wp('1%'),
+  },
+  statusTextView: {
+    // padding: 5,
+    height: wp('5%'),
+    backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginLeft: 'auto',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  statusText: {
+    fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
   },
 });

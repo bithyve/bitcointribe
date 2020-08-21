@@ -1,11 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform
-} from 'react-native';
+import React from 'react';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -15,40 +9,47 @@ import {
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
-export default function WalletName(props) {
-    let [walletName, setWalletName] = useState('');
+export default function RestoreWallet(props) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
-        <Text style={styles.headerTitleText}>Enter your Wallet’s Name</Text>
+        <Text style={styles.headerTitleText}>
+            Restore Hexa Wallet
+        </Text>
         <Text style={styles.headerInfoText}>
-          Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam
-          nonumy eirmod
+            Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod
         </Text>
       </View>
-      <View style={{ paddingTop: wp('10%'), paddingBottom: wp('10%'), justifyContent: 'center', alignItems: 'center' }}>
-        <TextInput
-          placeholder={'Enter Wallet Name'}
-          placeholderTextColor={Colors.borderColor}
-          value={walletName}
-          style={styles.inputStyle}
-          onChangeText={(text)=>{setWalletName(text)}}
-          onFocus={() => {
-            if (Platform.OS == 'ios') {
-              props.modalRef.snapTo(2);
-            }
-          }}
-          onBlur={() => {
-            if (Platform.OS == 'ios') {
-              props.modalRef.snapTo(1);
-            }
-          }}
-        />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={styles.greyBox}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/icon_wallet.png')}
+              style={styles.greyBoxImage}
+            />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Text style={styles.greyBoxText}>Pam’s Wallet</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                marginTop: hp('1%'),
+              }}
+            >
+              <Image
+                style={styles.cardBitCoinImage}
+                source={require('../../assets/images/icons/icon_bitcoin_dark_grey.png')}
+              />
+              <Text style={styles.cardAmountTextGrey}>{'2,065,000'}</Text>
+              <Text style={styles.cardAmountUnitText}>{'sats'}</Text>
+            </View>
+          </View>
+        </View>
       </View>
       <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.
         </Text>
       </View>
       <View style={styles.bottomButtonsView}>
@@ -56,14 +57,7 @@ export default function WalletName(props) {
           onPress={() => props.onPressProceed()}
           style={styles.successModalButtonView}
         >
-          <Text
-            style={{
-              ...styles.proceedButtonText,
-              color: Colors.white,
-            }}
-          >
-            Continue
-          </Text>
+          <Text style={styles.proceedButtonText}>Restore</Text>
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressBack()}
@@ -75,7 +69,7 @@ export default function WalletName(props) {
               color: Colors.blue,
             }}
           >
-            Forgot?
+            Back
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -126,6 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: wp('8%'),
     marginLeft: wp('8%'),
+    marginTop: 'auto',
   },
   successModalButtonView: {
     height: wp('13%'),
@@ -146,13 +141,45 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
-  inputStyle: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    height: 50,
+  greyBox: {
     width: wp('90%'),
-    paddingLeft: wp('2%'),
-    paddingRight: wp('2%'),
+    borderRadius: 10,
+    backgroundColor: Colors.backgroundColor1,
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  greyBoxImage: {
+    width: wp('13%'),
+    height: wp('13%'),
+  },
+  greyBoxText: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(20),
+  },
+  cardAmountUnitText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11),
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
+  },
+  cardAmountTextGrey: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(18),
+    marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(18),
+  },
+  cardBitCoinImage: {
+    width: wp('3%'),
+    height: wp('3%'),
+    marginRight: 5,
+    resizeMode: 'contain',
+    marginBottom: wp('0.7%'),
   },
 });
