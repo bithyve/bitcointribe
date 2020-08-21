@@ -10,7 +10,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function RestoreFromICloud(props) {
+export default function DeleteRecoveryKeys(props) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
@@ -18,36 +18,49 @@ export default function RestoreFromICloud(props) {
         <Text style={styles.headerInfoText}>{props.subText}</Text>
       </View>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View style={styles.greyBox}>
-          <View
-            style={styles.greyBoxImage}
-          >
-            <MaterialCommunityIcons
-              name={'restore'}
-              size={RFValue(25)}
-              color={Colors.blue}
-            />
-          </View>
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.greyBoxText}>{props.cardInfo}</Text>
-            <Text
-              style={{
-                ...styles.greyBoxText,
-                fontSize: RFValue(20),
-              }}
-            >
-              {props.cardTitle}
-            </Text>
-            <Text
-              style={{
-                ...styles.greyBoxText,
-                fontSize: RFValue(10),
-              }}
-            >
-              {props.cardSubInfo}
-            </Text>
-          </View>
-        </View>
+        {props.dataList.length
+          ? props.dataList.map((item) => (
+              <View style={styles.greyBox}>
+                <ImageBackground
+                  source={require('../../assets/images/icons/Ellipse.png')}
+                  style={{ ...styles.cardsImageView, marginRight: 10 }}
+                >
+                  <Image
+                    source={
+                      item.type == 'contact'
+                        ? require('../../assets/images/icons/icon_contact.png')
+                        : item.type == 'device'
+                        ? require('../../assets/images/icons/icon_secondarydevice.png')
+                        : require('../../assets/images/icons/icon_contact.png')
+                    }
+                    style={styles.cardImage}
+                  />
+                </ImageBackground>
+                <View style={{ marginLeft: 5, flex: 1 }}>
+                  <Text style={styles.greyBoxText}>
+                    {'Delete Recovery Key From'}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...styles.greyBoxText,
+                      fontSize: RFValue(20),
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={{
+                      ...styles.greyBoxText,
+                      fontSize: RFValue(10),
+                    }}
+                  >
+                    {item.typeName}
+                  </Text>
+                </View>
+              </View>
+            ))
+          : null}
       </View>
       <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>{props.info}</Text>
@@ -63,20 +76,7 @@ export default function RestoreFromICloud(props) {
               color: Colors.white,
             }}
           >
-            {props.proceedButtonText}
-          </Text>
-        </AppBottomSheetTouchableWrapper>
-        <AppBottomSheetTouchableWrapper
-          onPress={() => props.onPressBack()}
-          style={styles.transparentButtonView}
-        >
-          <Text
-            style={{
-              ...styles.proceedButtonText,
-              color: Colors.blue,
-            }}
-          >
-            {props.backButtonText}
+            {'Proceed'}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -178,5 +178,24 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
+  },
+  successModalImage: {
+    width: wp('30%'),
+    height: wp('35%'),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginRight: -5,
+  },
+  cardsImageView: {
+    width: wp('20%'),
+    height: wp('20%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardImage: {
+    width: wp('7%'),
+    height: wp('7%'),
+    resizeMode: 'contain',
+    marginBottom: wp('1%'),
   },
 });

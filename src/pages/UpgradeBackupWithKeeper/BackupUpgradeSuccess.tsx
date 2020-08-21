@@ -10,7 +10,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function RestoreFromICloud(props) {
+export default function BackupUpgradeSuccess(props) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
@@ -19,15 +19,10 @@ export default function RestoreFromICloud(props) {
       </View>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <View style={styles.greyBox}>
-          <View
-            style={styles.greyBoxImage}
-          >
-            <MaterialCommunityIcons
-              name={'restore'}
-              size={RFValue(25)}
-              color={Colors.blue}
-            />
-          </View>
+          <Image
+            source={require('../../assets/images/icons/keeper_sheild.png')}
+            style={{ width: wp('15%'), height: wp('15%'), resizeMode: 'contain' }}
+          />
           <View style={{ marginLeft: 10 }}>
             <Text style={styles.greyBoxText}>{props.cardInfo}</Text>
             <Text
@@ -79,6 +74,14 @@ export default function RestoreFromICloud(props) {
             {props.backButtonText}
           </Text>
         </AppBottomSheetTouchableWrapper>
+        <Image
+            source={
+            props.bottomImage
+                ? props.bottomImage
+                : require('../../assets/images/icons/illustration.png')
+            }
+            style={styles.successModalImage}
+        />
       </View>
     </View>
   );
@@ -178,5 +181,12 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
+  },
+  successModalImage: {
+    width: wp('30%'),
+    height: wp('35%'),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginRight: -5,
   },
 });

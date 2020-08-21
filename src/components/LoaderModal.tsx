@@ -17,10 +17,10 @@ export default function LoaderModal(props) {
             <View style={{marginTop:'auto', right:0, bottom:0, marginRight:-5, position:'absolute'}}>
                 <Image source={require('../assets/images/loader.gif')} style={ { width: wp('30%'), height: wp('35%'), marginLeft: 'auto', resizeMode: "stretch",}} />
             </View>
-            <View style={{marginLeft:wp('8%'), marginRight:wp('8%'), marginTop:wp('8%')}}>
+            <View style={{flex: 1, marginLeft:wp('8%'), marginRight:wp('8%'), marginTop:wp('8%')}}>
                 <Text style={{color:Colors.blue, fontSize:RFValue(18), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
                 <Text style={{marginRight: wp('15%'), color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
-                <Text style={{marginRight: wp('20%'), color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText2 ? props.messageText2 : ''}</Text>
+                <Text style={{marginRight: wp('20%'), color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:props.isLoader ? wp('3%') : 'auto', marginBottom:props.isLoader ? 0 : wp('7%')}}>{props.messageText2 ? props.messageText2 : ''}</Text>
             </View>
             
         </View>

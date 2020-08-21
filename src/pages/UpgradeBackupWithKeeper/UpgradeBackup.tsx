@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
+  Keyboard,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -31,26 +32,31 @@ import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
-import RestoreFromICloud from './RestoreFromICloud';
+// import RestoreFromICloud from './RestoreFromICloud';
 import DeviceInfo from 'react-native-device-info';
-import RestoreSuccess from './RestoreSuccess';
-import ICloudBackupNotFound from './ICloudBackupNotFound';
+// import RestoreSuccess from './RestoreSuccess';
+// import ICloudBackupNotFound from './ICloudBackupNotFound';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { requestTimedout } from '../../store/utils/utilities';
-import RestoreWallet from './RestoreWallet';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import RestoreFromICloud from '../RestoreHexaWithKeeper/RestoreFromICloud';
+import SetupPrimaryKeeper from '../Keeper/SetupPrimaryKeeper';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import SecurityQuestion from '../Keeper/SecurityQuestion';
+// import RestoreWallet from './RestoreWallet';
 
-interface RestoreWithICloudStateTypes {
+interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: any[];
 }
 
-interface RestoreWithICloudPropsTypes {
+interface UpgradeBackupPropsTypes {
   navigation: any;
 }
 
-class RestoreWithICloud extends Component<
-  RestoreWithICloudPropsTypes,
-  RestoreWithICloudStateTypes
+class UpgradeBackup extends Component<
+  UpgradeBackupPropsTypes,
+  UpgradeBackupStateTypes
 > {
   constructor(props) {
     super(props);
@@ -90,10 +96,12 @@ class RestoreWithICloud extends Component<
   // image: require('../../assets/images/icons/icon_contact.png'),
   // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    
+  };
 
   render() {
-    const { listData, selectedIds } = this.state;
+    const { listData, selectedIds, listToDelete } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -113,169 +121,21 @@ class RestoreWithICloud extends Component<
             </TouchableOpacity>
             <View style={{ justifyContent: 'center', width: wp('80%') }}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
-                {'Recover using keys'}
+                {'Upgrade Backup'}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit
-                amet, consetetur Lorem ipsum dolor sit amet, consetetur
+                Lorem ipsum dolor sit amet consetetur sadipscing
               </Text>
             </View>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}>
-          {listData.map((item, index) => {
-            return (
-              <TouchableOpacity
-                style={{
-                  ...styles.cardsView,
-                  borderBottomWidth: index == 2 ? 0 : 4,
-                }}
-              >
-                {item.type == 'contact' && item.image ? (
-                  <View
-                    style={{
-                      borderRadius: wp('15%') / 2,
-                      borderColor: Colors.white,
-                      borderWidth: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      shadowOffset: {
-                        width: 2,
-                        height: 2,
-                      },
-                      shadowOpacity: 0.8,
-                      shadowColor: Colors.textColorGrey,
-                      shadowRadius: 5,
-                      elevation: 10,
-                      marginRight: 15,
-                      marginLeft: 5,
-                    }}
-                  >
-                    <Image
-                      source={item.image}
-                      style={{
-                        width: wp('15%'),
-                        height: wp('15%'),
-                        borderRadius: wp('15%') / 2,
-                      }}
-                    />
-                  </View>
-                ) : (
-                  <ImageBackground
-                    source={require('../../assets/images/icons/Ellipse.png')}
-                    style={{ ...styles.cardsImageView, marginRight: 10 }}
-                  >
-                    <Image
-                      source={
-                        item.type == 'contact'
-                          ? require('../../assets/images/icons/icon_contact.png')
-                          : item.type == 'device'
-                          ? require('../../assets/images/icons/icon_secondarydevice.png')
-                          : require('../../assets/images/icons/icon_contact.png')
-                      }
-                      style={styles.cardImage}
-                    />
-                  </ImageBackground>
-                )}
-                <View style={{}}>
-                  <Text
-                    style={{
-                      ...styles.cardsInfoText,
-                      fontSize: RFValue(18),
-                    }}
-                  >
-                    {item.title}
-                  </Text>
-                  <Text style={styles.cardsInfoText}>{item.info}</Text>
-                  <Text style={styles.cardsInfoText}>
-                    Last backup {item.time} ago
-                  </Text>
-                </View>
-                {item.status == 'received' ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    <View
-                      style={{
-                        ...styles.statusTextView,
-                        backgroundColor: Colors.lightGreen,
-                      }}
-                    >
-                      <Text style={styles.statusText}>Key Received</Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.lightGreen,
-                        width: wp('5%'),
-                        height: wp('5%'),
-                        borderRadius: wp('5%') / 2,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 5,
-                      }}
-                    >
-                      <AntDesign
-                        name={'check'}
-                        size={RFValue(10)}
-                        color={Colors.darkGreen}
-                      />
-                    </View>
-                  </View>
-                ) : (
-                  <View style={styles.statusTextView}>
-                    <Text style={styles.statusText}>Waiting for Key</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: Colors.blue,
-            height: 60,
-            borderRadius: 10,
-            marginLeft: 25,
-            marginRight: 25,
-            marginBottom: hp('4%'),
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            shadowColor: Colors.shadowBlue,
-            shadowOpacity: 1,
-            shadowOffset: { width: 15, height: 15 },
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => (this.refs.RestoreWallet as any).snapTo(1)}
-            style={styles.buttonInnerView}
-          >
-            <Image
-              source={require('../../assets/images/icons/openlink.png')}
-              style={styles.buttonImage}
-            />
-            <Text style={styles.buttonText}>Send Request</Text>
-          </TouchableOpacity>
-          <View
-            style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-          />
-          <TouchableOpacity
-            style={styles.buttonInnerView}
-            onPress={() => {
-              (this.refs.BackupNotFound as any).snapTo(1);
-            }}
-          >
-            <Image
-              source={require('../../assets/images/icons/qr-code.png')}
-              style={styles.buttonImage}
-            />
-            <Text style={styles.buttonText}>Scan Key</Text>
-          </TouchableOpacity>
-        </View>
+        <ScrollView style={{ flex: 1 }}></ScrollView>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
+          }
+        />
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'RestoreFromICloud'}
@@ -287,13 +147,17 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => (
             <RestoreFromICloud
-              title={'Restore from iCloud'}
-              subText={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'}
-              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
-              cardInfo={'Restoring Wallet from'}
+              title={'Keeper on iCloud'}
+              subText={
+                'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+              }
+              info={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
+              cardInfo={'Store Backup'}
               cardTitle={'Hexa Wallet Backup'}
               cardSubInfo={'iCloud backup'}
-              proceedButtonText={'Restore'}
+              proceedButtonText={'Open Settings'}
               backButtonText={'Back'}
               modalRef={this.refs.RestoreFromICloud}
               onPressProceed={() => {
@@ -314,31 +178,72 @@ class RestoreWithICloud extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreSuccess'}
+          ref={'SetupPrimaryKeeperBottomSheet'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('60%'),
+              ? hp('60%')
+              : hp('70'),
           ]}
           renderContent={() => (
-            <RestoreSuccess
-              modalRef={this.refs.RestoreSuccess}
-              onPressProceed={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0);
-              }}
+            <SetupPrimaryKeeper
+              title={'Setup Primary Keeper\non a Personal Device'}
+              subText={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
+              textToCopy={'http://hexawallet.io/keeperapp'}
+              info={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
+              proceedButtonText={'Proceed'}
+              backButtonText={'Back'}
               onPressBack={() => {
-                (this.refs.RestoreSuccess as any).snapTo(0);
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
+              onPressContinue={() => {
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() =>
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'SecurityQuestionBottomSheet'}
+          snapPoints={[-30, hp('75%'), hp('90%')]}
+          renderContent={() => (
+            <SecurityQuestion
+              onFocus={()=>{
+                if (Platform.OS == 'ios')
+                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(2);
+              }}
+              onBlur={()=>{
+                if (Platform.OS == 'ios')
+                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+              }}
+              onPressConfirm={async () => {
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
+                }, 2);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => (this.refs.RestoreSuccess as any).snapTo(0)}
+              onPressHeader={() => {
+                (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
+              }}
             />
           )}
         />
-        <BottomSheet
+       {/* <BottomSheet
           enabledInnerScrolling={true}
           ref={'BackupNotFound'}
           snapPoints={[
@@ -389,7 +294,7 @@ class RestoreWithICloud extends Component<
               onPressHeader={() => (this.refs.RestoreWallet as any).snapTo(0)}
             />
           )}
-        />
+        /> */}
       </View>
     );
   }
@@ -409,7 +314,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
-  })(RestoreWithICloud),
+  })(UpgradeBackup),
 );
 
 const styles = StyleSheet.create({

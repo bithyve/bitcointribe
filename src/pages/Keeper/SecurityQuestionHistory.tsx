@@ -70,7 +70,14 @@ const SecurityQuestionHistory = (props) => {
   const renderSecurityQuestionContent = useCallback(() => {
     return (
       <SecurityQuestion
-        bottomSheetRef={SecurityQuestionBottomSheet}
+        onFocus={()=>{
+          if (Platform.OS == 'ios')
+            (this.refs.SecurityQuestionBottomSheet as any).snapTo(2);
+        }}
+        onBlur={()=>{
+          if (Platform.OS == 'ios')
+            (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+        }}
         onPressConfirm={async () => {
           Keyboard.dismiss();
           setTimeout(() => {

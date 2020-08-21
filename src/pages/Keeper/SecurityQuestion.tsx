@@ -135,16 +135,8 @@ function SecurityQuestion(props) {
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 onSubmitEditing={(event) => setConfirm()}
-                onFocus={() => {
-                  if (Platform.OS == 'ios') {
-                    props.bottomSheetRef.current.snapTo(2);
-                  }
-                }}
-                onBlur={() => {
-                  if (Platform.OS == 'ios') {
-                    props.bottomSheetRef.current.snapTo(1);
-                  }
-                }}
+                onFocus={() => props.onFocus()}
+                onBlur={() => props.onBlur()}
               />
               {errorText ? (
                 <Text

@@ -348,6 +348,7 @@ export default function Login(props) {
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
+        isLoader={true}
         headerText={message}
         messageText={subTextMessage1}
         messageText2={subTextMessage2}

@@ -95,6 +95,8 @@ import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount';
 import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey';
 import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation';
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
+import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
+import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -236,6 +238,8 @@ const HomeNavigator = createStackNavigator(
     SweepFundUseExitKey,
     SweepConfirmation,
     ScanRecoveryKey,
+    UpgradeBackup,
+    ConfirmKeys,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

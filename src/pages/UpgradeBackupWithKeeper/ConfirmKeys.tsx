@@ -31,31 +31,47 @@ import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
-import RestoreFromICloud from './RestoreFromICloud';
+// import RestoreFromICloud from './RestoreFromICloud';
 import DeviceInfo from 'react-native-device-info';
-import RestoreSuccess from './RestoreSuccess';
-import ICloudBackupNotFound from './ICloudBackupNotFound';
+// import RestoreSuccess from './RestoreSuccess';
+// import ICloudBackupNotFound from './ICloudBackupNotFound';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { requestTimedout } from '../../store/utils/utilities';
-import RestoreWallet from './RestoreWallet';
+import LoaderModal from '../../components/LoaderModal';
+// import RestoreWallet from './RestoreWallet';
+import BackupUpgradeSuccess from './BackupUpgradeSuccess';
+import DeleteRecoveryKeys from './DeleteRecoveryKeys';
 
-interface RestoreWithICloudStateTypes {
+interface ConfirmKeysStateTypes {
   selectedIds: any[];
   listData: any[];
+  listToDelete: any;
 }
 
-interface RestoreWithICloudPropsTypes {
+interface ConfirmKeysPropsTypes {
   navigation: any;
 }
 
-class RestoreWithICloud extends Component<
-  RestoreWithICloudPropsTypes,
-  RestoreWithICloudStateTypes
+class ConfirmKeys extends Component<
+  ConfirmKeysPropsTypes,
+  ConfirmKeysStateTypes
 > {
   constructor(props) {
     super(props);
     this.state = {
       selectedIds: [],
+      listToDelete: [
+        {
+          name: 'Donna’s MacBook',
+          typeName: 'Secondary Device',
+          type: 'device'
+        },
+        {
+          name: 'Randcaldor@bithyve.com',
+          typeName: 'PDF Keeper',
+          type: 'pdf'
+        }
+      ],
       listData: [
         {
           type: 'contact',
@@ -87,13 +103,13 @@ class RestoreWithICloud extends Component<
       ],
     };
   }
-  // image: require('../../assets/images/icons/icon_contact.png'),
-  // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    (this.refs.DeleteRecoveryKeys as any).snapTo(1);
+  };
 
   render() {
-    const { listData, selectedIds } = this.state;
+    const { listData, selectedIds, listToDelete } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -277,8 +293,32 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         <BottomSheet
+          onCloseEnd={() => { }}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={'RestoreFromICloud'}
+          ref={'loaderBottomSheet'}
+          snapPoints={[-50, hp('100%')]}
+          renderContent={()=>(<LoaderModal
+            isLoader={false}
+            headerText={'Upgrading Recovery Keys'}
+            messageText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.'}
+            messageText2={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.'}
+          />)}
+          renderHeader={()=>(<View
+            style={{
+              marginTop: 'auto',
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              height: hp('75%'),
+              zIndex: 9999,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />)}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'BackupUpgradeSuccess'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -286,21 +326,21 @@ class RestoreWithICloud extends Component<
               : hp('60%'),
           ]}
           renderContent={() => (
-            <RestoreFromICloud
-              title={'Restore from iCloud'}
+            <BackupUpgradeSuccess
+              title={'Backup Successfully\nUpgraded'}
               subText={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'}
               info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
-              cardInfo={'Restoring Wallet from'}
-              cardTitle={'Hexa Wallet Backup'}
-              cardSubInfo={'iCloud backup'}
-              proceedButtonText={'Restore'}
-              backButtonText={'Back'}
-              modalRef={this.refs.RestoreFromICloud}
+              cardInfo={'Security is at'}
+              cardTitle={'Level 3'}
+              cardSubInfo={'Backup'}
+              proceedButtonText={'Manage Backup'}
+              backButtonText={'Learn More'}
+              modalRef={this.refs.BackupUpgradeSuccess}
               onPressProceed={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0);
+                (this.refs.BackupUpgradeSuccess as any).snapTo(0);
               }}
               onPressBack={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0);
+                (this.refs.BackupUpgradeSuccess as any).snapTo(0);
               }}
             />
           )}
@@ -313,6 +353,32 @@ class RestoreWithICloud extends Component<
           )}
         />
         <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'DeleteRecoveryKeys'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('70%'),
+          ]}
+          renderContent={() => (
+            <DeleteRecoveryKeys
+              title={'Delete Recovery Keys\nfrom Old Keepers'}
+              subText={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'}
+              info={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'}
+              dataList={listToDelete}
+              onPressProceed={() => {
+                (this.refs.DeleteRecoveryKeys as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => (this.refs.DeleteRecoveryKeys as any).snapTo(0)}
+            />
+          )}
+        />
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           ref={'RestoreSuccess'}
           snapPoints={[
@@ -389,7 +455,7 @@ class RestoreWithICloud extends Component<
               onPressHeader={() => (this.refs.RestoreWallet as any).snapTo(0)}
             />
           )}
-        />
+        /> */}
       </View>
     );
   }
@@ -409,7 +475,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
-  })(RestoreWithICloud),
+  })(ConfirmKeys),
 );
 
 const styles = StyleSheet.create({

@@ -684,6 +684,12 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
+              title={'Setup Primary Keeper\non a Personal Device'}
+              subText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
+              textToCopy={'http://hexawallet.io/keeperapp'}
+              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
+              proceedButtonText={'Proceed'}
+              backButtonText={'Back'}
               onPressBack={() => {
                 navigation.navigate('KeeperFeatures');
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);

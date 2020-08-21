@@ -16,11 +16,10 @@ export default function SetupPrimaryKeeper(props) {
       <View style={{ height: '100%' }}>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.headerText}>
-            Setup Primary Keeper{'\n'}on a Personal Device
+            {props.title}
           </Text>
           <Text style={styles.modalInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore.
+            {props.subText}
           </Text>
         </View>
         <AppBottomSheetTouchableWrapper
@@ -37,11 +36,10 @@ export default function SetupPrimaryKeeper(props) {
             style={{ width: wp('85%'), height: wp('15%'), resizeMode: 'cover' }}
           />
         </AppBottomSheetTouchableWrapper>
-        <CopyThisText text={'http://hexawallet.io/keeperapp'}/>
+        <CopyThisText text={props.textToCopy}/>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.modalInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore.
+            {props.info}
           </Text>
         </View>
         <View
@@ -62,7 +60,7 @@ export default function SetupPrimaryKeeper(props) {
                 color: Colors.white,
               }}
             >
-              Proceed
+              {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
           <AppBottomSheetTouchableWrapper
@@ -80,7 +78,7 @@ export default function SetupPrimaryKeeper(props) {
                 color: Colors.blue,
               }}
             >
-              Back
+              {props.backButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
