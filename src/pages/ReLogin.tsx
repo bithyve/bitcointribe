@@ -49,7 +49,12 @@ export default function Login(props) {
   }
 
   useEffect(() => {
-    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
+    if (authenticationFailed) {
+      setCheckAuth(true);
+      setPasscode('');
+    } else {
+      setCheckAuth(false);
+    }
   }, [authenticationFailed]);
 
   const hardwareBackHandler = () => {
@@ -207,6 +212,7 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
+                  setCheckAuth(false);
                   dispatch(credsAuth(passcode, true));
                 }}
                 style={{

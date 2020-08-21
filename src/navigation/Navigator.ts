@@ -81,27 +81,8 @@ import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
-
-
-const fade = (props) => {
-  const { position, scene } = props
-
-  const index = scene.index
-
-  const translateX = 0
-  const translateY = 0
-
-  const opacity = position.interpolate({
-    inputRange: [index - 0.7, index, index + 0.7],
-    outputRange: [0.3, 1, 0.3]
-  })
-
-  return {
-    opacity,
-    transform: [{ translateX }, { translateY }]
-  }
-}
-
+import NewOwnQuestions from '../pages/NewOwnQuestions';
+import AddNewAccount from '../pages/Accounts/AddNewAccount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -120,6 +101,7 @@ const SetupNavigator = createStackNavigator(
     RecoveryCommunication,
     ShareRecoveryOTP,
     RecoveryQrScanner: QrScanner,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -164,6 +146,7 @@ const HomeNavigator = createStackNavigator(
     },
     Intermediate,
     Accounts,
+    AddNewAccount,
     ManageBackup,
     SecondaryDevice,
     TrustedContacts,
@@ -229,6 +212,7 @@ const HomeNavigator = createStackNavigator(
     ContactDetailsNew,
     Receive,
     PairNewWallet,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
