@@ -108,28 +108,28 @@ export default function NewOwnQuestions(props) {
   }, []);
 
   useEffect(() => {
-    // (async () => {
-    //   if (isLoaderStart) {
-    //     const security = {
-    //       question: dropdownBoxValue.question,
-    //       answer,
-    //     };
-    //     dispatch(initializeSetup(walletName, security));
-    //     const current = Date.now();
-    //     await AsyncStorage.setItem(
-    //       'SecurityAnsTimestamp',
-    //       JSON.stringify(current),
-    //     );
-    //     const securityQuestionHistory = {
-    //       created: current,
-    //       confirmed: current,
-    //     };
-    //     await AsyncStorage.setItem(
-    //       'securityQuestionHistory',
-    //       JSON.stringify(securityQuestionHistory),
-    //     );
-    //   }
-    // })();
+    (async () => {
+      if (isLoaderStart) {
+        const security = {
+          question: question,
+          answer,
+        };
+        dispatch(initializeSetup(walletName, security));
+        const current = Date.now();
+        await AsyncStorage.setItem(
+          'SecurityAnsTimestamp',
+          JSON.stringify(current),
+        );
+        const securityQuestionHistory = {
+          created: current,
+          confirmed: current,
+        };
+        await AsyncStorage.setItem(
+          'securityQuestionHistory',
+          JSON.stringify(securityQuestionHistory),
+        );
+      }
+    })();
   }, [isLoaderStart]);
 
   useEffect(() => {
@@ -187,7 +187,7 @@ export default function NewOwnQuestions(props) {
     return (
       <TouchableOpacity
         onPress={() => {
-         // (loaderBottomSheet as any).current.snapTo(1);
+          (loaderBottomSheet as any).current.snapTo(1);
           seLoaderMessages();
           setTimeout(() => {
             setElevation(0);
@@ -282,7 +282,6 @@ export default function NewOwnQuestions(props) {
               activeOpacity={10}
               style={{ flex: 1 }}
               onPress={() => {
-                setDropdownBoxOpenClose(false);
                 Keyboard.dismiss();
               }}
               disabled={isDisabled}
@@ -328,168 +327,166 @@ export default function NewOwnQuestions(props) {
                   }}
                 />
               </View>
-              {question ? 
-              (<View style={{ marginTop: 15 }}>
-                <View
-                  style={{
-                    ...answerInputStyle,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingRight: 15,
-                    borderColor: ansError ? Colors.red : Colors.borderColor,
-                  }}
-                >
-                  <TextInput
-                    style={styles.modalInputBox}
-                    placeholder={'Enter your answer'}
-                    placeholderTextColor={Colors.borderColor}
-                    value={hideShowAnswer ? answerMasked : answer}
-                    autoCompleteType="off"
-                    textContentType="none"
-                    returnKeyType="next"
-                    autoCorrect={false}
-                    editable={isEditable}
-                    autoCapitalize="none"
-                    onSubmitEditing={() =>
-                      (confirmAnswerTextInput as any).current.focus()
-                    }
-                    keyboardType={
-                      Platform.OS == 'ios'
-                        ? 'ascii-capable'
-                        : 'visible-password'
-                    }
-                    onChangeText={(text) => {
-                      text = text.replace(/[^a-z]/g, '');
-                      setAnswer(text);
-                      setAnswerMasked(text);
+              {question ? (
+                <View style={{ marginTop: 15 }}>
+                  <View
+                    style={{
+                      ...answerInputStyle,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingRight: 15,
+                      borderColor: ansError ? Colors.red : Colors.borderColor,
                     }}
-                    onFocus={() => {
-                      setDropdownBoxOpenClose(false);
-                      setAnswerInputStyle(styles.inputBoxFocused);
-                      if (answer.length > 0) {
-                        setAnswer('');
-                        setAnswerMasked('');
+                  >
+                    <TextInput
+                      style={styles.modalInputBox}
+                      placeholder={'Enter your answer'}
+                      placeholderTextColor={Colors.borderColor}
+                      value={hideShowAnswer ? answerMasked : answer}
+                      autoCompleteType="off"
+                      textContentType="none"
+                      returnKeyType="next"
+                      autoCorrect={false}
+                      editable={isEditable}
+                      autoCapitalize="none"
+                      onSubmitEditing={() =>
+                        (confirmAnswerTextInput as any).current.focus()
                       }
-                    }}
-                    onBlur={() => {
-                      setAnswerInputStyle(styles.inputBox);
-                      setDropdownBoxOpenClose(false);
-                      let temp = '';
-                      for (let i = 0; i < answer.length; i++) {
-                        temp += '*';
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
                       }
-                      setAnswerMasked(temp);
-
-                      if (answer && confirmAnswer && confirmAnswer != answer) {
-                        setAnsError('Answers do not match');
-                      } else {
-                        setTimeout(() => {
-                          setAnsError('');
-                        }, 2);
-                      }
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.nativeEvent.key === 'Backspace') {
-                        setTimeout(() => {
+                      onChangeText={(text) => {
+                        setAnswer(text);
+                        setAnswerMasked(text);
+                      }}
+                      onFocus={() => {
+                        setAnswerInputStyle(styles.inputBoxFocused);
+                        if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
-                        }, 70);
-                      }
-                    }}
-                  />
-                  {answer ? (
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        setHdeShowAnswer(!hideShowAnswer);
+                        }
                       }}
-                    >
-                      <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
-                        size={15}
-                        color={Colors.blue}
-                        name={hideShowAnswer ? 'eye-off' : 'eye'}
-                      />
-                    </TouchableWithoutFeedback>
-                  ) : null}
-                </View>
-                <View
-                  style={{
-                    ...confirmInputStyle,
-                    marginBottom: 15,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingRight: 15,
-                    marginTop: 15,
-                    borderColor: ansError ? Colors.red : Colors.borderColor,
-                  }}
-                >
-                  <TextInput
-                    style={styles.modalInputBox}
-                    ref={confirmAnswerTextInput}
-                    placeholder={'Confirm your answer'}
-                    placeholderTextColor={Colors.borderColor}
-                    value={
-                      hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
-                    }
-                    keyboardType={
-                      Platform.OS == 'ios'
-                        ? 'ascii-capable'
-                        : 'visible-password'
-                    }
-                    returnKeyType="done"
-                    returnKeyLabel="Done"
-                    textContentType="none"
-                    autoCompleteType="off"
-                    autoCorrect={false}
-                    editable={isEditable}
-                    autoCapitalize="none"
-                    onKeyPress={(event) => {
-                      setBackspace(event);
-                    }}
-                    onChangeText={(text) => {
-                      text = text.replace(/[^a-z]/g, '');
-                      setTempAns(text);
-                      setConfirmAnswerMasked(text);
-                    }}
-                    onSubmitEditing={(event) => setConfirm()}
-                    onFocus={() => {
-                      setDropdownBoxOpenClose(false);
-                      setConfirmAnswerInputStyle(styles.inputBoxFocused);
-                      if (tempAns.length > 0) {
-                        setTempAns('');
-                        setAnsError('');
-                        setConfirmAnswer('');
-                        setConfirmAnswerMasked('');
-                      }
-                    }}
-                    onBlur={() => {
-                      setConfirmAnswerInputStyle(styles.inputBox);
-                      setDropdownBoxOpenClose(false);
-                      let temp = '';
-                      for (let i = 0; i < tempAns.length; i++) {
-                        temp += '*';
-                      }
-                      setConfirmAnswerMasked(temp);
-                      setConfirm();
-                    }}
-                  />
-                  {tempAns ? (
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        setHideShowConfirmAnswer(!hideShowConfirmAnswer);
-                        setDropdownBoxOpenClose(false);
+                      onBlur={() => {
+                        setAnswerInputStyle(styles.inputBox);
+                        let temp = '';
+                        for (let i = 0; i < answer.length; i++) {
+                          temp += '*';
+                        }
+                        setAnswerMasked(temp);
+
+                        if (
+                          answer &&
+                          confirmAnswer &&
+                          confirmAnswer != answer
+                        ) {
+                          setAnsError('Answers do not match');
+                        } else {
+                          setTimeout(() => {
+                            setAnsError('');
+                          }, 2);
+                        }
                       }}
-                    >
-                      <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
-                        size={15}
-                        color={Colors.blue}
-                        name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
-                      />
-                    </TouchableWithoutFeedback>
-                  ) : null}
+                      onKeyPress={(e) => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          setTimeout(() => {
+                            setAnswer('');
+                            setAnswerMasked('');
+                          }, 70);
+                        }
+                      }}
+                    />
+                    {answer ? (
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          setHdeShowAnswer(!hideShowAnswer);
+                        }}
+                      >
+                        <Feather
+                          style={{ marginLeft: 'auto', padding: 10 }}
+                          size={15}
+                          color={Colors.blue}
+                          name={hideShowAnswer ? 'eye-off' : 'eye'}
+                        />
+                      </TouchableWithoutFeedback>
+                    ) : null}
+                  </View>
+                  <View
+                    style={{
+                      ...confirmInputStyle,
+                      marginBottom: 15,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingRight: 15,
+                      marginTop: 15,
+                      borderColor: ansError ? Colors.red : Colors.borderColor,
+                    }}
+                  >
+                    <TextInput
+                      style={styles.modalInputBox}
+                      ref={confirmAnswerTextInput}
+                      placeholder={'Confirm your answer'}
+                      placeholderTextColor={Colors.borderColor}
+                      value={
+                        hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
+                      }
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
+                      returnKeyType="done"
+                      returnKeyLabel="Done"
+                      textContentType="none"
+                      autoCompleteType="off"
+                      autoCorrect={false}
+                      editable={isEditable}
+                      autoCapitalize="none"
+                      onKeyPress={(event) => {
+                        setBackspace(event);
+                      }}
+                      onChangeText={(text) => {
+                        setTempAns(text);
+                        setConfirmAnswerMasked(text);
+                      }}
+                      onSubmitEditing={(event) => setConfirm()}
+                      onFocus={() => {
+                        setConfirmAnswerInputStyle(styles.inputBoxFocused);
+                        if (tempAns.length > 0) {
+                          setTempAns('');
+                          setAnsError('');
+                          setConfirmAnswer('');
+                          setConfirmAnswerMasked('');
+                        }
+                      }}
+                      onBlur={() => {
+                        setConfirmAnswerInputStyle(styles.inputBox);
+                        let temp = '';
+                        for (let i = 0; i < tempAns.length; i++) {
+                          temp += '*';
+                        }
+                        setConfirmAnswerMasked(temp);
+                        setConfirm();
+                      }}
+                    />
+                    {tempAns ? (
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          setHideShowConfirmAnswer(!hideShowConfirmAnswer);
+                        }}
+                      >
+                        <Feather
+                          style={{ marginLeft: 'auto', padding: 10 }}
+                          size={15}
+                          color={Colors.blue}
+                          name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
+                        />
+                      </TouchableWithoutFeedback>
+                    ) : null}
+                  </View>
                 </View>
-              </View>) : null}
+              ) : null}
               <View
                 style={{
                   marginLeft: 20,

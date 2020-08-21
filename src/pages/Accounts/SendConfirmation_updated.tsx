@@ -681,7 +681,7 @@ class SendConfirmation_updated extends Component<
                 <Text
                   style={{ ...styles.tableHeadingText, textAlign: 'center' }}
                 >
-                  Fee
+                  Total Fee
                 </Text>
               </View>
             </View>
@@ -865,7 +865,7 @@ class SendConfirmation_updated extends Component<
                 </View>
                 <View style={styles.priorityDataContainer}>
                   <Text style={styles.priorityTableText}>
-                    {this.state.customFeePerByte}
+                    {this.convertBitCoinToCurrency(this.state.customFeePerByte)}
                     {' ' + this.getCorrectCurrencySymbol()}
                     {/* {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -1216,7 +1216,7 @@ class SendConfirmation_updated extends Component<
           renderContent={() => (
             <CustomPriorityContent
               title={'Custom Priority'}
-              info={''}
+              info={'Enter the fee rate in sats per byte.'}
               err={this.state.customFeePerByteErr}
               service={this.props.accounts[this.serviceType].service}
               okButtonText={'Confirm'}

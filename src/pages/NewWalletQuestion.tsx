@@ -489,7 +489,7 @@ export default function NewWalletQuestion(props) {
                           : 'visible-password'
                       }
                       onChangeText={(text) => {
-                        text = text.replace(/[^a-z]/g, '');
+                        
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -581,7 +581,7 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={(text) => {
-                        text = text.replace(/[^a-z]/g, '');
+                        
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
@@ -653,7 +653,9 @@ export default function NewWalletQuestion(props) {
                paddingBottom: 10,
                paddingTop: 10,
             }}
-            onPress={()=> props.navigation.navigate('NewOwnQuestions')}>
+            onPress={()=> props.navigation.navigate('NewOwnQuestions',{
+              walletName,
+            })}>
               <Text
                 style={{
                   fontFamily: Fonts.FiraSansMediumItalic,
@@ -662,7 +664,9 @@ export default function NewWalletQuestion(props) {
                   fontSize: RFValue(12),
                   color: Colors.blue,
                 }}
-                onPress={()=> props.navigation.navigate('NewOwnQuestions')}
+                onPress={()=> props.navigation.navigate('NewOwnQuestions',{
+                  walletName,
+                })}
               >
                 or Choose my own Question
               </Text>

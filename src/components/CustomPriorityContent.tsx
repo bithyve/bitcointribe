@@ -142,7 +142,7 @@ export default function CustomPriorityContent(props) {
           }}
         >
           {customEstimatedBlock
-            ? `${customEstimatedBlock * 10} - ${
+            ? `~ ${customEstimatedBlock * 10} - ${
                 (customEstimatedBlock + 1) * 10
               } minutes`
             : 'Calculating...'}

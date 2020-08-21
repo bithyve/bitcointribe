@@ -113,6 +113,7 @@ const SetupNavigator = createStackNavigator(
     ShareRecoveryOTP,
     NewOwnQuestions,
     RecoveryQrScanner: QrScanner,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
