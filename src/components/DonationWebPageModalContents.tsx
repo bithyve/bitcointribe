@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Linking,
+  Clipboard,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -14,10 +14,17 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
+import ToggleSwitch from './ToggleSwitch';
+import Toast from '../components/Toast';
 
 export default function DonationWebPageModalContents(props) {
+  const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
+  const [isDonationTransactionEnable, setIsDonationTransactionEnable] = useState(false);
+
+  function writeToClipboard(link) {
+    Clipboard.setString(link);
+    Toast('Copied Successfully');
+  }
 
   return (
     <View style={styles.modalContentContainer}>
@@ -52,6 +59,13 @@ export default function DonationWebPageModalContents(props) {
               color: Colors.lightTextColor,
             }}>Lorem ipsum dolor sit amet</Text>
           </View>
+          <ToggleSwitch
+            isNotImage={true}
+            toggleColor={Colors.lightBlue}
+            toggleCircleColor={isDonationTotalEnable ? Colors.blue : Colors.white}
+            onpress={() => setIsDonationTotalEnable(prevState => !prevState)}
+            toggle={isDonationTotalEnable}
+          />
         </View>
         <View style={styles.rowContainer}>
           <Image style={styles.imageStyle} source={require('../assets/images/icons/icon_donation_transactions.png')} />
@@ -63,23 +77,19 @@ export default function DonationWebPageModalContents(props) {
               color: Colors.lightTextColor,
             }}>Lorem ipsum dolor sit amet</Text>
           </View>
+          <ToggleSwitch
+            isNotImage={true}
+            toggleColor={Colors.lightBlue}
+            toggleCircleColor={isDonationTransactionEnable ? Colors.blue : Colors.white}
+            onpress={() => setIsDonationTransactionEnable(prevState => !prevState)}
+            toggle={isDonationTransactionEnable}
+          />
         </View>
         <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Donation Link</Text>
           <Text style={styles.modalInfoText}>When someone wants to donate, they can simply click on this link which will serve up the donation page</Text>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 20,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: Colors.backgroundColor1,
-            height: 50,
-            borderRadius: 10,
-            padding: 10,
-          }}
-        >
+        <View style={styles.deeplinkContainerStyle}>
           <Text
             style={{
               color: Colors.lightBlue,
@@ -91,17 +101,7 @@ export default function DonationWebPageModalContents(props) {
           >
             {'creating...'}
           </Text>
-          <TouchableOpacity
-            style={{
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-              width: 50,
-              height: 50,
-              backgroundColor: '#E3E3E3',
-              borderTopRightRadius: 10,
-              borderBottomRightRadius: 10,
-            }}
-          >
+          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('')}>
             <Image
               source={require('../assets/images/icons/icon_copy.png')}
               style={{ width: 50, height: 50 }}
@@ -112,6 +112,26 @@ export default function DonationWebPageModalContents(props) {
         <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>
           <Text style={styles.modalInfoText}>If you have a website, simply copy this code on your site to start receiving donations</Text>
+        </View>
+        <View style={styles.deeplinkContainerStyle}>
+          <Text
+            style={{
+              color: Colors.lightBlue,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              paddingTop: 5,
+            }}
+            numberOfLines={1}
+          >
+            {'creating...'}
+          </Text>
+          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('')}>
+            <Image
+              source={require('../assets/images/icons/icon_copy.png')}
+              style={{ width: 50, height: 50 }}
+              resizeMode='center'
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -154,5 +174,26 @@ const styles = StyleSheet.create({
   infoTextContainer: {
     marginTop: 20,
     marginHorizontal: hp('1.5%'),
+  },
+  deeplinkContainerStyle: {
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.backgroundColor1,
+    height: 50,
+    borderRadius: 10,
+    padding: 10,
+  },
+  copylinkContainerStyle: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    width: 50,
+    height: 50,
+    backgroundColor: '#E3E3E3',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    position: 'absolute',
+    right: 0,
   }
 });

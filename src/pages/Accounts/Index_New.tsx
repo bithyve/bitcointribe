@@ -1389,7 +1389,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
-          snapPoints={[-50, hp('80%')]}
+          snapPoints={[-50, hp('70%')]}
           renderContent={() => {
             return (
               <DonationWebPageModalContents />
