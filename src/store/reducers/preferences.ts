@@ -10,6 +10,7 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
+  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
@@ -32,7 +33,8 @@ const initialState = {
   isSendHelperDoneValue: false,
   isTwoFASetupDone: false,
   isContactOpen: false,
-  isMigrated: false
+  isMigrated: false,
+  applicationStatus: null
 }
 
 export default (state = initialState, { type, payload }) => {
@@ -95,6 +97,18 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         isMigrated: true,
+      };
+
+    case UPDATE_APPLICATION_STATUS:
+      return {
+        ...state,
+        applicationStatus: payload.status,
+      };
+
+    case UPDATE_LAST_SEEN:
+      return {
+        ...state,
+        lastSeen: payload.lastSeen,
       };
 
     default:
