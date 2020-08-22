@@ -489,7 +489,7 @@ export default function NewWalletQuestion(props) {
                           : 'visible-password'
                       }
                       onChangeText={(text) => {
-                        text = text.replace(/[^a-z]/g, '');
+                        
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -581,7 +581,7 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={(text) => {
-                        text = text.replace(/[^a-z]/g, '');
+                        
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
@@ -645,6 +645,32 @@ export default function NewWalletQuestion(props) {
                   {ansError}
                 </Text>
               </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{
+              flexDirection: 'row',
+               marginLeft: 25,
+               marginRight: 25,
+               paddingBottom: 10,
+               paddingTop: 10,
+            }}
+            onPress={()=> props.navigation.navigate('NewOwnQuestions',{
+              walletName,
+            })}>
+              <Text
+                style={{
+                  fontFamily: Fonts.FiraSansMediumItalic,
+                  fontWeight: 'bold',
+                  fontStyle: 'italic',
+                  fontSize: RFValue(12),
+                  color: Colors.blue,
+                }}
+                onPress={()=> props.navigation.navigate('NewOwnQuestions',{
+                  walletName,
+                })}
+              >
+                or Choose my own Question
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
