@@ -1111,6 +1111,10 @@ export default class HDSegwitWallet extends Bitcoin {
   > => {
     const inputUTXOs = this.confirmedUTXOs;
     console.log('Input UTXOs:', inputUTXOs);
+    let confirmedBalance = 0;
+    this.confirmedUTXOs.forEach((confirmedUtxo) => {
+      confirmedBalance += confirmedUtxo.value;
+    });
 
     const outputUTXOs = [];
     for (const recipient of recipients) {
@@ -1148,10 +1152,7 @@ export default class HDSegwitWallet extends Bitcoin {
       netAmount += recipient.amount;
     });
     const defaultDebitedAmount = netAmount + defaultPriorityFee;
-    if (
-      !defaultPriorityInputs ||
-      defaultDebitedAmount > this.balances.balance
-    ) {
+    if (!defaultPriorityInputs || defaultDebitedAmount > confirmedBalance) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return { fee: defaultPriorityFee, balance: this.balances.balance };
     }
