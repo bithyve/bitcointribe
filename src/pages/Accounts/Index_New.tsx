@@ -81,7 +81,6 @@ import TransactionsContent from '../../components/home/transaction-content';
 import RelayServices from '../../bitcoin/services/RelayService';
 import DonationWebPageModalContents from '../../components/DonationWebPageModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
 // import accounts from '../../store/reducers/accounts';
 
 function isEmpty(obj) {
@@ -126,7 +125,6 @@ interface AccountsStateTypes {
   showLoader: boolean;
   averageTxFees: any;
   isRegularAccountHelperDone: boolean;
-  isDonationAccountHelperDone: boolean;
   exchangeRates: any;
   switchOn: boolean;
   CurrencyCode: string;
@@ -231,7 +229,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isTestHelperDone: true,
       isRegularAccountHelperDone: true,
       isSecureAccountHelperDone: true,
-      isDonationAccountHelperDone: true,
       transactionLoading: true,
       transactions: [],
       averageTxFees: null,
@@ -680,10 +677,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
                 } else if (item.accountType == 'Checking Account') {
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(1);
-                } else if (item.accountType == 'Donation Account') {
-                  if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(1);
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                      1,
+                    );
                 }
               }}
             >
@@ -888,7 +884,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isTestHelperDone,
       isSecureAccountHelperDone,
       isRegularAccountHelperDone,
-      isDonationAccountHelperDone,
       transactionItem,
       isHelperDone,
       switchOn,
@@ -1668,51 +1663,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   } else {
                     (this.refs
                       .TransactionDetailsHelperBottomSheet as any).snapTo(0);
-                  }
-                }}
-              />
-            )}
-          />
-        ) : null}
-
-        {this.state.is_initiated ? (
-          <BottomSheet
-            enabledInnerScrolling={true}
-            ref={'DonationAccountHelperBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('87%')
-                : hp('89%'),
-            ]}
-            renderContent={() => (
-              <DonationAccountHelpContents
-                titleClicked={() => {
-                  if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                      0,
-                    );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.blue}
-                backgroundColor={Colors.blue}
-                onPressHeader={() => {
-                  if (isDonationAccountHelperDone) {
-                    if (this.refs.DonationAccountHelperBottomSheet as any)
-                      (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                        1,
-                      );
-                    setTimeout(() => {
-                      this.setState({ isDonationAccountHelperDone: false });
-                    }, 10);
-                  } else {
-                    if (this.refs.DonationAccountHelperBottomSheet as any)
-                      (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                        0,
-                      );
                   }
                 }}
               />
