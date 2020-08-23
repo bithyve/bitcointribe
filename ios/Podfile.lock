@@ -109,7 +109,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PDFGenerator (3.1.0)
-  - Protobuf (3.11.4)
+  - Protobuf (3.12.0)
   - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
@@ -493,7 +493,7 @@ SPEC CHECKSUMS:
   jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
+  Protobuf: 2793fcd0622a00b546c60e7cbbcc493e043e9bb9
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
@@ -533,4 +533,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ee84328f93944edd163ed35f7bf5ce0383faa559
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
