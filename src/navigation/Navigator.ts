@@ -97,6 +97,7 @@ import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation';
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
 import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
 import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
+import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -240,6 +241,7 @@ const HomeNavigator = createStackNavigator(
     ScanRecoveryKey,
     UpgradeBackup,
     ConfirmKeys,
+    ManageBackupUpgradeSecurity,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

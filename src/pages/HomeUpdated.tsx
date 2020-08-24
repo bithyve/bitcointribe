@@ -2237,8 +2237,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }}
         >
           <HomeHeader
-            onPressNotifications={()=>navigation.navigate('UpgradeBackup')}
-            // onPressNotifications={this.onPressNotifications}
+            //onPressNotifications={()=>navigation.navigate('UpgradeBackup')}
+            onPressNotifications={this.onPressNotifications}
             notificationData={notificationData}
             walletName={walletName}
             switchOn={switchOn}

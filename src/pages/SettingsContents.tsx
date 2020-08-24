@@ -168,21 +168,7 @@ export default function SettingsContents(props) {
               />
             </TouchableOpacity>
             <Text style={styles.modalHeaderTitleText}>{'Settings'}</Text>
-            <View
-              style={{
-                height: wp('8%'),
-                width: wp('25%'),
-                marginLeft: 'auto',
-                marginRight: 10,
-                backgroundColor: Colors.backgroundColor,
-                borderRadius: 8,
-                padding: 10,
-                borderColor: Colors.greyTextColor,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <TouchableOpacity
+            <TouchableOpacity
                 onPress={() => {
                   (AdvanceBottomSheet as any).current.snapTo(1);
                 }}
@@ -190,6 +176,13 @@ export default function SettingsContents(props) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginLeft: 'auto',
+                marginRight: 10,
+                backgroundColor: Colors.backgroundColor,
+                borderRadius: 8,
+                padding: 5,
+                borderColor: Colors.borderColor,
+                borderWidth: 2,
                 }}
               >
                 <Image
@@ -208,7 +201,6 @@ export default function SettingsContents(props) {
                   Advance
                 </Text>
               </TouchableOpacity>
-            </View>
           </View>
         </View>
 
