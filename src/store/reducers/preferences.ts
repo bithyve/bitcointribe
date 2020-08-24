@@ -10,15 +10,13 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
+  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
-import { chain } from 'icepick';
+import ip, { chain } from 'icepick';
 
-
-
-
-const initialState = {
+const initialState = ip.freeze({
   isInternetModalCome: false,
   currencyCode: null,
   currencyToggleValue: null,
@@ -32,8 +30,10 @@ const initialState = {
   isSendHelperDoneValue: false,
   isTwoFASetupDone: false,
   isContactOpen: false,
-  isMigrated: false
-}
+  isMigrated: false,
+  applicationStatus: null,
+  lastSeen: null
+})
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
@@ -96,6 +96,15 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         isMigrated: true,
       };
+
+    case UPDATE_APPLICATION_STATUS:
+      return {
+        ...state,
+        applicationStatus: payload.status,
+      };
+
+    case UPDATE_LAST_SEEN:
+      return Object.assign({}, state, { lastSeen: new Date() })
 
     default:
       return state

@@ -80,6 +80,7 @@ import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
+import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 
 const SetupNavigator = createStackNavigator(
@@ -127,6 +128,7 @@ const MODAL_ROUTES = [
   'RecoveryRequestOTP',
   'Confirmation',
   'TransactionDetails',
+  'Intermediate'
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -141,6 +143,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    Intermediate,
     Accounts,
     ManageBackup,
     SecondaryDevice,
@@ -233,7 +236,6 @@ const HomeNavigator = createStackNavigator(
           (prevTransitionProps &&
             screenName === prevTransitionProps.scene.route.routeName),
       );
-
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
         prevTransitionProps,

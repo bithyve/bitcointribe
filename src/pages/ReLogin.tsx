@@ -44,7 +44,7 @@ export default function Login(props) {
   );
 
   if (reLogin) {
-    props.navigation.pop();
+    props.navigation.pop(2);
     dispatch(switchReLogin(false, true));
   }
 
