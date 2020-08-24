@@ -668,7 +668,7 @@ export default function NewWalletQuestion(props) {
                   walletName,
                 })}
               >
-                or Choose my own Question
+                or choose my own Question
               </Text>
             </TouchableOpacity>
           </View>

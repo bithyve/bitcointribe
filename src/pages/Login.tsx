@@ -201,6 +201,9 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
+
+  useEffect(() => { AsyncStorage.removeItem("lastSeen") }, [])
+
   const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
     // HC up-streaming

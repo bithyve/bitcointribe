@@ -48,6 +48,7 @@ import {
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../store/actions/trustedContacts';
+import { updateLastSeen } from '../store/actions/preferences'
 
 import {
   approveTrustedContact,
@@ -287,6 +288,7 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  updateLastSeen: any
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -791,8 +793,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     setTimeout(() => {
       this.setState({
         isLoading: false,
-      });
+      }, () => this.props.updateLastSeen(new Date()));
     }, 2);
+
+
   };
 
   getNewTransactionNotifications = async () => {
@@ -1118,8 +1122,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
           }`,
         );
       } else {
@@ -1847,8 +1850,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             if (!approvedTC) {
               navigation.navigate('ContactsListForAssociateContact', {
                 postAssociation: (contact) => {
-                  const contactName = `${contact.firstName} ${
-                    contact.lastName ? contact.lastName : ''
+                  const contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
                     }`.toLowerCase();
 
                   if (!semver.valid(version)) {
@@ -3096,6 +3098,7 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
+    updateLastSeen
   })(HomeUpdated),
 );
 

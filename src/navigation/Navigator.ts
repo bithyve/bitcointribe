@@ -86,6 +86,7 @@ import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
 import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
 import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
 import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
+import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import RestoreWithICloud from "../pages/RestoreHexaWithKeeper/RestoreWithICloud";
 import RestoreWithoutICloud from "../pages/RestoreHexaWithKeeper/RestoreWithoutICloud";
@@ -144,6 +145,7 @@ const MODAL_ROUTES = [
   'RecoveryRequestOTP',
   'Confirmation',
   'TransactionDetails',
+  'Intermediate'
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -158,6 +160,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    Intermediate,
     Accounts,
     ManageBackup,
     SecondaryDevice,
@@ -267,7 +270,6 @@ const HomeNavigator = createStackNavigator(
           (prevTransitionProps &&
             screenName === prevTransitionProps.scene.route.routeName),
       );
-
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
         prevTransitionProps,
