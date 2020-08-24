@@ -1047,6 +1047,10 @@ export default class HDSegwitWallet extends Bitcoin {
     averageTxFees,
   ): { fee: number } => {
     const inputUTXOs = this.confirmedUTXOs;
+    let confirmedBalance = 0;
+    this.confirmedUTXOs.forEach((confirmedUtxo) => {
+      confirmedBalance += confirmedUtxo.value;
+    });
     const outputUTXOs = [];
     for (let index = 0; index < numberOfRecipients; index++) {
       // using random outputs for send all fee calculation
@@ -1058,7 +1062,7 @@ export default class HDSegwitWallet extends Bitcoin {
           }),
           network: this.network,
         }).address,
-        value: Math.floor(this.balances.balance / numberOfRecipients),
+        value: Math.floor(confirmedBalance / numberOfRecipients),
       });
     }
     const { fee } = coinselect(
@@ -1079,16 +1083,19 @@ export default class HDSegwitWallet extends Bitcoin {
     customTxFeePerByte: number,
   ) => {
     const inputUTXOs = this.confirmedUTXOs;
-
+    let confirmedBalance = 0;
+    this.confirmedUTXOs.forEach((confirmedUtxo) => {
+      confirmedBalance += confirmedUtxo.value;
+    });
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       customTxFeePerByte,
     );
 
-    if (!inputs) return { fee, balance: this.balances.balance };
+    if (!inputs) return { fee, balance: confirmedBalance };
 
-    return { inputs, outputs, fee, balance: this.balances.balance };
+    return { inputs, outputs, fee, balance: confirmedBalance };
   };
 
   public transactionPrerequisites = async (
@@ -1154,14 +1161,14 @@ export default class HDSegwitWallet extends Bitcoin {
     const defaultDebitedAmount = netAmount + defaultPriorityFee;
     if (!defaultPriorityInputs || defaultDebitedAmount > confirmedBalance) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
-      return { fee: defaultPriorityFee, balance: this.balances.balance };
+      return { fee: defaultPriorityFee, balance: confirmedBalance };
     }
 
     const txPrerequisites: TransactionPrerequisite = {};
     for (const priority of Object.keys(averageTxFees)) {
       if (
         priority === defaultTxPriority ||
-        defaultDebitedAmount === this.balances.balance
+        defaultDebitedAmount === confirmedBalance
       ) {
         txPrerequisites[priority] = {
           inputs: defaultPriorityInputs,
@@ -1177,7 +1184,7 @@ export default class HDSegwitWallet extends Bitcoin {
           averageTxFees[priority].feePerByte,
         );
         const debitedAmount = netAmount + fee;
-        if (!inputs || debitedAmount > this.balances.balance) {
+        if (!inputs || debitedAmount > confirmedBalance) {
           // to default priorty assets
           txPrerequisites[priority] = {
             inputs: defaultPriorityInputs,

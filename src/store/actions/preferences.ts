@@ -17,7 +17,8 @@ export const TWO_FA_SETUP = 'TWO_FA_SETUP';
 export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST';
 export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS';
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED';
-
+export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS';
+export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
 
 
 export const setCurrencyCode = (data) => {
@@ -137,3 +138,19 @@ export const initMigration = () => {
     dispatch(initAsyncMigrationSuccess());
   };
 }
+
+
+export const updateApplicationStatus = (data) => {
+  return {
+    type: UPDATE_APPLICATION_STATUS,
+    payload: { status: data },
+  };
+};
+
+export const updateLastSeen = (data) => {
+  AsyncStorage.setItem("lastSeen", String(new Date()))
+  return {
+    type: UPDATE_LAST_SEEN,
+    payload: { lastSeen: data },
+  };
+};

@@ -66,6 +66,7 @@
     "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-native": "0.59.10",
+    "react-native-background-timer": "^2.3.1",
     "react-native-camera": "3.28.0",
     "react-native-cardview": "^2.0.5",
     "react-native-check-app-install": "^0.0.5",

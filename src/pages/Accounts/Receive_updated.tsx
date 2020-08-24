@@ -937,7 +937,7 @@ export default function Receive(props) {
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('56%'),
         ]}
         renderContent={() => (
           <SendViaQR

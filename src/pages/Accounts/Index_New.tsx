@@ -126,10 +126,6 @@ interface AccountsStateTypes {
   switchOn: boolean;
   CurrencyCode: string;
   transactions: any[];
-  tabBarIndex: number;
-  loading: boolean;
-  selectedTransactionItem: any;
-  currencyCode: string;
   spendableBalance: any;
   providedBalance: any;
 }
@@ -156,7 +152,6 @@ interface AccountsPropsTypes {
   isTestHelperDoneValue: any;
   setTransactionHelper: any;
   isTransactionHelperDoneValue: any;
-  averageTxFees: any;
   setAverageTxFee: any;
 }
 
@@ -1124,7 +1119,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 }}
                               >
                                 <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
+                                  {item.accountType == FAST_BITCOINS
+                            ? 'FastBitcoins.com'
+                            : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>
                                   {moment(item.date)
@@ -1163,7 +1160,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 }}
                               >
                                 <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
+                                {item.accountType == FAST_BITCOINS
+                            ? 'FastBitcoins.com'
+                            : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>
                                   {moment(item.date)
@@ -1373,11 +1372,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   transactionLoading={transactionLoading}
                   transactions={transactions}
                   AtCloseEnd={false}
-                  setTransactionItem={(item) =>
-                    this.setState({ selectedTransactionItem: item })
+                  setTransactionItem={(item) =>{}
+                    //this.setState({ selectedTransactionItem: item })
                   }
-                  setTabBarZIndex={(index) =>
-                    this.setState({ tabBarIndex: index })
+                  setTabBarZIndex={(index) =>{}
+                    //this.setState({ tabBarIndex: index })
                   }
                   TransactionDetailsBottomSheet={
                     this.refs.TransactionDetailsBottomSheet as any

@@ -298,7 +298,7 @@ export default function NewOwnQuestions(props) {
               >
                 <TextInput
                   style={styles.modalInputBox}
-                  placeholder={'Enter a question'}
+                  placeholder={'Enter a question/hint'}
                   placeholderTextColor={Colors.borderColor}
                   value={question}
                   autoCompleteType="off"
