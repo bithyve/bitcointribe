@@ -43,11 +43,14 @@ import RestoreFromICloud from '../RestoreHexaWithKeeper/RestoreFromICloud';
 import SetupPrimaryKeeper from '../Keeper/SetupPrimaryKeeper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecurityQuestion from '../Keeper/SecurityQuestion';
+import UpgradingKeeperContact from './UpgradingKeeperContact';
+import UpgradePdfKeeper from './UpgradePdfKeeper';
 // import RestoreWallet from './RestoreWallet';
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: any[];
+  selectedContact: any[];
 }
 
 interface UpgradeBackupPropsTypes {
@@ -99,13 +102,87 @@ class UpgradeBackup extends Component<
           image: require('../../assets/images/icons/icon_question.png'),
         },
       ],
+      selectedContact: [
+        {
+          checked: true,
+          contactType: 'person',
+          emails: [
+            {
+              email: 'floresjoyner@digifad.com',
+              id: '826F07EC-4B52-4703-907F-8AEE4F360EA2',
+            },
+            {
+              email: 'francinefranks@fossiel.com',
+              id: 'A3FD9B00-C732-4EEE-96E5-CD0040C6AB19',
+            },
+          ],
+          firstName: 'Jessica',
+          id: '5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson',
+          imageAvailable: false,
+          lastName: 'Pearson',
+          name: 'Jessica Pearson',
+          phoneNumbers: [
+            {
+              countryCode: 'in',
+              id: 'BF2490FA-C3B3-4F97-925E-6E07C4B7DB41',
+              number: '98247 52009',
+              digits: '9824752009',
+              label: 'home',
+            },
+            {
+              countryCode: 'in',
+              id: '7F31DFEF-BCFD-457C-A82A-6B88A28DA285',
+              number: '(811) 554-3283',
+              digits: '8115543283',
+              label: 'home',
+            },
+          ],
+        },
+        {
+          checked: true,
+          contactType: 'person',
+          emails: [
+            {
+              email: 'floresjoyner@digifad.com',
+              id: '826F07EC-4B52-4703-907F-8AEE4F360EA2',
+            },
+            {
+              email: 'francinefranks@fossiel.com',
+              id: 'A3FD9B00-C732-4EEE-96E5-CD0040C6AB19',
+            },
+          ],
+          firstName: 'Rachel',
+          id: '5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson',
+          imageAvailable: false,
+          lastName: 'Zane',
+          name: 'Rachel Zane',
+          phoneNumbers: [
+            {
+              countryCode: 'in',
+              id: 'BF2490FA-C3B3-4F97-925E-6E07C4B7DB41',
+              number: '98247 52009',
+              digits: '9824752009',
+              label: 'home',
+            },
+            {
+              countryCode: 'in',
+              id: '7F31DFEF-BCFD-457C-A82A-6B88A28DA285',
+              number: '(811) 554-3283',
+              digits: '8115543283',
+              label: 'home',
+            },
+          ],
+        },
+      ],
     };
   }
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    (this.refs.RestoreFromICloud as any).snapTo(1)
+  };
 
   render() {
-    const { listData, selectedIds } = this.state;
+    const { listData, selectedIds, selectedContact } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -269,6 +346,7 @@ class UpgradeBackup extends Component<
               modalRef={this.refs.RestoreFromICloud}
               onPressProceed={() => {
                 (this.refs.RestoreFromICloud as any).snapTo(0);
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
               }}
               onPressBack={() => {
                 (this.refs.RestoreFromICloud as any).snapTo(0);
@@ -309,6 +387,7 @@ class UpgradeBackup extends Component<
               }}
               onPressContinue={() => {
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+                (this.refs.UpgradingKeeperContact as any).snapTo(1)
               }}
             />
           )}
@@ -336,6 +415,7 @@ class UpgradeBackup extends Component<
               }}
               onPressConfirm={async () => {
                 Keyboard.dismiss();
+                navigation.navigate('ConfirmKeys');
                 setTimeout(() => {
                   (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
                 }, 2);
@@ -347,6 +427,77 @@ class UpgradeBackup extends Component<
               onPressHeader={() => {
                 (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
               }}
+            />
+          )}
+        />
+
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'UpgradingKeeperContact'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('70%')
+              : hp('80%'),
+          ]}
+          renderContent={() => (
+            <UpgradingKeeperContact
+              title={'Upgrading Keeper Contacts'}
+              subText={
+                'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+              }
+              info={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
+              selectedContactArray={selectedContact}
+              proceedButtonText={'Proceed'}
+              onPressProceed={() => {
+                (this.refs.UpgradingKeeperContact as any).snapTo(0);
+                (this.refs.UpgradePdfKeeper as any).snapTo(1);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() =>
+                (this.refs.UpgradingKeeperContact as any).snapTo(0)
+              }
+            />
+          )}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'UpgradePdfKeeper'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('50%')
+              : hp('60%'),
+          ]}
+          renderContent={() => (
+            <UpgradePdfKeeper
+              title={'Upgrade PDF Keeper'}
+              subText={
+                'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+              }
+              info={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
+              modalRef={this.refs.UpgradePdfKeeper}
+              onPressSetup={() => {
+                (this.refs.UpgradePdfKeeper as any).snapTo(0);
+                (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+              }}
+              onPressBack={() => {
+                (this.refs.UpgradePdfKeeper as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() =>
+                (this.refs.UpgradePdfKeeper as any).snapTo(0)
+              }
             />
           )}
         />

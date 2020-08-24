@@ -46,7 +46,7 @@ export const isEmpty = (obj) => {
 
 export const APP_LIST = {
   "WhatsApp": {pkgName: "com.whatsapp", urlScheme: "whatsapp", urlParams: "app"}, // fa
-  "Telegram": {pkgName: "org.telegram.messenger", urlScheme: "tg", urlParams: "share/url?url="}, // fa
+  "Telegram": {pkgName: "org.telegram.messenger", urlScheme: "telegram-messenger", urlParams: "share/url?url="}, // fa
   "Messenger": {pkgName: "com.facebook.orca", urlScheme: "fb-messenger", urlParams: "user-thread/{user-id}"}, // fa: facebook
 }
 

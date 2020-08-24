@@ -128,7 +128,6 @@ function SecurityQuestion(props) {
                   setBackspace(event);
                 }}
                 onChangeText={(text) => {
-                  text = text.replace(/[^a-z]/g, '');
                   setAnswer(text);
                 }}
                 keyboardType={

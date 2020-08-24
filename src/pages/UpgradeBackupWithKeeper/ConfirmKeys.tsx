@@ -267,7 +267,7 @@ class ConfirmKeys extends Component<
           }}
         >
           <TouchableOpacity
-            onPress={() => (this.refs.RestoreWallet as any).snapTo(1)}
+            onPress={() => {}}
             style={styles.buttonInnerView}
           >
             <Image
@@ -282,7 +282,7 @@ class ConfirmKeys extends Component<
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              (this.refs.BackupNotFound as any).snapTo(1);
+              // (this.refs.BackupNotFound as any).snapTo(1);
             }}
           >
             <Image
@@ -338,6 +338,7 @@ class ConfirmKeys extends Component<
               modalRef={this.refs.BackupUpgradeSuccess}
               onPressProceed={() => {
                 (this.refs.BackupUpgradeSuccess as any).snapTo(0);
+                navigation.replace('ManageBackup');
               }}
               onPressBack={() => {
                 (this.refs.BackupUpgradeSuccess as any).snapTo(0);
@@ -369,6 +370,7 @@ class ConfirmKeys extends Component<
               dataList={listToDelete}
               onPressProceed={() => {
                 (this.refs.DeleteRecoveryKeys as any).snapTo(0);
+                (this.refs.BackupUpgradeSuccess as any).snapTo(1);
               }}
             />
           )}
