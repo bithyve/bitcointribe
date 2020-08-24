@@ -5,9 +5,9 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  StatusBar, 
+  StatusBar,
   ScrollView,
-  Image
+  Image,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -51,7 +51,6 @@ interface SweepConfirmationPropsTypes {
   currencyToggleValue: any;
   currencyCode: any;
   exchangeRates: any;
-
 }
 
 class SweepConfirmation extends Component<
@@ -62,13 +61,13 @@ class SweepConfirmation extends Component<
   transfer: any;
   constructor(props) {
     super(props);
-    this.isSendMax = false;//props.navigation.getParam('isSendMax');
+    this.isSendMax = false; //props.navigation.getParam('isSendMax');
     if (this.isSendMax) {
       setTimeout(() => {
         this.onPrioritySelect('Medium Fee');
       }, 2);
     }
-    this.state={
+    this.state = {
       accountData: this.props.navigation.getParam('accountData'),
       serviceType: REGULAR_ACCOUNT,
       totalAmount: 0,
@@ -81,13 +80,12 @@ class SweepConfirmation extends Component<
       CurrencyCode: 'USD',
       exchangeRates: this.props.exchangeRates,
       customEstimatedBlock: 0,
-
-    }
+    };
   }
 
   componentDidMount = () => {
     let { accounts } = this.props;
-    let {serviceType} = this.state;
+    let { serviceType } = this.state;
     if (accounts[serviceType].transfer.details) {
       let totalAmount = 0;
       accounts[serviceType].transfer.details.map((item) => {
@@ -99,7 +97,7 @@ class SweepConfirmation extends Component<
       transfer: accounts[serviceType].transfer,
       loading: accounts[serviceType].loading,
     });
-   // this.onChangeInTransfer();
+    // this.onChangeInTransfer();
     this.setCurrencyCodeFromAsync();
   };
 
@@ -112,16 +110,18 @@ class SweepConfirmation extends Component<
       prevProps.accounts[this.state.serviceType].loading !==
       this.props.accounts[this.state.serviceType].loading
     ) {
-      this.setState({ loading: this.props.accounts[this.state.serviceType].loading });
+      this.setState({
+        loading: this.props.accounts[this.state.serviceType].loading,
+      });
     }
   };
 
-  calculateTotalAmount = () =>{
+  calculateTotalAmount = () => {
     const { accountData } = this.state;
     let sum = accountData.reduce((a, b) => a + (b['balance'] || 0), 0);
-    console.log("SUM", sum);
+    console.log('SUM', sum);
     return UsNumberFormat(sum);
-  }
+  };
 
   onPrioritySelect = (priority) => {
     this.setState({
@@ -137,7 +137,7 @@ class SweepConfirmation extends Component<
       });
       return;
     }
-  }
+  };
 
   setCurrencyCodeFromAsync = async () => {
     let currencyToggleValueTmp = this.props.currencyToggleValue;
@@ -150,9 +150,7 @@ class SweepConfirmation extends Component<
 
   getCorrectCurrencySymbol = () => {
     const { switchOn, CurrencyCode } = this.state;
-    return switchOn
-      ? 'sats'
-      : CurrencyCode.toLocaleLowerCase();
+    return switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase();
   };
 
   convertBitCoinToCurrency = (value) => {
@@ -198,8 +196,7 @@ class SweepConfirmation extends Component<
               return (
                 <View style={styles.view1}>
                   <View style={{ flexDirection: 'row' }}>
-                    <Image source={item.image} 
-                    style={styles.circleShapeView} />
+                    <Image source={item.image} style={styles.circleShapeView} />
                   </View>
                   <Text style={styles.name} numberOfLines={1}>
                     {item.account_name}
@@ -220,134 +217,121 @@ class SweepConfirmation extends Component<
             })}
           </ScrollView>
         </View>
-        <ScrollView style={{marginBottom: 20}}>
-        <View style={styles.availableToSpendView}>
-          <Text style={styles.sweepingFromText}>Sweeping From: </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}
-          >
-            {accountData.map((item) => {
-              return (
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansItalic,
-              }}
-            >
-              {item.account_name + ', '}
-            </Text>)
-            })}
-          </View>
-        </View>
-        <View style={styles.totalMountView}>
-          <Text style={styles.totalAmountText}>Total Amount</Text>
-          <View style={styles.totalAmountOuterView}>
-            <View style={styles.totalAmountInnerView}>
-              <View style={styles.amountInputImage}>
-                <Image
-                  style={styles.textBoxImage}
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                />
-              </View>
-              <View style={styles.totalAmountView} />
-              <Text style={styles.amountText}>
-                {this.calculateTotalAmount()}
-                {/* {UsNumberFormat(totalAmount)} */}
-                {/* {totalAmount} */}
-              </Text>
-              <Text style={styles.amountUnitText}>{' sats'}</Text>
+        <ScrollView style={{ marginBottom: 20 }}>
+          <View style={styles.availableToSpendView}>
+            <Text style={styles.sweepingFromText}>Sweeping From: </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {accountData.map((item) => {
+                return (
+                  <Text
+                    style={{
+                      color: Colors.blue,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansItalic,
+                    }}
+                  >
+                    {item.account_name + ', '}
+                  </Text>
+                );
+              })}
             </View>
           </View>
-        </View>
-        <View style={styles.transactionPriorityView}>
+          <View style={styles.totalMountView}>
+            <Text style={styles.totalAmountText}>Total Amount</Text>
+            <View style={styles.totalAmountOuterView}>
+              <View style={styles.totalAmountInnerView}>
+                <View style={styles.amountInputImage}>
+                  <Image
+                    style={styles.textBoxImage}
+                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                  />
+                </View>
+                <View style={styles.totalAmountView} />
+                <Text style={styles.amountText}>
+                  {this.calculateTotalAmount()}
+                  {/* {UsNumberFormat(totalAmount)} */}
+                  {/* {totalAmount} */}
+                </Text>
+                <Text style={styles.amountUnitText}>{' sats'}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.transactionPriorityView}>
             <Text style={styles.transactionPriorityText}>
               Transaction Priority
             </Text>
             {/* <Text style={styles.transactionPriorityInfoText}>
               Set priority for your transaction
             </Text> */}
-            <View style={styles.priorityTableHeadingContainer}>
-            <View style={styles.priorityDataContainer}>
-                <Text style={{...styles.tableHeadingText, paddingLeft: 15}}>Priority</Text>
+            <View style={styles.priorityTableContainer}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  flex: 2,
+                  marginLeft: wp('3%'),
+                }}
+              >
+                <Text style={styles.tableHeadingText}>
+                  Priority
+                </Text>
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={styles.arrivalTime}>
                 <Text style={styles.tableHeadingText}>Arrival Time</Text>
               </View>
-              <View style={styles.priorityDataContainer}>
-                <Text
-                  style={{...styles.tableHeadingText, paddingRight: 20}}
-                >
+              <View style={styles.feeValues}>
+                <Text style={{ ...styles.tableHeadingText, textAlign: 'center', }}>
                   Fee
                 </Text>
               </View>
             </View>
-            {!this.isSendMax ? (
-              <View style={styles.priorityTableContainer}>
-                <View
-                  style={{
-                    ...styles.priorityDataContainer,
-                    flex: 1,
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <RadioButton
-                    size={20}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={this.state.sliderValueText.includes('High')}
-                    onpress={() => this.onPrioritySelect('High Fee')}
-                  />
-                  <Text style={{ ...styles.priorityTableText, marginLeft: 10,}}>
-                    High
-                  </Text>
-                </View>
-                <View style={{...styles.priorityDataContainer, flex:1}}>
-                  <Text style={styles.priorityTableText}>
+            {!this.isSendMax && <View style={styles.priorityTableContainer}>
+              <View style={styles.priorityValues}>
+                <RadioButton
+                  size={15}
+                  color={Colors.blue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('High')}
+                  onpress={() => this.onPrioritySelect('High Fee')}
+                />
+                <Text style={{ color: Colors.greyTextColor, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMedium, marginLeft: wp('2%') }}>
+                  High
+                </Text>
+              </View>
+              <View style={styles.arrivalTime}>
+                <Text style={styles.priorityTableText}>
                   {'10 - 20 minutes'}
-                    </Text>
-                </View>
-                <View style={{...styles.priorityDataContainer , flex:1,
-                justifyContent: 'flex-end', paddingRight: 20}}>
-                  <Text style={styles.priorityTableText}>
-                    {this.convertBitCoinToCurrency(
+                </Text>
+              </View>
+              <View style={styles.feeValues}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
                         ? transfer.stage1.txPrerequisites['high'].fee
                         : '',
                     )}
                     {' ' + this.getCorrectCurrencySymbol()}
-                  </Text>
-                </View>
+                </Text>
               </View>
-            ) : null}
-            <View style={styles.priorityTableContainer}>
-              <View
-                style={{
-                  ...styles.priorityDataContainer,
-                  flex:1,
-                  justifyContent: 'flex-start',
-                }}
-              >
+            </View>}
+            {!this.isSendMax && <View style={styles.priorityTableContainer}>
+              <View style={styles.priorityValues}>
                 <RadioButton
-                  size={20}
-                  color={Colors.lightBlue}
+                  size={15}
+                  color={Colors.blue}
                   borderColor={Colors.borderColor}
                   isChecked={this.state.sliderValueText.includes('Medium')}
                   onpress={() => this.onPrioritySelect('Medium Fee')}
                 />
-                <Text style={{ ...styles.priorityTableText, marginLeft: 10}}>
+                <Text style={{ ...styles.priorityTableText, marginLeft: wp('2%') }}>
                   Medium
                 </Text>
               </View>
-              <View style={{...styles.priorityDataContainer, flex:1}}>
-                {!this.isSendMax ? (
-                    <Text style={styles.priorityTableText}>
-                      {'10 - 20 minutes'}
-                    </Text>
-                ) : (
-                  <Text>120 - 130</Text>
-                )}
+              <View style={styles.arrivalTime}>
+                <Text style={styles.priorityTableText}>
+                  {'20 - 40 minutes'}
+                </Text>
               </View>
-              <View style={{...styles.priorityDataContainer , flex:1, justifyContent: 'flex-end', paddingRight: 20}}>
+              <View style={styles.feeValues}>
                 <Text style={styles.priorityTableText}>
                   {this.convertBitCoinToCurrency(
                     transfer.stage1 && transfer.stage1.txPrerequisites
@@ -357,50 +341,36 @@ class SweepConfirmation extends Component<
                   {' ' + this.getCorrectCurrencySymbol()}
                 </Text>
               </View>
-            </View>
-            {!this.isSendMax ? (
-              <View
-                style={{
-                  ...styles.priorityTableContainer,
-                  borderBottomWidth:
-                    this.state.customFeePerByte !== '' ? 0.5 : 0,
-                }}
-              >
-                <View
-                  style={{
-                    ...styles.priorityDataContainer,
-                    flex:1,
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <RadioButton
-                    size={20}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={this.state.sliderValueText.includes('Low')}
-                    onpress={() => this.onPrioritySelect('Low Fee')}
-                  />
-                  <Text style={{ ...styles.priorityTableText, marginLeft: 10}}>
-                    Low
-                  </Text>
-                </View>
-                <View style={{...styles.priorityDataContainer , flex:1}}>
-                  <Text style={styles.priorityTableText}>
-                      {'10 - 20 minutes'}
-                    </Text>
-                </View>
-                <View style={{...styles.priorityDataContainer , flex:1, justifyContent: 'flex-end', paddingRight: 20}}>
-                  <Text style={styles.priorityTableText}>
-                    {this.convertBitCoinToCurrency(
+            </View>}
+            {!this.isSendMax && <View style={{...styles.priorityTableContainer, borderBottomWidth: 0, borderColor: Colors.borderColor,}}>
+              <View style={styles.priorityValues}>
+                <RadioButton
+                  size={15}
+                  color={Colors.blue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('Low')}
+                  onpress={() => this.onPrioritySelect('Low Fee')}
+                />
+                <Text style={{ ...styles.priorityTableText, marginLeft: wp('2%') }}>
+                  Low
+                </Text>
+              </View>
+              <View style={styles.arrivalTime}>
+                <Text style={styles.priorityTableText}>
+                  {'20 - 40 minutes'}
+                </Text>
+              </View>
+              <View style={styles.feeValues}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
                         ? transfer.stage1.txPrerequisites['low'].fee
                         : '',
                     )}
-                    {' ' + this.getCorrectCurrencySymbol()}
-                  </Text>
-                </View>
+                  {' ' + this.getCorrectCurrencySymbol()} 
+                </Text>
               </View>
-            ) : null}
+            </View>}
             {this.state.customFeePerByte !== '' && (
               <View
                 style={{
@@ -444,7 +414,8 @@ class SweepConfirmation extends Component<
               </View>
             )}
             <TouchableOpacity
-              style={{borderRadius: 8,
+              style={{
+                borderRadius: 8,
                 marginTop: hp('1.2%'),
                 backgroundColor: Colors.white,
                 borderColor: Colors.backgroundColor,
@@ -484,50 +455,49 @@ class SweepConfirmation extends Component<
               </View>
             </TouchableOpacity>
           </View>
-          </ScrollView>
-          <View style={{marginTop: 'auto'}}>
+        </ScrollView>
+        <View style={{ marginTop: 'auto' }}>
           <BottomInfoBox
-                backgroundColor={Colors.backgroundColor1}
-                title={'Note'}
-                infoText={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-                }
-              />
-              <View
-          style={{
-            flexDirection: "row",
-            marginTop: "auto",
-            alignItems: "center",
-            marginBottom: hp('2%')
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-            }}
-            style={{ ...styles.successModalButtonView }}
-          >
-            {/* {props.loading && props.loading==true ? 
-              <ActivityIndicator size="small" />: */}
-               <Text style={styles.proceedButtonText}>{'Confirm & Send'}</Text>
-            {/* } */}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {}}
+            backgroundColor={Colors.backgroundColor1}
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
+          <View
             style={{
-              height: wp("13%"),
-              width: wp("35%"),
-              justifyContent: "center",
-              alignItems: "center"
+              flexDirection: 'row',
+              marginTop: 'auto',
+              alignItems: 'center',
+              marginBottom: hp('2%'),
             }}
           >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Back
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {}}
+              style={{ ...styles.successModalButtonView }}
+            >
+              {/* {props.loading && props.loading==true ? 
+              <ActivityIndicator size="small" />: */}
+              <Text style={styles.proceedButtonText}>{'Confirm & Send'}</Text>
+              {/* } */}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {}}
+              style={{
+                height: wp('13%'),
+                width: wp('35%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        </View>
-        
-          <BottomSheet
+
+        <BottomSheet
           onCloseStart={() => {
             (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
           }}
@@ -571,7 +541,6 @@ const mapStateToProps = (state) => {
     accounts: state.accounts || [],
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
-
   };
 };
 
@@ -581,23 +550,23 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create({
   successModalButtonView: {
-    height: wp("13%"),
-    width: wp("35%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
-    alignSelf: "center",
-    marginLeft: wp("8%")
+    alignSelf: 'center',
+    marginLeft: wp('8%'),
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -614,11 +583,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: hp('1.5%'),
   },
-  textBoxView: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-  },
   textBoxImage: {
     width: wp('6%'),
     height: wp('6%'),
@@ -632,62 +596,18 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
-  confirmButtonView: {
-    width: wp('50%'),
-    height: wp('13%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  headerText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
-  },
-  availableBalanceView: {
-    paddingBottom: hp('1%'),
-    paddingTop: hp('0.7%'),
-    marginRight: wp('6%'),
-    marginLeft: wp('6%'),
-    marginBottom: hp('1%'),
-    marginTop: hp('1%'),
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
   accountTypeTextBalanceView: {
     color: Colors.blue,
     fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansItalic,
-  },
-  availableToSpendText: {
-    color: Colors.blue,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
-    lineHeight: 15,
-    textAlign: 'center',
-  },
-  availableBalanceText: {
-    color: Colors.blue,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
-  },
-  availableBalanceUnitText: {
-    color: Colors.blue,
-    fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansMediumItalic,
   },
   totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
-   marginTop: hp('1.2%'),
+    marginTop: hp('1.2%'),
     marginRight: wp('6%'),
     marginLeft: wp('6%'),
-     //borderTopWidth: 1,
+    //borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
     paddingBottom: hp('1.7%'),
@@ -747,46 +667,16 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
-  sliderTextView: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  sliderText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'center',
-    flex: 1,
-    flexWrap: 'wrap',
-    marginRight: 5,
-  },
-  bottomButtonView: {
-    flexDirection: 'row',
-    marginTop: hp('3%'),
-    marginBottom: hp('5%'),
-    marginLeft: wp('6%'),
-    marginRight: wp('6%'),
-  },
   tableHeadingText: {
     color: Colors.greyTextColor,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansMedium,
-    textAlign: 'center',
   },
   priorityTableText: {
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
     color: Colors.greyTextColor,
-  },
-  priorityTableHeadingContainer: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    marginTop: hp('2%'),
-    paddingBottom: hp('1.5%'),
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    fontFamily: Fonts.FiraSansRegular,
   },
   priorityTableContainer: {
     flexDirection: 'row',
@@ -839,25 +729,25 @@ const styles = StyleSheet.create({
     marginTop: hp('1.5%'),
     flexDirection: 'row',
   },
-  addessText: {
-    color: Colors.blue,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
-  },
   sweepingFromText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
-  balanceText: {
-    color: Colors.blue,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
+  priorityValues: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 2,
+    marginLeft: wp('3%'),
   },
-  textTsats: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(7),
-    fontFamily: Fonts.FiraSansMediumItalic,
+  feeValues: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
+  arrivalTime: {
+    justifyContent: 'center',
+    flex: 2,
+  }
 });
