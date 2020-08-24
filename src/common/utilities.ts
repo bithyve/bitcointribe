@@ -23,3 +23,16 @@ export const timeConvert = (valueInMinutes) => {
         return days == 1 ? days + ' day' : days + ' days';
     }
 }
+
+export const timeConvertNear30 = (valueInMinutes) => {
+    var num = Math.ceil(valueInMinutes / 30) * 30;
+    var hours = (num / 60);
+    var rhours = Math.floor(hours);
+    var minutes = (hours - rhours) * 60;
+    var rminutes = Math.round(minutes);
+    if (rhours > 0 && rminutes <= 0) {
+        return rhours + ' hours'
+    } else if (rhours > 0 && rminutes > 0) {
+        return rhours + '.5 hours';
+    }
+}
