@@ -20,7 +20,6 @@ interface IntermediatePropsTypes {
 
 interface IntermediateStateTypes {
     isLocked: boolean,
-    lastKnownTime: any,
     canLock: boolean
 }
 
@@ -30,14 +29,40 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
         super(props)
         this.state = {
             isLocked: false,
-            lastKnownTime: new Date(),
             canLock: true
         }
     }
 
     componentDidMount = () => {
         AppState.addEventListener("change", this.handleAppStateChange);
+        // this.handleLockCheck()
+        this.props.updateLastSeen()
     };
+
+
+
+    handleLockCheck = () => {
+        let interval = setInterval(() => {
+            // check if it should be rendered
+            const TIME_OUT = 15000
+            let now: any = new Date()
+            let diff = Math.abs(now - this.props.lastSeen)
+            const { canLock } = this.state
+            if (diff > TIME_OUT) {
+                if (canLock) {
+                    this.setState({
+                        canLock: false
+                    }, () => {
+                        this.props.navigation.push('ReLogin')
+                        clearInterval(interval)
+                    })
+                }
+            } else {
+                this.props.navigation.pop()
+                this.props.updateLastSeen()
+            }
+        }, 3000)
+    }
 
 
     handleAppStateChange = async (nextAppState) => {

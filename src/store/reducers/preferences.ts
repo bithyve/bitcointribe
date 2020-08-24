@@ -14,12 +14,9 @@ import {
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
-import { chain } from 'icepick';
+import ip, { chain } from 'icepick';
 
-
-
-
-const initialState = {
+const initialState = ip.freeze({
   isInternetModalCome: false,
   currencyCode: null,
   currencyToggleValue: null,
@@ -34,8 +31,9 @@ const initialState = {
   isTwoFASetupDone: false,
   isContactOpen: false,
   isMigrated: false,
-  applicationStatus: null
-}
+  applicationStatus: null,
+  lastSeen: null
+})
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
@@ -106,10 +104,7 @@ export default (state = initialState, { type, payload }) => {
       };
 
     case UPDATE_LAST_SEEN:
-      return {
-        ...state,
-        lastSeen: payload.lastSeen,
-      };
+      return Object.assign({}, state, { lastSeen: new Date() })
 
     default:
       return state

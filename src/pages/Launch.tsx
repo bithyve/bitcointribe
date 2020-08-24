@@ -10,7 +10,6 @@ import {
   AppState,
 } from 'react-native';
 import Video from 'react-native-video';
-import moment from 'moment';
 import Colors from '../common/Colors';
 
 import { initializeDB } from '../store/actions/storage';
@@ -29,6 +28,7 @@ import { connect } from 'react-redux'
 interface HomePropsTypes {
   initializeDB: any
   navigation: any
+  lastSeen: any
 }
 
 interface HomeStateTypes { }
@@ -45,6 +45,7 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
   componentDidMount = () => {
     this.props.initializeDB();
     AppState.addEventListener("change", this.handleAppStateChange);
+    this.handleDeeplink()
   };
 
 
@@ -53,17 +54,27 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
     let walletExists = await AsyncStorage.getItem("walletExists")
+    let lastSeen = await AsyncStorage.getItem("lastSeen")
     if (!walletExists) {
       return
     }
 
     if (Platform.OS === 'android' && nextAppState === 'background') {
-      this.props.navigation.navigate('Intermediate');
+      // if no last seen don't do anything
+      if (lastSeen) {
+        this.props.navigation.navigate('Intermediate');
+        return
+      }
       return
     }
 
     if (Platform.OS === 'ios' && (nextAppState === 'inactive' || nextAppState == 'background')) {
-      this.props.navigation.navigate('Intermediate');
+      // if no last seen don't do anything
+      if (lastSeen) {
+        this.props.navigation.navigate('Intermediate');
+        return
+      }
+
       return
     }
   };
@@ -153,6 +164,7 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
 
 
   render() {
+    console.log("lastSeen", this.props.lastSeen);
     return (
       <View style={styles.container}>
         <Video
@@ -213,8 +225,6 @@ const styles = StyleSheet.create({
 });
 
 
-// const mapStateToProps = () => {
 
-// }
 
 export default connect(null, { initializeDB })(Launch)
