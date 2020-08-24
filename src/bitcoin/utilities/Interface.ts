@@ -138,6 +138,7 @@ export interface DonationDerivativeAccountElements
   extends DerivativeAccountElements {
   donee: string;
   id: string;
+  subject: string;
   description: string;
   configuration: {
     displayBalance: boolean;

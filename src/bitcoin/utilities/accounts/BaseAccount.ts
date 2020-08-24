@@ -323,9 +323,8 @@ export default class BaseAccount {
   };
 
   public setupDonationAccount = async (
-    accountType: string,
-    accountNumber: number,
     donee: string,
+    subject: string,
     description: string,
     configuration: {
       displayBalance: boolean;
@@ -351,9 +350,8 @@ export default class BaseAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.setupDonationAccount(
-          accountType,
-          accountNumber,
           donee,
+          subject,
           description,
           configuration,
         ),

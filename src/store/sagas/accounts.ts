@@ -41,6 +41,8 @@ import {
   syncDerivativeAccounts,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
+  SETUP_DONATION_ACCOUNT,
+  UPDATE_DONATION_PREFERENCES,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -48,6 +50,7 @@ import {
   SECURE_ACCOUNT,
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
@@ -967,4 +970,73 @@ function* startupSyncWorker({ payload }) {
 export const startupSyncWatcher = createWatcher(
   startupSyncWorker,
   STARTUP_SYNC,
+);
+
+function* setupDonationAccountWorker({ payload }) {
+  const { serviceType, donee, subject, description, configuration } = payload;
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[serviceType].service,
+  );
+
+  const res = yield call(
+    service.setupDonationAccount,
+    donee,
+    subject,
+    description,
+    configuration,
+  );
+
+  if (res.status === 200) {
+    console.log({ res });
+    if (!res.data.setupSuccessful) {
+      throw new Error('Donation account setup failed');
+    }
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  }
+}
+
+export const setupDonationAccountWatcher = createWatcher(
+  setupDonationAccountWorker,
+  SETUP_DONATION_ACCOUNT,
+);
+
+function* updateDonationPreferencesWorker({ payload }) {
+  const { serviceType, accountNumber, configuration } = payload;
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[serviceType].service,
+  );
+
+  const res = yield call(
+    service.updateDonationPreferences,
+    accountNumber,
+    configuration,
+  );
+
+  if (res.status === 200) {
+    console.log({ res });
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  }
+}
+
+export const updateDonationPreferencesWatcher = createWatcher(
+  updateDonationPreferencesWorker,
+  UPDATE_DONATION_PREFERENCES,
 );
