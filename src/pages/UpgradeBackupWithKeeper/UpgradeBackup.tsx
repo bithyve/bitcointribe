@@ -64,44 +64,48 @@ class UpgradeBackup extends Component<
       selectedIds: [],
       listData: [
         {
-          type: 'contact',
-          title: 'Jessica P.',
-          info: '+34 000 000 0000',
-          time: '2 weeks',
-          status: 'waiting',
-          image: require('../../assets/images/icons/pexels-photo.png'),
-          id: 1,
+          title: 'App Backup',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'backup',
+          image: require('../../assets/images/icons/icon_backup.png'),
         },
         {
-          type: 'device',
-          title: 'Keeper Contact',
-          info: 'iMac Pro',
-          time: '2 weeks',
-          status: 'received',
-          image: null,
-          id: 2,
+          title: 'Primary Keeper',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'primary',
+          image: require('../../assets/images/icons/icon_secondarydevice.png'),
         },
         {
+          title: 'Keeper Contacts',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
           type: 'contact',
-          title: 'Rachel Z.',
-          info: 'zaner@bithyve.com',
-          time: '2 weeks',
-          status: 'waiting',
-          image: null,
-          id: 3,
+          image: require('../../assets/images/icons/icon_contact.png'),
+        },
+        {
+          title: 'Keeper Device & PDF Keepers',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'devicePDF',
+          image: require('../../assets/images/icons/files-and-folders-2.png'),
+        },
+        {
+          title: 'Security Question',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'securityQuestion',
+          image: require('../../assets/images/icons/icon_question.png'),
         },
       ],
     };
   }
-  // image: require('../../assets/images/icons/icon_contact.png'),
-  // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = () => {
-    
-  };
+  componentDidMount = () => {};
 
   render() {
-    const { listData, selectedIds, listToDelete } = this.state;
+    const { listData, selectedIds } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -129,8 +133,111 @@ class UpgradeBackup extends Component<
             </View>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}></ScrollView>
+        <ScrollView style={{ flex: 1 }}>
+          {listData.map((item) => (
+            <View style={styles.greyBox}>
+              <ImageBackground
+                source={require('../../assets/images/icons/Ellipse.png')}
+                style={{ ...styles.cardsImageView }}
+              >
+                <Image source={item.image} style={styles.cardImage} />
+              </ImageBackground>
+              <View style={{ flex: 1, marginLeft: 5 }}>
+                <View
+                  style={{
+                    borderRadius: 10,
+                    paddingLeft: wp('3%'),
+                    paddingRight: wp('3%'),
+                    height: 50,
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...styles.greyBoxText,
+                      fontSize: RFValue(13),
+                      marginBottom: 5,
+                    }}
+                  >
+                    Upgrade{' '}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {item.title}
+                    </Text>
+                  </Text>
+                  <Text style={styles.greyBoxText}>{item.info}</Text>
+                </View>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.borderColor,
+                    borderRadius: 10,
+                    paddingLeft: wp('3%'),
+                    paddingRight: wp('3%'),
+                    height: 50,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    backgroundColor: Colors.white,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                    }}
+                  >
+                    {item.subTitle}
+                  </Text>
+                  <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                    <View
+                      style={{
+                        height: wp('6%'),
+                        width: 'auto',
+                        paddingLeft: 15,
+                        paddingRight: 15,
+                        backgroundColor: Colors.borderColor,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(9),
+                        }}
+                      >
+                        Not Setup
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: wp('6%'),
+                        width: wp('6%'),
+                        borderRadius: wp('6%') / 2,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: Colors.lightGreen,
+                        marginLeft: 5,
+                      }}
+                    >
+                      <AntDesign
+                        style={{ marginTop: 1 }}
+                        size={RFValue(11)}
+                        color={Colors.darkGreen}
+                        name={'check'}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
         <BottomInfoBox
+          backgroundColor={Colors.white}
           title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
@@ -219,11 +326,11 @@ class UpgradeBackup extends Component<
           snapPoints={[-30, hp('75%'), hp('90%')]}
           renderContent={() => (
             <SecurityQuestion
-              onFocus={()=>{
+              onFocus={() => {
                 if (Platform.OS == 'ios')
                   (this.refs.SecurityQuestionBottomSheet as any).snapTo(2);
               }}
-              onBlur={()=>{
+              onBlur={() => {
                 if (Platform.OS == 'ios')
                   (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
               }}
@@ -243,58 +350,6 @@ class UpgradeBackup extends Component<
             />
           )}
         />
-       {/* <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'BackupNotFound'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('40%')
-              : hp('50%'),
-          ]}
-          renderContent={() => (
-            <ICloudBackupNotFound
-              modalRef={this.refs.BackupNotFound}
-              onPressProceed={() => {
-                (this.refs.BackupNotFound as any).snapTo(0);
-              }}
-              onPressBack={() => {
-                (this.refs.BackupNotFound as any).snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => (this.refs.BackupNotFound as any).snapTo(0)}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'RestoreWallet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('70%'),
-          ]}
-          renderContent={() => (
-            <RestoreWallet
-              modalRef={this.refs.RestoreWallet}
-              onPressProceed={() => {
-                (this.refs.RestoreWallet as any).snapTo(0);
-              }}
-              onPressBack={() => {
-                (this.refs.RestoreWallet as any).snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => (this.refs.RestoreWallet as any).snapTo(0)}
-            />
-          )}
-        /> */}
       </View>
     );
   }
@@ -375,19 +430,18 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.backgroundColor,
   },
   cardsImageView: {
-    width: wp('20%'),
-    height: wp('20%'),
+    width: wp('15%'),
+    height: wp('15%'),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardImage: {
-    width: wp('7%'),
-    height: wp('7%'),
+    width: wp('5%'),
+    height: wp('5%'),
     resizeMode: 'contain',
     marginBottom: wp('1%'),
   },
   statusTextView: {
-    // padding: 5,
     height: wp('5%'),
     backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
@@ -401,5 +455,43 @@ const styles = StyleSheet.create({
     fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
+  },
+  greyBox: {
+    backgroundColor: Colors.backgroundColor1,
+    paddingLeft: 10,
+    paddingRight: 10,
+    flexDirection: 'row',
+    marginTop: wp('2%'),
+    marginBottom: wp('2%'),
+  },
+  greyBoxImage: {
+    width: wp('15%'),
+    height: wp('15%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp('15%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 1,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.8,
+    shadowColor: Colors.textColorGrey,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  greyBoxText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(10),
+  },
+  successModalImage: {
+    width: wp('30%'),
+    height: wp('35%'),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginRight: -5,
   },
 });
