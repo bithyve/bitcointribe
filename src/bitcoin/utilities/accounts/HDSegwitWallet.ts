@@ -1175,11 +1175,6 @@ export default class HDSegwitWallet extends Bitcoin {
       confirmedBalance += confirmedUtxo.value;
     });
 
-    let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
-    });
-
     const outputUTXOs = [];
     for (const recipient of recipients) {
       outputUTXOs.push({
