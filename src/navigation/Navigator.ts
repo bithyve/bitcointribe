@@ -99,6 +99,7 @@ import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
 import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
 import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
 import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity';
+import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -118,6 +119,7 @@ const SetupNavigator = createStackNavigator(
     ShareRecoveryOTP,
     NewOwnQuestions,
     RecoveryQrScanner: QrScanner,
+    NewRecoveryOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

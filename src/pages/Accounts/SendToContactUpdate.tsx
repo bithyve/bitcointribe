@@ -685,7 +685,7 @@ class SendToContact extends Component<
 
   getIsMinimumAllowedStatus = () => {
     const { bitcoinAmount } = this.state;
-    return Number(bitcoinAmount) > 0 && Number(bitcoinAmount) < 550 ? true : false;
+    return bitcoinAmount.length > 0 && Number(bitcoinAmount) >= 0 && Number(bitcoinAmount) < 550 ? true : false;
   }
 
   render() {
@@ -1057,7 +1057,7 @@ class SendToContact extends Component<
                   ) : null}
                   {this.getIsMinimumAllowedStatus() ? (
                     <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>Enter more that 550 sats (min allowed)</Text>
+                      <Text style={styles.errorText}>Enter more than 550 sats (min allowed)</Text>
                     </View>
                   ) : null}
                   <TouchableOpacity
