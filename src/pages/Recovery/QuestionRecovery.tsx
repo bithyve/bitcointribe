@@ -161,7 +161,7 @@ export default function RecoveryQuestionModalContents(props) {
                   ...styles.inputBox,
                   width: '100%',
                   marginTop: 15,
-                  marginBottom: hp('6%'),
+                  marginBottom: hp('3%'),
                 }}
                 keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 textContentType="none"
@@ -172,7 +172,6 @@ export default function RecoveryQuestionModalContents(props) {
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 onChangeText={text => {
-                  text = text.replace(/[^a-z]/g, '')
                   setAnswer(text);
                 }}
                 onFocus={() => {
@@ -182,6 +181,33 @@ export default function RecoveryQuestionModalContents(props) {
                   setDropdownBoxOpenClose(false);
                 }}
               />
+              <TouchableOpacity style={{
+              flexDirection: 'row',
+               marginLeft: wp('6%'),
+               marginRight: wp('6%'),
+               paddingBottom: 10,
+               paddingTop: 10,
+               marginBottom: 25
+            }}
+            onPress={()=> props.navigation.navigate('NewRecoveryOwnQuestions',{
+              walletName,
+            })}>
+              <Text
+                style={{
+                  fontFamily: Fonts.FiraSansMediumItalic,
+                  fontWeight: 'bold',
+                  fontStyle: 'italic',
+                  fontSize: RFValue(12),
+                  color: Colors.blue,
+                }}
+                onPress={()=> props.navigation.navigate('NewRecoveryOwnQuestions',{
+                  walletName,
+                })}
+              >
+                or choose my own Question
+              </Text>
+            </TouchableOpacity>
+
               <Text style={styles.modalInfoText}>
                 The Security Answer is case sensitive, make sure you{'\n'}enter
                 the case, numeric or symbolic values correctly

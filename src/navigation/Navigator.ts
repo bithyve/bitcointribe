@@ -82,6 +82,7 @@ import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
+import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -101,6 +102,7 @@ const SetupNavigator = createStackNavigator(
     ShareRecoveryOTP,
     RecoveryQrScanner: QrScanner,
     NewOwnQuestions,
+    NewRecoveryOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
