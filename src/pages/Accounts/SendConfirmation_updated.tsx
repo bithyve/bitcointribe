@@ -709,10 +709,11 @@ class SendConfirmation_updated extends Component<
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        {transfer.stage1.txPrerequisites['high'].estimatedBlocks * 10}{' '}
+                        ~{(transfer.stage1.txPrerequisites['high'].estimatedBlocks + 1) * 10}{' '}minutes
+                        {/* {transfer.stage1.txPrerequisites['high'].estimatedBlocks * 10}{' '}
                         -{' '}
                         {(transfer.stage1.txPrerequisites['high'].estimatedBlocks + 1) * 10}{' '}
-                        minutes
+                        minutes */}
                       </Text>
                     ) : null}
                 </View>
@@ -752,7 +753,7 @@ class SendConfirmation_updated extends Component<
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        {timeConvertNear30((transfer.stage1.txPrerequisites['medium'].estimatedBlocks + 1) * 10)}
+                        ~{timeConvertNear30((transfer.stage1.txPrerequisites['medium'].estimatedBlocks + 1) * 10)}
                         {/* {transfer.stage1.txPrerequisites['medium']
                           .estimatedBlocks * 10}{' '}
                       -{' '}
@@ -808,7 +809,7 @@ class SendConfirmation_updated extends Component<
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        {timeConvertNear30((transfer.stage1.txPrerequisites['low'].estimatedBlocks + 1) * 10)}
+                        ~{timeConvertNear30((transfer.stage1.txPrerequisites['low'].estimatedBlocks + 1) * 10)}
                         {/* {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
                           10}{' '}
                       -{' '}
@@ -857,8 +858,9 @@ class SendConfirmation_updated extends Component<
                 </View>
                 <View style={styles.priorityDataContainer}>
                   <Text style={styles.priorityTableText}>
-                    {this.state.customEstimatedBlock * 10} - {' '}
-                    {(this.state.customEstimatedBlock + 1) * 10} minutes
+                    ~{(this.state.customEstimatedBlock + 1) * 10} minutes
+                    {/* {this.state.customEstimatedBlock * 10} - {' '}
+                    {(this.state.customEstimatedBlock + 1) * 10} minutes */}
                   </Text>
                 </View>
                 <View style={styles.priorityDataContainer}>

@@ -5,7 +5,7 @@ import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
 import { updateLastSeen } from '../../store/actions/preferences'
-var blurredImage = require('../../assets/images/blurred_bg.jpg')
+var imageBackground = require('../../assets/images/intermediate-bg.png')
 
 
 
@@ -15,7 +15,6 @@ interface IntermediatePropsTypes {
     applicationStatus: any,
     lastSeen: any,
     updateLastSeen: any
-
 }
 
 interface IntermediateStateTypes {
@@ -67,7 +66,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
     handleAppStateChange = async (nextAppState) => {
         const TIME_OUT = 15000
-        if (Platform.OS === 'ios' && nextAppState === 'active') {
+        if ((Platform.OS === 'ios' && nextAppState === 'active') || (Platform.OS === 'android' && nextAppState === 'background')) {
             let now: any = new Date()
             let diff = Math.abs(now - this.props.lastSeen)
             const { canLock } = this.state
@@ -93,7 +92,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
     render() {
         return (
-            <ImageBackground source={blurredImage} style={styles.wrapper}>
+            <ImageBackground source={imageBackground} style={styles.wrapper}>
                 <Loader />
             </ImageBackground>
         )
@@ -106,7 +105,8 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        resizeMode: 'contain'
     }
 })
 
