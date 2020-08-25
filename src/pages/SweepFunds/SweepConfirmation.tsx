@@ -29,6 +29,7 @@ import idx from 'idx';
 import ModalHeader from '../../components/ModalHeader';
 import CustomPriorityContent from '../../components/CustomPriorityContent';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import SendConfirmationContent from '../Accounts/SendConfirmationContent';
 
 interface SweepConfirmationStateTypes {
   accountData: any;
@@ -473,7 +474,9 @@ class SweepConfirmation extends Component<
             }}
           >
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={() => {
+                (this.refs.SendSuccessBottomSheet as any).snapTo(1);
+              }}
               style={{ ...styles.successModalButtonView }}
             >
               {/* {props.loading && props.loading==true ? 
@@ -496,7 +499,56 @@ class SweepConfirmation extends Component<
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+          onCloseStart={() => {
+            if (this.refs.SendSuccessBottomSheet as any)
+              (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
+            // this.props.clearTransfer(this.serviceType);
+            // navigation.navigate('Accounts', {
+            //   serviceType: this.serviceType,
+            //   index:
+            //     this.serviceType === TEST_ACCOUNT
+            //       ? 0
+            //       : this.serviceType === REGULAR_ACCOUNT
+            //         ? 1
+            //         : 2,
+            //   spendableBalance: this.spendableBalance - totalAmount,
+            // });
+          }}
+          enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
+          ref={'SendSuccessBottomSheet'}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={() => (
+            <SendConfirmationContent
+              title={'Sent Successfully'}
+              info={'Transaction(s) successfully submitted'}
+              infoText={
+                'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
+              }
+              userInfo={transfer.details ? transfer.details : []}
+              isFromContact={false}
+              okButtonText={'View Account'}
+              cancelButtonText={'Back'}
+              isCancel={false}
+              onPressOk={() => {
+                if (this.refs.SendSuccessBottomSheet as any)
+                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+              }}
+              isSuccess={true}
+              serviceType={REGULAR_ACCOUNT}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+            onPressHeader={() => {
+              if (this.refs.SendSuccessBottomSheet as any)
+                (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+            }}
+            />
+          )}
+        />
         <BottomSheet
           onCloseStart={() => {
             (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
