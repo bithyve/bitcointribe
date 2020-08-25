@@ -46,6 +46,7 @@ import SecurityQuestion from '../Keeper/SecurityQuestion';
 import UpgradingKeeperContact from './UpgradingKeeperContact';
 import UpgradePdfKeeper from './UpgradePdfKeeper';
 // import RestoreWallet from './RestoreWallet';
+import Dash from 'react-native-dash';
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -211,28 +212,34 @@ class UpgradeBackup extends Component<
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          {listData.map((item) => (
+          {listData.map((item, index) => (
             <View style={styles.greyBox}>
               <View>
-              <ImageBackground
-                source={require('../../assets/images/icons/Ellipse.png')}
-                style={{ ...styles.cardsImageView }}
-              >
-                <Image source={item.image} style={styles.cardImage} />
-              </ImageBackground>
-              <View
-                style={{
-                  height: 70,
-                  width: 1,
-                  borderRadius: 1,
-                  borderWidth: 1,
-                  borderColor: 'red',
-                  borderStyle: 'dashed',
-                  zIndex: 0,
-                  alignSelf: 'center'
-                }}
-              >
-              </View>
+                <ImageBackground
+                  source={require('../../assets/images/icons/Ellipse.png')}
+                  style={{ ...styles.cardsImageView }}
+                >
+                  <Image source={item.image} style={styles.cardImage} />
+                </ImageBackground>
+                {index != listData.length - 1 && (
+                  <Dash
+                    dashStyle={{
+                      width: wp('1%'),
+                      height: wp('1%'),
+                      borderRadius: wp('1%') / 2,
+                      overflow: 'hidden',
+                    }}
+                    dashColor={Colors.borderColor}
+                    style={{
+                      height: 75,
+                      width: wp('1%'),
+                      flexDirection: 'column',
+                      marginLeft: wp('7%'),
+                    }}
+                    dashThickness={10}
+                    dashGap={5}
+                  />
+                )}
               </View>
               <View style={{ flex: 1, marginLeft: 5 }}>
                 <View
@@ -249,7 +256,7 @@ class UpgradeBackup extends Component<
                     style={{
                       ...styles.greyBoxText,
                       fontSize: RFValue(13),
-                      marginBottom: 5,
+                      marginBottom: wp('1.5%'),
                     }}
                   >
                     Upgrade{' '}
@@ -627,8 +634,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     flexDirection: 'row',
-   // marginTop: wp('2%'),
-   // marginBottom: wp('2%'),
+    //  marginTop: wp('2%'),
+    //  marginBottom: wp('2%'),
   },
   greyBoxImage: {
     width: wp('15%'),
