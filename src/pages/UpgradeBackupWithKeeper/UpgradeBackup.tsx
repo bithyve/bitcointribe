@@ -178,7 +178,7 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    (this.refs.RestoreFromICloud as any).snapTo(1)
+    (this.refs.RestoreFromICloud as any).snapTo(1);
   };
 
   render() {
@@ -213,12 +213,27 @@ class UpgradeBackup extends Component<
         <ScrollView style={{ flex: 1 }}>
           {listData.map((item) => (
             <View style={styles.greyBox}>
+              <View>
               <ImageBackground
                 source={require('../../assets/images/icons/Ellipse.png')}
                 style={{ ...styles.cardsImageView }}
               >
                 <Image source={item.image} style={styles.cardImage} />
               </ImageBackground>
+              <View
+                style={{
+                  height: 70,
+                  width: 1,
+                  borderRadius: 1,
+                  borderWidth: 1,
+                  borderColor: 'red',
+                  borderStyle: 'dashed',
+                  zIndex: 0,
+                  alignSelf: 'center'
+                }}
+              >
+              </View>
+              </View>
               <View style={{ flex: 1, marginLeft: 5 }}>
                 <View
                   style={{
@@ -387,7 +402,7 @@ class UpgradeBackup extends Component<
               }}
               onPressContinue={() => {
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
-                (this.refs.UpgradingKeeperContact as any).snapTo(1)
+                (this.refs.UpgradingKeeperContact as any).snapTo(1);
               }}
             />
           )}
@@ -590,7 +605,7 @@ const styles = StyleSheet.create({
     width: wp('5%'),
     height: wp('5%'),
     resizeMode: 'contain',
-    marginBottom: wp('1%'),
+    //marginBottom: wp('1%'),
   },
   statusTextView: {
     height: wp('5%'),
@@ -612,8 +627,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     flexDirection: 'row',
-    marginTop: wp('2%'),
-    marginBottom: wp('2%'),
+   // marginTop: wp('2%'),
+   // marginBottom: wp('2%'),
   },
   greyBoxImage: {
     width: wp('15%'),
