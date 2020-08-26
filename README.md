@@ -41,8 +41,6 @@ yarn android
 
 Please download and keep all these files in the same location: `Android APK file, SHA256SUM.asc, HEXA_DETACHED_SIGN.sign`
 
-**Get Hexa@BitHyve.Com public Key**
-
 Get the public PGP key for Hexa@Bithyve.Com using
 
 ```
