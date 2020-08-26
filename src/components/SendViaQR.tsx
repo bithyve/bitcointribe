@@ -135,8 +135,8 @@ export default function SendViaQR(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{
-              height: wp('6%'),
-              width: wp('10%'),
+              height: wp('8%'),
+              width: wp('18%'),
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: Colors.lightBlue,
@@ -148,12 +148,12 @@ export default function SendViaQR(props) {
             <Text
               style={{
                 color: Colors.white,
-                fontSize: RFValue(14),
+                fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              X
-            </Text>
+              Done
+              </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
@@ -402,7 +402,7 @@ export default function SendViaQR(props) {
                 <QRCode value={props.QR} size={hp('27%')} />
               )}
           </View>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{
               backgroundColor: Colors.blue,
@@ -424,7 +424,7 @@ export default function SendViaQR(props) {
             >
               Yes, this was scanned
           </Text>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
         </View>
       </ScrollView>
 

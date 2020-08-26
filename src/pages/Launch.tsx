@@ -44,7 +44,7 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = () => {
     this.props.initializeDB();
-    AppState.addEventListener("change", this.handleAppStateChange);
+    // AppState.addEventListener("change", this.handleAppStateChange);
     this.handleDeeplink()
   };
 
