@@ -55,7 +55,7 @@ gpg --keyserver hkps://keys.openpgp.org --recv-key "389F 4CAD A078 5AC0 E28A 0C1
 
 **Verify the APK certificate**
 
-Extract `/META-INF/HEXAWALL.RSA`  from APK and extract the Certificate Finger Print:
+Extract `/META-INF/HEXAWALL.RSA` from APK by renaming the .apk to .zip and extract the Certificate Finger Print:
 
 ```
 keytool -printcert -file HEXAWALLET.RSA
