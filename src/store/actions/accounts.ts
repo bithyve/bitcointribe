@@ -33,7 +33,7 @@ export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
+  options?: { loader?; fetchTransactionsSync?; restore?},
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -245,6 +245,7 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED';
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
+export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -314,3 +315,7 @@ export const secondaryXprivGenerated = (generated) => {
 export const twoFAResetted = (resetted) => {
   return { type: TWO_FA_RESETTED, payload: { resetted } };
 };
+
+export const settedDonationAccount = (serviceType, successful) => {
+  return { type: SETTED_DONATION_ACC, payload: {serviceType, successful } }
+}

@@ -19,6 +19,8 @@ import {
   ADD_TRANSFER_DETAILS,
   REMOVE_TRANSFER_DETAILS,
   AVERAGE_TX_FEE,
+  SETTED_DONATION_ACC,
+  SETUP_DONATION_ACCOUNT,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -56,6 +58,10 @@ const ACCOUNT_VARS: {
     testcoins: Boolean;
   };
   averageTxFees: any;
+  donationAccount: {
+    settedup: Boolean,
+    preferenceUpdated: Boolean
+  }
 } = {
   service: null,
   receivingAddress: '',
@@ -82,6 +88,10 @@ const ACCOUNT_VARS: {
     testcoins: false,
   },
   averageTxFees: null,
+  donationAccount: {
+    settedup: false,
+    preferenceUpdated: false
+  }
 };
 
 const initialState: {
@@ -445,6 +455,30 @@ export default (state = initialState, action) => {
         ...state,
         averageTxFees: action.payload.averageTxFees,
       };
+
+    case SETUP_DONATION_ACCOUNT:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          donationAccount: {
+            settedup: false,
+            preferenceUpdated: false
+          }
+        }
+      }
+
+    case SETTED_DONATION_ACC:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          donationAccount: {
+            ...state[account].donationAccount,
+            settedup: action.payload.successful
+          }
+        }
+      }
   }
   return state;
 };

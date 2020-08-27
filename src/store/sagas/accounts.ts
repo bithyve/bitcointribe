@@ -24,6 +24,7 @@ import {
   testcoinsReceived,
   SYNC_ACCOUNTS,
   accountsSynched,
+  settedDonationAccount,
   FETCH_BALANCE_TX,
   EXCHANGE_RATE,
   exchangeRatesCalculated,
@@ -234,7 +235,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-      JSON.stringify(postFetchTransactions)
+    JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -366,7 +367,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -483,7 +484,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
+          contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -503,7 +504,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -520,7 +521,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -759,16 +760,16 @@ function* accumulativeTxAndBalWorker() {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+      .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -780,7 +781,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+      .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -974,7 +975,7 @@ export const startupSyncWatcher = createWatcher(
 
 function* setupDonationAccountWorker({ payload }) {
   const { serviceType, donee, subject, description, configuration } = payload;
-  const service: RegularAccount = yield select(
+  const service = yield select(
     (state) => state.accounts[serviceType].service,
   );
 
@@ -989,6 +990,7 @@ function* setupDonationAccountWorker({ payload }) {
   if (res.status === 200) {
     console.log({ res });
     if (!res.data.setupSuccessful) {
+      yield put(settedDonationAccount(serviceType, false));
       throw new Error('Donation account setup failed');
     }
 
@@ -998,6 +1000,7 @@ function* setupDonationAccountWorker({ payload }) {
       [serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(settedDonationAccount(serviceType, true));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);

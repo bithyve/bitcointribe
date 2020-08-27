@@ -33,7 +33,7 @@ import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
-import { setupDonationAccount } from '../../store/actions/accounts';
+import { setupDonationAccount, } from '../../store/actions/accounts';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
@@ -51,6 +51,7 @@ interface AddNewAccountStateTypes {
 interface AddNewAccountPropsTypes {
   navigation: any;
   walletName: string;
+  accounts: any;
   setupDonationAccount: any;
 }
 const accountData = [
@@ -93,6 +94,17 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
     this.AccountDetailBottomSheet = React.createRef();
   }
 
+  componentDidUpdate = (prevProps) => {
+    const serviceType = this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT;
+
+    if (
+      !prevProps.accounts[serviceType].donationAccount.settedup &&
+      this.props.accounts[serviceType].donationAccount.settedup
+    ) {
+      this.props.navigation.navigate('Accounts');
+    }
+  };
+
   initiateDonationAccount = () => {
     const { modelTitle, accountName, is2FAEnable, modelDescription } = this.state;
     let serviceType = REGULAR_ACCOUNT
@@ -112,7 +124,6 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
       displayTransactions: true,
     }
     this.props.setupDonationAccount(serviceType, donee, subject, modelDescription, configuration)
-    this.props.navigation.navigate('Accounts');
   }
 
   onSelectContact = (item) => {
@@ -497,11 +508,12 @@ const mapStateToProps = (state) => {
   return {
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+    accounts: idx(state, (_) => _.accounts) || [],
   };
 };
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    setupDonationAccount
+    setupDonationAccount,
   })(AddNewAccount),
 );
