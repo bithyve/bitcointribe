@@ -757,7 +757,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const accountNumber = inUse + 1;
 
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
-    const id = crypto.createHash('sha256').update(xpub).digest('hex');
+    const id = crypto.createHash('sha256').update(xpub).digest('hex').slice(0, 15);
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,

@@ -33,6 +33,10 @@ import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
+import { setupDonationAccount } from '../../store/actions/accounts';
+import { withNavigationFocus } from 'react-navigation';
+import { connect } from 'react-redux';
+import idx from 'idx';
 
 interface AddNewAccountStateTypes {
   selectedAccount: any;
@@ -46,22 +50,24 @@ interface AddNewAccountStateTypes {
 
 interface AddNewAccountPropsTypes {
   navigation: any;
+  walletName: string;
+  setupDonationAccount: any;
 }
 const accountData = [
-  {
-    id: REGULAR_ACCOUNT,
-    account_name: 'Checking Account',
-    type: REGULAR_ACCOUNT,
-    checked: false,
-    image: require('../../assets/images/icons/icon_regular_account.png'),
-  },
-  {
-    id: SECURE_ACCOUNT,
-    account_name: 'Savings Account',
-    type: SECURE_ACCOUNT,
-    checked: false,
-    image: require('../../assets/images/icons/icon_secureaccount_white.png'),
-  },
+  // {
+  //   id: REGULAR_ACCOUNT,
+  //   account_name: 'Checking Account',
+  //   type: REGULAR_ACCOUNT,
+  //   checked: false,
+  //   image: require('../../assets/images/icons/icon_regular_account.png'),
+  // },
+  // {
+  //   id: SECURE_ACCOUNT,
+  //   account_name: 'Savings Account',
+  //   type: SECURE_ACCOUNT,
+  //   checked: false,
+  //   image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+  // },
   {
     id: DONATION_ACCOUNT,
     account_name: 'Donation Account',
@@ -85,6 +91,28 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
       is2FAEnable: false,
     }
     this.AccountDetailBottomSheet = React.createRef();
+  }
+
+  initiateDonationAccount = () => {
+    const { modelTitle, accountName, is2FAEnable, modelDescription } = this.state;
+    let serviceType = REGULAR_ACCOUNT
+    if (is2FAEnable) {
+      serviceType = SECURE_ACCOUNT
+    }
+
+    let donee = modelTitle
+    if (!donee) {
+      // defaulting to wallet name
+      donee = this.props.walletName;
+    }
+
+    const subject = accountName;
+    const configuration = {
+      displayBalance: true,
+      displayTransactions: true,
+    }
+    this.props.setupDonationAccount(serviceType, donee, subject, modelDescription, configuration)
+    this.props.navigation.navigate('Accounts');
   }
 
   onSelectContact = (item) => {
@@ -144,7 +172,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter account name'}
+                placeholder={'Enter donee name'}
                 keyboardType={
                   Platform.OS == 'ios'
                     ? 'ascii-capable'
@@ -217,9 +245,9 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                     : Colors.blue,
                 }}
                 disabled={this.state.modelButtonIsValid}
-                onPress={() => {
-                  this.props.navigation.navigate('Accounts');
-                }}
+                onPress={
+                  this.initiateDonationAccount
+                }
               >
                 <Text style={styles.buttonText}>Proceed</Text>
               </AppBottomSheetTouchableWrapper>
@@ -464,4 +492,16 @@ const styles = StyleSheet.create({
     marginVertical: 10
   },
 })
-export default AddNewAccount;
+
+const mapStateToProps = (state) => {
+  return {
+    walletName:
+      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+  };
+};
+
+export default withNavigationFocus(
+  connect(mapStateToProps, {
+    setupDonationAccount
+  })(AddNewAccount),
+);
