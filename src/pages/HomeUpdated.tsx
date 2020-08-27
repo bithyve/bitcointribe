@@ -2314,9 +2314,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {isLoading ? <Loader /> : null}
+        {/* {isLoading ? <Loader /> : null} */}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onOpenEnd={() => {
             this.setState({
               atCloseEnd: true,
@@ -2376,9 +2376,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           renderHeader={() => (
             <TransactionHeader openCloseModal={this.openCloseModal} />
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           ref="addTabBarBottomSheet"
           onCloseEnd={() => {
             this.setState({
@@ -2437,9 +2437,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           ref="qrTabBarBottomSheet"
           onOpenEnd={() => {
             this.setState({
@@ -2497,9 +2497,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             this.setState(
               {
@@ -2545,9 +2545,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             if (tabBarIndex === 0 && !deepLinkModalOpen) {
               this.setState({
@@ -2650,8 +2650,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
-        <BottomSheet
+        />}
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             if (tabBarIndex === 0) {
               this.setState({
@@ -2717,9 +2717,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseStart={() => {
             this.setState({
               tabBarIndex: 999,
@@ -2766,7 +2766,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
         {knowMoreBottomSheetsFlag ? (
           <BottomSheet
             onOpenEnd={() => {
@@ -2820,7 +2820,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           />
         ) : null}
 
-        <BottomSheet
+        { !isLoading && <BottomSheet
           enabledInnerScrolling={true}
           onCloseEnd={() => {
             this.setState({
@@ -2862,7 +2862,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
 
         {knowMoreBottomSheetsFlag ? (
           <BottomSheet
