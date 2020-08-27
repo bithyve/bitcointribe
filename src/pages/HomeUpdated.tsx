@@ -45,6 +45,7 @@ import {
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
+  fetchWalletImage,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../store/actions/trustedContacts';
@@ -265,6 +266,7 @@ interface HomePropsTypes {
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
+  fetchWalletImage: any;
   s3Service: any;
   initHealthCheck: any;
   overallHealth: any;
@@ -289,6 +291,7 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   updateLastSeen: any
+  database: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -749,6 +752,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
+    this.cloudData();
     this.updateAccountCardData();
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
@@ -1785,6 +1789,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       fetchTrustedChannel,
       walletName,
       trustedContacts,
+      fetchWalletImage,
     } = this.props;
 
     if (!isRecovery) {
@@ -2049,6 +2054,27 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  cloudData = () =>{
+    let mnemonics = '';
+    let walletImage = {};
+    if(isEmpty(this.props.database)){
+      walletImage = this.props.database;
+    }
+    if(this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().status == 200){
+      this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
+      console.log('qwert', this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic);
+      mnemonics = this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
+    }
+    // fetchWalletImage();
+    let CloudDataJson = {
+      mnemonics,
+      walletImage,
+      keeperInfo:[]
+    }
+    if(Platform.OS == 'ios') console.log('call for icloud upload')
+    else console.log('call for google drive upload')
+  }
+
   onPressElement = (item) => {
     const { navigation } = this.props;
     if (item.title == 'Backup Health') {
@@ -2176,9 +2202,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   setCurrencyToggleValue = (temp) => {
     this.props.setCurrencyToggleValue(temp);
   };
-
-
-
 
   render() {
     const {
@@ -3074,6 +3097,7 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
+    database: idx(state, (_) => _.storage.database)
   };
 };
 
@@ -3086,6 +3110,7 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
+    fetchWalletImage,
     initHealthCheck,
     fetchDerivativeAccBalTx,
     addTransferDetails,
