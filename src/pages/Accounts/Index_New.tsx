@@ -320,6 +320,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
           accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
           type: serviceType,
+          donationAcc: donAcc,
         };
         additionalCarouselData.push(donationInstance)
       }
@@ -766,7 +767,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null
             ) : null}
-            {item.accountType == 'Savings Account' && (
+            {(item.accountType === 'Savings Account' || (item.accountType === "Donation Account" && item.type=== SECURE_ACCOUNT)) && (
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -1426,8 +1427,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           ref={'DonationWebPageBottomSheet'}
           snapPoints={[-50, hp('70%')]}
           renderContent={() => {
+            const {donationAcc} = this.state.presentCarouselData? this.state.presentCarouselData: {donationAcc: null}
+            if(!donationAcc) return
             return (
-              <DonationWebPageModalContents />
+              <DonationWebPageModalContents account={donationAcc}/>
             )
           }}
           renderHeader={() => (

@@ -99,9 +99,9 @@ export default function DonationWebPageModalContents(props) {
             }}
             numberOfLines={1}
           >
-            {'creating...'}
+            {'https://hexawallet.io/donate/?donationid=' + props.account.id}
           </Text>
-          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('')}>
+          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('https://hexawallet.io/donate/?donationid=' + props.account.id)}>
             <Image
               source={require('../assets/images/icons/icon_copy.png')}
               style={{ width: 50, height: 50 }}
@@ -109,7 +109,7 @@ export default function DonationWebPageModalContents(props) {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.infoTextContainer}>
+        {/* <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>
           <Text style={styles.modalInfoText}>If you have a website, simply copy this code on your site to start receiving donations</Text>
         </View>
@@ -132,7 +132,7 @@ export default function DonationWebPageModalContents(props) {
               resizeMode='center'
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View>
   );

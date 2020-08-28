@@ -868,26 +868,29 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public setupDonationAccount = async (
-    accountType: string,
-    accountNumber: number = 1,
     donee: string,
+    subject: string,
     description: string,
     configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
   ): Promise<{ setupSuccessful: Boolean }> => {
-    if (this.derivativeAccounts[accountType][accountNumber]) {
-      return;
-    }
+    const accountType = DONATION_ACCOUNT;
+    const donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
+      accountType
+    ];
+    const inUse = donationAccounts.instance.using;
+    const accountNumber = inUse + 1;
 
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
-    const id = crypto.createHash('sha256').update(xpub).digest('hex').slice(0, 15);
+    const id = crypto.createHash('sha256').update(xpub + this.xpubs.secondary).digest('hex').slice(0, 15);
 
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,
       id,
+      subject,
       description,
       configuration,
     };
