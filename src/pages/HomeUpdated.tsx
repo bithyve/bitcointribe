@@ -45,7 +45,6 @@ import {
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
-  fetchWalletImage,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../store/actions/trustedContacts';
@@ -110,6 +109,8 @@ import {
 } from '../store/actions/preferences';
 import * as Permissions from 'expo-permissions';
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
+import SSS from '../bitcoin/utilities/sss/SSS';
+import { encrypt, decrypt } from '../common/encryption';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -266,7 +267,6 @@ interface HomePropsTypes {
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
-  fetchWalletImage: any;
   s3Service: any;
   initHealthCheck: any;
   overallHealth: any;
@@ -932,6 +932,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses();
+    }
+
+    if (
+      prevProps.database !==
+      this.props.database
+    ) {
+      console.log('this.props.database', this.props.database)
+      this.cloudData();
     }
 
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
@@ -1789,7 +1797,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       fetchTrustedChannel,
       walletName,
       trustedContacts,
-      fetchWalletImage,
     } = this.props;
 
     if (!isRecovery) {
@@ -2056,20 +2063,27 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   cloudData = () =>{
     let mnemonics = '';
-    let walletImage = {};
-    if(isEmpty(this.props.database)){
-      walletImage = this.props.database;
-    }
+    let walletImage = {SERVICES:{},DECENTRALIZED_BACKUP:{},WALLET_SETUP:{}};
+    let CloudDataJson = {};
     if(this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().status == 200){
       this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
-      console.log('qwert', this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic);
       mnemonics = this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
     }
-    // fetchWalletImage();
-    let CloudDataJson = {
-      mnemonics,
-      walletImage,
-      keeperInfo:[]
+    if(!isEmpty(this.props.database)){
+      if(this.props.database.SERVICES) walletImage.SERVICES = this.props.database.SERVICES;
+      if(this.props.database.DECENTRALIZED_BACKUP) walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
+      if(this.props.database.WALLET_SETUP) walletImage.WALLET_SETUP = this.props.database.WALLET_SETUP;
+      let key = SSS.strechKey(this.props.database.WALLET_SETUP.security.answer);
+      CloudDataJson = {
+        mnemonics,
+        walletImage,
+        keeperInfo:[]
+      }
+      console.log('CloudDataJson', CloudDataJson);
+      const encryptedCloudDataJson = encrypt(CloudDataJson, key);
+      console.log('encryptedDatabase', encryptedCloudDataJson);
+      const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
+      console.log('decryptedDatabase', decryptedCloudDataJson);
     }
     if(Platform.OS == 'ios') console.log('call for icloud upload')
     else console.log('call for google drive upload')
@@ -3097,7 +3111,7 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
-    database: idx(state, (_) => _.storage.database)
+    database: idx(state, (_) => _.storage.database) || {},
   };
 };
 
@@ -3110,7 +3124,6 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    fetchWalletImage,
     initHealthCheck,
     fetchDerivativeAccBalTx,
     addTransferDetails,
