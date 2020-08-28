@@ -2062,20 +2062,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = () =>{
-    let mnemonics = '';
     let walletImage = {SERVICES:{},DECENTRALIZED_BACKUP:{},WALLET_SETUP:{}};
     let CloudDataJson = {};
-    if(this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().status == 200){
-      this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
-      mnemonics = this.props.accounts.REGULAR_ACCOUNT.service.getMnemonic().data.mnemonic;
-    }
     if(!isEmpty(this.props.database)){
       if(this.props.database.SERVICES) walletImage.SERVICES = this.props.database.SERVICES;
       if(this.props.database.DECENTRALIZED_BACKUP) walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
       if(this.props.database.WALLET_SETUP) walletImage.WALLET_SETUP = this.props.database.WALLET_SETUP;
       let key = SSS.strechKey(this.props.database.WALLET_SETUP.security.answer);
       CloudDataJson = {
-        mnemonics,
         walletImage,
         keeperInfo:[]
       }
