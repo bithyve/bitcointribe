@@ -1014,7 +1014,7 @@ export const setupDonationAccountWatcher = createWatcher(
 
 function* updateDonationPreferencesWorker({ payload }) {
   const { serviceType, accountNumber, configuration } = payload;
-  const service: RegularAccount = yield select(
+  const service = yield select(
     (state) => state.accounts[serviceType].service,
   );
 

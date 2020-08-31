@@ -321,6 +321,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
           type: serviceType,
           donationAcc: donAcc,
+          accountNumber: index
         };
         additionalCarouselData.push(donationInstance)
       }
@@ -516,13 +517,35 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  getServiceType = (serviceType, index) => {
+  getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
 
-    if (this.carousel.current as any)
-      (this.carousel.current as any).snapToItem(index, true, false);
-
-    this.setState({ serviceType: serviceType, presentCarouselData: this.state.carouselData[index] });
+    if(!index){
+      if (this.carousel.current) {
+        if (serviceType == TEST_ACCOUNT) {
+          if (this.carousel.current as any)
+            //setTimeout(() => {
+            (this.carousel.current as any).snapToItem(0, true, false);
+          //}, 1100);
+        } else if (serviceType == REGULAR_ACCOUNT) {
+          if (this.carousel.current as any)
+            // setTimeout(() => {
+            (this.carousel.current as any).snapToItem(1, true, false);
+          //}, 1100);
+        } else if (serviceType == SECURE_ACCOUNT) {
+          if (this.carousel.current as any)
+            // setTimeout(() => {
+            (this.carousel.current as any).snapToItem(2, true, false);
+          // }, 1100);
+        }
+      }
+      this.setState({ serviceType: serviceType });
+    } else {
+      if (this.carousel.current as any) 
+        (this.carousel.current as any).snapToItem(index, true, false);
+      this.setState({ serviceType: serviceType, presentCarouselData: this.state.carouselData[index] });
+    }
+ 
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
@@ -1427,10 +1450,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           ref={'DonationWebPageBottomSheet'}
           snapPoints={[-50, hp('70%')]}
           renderContent={() => {
-            const {donationAcc} = this.state.presentCarouselData? this.state.presentCarouselData: {donationAcc: null}
+            const {donationAcc, accountNumber} = this.state.presentCarouselData? this.state.presentCarouselData: {donationAcc: null, accountNumber: null}
             if(!donationAcc) return
             return (
-              <DonationWebPageModalContents account={donationAcc}/>
+              <DonationWebPageModalContents account={donationAcc} accountNumber={accountNumber} serviceType={this.state.serviceType} close={()=>(this.refs.DonationWebPageBottomSheet as any).snapTo(0)}/>
             )
           }}
           renderHeader={() => (

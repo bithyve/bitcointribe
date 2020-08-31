@@ -826,6 +826,8 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!updated) {
       throw new Error('Preference updation failed');
     }
+    this
+    .derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration = configuration
 
     return { updated };
   };

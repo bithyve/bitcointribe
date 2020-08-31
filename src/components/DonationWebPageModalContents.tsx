@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Clipboard,
 } from 'react-native';
+import {useDispatch} from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -16,15 +17,35 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import ToggleSwitch from './ToggleSwitch';
 import Toast from '../components/Toast';
+import { updateDonationPreferences } from '../store/actions/accounts';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function DonationWebPageModalContents(props) {
   const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
-  const [isDonationTransactionEnable, setIsDonationTransactionEnable] = useState(false);
+  const [isDonationTransactionEnable, setIsDonationTransactionEnable] = useState(props.account.configuration.displayTransactions);
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    setIsDonationTotalEnable(props.account.configuration.displayBalance);
+    setIsDonationTransactionEnable(props.account.configuration.displayTransactions)
+  },[props.account])
 
   function writeToClipboard(link) {
     Clipboard.setString(link);
     Toast('Copied Successfully');
   }
+
+  const updatePreferences = useCallback(() => {
+    if(isDonationTotalEnable !== props.account.configuration.displayBalance || isDonationTransactionEnable !== props.account.configuration.displayTransactions){
+      const configuration = {
+        displayBalance: isDonationTotalEnable,
+        displayTransactions: isDonationTransactionEnable
+      }
+      const {serviceType, accountNumber} = props;
+      console.log({serviceType, accountNumber})
+      Toast("Your preferences would be updated shortly")
+      dispatch(updateDonationPreferences(serviceType, accountNumber, configuration))
+    }
+  }, [isDonationTotalEnable, isDonationTransactionEnable, props.account.configuration])
 
   return (
     <View style={styles.modalContentContainer}>
@@ -133,6 +154,18 @@ export default function DonationWebPageModalContents(props) {
             />
           </TouchableOpacity>
         </View> */}
+        <View style={{marginTop: 30}}>  
+        <AppBottomSheetTouchableWrapper
+                  style={styles.buttonStyle}
+                  onPress={() => {
+                   updatePreferences()
+                   props.close();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Save</Text>
+                </AppBottomSheetTouchableWrapper>
+        </View>
+      
       </View>
     </View>
   );
@@ -174,6 +207,24 @@ const styles = StyleSheet.create({
   infoTextContainer: {
     marginTop: 20,
     marginHorizontal: hp('1.5%'),
+  },
+  buttonStyle: {
+    height: 50,
+    width: wp('40%'),
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(13),
   },
   deeplinkContainerStyle: {
     flexDirection: 'row',
