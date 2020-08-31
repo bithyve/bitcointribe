@@ -11,6 +11,7 @@ import {
   AsyncStorage,
   Linking,
   Alert,
+  NativeModules
 } from 'react-native';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -2062,6 +2063,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = () =>{
+    var ICloudBackup = NativeModules.ICloudBackup;
+    ICloudBackup.initBackup();
+    console.log('CalendarManager', ICloudBackup)
     let walletImage = {SERVICES:{},DECENTRALIZED_BACKUP:{},WALLET_SETUP:{}};
     let CloudDataJson = {};
     if(!isEmpty(this.props.database)){
@@ -2073,9 +2077,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         walletImage,
         keeperInfo:[]
       }
-      console.log('CloudDataJson', CloudDataJson);
+      // console.log('CloudDataJson', CloudDataJson);
       const encryptedCloudDataJson = encrypt(CloudDataJson, key);
-      console.log('encryptedDatabase', encryptedCloudDataJson);
+      // console.log('encryptedDatabase', encryptedCloudDataJson);
       const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
       console.log('decryptedDatabase', decryptedCloudDataJson);
     }
