@@ -14,7 +14,7 @@
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(startBackup)
+RCT_EXPORT_METHOD(initBackup)
 {
   Backup *bkp= [[Backup alloc]init];
   [bkp startBackup]
