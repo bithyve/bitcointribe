@@ -421,7 +421,7 @@ export default class HDSegwitWallet extends Bitcoin {
       [],
       externalAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
-        1,
+      1,
       0,
       accountType,
       contactName,
@@ -644,11 +644,11 @@ export default class HDSegwitWallet extends Bitcoin {
                   accountType:
                     tx.accountType === TRUSTED_CONTACTS
                       ? derivativeAccounts[accountNumber].contactName
-                          .split(' ')
-                          .map(
-                            (word) => word[0].toUpperCase() + word.substring(1),
-                          )
-                          .join(' ')
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ')
                       : tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
@@ -757,7 +757,13 @@ export default class HDSegwitWallet extends Bitcoin {
     const accountNumber = inUse + 1;
 
     const xpub = this.generateDerivativeXpub(accountType, accountNumber);
-    const id = crypto.createHash('sha256').update(xpub).digest('hex').slice(0, 15);
+    let xpubId = this.derivativeAccounts[accountType][accountNumber].xpubId;
+    if (!xpubId) {
+      xpubId = crypto.createHash('sha256').update(xpub).digest('hex');
+      this.derivativeAccounts[accountType][accountNumber].xpubId = xpubId
+    }
+
+    const id = xpubId.slice(0, 15);
     this.derivativeAccounts[accountType][accountNumber] = {
       ...this.derivativeAccounts[accountType][accountNumber],
       donee,
@@ -778,16 +784,19 @@ export default class HDSegwitWallet extends Bitcoin {
           subject,
           description,
           xpubs: [xpub],
+          xpubId,
           configuration,
         },
       });
     } catch (err) {
+      delete this.derivativeAccounts[accountType][accountNumber];
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
 
     const { setupSuccessful } = res.data;
     if (!setupSuccessful) {
+      delete this.derivativeAccounts[accountType][accountNumber];
       throw new Error('Donation account setup failed');
     }
 
@@ -827,7 +836,7 @@ export default class HDSegwitWallet extends Bitcoin {
       throw new Error('Preference updation failed');
     }
     this
-    .derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration = configuration
+      .derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration = configuration
 
     return { updated };
   };
@@ -1160,15 +1169,15 @@ export default class HDSegwitWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-        fee: number;
-        balance: number;
-        txPrerequisites?: undefined;
-      }
+      fee: number;
+      balance: number;
+      txPrerequisites?: undefined;
+    }
     | {
-        txPrerequisites: TransactionPrerequisite;
-        fee?: undefined;
-        balance?: undefined;
-      }
+      txPrerequisites: TransactionPrerequisite;
+      fee?: undefined;
+      balance?: undefined;
+    }
   > => {
     const inputUTXOs = this.confirmedUTXOs;
     console.log('Input UTXOs:', inputUTXOs);
@@ -1431,7 +1440,7 @@ export default class HDSegwitWallet extends Bitcoin {
                 let itr = 0;
                 itr <=
                 derivativeInstance.nextFreeAddressIndex +
-                  this.derivativeGapLimit; // would always be greater than
+                this.derivativeGapLimit; // would always be greater than
                 itr++
               ) {
                 if (
@@ -1509,12 +1518,13 @@ export default class HDSegwitWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();
       this.derivativeAccounts[accountType][accountNumber] = {
         xpriv,
         xpub,
+        xpubId: crypto.createHash('sha256').update(xpub).digest('hex'),
         nextFreeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;

@@ -89,6 +89,7 @@ export interface ShareUploadables {
 
 export interface DerivativeAccountElements {
   xpub: string;
+  xpubId: string;
   xpriv: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
@@ -157,9 +158,9 @@ export interface DonationDerivativeAccount {
 }
 export interface DerivativeAccounts {
   [accountType: string]:
-    | DerivativeAccount
-    | TrustedContactDerivativeAccount
-    | DonationDerivativeAccount;
+  | DerivativeAccount
+  | TrustedContactDerivativeAccount
+  | DonationDerivativeAccount;
 }
 
 export enum notificationType {
