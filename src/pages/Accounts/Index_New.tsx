@@ -116,6 +116,7 @@ export const isCompatible = async (method: string, version: string) => {
 interface AccountsStateTypes {
   carouselData: any;
   presentCarouselData: any;
+  presentCarouselIndex: number;
   FBTCAccount: any;
   serviceType: any;
   isHelperDone: boolean;
@@ -211,6 +212,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         },
       ],
       presentCarouselData: null,
+      presentCarouselIndex: null,
       CurrencyCode: 'USD',
       serviceType: this.props.navigation.state.params
         ? this.props.navigation.getParam('serviceType')
@@ -520,7 +522,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
 
-    if(!index){
+    if (!index) {
       if (this.carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
           if (this.carousel.current as any)
@@ -541,11 +543,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       }
       this.setState({ serviceType: serviceType });
     } else {
-      if (this.carousel.current as any) 
+      if (this.carousel.current as any)
         (this.carousel.current as any).snapToItem(index, true, false);
-      this.setState({ serviceType: serviceType, presentCarouselData: this.state.carouselData[index] });
+      this.setState({ serviceType: serviceType, presentCarouselData: this.state.carouselData[index], presentCarouselIndex: index });
     }
- 
+
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
@@ -790,7 +792,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null
             ) : null}
-            {(item.accountType === 'Savings Account' || (item.accountType === "Donation Account" && item.type=== SECURE_ACCOUNT)) && (
+            {(item.accountType === 'Savings Account' || (item.accountType === "Donation Account" && item.type === SECURE_ACCOUNT)) && (
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -800,6 +802,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   this.props.navigation.navigate('SecureScan', {
                     serviceType: this.state.serviceType,
                     getServiceType: this.getServiceType,
+                    carouselIndex: this.state.presentCarouselIndex,
                   });
                 }}
               >
@@ -1054,14 +1057,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   data={this.state.carouselData}
                   firstItem={carouselInitIndex}
                   initialNumToRender={carouselInitIndex}
-                  // onBeforeSnapToItem={(index) => {
-                  //   this.setState({ carouselInitIndex: index });
-                  //   index === 0
-                  //     ? this.getServiceType(TEST_ACCOUNT)
-                  //     : index === 1
-                  //     ? this.getServiceType(REGULAR_ACCOUNT)
-                  //     : this.getServiceType(SECURE_ACCOUNT);
-                  // }}
                   renderItem={this.RenderItem}
                   sliderWidth={this.sliderWidth}
                   itemWidth={this.sliderWidth * 0.95}
@@ -1348,6 +1343,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       this.props.navigation.navigate('Send', {
                         serviceType,
                         getServiceType: this.getServiceType,
+                        carouselIndex: this.state.presentCarouselIndex,
                         averageTxFees,
                         spendableBalance,
                       });
@@ -1396,6 +1392,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       this.props.navigation.navigate('Receive', {
                         serviceType,
                         getServiceType: this.getServiceType,
+                        carouselIndex: this.state.presentCarouselIndex,
                         netBalance,
                       });
                     }}
@@ -1450,10 +1447,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           ref={'DonationWebPageBottomSheet'}
           snapPoints={[-50, hp('70%')]}
           renderContent={() => {
-            const {donationAcc, accountNumber} = this.state.presentCarouselData? this.state.presentCarouselData: {donationAcc: null, accountNumber: null}
-            if(!donationAcc) return
+            const { donationAcc, accountNumber } = this.state.presentCarouselData ? this.state.presentCarouselData : { donationAcc: null, accountNumber: null }
+            if (!donationAcc) return
             return (
-              <DonationWebPageModalContents account={donationAcc} accountNumber={accountNumber} serviceType={this.state.serviceType} close={()=>(this.refs.DonationWebPageBottomSheet as any).snapTo(0)}/>
+              <DonationWebPageModalContents account={donationAcc} accountNumber={accountNumber} serviceType={this.state.serviceType} close={() => (this.refs.DonationWebPageBottomSheet as any).snapTo(0)} />
             )
           }}
           renderHeader={() => (
@@ -1665,7 +1662,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               <TransactionDetails
                 item={transactionItem}
                 serviceType={serviceType}
-                getServiceType={this.getServiceType}
                 onPressKnowMore={() => {
                   this.props.setTransactionHelper(true);
                   //AsyncStorage.setItem('isTransactionHelperDone', 'true');
