@@ -25,13 +25,15 @@ export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
+export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
+export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 // export const fetchAddress = (serviceType) => {
 //   return { type: FETCH_ADDR, payload: { serviceType } };
 // };
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
+  options?: { loader?; fetchTransactionsSync?; restore?},
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -195,6 +197,36 @@ export const setAverageTxFee = (data) => {
   };
 };
 
+export const setupDonationAccount = (
+  serviceType: string,
+  donee: string,
+  subject: string,
+  description: string,
+  configuration: {
+    displayBalance: boolean;
+    displayTransactions: boolean;
+  },
+) => {
+  return {
+    type: SETUP_DONATION_ACCOUNT,
+    payload: { serviceType, donee, subject, description, configuration },
+  };
+};
+
+export const updateDonationPreferences = (
+  serviceType: string,
+  accountNumber: number,
+  configuration: {
+    displayBalance: boolean;
+    displayTransactions: boolean;
+  },
+) => {
+  return {
+    type: UPDATE_DONATION_PREFERENCES,
+    payload: { serviceType, accountNumber, configuration },
+  };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -213,6 +245,7 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED';
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
+export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -282,3 +315,7 @@ export const secondaryXprivGenerated = (generated) => {
 export const twoFAResetted = (resetted) => {
   return { type: TWO_FA_RESETTED, payload: { resetted } };
 };
+
+export const settedDonationAccount = (serviceType, successful) => {
+  return { type: SETTED_DONATION_ACC, payload: {serviceType, successful } }
+}

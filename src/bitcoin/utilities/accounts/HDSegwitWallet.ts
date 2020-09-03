@@ -16,12 +16,15 @@ import {
   TrustedContactDerivativeAccount,
   TrustedContactDerivativeAccountElements,
   DerivativeAccount,
+  DonationDerivativeAccount,
+  DonationDerivativeAccountElements,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -41,7 +44,8 @@ export default class HDSegwitWallet extends Bitcoin {
   };
   public derivativeAccounts:
     | DerivativeAccounts
-    | TrustedContactDerivativeAccount = config.DERIVATIVE_ACC;
+    | TrustedContactDerivativeAccount
+    | DonationDerivativeAccount = config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
   public trustedContactToDA: { [contactName: string]: number } = {};
   public feeRates: any;
@@ -237,7 +241,7 @@ export default class HDSegwitWallet extends Bitcoin {
     // }
     accountNumber = inUse + 1;
 
-    const baseXpub = this.generateDerivativeXpub(
+    const baseXpub = this.generateTrustedDerivativeXpub(
       accountType,
       accountNumber,
       contactName,
@@ -251,80 +255,38 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber: number = 1,
     contactName?: string,
   ): Promise<{ address: string }> => {
+    // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (accountType === TRUSTED_CONTACTS) {
-      if (!contactName)
-        throw new Error(`Required param: contactName for ${accountType}`);
+    switch (accountType) {
+      case TRUSTED_CONTACTS:
+        if (!contactName)
+          throw new Error(`Required param: contactName for ${accountType}`);
 
-      return this.getTrustedContactDerivativeAccReceivingAddress(
-        accountType,
-        contactName,
-      );
-    } else if (!this.derivativeAccounts[accountType][accountNumber]) {
-      this.generateDerivativeXpub(accountType, accountNumber);
-    }
-
-    try {
-      let availableAddress = '';
-      let itr;
-
-      const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
-        accountNumber
-      ];
-      if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].nextFreeAddressIndex = 0;
-
-      for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
-        if (
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex +
-            itr <
-          0
-        ) {
-          continue;
-        }
-
-        const address = this.getAddress(
-          false,
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex + itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
+        return this.getTrustedContactDerivativeAccReceivingAddress(
+          accountType,
+          contactName,
         );
 
-        const txCounts = await this.getTxCounts([address]);
-        if (txCounts[address] === 0) {
-          availableAddress = address;
-          this.derivativeAccounts[accountType][
-            accountNumber
-          ].nextFreeAddressIndex += itr;
-          break;
-        }
-      }
+      case DONATION_ACCOUNT:
+        if (!this.derivativeAccounts[accountType][accountNumber])
+          throw new Error(`Donation account(${accountNumber}) doesn't exist`);
 
-      if (!availableAddress) {
-        const address = this.getAddress(
-          false,
-          this.derivativeAccounts[accountType][accountNumber]
-            .nextFreeAddressIndex + itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        );
-        availableAddress = address; // defaulting to following address
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].nextFreeAddressIndex += itr + 1;
-      }
+        break;
 
-      this.derivativeAccounts[accountType][
-        accountNumber
-      ].receivingAddress = availableAddress;
-      return { address: availableAddress };
-    } catch (err) {
-      throw new Error(`Unable to generate receiving address: ${err.message}`);
+      default:
+        if (!this.derivativeAccounts[accountType][accountNumber])
+          this.generateDerivativeXpub(accountType, accountNumber);
+
+        break;
     }
+
+    // receiving address updates during balance sync
+    return {
+      address: this.derivativeAccounts[accountType][accountNumber]
+        .receivingAddress,
+    };
   };
 
   public getTrustedContactDerivativeAccReceivingAddress = async (
@@ -459,7 +421,7 @@ export default class HDSegwitWallet extends Bitcoin {
       [],
       externalAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
-        1,
+      1,
       0,
       accountType,
       contactName,
@@ -682,11 +644,11 @@ export default class HDSegwitWallet extends Bitcoin {
                   accountType:
                     tx.accountType === TRUSTED_CONTACTS
                       ? derivativeAccounts[accountNumber].contactName
-                          .split(' ')
-                          .map(
-                            (word) => word[0].toUpperCase() + word.substring(1),
-                          )
-                          .join(' ')
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ')
                       : tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
@@ -776,6 +738,107 @@ export default class HDSegwitWallet extends Bitcoin {
       );
       throw new Error('Fetching balance-txn by addresses failed');
     }
+  };
+
+  public setupDonationAccount = async (
+    donee: string,
+    subject: string,
+    description: string,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<{ setupSuccessful: Boolean }> => {
+    const accountType = DONATION_ACCOUNT;
+    const donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
+      accountType
+    ];
+    const inUse = donationAccounts.instance.using;
+    const accountNumber = inUse + 1;
+
+    const xpub = this.generateDerivativeXpub(accountType, accountNumber);
+    let xpubId = this.derivativeAccounts[accountType][accountNumber].xpubId;
+    if (!xpubId) {
+      xpubId = crypto.createHash('sha256').update(xpub).digest('hex');
+      this.derivativeAccounts[accountType][accountNumber].xpubId = xpubId
+    }
+
+    const id = xpubId.slice(0, 15);
+    this.derivativeAccounts[accountType][accountNumber] = {
+      ...this.derivativeAccounts[accountType][accountNumber],
+      donee,
+      id,
+      subject,
+      description,
+      configuration,
+    };
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('setupDonationAccount', {
+        HEXA_ID,
+        donationId: id,
+        walletID: this.getWalletId().walletId,
+        details: {
+          donee,
+          subject,
+          description,
+          xpubs: [xpub],
+          xpubId,
+          configuration,
+        },
+      });
+    } catch (err) {
+      delete this.derivativeAccounts[accountType][accountNumber];
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { setupSuccessful } = res.data;
+    if (!setupSuccessful) {
+      delete this.derivativeAccounts[accountType][accountNumber];
+      throw new Error('Donation account setup failed');
+    }
+
+    return { setupSuccessful };
+  };
+
+  public updateDonationPreferences = async (
+    accountNumber: number,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<{ updated: Boolean }> => {
+    const donationAcc: DonationDerivativeAccountElements = this
+      .derivativeAccounts[DONATION_ACCOUNT][accountNumber];
+    if (!donationAcc) {
+      throw new Error(
+        `Donation account do not exist (instance id:${accountNumber})`,
+      );
+    }
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('updatePreferences', {
+        HEXA_ID,
+        donationId: donationAcc.id,
+        walletID: this.getWalletId().walletId,
+        configuration,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { updated } = res.data;
+    if (!updated) {
+      throw new Error('Preference updation failed');
+    }
+    this
+      .derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration = configuration
+
+    return { updated };
   };
 
   public deriveReceivingAddress = async (
@@ -1106,15 +1169,15 @@ export default class HDSegwitWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-        fee: number;
-        balance: number;
-        txPrerequisites?: undefined;
-      }
+      fee: number;
+      balance: number;
+      txPrerequisites?: undefined;
+    }
     | {
-        txPrerequisites: TransactionPrerequisite;
-        fee?: undefined;
-        balance?: undefined;
-      }
+      txPrerequisites: TransactionPrerequisite;
+      fee?: undefined;
+      balance?: undefined;
+    }
   > => {
     const inputUTXOs = this.confirmedUTXOs;
     console.log('Input UTXOs:', inputUTXOs);
@@ -1377,7 +1440,7 @@ export default class HDSegwitWallet extends Bitcoin {
                 let itr = 0;
                 itr <=
                 derivativeInstance.nextFreeAddressIndex +
-                  this.derivativeGapLimit; // would always be greater than
+                this.derivativeGapLimit; // would always be greater than
                 itr++
               ) {
                 if (
@@ -1424,10 +1487,23 @@ export default class HDSegwitWallet extends Bitcoin {
     return this.xpriv;
   };
 
+  private generateTrustedDerivativeXpub = (
+    accountType: string,
+    accountNumber: number = 1,
+    contactName: string,
+  ) => {
+    const xpub = this.generateDerivativeXpub(accountType, accountNumber);
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].contactName = contactName;
+    this.trustedContactToDA[contactName] = accountNumber;
+
+    return xpub;
+  };
+
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
-    contactName?: string,
   ) => {
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
@@ -1442,22 +1518,16 @@ export default class HDSegwitWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();
       this.derivativeAccounts[accountType][accountNumber] = {
         xpriv,
         xpub,
+        xpubId: crypto.createHash('sha256').update(xpub).digest('hex'),
         nextFreeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;
-
-      if (contactName) {
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].contactName = contactName;
-        this.trustedContactToDA[contactName] = accountNumber;
-      }
 
       this.derivativeAccounts[accountType][
         accountNumber

@@ -322,6 +322,88 @@ export default class BaseAccount {
     }
   };
 
+  public setupDonationAccount = async (
+    donee: string,
+    subject: string,
+    description: string,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          setupSuccessful: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.setupDonationAccount(
+          donee,
+          subject,
+          description,
+          configuration,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to setup donation account',
+      };
+    }
+  };
+
+  public updateDonationPreferences = async (
+    accountNumber: number,
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    },
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.updateDonationPreferences(
+          accountNumber,
+          configuration,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to update donation account preferences',
+      };
+    }
+  };
+
   public deriveReceivingAddress = async (
     xpub: string,
   ): Promise<
