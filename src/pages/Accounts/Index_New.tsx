@@ -1039,15 +1039,20 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     accounts[serviceType].loading.derivativeBalanceTx
                   }
                   onRefresh={() => {
-                    // this.props.fetchTransactions(serviceType);
-                    this.props.fetchBalanceTx(serviceType, {
-                      loader: true,
-                      syncTrustedDerivative:
-                        serviceType === REGULAR_ACCOUNT ||
-                          serviceType === SECURE_ACCOUNT
-                          ? true
-                          : false,
-                    });
+                    const { presentCarouselData } = this.state
+                    if (presentCarouselData && presentCarouselData.type === "Donation Account") {
+
+                    } else {
+                      this.props.fetchBalanceTx(serviceType, {
+                        loader: true,
+                        syncTrustedDerivative:
+                          serviceType === REGULAR_ACCOUNT ||
+                            serviceType === SECURE_ACCOUNT
+                            ? true
+                            : false,
+                      });
+                    }
+
                   }}
                 />
               }

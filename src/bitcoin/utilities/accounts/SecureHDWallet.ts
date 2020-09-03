@@ -882,6 +882,85 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public syncViaXpubAgent = async (
+    accountType: string,
+    accountNumber: number,
+  ): Promise<{
+    synched: Boolean
+  }> => {
+    if (!this.derivativeAccounts[accountType] || !this.derivativeAccounts[accountType][accountNumber]) {
+      throw new Error(`${accountType}:${accountNumber} does not exists`);
+    }
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('setupDonationAccount', {
+        HEXA_ID,
+        xpubId: this.derivativeAccounts[accountType][accountNumber].xpubId
+
+      });
+    } catch (err) {
+      delete this.derivativeAccounts[accountType][accountNumber];
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+
+    const { availableAddresses, usedAddresses, receivingAddresses, nextFreeAddressIndex, utxos, balances, transactions, lastSynched
+    } = res.data;
+
+    const confirmedUTXOs = [];
+    for (const utxo of utxos) {
+      if (utxo.status) {
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+
+    const lastSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    let latestSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    const newTransactions: Array<TransactionDetails> = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
+        if (tx.blockTime > lastSyncTime) {
+          newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].lastBalTxSync = latestSyncTime;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].newTransactions = newTransactions;
+    this.derivativeAccounts[accountType][accountNumber].confirmedUTXOs = confirmedUTXOs;
+    this.derivativeAccounts[accountType][accountNumber].balances = balances;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].transactions = transactions;
+    this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
+      nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].receivingAddress =
+      this.createSecureMultiSig(
+        nextFreeAddressIndex,
+        false,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
+      ).address;
+
+    return { synched: true };
+  };
+
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
