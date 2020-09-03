@@ -1891,9 +1891,12 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
             if (!approvedTC) {
               navigation.navigate('ContactsListForAssociateContact', {
                 postAssociation: (contact) => {
-                  const contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
-                    }`.toLowerCase();
-
+                  let contactName = '';
+                  if (contact) {
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''}`.toLowerCase();
+                  } else {
+                    contactName = 'No Contact Selected'.toLowerCase();
+                  }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
                     info = null;
@@ -2843,7 +2846,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         ) : null}
 
-        { !isLoading && <BottomSheet
+        {!isLoading && <BottomSheet
           enabledInnerScrolling={true}
           onCloseEnd={() => {
             this.setState({
