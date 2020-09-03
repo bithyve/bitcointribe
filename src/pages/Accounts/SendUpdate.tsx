@@ -661,11 +661,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     <View style={{ marginLeft: wp('2.5%') }}>
                       <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
                       <Text style={styles.accountText}>
-                        {serviceType == TEST_ACCOUNT
+                        Choose a recipient
+                        {/* {serviceType == TEST_ACCOUNT
                           ? 'Test Account'
                           : serviceType == REGULAR_ACCOUNT
                             ? 'Checking Account'
-                            : 'Savings Account'}
+                            : 'Savings Account'} */}
                       </Text>
                     </View>
                     {serviceType == TEST_ACCOUNT ? (

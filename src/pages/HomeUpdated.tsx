@@ -1504,7 +1504,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -1558,7 +1558,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;

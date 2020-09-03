@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   AsyncStorage,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -500,11 +501,12 @@ class SendConfirmation_updated extends Component<
                 {'Send Confirmation'}
               </Text>
               <Text style={styles.headerText}>
-                {this.serviceType == TEST_ACCOUNT
+                How urgent is the transaction?
+                {/* {this.serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : this.serviceType == REGULAR_ACCOUNT
                     ? 'Checking Account'
-                    : 'Savings Account'}
+                    : 'Savings Account'} */}
               </Text>
             </View>
             <TouchableOpacity
@@ -527,12 +529,12 @@ class SendConfirmation_updated extends Component<
         </View>
         <ScrollView>
           <View style={styles.availableBalanceView}>
-            {/* <Text style={styles.accountTypeTextBalanceView}>
-              {this.getServiceTypeAccount()}
-            </Text> */}
             <Text style={styles.accountTypeTextBalanceView}>
-              {'Available to spend '}
-              <Text style={styles.accountTypeTextBalanceView}>
+              {this.getServiceTypeAccount()}
+            </Text>
+            <Text style={styles.availableToSpendText}>
+              {' (Available to spend '}
+              <Text style={styles.availableToSpendText}>
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : switchOn
@@ -544,12 +546,12 @@ class SendConfirmation_updated extends Component<
                       ).toFixed(2)
                       : null}
               </Text>
-              <Text style={styles.accountTypeTextBalanceView}>
+              <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
-                  ? ' t-sats'
+                  ? ' t-sats)'
                   : switchOn
-                    ? ' sats'
-                    : ' ' + CurrencyCode.toLocaleLowerCase()}
+                    ? ' sats)'
+                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
           </View>
@@ -704,7 +706,7 @@ class SendConfirmation_updated extends Component<
                     High
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   {transfer &&
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
@@ -717,7 +719,7 @@ class SendConfirmation_updated extends Component<
                       </Text>
                     ) : null}
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -747,7 +749,7 @@ class SendConfirmation_updated extends Component<
                   Medium
                 </Text>
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={styles.priorityValueContainer}>
                 {!this.isSendMax ? (
                   transfer &&
                     transfer.stage1 &&
@@ -768,7 +770,7 @@ class SendConfirmation_updated extends Component<
                     <Text>120 - 130</Text>
                   )}
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={styles.priorityValueContainer}>
                 <Text style={styles.priorityTableText}>
                   {this.convertBitCoinToCurrency(
                     transfer.stage1 && transfer.stage1.txPrerequisites
@@ -804,7 +806,7 @@ class SendConfirmation_updated extends Component<
                     Low
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   {transfer &&
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
@@ -820,7 +822,7 @@ class SendConfirmation_updated extends Component<
                       </Text>
                     ) : null}
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -856,14 +858,15 @@ class SendConfirmation_updated extends Component<
                     Custom
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
-                    ~{(this.state.customEstimatedBlock + 1) * 10} minutes
+                    ~{timeConvertNear30((this.state.customEstimatedBlock + 1) * 10)}
+                    {/* ~{(this.state.customEstimatedBlock + 1) * 10} minutes */}
                     {/* {this.state.customEstimatedBlock * 10} - {' '}
                     {(this.state.customEstimatedBlock + 1) * 10} minutes */}
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(this.state.customFeePerByte)}
                     {' ' + this.getCorrectCurrencySymbol()}
@@ -1212,7 +1215,7 @@ class SendConfirmation_updated extends Component<
           }}
           enabledInnerScrolling={true}
           ref={'CustomPriorityBottomSheet'}
-          snapPoints={[-50, hp('65%')]}
+          snapPoints={[-50, hp('75%')]}
           renderContent={() => (
             <CustomPriorityContent
               title={'Custom Priority'}
@@ -1222,10 +1225,13 @@ class SendConfirmation_updated extends Component<
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
-              onPressOk={(amount, customEstimatedBlock) =>
-                this.handleCustomFee(amount, customEstimatedBlock)
+              onPressOk={(amount, customEstimatedBlock) => {
+                  Keyboard.dismiss();
+                  this.handleCustomFee(amount, customEstimatedBlock);
+                }
               }
               onPressCancel={() => {
+                Keyboard.dismiss();
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
               }}
@@ -1234,6 +1240,7 @@ class SendConfirmation_updated extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
+                Keyboard.dismiss();
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
               }}
@@ -1351,6 +1358,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansMediumItalic,
   },
+  textTsats: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(7),
+    fontFamily: Fonts.FiraSansMediumItalic,
+  },
   totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1446,7 +1458,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
     color: Colors.greyTextColor,
-    textAlign: 'center',
+    textAlign: 'right',
   },
   priorityTableHeadingContainer: {
     flex: 1,
@@ -1471,5 +1483,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  priorityValueContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginRight: 10,
   },
 });

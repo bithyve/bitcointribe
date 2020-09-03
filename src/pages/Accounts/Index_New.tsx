@@ -314,7 +314,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       const derivativeAccounts =
         accounts[serviceType].service[serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'].derivativeAccounts
 
-      for (let index = 1; index <= derivativeAccounts[DONATION_ACCOUNT].instance.using; index++) {
+      for (let index = 1; index <= derivativeAccounts && derivativeAccounts[DONATION_ACCOUNT].instance.using; index++) {
         const donAcc: DonationDerivativeAccountElements = derivativeAccounts[DONATION_ACCOUNT][index]
         const donationInstance = {
           accountType: 'Donation Account',
@@ -369,7 +369,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 .derivativeAccounts[dAccountType];
           }
 
-          if (derivativeAccount.instance.using) {
+          if (derivativeAccount && derivativeAccount.instance.using) {
             for (
               let accountNumber = 1;
               accountNumber <= derivativeAccount.instance.using;
