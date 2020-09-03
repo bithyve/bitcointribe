@@ -207,7 +207,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     let derivativeBalance = 0;
     if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
         let derivativeAccount;
 
         // calculating opposite accounts derivative balance for account tiles

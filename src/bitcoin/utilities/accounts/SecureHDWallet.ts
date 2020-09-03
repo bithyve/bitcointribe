@@ -424,7 +424,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     const batchedDerivativeAddresses = [];
 
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
       const derivativeAccount = this.derivativeAccounts[dAccountType];
       if (derivativeAccount.instance.using) {

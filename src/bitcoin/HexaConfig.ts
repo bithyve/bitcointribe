@@ -7,6 +7,7 @@ import {
   DonationDerivativeAccount,
 } from './utilities/Interface';
 import Config from 'react-native-config';
+import { DONATION_ACCOUNT } from '../common/constants/serviceTypes';
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -28,11 +29,11 @@ class HexaConfig {
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
-    salt: Config.BIT_CIPHER_SALT.trim(),
-    keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
-    iv: Buffer.alloc(16, 0),
-  };
+      algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
+      salt: Config.BIT_CIPHER_SALT.trim(),
+      keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
+      iv: Buffer.alloc(16, 0),
+    };
   public KEY_STRECH_ITERATIONS = parseInt(
     Config.BIT_KEY_STRECH_ITERATIONS.trim(),
     10,
@@ -185,6 +186,8 @@ class HexaConfig {
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
+
+  public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter((account) => account !== DONATION_ACCOUNT)
 
   constructor(env: string) {
     this.ENVIRONMENT = env;

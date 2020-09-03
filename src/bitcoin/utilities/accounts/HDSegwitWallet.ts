@@ -1045,7 +1045,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const batchedDerivativeAddresses = [];
     if (!this.isTest) {
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
         const derivativeAccount = this.derivativeAccounts[dAccountType];
         if (derivativeAccount.instance.using) {
           for (

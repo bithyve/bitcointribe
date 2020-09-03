@@ -402,10 +402,10 @@ function* syncDerivativeAccountsWorker({ payload }) {
         : service.secureHDWallet.derivativeAccounts,
     );
 
+
     const res = yield call(
       service.syncDerivativeAccountsBalanceTxs,
-      Object.keys(config.DERIVATIVE_ACC),
-    );
+      config.DERIVATIVE_ACC_TO_SYNC);
 
     const postFetchDerivativeAccounts = JSON.stringify(
       serviceType === REGULAR_ACCOUNT

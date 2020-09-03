@@ -355,7 +355,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       }
 
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
           let derivativeAccount;
 
           if (serviceType === REGULAR_ACCOUNT) {
