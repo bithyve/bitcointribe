@@ -362,20 +362,36 @@ export default function ContactList(props) {
           )
         }) : null}
       </View>
-      <AppBottomSheetTouchableWrapper
-        style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
-        onPress={() => addContact()}
-      >
-        <Text
-          style={{
-            fontSize: RFValue(13, 812),
-            fontFamily: Fonts.FiraSansRegular,
-          }}
+      <View style={{ flexDirection: 'row' }}>
+        <AppBottomSheetTouchableWrapper
+          style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
           onPress={() => addContact()}
         >
-          Add contact
-          </Text>
-      </AppBottomSheetTouchableWrapper>
+          <Text
+            style={{
+              fontSize: RFValue(13, 812),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+            onPress={() => addContact()}
+          >
+            Add contact
+        </Text>
+        </AppBottomSheetTouchableWrapper>
+        {props.isShowSkipContact && (<AppBottomSheetTouchableWrapper
+          style={{ marginRight: 10, padding: 10 }}
+          onPress={() => props.onPressContinue()}
+        >
+          <Text
+            style={{
+              fontSize: RFValue(13, 812),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+            onPress={() => props.onPressContinue()}
+          >
+            Skip Contact
+        </Text>
+        </AppBottomSheetTouchableWrapper>)}
+      </View>
       <View style={[styles.searchBoxContainer]}>
         <View style={styles.searchBoxIcon}>
           <EvilIcons
@@ -405,28 +421,28 @@ export default function ContactList(props) {
               if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
                 selected = true;
               }
-            //  if (item.phoneNumbers || item.emails) {
-                return (
-                  <AppBottomSheetTouchableWrapper
-                    onPress={() => onContactSelect(index)}
-                    style={styles.contactView}
-                    key={index}
-                  >
-                    <RadioButton
-                      size={15}
-                      color={Colors.lightBlue}
-                      borderColor={Colors.borderColor}
-                      isChecked={item.checked}
-                      onpress={() => onContactSelect(index)}
-                    />
-                    <Text style={styles.contactText}>
-                      {item.name && item.name.split(' ')[0] ? item.name.split(' ')[0] : ""}{' '}
-                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
-                      </Text>
+              //  if (item.phoneNumbers || item.emails) {
+              return (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => onContactSelect(index)}
+                  style={styles.contactView}
+                  key={index}
+                >
+                  <RadioButton
+                    size={15}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={item.checked}
+                    onpress={() => onContactSelect(index)}
+                  />
+                  <Text style={styles.contactText}>
+                    {item.name && item.name.split(' ')[0] ? item.name.split(' ')[0] : ""}{' '}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                     </Text>
-                  </AppBottomSheetTouchableWrapper>
-                );
+                  </Text>
+                </AppBottomSheetTouchableWrapper>
+              );
               // }
               // else {
               //   return null;

@@ -136,6 +136,7 @@ const ContactsListForAssociateContact = (props) => {
       </Text>
       <ContactList
         isTrustedContact={true}
+        isShowSkipContact={true}
         style={{}}
         onPressContinue={updateTrustedContactsInfo}
         onSelectContact={selectedContactsList}
