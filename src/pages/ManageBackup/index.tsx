@@ -1587,7 +1587,7 @@ export default function ManageBackup(props) {
       if (autoHighlightFlags.securityAns) {
         return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
           : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
-            : item.status == 'Good' ? 'Security Question and Answer are confirmed'
+            : item.status == 'Good' ? 'Security Question and Answer confirmed'
               : 'Last Backup';
       } else {
         return 'Last Backup';

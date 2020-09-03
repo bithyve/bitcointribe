@@ -47,6 +47,7 @@ export default function SecurityQuestionHelpContents(props) {
           style={{
             height: hp('89%'),
             paddingBottom: hp('6%'),
+            justifyContent: 'space-between'
           }}
         >
           <Text

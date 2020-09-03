@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function CheckingAccountHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -43,14 +45,15 @@ export default function CheckingAccountHelpContents(props) {
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
-         style={{
+        ref={scrollViewRef}
+        style={{
           flex: 1,
           backgroundColor: Colors.blue,
         }}
         snapToInterval={hp('89%')}
         decelerationRate="fast"
       >
-         <View style={styles.ElementView}>
+        <View style={styles.ElementView}>
           <Text
             style={{
               ...styles.infoText,
@@ -80,16 +83,21 @@ export default function CheckingAccountHelpContents(props) {
             storing more funds or for spending infrequently, please store
             your bitcoin in the Savings Account
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollToEnd({ animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <View
-            style={{
-              borderStyle: 'dotted',
-              borderWidth: 1,
-              borderRadius: 1,
-              borderColor: Colors.white,
-              ...styles.separatorView,
-            }}
-          />
+            <View
+              style={{
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
+                ...styles.separatorView,
+              }}
+            />
           </View>
         </View>
         <View style={styles.ElementView}>
@@ -111,30 +119,30 @@ export default function CheckingAccountHelpContents(props) {
             />
           </View>
           <View style={styles.bottomLinkView}>
-            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
-            Use this account to store small amounts for daily use
+            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
+              Use this account to store small amounts for daily use
           </Text>
-          <View style={{...styles.linkView, marginTop: wp('7%')}}>
-            <Text
-              style={styles.toKnowMoreText}
-            >
-              To read more,
-            </Text>
-            <AppBottomSheetTouchableWrapper
-              style={{ marginLeft: 5 }}
-              onPress={() =>
-                openLink(
-                  'https://en.bitcoin.it/wiki/Techniques_to_reduce_transaction_fees',
-                )
-              }
-            >
+            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
               <Text
-                style={styles.clickHereText}>
-                click here
+                style={styles.toKnowMoreText}
+              >
+                To read more,
+            </Text>
+              <AppBottomSheetTouchableWrapper
+                style={{ marginLeft: 5 }}
+                onPress={() =>
+                  openLink(
+                    'https://en.bitcoin.it/wiki/Techniques_to_reduce_transaction_fees',
+                  )
+                }
+              >
+                <Text
+                  style={styles.clickHereText}>
+                  click here
               </Text>
-            </AppBottomSheetTouchableWrapper>
+              </AppBottomSheetTouchableWrapper>
+            </View>
           </View>
-        </View>
         </View>
       </ScrollView>
     </View>
@@ -193,7 +201,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('89%'),
+    height: hp('80%'),
     justifyContent: 'space-between',
   },
   separatorView: {
