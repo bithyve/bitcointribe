@@ -47,6 +47,7 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
+import io.hexawallet.hexa.GoogleDrivePackage;
 
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
@@ -80,7 +81,7 @@ public class MainApplication extends Application implements ShareApplication, Re
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
           new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
           new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
-          new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
+          new PdfPasswordPackage(), new GoogleDrivePackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
 
     @Override

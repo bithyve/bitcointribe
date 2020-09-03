@@ -351,9 +351,12 @@ class UpgradeBackup extends Component<
               ? hp('50%')
               : hp('60%'),
           ]}
-          renderContent={() => (
-            <RestoreFromICloud
-              title={'Keeper on iCloud'}
+          renderContent={() => {
+            let name;
+            if(Platform.OS == 'ios') name = 'iCloud';
+            else name = 'GDrive';
+            return (<RestoreFromICloud
+              title={'Keeper on ' + name}
               subText={
                 'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
               }
@@ -362,7 +365,7 @@ class UpgradeBackup extends Component<
               }
               cardInfo={'Store Backup'}
               cardTitle={'Hexa Wallet Backup'}
-              cardSubInfo={'iCloud backup'}
+              cardSubInfo={name + ' backup'}
               proceedButtonText={'Open Settings'}
               backButtonText={'Back'}
               modalRef={this.refs.RestoreFromICloud}
@@ -374,7 +377,7 @@ class UpgradeBackup extends Component<
                 (this.refs.RestoreFromICloud as any).snapTo(0);
               }}
             />
-          )}
+          )}}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>

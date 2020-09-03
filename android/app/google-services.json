@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "1002970291557-nc87dvbhtrkuvu0nhmfbt2r7qvo1cp4f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa",
+            "certificate_hash": "c44125181ec60e743e30ab650833ea5773fac917"
+          }
+        },
+        {
+          "client_id": "1002970291557-7r0ak6i0fp4rl20h6b59vctkc3lhajit.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa",
+            "certificate_hash": "38550726f4c6c43ea287cf16117ce6a566e1cbc1"
+          }
+        },
+        {
           "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -51,6 +67,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "1002970291557-p35djt8iddkip2e4hf6ng77sut8i5df7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.development",
+            "certificate_hash": "c44125181ec60e743e30ab650833ea5773fac917"
+          }
+        },
+        {
+          "client_id": "1002970291557-gns533vq2ve029n5fbnee3hpsk3168oe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.development",
+            "certificate_hash": "38550726f4c6c43ea287cf16117ce6a566e1cbc1"
+          }
+        },
+        {
           "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -86,6 +118,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1002970291557-n85n3rcj9oemtga3757i27duesltdtmd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.staging",
+            "certificate_hash": "c44125181ec60e743e30ab650833ea5773fac917"
+          }
+        },
+        {
+          "client_id": "1002970291557-so4rfvq2krfdh4cc5mruut7ioede2p4i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.staging",
+            "certificate_hash": "38550726f4c6c43ea287cf16117ce6a566e1cbc1"
+          }
+        },
         {
           "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
           "client_type": 3

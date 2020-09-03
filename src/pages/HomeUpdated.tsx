@@ -11,7 +11,7 @@ import {
   AsyncStorage,
   Linking,
   Alert,
-  NativeModules
+  NativeModules, PermissionsAndroid
 } from 'react-native';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -112,6 +112,7 @@ import * as Permissions from 'expo-permissions';
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 import SSS from '../bitcoin/utilities/sss/SSS';
 import { encrypt, decrypt } from '../common/encryption';
+import WalletName from './RestoreHexaWithKeeper/WalletName';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -211,6 +212,43 @@ const TrustedContactRequestContent = ({
   );
 };
 
+/**
+ * require write storage permission
+ */
+async function requestWriteStoragePermission() {
+  try {
+      const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      )
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("You can write storage")
+      } else {
+          console.log("Write Storage permission denied")
+      }
+  } catch (err) {
+      console.warn(err)
+  }
+}
+
+
+/**
+* * require read storage permission
+*/
+async function requestReadStoragePermission() {
+  try {
+      const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+      )
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("You can Read storage")
+      } else {
+          console.log("Read Storage permission denied")
+      }
+  } catch (err) {
+      console.warn(err)
+  }
+}
+
 interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
@@ -252,6 +290,9 @@ interface HomeStateTypes {
   isRequestModalOpened: boolean;
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
+  googleLoginStatus: boolean;
+  permissionsGranted: boolean;
+  WalletData: any;
 }
 
 interface HomePropsTypes {
@@ -293,7 +334,9 @@ interface HomePropsTypes {
   releaseCasesValue: any;
   updateLastSeen: any
   database: any;
+  regularAccount: RegularAccount;
 }
+const GoogleDrive = NativeModules.GoogleDrive;
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -350,6 +393,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isRequestModalOpened: false,
       isBalanceLoading: true,
       addContactModalOpened: false,
+      googleLoginStatus: false,
+      permissionsGranted: false,
+      WalletData: []
     };
   }
 
@@ -800,9 +846,151 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         isLoading: false,
       }, () => this.props.updateLastSeen(new Date()));
     }, 2);
-
-
+    
   };
+
+  // check storage permission
+  checkPermission = async () => {
+    try {
+        const userResponse = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        ]);
+        return userResponse;
+      } catch (err) {
+        console.log(err);
+      }
+      return null;
+  }
+
+  GoogleDriveLogin = () => {
+    const { googleLoginStatus } = this.state;
+   // if(!googleLoginStatus){
+      GoogleDrive.setup()
+      .then(() => {
+        GoogleDrive.login(
+          (err,data) => {
+            this.handleLogin(err,data)
+          }
+        );
+      })
+      .catch((err) => {
+        console.log("GOOGLE SetupFail", err);
+    });
+  //  }
+  }
+
+    handleLogin = async (e, data) => {
+      const result = e || data;
+      console.log("GOOGLE ReSULT", data);
+      console.log("Error", e);
+      if (result.eventName == "onLogin") {
+        this.setState({googleLoginStatus: true});
+        if (!(await this.checkPermission())) {
+          throw new Error('Storage Permission Denied');
+        }
+        //this.createFile();
+        this.checkFileIsAvailable();
+      } 
+
+      if(result.eventName && this.props.hasOwnProperty(result.eventName)){
+        const event = result.eventName;
+        delete result.eventName;
+        this.props[event](result);
+      }
+    }
+
+    checkFileIsAvailable = async () =>{
+      const metaData = {
+        name: 'HexaBackupLatest.db',
+        description: 'Backup data for my app',
+        mimeType: 'application/json',
+    }
+      await GoogleDrive.checkIfFileExist(JSON.stringify(metaData),
+        (err,data) => {
+          console.log("err, data", data, err);
+          const result = err || data;
+          console.log("checkFileIsAvailable", result);
+         if (result.eventName == "listEmpty") {
+            this.createFile();
+          } else{
+            this.readFile(result);
+            //this.UpdateFile(result);
+          }
+        });
+    }
+
+    createFile = () => {
+      const { WalletData } = this.state;
+      const metaData = {
+        name: 'HexaBackupLatest.db',
+        description: 'Backup data for my app',
+        mimeType: 'application/json',
+        data: JSON.stringify(WalletData)
+    }
+      
+      try{
+        GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) =>{
+          console.log("DATA", data);
+          console.log("ERROR", err);
+        });
+             // uploadFile(JSON.stringify(content))
+          }
+      catch(error) {
+          console.log('error', error)
+      }
+  }
+
+  UpdateFile = (result) => {
+    const { WalletData } = this.state;
+    const metaData = {
+      name: result.name,
+      mimeType: result.mimeType,
+      data: JSON.stringify(WalletData),
+      id: result.id
+  }
+    
+    try{
+      GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) =>{
+        console.log("DATA updateFile", data);
+        console.log("ERROR updateFile", err);
+        const result = err || data;
+          console.log("GoogleDrive.updateFile", result);
+      });
+        }
+    catch(error) {
+        console.log('error', error)
+    }
+}
+
+readFile = (result) => {
+  const metaData = {
+    id: result.id
+}
+  try{
+    GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) =>{
+      console.log("DATA readFile", data1);
+      console.log("ERROR readFile", err);
+      const result = err || data1;
+      if(data1){
+        var arr = JSON.parse(data1);
+        const { data } = this.props.regularAccount.getWalletId();
+        for (var i = 0; i < arr.length; i++){
+          console.log(arr[i])
+          if(arr[i].walletId == data.walletId){
+
+          }
+        }
+          
+        //this.UpdateFile(result);
+      }
+        console.log("GoogleDrive.readFile", result);
+    });
+      }
+  catch(error) {
+      console.log('error', error)
+  }
+}
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -2062,12 +2250,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  cloudData = () =>{
-    var ICloudBackup = NativeModules.ICloudBackup;
-    ICloudBackup.initBackup();
-    console.log('CalendarManager', ICloudBackup)
+  cloudData = async () =>{
+    const { walletName, regularAccount} = this.props;
+    // var ICloudBackup = NativeModules.ICloudBackup;
+    // ICloudBackup.initBackup();
+    // console.log('CalendarManager', ICloudBackup)
     let walletImage = {SERVICES:{},DECENTRALIZED_BACKUP:{},WALLET_SETUP:{}};
     let CloudDataJson = {};
+    let WalletData = [];
     if(!isEmpty(this.props.database)){
       if(this.props.database.SERVICES) walletImage.SERVICES = this.props.database.SERVICES;
       if(this.props.database.DECENTRALIZED_BACKUP) walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
@@ -2077,14 +2267,27 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         walletImage,
         keeperInfo:[]
       }
-      // console.log('CloudDataJson', CloudDataJson);
-      const encryptedCloudDataJson = encrypt(CloudDataJson, key);
+      const encryptedCloudDataJson = await encrypt(CloudDataJson, key);
       // console.log('encryptedDatabase', encryptedCloudDataJson);
       const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
-      console.log('decryptedDatabase', decryptedCloudDataJson);
+      //console.log('decryptedDatabase', decryptedCloudDataJson);
+      //console.log("WALLETID", this.props.regularAccount);
+       const { data } = regularAccount.getWalletId();//yield call(service.getWalletId);
+      // console.log("WALLETID data", data);
+      let tempData = {
+        walletName : walletName,
+        walletId : data.walletId,
+        data : encryptedCloudDataJson, 
+        dateTime: new Date()
+      };
+      WalletData.push(tempData);
+      this.setState({ WalletData : WalletData});
     }
     if(Platform.OS == 'ios') console.log('call for icloud upload')
-    else console.log('call for google drive upload')
+    else {
+      this.GoogleDriveLogin();
+      console.log('call for google drive upload')
+    }
   }
 
   onPressElement = (item) => {
@@ -3095,6 +3298,7 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),

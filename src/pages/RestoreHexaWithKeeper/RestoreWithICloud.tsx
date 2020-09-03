@@ -285,14 +285,17 @@ class RestoreWithICloud extends Component<
               ? hp('50%')
               : hp('60%'),
           ]}
-          renderContent={() => (
-            <RestoreFromICloud
-              title={'Restore from iCloud'}
+          renderContent={() => {
+            let name;
+            if(Platform.OS == 'ios') name = 'iCloud';
+            else name = 'GDrive';
+            return (<RestoreFromICloud
+              title={'Restore from ' + name}
               subText={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'}
               info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
               cardInfo={'Restoring Wallet from'}
               cardTitle={'Hexa Wallet Backup'}
-              cardSubInfo={'iCloud backup'}
+              cardSubInfo={name + ' backup'}
               proceedButtonText={'Restore'}
               backButtonText={'Back'}
               modalRef={this.refs.RestoreFromICloud}
@@ -303,7 +306,7 @@ class RestoreWithICloud extends Component<
                 (this.refs.RestoreFromICloud as any).snapTo(0);
               }}
             />
-          )}
+          )}}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
