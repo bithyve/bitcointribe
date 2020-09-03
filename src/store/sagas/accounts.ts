@@ -44,6 +44,7 @@ import {
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
+  SYNC_VIA_XPUB_AGENT,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -437,6 +438,56 @@ function* syncDerivativeAccountsWorker({ payload }) {
 export const syncDerivativeAccountsWatcher = createWatcher(
   syncDerivativeAccountsWorker,
   SYNC_DERIVATIVE_ACCOUNTS,
+);
+
+
+
+function* syncViaXpubAgentWorker({ payload }) {
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+
+  const { serviceType, derivativeAccountType, accountNumber } = payload;
+  console.log({ serviceType, derivativeAccountType, accountNumber })
+  const service = yield select(
+    (state) => state.accounts[serviceType].service,
+  );
+
+  const preFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][accountNumber]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][accountNumber]);
+
+
+  const res = yield call(
+    service.syncViaXpubAgent,
+    derivativeAccountType, accountNumber);
+
+  const postFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][accountNumber]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][accountNumber]);
+
+
+  if (res.status === 200) {
+    if (
+      postFetchDerivativeAccount !== preFetchDerivativeAccount) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [serviceType]: JSON.stringify(service),
+      };
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log('Failed to sync derivative account');
+  }
+
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+}
+
+export const syncViaXpubAgentWatcher = createWatcher(
+  syncViaXpubAgentWorker,
+  SYNC_VIA_XPUB_AGENT,
 );
 
 function* processRecipients(

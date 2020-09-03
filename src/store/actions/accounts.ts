@@ -15,6 +15,7 @@ export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
+export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
@@ -133,6 +134,14 @@ export const syncDerivativeAccounts = (serviceTypes: string[]) => {
     payload: { serviceTypes },
   };
 };
+
+export const syncViaXpubAgent = (serviceType, derivativeAccountType, accountNumber) => {
+  return {
+    type: SYNC_VIA_XPUB_AGENT,
+    payload: { serviceType, derivativeAccountType, accountNumber },
+  };
+};
+
 
 export const removeTwoFA = () => {
   return {
@@ -317,5 +326,5 @@ export const twoFAResetted = (resetted) => {
 };
 
 export const settedDonationAccount = (serviceType, successful) => {
-  return { type: SETTED_DONATION_ACC, payload: {serviceType, successful } }
+  return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } }
 }

@@ -60,6 +60,7 @@ import {
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
+  syncViaXpubAgentWatcher,
 } from './sagas/accounts';
 
 import {
@@ -165,6 +166,7 @@ const rootSaga = function* () {
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncDerivativeAccountsWatcher,
+    syncViaXpubAgentWatcher,
     startupSyncWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,

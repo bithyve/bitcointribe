@@ -768,17 +768,15 @@ export default class HDSegwitWallet extends Bitcoin {
 
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('setupDonationAccount', {
+      res = await BH_AXIOS.post('fetchXpubInfo', {
         HEXA_ID,
         xpubId: this.derivativeAccounts[accountType][accountNumber].xpubId
 
       });
     } catch (err) {
-      delete this.derivativeAccounts[accountType][accountNumber];
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
-
 
     const { availableAddresses, usedAddresses, receivingAddresses, nextFreeAddressIndex, utxos, balances, transactions, lastSynched
     } = res.data;

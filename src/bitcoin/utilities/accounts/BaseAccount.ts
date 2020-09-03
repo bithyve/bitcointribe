@@ -324,6 +324,41 @@ export default class BaseAccount {
     }
   };
 
+
+  public syncViaXpubAgent = async (
+    accountType: string,
+    accountNumber: number,
+  ): Promise<{
+    status: number;
+    data: {
+      synched: Boolean;
+    };
+    err?: undefined;
+    message?: undefined;
+  } | {
+    status: number;
+    err: string;
+    message: string;
+    data?: undefined;
+  }> => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.syncViaXpubAgent(
+          accountType,
+          accountNumber
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: "Failed to sync xpub via xpub agent",
+      };
+    }
+  };
+
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,

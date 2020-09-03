@@ -50,6 +50,7 @@ import {
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
   setAverageTxFee,
+  syncViaXpubAgent
 } from '../../store/actions/accounts';
 import {
   setCurrencyToggleValue,
@@ -146,6 +147,7 @@ interface AccountsPropsTypes {
   fetchTransactions: any;
   getTestcoins: any;
   fetchBalanceTx: any;
+  syncViaXpubAgent: any;
   fetchDerivativeAccXpub: any;
   fetchDerivativeAccBalTx: any;
   fetchDerivativeAccAddress: any;
@@ -1039,9 +1041,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     accounts[serviceType].loading.derivativeBalanceTx
                   }
                   onRefresh={() => {
+                    console.log({ state: this.state, presentCarouselData: this.state.presentCarouselData })
                     const { presentCarouselData } = this.state
-                    if (presentCarouselData && presentCarouselData.type === "Donation Account") {
-
+                    if (presentCarouselData && presentCarouselData.accountType === "Donation Account") {
+                      const { derivativeAccountDetails } = presentCarouselData;
+                      console.log({ derivativeAccountDetails })
+                      if (derivativeAccountDetails) {
+                        this.props.syncViaXpubAgent(derivativeAccountDetails.parent, derivativeAccountDetails.type, derivativeAccountDetails.number)
+                      }
                     } else {
                       this.props.fetchBalanceTx(serviceType, {
                         loader: true,
@@ -1809,6 +1816,7 @@ export default withNavigationFocus(
     fetchTransactions,
     getTestcoins,
     fetchBalanceTx,
+    syncViaXpubAgent,
     fetchDerivativeAccXpub,
     fetchDerivativeAccBalTx,
     fetchDerivativeAccAddress,
