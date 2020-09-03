@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Clipboard,
 } from 'react-native';
-import {useDispatch} from 'react-redux'
+import { useDispatch } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -21,30 +21,36 @@ import { updateDonationPreferences } from '../store/actions/accounts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function DonationWebPageModalContents(props) {
+  const [saveEnabled, setSaveEnabled] = useState(false)
   const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
   const [isDonationTransactionEnable, setIsDonationTransactionEnable] = useState(props.account.configuration.displayTransactions);
   const dispatch = useDispatch()
-  useEffect(()=>{
+  useEffect(() => {
     setIsDonationTotalEnable(props.account.configuration.displayBalance);
     setIsDonationTransactionEnable(props.account.configuration.displayTransactions)
-  },[props.account])
+  }, [props.account])
 
   function writeToClipboard(link) {
     Clipboard.setString(link);
     Toast('Copied Successfully');
   }
 
+  useEffect(() => {
+    if (isDonationTotalEnable !== props.account.configuration.displayBalance || isDonationTransactionEnable !== props.account.configuration.displayTransactions)
+      setSaveEnabled(true)
+    else setSaveEnabled(false)
+  }, [isDonationTotalEnable, isDonationTransactionEnable, props.account.configuration])
+
   const updatePreferences = useCallback(() => {
-    if(isDonationTotalEnable !== props.account.configuration.displayBalance || isDonationTransactionEnable !== props.account.configuration.displayTransactions){
-      const configuration = {
-        displayBalance: isDonationTotalEnable,
-        displayTransactions: isDonationTransactionEnable
-      }
-      const {serviceType, accountNumber} = props;
-      console.log({serviceType, accountNumber})
-      Toast("Your preferences would be updated shortly")
-      dispatch(updateDonationPreferences(serviceType, accountNumber, configuration))
+    const configuration = {
+      displayBalance: isDonationTotalEnable,
+      displayTransactions: isDonationTransactionEnable
     }
+    const { serviceType, accountNumber } = props;
+    console.log({ serviceType, accountNumber })
+    Toast("Your preferences would be updated shortly")
+    dispatch(updateDonationPreferences(serviceType, accountNumber, configuration))
+
   }, [isDonationTotalEnable, isDonationTransactionEnable, props.account.configuration])
 
   return (
@@ -130,7 +136,7 @@ export default function DonationWebPageModalContents(props) {
             />
           </TouchableOpacity>
         </View>
-        {/* <View style={styles.infoTextContainer}>
+        <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>
           <Text style={styles.modalInfoText}>If you have a website, simply copy this code on your site to start receiving donations</Text>
         </View>
@@ -144,28 +150,29 @@ export default function DonationWebPageModalContents(props) {
             }}
             numberOfLines={1}
           >
-            {'creating...'}
+            {`<iframe src=${"https://hexawallet.io/donate/?donationid=" + props.account.id} width="400" height="600"></iframe>`}
           </Text>
-          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('')}>
+          <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard(`<iframe src=${"https://hexawallet.io/donate/?donationid=" + props.account.id} width="400" height="600"></iframe>`)}>
             <Image
               source={require('../assets/images/icons/icon_copy.png')}
               style={{ width: 50, height: 50 }}
               resizeMode='center'
             />
           </TouchableOpacity>
-        </View> */}
-        <View style={{marginTop: 30}}>  
-        <AppBottomSheetTouchableWrapper
-                  style={styles.buttonStyle}
-                  onPress={() => {
-                   updatePreferences()
-                   props.close();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Save</Text>
-                </AppBottomSheetTouchableWrapper>
         </View>
-      
+        <View style={{ marginTop: 30 }}>
+          <AppBottomSheetTouchableWrapper
+            style={{ ...styles.buttonStyle, opacity: !saveEnabled ? 0.5 : 1 }}
+            disabled={!saveEnabled}
+            onPress={() => {
+              updatePreferences()
+              props.close();
+            }}
+          >
+            <Text style={styles.buttonText}>Save</Text>
+          </AppBottomSheetTouchableWrapper>
+        </View>
+
       </View>
     </View>
   );

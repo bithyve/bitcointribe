@@ -60,7 +60,7 @@ const ACCOUNT_VARS: {
   averageTxFees: any;
   donationAccount: {
     settedup: Boolean,
-    preferenceUpdated: Boolean
+    loading: Boolean
   }
 } = {
   service: null,
@@ -90,7 +90,7 @@ const ACCOUNT_VARS: {
   averageTxFees: null,
   donationAccount: {
     settedup: false,
-    preferenceUpdated: false
+    loading: false
   }
 };
 
@@ -463,8 +463,8 @@ export default (state = initialState, action) => {
           ...state[account],
           donationAccount: {
             settedup: false,
-            preferenceUpdated: false
-          }
+            loading: true,
+          },
         }
       }
 
@@ -475,7 +475,8 @@ export default (state = initialState, action) => {
           ...state[account],
           donationAccount: {
             ...state[account].donationAccount,
-            settedup: action.payload.successful
+            settedup: action.payload.successful,
+            loading: false,
           }
         }
       }

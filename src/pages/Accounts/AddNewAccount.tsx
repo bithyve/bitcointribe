@@ -12,6 +12,7 @@ import {
   AsyncStorage,
   Linking,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -255,12 +256,12 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                     ? Colors.lightBlue
                     : Colors.blue,
                 }}
-                disabled={this.state.modelButtonIsValid}
+                disabled={this.state.modelButtonIsValid || this.props.accounts[this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT].donationAccount.loading}
                 onPress={
                   this.initiateDonationAccount
                 }
               >
-                <Text style={styles.buttonText}>Proceed</Text>
+                {this.props.accounts[this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT].donationAccount.loading ? <ActivityIndicator /> : <Text style={styles.buttonText}>Proceed</Text>}
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
