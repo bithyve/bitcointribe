@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   View,
   StyleSheet,
@@ -292,13 +292,17 @@ interface HomePropsTypes {
   updateLastSeen: any
 }
 
-class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
+class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
   NoInternetBottomSheet: any;
   unsubscribe: any;
+
+
+  static whyDidYouRender = true
+
 
   constructor(props) {
     super(props);
@@ -907,7 +911,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .then((notifications) => { });
   };
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
@@ -973,6 +977,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ? `${Math.round(options.amount * 1e8)}`
           : '',
       });
+    }
+
+
+    if (prevState.isLoading && !this.state.isLoading) {
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
     }
   };
 
@@ -1215,10 +1226,22 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     });
 
     setTimeout(() => {
-      (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-      (this.refs.addTabBarBottomSheet as any).snapTo(0);
-      (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-      (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
+
+      if (this.refs.addTabBarBottomSheet) {
+        (this.refs.addTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.qrTabBarBottomSheet) {
+        (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.moreTabBarBottomSheet) {
+        (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      }
+
     }, 500);
 
     this.getAssociatedContact();
