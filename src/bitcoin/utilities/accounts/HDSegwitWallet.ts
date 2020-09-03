@@ -200,6 +200,21 @@ export default class HDSegwitWallet extends Bitcoin {
     return this.getAddress(false, 0);
   };
 
+  public getReceivingAddress = (derivativeAccountType?: string, accountNumber?: number): string => {
+    let receivingAddress;
+    switch (derivativeAccountType) {
+      case DONATION_ACCOUNT:
+        const donationAcc: DonationDerivativeAccountElements = this.derivativeAccounts[DONATION_ACCOUNT][accountNumber];
+        receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
+        break;
+
+      default:
+        receivingAddress = this.receivingAddress
+
+    }
+    return receivingAddress;
+  }
+
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,

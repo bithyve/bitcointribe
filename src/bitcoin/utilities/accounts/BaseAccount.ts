@@ -57,19 +57,19 @@ export default class BaseAccount {
 
   public getMnemonic = ():
     | {
-        status: number;
-        data: {
-          mnemonic: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        mnemonic: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -82,19 +82,19 @@ export default class BaseAccount {
 
   public getWalletId = ():
     | {
-        status: number;
-        data: {
-          walletId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        walletId: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-        message: string;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+      message: string;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -107,19 +107,19 @@ export default class BaseAccount {
 
   public getAccountId = ():
     | {
-        status: number;
-        data: {
-          accountId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        accountId: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -160,23 +160,25 @@ export default class BaseAccount {
     type: string;
   } => this.hdWallet.addressDiff(scannedStr);
 
+  public getReceivingAddress = (derivativeAccountType?: string, accountNumber?: number) => this.hdWallet.getReceivingAddress(derivativeAccountType, accountNumber);
+
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
     contactName?: string,
   ):
     | {
-        status: number;
-        data: string;
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: string;
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -201,17 +203,17 @@ export default class BaseAccount {
     contactName?: string,
   ): Promise<
     | {
-        status: number;
-        data: { address: string };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: { address: string };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -236,39 +238,39 @@ export default class BaseAccount {
     accountNumber?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+      status: number;
+      data: {
+        balances: {
+          balance: number;
+          unconfirmedBalance: number;
         };
-        err?: undefined;
-        message?: undefined;
-      }
+        transactions: {
+          totalTransactions: number;
+          confirmedTransactions: number;
+          unconfirmedTransactions: number;
+          transactionDetails: Array<{
+            txid: string;
+            status: string;
+            confirmations: number;
+            fee: string;
+            date: string;
+            transactionType: string;
+            amount: number;
+            accountType: string;
+            recipientAddresses?: string[];
+            senderAddresses?: string[];
+          }>;
+        };
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -292,19 +294,19 @@ export default class BaseAccount {
     accountTypes: string[],
   ): Promise<
     | {
-        status: number;
-        data: {
-          synched: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        synched: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -332,19 +334,19 @@ export default class BaseAccount {
     },
   ): Promise<
     | {
-        status: number;
-        data: {
-          setupSuccessful: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        setupSuccessful: Boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -373,19 +375,19 @@ export default class BaseAccount {
     },
   ): Promise<
     | {
-        status: number;
-        data: {
-          updated: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        updated: Boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -408,19 +410,19 @@ export default class BaseAccount {
     xpub: string,
   ): Promise<
     | {
-        status: number;
-        data: {
-          address: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        address: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -439,39 +441,39 @@ export default class BaseAccount {
     restore?;
   }): Promise<
     | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+      status: number;
+      data: {
+        balances: {
+          balance: number;
+          unconfirmedBalance: number;
         };
-        err?: undefined;
-        message?: undefined;
-      }
+        transactions: {
+          totalTransactions: number;
+          confirmedTransactions: number;
+          unconfirmedTransactions: number;
+          transactionDetails: Array<{
+            txid: string;
+            status: string;
+            confirmations: number;
+            fee: string;
+            date: string;
+            transactionType: string;
+            amount: number;
+            accountType: string;
+            recipientAddresses?: string[];
+            senderAddresses?: string[];
+          }>;
+        };
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -487,17 +489,17 @@ export default class BaseAccount {
     txHash: string,
   ): Promise<
     | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: any;
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -511,22 +513,22 @@ export default class BaseAccount {
 
   public getTestcoins = async (): Promise<
     | {
-        status: number;
-        data: {
-          txid: any;
-          funded: any;
-          balances: any;
-          transactions: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txid: any;
+        funded: any;
+        balances: any;
+        transactions: any;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -557,21 +559,21 @@ export default class BaseAccount {
     averageTxFees?: any,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txPrerequisites: TransactionPrerequisite;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txPrerequisites: TransactionPrerequisite;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        fee?: number;
-        netAmount?: number;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      fee?: number;
+      netAmount?: number;
+      data?: undefined;
+    }
   > => {
     try {
       // if (this.hdWallet.isValidAddress(recipientAddress)) {
@@ -632,19 +634,19 @@ export default class BaseAccount {
     nSequence?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txid: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txid: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       const { txb } = await this.hdWallet.createHDTransaction(

@@ -217,6 +217,21 @@ export default class SecureHDWallet extends Bitcoin {
     if (this.xpubs) return this.createSecureMultiSig(0).address;
   };
 
+  public getReceivingAddress = (derivativeAccountType?: string, accountNumber?: number): string => {
+    let receivingAddress;
+    switch (derivativeAccountType) {
+      case DONATION_ACCOUNT:
+        const donationAcc: DonationDerivativeAccountElements = this.derivativeAccounts[DONATION_ACCOUNT][accountNumber];
+        receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
+        break;
+
+      default:
+        receivingAddress = this.receivingAddress
+
+    }
+    return receivingAddress;
+  }
+
   public getSecondaryID = (
     secondaryMnemonic: string,
   ): { secondaryID: string } => {

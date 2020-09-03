@@ -97,6 +97,11 @@ export default function Receive(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+
+  const derivativeAccountDetails = props.navigation.state.params.derivativeAccountDetails
+    ? props.navigation.state.params.derivativeAccountDetails
+    : { type: null, number: null, parent: null };
+
   const carouselIndex = props.navigation.state.params.carouselIndex
     ? props.navigation.state.params.carouselIndex
     : null;
@@ -143,10 +148,8 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(derivativeAccountDetails.type, derivativeAccountDetails.number);
+
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -383,10 +386,8 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(derivativeAccountDetails.type, derivativeAccountDetails.number);
+
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {

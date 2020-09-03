@@ -318,6 +318,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         const donAcc: DonationDerivativeAccountElements = derivativeAccounts[DONATION_ACCOUNT][index]
         const donationInstance = {
           accountType: 'Donation Account',
+          derivativeAccountDetails: { type: DONATION_ACCOUNT, number: index, parent: serviceType },
           accountInfo: donAcc.subject,
           backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
           accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
@@ -1391,6 +1392,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     onPress={() => {
                       this.props.navigation.navigate('Receive', {
                         serviceType,
+                        derivativeAccountDetails: this.state.presentCarouselData.derivativeAccountDetails,
                         getServiceType: this.getServiceType,
                         carouselIndex: this.state.presentCarouselIndex,
                         netBalance,

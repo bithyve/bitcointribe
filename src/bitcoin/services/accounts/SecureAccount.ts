@@ -128,23 +128,23 @@ export default class SecureAccount {
 
   public setupSecureAccount = async (): Promise<
     | {
-        status: number;
-        data: {
-          setupData: {
-            qrData: string;
-            secret: string;
-            bhXpub: string;
-          };
+      status: number;
+      data: {
+        setupData: {
+          qrData: string;
+          secret: string;
+          bhXpub: string;
         };
-        err?: undefined;
-        message?: undefined;
-      }
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -162,19 +162,19 @@ export default class SecureAccount {
     token?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          imported: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        imported: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       if (!bhXpub) {
@@ -202,19 +202,19 @@ export default class SecureAccount {
     encryptedSecXpub: string,
   ):
     | {
-        status: number;
-        data: {
-          secondaryXpub: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        secondaryXpub: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -230,19 +230,19 @@ export default class SecureAccount {
     pos: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          isValid: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        isValid: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -256,19 +256,19 @@ export default class SecureAccount {
 
   public isActive = async (): Promise<
     | {
-        status: number;
-        data: {
-          isActive: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        isActive: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -284,20 +284,20 @@ export default class SecureAccount {
     secondaryMnemonic: string,
   ): Promise<
     | {
-        status: number;
-        data: {
-          qrData: any;
-          secret: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        qrData: any;
+        secret: any;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -326,19 +326,19 @@ export default class SecureAccount {
 
   public getSecondaryXpub = ():
     | {
-        status: number;
-        data: {
-          secondaryXpub: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        secondaryXpub: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -351,19 +351,19 @@ export default class SecureAccount {
 
   public getAccountId = ():
     | {
-        status: number;
-        data: {
-          accountId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        accountId: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -405,43 +405,45 @@ export default class SecureAccount {
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);
 
+  public getReceivingAddress = (derivativeAccountType?: string, accountNumber?: number) => this.secureHDWallet.getReceivingAddress(derivativeAccountType, accountNumber);
+
   public getBalanceTransactions = async (options?: {
     restore?;
   }): Promise<
     | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+      status: number;
+      data: {
+        balances: {
+          balance: number;
+          unconfirmedBalance: number;
         };
-        err?: undefined;
-        message?: undefined;
-      }
+        transactions: {
+          totalTransactions: number;
+          confirmedTransactions: number;
+          unconfirmedTransactions: number;
+          transactionDetails: Array<{
+            txid: string;
+            status: string;
+            confirmations: number;
+            fee: string;
+            date: string;
+            transactionType: string;
+            amount: number;
+            accountType: string;
+            recipientAddresses?: string[];
+            senderAddresses?: string[];
+          }>;
+        };
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -457,19 +459,19 @@ export default class SecureAccount {
     accountTypes: string[],
   ): Promise<
     | {
-        status: number;
-        data: {
-          synched: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        synched: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -497,19 +499,19 @@ export default class SecureAccount {
     },
   ): Promise<
     | {
-        status: number;
-        data: {
-          setupSuccessful: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        setupSuccessful: Boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -538,19 +540,19 @@ export default class SecureAccount {
     },
   ): Promise<
     | {
-        status: number;
-        data: {
-          updated: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        updated: Boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -573,17 +575,17 @@ export default class SecureAccount {
     txHash: string,
   ): Promise<
     | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: any;
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -628,21 +630,21 @@ export default class SecureAccount {
     averageTxFees?: any,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txPrerequisites: TransactionPrerequisite;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txPrerequisites: TransactionPrerequisite;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        fee?: number;
-        netAmount?: number;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      fee?: number;
+      netAmount?: number;
+      data?: undefined;
+    }
   > => {
     try {
       // if (this.hdWallet.isValidAddress(recipientAddress)) {
@@ -704,26 +706,26 @@ export default class SecureAccount {
     nSequence?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txHex: string;
-          childIndexArray: Array<{
-            childIndex: number;
-            inputIdentifier: {
-              txId: string;
-              vout: number;
-            };
-          }>;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txHex: string;
+        childIndexArray: Array<{
+          childIndex: number;
+          inputIdentifier: {
+            txId: string;
+            vout: number;
+          };
+        }>;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       const { txb } = await this.secureHDWallet.createHDTransaction(
@@ -772,19 +774,19 @@ export default class SecureAccount {
     }>,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txid: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txid: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -807,19 +809,19 @@ export default class SecureAccount {
     nSequence?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txid: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: {
+        txid: string;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       const { txb } = await this.secureHDWallet.createHDTransaction(
@@ -854,17 +856,17 @@ export default class SecureAccount {
     accountNumber?: number,
   ): Promise<
     | {
-        status: number;
-        data: { address: string };
-        err?: undefined;
-        message?: undefined;
-      }
+      status: number;
+      data: { address: string };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
@@ -888,39 +890,39 @@ export default class SecureAccount {
     accountNumber?: number,
   ): Promise<
     | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+      status: number;
+      data: {
+        balances: {
+          balance: number;
+          unconfirmedBalance: number;
         };
-        err?: undefined;
-        message?: undefined;
-      }
+        transactions: {
+          totalTransactions: number;
+          confirmedTransactions: number;
+          unconfirmedTransactions: number;
+          transactionDetails: Array<{
+            txid: string;
+            status: string;
+            confirmations: number;
+            fee: string;
+            date: string;
+            transactionType: string;
+            amount: number;
+            accountType: string;
+            recipientAddresses?: string[];
+            senderAddresses?: string[];
+          }>;
+        };
+      };
+      err?: undefined;
+      message?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
