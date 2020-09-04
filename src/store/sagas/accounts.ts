@@ -610,7 +610,7 @@ function* processRecipients(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  let { recipients, averageTxFees } = payload;
+  let { recipients, averageTxFees, derivativeAccountDetails } = payload;
   console.log({ recipients });
 
   try {
@@ -623,7 +623,12 @@ function* transferST1Worker({ payload }) {
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
-  const res = yield call(service.transferST1, recipients, averageTxFees);
+  const res = yield call(
+    service.transferST1,
+    recipients,
+    averageTxFees,
+    derivativeAccountDetails,
+  );
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();

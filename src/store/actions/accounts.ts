@@ -34,7 +34,7 @@ export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore?},
+  options?: { loader?; fetchTransactionsSync?; restore? },
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -56,10 +56,20 @@ export const fetchBalanceTx = (
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
-export const transferST1 = (serviceType, recipients, averageTxFees?) => {
+export const transferST1 = (
+  serviceType,
+  recipients,
+  averageTxFees?,
+  derivativeAccountDetails?: { type: string; number: number },
+) => {
   return {
     type: TRANSFER_ST1,
-    payload: { serviceType, recipients, averageTxFees },
+    payload: {
+      serviceType,
+      recipients,
+      averageTxFees,
+      derivativeAccountDetails,
+    },
   };
 };
 
@@ -135,13 +145,16 @@ export const syncDerivativeAccounts = (serviceTypes: string[]) => {
   };
 };
 
-export const syncViaXpubAgent = (serviceType, derivativeAccountType, accountNumber) => {
+export const syncViaXpubAgent = (
+  serviceType,
+  derivativeAccountType,
+  accountNumber,
+) => {
   return {
     type: SYNC_VIA_XPUB_AGENT,
     payload: { serviceType, derivativeAccountType, accountNumber },
   };
 };
-
 
 export const removeTwoFA = () => {
   return {
@@ -254,7 +267,7 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED';
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
-export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
+export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -326,5 +339,5 @@ export const twoFAResetted = (resetted) => {
 };
 
 export const settedDonationAccount = (serviceType, successful) => {
-  return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } }
-}
+  return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
+};

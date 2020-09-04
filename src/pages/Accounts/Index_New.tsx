@@ -540,11 +540,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         this.state.serviceType
       ].loading.derivativeBalanceTx;
     }
-    if (
-      prevProps.accounts.exchangeRates !== this.props.accounts.exchangeRates
-    ) {
-      this.setState({ exchangeRates: this.props.accounts.exchangeRates });
-    }
 
     if (prevState.serviceType !== this.state.serviceType) {
       this.setAverageTransactionFees();
@@ -1431,7 +1426,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       this.props.navigation.navigate('Send', {
                         serviceType,
                         derivativeAccountDetails: this.state.presentCarouselData
-                          .derivativeAccountDetails,
+                          ? this.state.presentCarouselData
+                              .derivativeAccountDetails
+                          : null,
                         getServiceType: this.getServiceType,
                         carouselIndex: this.state.presentCarouselIndex,
                         averageTxFees,
@@ -1482,7 +1479,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       this.props.navigation.navigate('Receive', {
                         serviceType,
                         derivativeAccountDetails: this.state.presentCarouselData
-                          .derivativeAccountDetails,
+                          ? this.state.presentCarouselData
+                              .derivativeAccountDetails
+                          : null,
                         getServiceType: this.getServiceType,
                         carouselIndex: this.state.presentCarouselIndex,
                       });

@@ -487,6 +487,7 @@ class SendToContact extends Component<
       spendableBalance,
       averageTxFees,
       isSendMax,
+      derivativeAccountDetails,
     } = this.state;
     const { transfer } = this.props;
     if (!recipients.length) return;
@@ -504,6 +505,7 @@ class SendToContact extends Component<
           recipients,
           averageTxFees,
           isSendMax,
+          derivativeAccountDetails,
         });
       }
     }
@@ -565,7 +567,6 @@ class SendToContact extends Component<
       serviceType,
       averageTxFees,
     } = this.state;
-    console.log({ state: this.state, averageTxFees });
     const { transfer, service, transferST1 } = this.props;
 
     const recipients = [];
@@ -621,7 +622,12 @@ class SendToContact extends Component<
       }
     });
     this.setState({ recipients: recipients });
-    transferST1(serviceType, recipients, averageTxFees);
+    transferST1(
+      serviceType,
+      recipients,
+      averageTxFees,
+      this.state.derivativeAccountDetails,
+    );
   };
 
   onConfirm = () => {
