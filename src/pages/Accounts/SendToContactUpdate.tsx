@@ -102,7 +102,7 @@ interface SendToContactStateTypes {
   serviceType: string;
   averageTxFees: any;
   spendableBalance: any;
-  derivativeAccountDetails: { type: string; number: number; parent: string };
+  derivativeAccountDetails: { type: string; number: number };
   sweepSecure: any;
   removeItem: any;
   switchOn: boolean;
@@ -210,6 +210,7 @@ class SendToContact extends Component<
 
   updateSpendableBalance = () => {
     const { serviceType, spendableBalances } = this.state;
+    if (this.state.derivativeAccountDetails) return;
     if (serviceType === TEST_ACCOUNT) {
       this.setState({ spendableBalance: spendableBalances.testBalance });
     } else if (serviceType == REGULAR_ACCOUNT) {
@@ -533,6 +534,7 @@ class SendToContact extends Component<
     const { fee } = this.props.service[serviceType].service.calculateSendMaxFee(
       recipientsList.length + 1, // +1 for the current instance
       averageTxFees,
+      this.state.derivativeAccountDetails,
     );
 
     if (spendableBalance) {

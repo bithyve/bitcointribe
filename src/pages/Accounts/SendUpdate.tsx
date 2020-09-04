@@ -92,7 +92,7 @@ interface SendStateTypes {
   accountData: any[];
   sweepSecure: any;
   spendableBalance: any;
-  derivativeAccountDetails: { type: string; number: number; parent: string };
+  derivativeAccountDetails: { type: string; number: number };
   getServiceType: any;
   carouselIndex: number;
   averageTxFees: any;

@@ -342,7 +342,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           derivativeAccountDetails: {
             type: DONATION_ACCOUNT,
             number: index,
-            parent: serviceType,
           },
           accountInfo: donAcc.subject,
           backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
@@ -1118,7 +1117,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       console.log({ derivativeAccountDetails });
                       if (derivativeAccountDetails) {
                         this.props.syncViaXpubAgent(
-                          derivativeAccountDetails.parent,
+                          serviceType,
                           derivativeAccountDetails.type,
                           derivativeAccountDetails.number,
                         );
