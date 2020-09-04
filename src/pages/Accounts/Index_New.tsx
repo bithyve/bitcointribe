@@ -50,7 +50,7 @@ import {
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
   setAverageTxFee,
-  syncViaXpubAgent
+  syncViaXpubAgent,
 } from '../../store/actions/accounts';
 import {
   setCurrencyToggleValue,
@@ -83,7 +83,10 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import DonationWebPageModalContents from '../../components/DonationWebPageModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
-import { DonationDerivativeAccount, DonationDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import {
+  DonationDerivativeAccount,
+  DonationDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 // import accounts from '../../store/reducers/accounts';
 
 function isEmpty(obj) {
@@ -248,8 +251,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // this.setState({ spendableBalance: this.props.navigation.state.params
     //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
-
-    this.getServiceType(serviceType, serviceType === SECURE_ACCOUNT ? 2 : serviceType === REGULAR_ACCOUNT ? 1 : 0);
+    this.getServiceType(
+      serviceType,
+      serviceType === SECURE_ACCOUNT
+        ? 2
+        : serviceType === REGULAR_ACCOUNT
+        ? 1
+        : 0,
+    );
     this.getBalance();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
@@ -289,50 +298,66 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   updateCarouselData = () => {
     let { accounts } = this.props;
-    const defaultCarouselData = [{
-      accountType: 'Test Account',
-      accountInfo: 'Learn Bitcoin',
-      backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
-      type: TEST_ACCOUNT,
-    },
-    {
-      accountType: 'Checking Account',
-      accountInfo: 'Fast and easy',
-      backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
-      type: REGULAR_ACCOUNT,
-    },
-    {
-      accountType: 'Savings Account',
-      accountInfo: 'Multi-factor security',
-      backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
-      type: SECURE_ACCOUNT,
-    }];
+    const defaultCarouselData = [
+      {
+        accountType: 'Test Account',
+        accountInfo: 'Learn Bitcoin',
+        backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
+        accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
+        type: TEST_ACCOUNT,
+      },
+      {
+        accountType: 'Checking Account',
+        accountInfo: 'Fast and easy',
+        backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
+        accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
+        type: REGULAR_ACCOUNT,
+      },
+      {
+        accountType: 'Savings Account',
+        accountInfo: 'Multi-factor security',
+        backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
+        accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
+        type: SECURE_ACCOUNT,
+      },
+    ];
 
     const additionalCarouselData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].service[serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'].derivativeAccounts
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
 
-      for (let index = 1; index <= derivativeAccounts && derivativeAccounts[DONATION_ACCOUNT].instance.using; index++) {
-        const donAcc: DonationDerivativeAccountElements = derivativeAccounts[DONATION_ACCOUNT][index]
+      for (
+        let index = 1;
+        index <= derivativeAccounts &&
+        derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
         const donationInstance = {
           accountType: 'Donation Account',
-          derivativeAccountDetails: { type: DONATION_ACCOUNT, number: index, parent: serviceType },
+          derivativeAccountDetails: {
+            type: DONATION_ACCOUNT,
+            number: index,
+            parent: serviceType,
+          },
           accountInfo: donAcc.subject,
           backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
           accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
           type: serviceType,
           donationAcc: donAcc,
-          accountNumber: index
+          accountNumber: index,
         };
-        additionalCarouselData.push(donationInstance)
+        additionalCarouselData.push(donationInstance);
       }
     }
-    this.setState({ carouselData: [...defaultCarouselData, ...additionalCarouselData] })
-  }
+    this.setState({
+      carouselData: [...defaultCarouselData, ...additionalCarouselData],
+    });
+  };
 
   getBalance = () => {
     let { serviceType } = this.state;
@@ -343,67 +368,91 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         ? service.secureHDWallet
         : service.hdWallet;
     if (service) {
-      let currentBalance =
-        wallet.balances.balance + wallet.balances.unconfirmedBalance;
-      let spendableBalance = wallet.balances.balance;
-      let currentTransactions = wallet.transactions.transactionDetails;
+      let currentBalance;
+      let spendableBalance;
+      let currentTransactions;
 
-      if (serviceType === TEST_ACCOUNT) {
-        // hardcoding t-balance (till t-faucet saga syncs)
-        if (!currentTransactions.length) {
-          currentBalance = 10000;
-          spendableBalance = 10000;
-        }
-      }
+      const { presentCarouselData } = this.state;
+      if (
+        presentCarouselData &&
+        presentCarouselData.accountType === 'Donation Account'
+      ) {
+        const donationAccount: DonationDerivativeAccountElements =
+          presentCarouselData.donationAcc;
 
-      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-          let derivativeAccount;
+        const { balances, transactions } = donationAccount;
+        currentBalance = balances
+          ? balances.balance + balances.unconfirmedBalance
+          : 0;
+        spendableBalance = balances ? balances.balance : 0;
+        currentTransactions = transactions
+          ? transactions.transactionDetails
+          : [];
+      } else {
+        currentBalance =
+          wallet.balances.balance + wallet.balances.unconfirmedBalance;
+        spendableBalance = wallet.balances.balance;
+        currentTransactions = wallet.transactions.transactionDetails;
 
-          if (serviceType === REGULAR_ACCOUNT) {
-            derivativeAccount =
-              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-              dAccountType
-              ];
-          } else if (serviceType === SECURE_ACCOUNT) {
-            if (dAccountType === TRUSTED_CONTACTS) continue;
-            derivativeAccount =
-              accounts[SECURE_ACCOUNT].service.secureHDWallet
-                .derivativeAccounts[dAccountType];
+        if (serviceType === TEST_ACCOUNT) {
+          // hardcoding t-balance (till t-faucet saga syncs)
+          if (!currentTransactions.length) {
+            currentBalance = 10000;
+            spendableBalance = 10000;
           }
+        }
 
-          if (derivativeAccount && derivativeAccount.instance.using) {
-            for (
-              let accountNumber = 1;
-              accountNumber <= derivativeAccount.instance.using;
-              accountNumber++
-            ) {
-              if (derivativeAccount[accountNumber].balances) {
-                currentBalance +=
-                  derivativeAccount[accountNumber].balances.balance +
-                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
-                spendableBalance +=
-                  derivativeAccount[accountNumber].balances.balance;
-              }
+        if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+          for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+            let derivativeAccount;
 
-              if (derivativeAccount[accountNumber].transactions) {
-                derivativeAccount[
-                  accountNumber
-                ].transactions.transactionDetails.forEach((tx) => {
-                  let include = true;
-                  for (const currentTx of currentTransactions) {
-                    if (tx.txid === currentTx.txid) {
-                      include = false;
-                      break;
+            if (serviceType === REGULAR_ACCOUNT) {
+              derivativeAccount =
+                accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                  dAccountType
+                ];
+            } else if (serviceType === SECURE_ACCOUNT) {
+              if (dAccountType === TRUSTED_CONTACTS) continue;
+              derivativeAccount =
+                accounts[SECURE_ACCOUNT].service.secureHDWallet
+                  .derivativeAccounts[dAccountType];
+            }
+
+            if (derivativeAccount && derivativeAccount.instance.using) {
+              for (
+                let accountNumber = 1;
+                accountNumber <= derivativeAccount.instance.using;
+                accountNumber++
+              ) {
+                if (derivativeAccount[accountNumber].balances) {
+                  currentBalance +=
+                    derivativeAccount[accountNumber].balances.balance +
+                    derivativeAccount[accountNumber].balances
+                      .unconfirmedBalance;
+                  spendableBalance +=
+                    derivativeAccount[accountNumber].balances.balance;
+                }
+
+                if (derivativeAccount[accountNumber].transactions) {
+                  derivativeAccount[
+                    accountNumber
+                  ].transactions.transactionDetails.forEach((tx) => {
+                    let include = true;
+                    for (const currentTx of currentTransactions) {
+                      if (tx.txid === currentTx.txid) {
+                        include = false;
+                        break;
+                      }
                     }
-                  }
-                  if (include) currentTransactions.push(tx);
-                });
+                    if (include) currentTransactions.push(tx);
+                  });
+                }
               }
             }
           }
         }
       }
+
       currentTransactions.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
@@ -502,18 +551,23 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.setAverageTransactionFees();
     }
 
-    if (prevProps.accounts !==
-      this.props.accounts) {
+    if (prevProps.accounts !== this.props.accounts) {
       let donationAccUpdated = false;
       for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-
         const prevDonationAccounts =
-          prevProps.accounts[serviceType].service[serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'].derivativeAccounts
+          prevProps.accounts[serviceType].service[
+            serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+          ].derivativeAccounts;
 
-        const updatedDonationAccounts =
-          this.props.accounts[serviceType].service[serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'].derivativeAccounts
+        const updatedDonationAccounts = this.props.accounts[serviceType]
+          .service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
 
-        if (prevDonationAccounts[DONATION_ACCOUNT] !== updatedDonationAccounts[DONATION_ACCOUNT]) {
+        if (
+          prevDonationAccounts[DONATION_ACCOUNT] !==
+          updatedDonationAccounts[DONATION_ACCOUNT]
+        ) {
           donationAccUpdated = true;
         }
       }
@@ -548,7 +602,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     } else {
       if (this.carousel.current as any)
         (this.carousel.current as any).snapToItem(index, true, false);
-      this.setState({ serviceType: serviceType, presentCarouselData: this.state.carouselData[index], presentCarouselIndex: index });
+      this.setState({
+        serviceType: serviceType,
+        presentCarouselData: this.state.carouselData[index],
+        presentCarouselIndex: index,
+      });
     }
 
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
@@ -679,10 +737,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             index == 0
               ? Colors.blue
               : index == 1
-                ? Colors.yellow
-                : index == 2
-                  ? Colors.green
-                  : Colors.borderColor,
+              ? Colors.yellow
+              : index == 2
+              ? Colors.green
+              : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -743,10 +801,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
                 } else if (item.accountType == 'Checking Account') {
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(1);
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                      1,
+                    );
                 } else if (item.accountType == 'Donation Account') {
                   if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(1);
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
+                      1,
+                    );
                 }
               }}
             >
@@ -795,7 +857,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null
             ) : null}
-            {(item.accountType === 'Savings Account' || (item.accountType === "Donation Account" && item.type === SECURE_ACCOUNT)) && (
+            {(item.accountType === 'Savings Account' ||
+              (item.accountType === 'Donation Account' &&
+                item.type === SECURE_ACCOUNT)) && (
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -854,32 +918,32 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 )}
               </View>
             ) : (
-                  <Image
-                    style={styles.cardBitCoinImage}
-                    source={getCurrencyImageByRegion(
-                      this.state.CurrencyCode,
-                      'light',
-                    )}
-                  />
+              <Image
+                style={styles.cardBitCoinImage}
+                source={getCurrencyImageByRegion(
+                  this.state.CurrencyCode,
+                  'light',
                 )}
+              />
+            )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.switchOn
-                  ? UsNumberFormat(this.state.netBalance)
-                  : this.state.exchangeRates
-                    ? (
-                      (this.state.netBalance / 1e8) *
-                      this.state.exchangeRates[this.state.CurrencyCode].last
-                    ).toFixed(2)
-                    : null}
+                ? UsNumberFormat(this.state.netBalance)
+                : this.state.exchangeRates
+                ? (
+                    (this.state.netBalance / 1e8) *
+                    this.state.exchangeRates[this.state.CurrencyCode].last
+                  ).toFixed(2)
+                : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : this.state.switchOn
-                  ? 'sats'
-                  : this.state.CurrencyCode.toLocaleLowerCase()}
+                ? 'sats'
+                : this.state.CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -987,7 +1051,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           <Text style={styles.headerText}>Accounts</Text>
           <TouchableOpacity
             style={{ height: 54, justifyContent: 'center' }}
-            onPress={() => { }}
+            onPress={() => {}}
           >
             <View
               style={{
@@ -1002,17 +1066,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 activeOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'light',
-                    )
+                        getCurrencyImageName(CurrencyCode),
+                        'light',
+                      )
                     : getCurrencyImageByRegion(CurrencyCode, 'light')
                 }
                 inactiveOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'dark',
-                    )
+                        getCurrencyImageName(CurrencyCode),
+                        'dark',
+                      )
                     : getCurrencyImageByRegion(CurrencyCode, 'dark')
                 }
                 toggleColor={Colors.lightBlue}
@@ -1041,25 +1105,34 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     accounts[serviceType].loading.derivativeBalanceTx
                   }
                   onRefresh={() => {
-                    console.log({ state: this.state, presentCarouselData: this.state.presentCarouselData })
-                    const { presentCarouselData } = this.state
-                    if (presentCarouselData && presentCarouselData.accountType === "Donation Account") {
+                    console.log({
+                      state: this.state,
+                      presentCarouselData: this.state.presentCarouselData,
+                    });
+                    const { presentCarouselData } = this.state;
+                    if (
+                      presentCarouselData &&
+                      presentCarouselData.accountType === 'Donation Account'
+                    ) {
                       const { derivativeAccountDetails } = presentCarouselData;
-                      console.log({ derivativeAccountDetails })
+                      console.log({ derivativeAccountDetails });
                       if (derivativeAccountDetails) {
-                        this.props.syncViaXpubAgent(derivativeAccountDetails.parent, derivativeAccountDetails.type, derivativeAccountDetails.number)
+                        this.props.syncViaXpubAgent(
+                          derivativeAccountDetails.parent,
+                          derivativeAccountDetails.type,
+                          derivativeAccountDetails.number,
+                        );
                       }
                     } else {
                       this.props.fetchBalanceTx(serviceType, {
                         loader: true,
                         syncTrustedDerivative:
                           serviceType === REGULAR_ACCOUNT ||
-                            serviceType === SECURE_ACCOUNT
+                          serviceType === SECURE_ACCOUNT
                             ? true
                             : false,
                       });
                     }
-
                   }}
                 />
               }
@@ -1074,7 +1147,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   sliderWidth={this.sliderWidth}
                   itemWidth={this.sliderWidth * 0.95}
                   onSnapToItem={(index) => {
-                    this.getServiceType(this.state.carouselData[index].type, index)
+                    this.getServiceType(
+                      this.state.carouselData[index].type,
+                      index,
+                    );
                   }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
@@ -1115,18 +1191,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? UsNumberFormat(spendableBalance)
                         : switchOn
-                          ? UsNumberFormat(spendableBalance)
-                          : exchangeRates
-                            ? (
-                              (spendableBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
-                            ).toFixed(2)
-                            : null}{' '}
+                        ? UsNumberFormat(spendableBalance)
+                        : exchangeRates
+                        ? (
+                            (spendableBalance / 1e8) *
+                            exchangeRates[CurrencyCode].last
+                          ).toFixed(2)
+                        : null}{' '}
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
                         : switchOn
-                          ? 'sats'
-                          : CurrencyCode.toLocaleLowerCase()}
+                        ? 'sats'
+                        : CurrencyCode.toLocaleLowerCase()}
                     </Text>
                     {/* <Text
                       style={{
@@ -1171,8 +1247,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             () => {
                               (this.refs
                                 .TransactionDetailsBottomSheet as any).snapTo(
-                                  1,
-                                );
+                                1,
+                              );
                               this.checkNShowHelperModal();
                               setTimeout(() => {
                                 this.setState({ transactionItem: item });
@@ -1228,47 +1304,47 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               </View>
                             </View>
                           ) : (
-                              <View style={styles.modalElementInfoView}>
-                                <View style={{ justifyContent: 'center' }}>
-                                  <FontAwesome
-                                    name={
-                                      item.transactionType == 'Received'
-                                        ? 'long-arrow-down'
-                                        : 'long-arrow-up'
-                                    }
-                                    size={15}
-                                    color={
-                                      item.transactionType == 'Received'
-                                        ? Colors.green
-                                        : Colors.red
-                                    }
-                                  />
-                                </View>
-                                <View
-                                  style={{
-                                    justifyContent: 'center',
-                                    marginLeft: 10,
-                                  }}
-                                >
-                                  <Text style={styles.transactionModalTitleText}>
-                                    {item.accountType == FAST_BITCOINS
-                                      ? 'FastBitcoins.com'
-                                      : item.accountType}{' '}
-                                  </Text>
-                                  <Text style={styles.transactionModalDateText}>
-                                    {moment(item.date)
-                                      .utc()
-                                      .format('DD MMMM YYYY')}{' '}
-                                    {/* <Entypo
+                            <View style={styles.modalElementInfoView}>
+                              <View style={{ justifyContent: 'center' }}>
+                                <FontAwesome
+                                  name={
+                                    item.transactionType == 'Received'
+                                      ? 'long-arrow-down'
+                                      : 'long-arrow-up'
+                                  }
+                                  size={15}
+                                  color={
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red
+                                  }
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  justifyContent: 'center',
+                                  marginLeft: 10,
+                                }}
+                              >
+                                <Text style={styles.transactionModalTitleText}>
+                                  {item.accountType == FAST_BITCOINS
+                                    ? 'FastBitcoins.com'
+                                    : item.accountType}{' '}
+                                </Text>
+                                <Text style={styles.transactionModalDateText}>
+                                  {moment(item.date)
+                                    .utc()
+                                    .format('DD MMMM YYYY')}{' '}
+                                  {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                    {/* {item.time} */}
-                                  </Text>
-                                </View>
+                                  {/* {item.time} */}
+                                </Text>
                               </View>
-                            )}
+                            </View>
+                          )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1288,13 +1364,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                    ? UsNumberFormat(item.amount)
-                                    : exchangeRates
-                                      ? (
-                                        (item.amount / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                      : null}
+                                  ? UsNumberFormat(item.amount)
+                                  : exchangeRates
+                                  ? (
+                                      (item.amount / 1e8) *
+                                      exchangeRates[CurrencyCode].last
+                                    ).toFixed(2)
+                                  : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1304,8 +1380,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                    ? 'sats'
-                                    : CurrencyCode.toLocaleLowerCase()}
+                                  ? 'sats'
+                                  : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1318,11 +1394,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 ? item.confirmations < 6
                                   ? item.confirmations
                                   : item.confirmations === '-' // for testnet faucet tx
-                                    ? item.confirmations
-                                    : '6+'
-                                : item.confirmations < 6
                                   ? item.confirmations
-                                  : '6+'}
+                                  : '6+'
+                                : item.confirmations < 6
+                                ? item.confirmations
+                                : '6+'}
                             </Text>
                             {index == 0 ? (
                               <View style={styles.forwardIconView}>
@@ -1333,14 +1409,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 />
                               </View>
                             ) : (
-                                <View style={styles.forwardIconView}>
-                                  <Ionicons
-                                    name="ios-arrow-forward"
-                                    color={Colors.textColorGrey}
-                                    size={12}
-                                  />
-                                </View>
-                              )}
+                              <View style={styles.forwardIconView}>
+                                <Ionicons
+                                  name="ios-arrow-forward"
+                                  color={Colors.textColorGrey}
+                                  size={12}
+                                />
+                              </View>
+                            )}
                           </View>
                         </TouchableOpacity>
                       )}
@@ -1355,6 +1431,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     onPress={() => {
                       this.props.navigation.navigate('Send', {
                         serviceType,
+                        derivativeAccountDetails: this.state.presentCarouselData
+                          .derivativeAccountDetails,
                         getServiceType: this.getServiceType,
                         carouselIndex: this.state.presentCarouselIndex,
                         averageTxFees,
@@ -1375,12 +1453,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         Tran Fee : (~
                         {switchOn || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
-                            ? averageTxFees['medium'].averageTxFee
-                            : 0) +
-                          ' ' +
-                          (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
+                              ? averageTxFees['medium'].averageTxFee
+                              : 0) +
+                            ' ' +
+                            (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
                           : exchangeRates
-                            ? (
+                          ? (
                               ((averageTxFees
                                 ? averageTxFees['medium'].averageTxFee
                                 : 0) /
@@ -1389,7 +1467,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             ).toFixed(2) +
                             ' ' +
                             CurrencyCode.toLocaleLowerCase()
-                            : null}
+                          : null}
                         )
                         {/* {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
                         ({serviceType == TEST_ACCOUNT
@@ -1404,10 +1482,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     onPress={() => {
                       this.props.navigation.navigate('Receive', {
                         serviceType,
-                        derivativeAccountDetails: this.state.presentCarouselData.derivativeAccountDetails,
+                        derivativeAccountDetails: this.state.presentCarouselData
+                          .derivativeAccountDetails,
                         getServiceType: this.getServiceType,
                         carouselIndex: this.state.presentCarouselIndex,
-                        netBalance,
                       });
                     }}
                     style={styles.bottomCardView}
@@ -1431,41 +1509,62 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   }}
                 ></View>
               </View>
-              {this.state.presentCarouselData && this.state.presentCarouselData.accountType === 'Donation Account' ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 20 }}>
-                <AppBottomSheetTouchableWrapper
-                  style={styles.buttonStyle}
-                  onPress={() => {
-                    if (this.refs.DonationWebPageBottomSheet as any) {
-                      (this.refs.DonationWebPageBottomSheet as any).snapTo(1);
-                    }
+              {this.state.presentCarouselData &&
+              this.state.presentCarouselData.accountType ===
+                'Donation Account' ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginVertical: 20,
                   }}
                 >
-                  <Text style={styles.buttonText}>Donation Webpage</Text>
-                </AppBottomSheetTouchableWrapper>
-              </View> : null}
+                  <AppBottomSheetTouchableWrapper
+                    style={styles.buttonStyle}
+                    onPress={() => {
+                      if (this.refs.DonationWebPageBottomSheet as any) {
+                        (this.refs.DonationWebPageBottomSheet as any).snapTo(1);
+                      }
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Donation Webpage</Text>
+                  </AppBottomSheetTouchableWrapper>
+                </View>
+              ) : null}
             </ScrollView>
             {showLoader ? <Loader /> : null}
           </View>
         ) : (
-            <ScrollView
-              contentContainerStyle={{
-                backgroundColor: Colors.backgroundColor,
-              }}
-              refreshControl={
-                <RefreshControl refreshing={!this.state.is_initiated} />
-              }
-            />
-          )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={
+              <RefreshControl refreshing={!this.state.is_initiated} />
+            }
+          />
+        )}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
           snapPoints={[-50, hp('70%')]}
           renderContent={() => {
-            const { donationAcc, accountNumber } = this.state.presentCarouselData ? this.state.presentCarouselData : { donationAcc: null, accountNumber: null }
-            if (!donationAcc) return
+            const { donationAcc, accountNumber } = this.state
+              .presentCarouselData
+              ? this.state.presentCarouselData
+              : { donationAcc: null, accountNumber: null };
+            if (!donationAcc) return;
             return (
-              <DonationWebPageModalContents account={donationAcc} accountNumber={accountNumber} serviceType={this.state.serviceType} close={() => (this.refs.DonationWebPageBottomSheet as any).snapTo(0)} />
-            )
+              <DonationWebPageModalContents
+                account={donationAcc}
+                accountNumber={accountNumber}
+                serviceType={this.state.serviceType}
+                close={() =>
+                  (this.refs.DonationWebPageBottomSheet as any).snapTo(0)
+                }
+              />
+            );
           }}
           renderHeader={() => (
             <ModalHeader
@@ -1497,10 +1596,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   transactionLoading={transactionLoading}
                   transactions={transactions}
                   AtCloseEnd={false}
-                  setTransactionItem={(item) => { }
+                  setTransactionItem={
+                    (item) => {}
                     //this.setState({ selectedTransactionItem: item })
                   }
-                  setTabBarZIndex={(index) => { }
+                  setTabBarZIndex={
+                    (index) => {}
                     //this.setState({ tabBarIndex: index })
                   }
                   TransactionDetailsBottomSheet={
@@ -1768,17 +1869,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 onPressHeader={() => {
                   if (isDonationAccountHelperDone) {
                     if (this.refs.DonationAccountHelperBottomSheet as any)
-                      (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                        1,
-                      );
+                      (this.refs
+                        .DonationAccountHelperBottomSheet as any).snapTo(1);
                     setTimeout(() => {
                       this.setState({ isDonationAccountHelperDone: false });
                     }, 10);
                   } else {
                     if (this.refs.DonationAccountHelperBottomSheet as any)
-                      (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                        0,
-                      );
+                      (this.refs
+                        .DonationAccountHelperBottomSheet as any).snapTo(0);
                   }
                 }}
               />
@@ -1937,8 +2036,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-          ? 43
-          : 40,
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

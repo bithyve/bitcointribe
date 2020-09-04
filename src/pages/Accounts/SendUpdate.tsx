@@ -92,6 +92,7 @@ interface SendStateTypes {
   accountData: any[];
   sweepSecure: any;
   spendableBalance: any;
+  derivativeAccountDetails: { type: string; number: number; parent: string };
   getServiceType: any;
   carouselIndex: number;
   averageTxFees: any;
@@ -110,6 +111,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
+      derivativeAccountDetails: this.props.navigation.getParam(
+        'derivativeAccountDetails',
+      ),
       recipientAddress: '',
       isSendHelperDone: true,
       isInvalidAddress: false,
@@ -146,7 +150,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   componentDidMount = () => {
     this.props.clearTransfer(this.state.serviceType);
-    this.getBalances();
+    this.getAccountBalances();
     if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
     this.checkNShowHelperModal();
     this.setRecipientAddress();
@@ -166,7 +170,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.accounts !== this.props.accounts) {
-      this.getBalances();
+      this.getAccountBalances();
     }
 
     if (
@@ -187,22 +191,22 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
-  getBalances = () => {
+  getAccountBalances = () => {
     const { accounts } = this.props;
     const { serviceType } = this.state;
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     let derivativeBalance = 0;
@@ -214,12 +218,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
             accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            dAccountType
+              dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
             accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-            dAccountType
+              dAccountType
             ];
         }
 
@@ -285,6 +289,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       serviceType,
       sweepSecure,
       spendableBalance,
+      derivativeAccountDetails,
     } = this.state;
     // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
     // // console.log("instance setRecipientAddress", instance);
@@ -335,6 +340,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             serviceType,
             sweepSecure,
             spendableBalance,
+            derivativeAccountDetails,
             bitcoinAmount: options.amount
               ? `${Math.round(options.amount * 1e8)}`
               : '',
@@ -346,7 +352,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   barcodeRecognized = async (barcodes) => {
     const { service } = this.props;
-    const { serviceType, sweepSecure, spendableBalance } = this.state;
+    const {
+      serviceType,
+      sweepSecure,
+      spendableBalance,
+      derivativeAccountDetails,
+    } = this.state;
     //console.log('barcodes', barcodes);
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(
@@ -388,6 +399,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               serviceType,
               sweepSecure,
               spendableBalance,
+              derivativeAccountDetails,
               bitcoinAmount: options.amount
                 ? `${Math.round(options.amount * 1e8)}`
                 : '',
@@ -413,6 +425,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       averageTxFees,
       sweepSecure,
       spendableBalance,
+      derivativeAccountDetails,
     } = this.state;
 
     let isNavigate = true;
@@ -432,6 +445,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         averageTxFees,
         sweepSecure,
         spendableBalance,
+        derivativeAccountDetails,
         bitcoinAmount,
       });
     } else {
@@ -452,6 +466,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           averageTxFees,
           sweepSecure,
           spendableBalance,
+          derivativeAccountDetails,
           bitcoinAmount,
         });
       }
@@ -516,7 +531,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -557,7 +572,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             trustedTestAddress,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           let hasTrustedAddress = false;
           if (serviceType === TEST_ACCOUNT)
@@ -615,7 +630,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       isEditable,
       accountData,
       getServiceType,
-      carouselIndex
+      carouselIndex,
     } = this.state;
     const { clearTransfer, service, transfer, accounts } = this.props;
     return (
@@ -650,11 +665,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     </TouchableOpacity>
                     <Image
                       source={
-                        serviceType == TEST_ACCOUNT
+                        this.state.derivativeAccountDetails
+                          ? require('../../assets/images/icons/icon_donation_account.png')
+                          : serviceType == TEST_ACCOUNT
                           ? require('../../assets/images/icons/icon_test.png')
                           : serviceType == REGULAR_ACCOUNT
-                            ? require('../../assets/images/icons/icon_regular.png')
-                            : require('../../assets/images/icons/icon_secureaccount.png')
+                          ? require('../../assets/images/icons/icon_regular.png')
+                          : require('../../assets/images/icons/icon_secureaccount.png')
                       }
                       style={{ width: wp('10%'), height: wp('10%') }}
                     />
@@ -662,11 +679,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
                       <Text style={styles.accountText}>
                         Choose a recipient
-                        {/* {serviceType == TEST_ACCOUNT
+                        {/* {this.state.derivativeAccountDetails
+                          ? 'Donation Account'
+                          : serviceType == TEST_ACCOUNT
                           ? 'Test Account'
                           : serviceType == REGULAR_ACCOUNT
-                            ? 'Checking Account'
-                            : 'Savings Account'} */}
+                          ? 'Checking Account'
+                          : 'Savings Account'} */}
                       </Text>
                     </View>
                     {serviceType == TEST_ACCOUNT ? (
@@ -749,7 +768,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       <Text style={styles.sendToContactText}>
                         Send to Contact
                       </Text>
-                      <TouchableOpacity onPress={() => { }} style={styles.icon}>
+                      <TouchableOpacity onPress={() => {}} style={styles.icon}>
                         <SimpleLineIcons
                           name="options-vertical"
                           color={Colors.blue}
@@ -790,15 +809,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         </View>
                       </View>
                     ) : (
-                        <View style={styles.note}>
-                          <BottomInfoBox
-                            title={'You have not added any Contact'}
-                            infoText={
-                              'Add a Contact to send them sats without having to scan an address'
-                            }
-                          />
-                        </View>
-                      )}
+                      <View style={styles.note}>
+                        <BottomInfoBox
+                          title={'You have not added any Contact'}
+                          infoText={
+                            'Add a Contact to send them sats without having to scan an address'
+                          }
+                        />
+                      </View>
+                    )}
                   </View>
                   {serviceType != TEST_ACCOUNT ? (
                     <View style={{ paddingTop: wp('3%') }}>
@@ -807,7 +826,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                           Send to Account
                         </Text>
                         <TouchableOpacity
-                          onPress={() => { }}
+                          onPress={() => {}}
                           style={styles.icon}
                         >
                           <SimpleLineIcons
@@ -847,7 +866,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                 checked = true;
                               }
                             }
-                            if (Items.item.type != serviceType) {
+                            if (
+                              Items.item.type != serviceType ||
+                              this.state.derivativeAccountDetails
+                            ) {
                               return (
                                 <AccountsListSend
                                   accounts={Items.item}
@@ -862,7 +884,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                             details: transfer[serviceType].transfer.details,
                             balances,
                           }}
-                        //keyExtractor={(item, index) => index.toString()}
+                          //keyExtractor={(item, index) => index.toString()}
                         />
                       </View>
                     </View>

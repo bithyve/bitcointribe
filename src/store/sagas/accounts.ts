@@ -236,7 +236,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-    JSON.stringify(postFetchTransactions)
+      JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -368,7 +368,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-    JSON.stringify({ postFetchBalances, postFetchTransactions })
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -403,10 +403,10 @@ function* syncDerivativeAccountsWorker({ payload }) {
         : service.secureHDWallet.derivativeAccounts,
     );
 
-
     const res = yield call(
       service.syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC);
+      config.DERIVATIVE_ACC_TO_SYNC,
+    );
 
     const postFetchDerivativeAccounts = JSON.stringify(
       serviceType === REGULAR_ACCOUNT
@@ -440,36 +440,40 @@ export const syncDerivativeAccountsWatcher = createWatcher(
   SYNC_DERIVATIVE_ACCOUNTS,
 );
 
-
-
 function* syncViaXpubAgentWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'balanceTx'));
 
   const { serviceType, derivativeAccountType, accountNumber } = payload;
-  console.log({ serviceType, derivativeAccountType, accountNumber })
-  const service = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   const preFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
-      ? service.hdWallet.derivativeAccounts[derivativeAccountType][accountNumber]
-      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][accountNumber]);
-
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
 
   const res = yield call(
     service.syncViaXpubAgent,
-    derivativeAccountType, accountNumber);
+    derivativeAccountType,
+    accountNumber,
+  );
 
   const postFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
-      ? service.hdWallet.derivativeAccounts[derivativeAccountType][accountNumber]
-      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][accountNumber]);
-
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
 
   if (res.status === 200) {
-    if (
-      postFetchDerivativeAccount !== preFetchDerivativeAccount) {
+    if (postFetchDerivativeAccount !== preFetchDerivativeAccount) {
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
@@ -535,7 +539,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-          contactName.toLowerCase().trim()
+            contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -555,7 +559,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -572,7 +576,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -811,16 +815,16 @@ function* accumulativeTxAndBalWorker() {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -832,7 +836,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-      .transactionDetails
+        .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -1026,9 +1030,7 @@ export const startupSyncWatcher = createWatcher(
 
 function* setupDonationAccountWorker({ payload }) {
   const { serviceType, donee, subject, description, configuration } = payload;
-  const service = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
     service.setupDonationAccount,
@@ -1065,9 +1067,7 @@ export const setupDonationAccountWatcher = createWatcher(
 
 function* updateDonationPreferencesWorker({ payload }) {
   const { serviceType, accountNumber, configuration } = payload;
-  const service = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
     service.updateDonationPreferences,
