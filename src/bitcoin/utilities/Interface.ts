@@ -94,6 +94,13 @@ export interface DerivativeAccountElements {
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   receivingAddress?: string;
+  confirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[],
   balances?: {
     balance: number;
     unconfirmedBalance: number;

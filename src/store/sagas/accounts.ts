@@ -44,6 +44,7 @@ import {
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
+  SYNC_VIA_XPUB_AGENT,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -235,7 +236,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-    JSON.stringify(postFetchTransactions)
+      JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -367,7 +368,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-    JSON.stringify({ postFetchBalances, postFetchTransactions })
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -404,7 +405,7 @@ function* syncDerivativeAccountsWorker({ payload }) {
 
     const res = yield call(
       service.syncDerivativeAccountsBalanceTxs,
-      Object.keys(config.DERIVATIVE_ACC),
+      config.DERIVATIVE_ACC_TO_SYNC,
     );
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -437,6 +438,60 @@ function* syncDerivativeAccountsWorker({ payload }) {
 export const syncDerivativeAccountsWatcher = createWatcher(
   syncDerivativeAccountsWorker,
   SYNC_DERIVATIVE_ACCOUNTS,
+);
+
+function* syncViaXpubAgentWorker({ payload }) {
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+
+  const { serviceType, derivativeAccountType, accountNumber } = payload;
+  const service = yield select((state) => state.accounts[serviceType].service);
+
+  const preFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
+
+  const res = yield call(
+    service.syncViaXpubAgent,
+    derivativeAccountType,
+    accountNumber,
+  );
+
+  const postFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
+
+  if (res.status === 200) {
+    if (postFetchDerivativeAccount !== preFetchDerivativeAccount) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [serviceType]: JSON.stringify(service),
+      };
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log('Failed to sync derivative account');
+  }
+
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+}
+
+export const syncViaXpubAgentWatcher = createWatcher(
+  syncViaXpubAgentWorker,
+  SYNC_VIA_XPUB_AGENT,
 );
 
 function* processRecipients(
@@ -484,7 +539,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-          contactName.toLowerCase().trim()
+            contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -504,7 +559,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -521,7 +576,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -555,7 +610,7 @@ function* processRecipients(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  let { recipients, averageTxFees } = payload;
+  let { recipients, averageTxFees, derivativeAccountDetails } = payload;
   console.log({ recipients });
 
   try {
@@ -568,7 +623,12 @@ function* transferST1Worker({ payload }) {
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
-  const res = yield call(service.transferST1, recipients, averageTxFees);
+  const res = yield call(
+    service.transferST1,
+    recipients,
+    averageTxFees,
+    derivativeAccountDetails,
+  );
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -587,6 +647,7 @@ function* transferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
 
@@ -605,6 +666,7 @@ function* transferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -656,6 +718,7 @@ function* alternateTransferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
   if (serviceType !== SECURE_ACCOUNT) return;
@@ -676,6 +739,7 @@ function* alternateTransferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -760,16 +824,16 @@ function* accumulativeTxAndBalWorker() {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -781,7 +845,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-      .transactionDetails
+        .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -975,9 +1039,7 @@ export const startupSyncWatcher = createWatcher(
 
 function* setupDonationAccountWorker({ payload }) {
   const { serviceType, donee, subject, description, configuration } = payload;
-  const service = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
     service.setupDonationAccount,
@@ -1014,9 +1076,7 @@ export const setupDonationAccountWatcher = createWatcher(
 
 function* updateDonationPreferencesWorker({ payload }) {
   const { serviceType, accountNumber, configuration } = payload;
-  const service = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
     service.updateDonationPreferences,

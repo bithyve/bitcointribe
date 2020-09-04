@@ -160,6 +160,11 @@ export default class BaseAccount {
     type: string;
   } => this.hdWallet.addressDiff(scannedStr);
 
+  public getReceivingAddress = (
+    derivativeAccountType?: string,
+    accountNumber?: number,
+  ) => this.hdWallet.getReceivingAddress(derivativeAccountType, accountNumber);
+
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
@@ -318,6 +323,39 @@ export default class BaseAccount {
         status: 0o3,
         err: err.message,
         message: "Failed to sync derivative account's balance and transactions",
+      };
+    }
+  };
+
+  public syncViaXpubAgent = async (
+    accountType: string,
+    accountNumber: number,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          synched: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.syncViaXpubAgent(accountType, accountNumber),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to sync xpub via xpub agent',
       };
     }
   };
@@ -538,8 +576,16 @@ export default class BaseAccount {
     }
   };
 
-  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
-    this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
+  public calculateSendMaxFee = (
+    numberOfRecipients,
+    averageTxFees,
+    derivativeAccountDetails?: { type: string; number: number },
+  ) =>
+    this.hdWallet.calculateSendMaxFee(
+      numberOfRecipients,
+      averageTxFees,
+      derivativeAccountDetails,
+    );
 
   public calculateCustomFee = (
     outputUTXOs: {
@@ -547,7 +593,13 @@ export default class BaseAccount {
       value: number;
     }[],
     customTxFeePerByte: number,
-  ) => this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+    derivativeAccountDetails?: { type: string; number: number },
+  ) =>
+    this.hdWallet.calculateCustomFee(
+      outputUTXOs,
+      customTxFeePerByte,
+      derivativeAccountDetails,
+    );
 
   public transferST1 = async (
     recipients: {
@@ -555,6 +607,7 @@ export default class BaseAccount {
       amount: number;
     }[],
     averageTxFees?: any,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -589,6 +642,7 @@ export default class BaseAccount {
       } = await this.hdWallet.transactionPrerequisites(
         recipients,
         averageTxFees,
+        derivativeAccountDetails,
       );
 
       let netAmount = 0;
@@ -629,6 +683,7 @@ export default class BaseAccount {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -651,6 +706,7 @@ export default class BaseAccount {
         txPrerequisites,
         txnPriority.toLowerCase(),
         customTxPrerequisites,
+        derivativeAccountDetails,
         nSequence,
       );
 

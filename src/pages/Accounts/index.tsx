@@ -406,10 +406,10 @@ export default function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -583,29 +583,29 @@ export default function Accounts(props) {
                 )}
               </View>
             ) : (
-              <Image
-                style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              />
-            )}
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                  />
+                )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(netBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
-                : exchangeRates
-                ? (
-                    (netBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+                  ? UsNumberFormat(netBalance)
+                  : exchangeRates
+                    ? (
+                      (netBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                    : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : switchOn
-                ? 'sats'
-                : CurrencyCode.toLocaleLowerCase()}
+                  ? 'sats'
+                  : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -950,13 +950,13 @@ export default function Accounts(props) {
       }
 
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
           let derivativeAccount;
 
           if (serviceType === REGULAR_ACCOUNT) {
             derivativeAccount =
               accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-                dAccountType
+              dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
             if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -1119,7 +1119,7 @@ export default function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -1134,17 +1134,17 @@ export default function Accounts(props) {
               activeOffImage={
                 currencyCode.includes(CurrencyCode)
                   ? setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'light',
-                    )
+                    getCurrencyImageName(CurrencyCode),
+                    'light',
+                  )
                   : getCurrencyImageByRegion(CurrencyCode, 'light')
               }
               inactiveOffImage={
                 currencyCode.includes(CurrencyCode)
                   ? setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'dark',
-                    )
+                    getCurrencyImageName(CurrencyCode),
+                    'dark',
+                  )
                   : getCurrencyImageByRegion(CurrencyCode, 'dark')
               }
               toggleColor={Colors.lightBlue}
@@ -1175,7 +1175,7 @@ export default function Accounts(props) {
                       loader: true,
                       syncTrustedDerivative:
                         serviceType === REGULAR_ACCOUNT ||
-                        serviceType === SECURE_ACCOUNT
+                          serviceType === SECURE_ACCOUNT
                           ? true
                           : false,
                     }),
@@ -1209,8 +1209,8 @@ export default function Accounts(props) {
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
-                    ? getServiceType(REGULAR_ACCOUNT)
-                    : getServiceType(SECURE_ACCOUNT);
+                      ? getServiceType(REGULAR_ACCOUNT)
+                      : getServiceType(SECURE_ACCOUNT);
                 }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
@@ -1249,13 +1249,13 @@ export default function Accounts(props) {
                     {serviceType == TEST_ACCOUNT
                       ? UsNumberFormat(spendableBalance)
                       : switchOn
-                      ? UsNumberFormat(spendableBalance)
-                      : exchangeRates
-                      ? (
-                          (spendableBalance / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)
-                      : null}
+                        ? UsNumberFormat(spendableBalance)
+                        : exchangeRates
+                          ? (
+                            (spendableBalance / 1e8) *
+                            exchangeRates[CurrencyCode].last
+                          ).toFixed(2)
+                          : null}
                   </Text>
                   <Text
                     style={{
@@ -1268,8 +1268,8 @@ export default function Accounts(props) {
                     {serviceType == TEST_ACCOUNT
                       ? ' t-sats'
                       : switchOn
-                      ? ' sats'
-                      : CurrencyCode.toLocaleLowerCase()}
+                        ? ' sats'
+                        : CurrencyCode.toLocaleLowerCase()}
                   </Text>
                 </View>
                 <View
@@ -1377,45 +1377,45 @@ export default function Accounts(props) {
                               </View>
                             </View>
                           ) : (
-                            <View style={styles.modalElementInfoView}>
-                              <View style={{ justifyContent: 'center' }}>
-                                <FontAwesome
-                                  name={
-                                    item.transactionType == 'Received'
-                                      ? 'long-arrow-down'
-                                      : 'long-arrow-up'
-                                  }
-                                  size={15}
-                                  color={
-                                    item.transactionType == 'Received'
-                                      ? Colors.green
-                                      : Colors.red
-                                  }
-                                />
-                              </View>
-                              <View
-                                style={{
-                                  justifyContent: 'center',
-                                  marginLeft: 10,
-                                }}
-                              >
-                                <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
-                                </Text>
-                                <Text style={styles.transactionModalDateText}>
-                                  {moment(item.date)
-                                    .utc()
-                                    .format('DD MMMM YYYY')}{' '}
-                                  {/* <Entypo
+                              <View style={styles.modalElementInfoView}>
+                                <View style={{ justifyContent: 'center' }}>
+                                  <FontAwesome
+                                    name={
+                                      item.transactionType == 'Received'
+                                        ? 'long-arrow-down'
+                                        : 'long-arrow-up'
+                                    }
+                                    size={15}
+                                    color={
+                                      item.transactionType == 'Received'
+                                        ? Colors.green
+                                        : Colors.red
+                                    }
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    justifyContent: 'center',
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  <Text style={styles.transactionModalTitleText}>
+                                    {item.accountType}{' '}
+                                  </Text>
+                                  <Text style={styles.transactionModalDateText}>
+                                    {moment(item.date)
+                                      .utc()
+                                      .format('DD MMMM YYYY')}{' '}
+                                    {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                  {/* {item.time} */}
-                                </Text>
+                                    {/* {item.time} */}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
+                            )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1447,13 +1447,13 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                  ? UsNumberFormat(item.amount)
-                                  : exchangeRates
-                                  ? (
-                                      (item.amount / 1e8) *
-                                      exchangeRates[CurrencyCode].last
-                                    ).toFixed(2)
-                                  : null}
+                                    ? UsNumberFormat(item.amount)
+                                    : exchangeRates
+                                      ? (
+                                        (item.amount / 1e8) *
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                      : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1469,8 +1469,8 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                  ? 'sats'
-                                  : CurrencyCode.toLocaleLowerCase()}
+                                    ? 'sats'
+                                    : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1483,11 +1483,11 @@ export default function Accounts(props) {
                                 ? item.confirmations < 6
                                   ? item.confirmations
                                   : item.confirmations === '-' // for testnet faucet tx
-                                  ? item.confirmations
-                                  : '6+'
+                                    ? item.confirmations
+                                    : '6+'
                                 : item.confirmations < 6
-                                ? item.confirmations
-                                : '6+'}
+                                  ? item.confirmations
+                                  : '6+'}
                             </Text>
                             {index == 0 ? (
                               <View
@@ -1504,20 +1504,20 @@ export default function Accounts(props) {
                                 />
                               </View>
                             ) : (
-                              <View
-                                style={{
-                                  padding: 10,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Ionicons
-                                  name="ios-arrow-forward"
-                                  color={Colors.textColorGrey}
-                                  size={12}
-                                />
-                              </View>
-                            )}
+                                <View
+                                  style={{
+                                    padding: 10,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Ionicons
+                                    name="ios-arrow-forward"
+                                    color={Colors.textColorGrey}
+                                    size={12}
+                                  />
+                                </View>
+                              )}
                           </View>
                         </TouchableOpacity>
                       );
@@ -1574,12 +1574,12 @@ export default function Accounts(props) {
                         Avg. Fee :{' '}
                         {switchOn || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
-                              ? averageTxFees['medium'].averageTxFee
-                              : 0) +
-                            ' ' +
-                            (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
+                            ? averageTxFees['medium'].averageTxFee
+                            : 0) +
+                          ' ' +
+                          (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
                           : exchangeRates
-                          ? (
+                            ? (
                               ((averageTxFees
                                 ? averageTxFees['medium'].averageTxFee
                                 : 0) /
@@ -1588,7 +1588,7 @@ export default function Accounts(props) {
                             ).toFixed(2) +
                             ' ' +
                             CurrencyCode.toLocaleLowerCase()
-                          : null}
+                            : null}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -1806,13 +1806,13 @@ export default function Accounts(props) {
           />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{
-            backgroundColor: Colors.backgroundColor,
-          }}
-          refreshControl={<RefreshControl refreshing={!is_initiated} />}
-        />
-      )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
     </View>
   );
   //  } else {

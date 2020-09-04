@@ -18,6 +18,7 @@ import {
   DerivativeAccount,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
+  DerivativeAccountElements,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
@@ -198,6 +199,24 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getInitialReceivingAddress = (): string => {
     return this.getAddress(false, 0);
+  };
+
+  public getReceivingAddress = (
+    derivativeAccountType?: string,
+    accountNumber?: number,
+  ): string => {
+    let receivingAddress;
+    switch (derivativeAccountType) {
+      case DONATION_ACCOUNT:
+        const donationAcc: DonationDerivativeAccountElements = this
+          .derivativeAccounts[DONATION_ACCOUNT][accountNumber];
+        receivingAddress = donationAcc ? donationAcc.receivingAddress : '';
+        break;
+
+      default:
+        receivingAddress = this.receivingAddress;
+    }
+    return receivingAddress;
   };
 
   public getDerivativeAccXpub = (
@@ -421,7 +440,7 @@ export default class HDSegwitWallet extends Bitcoin {
       [],
       externalAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
-      1,
+        1,
       0,
       accountType,
       contactName,
@@ -644,11 +663,11 @@ export default class HDSegwitWallet extends Bitcoin {
                   accountType:
                     tx.accountType === TRUSTED_CONTACTS
                       ? derivativeAccounts[accountNumber].contactName
-                        .split(' ')
-                        .map(
-                          (word) => word[0].toUpperCase() + word.substring(1),
-                        )
-                        .join(' ')
+                          .split(' ')
+                          .map(
+                            (word) => word[0].toUpperCase() + word.substring(1),
+                          )
+                          .join(' ')
                       : tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
@@ -740,6 +759,97 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public syncViaXpubAgent = async (
+    accountType: string,
+    accountNumber: number,
+  ): Promise<{
+    synched: Boolean;
+  }> => {
+    if (
+      !this.derivativeAccounts[accountType] ||
+      !this.derivativeAccounts[accountType][accountNumber]
+    ) {
+      throw new Error(`${accountType}:${accountNumber} does not exists`);
+    }
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('fetchXpubInfo', {
+        HEXA_ID,
+        xpubId: this.derivativeAccounts[accountType][accountNumber].xpubId,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const {
+      availableAddresses,
+      usedAddresses,
+      receivingAddresses,
+      nextFreeAddressIndex,
+      utxos,
+      balances,
+      transactions,
+      lastSynched,
+    } = res.data;
+
+    const confirmedUTXOs = [];
+    for (const utxo of utxos) {
+      if (utxo.status) {
+        if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push(utxo);
+      }
+    }
+
+    const lastSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    let latestSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    const newTransactions: Array<TransactionDetails> = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
+        if (tx.blockTime > lastSyncTime) {
+          newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].lastBalTxSync = latestSyncTime;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].newTransactions = newTransactions;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].usedAddresses = usedAddresses;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].confirmedUTXOs = confirmedUTXOs;
+    this.derivativeAccounts[accountType][accountNumber].balances = balances;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].transactions = transactions;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].nextFreeAddressIndex = nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].receivingAddress = this.getAddress(
+      false,
+      nextFreeAddressIndex,
+      this.derivativeAccounts[accountType][accountNumber].xpub,
+    );
+
+    return { synched: true };
+  };
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
@@ -760,7 +870,7 @@ export default class HDSegwitWallet extends Bitcoin {
     let xpubId = this.derivativeAccounts[accountType][accountNumber].xpubId;
     if (!xpubId) {
       xpubId = crypto.createHash('sha256').update(xpub).digest('hex');
-      this.derivativeAccounts[accountType][accountNumber].xpubId = xpubId
+      this.derivativeAccounts[accountType][accountNumber].xpubId = xpubId;
     }
 
     const id = xpubId.slice(0, 15);
@@ -835,8 +945,9 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!updated) {
       throw new Error('Preference updation failed');
     }
-    this
-      .derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration = configuration
+    this.derivativeAccounts[DONATION_ACCOUNT][
+      accountNumber
+    ].configuration = configuration;
 
     return { updated };
   };
@@ -1030,7 +1141,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const batchedDerivativeAddresses = [];
     if (!this.isTest) {
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
         const derivativeAccount = this.derivativeAccounts[dAccountType];
         if (derivativeAccount.instance.using) {
           for (
@@ -1108,11 +1219,22 @@ export default class HDSegwitWallet extends Bitcoin {
   public calculateSendMaxFee = (
     numberOfRecipients,
     averageTxFees,
+    derivativeAccountDetails?: { type: string; number: number },
   ): { fee: number } => {
-    const inputUTXOs = this.confirmedUTXOs;
+    let inputUTXOs;
+    if (derivativeAccountDetails) {
+      const derivativeUtxos = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][derivativeAccountDetails.number].confirmedUTXOs;
+      inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
+    } else {
+      inputUTXOs = this.confirmedUTXOs;
+    }
+    console.log({ inputUTXOs });
+
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
+    inputUTXOs.forEach((utxo) => {
+      confirmedBalance += utxo.value;
     });
     const outputUTXOs = [];
     for (let index = 0; index < numberOfRecipients; index++) {
@@ -1144,11 +1266,22 @@ export default class HDSegwitWallet extends Bitcoin {
       value: number;
     }[],
     customTxFeePerByte: number,
+    derivativeAccountDetails?: { type: string; number: number },
   ) => {
-    const inputUTXOs = this.confirmedUTXOs;
+    let inputUTXOs;
+    if (derivativeAccountDetails) {
+      const derivativeUtxos = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][derivativeAccountDetails.number].confirmedUTXOs;
+      inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
+    } else {
+      inputUTXOs = this.confirmedUTXOs;
+    }
+    console.log({ inputUTXOs });
+
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
+    inputUTXOs.forEach((utxo) => {
+      confirmedBalance += utxo.value;
     });
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
@@ -1167,23 +1300,33 @@ export default class HDSegwitWallet extends Bitcoin {
       amount: number;
     }[],
     averageTxFees?: any,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
-      fee: number;
-      balance: number;
-      txPrerequisites?: undefined;
-    }
+        fee: number;
+        balance: number;
+        txPrerequisites?: undefined;
+      }
     | {
-      txPrerequisites: TransactionPrerequisite;
-      fee?: undefined;
-      balance?: undefined;
-    }
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
+      }
   > => {
-    const inputUTXOs = this.confirmedUTXOs;
+    let inputUTXOs;
+    if (derivativeAccountDetails) {
+      const derivativeUtxos = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][derivativeAccountDetails.number].confirmedUTXOs;
+      inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
+    } else {
+      inputUTXOs = this.confirmedUTXOs;
+    }
+
     console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
+    inputUTXOs.forEach((utxo) => {
+      confirmedBalance += utxo.value;
     });
 
     const outputUTXOs = [];
@@ -1274,6 +1417,7 @@ export default class HDSegwitWallet extends Bitcoin {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
@@ -1296,7 +1440,10 @@ export default class HDSegwitWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
-      const sortedOuts = await this.sortOutputs(outputs);
+      const sortedOuts = await this.sortOutputs(
+        outputs,
+        derivativeAccountDetails,
+      );
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
@@ -1347,6 +1494,7 @@ export default class HDSegwitWallet extends Bitcoin {
       address: string;
       value: number;
     }>,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     Array<{
       address: string;
@@ -1355,7 +1503,34 @@ export default class HDSegwitWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        output.address = this.getAddress(true, this.nextFreeChangeAddressIndex);
+        let changeAddress;
+        if (derivativeAccountDetails) {
+          const {
+            xpub,
+            nextFreeAddressIndex,
+            receivingAddress,
+          } = this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ];
+          changeAddress = receivingAddress;
+
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].receivingAddress = this.getAddress(
+            false,
+            nextFreeAddressIndex + 1,
+            xpub,
+          );
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].nextFreeAddressIndex++;
+        } else {
+          changeAddress = this.getAddress(
+            true,
+            this.nextFreeChangeAddressIndex,
+          );
+        }
+        output.address = changeAddress;
         console.log(`adding the change address: ${output.address}`);
       }
     }
@@ -1440,7 +1615,7 @@ export default class HDSegwitWallet extends Bitcoin {
                 let itr = 0;
                 itr <=
                 derivativeInstance.nextFreeAddressIndex +
-                this.derivativeGapLimit; // would always be greater than
+                  this.derivativeGapLimit; // would always be greater than
                 itr++
               ) {
                 if (
@@ -1518,7 +1693,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();
       this.derivativeAccounts[accountType][accountNumber] = {
