@@ -593,7 +593,13 @@ export default class BaseAccount {
       value: number;
     }[],
     customTxFeePerByte: number,
-  ) => this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+    derivativeAccountDetails?: { type: string; number: number },
+  ) =>
+    this.hdWallet.calculateCustomFee(
+      outputUTXOs,
+      customTxFeePerByte,
+      derivativeAccountDetails,
+    );
 
   public transferST1 = async (
     recipients: {
@@ -601,6 +607,7 @@ export default class BaseAccount {
       amount: number;
     }[],
     averageTxFees?: any,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -635,6 +642,7 @@ export default class BaseAccount {
       } = await this.hdWallet.transactionPrerequisites(
         recipients,
         averageTxFees,
+        derivativeAccountDetails,
       );
 
       let netAmount = 0;

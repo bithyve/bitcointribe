@@ -1262,11 +1262,22 @@ export default class HDSegwitWallet extends Bitcoin {
       value: number;
     }[],
     customTxFeePerByte: number,
+    derivativeAccountDetails?: { type: string; number: number },
   ) => {
-    const inputUTXOs = this.confirmedUTXOs;
+    let inputUTXOs;
+    if (derivativeAccountDetails) {
+      const derivativeUtxos = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][derivativeAccountDetails.number].confirmedUTXOs;
+      inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
+    } else {
+      inputUTXOs = this.confirmedUTXOs;
+    }
+    console.log({ inputUTXOs });
+
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
+    inputUTXOs.forEach((utxo) => {
+      confirmedBalance += utxo.value;
     });
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
@@ -1285,6 +1296,7 @@ export default class HDSegwitWallet extends Bitcoin {
       amount: number;
     }[],
     averageTxFees?: any,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         fee: number;
@@ -1297,11 +1309,20 @@ export default class HDSegwitWallet extends Bitcoin {
         balance?: undefined;
       }
   > => {
-    const inputUTXOs = this.confirmedUTXOs;
+    let inputUTXOs;
+    if (derivativeAccountDetails) {
+      const derivativeUtxos = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][derivativeAccountDetails.number].confirmedUTXOs;
+      inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
+    } else {
+      inputUTXOs = this.confirmedUTXOs;
+    }
+
     console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
-      confirmedBalance += confirmedUtxo.value;
+    inputUTXOs.forEach((utxo) => {
+      confirmedBalance += utxo.value;
     });
 
     const outputUTXOs = [];

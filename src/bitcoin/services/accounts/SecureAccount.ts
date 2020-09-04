@@ -671,7 +671,13 @@ export default class SecureAccount {
       value: number;
     }[],
     customTxFeePerByte: number,
-  ) => this.secureHDWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
+    derivativeAccountDetails?: { type: string; number: number },
+  ) =>
+    this.secureHDWallet.calculateCustomFee(
+      outputUTXOs,
+      customTxFeePerByte,
+      derivativeAccountDetails,
+    );
 
   public transferST1 = async (
     recipients: {
@@ -679,6 +685,7 @@ export default class SecureAccount {
       amount: number;
     }[],
     averageTxFees?: any,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -714,6 +721,7 @@ export default class SecureAccount {
       } = await this.secureHDWallet.transactionPrerequisites(
         recipients,
         averageTxFees,
+        derivativeAccountDetails,
       );
 
       let netAmount = 0;
