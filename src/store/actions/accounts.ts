@@ -77,11 +77,18 @@ export const transferST2 = (
   serviceType,
   txnPriority,
   customTxPrerequisites?,
+  derivativeAccountDetails?: { type: string; number: number },
   nSequence?,
 ) => {
   return {
     type: TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
+    payload: {
+      serviceType,
+      txnPriority,
+      customTxPrerequisites,
+      derivativeAccountDetails,
+      nSequence,
+    },
   };
 };
 
@@ -89,11 +96,18 @@ export const alternateTransferST2 = (
   serviceType,
   txnPriority,
   customTxPrerequisites?,
+  derivativeAccountDetails?: { type: string; number: number },
   nSequence?,
 ) => {
   return {
     type: ALTERNATE_TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
+    payload: {
+      serviceType,
+      txnPriority,
+      customTxPrerequisites,
+      derivativeAccountDetails,
+      nSequence,
+    },
   };
 };
 

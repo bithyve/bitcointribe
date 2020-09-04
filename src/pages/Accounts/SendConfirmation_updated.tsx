@@ -58,6 +58,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import RecipientSendConfirmation from './RecipientSendConfirmation';
 import RadioButton from '../../components/RadioButton';
 import CustomPriorityContent from './CustomPriorityContent';
+import Toast from '../../components/Toast';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -252,7 +253,9 @@ class SendConfirmation_updated extends Component<
         this.updateDescription(transfer.txid, transfer.details[0].note);
       }
       this.storeTrustedContactsHistory(transfer.details);
-      if (!this.state.derivativeAccountDetails) {
+      if (this.state.derivativeAccountDetails) {
+        Toast('Your transaction would be updated shortly');
+      } else {
         this.props.fetchBalanceTx(this.serviceType, {
           loader: true,
           syncTrustedDerivative:
@@ -384,12 +387,14 @@ class SendConfirmation_updated extends Component<
         this.serviceType,
         txPriority,
         this.state.customTxPrerequisites,
+        this.state.derivativeAccountDetails,
       );
     } else {
       this.props.transferST2(
         this.serviceType,
         txPriority,
         this.state.customTxPrerequisites,
+        this.state.derivativeAccountDetails,
       );
     }
   };

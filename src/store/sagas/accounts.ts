@@ -647,6 +647,7 @@ function* transferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
 
@@ -665,6 +666,7 @@ function* transferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -716,6 +718,7 @@ function* alternateTransferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
   if (serviceType !== SECURE_ACCOUNT) return;
@@ -736,6 +739,7 @@ function* alternateTransferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {

@@ -683,6 +683,7 @@ export default class BaseAccount {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -705,6 +706,7 @@ export default class BaseAccount {
         txPrerequisites,
         txnPriority.toLowerCase(),
         customTxPrerequisites,
+        derivativeAccountDetails,
         nSequence,
       );
 

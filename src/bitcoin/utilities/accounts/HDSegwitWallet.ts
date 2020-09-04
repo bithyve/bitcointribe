@@ -18,6 +18,7 @@ import {
   DerivativeAccount,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
+  DerivativeAccountElements,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
@@ -827,6 +828,9 @@ export default class HDSegwitWallet extends Bitcoin {
     ].newTransactions = newTransactions;
     this.derivativeAccounts[accountType][
       accountNumber
+    ].usedAddresses = usedAddresses;
+    this.derivativeAccounts[accountType][
+      accountNumber
     ].confirmedUTXOs = confirmedUTXOs;
     this.derivativeAccounts[accountType][accountNumber].balances = balances;
     this.derivativeAccounts[accountType][
@@ -1413,6 +1417,7 @@ export default class HDSegwitWallet extends Bitcoin {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
@@ -1435,7 +1440,10 @@ export default class HDSegwitWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
-      const sortedOuts = await this.sortOutputs(outputs);
+      const sortedOuts = await this.sortOutputs(
+        outputs,
+        derivativeAccountDetails,
+      );
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
@@ -1486,6 +1494,7 @@ export default class HDSegwitWallet extends Bitcoin {
       address: string;
       value: number;
     }>,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     Array<{
       address: string;
@@ -1494,7 +1503,34 @@ export default class HDSegwitWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        output.address = this.getAddress(true, this.nextFreeChangeAddressIndex);
+        let changeAddress;
+        if (derivativeAccountDetails) {
+          const {
+            xpub,
+            nextFreeAddressIndex,
+            receivingAddress,
+          } = this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ];
+          changeAddress = receivingAddress;
+
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].receivingAddress = this.getAddress(
+            false,
+            nextFreeAddressIndex + 1,
+            xpub,
+          );
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].nextFreeAddressIndex++;
+        } else {
+          changeAddress = this.getAddress(
+            true,
+            this.nextFreeChangeAddressIndex,
+          );
+        }
+        output.address = changeAddress;
         console.log(`adding the change address: ${output.address}`);
       }
     }

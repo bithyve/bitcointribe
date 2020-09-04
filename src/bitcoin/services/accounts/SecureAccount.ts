@@ -762,6 +762,7 @@ export default class SecureAccount {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -791,6 +792,7 @@ export default class SecureAccount {
         txPrerequisites,
         txnPriority.toLowerCase(),
         customTxPrerequisites,
+        derivativeAccountDetails,
         nSequence,
       );
 
@@ -864,7 +866,8 @@ export default class SecureAccount {
   public alternateTransferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customFee?: number,
+    customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -886,7 +889,8 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
-        customFee,
+        customTxPrerequisites,
+        derivativeAccountDetails,
         nSequence,
       );
       const { inputs } = txPrerequisites[txnPriority.toLowerCase()];

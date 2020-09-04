@@ -954,6 +954,9 @@ export default class SecureHDWallet extends Bitcoin {
     ].newTransactions = newTransactions;
     this.derivativeAccounts[accountType][
       accountNumber
+    ].usedAddresses = usedAddresses;
+    this.derivativeAccounts[accountType][
+      accountNumber
     ].confirmedUTXOs = confirmedUTXOs;
     this.derivativeAccounts[accountType][accountNumber].balances = balances;
     this.derivativeAccounts[accountType][
@@ -1163,6 +1166,7 @@ export default class SecureHDWallet extends Bitcoin {
       address: string;
       value: number;
     }>,
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     Array<{
       address: string;
@@ -1171,10 +1175,35 @@ export default class SecureHDWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        output.address = this.createSecureMultiSig(
-          this.nextFreeChangeAddressIndex,
-          true,
-        ).address;
+        let changeAddress;
+        if (derivativeAccountDetails) {
+          const {
+            xpub,
+            nextFreeAddressIndex,
+            receivingAddress,
+          } = this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ];
+          changeAddress = receivingAddress;
+
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].receivingAddress = this.createSecureMultiSig(
+            nextFreeAddressIndex + 1,
+            false,
+            xpub,
+          ).address;
+          this.derivativeAccounts[derivativeAccountDetails.type][
+            derivativeAccountDetails.number
+          ].nextFreeAddressIndex++;
+        } else {
+          changeAddress = this.createSecureMultiSig(
+            this.nextFreeChangeAddressIndex,
+            true,
+          ).address;
+        }
+        output.address = changeAddress;
+
         console.log(`adding the change address: ${output.address}`);
       }
     }
@@ -1301,7 +1330,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0;
-    this.confirmedUTXOs.forEach((confirmedUtxo) => {
+    inputUTXOs.forEach((confirmedUtxo) => {
       confirmedBalance += confirmedUtxo.value;
     });
 
@@ -1393,6 +1422,7 @@ export default class SecureHDWallet extends Bitcoin {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
+    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{
     txb: bitcoinJS.TransactionBuilder;
@@ -1416,7 +1446,10 @@ export default class SecureHDWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
-      const sortedOuts = await this.sortOutputs(outputs);
+      const sortedOuts = await this.sortOutputs(
+        outputs,
+        derivativeAccountDetails,
+      );
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
