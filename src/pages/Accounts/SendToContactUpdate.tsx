@@ -286,7 +286,7 @@ class SendToContact extends Component<
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -314,7 +314,7 @@ class SendToContact extends Component<
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -758,11 +758,12 @@ class SendToContact extends Component<
             <View style={{ marginLeft: wp('2.5%') }}>
               <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
               <Text style={styles.sendText}>
-                {serviceType == TEST_ACCOUNT
+                Enter amount/ details
+                {/* {serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : serviceType == REGULAR_ACCOUNT
                     ? 'Checking Account'
-                    : 'Savings Account'}
+                    : 'Savings Account'} */}
               </Text>
             </View>
           </View>
@@ -929,7 +930,7 @@ class SendToContact extends Component<
                             ? item.bitcoinAmount
                             : bitcoinAmount
                           }` +
-                          `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
+                          `${serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
                           : CurrencySymbol +
                           ' ' +
                           `${
