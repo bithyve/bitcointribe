@@ -334,7 +334,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     @Override
                     public void onSuccess(String data) {
                         Log.d(TAG, "onSuccess readFileCallback: "+ data);
-                        readFileCallback.invoke(data, null);
+                        WritableMap map = Arguments.createMap();
+                        map.putString("data", data);
+                        readFileCallback.invoke(map, null);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
