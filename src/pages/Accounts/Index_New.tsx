@@ -331,8 +331,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
       for (
         let index = 1;
-        index <= derivativeAccounts &&
-        derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
         index++
       ) {
         const donAcc: DonationDerivativeAccountElements =
@@ -417,7 +416,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   .derivativeAccounts[dAccountType];
             }
 
-            if (derivativeAccount && derivativeAccount.instance.using) {
+            if (derivativeAccount.instance.using) {
               for (
                 let accountNumber = 1;
                 accountNumber <= derivativeAccount.instance.using;
