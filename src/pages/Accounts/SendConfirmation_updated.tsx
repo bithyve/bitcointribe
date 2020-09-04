@@ -27,6 +27,7 @@ import {
   transferST2,
   clearTransfer,
   fetchBalanceTx,
+  syncViaXpubAgent,
   alternateTransferST2,
 } from '../../store/actions/accounts';
 import { UsNumberFormat, timeConvertNear30 } from '../../common/utilities';
@@ -86,6 +87,7 @@ interface SendConfirmationPropsTypes {
   trustedContactsService: any;
   exchangeRates: any;
   fetchBalanceTx: any;
+  syncViaXpubAgent: any;
   clearTransfer: any;
   alternateTransferST2: any;
   transferST2: any;
@@ -254,7 +256,11 @@ class SendConfirmation_updated extends Component<
       }
       this.storeTrustedContactsHistory(transfer.details);
       if (this.state.derivativeAccountDetails) {
-        Toast('Your transaction would be updated shortly');
+        this.props.syncViaXpubAgent(
+          this.serviceType,
+          this.state.derivativeAccountDetails.type,
+          this.state.derivativeAccountDetails.number,
+        );
       } else {
         this.props.fetchBalanceTx(this.serviceType, {
           loader: true,
@@ -336,6 +342,7 @@ class SendConfirmation_updated extends Component<
     const customTxPrerequisites = service.calculateCustomFee(
       outputs,
       parseInt(amount),
+      this.state.derivativeAccountDetails,
     );
 
     if (customTxPrerequisites.inputs) {
@@ -1301,6 +1308,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchBalanceTx,
+    syncViaXpubAgent,
     clearTransfer,
     alternateTransferST2,
     transferST2,

@@ -98,9 +98,10 @@ export default function Receive(props) {
     ? props.navigation.state.params.getServiceType
     : null;
 
-  const derivativeAccountDetails = props.navigation.state.params.derivativeAccountDetails
+  const derivativeAccountDetails = props.navigation.state.params
+    .derivativeAccountDetails
     ? props.navigation.state.params.derivativeAccountDetails
-    : { type: null, number: null, parent: null };
+    : { type: null, number: null };
 
   const carouselIndex = props.navigation.state.params.carouselIndex
     ? props.navigation.state.params.carouselIndex
@@ -148,7 +149,10 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const receivingAddress = service.getReceivingAddress(derivativeAccountDetails.type, derivativeAccountDetails.number);
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails.type,
+        derivativeAccountDetails.number,
+      );
 
       if (receivingAddress) {
         let receiveAt = receivingAddress;
@@ -199,7 +203,7 @@ export default function Receive(props) {
     }
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -333,12 +337,12 @@ export default function Receive(props) {
           if (!trustedContact) return false;
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
           return presentContactName == selectedContactName;
@@ -366,7 +370,7 @@ export default function Receive(props) {
     if (selectedContact && selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -386,7 +390,10 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const receivingAddress = service.getReceivingAddress(derivativeAccountDetails.type, derivativeAccountDetails.number);
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails.type,
+        derivativeAccountDetails.number,
+      );
 
       let paymentURI;
       if (amount) {
@@ -453,7 +460,7 @@ export default function Receive(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -631,11 +638,13 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    serviceType == TEST_ACCOUNT
+                    derivativeAccountDetails
+                      ? require('../../assets/images/icons/icon_donation_account.png')
+                      : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
-                        ? require('../../assets/images/icons/icon_regular.png')
-                        : require('../../assets/images/icons/icon_secureaccount.png')
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
                   }
                   style={{ width: wp('10%'), height: wp('10%') }}
                 />
@@ -648,11 +657,13 @@ export default function Receive(props) {
                       fontSize: RFValue(12),
                     }}
                   >
-                    {serviceType == TEST_ACCOUNT
+                    {derivativeAccountDetails
+                      ? 'Donation Account'
+                      : serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
-                        ? 'Checking Account'
-                        : 'Savings Account'}
+                      ? 'Checking Account'
+                      : 'Savings Account'}
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
@@ -721,64 +732,64 @@ export default function Receive(props) {
                             />
                           </View>
                         ) : (
-                            <View style={styles.selectedContactInitialsView}>
-                              <Text style={styles.selectedContactInitialsText}>
-                                {nameToInitials(
-                                  selectedContact &&
+                          <View style={styles.selectedContactInitialsView}>
+                            <Text style={styles.selectedContactInitialsText}>
+                              {nameToInitials(
+                                selectedContact &&
+                                  selectedContact.firstName &&
+                                  selectedContact.lastName
+                                  ? selectedContact.firstName +
+                                      ' ' +
+                                      selectedContact.lastName
+                                  : selectedContact &&
                                     selectedContact.firstName &&
+                                    !selectedContact.lastName
+                                  ? selectedContact.firstName
+                                  : selectedContact &&
+                                    !selectedContact.firstName &&
                                     selectedContact.lastName
-                                    ? selectedContact.firstName +
-                                    ' ' +
-                                    selectedContact.lastName
-                                    : selectedContact &&
-                                      selectedContact.firstName &&
-                                      !selectedContact.lastName
-                                      ? selectedContact.firstName
-                                      : selectedContact &&
-                                        !selectedContact.firstName &&
-                                        selectedContact.lastName
-                                        ? selectedContact.lastName
-                                        : '',
-                                )}
-                              </Text>
-                            </View>
-                          )}
+                                  ? selectedContact.lastName
+                                  : '',
+                              )}
+                            </Text>
+                          </View>
+                        )}
                         <View>
                           <Text style={styles.addingAsContactText}>
                             Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&
-                              selectedContact.firstName &&
-                              selectedContact.lastName
+                            selectedContact.firstName &&
+                            selectedContact.lastName
                               ? selectedContact.firstName +
-                              ' ' +
-                              selectedContact.lastName
+                                ' ' +
+                                selectedContact.lastName
                               : selectedContact &&
                                 selectedContact.firstName &&
                                 !selectedContact.lastName
-                                ? selectedContact.firstName
-                                : selectedContact &&
-                                  !selectedContact.firstName &&
-                                  selectedContact.lastName
-                                  ? selectedContact.lastName
-                                  : ''}
+                              ? selectedContact.firstName
+                              : selectedContact &&
+                                !selectedContact.firstName &&
+                                selectedContact.lastName
+                              ? selectedContact.lastName
+                              : ''}
                           </Text>
                           {selectedContact &&
-                            selectedContact.phoneNumbers &&
-                            selectedContact.phoneNumbers.length ? (
-                              <Text style={styles.selectedContactPhoneNumber}>
-                                {setPhoneNumber()}
-                                {/* {selectedContact.phoneNumbers[0].digits} */}
-                              </Text>
-                            ) : selectedContact &&
-                              selectedContact.emails &&
-                              selectedContact.emails.length ? (
-                                <Text style={styles.selectedContactEmail}>
-                                  {selectedContact &&
-                                    selectedContact.emails[0].email}
-                                </Text>
-                              ) : null}
+                          selectedContact.phoneNumbers &&
+                          selectedContact.phoneNumbers.length ? (
+                            <Text style={styles.selectedContactPhoneNumber}>
+                              {setPhoneNumber()}
+                              {/* {selectedContact.phoneNumbers[0].digits} */}
+                            </Text>
+                          ) : selectedContact &&
+                            selectedContact.emails &&
+                            selectedContact.emails.length ? (
+                            <Text style={styles.selectedContactEmail}>
+                              {selectedContact &&
+                                selectedContact.emails[0].email}
+                            </Text>
+                          ) : null}
                         </View>
                       </View>
                     </View>
@@ -879,7 +890,7 @@ export default function Receive(props) {
         renderHeader={() => (
           <ModalHeader
             backgroundColor={Colors.white}
-          //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+            //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
           />
         )}
       />
@@ -909,10 +920,10 @@ export default function Receive(props) {
             infoText={
               receiveLink.includes('https://hexawallet.io')
                 ? `Click here to accept contact request from ${
-                WALLET_SETUP.walletName
-                } Hexa wallet - link will expire in ${
-                config.TC_REQUEST_EXPIRY / (60000 * 60)
-                } hours`
+                    WALLET_SETUP.walletName
+                  } Hexa wallet - link will expire in ${
+                    config.TC_REQUEST_EXPIRY / (60000 * 60)
+                  } hours`
                 : null
             }
             amount={amount === '' ? null : amount}
@@ -983,17 +994,17 @@ export default function Receive(props) {
         renderContent={() => (
           <TwoFASetupWarningModal
             onPressOk={() => onPressOkOf2FASetupWarning()}
-          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
           />
         )}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.borderColor}
             backgroundColor={Colors.white}
-          // onPressHeader={() => {
-          //   if (SecureReceiveWarningBottomSheet.current)
-          //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-          // }}
+            // onPressHeader={() => {
+            //   if (SecureReceiveWarningBottomSheet.current)
+            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />
