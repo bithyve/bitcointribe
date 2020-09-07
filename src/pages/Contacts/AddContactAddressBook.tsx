@@ -48,6 +48,12 @@ export default function AddContactAddressBook(props) {
   ] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
 
+  const data = {
+    firstName: 'F&F request',
+    lastName: 'awaiting',
+    name: 'F&F request awaiting'
+  };
+
   useEffect(() => {
     if (!props.addContactModalOpened) {
       setSelectedContacts([]);
@@ -428,6 +434,22 @@ export default function AddContactAddressBook(props) {
               })
               : null}
           </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            <AppBottomSheetTouchableWrapper
+              style={{ marginRight: 10, padding: 10 }}
+              onPress={() => props.onSkipContinue([data])}
+            >
+              <Text
+                style={{
+                  fontSize: RFValue(13, 812),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                onPress={() => props.onSkipContinue([data])}
+              >
+                Skip Contact
+            </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
           <View style={[styles.searchBoxContainer]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -463,31 +485,31 @@ export default function AddContactAddressBook(props) {
                     selected = true;
                   }
                   // if (item.phoneNumbers || item.emails) {
-                    return (
-                      <AppBottomSheetTouchableWrapper
-                        onPress={() => onContactSelect(index)}
-                        style={styles.contactView}
-                        key={index}
-                      >
-                        <RadioButton
-                          size={15}
-                          color={Colors.lightBlue}
-                          borderColor={Colors.borderColor}
-                          isChecked={item.checked}
-                          onpress={() => onContactSelect(index)}
-                        />
-                        <Text style={styles.contactText}>
-                          {item.name && item.name.split(' ')[0]
-                            ? item.name.split(' ')[0]
-                            : ''}{' '}
-                          <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                            {item.name && item.name.split(' ')[1]
-                              ? item.name.split(' ')[1]
-                              : ''}
-                          </Text>
+                  return (
+                    <AppBottomSheetTouchableWrapper
+                      onPress={() => onContactSelect(index)}
+                      style={styles.contactView}
+                      key={index}
+                    >
+                      <RadioButton
+                        size={15}
+                        color={Colors.lightBlue}
+                        borderColor={Colors.borderColor}
+                        isChecked={item.checked}
+                        onpress={() => onContactSelect(index)}
+                      />
+                      <Text style={styles.contactText}>
+                        {item.name && item.name.split(' ')[0]
+                          ? item.name.split(' ')[0]
+                          : ''}{' '}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {item.name && item.name.split(' ')[1]
+                            ? item.name.split(' ')[1]
+                            : ''}
                         </Text>
-                      </AppBottomSheetTouchableWrapper>
-                    );
+                      </Text>
+                    </AppBottomSheetTouchableWrapper>
+                  );
                   // } else {
                   //   return null;
                   // }
