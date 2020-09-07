@@ -329,6 +329,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
       for (
         let index = 1;
         index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;

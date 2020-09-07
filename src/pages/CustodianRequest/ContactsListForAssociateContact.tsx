@@ -140,6 +140,7 @@ const ContactsListForAssociateContact = (props) => {
         style={{}}
         onPressContinue={updateTrustedContactsInfo}
         onSelectContact={selectedContactsList}
+        onPressSkip={updateTrustedContactsInfo}
       />
     </View>
   );

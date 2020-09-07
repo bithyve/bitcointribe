@@ -494,6 +494,12 @@ class AddressBookContents extends PureComponent<
         onPressBack={() => {
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
+        onSkipContinue={(data) => {
+          navigation.navigate('AddContactSendRequest', {
+            SelectedContact: data,
+          });
+          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   };
