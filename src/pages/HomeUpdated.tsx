@@ -11,7 +11,8 @@ import {
   AsyncStorage,
   Linking,
   Alert,
-  NativeModules, PermissionsAndroid
+  NativeModules,
+  PermissionsAndroid,
 } from 'react-native';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -49,7 +50,7 @@ import {
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../store/actions/trustedContacts';
-import { updateLastSeen } from '../store/actions/preferences'
+import { updateLastSeen } from '../store/actions/preferences';
 
 import {
   approveTrustedContact,
@@ -217,35 +218,16 @@ const TrustedContactRequestContent = ({
  */
 async function requestWriteStoragePermission() {
   try {
-      const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      )
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("You can write storage")
-      } else {
-          console.log("Write Storage permission denied")
-      }
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can write storage');
+    } else {
+      console.log('Write Storage permission denied');
+    }
   } catch (err) {
-      console.warn(err)
-  }
-}
-
-
-/**
-* * require read storage permission
-*/
-async function requestReadStoragePermission() {
-  try {
-      const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-      )
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("You can Read storage")
-      } else {
-          console.log("Read Storage permission denied")
-      }
-  } catch (err) {
-      console.warn(err)
+    console.warn(err);
   }
 }
 
@@ -332,7 +314,7 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  updateLastSeen: any
+  updateLastSeen: any;
   database: any;
   regularAccount: RegularAccount;
 }
@@ -395,7 +377,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       addContactModalOpened: false,
       googleLoginStatus: false,
       permissionsGranted: false,
-      encryptedCloudDataJson: []
+      encryptedCloudDataJson: [],
     };
   }
 
@@ -730,7 +712,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   scheduleNotification = async () => {
-    const channelId = new firebase.notifications.Android.Channel("Default", "Default", firebase.notifications.Android.Importance.High);
+    const channelId = new firebase.notifications.Android.Channel(
+      'Default',
+      'Default',
+      firebase.notifications.Android.Importance.High,
+    );
     firebase.notifications().android.createChannel(channelId);
     const notification = new firebase.notifications.Notification()
       .setTitle('We have not seen you in a while!')
@@ -758,9 +744,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => { })
+      .then(() => {})
       .catch(
-        (err) => { }, //console.log('err', err)
+        (err) => {}, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -795,7 +781,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
@@ -841,197 +827,187 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     this.handleDeeplinkModal();
 
     setTimeout(() => {
-      this.setState({
-        isLoading: false,
-      }, () => this.props.updateLastSeen(new Date()));
+      this.setState(
+        {
+          isLoading: false,
+        },
+        () => this.props.updateLastSeen(new Date()),
+      );
     }, 2);
     this.cloudData();
-    
   };
 
   // check storage permission
   checkPermission = async () => {
     try {
-        const userResponse = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        ]);
-        return userResponse;
-      } catch (err) {
-        console.log(err);
-      }
-      return null;
-  }
+      const userResponse = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      ]);
+      return userResponse;
+    } catch (err) {
+     // console.log(err);
+    }
+    return null;
+  };
 
   GoogleDriveLogin = () => {
     const { googleLoginStatus } = this.state;
-   // if(!googleLoginStatus){
-      GoogleDrive.setup()
+    // if(!googleLoginStatus){
+    GoogleDrive.setup()
       .then(() => {
-        GoogleDrive.login(
-          (err,data) => {
-            this.handleLogin(err,data)
-          }
-        );
+        GoogleDrive.login((err, data) => {
+          this.handleLogin(err, data);
+        });
       })
       .catch((err) => {
-        console.log("GOOGLE SetupFail", err);
-    });
-  //  }
-  }
+       // console.log('GOOGLE SetupFail', err);
+      });
+    //  }
+  };
 
-    handleLogin = async (e, data) => {
-      const result = e || data;
-      console.log("GOOGLE ReSULT", data);
-      console.log("Error", e);
-      if (result.eventName == "onLogin") {
-        this.setState({googleLoginStatus: true});
-        if (!(await this.checkPermission())) {
-          throw new Error('Storage Permission Denied');
+  handleLogin = async (e, data) => {
+    const result = e || data;
+   // console.log('GOOGLE ReSULT', data);
+   // console.log('Error', e);
+    if (result.eventName == 'onLogin') {
+      this.setState({ googleLoginStatus: true });
+      if (!(await this.checkPermission())) {
+        throw new Error('Storage Permission Denied');
+      }
+      //this.createFile();
+      this.checkFileIsAvailable();
+    }
+
+    if (result.eventName && this.props.hasOwnProperty(result.eventName)) {
+      const event = result.eventName;
+      delete result.eventName;
+      this.props[event](result);
+    }
+  };
+
+  checkFileIsAvailable = async () => {
+    /**
+     * TODO: Check if file exist if not then create new file having name HexaBackupLatest.db
+     * If file exist then call readFile
+     */
+    const metaData = {
+      name: 'HexaBackupLatest.db',
+      description: 'Backup data for my app',
+      mimeType: 'application/json',
+    };
+    await GoogleDrive.checkIfFileExist(
+      JSON.stringify(metaData),
+      (err, data) => {
+       // console.log('err, data', data, err);
+        const result = err || data;
+       // console.log('checkFileIsAvailable', result);
+        if (result.eventName == 'listEmpty') {
+          this.createFile();
+        } else {
+          this.readFile(result);
         }
-        //this.createFile();
-        this.checkFileIsAvailable();
-      } 
+      },
+    );
+  };
 
-      if(result.eventName && this.props.hasOwnProperty(result.eventName)){
-        const event = result.eventName;
-        delete result.eventName;
-        this.props[event](result);
-      }
-    }
+  createFile = () => {
+    const { encryptedCloudDataJson } = this.state;
+    const { walletName, regularAccount } = this.props;
+    let WalletData = [];
+    const { data } = regularAccount.getWalletId();
+    let tempData = {
+      walletName: walletName,
+      walletId: data.walletId,
+      data: encryptedCloudDataJson,
+      dateTime: new Date(),
+    };
+    WalletData.push(tempData);
 
-    checkFileIsAvailable = async () =>{
-      /**
-       * TODO: Check if file exist if not then create new file having name HexaBackupLatest.db
-       * If file exist then call readFile
-       */
-      const metaData = {
-        name: 'HexaBackupLatest.db',
-        description: 'Backup data for my app',
-        mimeType: 'application/json',
-    }
-      await GoogleDrive.checkIfFileExist(JSON.stringify(metaData),
-        (err,data) => {
-          console.log("err, data", data, err);
-          const result = err || data;
-          console.log("checkFileIsAvailable", result);
-         if (result.eventName == "listEmpty") {
-            this.createFile();
-          } else{
-            this.readFile(result);
-          }
-        });
-    }
+    const metaData = {
+      name: 'HexaBackupLatest.db',
+      description: 'Backup data for my app',
+      mimeType: 'application/json',
+      data: JSON.stringify(WalletData),
+    };
 
-    createFile = () => {
-      const { encryptedCloudDataJson } = this.state;
-      const { walletName, regularAccount} = this.props;
-      let WalletData = [];
-      const { data } = regularAccount.getWalletId();
-      let tempData = {
-        walletName : walletName,
-        walletId : data.walletId,
-        data : encryptedCloudDataJson, 
-        dateTime: new Date()
-      };
-      WalletData.push(tempData);
-
-      const metaData = {
-        name: 'HexaBackupLatest.db',
-        description: 'Backup data for my app',
-        mimeType: 'application/json',
-        data: JSON.stringify(WalletData)
+    try {
+      GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
+       // console.log('DATA', data);
+       // console.log('ERROR', err);
+      });
+      // uploadFile(JSON.stringify(content))
+    } catch (error) {
+      //console.log('error', error);
     }
-      
-      try{
-        GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) =>{
-          console.log("DATA", data);
-          console.log("ERROR", err);
-        });
-             // uploadFile(JSON.stringify(content))
-          }
-      catch(error) {
-          console.log('error', error)
-      }
-  }
+  };
 
   UpdateFile = (metaData) => {
-    try{
-      GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) =>{
-        console.log("DATA updateFile", data);
-        console.log("ERROR updateFile", err);
+    try {
+      GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
+       // console.log('DATA updateFile', data);
+       // console.log('ERROR updateFile', err);
         const result = err || data;
-          console.log("GoogleDrive.updateFile", result);
+       // console.log('GoogleDrive.updateFile', result);
       });
-        }
-    catch(error) {
-        console.log('error', error)
+    } catch (error) {
+      console.log('error', error);
     }
-}
+  };
 
-readFile = (result) => {
-  /**
-   * TODO : iOS
-   * If file is exist then read that file and check our wallet id is presend or not
-   * if id present then add new data to exitsing object 
-   * if id not present then Add new object to existing Array call method UpdateFile() 
-   */
-  const { encryptedCloudDataJson } = this.state;
-  const metaData = {
-    id: result.id
-}
-  try{
-    GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) =>{
-      const { walletName, regularAccount} = this.props;
-      console.log("DATA readFile", data1);
-      const { data } = this.props.regularAccount.getWalletId();
-      const result1 = err || data1;
-      var arr = [];
-      var newArray = [];
-      if(result1.data){
-        arr = JSON.parse(result1.data);
-        for (var i = 0; i < arr.length; i++) {
-          newArray.push(arr[i]);
-      }
-      console.log("new Array", newArray);
-       
-        let abc = false;
-        console.log("TYPE of Array", typeof newArray);
-        for (var i = 0; i < newArray.length; i++){
-          console.log(newArray[i])
-          if(newArray[i].walletId == data.walletId){
-            newArray[i].data = encryptedCloudDataJson;
-            newArray[i].dateTime = new Date();
-          } else{
-            //abc = true;
-            let tempData = {
-              walletName : walletName,
-              walletId : data.walletId,
-              data : encryptedCloudDataJson, 
-              dateTime: new Date()
-            };
+  readFile = (result) => {
+    /**
+     * TODO : iOS
+     * If file is exist then read that file and check our wallet id is presend or not
+     * if id present then add new data to exitsing object
+     * if id not present then Add new object to existing Array call method UpdateFile()
+     */
+    const { encryptedCloudDataJson } = this.state;
+    const metaData = {
+      id: result.id,
+    };
+    try {
+      GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
+        const { walletName, regularAccount } = this.props;
+        const { data } = this.props.regularAccount.getWalletId();
+        const result1 = err || data1;
+        var arr = [];
+        var newArray = [];
+        if (result1.data) {
+          arr = JSON.parse(result1.data);
+          for (var i = 0; i < arr.length; i++) {
+            newArray.push(arr[i]);
           }
-        }
-        // if(abc){
+          var index = newArray.findIndex((x) => x.walletId == data.walletId);
+          //console.log('sdgsdg', index);
+          if (index === -1) {
+            let tempData = {
+              walletName: walletName,
+              walletId: data.walletId,
+              data: encryptedCloudDataJson,
+              dateTime: moment(new Date()),
+            };
+            newArray.push(tempData);
+          } else {
+            newArray[index].data = encryptedCloudDataJson;
+            newArray[index].dateTime = moment(new Date());
+          }
           
-        //   newArray.push(tempData)
-        // }
-         console.log("ARR", newArray);
+          //console.log('ARR', newArray);
 
-        const metaData = {
-          name: result.name,
-          mimeType: result.mimeType,
-          data: JSON.stringify(newArray),
-          id: result.id
-      }
-        this.UpdateFile(metaData);
-      }
-    });
-      }
-  catch(error) {
-      console.log('error', error)
-  }
-}
+          const metaData = {
+            name: result.name,
+            mimeType: result.mimeType,
+            data: JSON.stringify(newArray),
+            id: result.id,
+          };
+          this.UpdateFile(metaData);
+        }
+      });
+    } catch (error) {
+      //console.log('error', error);
+    }
+  };
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -1132,12 +1108,12 @@ readFile = (result) => {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => { })
-      .catch((err) => { });
+      .then(() => {})
+      .catch((err) => {});
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => { });
+      .then((notifications) => {});
   };
 
   componentDidUpdate = (prevProps) => {
@@ -1364,7 +1340,8 @@ readFile = (result) => {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[3]
           }`,
         );
       } else {
@@ -1697,7 +1674,7 @@ readFile = (result) => {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1708,19 +1685,19 @@ readFile = (result) => {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1759,13 +1736,13 @@ readFile = (result) => {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1774,7 +1751,7 @@ readFile = (result) => {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1864,7 +1841,6 @@ readFile = (result) => {
     // }
   };
 
-
   managePinSuccessProceed = (pin) => {
     this.setState(
       {
@@ -1939,7 +1915,7 @@ readFile = (result) => {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -2092,8 +2068,9 @@ readFile = (result) => {
             if (!approvedTC) {
               navigation.navigate('ContactsListForAssociateContact', {
                 postAssociation: (contact) => {
-                  const contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
-                    }`.toLowerCase();
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
 
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -2269,8 +2246,8 @@ readFile = (result) => {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2291,38 +2268,44 @@ readFile = (result) => {
     }
   };
 
-  cloudData = async () =>{
+  cloudData = async () => {
     // var ICloudBackup = NativeModules.ICloudBackup;
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
-    let walletImage = {SERVICES:{},DECENTRALIZED_BACKUP:{},WALLET_SETUP:{}};
+    let walletImage = {
+      SERVICES: {},
+      DECENTRALIZED_BACKUP: {},
+      WALLET_SETUP: {},
+    };
     let CloudDataJson = {};
-    if(!isEmpty(this.props.database)){
-      if(this.props.database.SERVICES) walletImage.SERVICES = this.props.database.SERVICES;
-      if(this.props.database.DECENTRALIZED_BACKUP) walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
-      if(this.props.database.WALLET_SETUP) walletImage.WALLET_SETUP = this.props.database.WALLET_SETUP;
+    if (!isEmpty(this.props.database)) {
+      if (this.props.database.SERVICES)
+        walletImage.SERVICES = this.props.database.SERVICES;
+      if (this.props.database.DECENTRALIZED_BACKUP)
+        walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
+      if (this.props.database.WALLET_SETUP)
+        walletImage.WALLET_SETUP = this.props.database.WALLET_SETUP;
       let key = SSS.strechKey(this.props.database.WALLET_SETUP.security.answer);
       CloudDataJson = {
         walletImage,
-        keeperInfo:[]
-      }
+        keeperInfo: [],
+      };
       const encryptedCloudDataJson = await encrypt(CloudDataJson, key);
       // console.log('encryptedDatabase', encryptedCloudDataJson);
       const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
       //console.log('decryptedDatabase', decryptedCloudDataJson);
       //console.log("WALLETID", this.props.regularAccount);
-       
-      this.setState({ encryptedCloudDataJson : encryptedCloudDataJson});
+
+      this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     }
-    if(Platform.OS == 'ios') {
+    if (Platform.OS == 'ios') {
       /**TODO iOS Login check and checkIfFileExist()*/
-      console.log('call for icloud upload')
-    }
-    else {
+      console.log('call for icloud upload');
+    } else {
       this.GoogleDriveLogin();
-      console.log('call for google drive upload')
+      console.log('call for google drive upload');
     }
-  }
+  };
 
   onPressElement = (item) => {
     const { navigation } = this.props;
@@ -2338,14 +2321,13 @@ readFile = (result) => {
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
     } else if (item.title === 'Hexa Community (Telegram)') {
-      let url = 'https://t.me/HexaWallet'
+      let url = 'https://t.me/HexaWallet';
       Linking.openURL(url)
-        .then((data) => {
-        })
+        .then((data) => {})
         .catch((e) => {
           alert('Make sure Telegram installed on your device');
         });
-      return
+      return;
     }
   };
 
@@ -2391,9 +2373,9 @@ readFile = (result) => {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2598,8 +2580,8 @@ readFile = (result) => {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2650,8 +2632,8 @@ readFile = (result) => {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2719,8 +2701,8 @@ readFile = (result) => {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2774,8 +2756,8 @@ readFile = (result) => {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -3372,7 +3354,7 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
-    updateLastSeen
+    updateLastSeen,
   })(HomeUpdated),
 );
 
@@ -3447,8 +3429,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-          ? 43
-          : 40,
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
