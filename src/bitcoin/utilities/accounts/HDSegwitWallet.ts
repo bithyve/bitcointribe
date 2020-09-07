@@ -860,9 +860,17 @@ export default class HDSegwitWallet extends Bitcoin {
     },
   ): Promise<{ setupSuccessful: Boolean }> => {
     const accountType = DONATION_ACCOUNT;
-    const donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
+    let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
       accountType
     ];
+    if (!donationAccounts) {
+      this.derivativeAccounts = {
+        ...this.derivativeAccounts,
+        [DONATION_ACCOUNT]: config.DONATION_ACCOUNT,
+      };
+      donationAccounts = this.derivativeAccounts[accountType];
+    }
+
     const inUse = donationAccounts.instance.using;
     const accountNumber = inUse + 1;
 
