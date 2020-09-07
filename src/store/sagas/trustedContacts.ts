@@ -100,12 +100,7 @@ function* approveTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const {
-    contactInfo,
-    contactsPublicKey,
-    contactsWalletName,
-    isGuardian,
-  } = payload;
+  const { contactInfo, contactsPublicKey, contactsWalletName } = payload;
 
   let encKey;
   if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
@@ -115,7 +110,6 @@ function* approveTrustedContactWorker({ payload }) {
     contactsPublicKey,
     encKey,
     contactsWalletName,
-    isGuardian,
   );
   if (res.status === 200) {
     yield put(trustedContactApproved(contactInfo.contactName, true));
@@ -273,11 +267,6 @@ function* updateEphemeralChannelWorker({ payload }) {
       );
 
       if (res.status === 200) {
-        // send acceptance notification
-        const { walletName } = yield select(
-          (state) => state.storage.database.WALLET_SETUP,
-        );
-
         const xpub = res.data;
         const tpub = testService.getTestXpub();
         const walletID = yield call(AsyncStorage.getItem, 'walletID');
@@ -288,7 +277,6 @@ function* updateEphemeralChannelWorker({ payload }) {
           tpub,
           walletID,
           FCM,
-          walletName,
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
@@ -299,6 +287,10 @@ function* updateEphemeralChannelWorker({ payload }) {
         if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactInfo.contactName);
 
+          // send acceptance notification
+          const { walletName } = yield select(
+            (state) => state.storage.database.WALLET_SETUP,
+          );
           sendNotification(
             trustedContacts,
             contactInfo.contactName.toLowerCase().trim(),

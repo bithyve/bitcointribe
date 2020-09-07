@@ -49,7 +49,7 @@ import AddressBookHelpContents from '../components/Helper/AddressBookHelpContent
 // import CountDown from 'react-native-countdown-component';
 import CountDown from '../components/CountDown';
 import Config from '../bitcoin/HexaConfig';
-import { ContactTypes } from 'expo-contacts';
+// import { ContactTypes } from 'expo-contacts';
 
 interface AddressBookContentsPropTypes {
   navigation: any;
@@ -492,12 +492,6 @@ class AddressBookContents extends PureComponent<
           });
         }}
         onPressBack={() => {
-          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-        onSkipContinue={(data) => {
-          navigation.navigate('AddContactSendRequest', {
-            SelectedContact: data,
-          });
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />

@@ -28,13 +28,13 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-  DONATION_ACCOUNT,
+  DONATION_ACCOUNT
 } from '../../common/constants/serviceTypes';
 import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
-import { setupDonationAccount } from '../../store/actions/accounts';
+import { setupDonationAccount, } from '../../store/actions/accounts';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
@@ -77,11 +77,8 @@ const accountData = [
     checked: false,
     image: require('../../assets/images/icons/icon_donation_account.png'), //icon_donation_white
   },
-];
-class AddNewAccount extends PureComponent<
-  AddNewAccountPropsTypes,
-  AddNewAccountStateTypes
-> {
+]
+class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccountStateTypes> {
   AccountDetailBottomSheet: any;
 
   constructor(props) {
@@ -94,14 +91,12 @@ class AddNewAccount extends PureComponent<
       modelDescription: '',
       modelButtonIsValid: true,
       is2FAEnable: false,
-    };
+    }
     this.AccountDetailBottomSheet = React.createRef();
   }
 
   componentDidUpdate = (prevProps) => {
-    const serviceType = this.state.is2FAEnable
-      ? SECURE_ACCOUNT
-      : REGULAR_ACCOUNT;
+    const serviceType = this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT;
 
     if (
       !prevProps.accounts[serviceType].donationAccount.settedup &&
@@ -112,18 +107,13 @@ class AddNewAccount extends PureComponent<
   };
 
   initiateDonationAccount = () => {
-    const {
-      modelTitle,
-      accountName,
-      is2FAEnable,
-      modelDescription,
-    } = this.state;
-    let serviceType = REGULAR_ACCOUNT;
+    const { modelTitle, accountName, is2FAEnable, modelDescription } = this.state;
+    let serviceType = REGULAR_ACCOUNT
     if (is2FAEnable) {
-      serviceType = SECURE_ACCOUNT;
+      serviceType = SECURE_ACCOUNT
     }
 
-    let donee = modelTitle;
+    let donee = modelTitle
     if (!donee) {
       // defaulting to wallet name
       donee = this.props.walletName;
@@ -133,36 +123,28 @@ class AddNewAccount extends PureComponent<
     const configuration = {
       displayBalance: true,
       displayTransactions: true,
-    };
-    this.props.setupDonationAccount(
-      serviceType,
-      donee,
-      subject,
-      modelDescription,
-      configuration,
-    );
-  };
+    }
+    this.props.setupDonationAccount(serviceType, donee, subject, modelDescription, configuration)
+  }
 
   onSelectContact = (item) => {
     this.setState({
       selectedAccount: item,
     });
-  };
+  }
 
   handleOnTextChange = (name, text) => {
     if (name === 'modelTitle') {
       this.setState({
-        modelTitle: text,
+        modelTitle: text
       });
     } else if (name === 'modelDescription') {
       this.setState({
-        modelDescription: text,
+        modelDescription: text
       });
     }
-    text.trim().length > 0
-      ? this.setState({ modelButtonIsValid: false })
-      : this.setState({ modelButtonIsValid: true });
-  };
+    text.trim().length > 0 ? this.setState({ modelButtonIsValid: false }) : this.setState({ modelButtonIsValid: true });
+  }
 
   renderAccountDetailModalHeader = () => {
     return (
@@ -188,7 +170,7 @@ class AddNewAccount extends PureComponent<
                 }}
               >
                 Enter details for Donation Account
-              </Text>
+            </Text>
               <Text
                 style={{
                   ...styles.modalInfoText,
@@ -197,14 +179,16 @@ class AddNewAccount extends PureComponent<
                 }}
               >
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit
-              </Text>
+            </Text>
             </View>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
                 placeholder={'Enter donee name'}
                 keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                  Platform.OS == 'ios'
+                    ? 'ascii-capable'
+                    : 'visible-password'
                 }
                 value={this.state.modelTitle}
                 onChangeText={(text) => {
@@ -220,7 +204,9 @@ class AddNewAccount extends PureComponent<
                 style={styles.textBox}
                 placeholder={'Enter a description'}
                 keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                  Platform.OS == 'ios'
+                    ? 'ascii-capable'
+                    : 'visible-password'
                 }
                 value={this.state.modelDescription}
                 onChangeText={(text) => {
@@ -232,18 +218,8 @@ class AddNewAccount extends PureComponent<
               />
             </View>
             <View style={styles.greyBoxView}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginHorizontal: 20,
-                }}
-              >
-                <Text style={styles.modalInfoText}>
-                  Enable 2 Factor Aunthentication
-                </Text>
+              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20 }}>
+                <Text style={styles.modalInfoText}>Enable 2 Factor Aunthentication</Text>
                 <CheckBox
                   size={26}
                   borderRadius={5}
@@ -252,24 +228,21 @@ class AddNewAccount extends PureComponent<
                   isChecked={this.state.is2FAEnable}
                   onpress={() => {
                     this.setState({
-                      is2FAEnable: !this.state.is2FAEnable,
+                      is2FAEnable: !this.state.is2FAEnable
                     });
-                  }}
-                />
+                  }} />
               </View>
             </View>
             <View style={{ marginVertical: 15, marginLeft: 10 }}>
               <Text style={styles.modalInfoText}>
                 By clicking proceed you agree to our{' '}
-                <Text
-                  style={{
-                    fontFamily: Fonts.FiraSansItalic,
-                    color: Colors.blue,
-                    fontSize: RFValue(11),
-                  }}
-                >
+                <Text style={{
+                  fontFamily: Fonts.FiraSansItalic,
+                  color: Colors.blue,
+                  fontSize: RFValue(11),
+                }}>
                   Terms and Conditions
-                </Text>
+            </Text>
               </Text>
             </View>
             <View
@@ -279,33 +252,23 @@ class AddNewAccount extends PureComponent<
             >
               <AppBottomSheetTouchableWrapper
                 style={{
-                  ...styles.bottomButtonView,
-                  backgroundColor: this.state.modelButtonIsValid
+                  ...styles.bottomButtonView, backgroundColor: this.state.modelButtonIsValid
                     ? Colors.lightBlue
                     : Colors.blue,
                 }}
-                disabled={
-                  this.state.modelButtonIsValid ||
-                  this.props.accounts[
-                    this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT
-                  ].donationAccount.loading
+                disabled={this.state.modelButtonIsValid || this.props.accounts[this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT].donationAccount.loading}
+                onPress={
+                  this.initiateDonationAccount
                 }
-                onPress={this.initiateDonationAccount}
               >
-                {this.props.accounts[
-                  this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT
-                ].donationAccount.loading ? (
-                  <ActivityIndicator />
-                ) : (
-                  <Text style={styles.buttonText}>Proceed</Text>
-                )}
+                {this.props.accounts[this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT].donationAccount.loading ? <ActivityIndicator /> : <Text style={styles.buttonText}>Proceed</Text>}
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
         </View>
       </ScrollView>
-    );
-  };
+    )
+  }
 
   render() {
     const { navigation } = this.props;
@@ -391,8 +354,7 @@ class AddNewAccount extends PureComponent<
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             renderItem={(Items) => {
-              const checked =
-                Items.item.id === this.state.selectedAccount.id ? true : false;
+              const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
               return (
                 <AccountsListSend
                   accounts={Items.item}
@@ -411,13 +373,13 @@ class AddNewAccount extends PureComponent<
             style={styles.textBox}
             placeholder={'Enter account name'}
             keyboardType={
-              Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              Platform.OS == 'ios'
+                ? 'ascii-capable'
+                : 'visible-password'
             }
             value={this.state.accountName}
             onChangeText={(text) => {
-              text.trim().length > 0
-                ? this.setState({ isValid: false })
-                : this.setState({ isValid: true });
+              text.trim().length > 0 ? this.setState({ isValid: false }) : this.setState({ isValid: true });
               this.setState({
                 accountName: text,
               });
@@ -435,8 +397,7 @@ class AddNewAccount extends PureComponent<
         >
           <AppBottomSheetTouchableWrapper
             style={{
-              ...styles.bottomButtonView,
-              backgroundColor: this.state.isValid
+              ...styles.bottomButtonView, backgroundColor: this.state.isValid
                 ? Colors.lightBlue
                 : Colors.blue,
             }}
@@ -451,12 +412,14 @@ class AddNewAccount extends PureComponent<
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.AccountDetailBottomSheet as any}
-          snapPoints={[-50, hp('85%')]}
+          snapPoints={[
+            -50, hp('85%'),
+          ]}
           renderContent={this.renderAccountDetailModalContent}
           renderHeader={this.renderAccountDetailModalHeader}
         />
       </View>
-    );
+    )
   }
 }
 const styles = StyleSheet.create({
@@ -484,7 +447,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     height: wp('13%'),
     marginHorizontal: 16,
-    marginVertical: 20,
+    marginVertical: 20
   },
   textBox: {
     flex: 1,
@@ -529,7 +492,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderColor,
     height: wp('13%'),
-    marginVertical: 10,
+    marginVertical: 10
   },
   greyBoxView: {
     borderRadius: 10,
@@ -538,9 +501,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
     height: wp('13%'),
-    marginVertical: 10,
+    marginVertical: 10
   },
-});
+})
 
 const mapStateToProps = (state) => {
   return {
