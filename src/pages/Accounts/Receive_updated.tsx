@@ -885,6 +885,9 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
+            onSkipContinue={(data) =>
+              onPressContinue(data)
+            }
           />
         )}
         renderHeader={() => (

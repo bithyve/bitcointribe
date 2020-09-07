@@ -47,6 +47,12 @@ export default function ContactList(props) {
   const [contactData, setContactData] = useState([]);
   const dispatch = useDispatch()
 
+  const data = {
+    firstName: 'F&F request',
+    lastName: 'awaiting',
+    name: 'F&F request awaiting'
+  };
+
   useEffect(() => {
     if (props.selectedContacts) {
       setSelectedContacts(selectectcontactlist);
@@ -379,14 +385,14 @@ export default function ContactList(props) {
         </AppBottomSheetTouchableWrapper>
         {props.isShowSkipContact && (<AppBottomSheetTouchableWrapper
           style={{ marginRight: 10, padding: 10 }}
-          onPress={() => props.onPressContinue()}
+          onPress={() => props.onPressSkip(data)}
         >
           <Text
             style={{
               fontSize: RFValue(13, 812),
               fontFamily: Fonts.FiraSansRegular,
             }}
-            onPress={() => props.onPressContinue()}
+            onPress={() => props.onPressSkip(data)}
           >
             Skip Contact
         </Text>
