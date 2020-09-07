@@ -2,7 +2,7 @@
 #import <React/RCTLog.h>
 #import <PDFKit/PDFKit.h>
 #import <FileProvider/FileProvider.h>
-#import "HEXA-Swift.h"
+#import "Hexa-Swift.h"
 
 @implementation PdfPassword
 
