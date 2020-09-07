@@ -94,33 +94,33 @@ export default function Send(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     let derivativeBalance = 0;
     if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
         let derivativeAccount;
 
         // calculating opposite accounts derivative balance for account tiles
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
             accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            dAccountType
+              dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
             accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-            dAccountType
+              dAccountType
             ];
         }
 
@@ -254,7 +254,7 @@ export default function Send(props) {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -295,7 +295,7 @@ export default function Send(props) {
             trustedTestAddress,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           let hasTrustedAddress = false;
           if (serviceType === TEST_ACCOUNT)
@@ -600,8 +600,8 @@ export default function Send(props) {
                       serviceType == TEST_ACCOUNT
                         ? require('../../assets/images/icons/icon_test.png')
                         : serviceType == REGULAR_ACCOUNT
-                          ? require('../../assets/images/icons/icon_regular.png')
-                          : require('../../assets/images/icons/icon_secureaccount.png')
+                        ? require('../../assets/images/icons/icon_regular.png')
+                        : require('../../assets/images/icons/icon_secureaccount.png')
                     }
                     style={{ width: wp('10%'), height: wp('10%') }}
                   />
@@ -617,8 +617,8 @@ export default function Send(props) {
                       {serviceType == TEST_ACCOUNT
                         ? 'Test Account'
                         : serviceType == REGULAR_ACCOUNT
-                          ? 'Checking Account'
-                          : 'Savings Account'}
+                        ? 'Checking Account'
+                        : 'Savings Account'}
                     </Text>
                   </View>
                   {serviceType == TEST_ACCOUNT ? (
@@ -718,7 +718,7 @@ export default function Send(props) {
                       Send to Contact
                     </Text>
                     <TouchableOpacity
-                      onPress={() => { }}
+                      onPress={() => {}}
                       style={{
                         height: 20,
                         width: 20,
@@ -803,22 +803,22 @@ export default function Send(props) {
                       </View>
                     </View>
                   ) : (
-                      <View
-                        style={{
-                          marginBottom: -25,
-                          padding: -20,
-                          marginLeft: -20,
-                          marginRight: -20,
-                        }}
-                      >
-                        <BottomInfoBox
-                          title={'You have not added any Contact'}
-                          infoText={
-                            'Add a Contact to send them sats without having to scan an address'
-                          }
-                        />
-                      </View>
-                    )}
+                    <View
+                      style={{
+                        marginBottom: -25,
+                        padding: -20,
+                        marginLeft: -20,
+                        marginRight: -20,
+                      }}
+                    >
+                      <BottomInfoBox
+                        title={'You have not added any Contact'}
+                        infoText={
+                          'Add a Contact to send them sats without having to scan an address'
+                        }
+                      />
+                    </View>
+                  )}
                 </View>
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
@@ -834,7 +834,7 @@ export default function Send(props) {
                         Send to Account
                       </Text>
                       <TouchableOpacity
-                        onPress={() => { }}
+                        onPress={() => {}}
                         style={{
                           height: 20,
                           width: 20,
@@ -902,7 +902,7 @@ export default function Send(props) {
                           }
                         }}
                         extraData={{ details: transfer.details, balances }}
-                      //keyExtractor={(item, index) => index.toString()}
+                        //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
                   </View>

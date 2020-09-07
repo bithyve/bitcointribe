@@ -160,11 +160,6 @@ export default class BaseAccount {
     type: string;
   } => this.hdWallet.addressDiff(scannedStr);
 
-  public getReceivingAddress = (
-    derivativeAccountType?: string,
-    accountNumber?: number,
-  ) => this.hdWallet.getReceivingAddress(derivativeAccountType, accountNumber);
-
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
@@ -327,121 +322,6 @@ export default class BaseAccount {
     }
   };
 
-  public syncViaXpubAgent = async (
-    accountType: string,
-    accountNumber: number,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          synched: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.syncViaXpubAgent(accountType, accountNumber),
-      };
-    } catch (err) {
-      return {
-        status: 0o3,
-        err: err.message,
-        message: 'Failed to sync xpub via xpub agent',
-      };
-    }
-  };
-
-  public setupDonationAccount = async (
-    donee: string,
-    subject: string,
-    description: string,
-    configuration: {
-      displayBalance: boolean;
-      displayTransactions: boolean;
-    },
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          setupSuccessful: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.setupDonationAccount(
-          donee,
-          subject,
-          description,
-          configuration,
-        ),
-      };
-    } catch (err) {
-      return {
-        status: 0o3,
-        err: err.message,
-        message: 'Failed to setup donation account',
-      };
-    }
-  };
-
-  public updateDonationPreferences = async (
-    accountNumber: number,
-    configuration: {
-      displayBalance: boolean;
-      displayTransactions: boolean;
-    },
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          updated: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.updateDonationPreferences(
-          accountNumber,
-          configuration,
-        ),
-      };
-    } catch (err) {
-      return {
-        status: 0o3,
-        err: err.message,
-        message: 'Failed to update donation account preferences',
-      };
-    }
-  };
-
   public deriveReceivingAddress = async (
     xpub: string,
   ): Promise<
@@ -576,16 +456,8 @@ export default class BaseAccount {
     }
   };
 
-  public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
-    derivativeAccountDetails?: { type: string; number: number },
-  ) =>
-    this.hdWallet.calculateSendMaxFee(
-      numberOfRecipients,
-      averageTxFees,
-      derivativeAccountDetails,
-    );
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.hdWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
 
   public calculateCustomFee = (
     outputUTXOs: {
@@ -593,13 +465,7 @@ export default class BaseAccount {
       value: number;
     }[],
     customTxFeePerByte: number,
-    derivativeAccountDetails?: { type: string; number: number },
-  ) =>
-    this.hdWallet.calculateCustomFee(
-      outputUTXOs,
-      customTxFeePerByte,
-      derivativeAccountDetails,
-    );
+  ) => this.hdWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
 
   public transferST1 = async (
     recipients: {
@@ -607,7 +473,6 @@ export default class BaseAccount {
       amount: number;
     }[],
     averageTxFees?: any,
-    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -642,7 +507,6 @@ export default class BaseAccount {
       } = await this.hdWallet.transactionPrerequisites(
         recipients,
         averageTxFees,
-        derivativeAccountDetails,
       );
 
       let netAmount = 0;
@@ -683,7 +547,6 @@ export default class BaseAccount {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
-    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -706,7 +569,6 @@ export default class BaseAccount {
         txPrerequisites,
         txnPriority.toLowerCase(),
         customTxPrerequisites,
-        derivativeAccountDetails,
         nSequence,
       );
 

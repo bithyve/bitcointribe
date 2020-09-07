@@ -34,12 +34,9 @@ const SecureScan = props => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  // console.log('isErrorSendingFailed', isErrorSendingFailed);
+ // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
-    : null;
-  const carouselIndex = props.navigation.state.params.carouselIndex
-    ? props.navigation.state.params.carouselIndex
     : null;
   const serviceType = props.navigation.getParam('serviceType');
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
@@ -115,7 +112,7 @@ const SecureScan = props => {
           style={BackupStyles.headerLeftIconContainer}
           onPress={() => {
             if (getServiceType) {
-              getServiceType(serviceType, carouselIndex);
+              getServiceType(serviceType);
             }
             props.navigation.goBack();
           }}

@@ -92,9 +92,7 @@ interface SendStateTypes {
   accountData: any[];
   sweepSecure: any;
   spendableBalance: any;
-  derivativeAccountDetails: { type: string; number: number };
   getServiceType: any;
-  carouselIndex: number;
   averageTxFees: any;
 }
 
@@ -111,9 +109,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
-      derivativeAccountDetails: this.props.navigation.getParam(
-        'derivativeAccountDetails',
-      ),
       recipientAddress: '',
       isSendHelperDone: true,
       isInvalidAddress: false,
@@ -142,15 +137,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       getServiceType: this.props.navigation.getParam('getServiceType')
         ? this.props.navigation.getParam('getServiceType')
         : null,
-      carouselIndex: this.props.navigation.getParam('carouselIndex')
-        ? this.props.navigation.getParam('carouselIndex')
-        : null,
     };
   }
 
   componentDidMount = () => {
     this.props.clearTransfer(this.state.serviceType);
-    this.getAccountBalances();
+    this.getBalances();
     if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
     this.checkNShowHelperModal();
     this.setRecipientAddress();
@@ -170,7 +162,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.accounts !== this.props.accounts) {
-      this.getAccountBalances();
+      this.getBalances();
     }
 
     if (
@@ -191,7 +183,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
-  getAccountBalances = () => {
+  getBalances = () => {
     const { accounts } = this.props;
     const { serviceType } = this.state;
 
@@ -211,7 +203,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     let derivativeBalance = 0;
     if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
         let derivativeAccount;
 
         // calculating opposite accounts derivative balance for account tiles
@@ -289,7 +281,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       serviceType,
       sweepSecure,
       spendableBalance,
-      derivativeAccountDetails,
     } = this.state;
     // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
     // // console.log("instance setRecipientAddress", instance);
@@ -340,7 +331,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             serviceType,
             sweepSecure,
             spendableBalance,
-            derivativeAccountDetails,
             bitcoinAmount: options.amount
               ? `${Math.round(options.amount * 1e8)}`
               : '',
@@ -352,12 +342,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   barcodeRecognized = async (barcodes) => {
     const { service } = this.props;
-    const {
-      serviceType,
-      sweepSecure,
-      spendableBalance,
-      derivativeAccountDetails,
-    } = this.state;
+    const { serviceType, sweepSecure, spendableBalance } = this.state;
     //console.log('barcodes', barcodes);
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(
@@ -399,7 +384,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               serviceType,
               sweepSecure,
               spendableBalance,
-              derivativeAccountDetails,
               bitcoinAmount: options.amount
                 ? `${Math.round(options.amount * 1e8)}`
                 : '',
@@ -425,7 +409,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       averageTxFees,
       sweepSecure,
       spendableBalance,
-      derivativeAccountDetails,
     } = this.state;
 
     let isNavigate = true;
@@ -445,7 +428,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         averageTxFees,
         sweepSecure,
         spendableBalance,
-        derivativeAccountDetails,
         bitcoinAmount,
       });
     } else {
@@ -466,7 +448,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           averageTxFees,
           sweepSecure,
           spendableBalance,
-          derivativeAccountDetails,
           bitcoinAmount,
         });
       }
@@ -630,7 +611,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       isEditable,
       accountData,
       getServiceType,
-      carouselIndex,
     } = this.state;
     const { clearTransfer, service, transfer, accounts } = this.props;
     return (
@@ -650,7 +630,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     <TouchableOpacity
                       onPress={() => {
                         if (getServiceType) {
-                          getServiceType(serviceType, carouselIndex);
+                          getServiceType(serviceType);
                         }
                         clearTransfer(serviceType);
                         this.props.navigation.goBack();
@@ -665,9 +645,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     </TouchableOpacity>
                     <Image
                       source={
-                        this.state.derivativeAccountDetails
-                          ? require('../../assets/images/icons/icon_donation_account.png')
-                          : serviceType == TEST_ACCOUNT
+                        serviceType == TEST_ACCOUNT
                           ? require('../../assets/images/icons/icon_test.png')
                           : serviceType == REGULAR_ACCOUNT
                           ? require('../../assets/images/icons/icon_regular.png')
@@ -678,14 +656,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     <View style={{ marginLeft: wp('2.5%') }}>
                       <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
                       <Text style={styles.accountText}>
-                        Choose a recipient
-                        {/* {this.state.derivativeAccountDetails
-                          ? 'Donation Account'
-                          : serviceType == TEST_ACCOUNT
+                        {serviceType == TEST_ACCOUNT
                           ? 'Test Account'
                           : serviceType == REGULAR_ACCOUNT
                           ? 'Checking Account'
-                          : 'Savings Account'} */}
+                          : 'Savings Account'}
                       </Text>
                     </View>
                     {serviceType == TEST_ACCOUNT ? (
@@ -866,10 +841,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                 checked = true;
                               }
                             }
-                            if (
-                              Items.item.type != serviceType ||
-                              this.state.derivativeAccountDetails
-                            ) {
+                            if (Items.item.type != serviceType) {
                               return (
                                 <AccountsListSend
                                   accounts={Items.item}

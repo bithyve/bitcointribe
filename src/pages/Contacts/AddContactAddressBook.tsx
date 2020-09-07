@@ -21,7 +21,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { FlatList } from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import RadioButton from '../../components/RadioButton';
-import * as ExpoContacts from 'expo-contacts';
+// import * as ExpoContacts from 'expo-contacts';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -47,12 +47,6 @@ export default function AddContactAddressBook(props) {
     setContactListErrorBottomSheet,
   ] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
-
-  const data = {
-    firstName: 'F&F request',
-    lastName: 'awaiting',
-    name: 'F&F request awaiting'
-  };
 
   useEffect(() => {
     if (!props.addContactModalOpened) {
@@ -86,28 +80,29 @@ export default function AddContactAddressBook(props) {
     getContactsAsync();
   }, [props.isLoadContacts]);
 
-  const getContact = () => {
-    if (props.isLoadContacts) {
-      ExpoContacts.getContactsAsync().then(async ({ data }) => {
-        if (!data.length) {
-          setErrorMessage(
-            'No contacts found. Please add contacts to your Address Book and try again',
-          );
-          (contactListErrorBottomSheet as any).current.snapTo(1);
-        }
-        setContactData(data);
-        await AsyncStorage.setItem('ContactData', JSON.stringify(data));
-        const contactList = data.sort(function (a, b) {
-          if (a.name && b.name) {
-            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-          }
-          return 0;
-        });
-        setFilterContactData(contactList);
-      });
-    }
-  };
+  // TODO: Migrate it using react-native-contact
+  // const getContact = () => {
+  //   if (props.isLoadContacts) {
+  //     ExpoContacts.getContactsAsync().then(async ({ data }) => {
+  //       if (!data.length) {
+  //         setErrorMessage(
+  //           'No contacts found. Please add contacts to your Address Book and try again',
+  //         );
+  //         (contactListErrorBottomSheet as any).current.snapTo(1);
+  //       }
+  //       setContactData(data);
+  //       await AsyncStorage.setItem('ContactData', JSON.stringify(data));
+  //       const contactList = data.sort(function (a, b) {
+  //         if (a.name && b.name) {
+  //           if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+  //           if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+  //         }
+  //         return 0;
+  //       });
+  //       setFilterContactData(contactList);
+  //     });
+  //   }
+  // };
 
   const getContactsAsync = async () => {
     if (Platform.OS === 'android') {
@@ -121,7 +116,8 @@ export default function AddContactAddressBook(props) {
         setContactPermissionAndroid(false);
         return;
       } else {
-        getContact();
+        // TODO: Migrate it using react-native-contact
+        // getContact();
       }
     } else if (Platform.OS === 'ios') {
       const { status, expires, permissions } = await Permissions.getAsync(
@@ -135,7 +131,8 @@ export default function AddContactAddressBook(props) {
         (contactListErrorBottomSheet as any).current.snapTo(1);
         return;
       } else {
-        getContact();
+        // TODO: Migrate it using react-native-contact
+        // getContact();
       }
     }
   };
@@ -434,22 +431,6 @@ export default function AddContactAddressBook(props) {
               })
               : null}
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <AppBottomSheetTouchableWrapper
-              style={{ marginRight: 10, padding: 10 }}
-              onPress={() => props.onSkipContinue([data])}
-            >
-              <Text
-                style={{
-                  fontSize: RFValue(13, 812),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-                onPress={() => props.onSkipContinue([data])}
-              >
-                Skip Contact
-            </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View>
           <View style={[styles.searchBoxContainer]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -485,31 +466,31 @@ export default function AddContactAddressBook(props) {
                     selected = true;
                   }
                   // if (item.phoneNumbers || item.emails) {
-                  return (
-                    <AppBottomSheetTouchableWrapper
-                      onPress={() => onContactSelect(index)}
-                      style={styles.contactView}
-                      key={index}
-                    >
-                      <RadioButton
-                        size={15}
-                        color={Colors.lightBlue}
-                        borderColor={Colors.borderColor}
-                        isChecked={item.checked}
-                        onpress={() => onContactSelect(index)}
-                      />
-                      <Text style={styles.contactText}>
-                        {item.name && item.name.split(' ')[0]
-                          ? item.name.split(' ')[0]
-                          : ''}{' '}
-                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {item.name && item.name.split(' ')[1]
-                            ? item.name.split(' ')[1]
-                            : ''}
+                    return (
+                      <AppBottomSheetTouchableWrapper
+                        onPress={() => onContactSelect(index)}
+                        style={styles.contactView}
+                        key={index}
+                      >
+                        <RadioButton
+                          size={15}
+                          color={Colors.lightBlue}
+                          borderColor={Colors.borderColor}
+                          isChecked={item.checked}
+                          onpress={() => onContactSelect(index)}
+                        />
+                        <Text style={styles.contactText}>
+                          {item.name && item.name.split(' ')[0]
+                            ? item.name.split(' ')[0]
+                            : ''}{' '}
+                          <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                            {item.name && item.name.split(' ')[1]
+                              ? item.name.split(' ')[1]
+                              : ''}
+                          </Text>
                         </Text>
-                      </Text>
-                    </AppBottomSheetTouchableWrapper>
-                  );
+                      </AppBottomSheetTouchableWrapper>
+                    );
                   // } else {
                   //   return null;
                   // }

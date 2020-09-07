@@ -4,10 +4,8 @@ import {
   DerivativeAccount,
   DerivativeAccounts,
   TrustedContactDerivativeAccount,
-  DonationDerivativeAccount,
 } from './utilities/Interface';
 import Config from 'react-native-config';
-import { DONATION_ACCOUNT } from '../common/constants/serviceTypes';
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -156,7 +154,7 @@ class HexaConfig {
     },
   };
 
-  public FAST_BITCOINS: DerivativeAccount = {
+  FAST_BITCOINS: DerivativeAccount = {
     series: parseInt(Config.BIT_FAST_BITCOINS_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10),
@@ -164,7 +162,7 @@ class HexaConfig {
     },
   };
 
-  public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
+  TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10),
     instance: {
@@ -173,23 +171,10 @@ class HexaConfig {
     },
   };
 
-  public DONATION_ACCOUNT: DonationDerivativeAccount = {
-    series: parseInt(Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10),
-    instance: {
-      max: parseInt(Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10),
-      using: 0,
-    },
-  };
-
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
-    DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
-
-  public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
-    (account) => account !== DONATION_ACCOUNT,
-  );
 
   constructor(env: string) {
     this.ENVIRONMENT = env;

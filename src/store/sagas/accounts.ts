@@ -24,7 +24,6 @@ import {
   testcoinsReceived,
   SYNC_ACCOUNTS,
   accountsSynched,
-  settedDonationAccount,
   FETCH_BALANCE_TX,
   EXCHANGE_RATE,
   exchangeRatesCalculated,
@@ -42,9 +41,6 @@ import {
   syncDerivativeAccounts,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
-  SETUP_DONATION_ACCOUNT,
-  UPDATE_DONATION_PREFERENCES,
-  SYNC_VIA_XPUB_AGENT,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -52,7 +48,6 @@ import {
   SECURE_ACCOUNT,
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
@@ -405,7 +400,7 @@ function* syncDerivativeAccountsWorker({ payload }) {
 
     const res = yield call(
       service.syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC,
+      Object.keys(config.DERIVATIVE_ACC),
     );
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -438,60 +433,6 @@ function* syncDerivativeAccountsWorker({ payload }) {
 export const syncDerivativeAccountsWatcher = createWatcher(
   syncDerivativeAccountsWorker,
   SYNC_DERIVATIVE_ACCOUNTS,
-);
-
-function* syncViaXpubAgentWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'balanceTx'));
-
-  const { serviceType, derivativeAccountType, accountNumber } = payload;
-  const service = yield select((state) => state.accounts[serviceType].service);
-
-  const preFetchDerivativeAccount = JSON.stringify(
-    serviceType === REGULAR_ACCOUNT
-      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
-      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
-  );
-
-  const res = yield call(
-    service.syncViaXpubAgent,
-    derivativeAccountType,
-    accountNumber,
-  );
-
-  const postFetchDerivativeAccount = JSON.stringify(
-    serviceType === REGULAR_ACCOUNT
-      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
-      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
-  );
-
-  if (res.status === 200) {
-    if (postFetchDerivativeAccount !== preFetchDerivativeAccount) {
-      const { SERVICES } = yield select((state) => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        [serviceType]: JSON.stringify(service),
-      };
-      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    }
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log('Failed to sync derivative account');
-  }
-
-  yield put(switchLoader(payload.serviceType, 'balanceTx'));
-}
-
-export const syncViaXpubAgentWatcher = createWatcher(
-  syncViaXpubAgentWorker,
-  SYNC_VIA_XPUB_AGENT,
 );
 
 function* processRecipients(
@@ -610,7 +551,7 @@ function* processRecipients(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  let { recipients, averageTxFees, derivativeAccountDetails } = payload;
+  let { recipients, averageTxFees } = payload;
   console.log({ recipients });
 
   try {
@@ -623,12 +564,7 @@ function* transferST1Worker({ payload }) {
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
-  const res = yield call(
-    service.transferST1,
-    recipients,
-    averageTxFees,
-    derivativeAccountDetails,
-  );
+  const res = yield call(service.transferST1, recipients, averageTxFees);
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -647,7 +583,6 @@ function* transferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
-    derivativeAccountDetails,
     nSequence,
   } = payload;
 
@@ -666,7 +601,6 @@ function* transferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
-    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -718,7 +652,6 @@ function* alternateTransferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
-    derivativeAccountDetails,
     nSequence,
   } = payload;
   if (serviceType !== SECURE_ACCOUNT) return;
@@ -739,7 +672,6 @@ function* alternateTransferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
-    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -1035,71 +967,4 @@ function* startupSyncWorker({ payload }) {
 export const startupSyncWatcher = createWatcher(
   startupSyncWorker,
   STARTUP_SYNC,
-);
-
-function* setupDonationAccountWorker({ payload }) {
-  const { serviceType, donee, subject, description, configuration } = payload;
-  const service = yield select((state) => state.accounts[serviceType].service);
-
-  const res = yield call(
-    service.setupDonationAccount,
-    donee,
-    subject,
-    description,
-    configuration,
-  );
-
-  if (res.status === 200) {
-    console.log({ res });
-    if (!res.data.setupSuccessful) {
-      yield put(settedDonationAccount(serviceType, false));
-      throw new Error('Donation account setup failed');
-    }
-
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [serviceType]: JSON.stringify(service),
-    };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    yield put(settedDonationAccount(serviceType, true));
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error(res.err);
-  }
-}
-
-export const setupDonationAccountWatcher = createWatcher(
-  setupDonationAccountWorker,
-  SETUP_DONATION_ACCOUNT,
-);
-
-function* updateDonationPreferencesWorker({ payload }) {
-  const { serviceType, accountNumber, configuration } = payload;
-  const service = yield select((state) => state.accounts[serviceType].service);
-
-  const res = yield call(
-    service.updateDonationPreferences,
-    accountNumber,
-    configuration,
-  );
-
-  if (res.status === 200) {
-    console.log({ res });
-
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [serviceType]: JSON.stringify(service),
-    };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error(res.err);
-  }
-}
-
-export const updateDonationPreferencesWatcher = createWatcher(
-  updateDonationPreferencesWorker,
-  UPDATE_DONATION_PREFERENCES,
 );
