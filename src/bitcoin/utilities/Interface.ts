@@ -89,10 +89,18 @@ export interface ShareUploadables {
 
 export interface DerivativeAccountElements {
   xpub: string;
+  xpubId: string;
   xpriv: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   receivingAddress?: string;
+  confirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[],
   balances?: {
     balance: number;
     unconfirmedBalance: number;
@@ -112,7 +120,8 @@ export interface DerivativeAccount {
   [accounts: number]: DerivativeAccountElements;
 }
 
-export interface TrustedContactDerivativeAccountElements {
+export interface TrustedContactDerivativeAccountElements
+  extends DerivativeAccountElements {
   contactName: string;
   contactDetails?: {
     xpub: string;
@@ -121,18 +130,6 @@ export interface TrustedContactDerivativeAccountElements {
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
   };
-  xpub: string;
-  xpriv: string;
-  nextFreeAddressIndex: number;
-  usedAddresses?: string[];
-  receivingAddress?: string;
-  balances?: {
-    balance: number;
-    unconfirmedBalance: number;
-  };
-  transactions?: Transactions;
-  lastBalTxSync?: number;
-  newTransactions?: TransactionDetails[];
 }
 
 // Trusted Contact Dervative Account (extension of Base Derivative Account)
@@ -145,8 +142,32 @@ export interface TrustedContactDerivativeAccount {
   [accounts: number]: TrustedContactDerivativeAccountElements;
 }
 
+export interface DonationDerivativeAccountElements
+  extends DerivativeAccountElements {
+  donee: string;
+  id: string;
+  subject: string;
+  description: string;
+  configuration: {
+    displayBalance: boolean;
+    displayTransactions: boolean;
+  };
+}
+
+// Base Dervative Account
+export interface DonationDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: DonationDerivativeAccountElements;
+}
 export interface DerivativeAccounts {
-  [accountType: string]: DerivativeAccount | TrustedContactDerivativeAccount;
+  [accountType: string]:
+  | DerivativeAccount
+  | TrustedContactDerivativeAccount
+  | DonationDerivativeAccount;
 }
 
 export enum notificationType {

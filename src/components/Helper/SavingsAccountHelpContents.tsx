@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function SavingsAccountHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -57,16 +59,17 @@ export default function SavingsAccountHelpContents(props) {
         }}
       />
       <ScrollView
+        ref={scrollViewRef}
         style={styles.modalContainer}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('80%')}
         decelerationRate="fast"
       >
         <View
           style={{
-            height: hp('89%'),
-            
+            height: hp('80%'),
             paddingBottom: hp('6%'),
             marginTop: hp('1%'),
+            justifyContent: 'space-between'
           }}
         >
           <Text
@@ -82,7 +85,7 @@ export default function SavingsAccountHelpContents(props) {
             Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}
             spending. The 2FA code must be retrieved{'\n'}from the Keeper App
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center',  marginTop: hp('5%'), marginBottom: hp('5%') }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('5%'), marginBottom: hp('5%') }}>
             <Image
               source={require('../../assets/images/icons/savings_account_info_1.png')}
               style={{
@@ -104,7 +107,12 @@ export default function SavingsAccountHelpContents(props) {
             the Checking Account.{'\n'}This is in part, due to the requirement
             of {'\n'}2FA confirmation to confirm spending
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center',marginTop: hp('7%') }}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
                 borderStyle: 'dotted',
@@ -119,10 +127,10 @@ export default function SavingsAccountHelpContents(props) {
         </View>
         <View
           style={{
-            height: hp('89%'),
-            
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
+            height: hp('80%'),
+            // paddingTop: hp('2%'),
+            paddingBottom: hp('2%'),
+            justifyContent: 'space-between'
           }}
         >
           <Text
@@ -132,16 +140,16 @@ export default function SavingsAccountHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
-            >
-                The Savings Account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the 2FA App
+          >
+            The Savings Account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the 2FA App
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/savings_account_info_1.png')}
-                    style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/savings_account_info_1.png')}
+              style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
+            />
+          </View>
+          <Text
             style={{
               textAlign: 'center',
               color: Colors.white,
@@ -153,10 +161,29 @@ export default function SavingsAccountHelpContents(props) {
             keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}
             one key belongs to BitHyve signing server
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('162%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
+                width: wp('70%'),
+                height: 0,
+              }}
+            />
+          </View>
         </View>
         <View
           style={{
-            height: hp('89%'),paddingTop: hp('2%'),
+            height: hp('80%'),
+            marginTop: hp('2%'), 
+            justifyContent: 'space-between'
           }}
         >
           <Text
@@ -166,34 +193,33 @@ export default function SavingsAccountHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
-            >
-                The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on your Keeper device), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper device can be used to migrate from Hexa{'\n'}
+          >
+            The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on your Keeper device), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper device can be used to migrate from Hexa{'\n'}
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/savings_account_info_2.png')}
+              style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
+            />
+          </View>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+          >
+            A multi signature account requires signatures from {'\n'}multiple keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}one key belongs to BitHyve signing server
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('5%'), marginBottom: hp('5%') }}>
-                <Image
-                    source={require('../../assets/images/icons/savings_account_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                  A multi signature account requires signatures from {'\n'}multiple keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}one key belongs to BitHyve signing server
-            </Text>
-        
-        <View
+          <View
             style={{
               flexDirection: 'row',
               marginLeft: wp('10%'),
               marginRight: wp('10%'),
               justifyContent: 'center',
               flexWrap: 'wrap',
-              marginTop: hp('3%'),
+              marginBottom: hp('3%'),
             }}
           >
             <Text
@@ -225,7 +251,7 @@ export default function SavingsAccountHelpContents(props) {
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
-          </View>
+        </View>
       </ScrollView>
     </View>
   );

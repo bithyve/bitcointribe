@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   View,
   StyleSheet,
@@ -320,13 +320,17 @@ interface HomePropsTypes {
 }
 const GoogleDrive = NativeModules.GoogleDrive;
 
-class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
+class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
   NoInternetBottomSheet: any;
   unsubscribe: any;
+
+
+  static whyDidYouRender = true
+
 
   constructor(props) {
     super(props);
@@ -1116,7 +1120,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .then((notifications) => {});
   };
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
@@ -1190,6 +1194,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ? `${Math.round(options.amount * 1e8)}`
           : '',
       });
+    }
+
+
+    if (prevState.isLoading && !this.state.isLoading) {
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
     }
   };
 
@@ -1433,10 +1444,22 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     });
 
     setTimeout(() => {
-      (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-      (this.refs.addTabBarBottomSheet as any).snapTo(0);
-      (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-      (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
+
+      if (this.refs.addTabBarBottomSheet) {
+        (this.refs.addTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.qrTabBarBottomSheet) {
+        (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.moreTabBarBottomSheet) {
+        (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      }
+
     }, 500);
 
     this.getAssociatedContact();
@@ -1694,12 +1717,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       : [];
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
           dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -1746,14 +1769,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       : [];
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
           dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -2068,10 +2091,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             if (!approvedTC) {
               navigation.navigate('ContactsListForAssociateContact', {
                 postAssociation: (contact) => {
-                  const contactName = `${contact.firstName} ${
-                    contact.lastName ? contact.lastName : ''
-                  }`.toLowerCase();
-
+                  let contactName = '';
+                  if (contact) {
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''}`.toLowerCase();
+                  } else {
+                    contactName = 'No Contact Selected'.toLowerCase();
+                  }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
                     info = null;
@@ -2546,9 +2571,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {isLoading ? <Loader /> : null}
+        {/* {isLoading ? <Loader /> : null} */}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onOpenEnd={() => {
             this.setState({
               atCloseEnd: true,
@@ -2608,9 +2633,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           renderHeader={() => (
             <TransactionHeader openCloseModal={this.openCloseModal} />
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           ref="addTabBarBottomSheet"
           onCloseEnd={() => {
             this.setState({
@@ -2669,9 +2694,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           ref="qrTabBarBottomSheet"
           onOpenEnd={() => {
             this.setState({
@@ -2729,9 +2754,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             this.setState(
               {
@@ -2777,9 +2802,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
             </TouchableOpacity>
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             if (tabBarIndex === 0 && !deepLinkModalOpen) {
               this.setState({
@@ -2882,8 +2907,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
-        <BottomSheet
+        />}
+        {!isLoading && <BottomSheet
           onCloseEnd={() => {
             if (tabBarIndex === 0) {
               this.setState({
@@ -2949,9 +2974,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           onCloseStart={() => {
             this.setState({
               tabBarIndex: 999,
@@ -2998,7 +3023,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
         {knowMoreBottomSheetsFlag ? (
           <BottomSheet
             onOpenEnd={() => {
@@ -3052,7 +3077,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           />
         ) : null}
 
-        <BottomSheet
+        {!isLoading && <BottomSheet
           enabledInnerScrolling={true}
           onCloseEnd={() => {
             this.setState({
@@ -3094,7 +3119,67 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
             />
           )}
-        />
+        />}
+
+        {knowMoreBottomSheetsFlag ? (
+          <BottomSheet
+            onOpenEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+            }}
+            onCloseEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            enabledInnerScrolling={true}
+            ref={'settingsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <SettingsContents
+                currencyCode={CurrencyCode}
+                onPressManagePin={(type, currencycode) =>
+                  this.onPressSettingsElements(type, currencycode)
+                }
+                onPressBack={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => {
+                      (this.refs.settingsBottomSheet as any).snapTo(0);
+                    },
+                  );
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => (this.refs.settingsBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
+
         <BottomSheet
           onOpenEnd={() => {
             this.setState({

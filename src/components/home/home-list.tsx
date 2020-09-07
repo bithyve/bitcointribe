@@ -72,7 +72,7 @@ const HomeList = ({
       {Items.item.map((value) => {
         if (value.accountType === 'add') {
           return (
-            <TouchableOpacity disabled={true}>
+            <TouchableOpacity onPress={() => navigation.navigate('AddNewAccount')}>
               <CardView
                 cornerRadius={10}
                 style={{

@@ -553,7 +553,7 @@ class AddressBookContents extends PureComponent<
                 }}
               />
             }
-            style={{ flex: 1 }}
+            style={{ flex: 1, marginBottom: hp('6%') }}
           >
             <View style={{ marginTop: wp('2%') }}>
               <Text style={styles.pageTitle}>My Keepers</Text>

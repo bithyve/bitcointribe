@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function AddressBookHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -39,18 +41,19 @@ export default function AddressBookHelpContents(props) {
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
+        ref={scrollViewRef}
         style={{
           flex: 1,
           backgroundColor: Colors.blue,
         }}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('80%')}
         decelerationRate="fast"
       >
         <View style={styles.ElementView}>
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('10%'),
+              marginTop: wp('5%'),
             }}
           >
             Friends and Family are contacts whom you know and trust, and those
@@ -67,13 +70,17 @@ export default function AddressBookHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('15%'),
             }}
           >
             Selecting a contact as Friends and Family creates a secure channel
             between you and the contact. This secure channel enables easy
             exchange of information without requiring user action
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
           <View
             style={{
               borderStyle: 'dotted',
@@ -102,12 +109,12 @@ export default function AddressBookHelpContents(props) {
             />
           </View>
           <View style={styles.bottomLinkView}>
-            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
+            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
               Possessing an extended public key does not allow one to gain
               possession of funds. This is because the contact does not possess
               your private key which affirms ownership of funds
             </Text>
-            <View style={{...styles.linkView, marginTop: wp('7%')}}>
+            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
               <Text style={styles.toKnowMoreText}>To know more,</Text>
               <AppBottomSheetTouchableWrapper
                 style={{ marginLeft: 5 }}
@@ -180,7 +187,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('89%'),
+    height: hp('80%'),
     justifyContent: 'space-between',
   },
   separatorView: {
