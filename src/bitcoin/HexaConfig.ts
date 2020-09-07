@@ -29,11 +29,11 @@ class HexaConfig {
     iv: Buffer;
     keyLength: number;
   } = {
-      algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
-      salt: Config.BIT_CIPHER_SALT.trim(),
-      keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
-      iv: Buffer.alloc(16, 0),
-    };
+    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
+    salt: Config.BIT_CIPHER_SALT.trim(),
+    keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
+    iv: Buffer.alloc(16, 0),
+  };
   public KEY_STRECH_ITERATIONS = parseInt(
     Config.BIT_KEY_STRECH_ITERATIONS.trim(),
     10,
@@ -156,7 +156,7 @@ class HexaConfig {
     },
   };
 
-  FAST_BITCOINS: DerivativeAccount = {
+  public FAST_BITCOINS: DerivativeAccount = {
     series: parseInt(Config.BIT_FAST_BITCOINS_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10),
@@ -164,7 +164,7 @@ class HexaConfig {
     },
   };
 
-  TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
+  public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10),
     instance: {
@@ -173,7 +173,7 @@ class HexaConfig {
     },
   };
 
-  DONATION_ACCOUNT: DonationDerivativeAccount = {
+  public DONATION_ACCOUNT: DonationDerivativeAccount = {
     series: parseInt(Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10),
@@ -187,7 +187,9 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter((account) => account !== DONATION_ACCOUNT)
+  public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
+    (account) => account !== DONATION_ACCOUNT,
+  );
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
