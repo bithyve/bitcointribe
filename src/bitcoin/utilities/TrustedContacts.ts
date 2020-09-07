@@ -183,6 +183,7 @@ export default class TrustedContacts {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
+    isGuardian?: boolean,
   ): {
     channelAddress: string;
     ephemeralAddress: string;
@@ -229,7 +230,7 @@ export default class TrustedContacts {
       },
       contactsPubKey: encodedPublicKey,
       contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
-      isWard: contactsWalletName ? true : false,
+      isWard: isGuardian ? true : false,
     };
     return {
       channelAddress,
@@ -657,6 +658,13 @@ export default class TrustedContacts {
 
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        const { walletName } = data.data ? data.data : { walletName: null };
+        if (walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: walletName,
+          };
+        }
         return { updated, data };
       }
       return { updated };
@@ -702,6 +710,12 @@ export default class TrustedContacts {
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey)
           .data;
+        if (data.walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: data.walletName,
+          };
+        }
       }
 
       if (contactsWalletName) {
