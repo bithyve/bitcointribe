@@ -83,6 +83,7 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
+import AddNewAccount from '../pages/Accounts/AddNewAccount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -154,6 +155,7 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
+    AddNewAccount,
     Send: {
       screen: Send,
       navigationOptions: {
