@@ -36,6 +36,7 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
+  DONATION_ACCOUNT,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
@@ -87,7 +88,7 @@ import HomeList from '../components/home/home-list';
 import HomeHeader from '../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
-import { initialCardData } from '../stubs/initialCardData';
+import { initialCardData, closingCardData } from '../stubs/initialCardData';
 import { initialTransactionData } from '../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
@@ -97,6 +98,7 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   TrustedContactDerivativeAccount,
   trustedChannelActions,
+  DonationDerivativeAccountElements,
 } from '../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
@@ -155,6 +157,8 @@ const getIconByAccountType = (type) => {
     return require('../assets/images/icons/icon_secureaccount.png');
   } else if (type == 'test') {
     return require('../assets/images/icons/icon_test.png');
+  } else if (type === 'Donation Account') {
+    return require('../assets/images/icons/icon_donation_account.png');
   } else {
     return require('../assets/images/icons/icon_test.png');
   }
@@ -662,14 +666,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateAccountCardData = () => {
+  setAccountCardData = (newCardData) => {
     let newArrayFinal = [];
     let tempArray = [];
-    for (let a = 0; a < initialCardData.length; a++) {
-      tempArray.push(initialCardData[a]);
+    for (let a = 0; a < newCardData.length; a++) {
+      tempArray.push(newCardData[a]);
       if (
         tempArray.length == 2 ||
-        initialCardData[initialCardData.length - 1].id == tempArray[0].id
+        newCardData[newCardData.length - 1].id == tempArray[0].id
       ) {
         newArrayFinal.push(tempArray);
         tempArray = [];
@@ -680,6 +684,50 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
         cardData: newArrayFinal,
       });
     }
+  };
+
+  updateAccountCardData = () => {
+    let { accounts } = this.props;
+    const defaultCardData = initialCardData;
+    let idIndex = initialCardData[initialCardData.length - 1].id;
+
+    const additionalCardData = [];
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+        idIndex++;
+        const donationCardInstance = {
+          id: idIndex,
+          title: 'Donation Account',
+          unit: 'sats',
+          amount: donAcc.balances
+            ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
+            : 0,
+          account: `Donate Bitcoin`,
+          accountType: serviceType,
+          bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+        };
+        additionalCardData.push(donationCardInstance);
+      }
+    }
+
+    this.setAccountCardData([
+      ...defaultCardData,
+      ...additionalCardData,
+      ...closingCardData,
+    ]);
   };
 
   scheduleNotification = async () => {
@@ -925,6 +973,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (prevProps.accounts !== this.props.accounts) {
       this.getBalances();
       this.getNewTransactionNotifications();
+      this.updateAccountCardData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
