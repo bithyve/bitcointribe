@@ -1505,7 +1505,11 @@ export default class SecureHDWallet extends Bitcoin {
         );
         childIndexArray.push({
           childIndex,
-          inputIdentifier: { txId: input.txId, vout: input.vout },
+          inputIdentifier: {
+            txId: input.txId,
+            vout: input.vout,
+            value: input.value,
+          },
         });
         vin++;
       }
