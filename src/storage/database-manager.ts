@@ -6,10 +6,14 @@ const initialize = () => db.init();
 const fetch = async (key) => {
   try {
     const data = await db.fetch();
-    if (data.rows._array.length === 0) {
+    // if (data.rows._array.length === 0) {
+    //   return;
+    // }
+    if (data.rows.length === 0) {
       return;
     }
-    const encryptedDatabase = data.rows._array[0].encData;
+    // const encryptedDatabase = data.rows._array[0].encData;
+    const encryptedDatabase = data.rows.item(0).encData;
     const database = decrypt(encryptedDatabase, key);
 
     return database;

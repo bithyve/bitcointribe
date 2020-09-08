@@ -405,15 +405,6 @@ export default class SecureAccount {
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);
 
-  public getReceivingAddress = (
-    derivativeAccountType?: string,
-    accountNumber?: number,
-  ) =>
-    this.secureHDWallet.getReceivingAddress(
-      derivativeAccountType,
-      accountNumber,
-    );
-
   public getBalanceTransactions = async (options?: {
     restore?;
   }): Promise<
@@ -492,42 +483,6 @@ export default class SecureAccount {
         status: 0o3,
         err: err.message,
         message: "Failed to sync derivative account's balance and transactions",
-      };
-    }
-  };
-
-  public syncViaXpubAgent = async (
-    accountType: string,
-    accountNumber: number,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          synched: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.syncViaXpubAgent(
-          accountType,
-          accountNumber,
-        ),
-      };
-    } catch (err) {
-      return {
-        status: 0o3,
-        err: err.message,
-        message: 'Failed to sync xpub via xpub agent',
       };
     }
   };
@@ -654,16 +609,8 @@ export default class SecureAccount {
     }
   };
 
-  public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
-    derivativeAccountDetails?: { type: string; number: number },
-  ) =>
-    this.secureHDWallet.calculateSendMaxFee(
-      numberOfRecipients,
-      averageTxFees,
-      derivativeAccountDetails,
-    );
+  public calculateSendMaxFee = (numberOfRecipients, averageTxFees) =>
+    this.secureHDWallet.calculateSendMaxFee(numberOfRecipients, averageTxFees);
 
   public calculateCustomFee = (
     outputUTXOs: {
@@ -671,13 +618,7 @@ export default class SecureAccount {
       value: number;
     }[],
     customTxFeePerByte: number,
-    derivativeAccountDetails?: { type: string; number: number },
-  ) =>
-    this.secureHDWallet.calculateCustomFee(
-      outputUTXOs,
-      customTxFeePerByte,
-      derivativeAccountDetails,
-    );
+  ) => this.secureHDWallet.calculateCustomFee(outputUTXOs, customTxFeePerByte);
 
   public transferST1 = async (
     recipients: {
@@ -685,7 +626,6 @@ export default class SecureAccount {
       amount: number;
     }[],
     averageTxFees?: any,
-    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -721,7 +661,6 @@ export default class SecureAccount {
       } = await this.secureHDWallet.transactionPrerequisites(
         recipients,
         averageTxFees,
-        derivativeAccountDetails,
       );
 
       let netAmount = 0;
@@ -762,7 +701,6 @@ export default class SecureAccount {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     customTxPrerequisites?: any,
-    derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
     | {
@@ -792,7 +730,6 @@ export default class SecureAccount {
         txPrerequisites,
         txnPriority.toLowerCase(),
         customTxPrerequisites,
-        derivativeAccountDetails,
         nSequence,
       );
 
@@ -866,8 +803,7 @@ export default class SecureAccount {
   public alternateTransferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
-    derivativeAccountDetails?: { type: string; number: number },
+    customFee?: number,
     nSequence?: number,
   ): Promise<
     | {
@@ -889,8 +825,7 @@ export default class SecureAccount {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
         txnPriority.toLowerCase(),
-        customTxPrerequisites,
-        derivativeAccountDetails,
+        customFee,
         nSequence,
       );
       const { inputs } = txPrerequisites[txnPriority.toLowerCase()];

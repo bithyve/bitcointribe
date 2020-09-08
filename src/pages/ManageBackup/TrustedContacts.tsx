@@ -30,20 +30,13 @@ const TrustedContacts = props => {
     props.onPressContinue(contacts, index);
   }, [contacts, props.onPressContinue]);
 
-  const onPressSkip = (value) => {
-    const data = [value];
-    props.onPressContinue(data, index);
-  };
-
   const renderContactList = useCallback(
     () => (
       <ContactList
         isTrustedContact={true}
-        isShowSkipContact={true}
         style={{}}
         onPressContinue={onPressContinue}
         onSelectContact={selectedContactsList}
-        onPressSkip={onPressSkip}
       />
     ),
     [onPressContinue, selectedContactsList],

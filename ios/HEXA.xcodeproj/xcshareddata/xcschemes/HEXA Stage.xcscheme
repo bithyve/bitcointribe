@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1020"
+   LastUpgradeVersion = "1170"
    version = "1.3">
    <BuildAction
-      parallelizeBuildables = "NO"
+      parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
       <PreActions>
          <ExecutionAction
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;echo &quot;.env.staging&quot; &gt; /tmp/envfile&#10;">
+               scriptText = "cp ${PROJECT_DIR}/../.env.staging ${PROJECT_DIR}/../.env  # replace .env.staging for your file&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
@@ -23,8 +23,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4D437D9D2440811F00A43169"
-               BuildableName = "Hexa Stage.app"
+               BlueprintIdentifier = "617379BA2506677000D4DA9C"
+               BuildableName = "HEXA Stage.app"
                BlueprintName = "HEXA Stage"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
@@ -36,15 +36,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D437D9D2440811F00A43169"
-            BuildableName = "Hexa Stage.app"
-            BlueprintName = "HEXA Stage"
-            ReferencedContainer = "container:HEXA.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
       </Testables>
    </TestAction>
@@ -58,16 +49,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D437D9D2440811F00A43169"
-            BuildableName = "Hexa Stage.app"
-            BlueprintName = "HEXA Stage"
-            ReferencedContainer = "container:HEXA.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -75,16 +56,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D437D9D2440811F00A43169"
-            BuildableName = "Hexa Stage.app"
+            BlueprintIdentifier = "617379BA2506677000D4DA9C"
+            BuildableName = "HEXA Stage.app"
             BlueprintName = "HEXA Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

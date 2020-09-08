@@ -1,4 +1,5 @@
-import * as SQLite from 'expo-sqlite';
+// import * as SQLite from 'expo-sqlite';
+var SQLite = require('react-native-sqlite-storage');
 
 const db = SQLite.openDatabase('hexa.db');
 
