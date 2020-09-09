@@ -637,7 +637,7 @@ export default function Receive(props) {
                 <Image
                   source={
                     derivativeAccountDetails
-                      ? require('../../assets/images/icons/icon_donation_account.png')
+                      ? require('../../assets/images/icons/icon_donation_hexa.png')
                       : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
@@ -883,6 +883,9 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
+            onSkipContinue={(data) =>
+              onPressContinue(data)
+            }
           />
         )}
         renderHeader={() => (

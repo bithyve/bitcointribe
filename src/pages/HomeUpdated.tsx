@@ -158,7 +158,7 @@ const getIconByAccountType = (type) => {
   } else if (type == 'test') {
     return require('../assets/images/icons/icon_test.png');
   } else if (type === 'Donation Account') {
-    return require('../assets/images/icons/icon_donation_account.png');
+    return require('../assets/images/icons/icon_donation_hexa.png');
   } else {
     return require('../assets/images/icons/icon_test.png');
   }
@@ -1974,7 +1974,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       contact.lastName ? contact.lastName : ''
                     }`.toLowerCase();
                   } else {
-                    contactName = 'No Contact Selected'.toLowerCase();
+                    contactName = `${requester}'s Wallet`.toLowerCase();
                   }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -3156,6 +3156,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
                   0,
                 );
+              }}
+              onSkipContinue={(data) => {
+                if (data && data.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: data,
+                  });
+                  (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0);
+                }
               }}
             />
           )}

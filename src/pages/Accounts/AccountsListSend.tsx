@@ -36,8 +36,15 @@ const AccountsListSend = ({
           backgroundColor: checkedItem ? Colors.lightBlue : Colors.white,
         }}
       >
-        <View style={styles.imageView}>
-          <Image style={styles.image} source={accounts.image} />
+
+        <View
+          style={styles.imageView}
+        >
+          <Image
+            style={styles.image}
+            source={accounts.image}
+            resizeMode='center'
+          />
           <Text
             style={{
               ...styles.accountName,

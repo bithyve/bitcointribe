@@ -1547,7 +1547,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
-          snapPoints={[-50, hp('70%')]}
+          snapPoints={[-50, hp('75%')]}
           renderContent={() => {
             const { donationAcc, accountNumber } = this.state
               .presentCarouselData

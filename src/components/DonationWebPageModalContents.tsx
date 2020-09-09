@@ -74,10 +74,10 @@ export default function DonationWebPageModalContents(props) {
             }}
           >
             Lorem ipsum dolor sit amet, consectetur adipiscing elit
-            </Text>
+          </Text>
         </View>
         <View style={{ ...styles.rowContainer, marginTop: 20 }}>
-          <Image style={styles.imageStyle} source={require('../assets/images/icons/icon_donation_total.png')} />
+          <Image style={styles.imageStyle} resizeMode='center' source={require('../assets/images/icons/icon_donation_total.png')} />
           <View style={styles.textContainer}>
             <Text style={styles.titleTextStyle}>Donation Total</Text>
             <Text style={{
@@ -95,7 +95,7 @@ export default function DonationWebPageModalContents(props) {
           />
         </View>
         <View style={styles.rowContainer}>
-          <Image style={styles.imageStyle} source={require('../assets/images/icons/icon_donation_transactions.png')} />
+          <Image style={styles.imageStyle} resizeMode='center' source={require('../assets/images/icons/icon_donation_transactions.png')} />
           <View style={styles.textContainer}>
             <Text style={styles.titleTextStyle}>Donation Transactions</Text>
             <Text style={{
@@ -131,7 +131,7 @@ export default function DonationWebPageModalContents(props) {
           <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard('https://hexawallet.io/donate/?donationid=' + props.account.id)}>
             <Image
               source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: 50, height: 50 }}
+              style={{ width: wp('10%'), height: wp('10%') }}
               resizeMode='center'
             />
           </TouchableOpacity>
@@ -155,7 +155,7 @@ export default function DonationWebPageModalContents(props) {
           <TouchableOpacity style={styles.copylinkContainerStyle} onPress={() => writeToClipboard(`<iframe src=${"https://hexawallet.io/donate/?donationid=" + props.account.id} width="400" height="600"></iframe>`)}>
             <Image
               source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: 50, height: 50 }}
+              style={{ width: wp('10%'), height: wp('10%') }}
               resizeMode='center'
             />
           </TouchableOpacity>
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageStyle: {
-    width: 26,
-    height: 26,
+    width: wp('12%'),
+    height: wp('12%'),
     resizeMode: 'center'
   },
   textContainer: {
@@ -244,8 +244,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   copylinkContainerStyle: {
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
     width: 50,
     height: 50,
     backgroundColor: '#E3E3E3',

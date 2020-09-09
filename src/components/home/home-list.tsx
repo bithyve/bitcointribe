@@ -77,11 +77,7 @@ const HomeList = ({
             >
               <CardView
                 cornerRadius={10}
-                style={{
-                  ...styles.card,
-                  opacity: 0.4,
-                  backgroundColor: Colors.borderColor,
-                }}
+                style={styles.card}
               >
                 <View
                   style={{
@@ -100,7 +96,7 @@ const HomeList = ({
                       fontSize: RFValue(11),
                     }}
                   >
-                    Add Account
+                    Add to my wallet
                   </Text>
                 </View>
               </CardView>
