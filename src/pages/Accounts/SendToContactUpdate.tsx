@@ -583,8 +583,24 @@ class SendToContact extends Component<
       if (
         instance.bitcoinAmount &&
         instance.selectedContact.id !== selectedContact.id
-      )
+      ) {
         recipientsList.push(instance);
+      } else if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id === selectedContact.id
+      ) {
+        if (selectedContact.id === DONATION_ACCOUNT) {
+          if (
+            instance.selectedContact.account_number ===
+              selectedContact.account_number &&
+            instance.selectedContact.type === selectedContact.type
+          ) {
+            // skip (current donation instance), get added as currentRecipientInstance
+          } else {
+            recipientsList.push(instance);
+          }
+        }
+      }
     });
     recipientsList.push(currentRecipientInstance);
     const instance =
@@ -602,10 +618,16 @@ class SendToContact extends Component<
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        if (recipientId === REGULAR_ACCOUNT || recipientId === SECURE_ACCOUNT) {
-          // recipient: sibling account
+        if (
+          recipientId === REGULAR_ACCOUNT ||
+          recipientId === SECURE_ACCOUNT ||
+          recipientId === DONATION_ACCOUNT
+        ) {
+          // recipient: account
           recipients.push({
             id: recipientId,
+            type: item.selectedContact.type, // underlying accountType (used in case of derv acc(here donation))
+            accountNumber: item.selectedContact.account_number, // donation acc number
             address: null,
             amount: parseInt(item.bitcoinAmount),
           });

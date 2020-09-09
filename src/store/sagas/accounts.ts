@@ -495,7 +495,15 @@ export const syncViaXpubAgentWatcher = createWatcher(
 );
 
 function* processRecipients(
-  recipients: [{ id: string; address: string; amount: number }],
+  recipients: [
+    {
+      id: string;
+      address: string;
+      amount: number;
+      type?: string;
+      accountNumber?: number;
+    },
+  ],
   serviceType: string,
 ) {
   const addressedRecipients = [];
@@ -512,19 +520,29 @@ function* processRecipients(
   const trustedContactsServices: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
-
   for (const recipient of recipients) {
     if (recipient.address) addressedRecipients.push(recipient);
     // recipient: explicit address
     else {
       if (!recipient.id) throw new Error('Invalid recipient');
-      if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
-        // recipient: sibling account
+      if (
+        recipient.id === REGULAR_ACCOUNT ||
+        recipient.id === SECURE_ACCOUNT ||
+        recipient.id === DONATION_ACCOUNT
+      ) {
+        // recipient: account
         const subInstance =
-          recipient.id === REGULAR_ACCOUNT
+          recipient.type === REGULAR_ACCOUNT
             ? regularAccount.hdWallet
             : secureAccount.secureHDWallet;
-        let { receivingAddress } = subInstance; // available based on serviceType
+
+        let receivingAddress;
+        if (recipient.id === DONATION_ACCOUNT) {
+          receivingAddress = subInstance.getReceivingAddress(
+            recipient.id,
+            recipient.accountNumber,
+          );
+        } else receivingAddress = subInstance.getReceivingAddress(); // available based on serviceType
         if (!receivingAddress) {
           throw new Error(
             `Failed to generate receiving address for recipient: ${recipient.id}`,

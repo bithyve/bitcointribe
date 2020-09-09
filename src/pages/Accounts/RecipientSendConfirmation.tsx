@@ -27,115 +27,119 @@ import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientSendConfirmation(props) {
   const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue);
+  const currencyToggleValue = useSelector(
+    (state) => state.preferences.currencyToggleValue,
+  );
 
   const getCorrectAmountCurrency = () => {
     const switchOn = currencyToggleValue ? true : false;
     if (!switchOn) {
-      return props.item.currencyAmount && (props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase());
+      return (
+        props.item.currencyAmount &&
+        props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()
+      );
     } else {
-      return props.item.bitcoinAmount && props.item.bitcoinAmount + (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats');
+      return (
+        props.item.bitcoinAmount &&
+        props.item.bitcoinAmount +
+          (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
+      );
     }
-  }
+  };
   const { item } = props;
   return (
     <TouchableOpacity
       // onPress={() => props.onPressElement()}
       activeOpacity={10}
     >
-      <View style={{
-        marginRight: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: wp('15%'),
-      }}>
+      <View
+        style={{
+          marginRight: 20,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: wp('15%'),
+        }}
+      >
         <View style={{ flexDirection: 'row' }}>
-          {item.selectedContact &&
-            item.selectedContact.account_name ? (
-              <Image
-                source={
-                  item.selectedContact.account_name ===
-                    'Checking Account'
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : item.selectedContact.account_name ===
-                      'Savings Account'
-                      ? require('../../assets/images/icons/icon_secureaccount.png')
-                      : item.selectedContact.account_name ===
-                        'Test Account'
-                        ? require('../../assets/images/icons/icon_test_white.png')
-                        : require('../../assets/images/icons/icon_user.png')
-                }
-                style={styles.circleShapeView}
-              />
-            ) : item.selectedContact.image ? (
-              <Image
-                source={item.selectedContact.image}
-                style={styles.circleShapeView}
-              />
-            ) : (
-                <View
+          {item.selectedContact && item.selectedContact.account_name ? (
+            <Image
+              source={
+                item.selectedContact.account_name === 'Checking Account'
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : item.selectedContact.account_name === 'Savings Account'
+                  ? require('../../assets/images/icons/icon_secureaccount.png')
+                  : item.selectedContact.account_name === 'Test Account'
+                  ? require('../../assets/images/icons/icon_test_white.png')
+                  : item.selectedContact.account_name === 'Donation Account'
+                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  : require('../../assets/images/icons/icon_user.png')
+              }
+              style={styles.circleShapeView}
+            />
+          ) : item.selectedContact.image ? (
+            <Image
+              source={item.selectedContact.image}
+              style={styles.circleShapeView}
+            />
+          ) : (
+            <View
+              style={{
+                ...styles.circleShapeView,
+                backgroundColor: Colors.shadowBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {item.selectedContact && item.selectedContact.firstName ? (
+                <Text
                   style={{
-                    ...styles.circleShapeView,
-                    backgroundColor: Colors.shadowBlue,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    textAlign: 'center',
+                    fontSize: 13,
+                    lineHeight: 13, //... One for top and one for bottom alignment
                   }}
                 >
-                  {item.selectedContact &&
-                    item.selectedContact.firstName ? (
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          fontSize: 13,
-                          lineHeight: 13, //... One for top and one for bottom alignment
-                        }}
-                      >
-                        {item && item.selectedContact
-                          ? nameToInitials(
-                            item.selectedContact.firstName &&
-                              item.selectedContact.lastName
-                              ? item.selectedContact.firstName +
+                  {item && item.selectedContact
+                    ? nameToInitials(
+                        item.selectedContact.firstName &&
+                          item.selectedContact.lastName
+                          ? item.selectedContact.firstName +
                               ' ' +
                               item.selectedContact.lastName
-                              : item.selectedContact.firstName &&
-                                !item.selectedContact.lastName
-                                ? item.selectedContact.firstName
-                                : !item.selectedContact.firstName &&
-                                  item.selectedContact.lastName
-                                  ? item.selectedContact.lastName
-                                  : '',
-                          )
-                          : ''}
-                      </Text>
-                    ) : item &&
-                      item.selectedContact &&
-                      item.selectedContact.id ? (
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: 18,
-                            lineHeight: 18, //... One for top and one for bottom alignment
-                          }}
-                        >
-                          @
-                        </Text>
-                      ) : (
-                        <Image
-                          source={require('../../assets/images/icons/icon_user.png')}
-                          style={styles.circleShapeView}
-                        />
-                      )}
-                </View>
+                          : item.selectedContact.firstName &&
+                            !item.selectedContact.lastName
+                          ? item.selectedContact.firstName
+                          : !item.selectedContact.firstName &&
+                            item.selectedContact.lastName
+                          ? item.selectedContact.lastName
+                          : '',
+                      )
+                    : ''}
+                </Text>
+              ) : item && item.selectedContact && item.selectedContact.id ? (
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 18,
+                    lineHeight: 18, //... One for top and one for bottom alignment
+                  }}
+                >
+                  @
+                </Text>
+              ) : (
+                <Image
+                  source={require('../../assets/images/icons/icon_user.png')}
+                  style={styles.circleShapeView}
+                />
               )}
+            </View>
+          )}
         </View>
         <Text style={styles.name} numberOfLines={1}>
           {item.selectedContact.name ||
             item.selectedContact.account_name ||
             item.selectedContact.id}
         </Text>
-        <Text style={styles.amountText}>
-          {getCorrectAmountCurrency()}
-        </Text>
+        <Text style={styles.amountText}>{getCorrectAmountCurrency()}</Text>
       </View>
     </TouchableOpacity>
   );
