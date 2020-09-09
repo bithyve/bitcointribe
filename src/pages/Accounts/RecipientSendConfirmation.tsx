@@ -42,7 +42,7 @@ function RecipientSendConfirmation(props) {
       return (
         props.item.bitcoinAmount &&
         props.item.bitcoinAmount +
-          (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
+        (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
       );
     }
   };
@@ -67,12 +67,12 @@ function RecipientSendConfirmation(props) {
                 item.selectedContact.account_name === 'Checking Account'
                   ? require('../../assets/images/icons/icon_regular.png')
                   : item.selectedContact.account_name === 'Savings Account'
-                  ? require('../../assets/images/icons/icon_secureaccount.png')
-                  : item.selectedContact.account_name === 'Test Account'
-                  ? require('../../assets/images/icons/icon_test_white.png')
-                  : item.selectedContact.account_name === 'Donation Account'
-                  ? require('../../assets/images/icons/icon_donation_account.png')
-                  : require('../../assets/images/icons/icon_user.png')
+                    ? require('../../assets/images/icons/icon_secureaccount.png')
+                    : item.selectedContact.account_name === 'Test Account'
+                      ? require('../../assets/images/icons/icon_test_white.png')
+                      : item.selectedContact.account_name === 'Donation Account'
+                        ? require('../../assets/images/icons/icon_donation_account.png')
+                        : require('../../assets/images/icons/icon_user.png')
               }
               style={styles.circleShapeView}
             />
@@ -82,20 +82,12 @@ function RecipientSendConfirmation(props) {
               style={styles.circleShapeView}
             />
           ) : (
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.shadowBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {item.selectedContact && item.selectedContact.firstName ? (
-                <Text
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: 13,
-                    lineHeight: 13, //... One for top and one for bottom alignment
+                    ...styles.circleShapeView,
+                    backgroundColor: Colors.shadowBlue,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   {item.selectedContact &&
@@ -146,8 +138,6 @@ function RecipientSendConfirmation(props) {
                       )}
                 </View>
               )}
-            </View>
-          )}
         </View>
         <Text style={styles.name} numberOfLines={1}>
           {item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
