@@ -47,6 +47,7 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -582,8 +583,24 @@ class SendToContact extends Component<
       if (
         instance.bitcoinAmount &&
         instance.selectedContact.id !== selectedContact.id
-      )
+      ) {
         recipientsList.push(instance);
+      } else if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id === selectedContact.id
+      ) {
+        if (selectedContact.id === DONATION_ACCOUNT) {
+          if (
+            instance.selectedContact.account_number ===
+              selectedContact.account_number &&
+            instance.selectedContact.type === selectedContact.type
+          ) {
+            // skip (current donation instance), get added as currentRecipientInstance
+          } else {
+            recipientsList.push(instance);
+          }
+        }
+      }
     });
     recipientsList.push(currentRecipientInstance);
     const instance =
@@ -601,10 +618,16 @@ class SendToContact extends Component<
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        if (recipientId === REGULAR_ACCOUNT || recipientId === SECURE_ACCOUNT) {
-          // recipient: sibling account
+        if (
+          recipientId === REGULAR_ACCOUNT ||
+          recipientId === SECURE_ACCOUNT ||
+          recipientId === DONATION_ACCOUNT
+        ) {
+          // recipient: account
           recipients.push({
             id: recipientId,
+            type: item.selectedContact.type, // underlying accountType (used in case of derv acc(here donation))
+            accountNumber: item.selectedContact.account_number, // donation acc number
             address: null,
             amount: parseInt(item.bitcoinAmount),
           });
@@ -649,10 +672,23 @@ class SendToContact extends Component<
           transfer[serviceType].transfer.details[i].selectedContact.id ==
           selectedContact.id
         ) {
-          removeTransferDetails(
-            serviceType,
-            transfer[serviceType].transfer.details[i],
-          );
+          if (selectedContact.id === DONATION_ACCOUNT) {
+            if (
+              transfer[serviceType].transfer.details[i].selectedContact
+                .account_number === selectedContact.account_number &&
+              transfer[serviceType].transfer.details[i].selectedContact.type ===
+                selectedContact.type
+            )
+              removeTransferDetails(
+                serviceType,
+                transfer[serviceType].transfer.details[i],
+              );
+          } else {
+            removeTransferDetails(
+              serviceType,
+              transfer[serviceType].transfer.details[i],
+            );
+          }
         }
       }
       addTransferDetails(serviceType, {
@@ -849,6 +885,9 @@ class SendToContact extends Component<
                               : item.selectedContact.account_name ===
                                 'Test Account'
                               ? require('../../assets/images/icons/icon_test_white.png')
+                              : item.selectedContact.account_name ===
+                                'Donation Account'
+                              ? require('../../assets/images/icons/icon_donation_account.png')
                               : require('../../assets/images/icons/icon_user.png')
                           }
                           style={styles.circleShapeView}
@@ -1273,10 +1312,24 @@ class SendToContact extends Component<
                           transfer[serviceType].transfer.details[i]
                             .selectedContact.id == selectedContact.id
                         ) {
-                          removeTransferDetails(
-                            serviceType,
-                            transfer[serviceType].transfer.details[i],
-                          );
+                          if (selectedContact.id === DONATION_ACCOUNT) {
+                            if (
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.account_number ===
+                                selectedContact.account_number &&
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.type === selectedContact.type
+                            )
+                              removeTransferDetails(
+                                serviceType,
+                                transfer[serviceType].transfer.details[i],
+                              );
+                          } else {
+                            removeTransferDetails(
+                              serviceType,
+                              transfer[serviceType].transfer.details[i],
+                            );
+                          }
                         }
                       }
                       addTransferDetails(serviceType, {
