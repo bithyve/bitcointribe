@@ -189,15 +189,15 @@ class AddNewAccount extends PureComponent<
               >
                 Enter details for Donation Account
               </Text>
-              {/* <Text
+              <Text
                 style={{
                   ...styles.modalInfoText,
                   marginTop: wp('1.5%'),
                   color: Colors.lightTextColor,
                 }}
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-              </Text> */}
+                Some of these details can be displayed on the Donation web-view
+              </Text>
             </View>
             <View style={styles.modalTextBoxView}>
               <TextInput
