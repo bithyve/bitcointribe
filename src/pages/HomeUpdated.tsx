@@ -1646,6 +1646,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // donation transactions
     const donationTxs = [];
+    let donationsBalance = 0;
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
         accounts[serviceType].service[
@@ -1661,12 +1662,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       ) {
         const donAcc: DonationDerivativeAccountElements =
           derivativeAccounts[DONATION_ACCOUNT][index];
-
+        donationsBalance +=
+          donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
         donationTxs.push(...donAcc.transactions.transactionDetails);
       }
     }
 
-    const accumulativeBalance = regularBalance + secureBalance;
+    const accumulativeBalance =
+      regularBalance + secureBalance + donationsBalance;
 
     const accumulativeTransactions = [
       ...testTransactions,
