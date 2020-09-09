@@ -528,7 +528,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       transfer[serviceType].transfer.details.length &&
         transfer[serviceType].transfer.details.map((contact) => {
           if (contact.selectedContact.id === item.id) {
-            return (isNavigate = false);
+            if (item.id === DONATION_ACCOUNT) {
+              if (
+                item.account_number ===
+                  contact.selectedContact.account_number &&
+                item.type === contact.selectedContact.type
+              )
+                return (isNavigate = false);
+            } else {
+              return (isNavigate = false);
+            }
           }
         });
       if (isNavigate) {
@@ -939,7 +948,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                 transfer[serviceType].transfer.details[i]
                                   .selectedContact;
                               if (element.id == Items.item.id) {
-                                checked = true;
+                                if (element.id === DONATION_ACCOUNT) {
+                                  if (
+                                    element.account_number ===
+                                      Items.item.account_number &&
+                                    element.type === Items.item.type
+                                  )
+                                    checked = true;
+                                } else {
+                                  checked = true;
+                                }
                               }
                             }
 
