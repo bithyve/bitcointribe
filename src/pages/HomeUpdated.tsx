@@ -1662,9 +1662,15 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       ) {
         const donAcc: DonationDerivativeAccountElements =
           derivativeAccounts[DONATION_ACCOUNT][index];
-        donationsBalance +=
-          donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
-        donationTxs.push(...donAcc.transactions.transactionDetails);
+
+        if (donAcc.balances)
+          donationsBalance +=
+            donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+        if (
+          donAcc.transactions &&
+          donAcc.transactions.transactionDetails.length
+        )
+          donationTxs.push(...donAcc.transactions.transactionDetails);
       }
     }
 
@@ -3162,7 +3168,8 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   navigation.navigate('AddContactSendRequest', {
                     SelectedContact: data,
                   });
-                  (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0);
+                  (this.refs
+                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
                 }
               }}
             />

@@ -36,14 +36,11 @@ const AccountsListSend = ({
           backgroundColor: checkedItem ? Colors.lightBlue : Colors.white,
         }}
       >
-
-        <View
-          style={styles.imageView}
-        >
+        <View style={styles.imageView}>
           <Image
             style={styles.image}
             source={accounts.image}
-            resizeMode='center'
+            resizeMode="center"
           />
           <Text
             style={{
@@ -63,7 +60,7 @@ const AccountsListSend = ({
               ? '$' + UsNumberFormat(balances.regularBalance)
               : accounts.id === SECURE_ACCOUNT
               ? '$' + UsNumberFormat(balances.secureBalance)
-              : accounts.id === DONATION_ACCOUNT
+              : accounts.id === DONATION_ACCOUNT && balances.donationsBalance
               ? '$' +
                 UsNumberFormat(
                   balances.donationsBalance[
