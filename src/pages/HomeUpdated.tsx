@@ -158,7 +158,7 @@ const getIconByAccountType = (type) => {
   } else if (type == 'test') {
     return require('../assets/images/icons/icon_test.png');
   } else if (type === 'Donation Account') {
-    return require('../assets/images/icons/icon_donation_account.png');
+    return require('../assets/images/icons/icon_donation_hexa.png');
   } else {
     return require('../assets/images/icons/icon_test.png');
   }
