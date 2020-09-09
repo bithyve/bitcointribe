@@ -41,6 +41,7 @@ const AccountsListSend = ({ balances, accounts, onSelectContact, checkedItem }) 
           <Image
             style={styles.image}
             source={accounts.image}
+            resizeMode='center'
           />
           <Text
             style={{
