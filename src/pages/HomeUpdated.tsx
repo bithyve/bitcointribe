@@ -1644,12 +1644,35 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
+    // donation transactions
+    const donationTxs = [];
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+
+        donationTxs.push(...donAcc.transactions.transactionDetails);
+      }
+    }
+
     const accumulativeBalance = regularBalance + secureBalance;
 
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
+      ...donationTxs,
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
