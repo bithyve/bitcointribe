@@ -1,11 +1,5 @@
 import React, { memo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Fonts from './../../common/Fonts';
@@ -18,9 +12,16 @@ import CardView from 'react-native-cardview';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {
   REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 
-const AccountsListSend = ({ balances, accounts, onSelectContact, checkedItem }) => {
+const AccountsListSend = ({
+  balances,
+  accounts,
+  onSelectContact,
+  checkedItem,
+}) => {
   // console.log("Items,", accounts);
   return (
     <TouchableOpacity
@@ -35,13 +36,8 @@ const AccountsListSend = ({ balances, accounts, onSelectContact, checkedItem }) 
           backgroundColor: checkedItem ? Colors.lightBlue : Colors.white,
         }}
       >
-        <View
-          style={styles.imageView}
-        >
-          <Image
-            style={styles.image}
-            source={accounts.image}
-          />
+        <View style={styles.imageView}>
+          <Image style={styles.image} source={accounts.image} />
           <Text
             style={{
               ...styles.accountName,
@@ -54,12 +50,20 @@ const AccountsListSend = ({ balances, accounts, onSelectContact, checkedItem }) 
             style={{
               ...styles.accountBalance,
               color: checkedItem ? Colors.white : Colors.borderColor,
-
             }}
           >
-            {accounts.type === REGULAR_ACCOUNT
+            {accounts.id === REGULAR_ACCOUNT
               ? '$' + UsNumberFormat(balances.regularBalance)
-              : '$' + UsNumberFormat(balances.secureBalance)}
+              : accounts.id === SECURE_ACCOUNT
+              ? '$' + UsNumberFormat(balances.secureBalance)
+              : accounts.id === DONATION_ACCOUNT
+              ? '$' +
+                UsNumberFormat(
+                  balances.donationsBalance[
+                    accounts.type + accounts.account_number
+                  ],
+                )
+              : 0}
           </Text>
           <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
             <TouchableOpacity
@@ -140,7 +144,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
 });
 
 export default memo(AccountsListSend);
