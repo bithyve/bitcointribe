@@ -73,10 +73,10 @@ export default function DonationWebPageModalContents(props) {
               color: Colors.lightTextColor,
             }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit
+            Settings for the Donation web view
           </Text>
         </View>
-        <View style={{ ...styles.rowContainer, marginTop: 20 }}>
+        <View style={{ ...styles.rowContainer, marginTop: 10 }}>
           <Image style={styles.imageStyle} resizeMode='center' source={require('../assets/images/icons/icon_donation_total.png')} />
           <View style={styles.textContainer}>
             <Text style={styles.titleTextStyle}>Donation Total</Text>
@@ -84,7 +84,7 @@ export default function DonationWebPageModalContents(props) {
               ...styles.modalInfoText,
               marginTop: wp('1.2%'),
               color: Colors.lightTextColor,
-            }}>Lorem ipsum dolor sit amet</Text>
+            }}>Show the total funds received for the donation</Text>
           </View>
           <ToggleSwitch
             isNotImage={true}
@@ -102,7 +102,7 @@ export default function DonationWebPageModalContents(props) {
               ...styles.modalInfoText,
               marginTop: wp('1.2%'),
               color: Colors.lightTextColor,
-            }}>Lorem ipsum dolor sit amet</Text>
+            }}>Show the transactions set to the donation account</Text>
           </View>
           <ToggleSwitch
             isNotImage={true}
