@@ -10,8 +10,9 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
-  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN
-
+  UPDATE_APPLICATION_STATUS, 
+  UPDATE_LAST_SEEN,
+  CLOUD_BACKUP_DATA_STATUS
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import ip, { chain } from 'icepick';
@@ -32,7 +33,8 @@ const initialState = ip.freeze({
   isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,
-  lastSeen: null
+  lastSeen: null,
+  cloudBackupStatus: false
 })
 
 export default (state = initialState, { type, payload }) => {
@@ -105,6 +107,12 @@ export default (state = initialState, { type, payload }) => {
 
     case UPDATE_LAST_SEEN:
       return Object.assign({}, state, { lastSeen: new Date() })
+
+      case CLOUD_BACKUP_DATA_STATUS:
+      return {
+        ...state,
+        cloudBackupStatus: payload.status,
+      };
 
     default:
       return state

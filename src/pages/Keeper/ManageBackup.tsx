@@ -34,11 +34,16 @@ import {
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
+import { setCloudBackupStatus } from '../../store/actions/preferences';
 import idx from 'idx';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import SetupPrimaryKeeper from './SetupPrimaryKeeper';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import { CloudData } from '../../common/CommonFunctions';
+import { GoogleDriveLogin } from '../../common/CommonFunctions/GoogleDriveBackup';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -49,6 +54,12 @@ interface ManageBackupStateTypes {
 
 interface ManageBackupPropsTypes {
   navigation: any;
+  setCloudBackupStatus: any;
+  cloudBackupStatus: any;
+  walletName: string;
+  regularAccount: RegularAccount;
+  database: any;
+
 }
 
 class ManageBackup extends Component<
@@ -181,6 +192,33 @@ class ManageBackup extends Component<
       ? 'never'
       : timeFormatter(moment(new Date()), item);
   };
+
+  GoogleDriveLogin = async () => {
+    const { walletName, regularAccount } = this.props;
+    let encryptedCloudDataJson;
+    // var ICloudBackup = NativeModules.ICloudBackup;
+    // ICloudBackup.initBackup();
+    // console.log('CalendarManager', ICloudBackup)
+      encryptedCloudDataJson = await CloudData(this.props.database);
+      console.log('encryptedDatabase', encryptedCloudDataJson);
+    if (Platform.OS == 'ios') {
+      /**TODO iOS Login check and checkIfFileExist()*/
+      console.log('call for icloud upload');
+    } else {
+      let data = {
+        encryptedCloudDataJson : encryptedCloudDataJson,
+        walletName: walletName,
+        regularAccount: regularAccount,
+      }
+    GoogleDriveLogin(data, this.setCloudBackupStatus);
+        console.log('call for google drive upload', this.props.cloudBackupStatus);
+    }
+  };
+
+  setCloudBackupStatus = () => {
+    this.props.setCloudBackupStatus({status: true});
+    console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
+  }
 
   render() {
     const { levelData, selectedId, isLevel2, securityAtLevel } = this.state;
@@ -409,7 +447,12 @@ class ManageBackup extends Component<
                           <View
                             style={{ flexDirection: 'row', marginTop: 'auto' }}
                           >
-                            <TouchableOpacity style={styles.appBackupButton}>
+                            <TouchableOpacity style={styles.appBackupButton}
+                            onPress={()=>{
+                              if(!this.props.cloudBackupStatus){
+                                this.GoogleDriveLogin();
+                              }
+                            }}>
                               <Image
                                 source={require('../../assets/images/icons/reset.png')}
                                 style={styles.resetImage}
@@ -721,12 +764,16 @@ const mapStateToProps = (state) => {
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
+    cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    database: idx(state, (_) => _.storage.database) || {},
   };
 };
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
+    setCloudBackupStatus,
   })(ManageBackup),
 );
 

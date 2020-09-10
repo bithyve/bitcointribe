@@ -1,4 +1,6 @@
 import { NativeModules } from "react-native";
+import SSS from "../../bitcoin/utilities/sss/SSS";
+import { decrypt, encrypt } from "../encryption";
 
 export const nameToInitials = fullName => {
   const namesArray = fullName.split(' ');
@@ -48,6 +50,36 @@ export const APP_LIST = {
   "WhatsApp": {pkgName: "com.whatsapp", urlScheme: "whatsapp", urlParams: "app"}, // fa
   "Telegram": {pkgName: "org.telegram.messenger", urlScheme: "telegram-messenger", urlParams: "share/url?url="}, // fa
   "Messenger": {pkgName: "com.facebook.orca", urlScheme: "fb-messenger", urlParams: "user-thread/{user-id}"}, // fa: facebook
+}
+
+export const CloudData = async (database) => {
+  let encryptedCloudDataJson;
+    // var ICloudBackup = NativeModules.ICloudBackup;
+    // ICloudBackup.initBackup();
+    // console.log('CalendarManager', ICloudBackup)
+    let walletImage = {
+      SERVICES: {},
+      DECENTRALIZED_BACKUP: {},
+      WALLET_SETUP: {},
+    };
+    let CloudDataJson = {};
+    if (!isEmpty(database)) {
+      if (database.SERVICES)
+        walletImage.SERVICES = database.SERVICES;
+      if (database.DECENTRALIZED_BACKUP)
+        walletImage.DECENTRALIZED_BACKUP = database.DECENTRALIZED_BACKUP;
+      if (database.WALLET_SETUP)
+        walletImage.WALLET_SETUP = database.WALLET_SETUP;
+      let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
+      CloudDataJson = {
+        walletImage,
+        keeperInfo: [],
+      };
+      encryptedCloudDataJson = await encrypt(CloudDataJson, key);
+      // console.log('encryptedDatabase', encryptedCloudDataJson);
+      const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
+      return encryptedCloudDataJson;
+}
 }
 
 export const getCurrencyImageByRegion = (currencyCode, type) => {

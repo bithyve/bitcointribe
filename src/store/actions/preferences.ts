@@ -20,6 +20,7 @@ export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED';
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS';
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
 
+export const CLOUD_BACKUP_DATA_STATUS = 'CLOUD_BACKUP_DATA_STATUS';
 
 export const setCurrencyCode = (data) => {
   return {
@@ -152,5 +153,12 @@ export const updateLastSeen = (data) => {
   return {
     type: UPDATE_LAST_SEEN,
     payload: { lastSeen: data },
+  };
+};
+
+export const setCloudBackupStatus = (data) => {
+  return {
+    type: CLOUD_BACKUP_DATA_STATUS,
+    payload: { status: data },
   };
 };

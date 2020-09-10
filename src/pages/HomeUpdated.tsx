@@ -68,9 +68,10 @@ import { storeFbtcData } from '../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
+  setCloudBackupStatus
 } from '../store/actions/preferences';
 import { UsNumberFormat } from '../common/utilities';
-import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
+import { getCurrencyImageByRegion, CloudData } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
@@ -116,6 +117,8 @@ import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 import SSS from '../bitcoin/utilities/sss/SSS';
 import { encrypt, decrypt } from '../common/encryption';
 import WalletName from './RestoreHexaWithKeeper/WalletName';
+import SettingsContents from './SettingsContents';
+import { GoogleDriveLogin } from '../common/CommonFunctions/GoogleDriveBackup';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -321,6 +324,8 @@ interface HomePropsTypes {
   updateLastSeen: any;
   database: any;
   regularAccount: RegularAccount;
+  setCloudBackupStatus : any;
+  cloudBackupStatus: any;
 }
 const GoogleDrive = NativeModules.GoogleDrive;
 
@@ -899,164 +904,6 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
      // console.log(err);
     }
     return null;
-  };
-
-  GoogleDriveLogin = () => {
-    const { googleLoginStatus } = this.state;
-    // if(!googleLoginStatus){
-    GoogleDrive.setup()
-      .then(() => {
-        GoogleDrive.login((err, data) => {
-          this.handleLogin(err, data);
-        });
-      })
-      .catch((err) => {
-       // console.log('GOOGLE SetupFail', err);
-      });
-    //  }
-  };
-
-  handleLogin = async (e, data) => {
-    const result = e || data;
-   // console.log('GOOGLE ReSULT', data);
-   // console.log('Error', e);
-    if (result.eventName == 'onLogin') {
-      this.setState({ googleLoginStatus: true });
-      if (!(await this.checkPermission())) {
-        throw new Error('Storage Permission Denied');
-      }
-      //this.createFile();
-      this.checkFileIsAvailable();
-    }
-
-    if (result.eventName && this.props.hasOwnProperty(result.eventName)) {
-      const event = result.eventName;
-      delete result.eventName;
-      this.props[event](result);
-    }
-  };
-
-  checkFileIsAvailable = async () => {
-    /**
-     * TODO: Check if file exist if not then create new file having name HexaBackupLatest.db
-     * If file exist then call readFile
-     */
-    const metaData = {
-      name: 'HexaBackupLatest.db',
-      description: 'Backup data for my app',
-      mimeType: 'application/json',
-    };
-    await GoogleDrive.checkIfFileExist(
-      JSON.stringify(metaData),
-      (err, data) => {
-       // console.log('err, data', data, err);
-        const result = err || data;
-       // console.log('checkFileIsAvailable', result);
-        if (result.eventName == 'listEmpty') {
-          this.createFile();
-        } else {
-          this.readFile(result);
-        }
-      },
-    );
-  };
-
-  createFile = () => {
-    const { encryptedCloudDataJson } = this.state;
-    const { walletName, regularAccount } = this.props;
-    let WalletData = [];
-    const { data } = regularAccount.getWalletId();
-    let tempData = {
-      walletName: walletName,
-      walletId: data.walletId,
-      data: encryptedCloudDataJson,
-      dateTime: new Date(),
-    };
-    WalletData.push(tempData);
-
-    const metaData = {
-      name: 'HexaBackupLatest.db',
-      description: 'Backup data for my app',
-      mimeType: 'application/json',
-      data: JSON.stringify(WalletData),
-    };
-
-    try {
-      GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-       // console.log('DATA', data);
-       // console.log('ERROR', err);
-      });
-      // uploadFile(JSON.stringify(content))
-    } catch (error) {
-      //console.log('error', error);
-    }
-  };
-
-  UpdateFile = (metaData) => {
-    try {
-      GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
-       // console.log('DATA updateFile', data);
-       // console.log('ERROR updateFile', err);
-        const result = err || data;
-       // console.log('GoogleDrive.updateFile', result);
-      });
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  readFile = (result) => {
-    /**
-     * TODO : iOS
-     * If file is exist then read that file and check our wallet id is presend or not
-     * if id present then add new data to exitsing object
-     * if id not present then Add new object to existing Array call method UpdateFile()
-     */
-    const { encryptedCloudDataJson } = this.state;
-    const metaData = {
-      id: result.id,
-    };
-    try {
-      GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
-        const { walletName, regularAccount } = this.props;
-        const { data } = this.props.regularAccount.getWalletId();
-        const result1 = err || data1;
-        var arr = [];
-        var newArray = [];
-        if (result1.data) {
-          arr = JSON.parse(result1.data);
-          for (var i = 0; i < arr.length; i++) {
-            newArray.push(arr[i]);
-          }
-          var index = newArray.findIndex((x) => x.walletId == data.walletId);
-          //console.log('sdgsdg', index);
-          if (index === -1) {
-            let tempData = {
-              walletName: walletName,
-              walletId: data.walletId,
-              data: encryptedCloudDataJson,
-              dateTime: moment(new Date()),
-            };
-            newArray.push(tempData);
-          } else {
-            newArray[index].data = encryptedCloudDataJson;
-            newArray[index].dateTime = moment(new Date());
-          }
-          
-          //console.log('ARR', newArray);
-
-          const metaData = {
-            name: result.name,
-            mimeType: result.mimeType,
-            data: JSON.stringify(newArray),
-            id: result.id,
-          };
-          this.UpdateFile(metaData);
-        }
-      });
-    } catch (error) {
-      //console.log('error', error);
-    }
   };
 
   getNewTransactionNotifications = async () => {
@@ -1941,6 +1788,24 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // }
   };
 
+  onPressSettingsElements = async (type, currencycode) => {
+    const { navigation, currencyCode } = this.props;
+    if (type == 'ManagePin') {
+      return navigation.navigate('SettingManagePin', {
+        managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
+      });
+    } else if (type == 'ChangeCurrency') {
+      let currency = currencyCode;
+      //await AsyncStorage.getItem('currencyCode');
+      navigation.navigate('ChangeCurrency');
+      this.setState({
+        currencyCode: currency,
+      });
+    } else if (type == 'ChangeWalletName') {
+      navigation.navigate('SettingWalletNameChange');
+    }
+  };
+
   managePinSuccessProceed = (pin) => {
     this.setState(
       {
@@ -2371,43 +2236,32 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = async () => {
+    const { walletName, regularAccount } = this.props;
+    let encryptedCloudDataJson;
     // var ICloudBackup = NativeModules.ICloudBackup;
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
-    let walletImage = {
-      SERVICES: {},
-      DECENTRALIZED_BACKUP: {},
-      WALLET_SETUP: {},
-    };
-    let CloudDataJson = {};
-    if (!isEmpty(this.props.database)) {
-      if (this.props.database.SERVICES)
-        walletImage.SERVICES = this.props.database.SERVICES;
-      if (this.props.database.DECENTRALIZED_BACKUP)
-        walletImage.DECENTRALIZED_BACKUP = this.props.database.DECENTRALIZED_BACKUP;
-      if (this.props.database.WALLET_SETUP)
-        walletImage.WALLET_SETUP = this.props.database.WALLET_SETUP;
-      let key = SSS.strechKey(this.props.database.WALLET_SETUP.security.answer);
-      CloudDataJson = {
-        walletImage,
-        keeperInfo: [],
-      };
-      const encryptedCloudDataJson = await encrypt(CloudDataJson, key);
-      // console.log('encryptedDatabase', encryptedCloudDataJson);
-      const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
-      //console.log('decryptedDatabase', decryptedCloudDataJson);
-      //console.log("WALLETID", this.props.regularAccount);
-
+      encryptedCloudDataJson = await CloudData(this.props.database);
+      console.log('encryptedDatabase', encryptedCloudDataJson);
       this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-    }
     if (Platform.OS == 'ios') {
       /**TODO iOS Login check and checkIfFileExist()*/
       console.log('call for icloud upload');
     } else {
-      this.GoogleDriveLogin();
-      console.log('call for google drive upload');
+      let data = {
+        encryptedCloudDataJson : encryptedCloudDataJson,
+        walletName: walletName,
+        regularAccount: regularAccount,
+      }
+    GoogleDriveLogin(data, this.setCloudBackupStatus);
+        console.log('call for google drive upload', this.props.cloudBackupStatus);
     }
   };
+
+  setCloudBackupStatus = () => {
+    this.props.setCloudBackupStatus({status: true});
+    console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
+  }
 
   onPressElement = (item) => {
     const { navigation } = this.props;
@@ -3528,6 +3382,7 @@ const mapStateToProps = (state) => {
     ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
     database: idx(state, (_) => _.storage.database) || {},
+    cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
   };
 };
 
@@ -3553,6 +3408,7 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
+    setCloudBackupStatus,
   })(HomeUpdated),
 );
 
