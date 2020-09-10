@@ -18,6 +18,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 
 const ContactsListForAssociateContact = (props) => {
+  const data = {
+    firstName: 'F&F request',
+    lastName: 'awaiting',
+    name: 'F&F request awaiting'
+  };
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');
   const isGuardian = props.navigation.getParam('isGuardian');
@@ -136,9 +141,14 @@ const ContactsListForAssociateContact = (props) => {
       </Text>
       <ContactList
         isTrustedContact={true}
+        isShowSkipContact={true}
         style={{}}
         onPressContinue={updateTrustedContactsInfo}
         onSelectContact={selectedContactsList}
+        onPressSkip={() => {
+          selectedContactsList([data]);
+          updateTrustedContactsInfo();
+        }}
       />
     </View>
   );

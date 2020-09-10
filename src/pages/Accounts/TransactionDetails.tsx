@@ -36,7 +36,6 @@ export default function TransactionDetails(props) {
   if (!txDetails) {
     return null;
   }
-  const getServiceType = props.getServiceType ? props.getServiceType : null;
   const serviceType = props.serviceType ? props.serviceType : null;
   const [description, setDescription] = useState('');
 
@@ -93,8 +92,8 @@ export default function TransactionDetails(props) {
               accountType == 'Savings Account'
                 ? require('../../assets/images/icons/icon_secureaccount.png')
                 : accountType == 'Test Account'
-                ? require('../../assets/images/icons/icon_test.png')
-                : require('../../assets/images/icons/icon_regular.png')
+                  ? require('../../assets/images/icons/icon_test.png')
+                  : require('../../assets/images/icons/icon_regular.png')
             }
             style={{ width: wp('12%'), height: wp('12%') }}
           />
@@ -368,7 +367,7 @@ export default function TransactionDetails(props) {
             onPress={() =>
               openLink(
                 `https://blockstream.info${
-                  txDetails.accountType === 'Test Account' ? '/testnet' : ''
+                txDetails.accountType === 'Test Account' ? '/testnet' : ''
                 }/tx/${txDetails.txid}`,
               )
             }
@@ -407,11 +406,11 @@ export default function TransactionDetails(props) {
               ? txDetails.confirmations < 6
                 ? txDetails.confirmations
                 : txDetails.confirmations === '-' // for testnet faucet tx
-                ? txDetails.confirmations
-                : '6+'
+                  ? txDetails.confirmations
+                  : '6+'
               : txDetails.confirmations < 6
-              ? txDetails.confirmations
-              : '6+'}
+                ? txDetails.confirmations
+                : '6+'}
           </Text>
         </View>
       </View>

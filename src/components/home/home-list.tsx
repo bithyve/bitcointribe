@@ -72,14 +72,12 @@ const HomeList = ({
       {Items.item.map((value) => {
         if (value.accountType === 'add') {
           return (
-            <TouchableOpacity disabled={true}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('AddNewAccount')}
+            >
               <CardView
                 cornerRadius={10}
-                style={{
-                  ...styles.card,
-                  opacity: 0.4,
-                  backgroundColor: Colors.borderColor,
-                }}
+                style={styles.card}
               >
                 <View
                   style={{
@@ -98,7 +96,7 @@ const HomeList = ({
                       fontSize: RFValue(11),
                     }}
                   >
-                    Add Account
+                    Add to my wallet
                   </Text>
                 </View>
               </CardView>
@@ -128,7 +126,11 @@ const HomeList = ({
                 <View style={{ flexDirection: 'row' }}>
                   <Image
                     style={{ width: wp('10%'), height: wp('10%') }}
-                    source={getIconByAccountType(value.accountType)}
+                    source={getIconByAccountType(
+                      value.title === 'Donation Account'
+                        ? value.title
+                        : value.accountType,
+                    )}
                   />
                   {value.accountType == 'secure' ? (
                     <TouchableOpacity
@@ -216,11 +218,18 @@ const HomeList = ({
                         }
                       >
                         {switchOn
-                          ? value.accountType === 'test'
+                          ? value.title === 'Donation Account'
+                            ? UsNumberFormat(value.amount)
+                            : value.accountType === 'test'
                             ? UsNumberFormat(balances.testBalance)
                             : value.accountType === 'regular'
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)
+                          : value.title === 'Donation Account' && exchangeRates
+                          ? (
+                              (value.amount / 1e8) *
+                              exchangeRates[CurrencyCode].last
+                            ).toFixed(2)
                           : value.accountType === 'test'
                           ? UsNumberFormat(balances.testBalance)
                           : value.accountType === 'regular' && exchangeRates
@@ -233,7 +242,7 @@ const HomeList = ({
                               (balances.secureBalance / 1e8) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2)
-                          : 0}
+                          : value.amount}
                       </Text>
                       <Text style={styles.cardAmountUnitText}>
                         {switchOn

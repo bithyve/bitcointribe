@@ -1,11 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  Linking,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -16,19 +14,8 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function CheckingAccountHelpContents(props) {
-  const scrollViewRef = useRef();
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
+export default function DonationAccountHelpContents(props) {
 
   return (
     <View style={styles.modalContainer}>
@@ -40,12 +27,11 @@ export default function CheckingAccountHelpContents(props) {
         <Text
           style={styles.headerText}
         >
-          Checking Account
+          Donation Account
         </Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
-        ref={scrollViewRef}
         style={{
           flex: 1,
           backgroundColor: Colors.blue,
@@ -60,14 +46,15 @@ export default function CheckingAccountHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            The Checking Account is designed as an account that you plan to
-            use in the short term. Funds in the Checking Account can be
-            spent immediately without 2FA confirmation, and carries lower
-            fees compared to the Savings Account
+            A Donation Account lets you collect donation for a cause or a charity. 
+            All the funds collected will show in this account 
+            It provides you with the tools you need to start collecting donations from 
+            across the world in a permission less way without incurring any middleman cost. 
+            Simply copy the link anywhere and start collecting donations
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
-              source={require('../../assets/images/icons/checking_account_info_1.png')}
+              source={require('../../assets/images/icons/donation_account_info.png')}
               style={styles.helperImage}
             />
           </View>
@@ -77,17 +64,10 @@ export default function CheckingAccountHelpContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Since the Checking Account does not require 2FA confirmation
-            for spending, a person using your phone and knowing your
-            passcode will be able to spend your bitcoin. Hence, for
-            storing more funds or for spending infrequently, please store
-            your bitcoin in the Savings Account
+            It provides you with the tools you need to start collecting donations from across the world 
+            in a permission less way without incurring any middleman cost. Simply copy the link anywhere 
+            and start collecting donations
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollToEnd({ animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
@@ -98,50 +78,6 @@ export default function CheckingAccountHelpContents(props) {
                 ...styles.separatorView,
               }}
             />
-          </View>
-        </View>
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp('5%'),
-            }}
-          >
-            The Checking Account is a single signature account as compared
-            to the multi signature Savings Account, and does not require
-            2FA confirmation for spending. This smaller requirement
-            results in a lesser fee compared to the Savings Account
-          </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <Image
-              source={require('../../assets/images/icons/test_account_info_2.png')}
-              style={styles.helperImage}
-            />
-          </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
-              Use this account to store small amounts for daily use
-          </Text>
-            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
-              <Text
-                style={styles.toKnowMoreText}
-              >
-                To read more,
-            </Text>
-              <AppBottomSheetTouchableWrapper
-                style={{ marginLeft: 5 }}
-                onPress={() =>
-                  openLink(
-                    'https://en.bitcoin.it/wiki/Techniques_to_reduce_transaction_fees',
-                  )
-                }
-              >
-                <Text
-                  style={styles.clickHereText}>
-                  click here
-              </Text>
-              </AppBottomSheetTouchableWrapper>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -201,7 +137,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('80%'),
+    height: hp('89%'),
     justifyContent: 'space-between',
   },
   separatorView: {

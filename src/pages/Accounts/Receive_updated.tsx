@@ -97,6 +97,14 @@ export default function Receive(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+
+  const derivativeAccountDetails =
+    props.navigation.state.params.derivativeAccountDetails;
+
+  const carouselIndex = props.navigation.state.params.carouselIndex
+    ? props.navigation.state.params.carouselIndex
+    : null;
+
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
@@ -139,10 +147,11 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -379,10 +388,11 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
@@ -544,7 +554,7 @@ export default function Receive(props) {
 
   const onPressBack = () => {
     if (getServiceType) {
-      getServiceType(serviceType);
+      getServiceType(serviceType, carouselIndex);
     }
     props.navigation.goBack();
   };
@@ -626,7 +636,9 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    serviceType == TEST_ACCOUNT
+                    derivativeAccountDetails
+                      ? require('../../assets/images/icons/icon_donation_hexa.png')
+                      : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
                       ? require('../../assets/images/icons/icon_regular.png')
@@ -643,7 +655,9 @@ export default function Receive(props) {
                       fontSize: RFValue(12),
                     }}
                   >
-                    {serviceType == TEST_ACCOUNT
+                    {derivativeAccountDetails
+                      ? 'Donation Account'
+                      : serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
                       ? 'Checking Account'
@@ -869,6 +883,9 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
+            onSkipContinue={(data) =>
+              onPressContinue(data)
+            }
           />
         )}
         renderHeader={() => (

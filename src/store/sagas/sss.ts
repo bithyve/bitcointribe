@@ -195,7 +195,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-        payload.contactInfo.contactName
+          payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -215,8 +215,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-          .UPLOADED_AT <
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+            .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -311,6 +311,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       );
     } else {
       // adding transfer details to he ephemeral data
+
       const data: EphemeralDataElements = {
         ...payload.data,
         shareTransferDetails: {
@@ -756,15 +757,16 @@ function* sharePersonalCopyWorker({ payload }) {
             Mailer.mail,
             {
               subject: selectedPersonalCopy.title,
-              body: `<b>Please find attached the personal copy ${
-                selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-                } share pdf, it is password protected by the answer to the security question.</b>`,
+              body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
+              // body: `<b>Please find the attached personal copy ${
+              //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+              //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
               isHTML: true,
               attachment: {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                    personalCopyDetails[selectedPersonalCopy.type].path
+                      personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -784,13 +786,14 @@ function* sharePersonalCopyWorker({ payload }) {
         } else {
           let shareOptions = {
             title: selectedPersonalCopy.title,
-            message: `Please find attached the personal copy ${
-              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-              } share pdf, it is password protected by the answer to the security question.`,
+            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
+            // message: `Please find the attached personal copy ${
+            //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                personalCopyDetails[selectedPersonalCopy.type].path
+                  personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -800,8 +803,8 @@ function* sharePersonalCopyWorker({ payload }) {
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {
-            let errorMessage = idx(err, _ => _.message)
-            if (errorMessage !== "User did not share") {
+            let errorMessage = idx(err, (_) => _.message);
+            if (errorMessage !== 'User did not share') {
               throw new Error(`Share failed: ${err}`);
             }
           }
@@ -854,9 +857,10 @@ function* sharePersonalCopyWorker({ payload }) {
       case 'Other':
         let shareOptions = {
           title: selectedPersonalCopy.title,
-          message: `Please find attached the personal copy ${
-            selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-            } share pdf, it is password protected by the answer to the security question.`,
+          message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
+          // message: `Please find the attached personal copy ${
+          //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+          //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
           url:
             Platform.OS == 'android'
               ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
@@ -869,8 +873,8 @@ function* sharePersonalCopyWorker({ payload }) {
         try {
           yield call(Share.open, shareOptions);
         } catch (err) {
-          let errorMessage = idx(err, _ => _.message)
-          if (errorMessage !== "User did not share") {
+          let errorMessage = idx(err, (_) => _.message);
+          if (errorMessage !== 'User did not share') {
             throw new Error(`Share failed: ${err}`);
           }
         }
