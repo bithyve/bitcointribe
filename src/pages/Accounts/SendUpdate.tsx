@@ -327,8 +327,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       ) {
         const donAcc: DonationDerivativeAccountElements =
           derivativeAccounts[DONATION_ACCOUNT][index];
-        donationsBalance[serviceType + index] =
-          donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+        donationsBalance[serviceType + index] = donAcc.balances
+          ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
+          : 0;
       }
     }
 
