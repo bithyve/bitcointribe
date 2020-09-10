@@ -185,6 +185,9 @@ export default function ManageBackup(props) {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+  let trustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
   // const { databaseSSS } = useSelector(state => state.storage);
   const [overallHealth, setOverallHealth] = useState(null);
   const health = useSelector((state) => state.sss.overallHealth);
@@ -797,10 +800,16 @@ export default function ManageBackup(props) {
       setContacts(selectedContacts);
 
       if (selectedContacts[0]) {
-        pageData[1].personalInfo = selectedContacts[0];
+        let tempContact = selectedContacts[0];
+        const { contactsWalletName } = trustedContactsService.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
+        tempContact.contactsWalletName = contactsWalletName;
+        pageData[1].personalInfo = tempContact;
       }
       if (selectedContacts[1]) {
-        pageData[2].personalInfo = selectedContacts[1];
+        let tempContact = selectedContacts[1];
+        const { contactsWalletName } = trustedContactsService.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
+        tempContact.contactsWalletName = contactsWalletName;
+        pageData[2].personalInfo = tempContact;
       }
       setPageData([...pageData]);
     }
@@ -1440,6 +1449,20 @@ export default function ManageBackup(props) {
     };
   };
 
+  const makeFullName = (item) => {
+    return item.personalInfo.firstName && item.personalInfo.lastName
+      ? item.personalInfo.firstName +
+      ' ' +
+      item.personalInfo.lastName
+      : item.personalInfo.firstName &&
+        !item.personalInfo.lastName
+        ? item.personalInfo.firstName
+        : !item.personalInfo.firstName &&
+          item.personalInfo.lastName
+          ? item.personalInfo.lastName
+          : '';
+  }
+
   const getImageIcon = (item) => {
     if (item.type == 'contact1' || item.type == 'contact2') {
       if (item.personalInfo) {
@@ -1456,42 +1479,70 @@ export default function ManageBackup(props) {
             />
           );
         } else {
-          return (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: Colors.shadowBlue,
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-              }}
-            >
-              <Text
+          if (item.personalInfo.firstName === 'F&F request' && item.personalInfo.contactsWalletName !== undefined && item.personalInfo.contactsWalletName !== "") {
+            return (
+              <View
                 style={{
-                  textAlign: 'center',
-                  fontSize: 13,
-                  lineHeight: 13, //... One for top and one for bottom alignment
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.shadowBlue,
+                  width: 35,
+                  height: 35,
+                  borderRadius: 30,
                 }}
               >
-                {item.personalInfo
-                  ? nameToInitials(
-                    item.personalInfo.firstName && item.personalInfo.lastName
-                      ? item.personalInfo.firstName +
-                      ' ' +
-                      item.personalInfo.lastName
-                      : item.personalInfo.firstName &&
-                        !item.personalInfo.lastName
-                        ? item.personalInfo.firstName
-                        : !item.personalInfo.firstName &&
-                          item.personalInfo.lastName
-                          ? item.personalInfo.lastName
-                          : '',
-                  )
-                  : ''}
-              </Text>
-            </View>
-          );
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 13,
+                    lineHeight: 13, //... One for top and one for bottom alignment
+                  }}
+                >
+                  {item.personalInfo
+                    ? nameToInitials(item.personalInfo.contactsWalletName && item.personalInfo.contactsWalletName !== ""
+                      ? `${item.personalInfo.contactsWalletName}'s Wallet` : makeFullName(item))
+                    : ''}
+                </Text>
+              </View>
+            );
+          } else {
+            return (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.shadowBlue,
+                  width: 35,
+                  height: 35,
+                  borderRadius: 30,
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 13,
+                    lineHeight: 13, //... One for top and one for bottom alignment
+                  }}
+                >
+                  {item.personalInfo
+                    ? nameToInitials(
+                      item.personalInfo.firstName && item.personalInfo.lastName
+                        ? item.personalInfo.firstName +
+                        ' ' +
+                        item.personalInfo.lastName
+                        : item.personalInfo.firstName &&
+                          !item.personalInfo.lastName
+                          ? item.personalInfo.firstName
+                          : !item.personalInfo.firstName &&
+                            item.personalInfo.lastName
+                            ? item.personalInfo.lastName
+                            : '',
+                    )
+                    : ''}
+                </Text>
+              </View>
+            );
+          }
         }
       }
     }
@@ -1501,16 +1552,21 @@ export default function ManageBackup(props) {
   const getCardTitle = (item) => {
     if (item.type === 'contact1' || item.type === 'contact2') {
       if (item.personalInfo) {
-        if (item.personalInfo.firstName && item.personalInfo.lastName) {
-          return item.personalInfo.firstName + ' ' + item.personalInfo.lastName;
+        if (item.personalInfo.firstName === 'F&F request' && item.personalInfo.contactsWalletName !== undefined && item.personalInfo.contactsWalletName !== "") {
+          return item.personalInfo.contactsWalletName && item.personalInfo.contactsWalletName !== ""
+          ? `${item.personalInfo.contactsWalletName}'s Wallet`
+          : makeFullName(item);
+        } else {
+          if (item.personalInfo.firstName && item.personalInfo.lastName) {
+            return item.personalInfo.firstName + ' ' + item.personalInfo.lastName;
+          }
+          if (!item.personalInfo.firstName && item.personalInfo.lastName) {
+            return item.personalInfo.lastName;
+          }
+          if (item.personalInfo.firstName && !item.personalInfo.lastName) {
+            return item.personalInfo.firstName;
+          }
         }
-        if (!item.personalInfo.firstName && item.personalInfo.lastName) {
-          return item.personalInfo.lastName;
-        }
-        if (item.personalInfo.firstName && !item.personalInfo.lastName) {
-          return item.personalInfo.firstName;
-        }
-
         return '';
       } else {
         return 'Friends and Family';

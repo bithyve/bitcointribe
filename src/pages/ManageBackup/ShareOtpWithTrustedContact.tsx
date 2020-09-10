@@ -34,8 +34,7 @@ export default function ShareOtpWithTrustedContact(props) {
               Send OTP to contact
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              Please provide this OTP to your contact in order for them
-              to send you the recovery key
+              Please provide this OTP to your contact for them to accept your request
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please make sure you use a different to channel to send the OTP
@@ -74,7 +73,7 @@ export default function ShareOtpWithTrustedContact(props) {
           Tap on OTP to copy
         </Text>
         <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-          This OTP is only valid for 10 minutes, if the OTP{'\n'}expires you
+          This OTP is only valid for 24 hours, if the OTP{'\n'}expires you
           will be asked to create a new one
         </Text>
         <View style={styles.separator} />

@@ -38,6 +38,7 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
+  DONATION_ACCOUNT,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import { connect } from 'react-redux';
@@ -88,7 +89,7 @@ import HomeList from '../components/home/home-list';
 import HomeHeader from '../components/home/home-header_update';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
-import { initialCardData } from '../stubs/initialCardData';
+import { initialCardData, closingCardData } from '../stubs/initialCardData';
 import { initialTransactionData } from '../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
@@ -98,6 +99,7 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   TrustedContactDerivativeAccount,
   trustedChannelActions,
+  DonationDerivativeAccountElements,
 } from '../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
@@ -159,6 +161,8 @@ const getIconByAccountType = (type) => {
     return require('../assets/images/icons/icon_secureaccount.png');
   } else if (type == 'test') {
     return require('../assets/images/icons/icon_test.png');
+  } else if (type === 'Donation Account') {
+    return require('../assets/images/icons/icon_donation_hexa.png');
   } else {
     return require('../assets/images/icons/icon_test.png');
   }
@@ -328,9 +332,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   NoInternetBottomSheet: any;
   unsubscribe: any;
 
-
-  static whyDidYouRender = true
-
+  static whyDidYouRender = true;
 
   constructor(props) {
     super(props);
@@ -695,14 +697,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateAccountCardData = () => {
+  setAccountCardData = (newCardData) => {
     let newArrayFinal = [];
     let tempArray = [];
-    for (let a = 0; a < initialCardData.length; a++) {
-      tempArray.push(initialCardData[a]);
+    for (let a = 0; a < newCardData.length; a++) {
+      tempArray.push(newCardData[a]);
       if (
         tempArray.length == 2 ||
-        initialCardData[initialCardData.length - 1].id == tempArray[0].id
+        newCardData[newCardData.length - 1].id == tempArray[0].id
       ) {
         newArrayFinal.push(tempArray);
         tempArray = [];
@@ -713,6 +715,50 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
         cardData: newArrayFinal,
       });
     }
+  };
+
+  updateAccountCardData = () => {
+    let { accounts } = this.props;
+    const defaultCardData = initialCardData;
+    let idIndex = initialCardData[initialCardData.length - 1].id;
+
+    const additionalCardData = [];
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+        idIndex++;
+        const donationCardInstance = {
+          id: idIndex,
+          title: 'Donation Account',
+          unit: 'sats',
+          amount: donAcc.balances
+            ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
+            : 0,
+          account: `Donate Bitcoin`,
+          accountType: serviceType,
+          bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+        };
+        additionalCardData.push(donationCardInstance);
+      }
+    }
+
+    this.setAccountCardData([
+      ...defaultCardData,
+      ...additionalCardData,
+      ...closingCardData,
+    ]);
   };
 
   scheduleNotification = async () => {
@@ -1131,6 +1177,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (prevProps.accounts !== this.props.accounts) {
       this.getBalances();
       this.getNewTransactionNotifications();
+      this.updateAccountCardData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -1195,7 +1242,6 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
           : '',
       });
     }
-
 
     if (prevState.isLoading && !this.state.isLoading) {
       if (this.refs.transactionTabBarBottomSheet) {
@@ -1459,7 +1505,6 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (this.refs.moreTabBarBottomSheet) {
         (this.refs.moreTabBarBottomSheet as any).snapTo(0);
       }
-
     }, 500);
 
     this.getAssociatedContact();
@@ -1811,12 +1856,44 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    const accumulativeBalance = regularBalance + secureBalance;
+    // donation transactions
+    const donationTxs = [];
+    let donationsBalance = 0;
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+
+        if (donAcc.balances)
+          donationsBalance +=
+            donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+        if (
+          donAcc.transactions &&
+          donAcc.transactions.transactionDetails.length
+        )
+          donationTxs.push(...donAcc.transactions.transactionDetails);
+      }
+    }
+
+    const accumulativeBalance =
+      regularBalance + secureBalance + donationsBalance;
 
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
+      ...donationTxs,
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
@@ -2093,9 +2170,11 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   let contactName = '';
                   if (contact) {
-                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''}`.toLowerCase();
+                    contactName = `${contact.firstName} ${
+                      contact.lastName ? contact.lastName : ''
+                    }`.toLowerCase();
                   } else {
-                    contactName = 'No Contact Selected'.toLowerCase();
+                    contactName = `${requester}'s Wallet`.toLowerCase();
                   }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -2106,16 +2185,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     contactName,
                     info,
                   };
-                  if (isGuardian) {
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                    );
-                  } else {
-                    approveTrustedContact(contactInfo, publicKey, true);
-                  }
+
+                  approveTrustedContact(
+                    contactInfo,
+                    publicKey,
+                    true,
+                    requester,
+                    isGuardian,
+                  );
                 },
                 isGuardian,
               });
@@ -2573,457 +2650,482 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
         {/* {isLoading ? <Loader /> : null} */}
 
-        {!isLoading && <BottomSheet
-          onOpenEnd={() => {
-            this.setState({
-              atCloseEnd: true,
-              isLoading: false,
-            });
-          }}
-          onCloseEnd={() => {
-            this.setState(
-              {
-                qrBottomSheetsFlag: false,
-              },
-              () => {
-                if (this.state.selectedBottomTab == 'Transactions') {
-                  (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-                }
-              },
-            );
-          }}
-          onCloseStart={() => {
-            this.setState({
-              qrBottomSheetsFlag: false,
-              atCloseEnd: false,
-            });
-          }}
-          enabledInnerScrolling={true}
-          ref={'transactionTabBarBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
-          ]}
-          renderContent={() => (
-            <TransactionsContent
-              infoBoxInfoText={''}
-              isFromAccount={false}
-              transactionLoading={transactionsLoading}
-              transactions={transactions}
-              AtCloseEnd={atCloseEnd}
-              setTransactionItem={(item) =>
-                this.setState({ selectedTransactionItem: item })
-              }
-              setTabBarZIndex={(index) => this.setState({ tabBarIndex: index })}
-              TransactionDetailsBottomSheet={
-                this.refs.transactionDetailsBottomSheet
-              }
-            />
-          )}
-          renderHeader={() => (
-            <TransactionHeader openCloseModal={this.openCloseModal} />
-          )}
-        />}
-
-        {!isLoading && <BottomSheet
-          ref="addTabBarBottomSheet"
-          onCloseEnd={() => {
-            this.setState({
-              qrBottomSheetsFlag: false,
-            });
-
-            if (selectedBottomTab == 'Add') {
-              (this.refs.addTabBarBottomSheet as any).snapTo(1);
-            }
-          }}
-          onCloseStart={() => {
-            this.setState({
-              qrBottomSheetsFlag: false,
-            });
-          }}
-          enabledInnerScrolling={true}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
-          ]}
-          renderContent={() => (
-            <AddModalContents
-              onPressElements={(type) => {
-                if (type == 'buyBitcoins') {
-                  this.props.navigation.navigate('VoucherScanner');
-                } else if (type == 'addContact') {
-                  this.setState(
-                    {
-                      // addSubBottomSheetsFlag: true,
-                      isLoadContacts: true,
-                      tabBarIndex: 0,
-                    },
-                    () =>
-                      (this.refs
-                        .addContactAddressBookBookBottomSheet as any).snapTo(1),
-                  );
-                }
-              }}
-              addData={modalData}
-            />
-          )}
-          renderHeader={() => (
-            <TouchableOpacity
-              activeOpacity={10}
-              onPress={this.openCloseModal}
-              style={styles.modalHeaderContainer}
-            >
-              <View style={styles.modalHeaderHandle} />
-              <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
-            </TouchableOpacity>
-          )}
-        />}
-
-        {!isLoading && <BottomSheet
-          ref="qrTabBarBottomSheet"
-          onOpenEnd={() => {
-            this.setState({
-              qrBottomSheetsFlag: selectedBottomTab === 'QR',
-            });
-          }}
-          onCloseEnd={() => {
-            this.setState(
-              {
-                qrBottomSheetsFlag: false,
-              },
-              () => {
-                if (selectedBottomTab === 'QR') {
-                  (this.refs.qrTabBarBottomSheet as any).snapTo(1);
-                }
-              },
-            );
-          }}
-          onCloseStart={() => {
-            this.setState({
-              qrBottomSheetsFlag: false,
-            });
-          }}
-          enabledInnerScrolling={true}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
-          ]}
-          renderContent={() => (
-            <QrCodeModalContents
-              modalRef={this.refs.qrTabBarBottomSheet}
-              isOpenedFlag={qrBottomSheetsFlag}
-              onQrScan={(qrData) => this.processQRData(qrData)}
-              onPressQrScanner={() => {
-                navigation.navigate('QrScanner', {
-                  scanedCode: this.processQRData,
-                });
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <TouchableOpacity
-              activeOpacity={10}
-              onPress={this.openCloseModal}
-              style={styles.modalHeaderContainer}
-            >
-              <View style={styles.modalHeaderHandle} />
-              <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
-            </TouchableOpacity>
-          )}
-        />}
-
-        {!isLoading && <BottomSheet
-          onCloseEnd={() => {
-            this.setState(
-              {
-                qrBottomSheetsFlag: false,
-              },
-              () => {
-                if (selectedBottomTab == 'More') {
-                  (this.refs.moreTabBarBottomSheet as any).snapTo(1);
-                }
-              },
-            );
-          }}
-          onCloseStart={() => {
-            this.setState({
-              qrBottomSheetsFlag: false,
-            });
-          }}
-          enabledInnerScrolling={true}
-          ref={'moreTabBarBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
-          ]}
-          renderContent={() => (
-            <MoreHomePageTabContents
-              onPressElements={(item) => this.onPressElement(item)}
-            />
-          )}
-          renderHeader={() => (
-            <TouchableOpacity
-              activeOpacity={10}
-              onPress={() => this.openCloseModal()}
-              style={styles.modalHeaderContainer}
-            >
-              <View style={styles.modalHeaderHandle} />
-              <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
-            </TouchableOpacity>
-          )}
-        />}
-
-        {!isLoading && <BottomSheet
-          onCloseEnd={() => {
-            if (tabBarIndex === 0 && !deepLinkModalOpen) {
+        {!isLoading && (
+          <BottomSheet
+            onOpenEnd={() => {
               this.setState({
-                tabBarIndex: 999,
+                atCloseEnd: true,
+                isLoading: false,
               });
-            }
-          }}
-          onOpenEnd={() => {
-            if (tabBarIndex == 999) {
+            }}
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (this.state.selectedBottomTab == 'Transactions') {
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
+              );
+            }}
+            onCloseStart={() => {
               this.setState({
-                tabBarIndex: 0,
+                qrBottomSheetsFlag: false,
+                atCloseEnd: false,
               });
-            }
-            this.setState({
-              deepLinkModalOpen: true,
-            });
-          }}
-          enabledInnerScrolling={true}
-          ref={'custodianRequestBottomSheet'}
-          snapPoints={[-50, hp('60%')]}
-          renderContent={() => {
-            if (!custodyRequest) {
-              return null;
-            }
+            }}
+            enabledInnerScrolling={true}
+            ref={'transactionTabBarBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                ? hp('19%')
+                : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <TransactionsContent
+                infoBoxInfoText={''}
+                isFromAccount={false}
+                transactionLoading={transactionsLoading}
+                transactions={transactions}
+                AtCloseEnd={atCloseEnd}
+                setTransactionItem={(item) =>
+                  this.setState({ selectedTransactionItem: item })
+                }
+                setTabBarZIndex={(index) =>
+                  this.setState({ tabBarIndex: index })
+                }
+                TransactionDetailsBottomSheet={
+                  this.refs.transactionDetailsBottomSheet
+                }
+              />
+            )}
+            renderHeader={() => (
+              <TransactionHeader openCloseModal={this.openCloseModal} />
+            )}
+          />
+        )}
 
-            return (
-              <CustodianRequestModalContents
-                loading={loading}
-                userName={custodyRequest.requester}
-                onPressAcceptSecret={() => {
-                  this.setState(
-                    {
-                      loading: true,
-                      tabBarIndex: 0,
-                      deepLinkModalOpen: true,
-                    },
-                    () => {
-                      (this.refs.custodianRequestBottomSheet as any).snapTo(0);
-                    },
-                  );
+        {!isLoading && (
+          <BottomSheet
+            ref="addTabBarBottomSheet"
+            onCloseEnd={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
 
-                  if (Date.now() - custodyRequest.uploadedAt > 600000) {
-                    Alert.alert(
-                      'Request expired!',
-                      'Please ask the sender to initiate a new request',
+              if (selectedBottomTab == 'Add') {
+                (this.refs.addTabBarBottomSheet as any).snapTo(1);
+              }
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                ? hp('19%')
+                : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <AddModalContents
+                onPressElements={(type) => {
+                  if (type == 'buyBitcoins') {
+                    this.props.navigation.navigate('VoucherScanner');
+                  } else if (type == 'addContact') {
+                    this.setState(
+                      {
+                        // addSubBottomSheetsFlag: true,
+                        isLoadContacts: true,
+                        tabBarIndex: 0,
+                      },
+                      () =>
+                        (this.refs
+                          .addContactAddressBookBookBottomSheet as any).snapTo(
+                          1,
+                        ),
                     );
-                    this.setState({
-                      loading: false,
-                    });
-                  } else {
-                    if (UNDER_CUSTODY[custodyRequest.requester]) {
-                      Alert.alert(
-                        'Failed to store',
-                        'You cannot custody multiple shares of the same user.',
-                      );
-                      this.setState({ loading: false });
-                    } else {
-                      if (custodyRequest.isQR) {
-                        downloadMShare(custodyRequest.ek, custodyRequest.otp);
-                        this.setState({
-                          loading: false,
-                        });
-                      } else {
-                        navigation.navigate('CustodianRequestOTP', {
-                          custodyRequest,
-                        });
-                        this.setState({
-                          loading: false,
-                        });
-                      }
-                    }
                   }
                 }}
-                onPressRejectSecret={() => {
+                addData={modalData}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={this.openCloseModal}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            ref="qrTabBarBottomSheet"
+            onOpenEnd={() => {
+              this.setState({
+                qrBottomSheetsFlag: selectedBottomTab === 'QR',
+              });
+            }}
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (selectedBottomTab === 'QR') {
+                    (this.refs.qrTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
+              );
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                ? hp('19%')
+                : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <QrCodeModalContents
+                modalRef={this.refs.qrTabBarBottomSheet}
+                isOpenedFlag={qrBottomSheetsFlag}
+                onQrScan={(qrData) => this.processQRData(qrData)}
+                onPressQrScanner={() => {
+                  navigation.navigate('QrScanner', {
+                    scanedCode: this.processQRData,
+                  });
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={this.openCloseModal}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (selectedBottomTab == 'More') {
+                    (this.refs.moreTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
+              );
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'moreTabBarBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                ? hp('19%')
+                : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <MoreHomePageTabContents
+                onPressElements={(item) => this.onPressElement(item)}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={() => this.openCloseModal()}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              if (tabBarIndex === 0 && !deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            onOpenEnd={() => {
+              if (tabBarIndex == 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+              this.setState({
+                deepLinkModalOpen: true,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'custodianRequestBottomSheet'}
+            snapPoints={[-50, hp('60%')]}
+            renderContent={() => {
+              if (!custodyRequest) {
+                return null;
+              }
+
+              return (
+                <CustodianRequestModalContents
+                  loading={loading}
+                  userName={custodyRequest.requester}
+                  onPressAcceptSecret={() => {
+                    this.setState(
+                      {
+                        loading: true,
+                        tabBarIndex: 0,
+                        deepLinkModalOpen: true,
+                      },
+                      () => {
+                        (this.refs.custodianRequestBottomSheet as any).snapTo(
+                          0,
+                        );
+                      },
+                    );
+
+                    if (Date.now() - custodyRequest.uploadedAt > 600000) {
+                      Alert.alert(
+                        'Request expired!',
+                        'Please ask the sender to initiate a new request',
+                      );
+                      this.setState({
+                        loading: false,
+                      });
+                    } else {
+                      if (UNDER_CUSTODY[custodyRequest.requester]) {
+                        Alert.alert(
+                          'Failed to store',
+                          'You cannot custody multiple shares of the same user.',
+                        );
+                        this.setState({ loading: false });
+                      } else {
+                        if (custodyRequest.isQR) {
+                          downloadMShare(custodyRequest.ek, custodyRequest.otp);
+                          this.setState({
+                            loading: false,
+                          });
+                        } else {
+                          navigation.navigate('CustodianRequestOTP', {
+                            custodyRequest,
+                          });
+                          this.setState({
+                            loading: false,
+                          });
+                        }
+                      }
+                    }
+                  }}
+                  onPressRejectSecret={() => {
+                    this.setState(
+                      {
+                        tabBarIndex: 0,
+                      },
+                      () => {
+                        (this.refs.custodianRequestBottomSheet as any).snapTo(
+                          0,
+                        );
+                        (this.refs
+                          .custodianRequestRejectedBottomSheet as any).snapTo(
+                          1,
+                        );
+                      },
+                    );
+                  }}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <TransparentHeaderModal
+                onPressheader={() => {
                   this.setState(
                     {
-                      tabBarIndex: 0,
+                      tabBarIndex: 999,
+                      deepLinkModalOpen: false,
+                    },
+                    () =>
+                      (this.refs.custodianRequestBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        )}
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              if (tabBarIndex === 0) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+              this.setState({
+                isRequestModalOpened: false,
+              });
+            }}
+            onOpenEnd={() => {
+              if (tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+              this.setState({
+                deepLinkModalOpen: true,
+                isRequestModalOpened: true,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'trustedContactRequestBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('70%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('95%')
+                : hp('95%'),
+            ]}
+            renderContent={() => {
+              if (!trustedContactRequest && !recoveryRequest) {
+                return;
+              }
+              return (
+                <TrustedContactRequestContent
+                  isRequestModalOpened={this.state.isRequestModalOpened}
+                  trustedContactRequest={trustedContactRequest}
+                  recoveryRequest={recoveryRequest}
+                  onPressAccept={this.onTrustedContactRequestAccept}
+                  onPressReject={this.onTrustedContactReject}
+                  onPhoneNumberChange={this.onPhoneNumberChange}
+                  bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <ModalHeader
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                      deepLinkModalOpen: false,
                     },
                     () => {
-                      (this.refs.custodianRequestBottomSheet as any).snapTo(0);
                       (this.refs
-                        .custodianRequestRejectedBottomSheet as any).snapTo(1);
+                        .trustedContactRequestBottomSheet as any).snapTo(0);
                     },
                   );
                 }}
               />
-            );
-          }}
-          renderHeader={() => (
-            <TransparentHeaderModal
-              onPressheader={() => {
-                this.setState(
-                  {
-                    tabBarIndex: 999,
-                    deepLinkModalOpen: false,
-                  },
-                  () =>
-                    (this.refs.custodianRequestBottomSheet as any).snapTo(0),
-                );
-              }}
-            />
-          )}
-        />}
-        {!isLoading && <BottomSheet
-          onCloseEnd={() => {
-            if (tabBarIndex === 0) {
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseStart={() => {
               this.setState({
                 tabBarIndex: 999,
               });
-            }
-            this.setState({
-              isRequestModalOpened: false,
-            });
-          }}
-          onOpenEnd={() => {
-            if (tabBarIndex === 999) {
+            }}
+            onOpenEnd={() => {
               this.setState({
                 tabBarIndex: 0,
               });
-            }
-            this.setState({
-              deepLinkModalOpen: true,
-              isRequestModalOpened: true,
-            });
-          }}
-          enabledInnerScrolling={true}
-          ref={'trustedContactRequestBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('70%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('95%')
-              : hp('95%'),
-          ]}
-          renderContent={() => {
-            if (!trustedContactRequest && !recoveryRequest) {
-              return;
-            }
-            return (
-              <TrustedContactRequestContent
-                isRequestModalOpened={this.state.isRequestModalOpened}
-                trustedContactRequest={trustedContactRequest}
-                recoveryRequest={recoveryRequest}
-                onPressAccept={this.onTrustedContactRequestAccept}
-                onPressReject={this.onTrustedContactReject}
-                onPhoneNumberChange={this.onPhoneNumberChange}
-                bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
-              />
-            );
-          }}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => {
-                this.setState(
-                  {
-                    tabBarIndex: 999,
-                    deepLinkModalOpen: false,
-                  },
-                  () => {
-                    (this.refs.trustedContactRequestBottomSheet as any).snapTo(
-                      0,
+            }}
+            enabledInnerScrolling={true}
+            ref={'custodianRequestRejectedBottomSheet'}
+            snapPoints={[-50, hp('60%')]}
+            renderContent={() => {
+              if (!custodyRequest) return null;
+              return (
+                <CustodianRequestRejectedModalContents
+                  onPressViewThrustedContacts={() => {
+                    this.setState(
+                      {
+                        tabBarIndex: 999,
+                      },
+                      () => {
+                        (this.refs
+                          .custodianRequestRejectedBottomSheet as any).snapTo(
+                          0,
+                        );
+                      },
                     );
-                  },
-                );
-              }}
-            />
-          )}
-        />}
-
-        {!isLoading && <BottomSheet
-          onCloseStart={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
-          onOpenEnd={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          enabledInnerScrolling={true}
-          ref={'custodianRequestRejectedBottomSheet'}
-          snapPoints={[-50, hp('60%')]}
-          renderContent={() => {
-            if (!custodyRequest) return null;
-            return (
-              <CustodianRequestRejectedModalContents
-                onPressViewThrustedContacts={() => {
+                  }}
+                  userName={custodyRequest.requester}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <TransparentHeaderModal
+                onPressheader={() => {
                   this.setState(
                     {
                       tabBarIndex: 999,
                     },
-                    () => {
+                    () =>
                       (this.refs
-                        .custodianRequestRejectedBottomSheet as any).snapTo(0);
-                    },
+                        .custodianRequestRejectedBottomSheet as any).snapTo(0),
                   );
                 }}
-                userName={custodyRequest.requester}
               />
-            );
-          }}
-          renderHeader={() => (
-            <TransparentHeaderModal
-              onPressheader={() => {
-                this.setState(
-                  {
-                    tabBarIndex: 999,
-                  },
-                  () =>
-                    (this.refs
-                      .custodianRequestRejectedBottomSheet as any).snapTo(0),
-                );
-              }}
-            />
-          )}
-        />}
+            )}
+          />
+        )}
         {knowMoreBottomSheetsFlag ? (
           <BottomSheet
             onOpenEnd={() => {
@@ -3077,49 +3179,51 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         ) : null}
 
-        {!isLoading && <BottomSheet
-          enabledInnerScrolling={true}
-          onCloseEnd={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
-          onCloseStart={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
-          onOpenEnd={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          ref={'transactionDetailsBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
-          ]}
-          renderContent={() => (
-            <TransactionDetails
-              item={selectedTransactionItem}
-              onPressKnowMore={() => {
-                (this.refs.transactionDetailsBottomSheet as any).snapTo(1);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.white}
-              backgroundColor={Colors.white}
-              onPressHeader={() => {
-                if (this.refs.transactionDetailsBottomSheet)
-                  (this.refs.transactionDetailsBottomSheet as any).snapTo(0);
-              }}
-            />
-          )}
-        />}
+        {!isLoading && (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            onCloseEnd={() => {
+              this.setState({
+                tabBarIndex: 999,
+              });
+            }}
+            onCloseStart={() => {
+              this.setState({
+                tabBarIndex: 999,
+              });
+            }}
+            onOpenEnd={() => {
+              this.setState({
+                tabBarIndex: 0,
+              });
+            }}
+            ref={'transactionDetailsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <TransactionDetails
+                item={selectedTransactionItem}
+                onPressKnowMore={() => {
+                  (this.refs.transactionDetailsBottomSheet as any).snapTo(1);
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  if (this.refs.transactionDetailsBottomSheet)
+                    (this.refs.transactionDetailsBottomSheet as any).snapTo(0);
+                }}
+              />
+            )}
+          />
+        )}
 
         {knowMoreBottomSheetsFlag ? (
           <BottomSheet
@@ -3287,6 +3391,15 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
                   0,
                 );
+              }}
+              onSkipContinue={(data) => {
+                if (data && data.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: data,
+                  });
+                  (this.refs
+                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+                }
               }}
             />
           )}

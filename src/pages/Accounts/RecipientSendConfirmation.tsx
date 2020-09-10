@@ -27,52 +27,61 @@ import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientSendConfirmation(props) {
   const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue);
+  const currencyToggleValue = useSelector(
+    (state) => state.preferences.currencyToggleValue,
+  );
 
   const getCorrectAmountCurrency = () => {
     const switchOn = currencyToggleValue ? true : false;
     if (!switchOn) {
-      return props.item.currencyAmount && (props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase());
+      return (
+        props.item.currencyAmount &&
+        props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()
+      );
     } else {
-      return props.item.bitcoinAmount && props.item.bitcoinAmount + (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats');
+      return (
+        props.item.bitcoinAmount &&
+        props.item.bitcoinAmount +
+        (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
+      );
     }
-  }
+  };
   const { item } = props;
   return (
     <TouchableOpacity
       // onPress={() => props.onPressElement()}
       activeOpacity={10}
     >
-      <View style={{
-        marginRight: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: wp('15%'),
-      }}>
+      <View
+        style={{
+          marginRight: 20,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: wp('15%'),
+        }}
+      >
         <View style={{ flexDirection: 'row' }}>
-          {item.selectedContact &&
-            item.selectedContact.account_name ? (
-              <Image
-                source={
-                  item.selectedContact.account_name ===
-                    'Checking Account'
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : item.selectedContact.account_name ===
-                      'Savings Account'
-                      ? require('../../assets/images/icons/icon_secureaccount.png')
-                      : item.selectedContact.account_name ===
-                        'Test Account'
-                        ? require('../../assets/images/icons/icon_test_white.png')
+          {item.selectedContact && item.selectedContact.account_name ? (
+            <Image
+              source={
+                item.selectedContact.account_name === 'Checking Account'
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : item.selectedContact.account_name === 'Savings Account'
+                    ? require('../../assets/images/icons/icon_secureaccount.png')
+                    : item.selectedContact.account_name === 'Test Account'
+                      ? require('../../assets/images/icons/icon_test_white.png')
+                      : item.selectedContact.account_name === 'Donation Account'
+                        ? require('../../assets/images/icons/icon_donation_account.png')
                         : require('../../assets/images/icons/icon_user.png')
-                }
-                style={styles.circleShapeView}
-              />
-            ) : item.selectedContact.image ? (
-              <Image
-                source={item.selectedContact.image}
-                style={styles.circleShapeView}
-              />
-            ) : (
+              }
+              style={styles.circleShapeView}
+            />
+          ) : item.selectedContact.image ? (
+            <Image
+              source={item.selectedContact.image}
+              style={styles.circleShapeView}
+            />
+          ) : (
                 <View
                   style={{
                     ...styles.circleShapeView,
@@ -92,18 +101,20 @@ function RecipientSendConfirmation(props) {
                       >
                         {item && item.selectedContact
                           ? nameToInitials(
-                            item.selectedContact.firstName &&
-                              item.selectedContact.lastName
-                              ? item.selectedContact.firstName +
-                              ' ' +
-                              item.selectedContact.lastName
+                            item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                              ? `${item.selectedContact.contactsWalletName}'s wallet`
                               : item.selectedContact.firstName &&
-                                !item.selectedContact.lastName
-                                ? item.selectedContact.firstName
-                                : !item.selectedContact.firstName &&
-                                  item.selectedContact.lastName
-                                  ? item.selectedContact.lastName
-                                  : '',
+                                item.selectedContact.lastName
+                                ? item.selectedContact.firstName +
+                                ' ' +
+                                item.selectedContact.lastName
+                                : item.selectedContact.firstName &&
+                                  !item.selectedContact.lastName
+                                  ? item.selectedContact.firstName
+                                  : !item.selectedContact.firstName &&
+                                    item.selectedContact.lastName
+                                    ? item.selectedContact.lastName
+                                    : '',
                           )
                           : ''}
                       </Text>
@@ -129,13 +140,13 @@ function RecipientSendConfirmation(props) {
               )}
         </View>
         <Text style={styles.name} numberOfLines={1}>
-          {item.selectedContact.name ||
+          {item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+            ? `${item.selectedContact.contactsWalletName}'s wallet`
+            : item.selectedContact.name ||
             item.selectedContact.account_name ||
             item.selectedContact.id}
         </Text>
-        <Text style={styles.amountText}>
-          {getCorrectAmountCurrency()}
-        </Text>
+        <Text style={styles.amountText}>{getCorrectAmountCurrency()}</Text>
       </View>
     </TouchableOpacity>
   );

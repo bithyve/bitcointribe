@@ -209,10 +209,16 @@ const TrustedContactHistory = (props) => {
       // }
 
       if (index == 1 && selectedContacts[0]) {
-        setChosenContact(selectedContacts[0]);
+        let tempContact = selectedContacts[0];
+        const { contactsWalletName } = trustedContacts.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
+        tempContact.contactsWalletName = contactsWalletName;
+        setChosenContact(tempContact);
       }
       if (index == 2 && selectedContacts[1]) {
-        setChosenContact(selectedContacts[1]);
+        let tempContact = selectedContacts[1];
+        const { contactsWalletName } = trustedContacts.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
+        tempContact.contactsWalletName = contactsWalletName;
+        setChosenContact(tempContact);
       }
     }
   }, [index, trustedContactsInfo]);
@@ -242,7 +248,7 @@ const TrustedContactHistory = (props) => {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -627,6 +633,16 @@ const TrustedContactHistory = (props) => {
     }
   }, [next]);
 
+  const makeFullName = (chosenContact) => {
+    return chosenContact.firstName && chosenContact.lastName
+      ? chosenContact.firstName + ' ' + chosenContact.lastName
+      : chosenContact.firstName && !chosenContact.lastName
+        ? chosenContact.firstName
+        : !chosenContact.firstName && chosenContact.lastName
+          ? chosenContact.lastName
+          : '';
+  }
+
   const getImageIcon = () => {
     if (chosenContact.name) {
       if (chosenContact.imageAvailable) {
@@ -664,17 +680,19 @@ const TrustedContactHistory = (props) => {
                 lineHeight: 13, //... One for top and one for bottom alignment
               }}
             >
-              {chosenContact && chosenContact.name
-                ? nameToInitials(
+              {chosenContact && chosenContact.firstName === 'F&F request' && chosenContact.contactsWalletName !== undefined && chosenContact.contactsWalletName !== ""
+                ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
+                : chosenContact && chosenContact.name
+                  ? nameToInitials(
                     chosenContact.firstName && chosenContact.lastName
                       ? chosenContact.firstName + ' ' + chosenContact.lastName
                       : chosenContact.firstName && !chosenContact.lastName
-                      ? chosenContact.firstName
-                      : !chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.lastName
-                      : '',
+                        ? chosenContact.firstName
+                        : !chosenContact.firstName && chosenContact.lastName
+                          ? chosenContact.lastName
+                          : '',
                   )
-                : ''}
+                  : ''}
             </Text>
           </View>
         );
@@ -713,7 +731,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -747,11 +765,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const numberDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${numberEncPubKey}` +
@@ -774,11 +792,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const emailDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${emailEncPubKey}` +
@@ -798,11 +816,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const otpDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${otpEncPubKey}` +
@@ -877,7 +895,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -937,7 +955,7 @@ const TrustedContactHistory = (props) => {
         if (previousGuardian) {
           previousGuardianName = `${previousGuardian.firstName} ${
             previousGuardian.lastName ? previousGuardian.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
         } else {
@@ -954,7 +972,7 @@ const TrustedContactHistory = (props) => {
     } else if (
       !SHARES_TRANSFER_DETAILS[index] ||
       Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
+      config.TC_REQUEST_EXPIRY
     ) {
       setTrustedLink('');
       setTrustedQR('');
@@ -967,7 +985,7 @@ const TrustedContactHistory = (props) => {
       trustedContact.ephemeralChannel &&
       trustedContact.ephemeralChannel.initiatedAt &&
       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY &&
+      config.TC_REQUEST_EXPIRY &&
       !hasTrustedChannel
     ) {
       setTrustedLink('');
@@ -995,7 +1013,7 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       console.log({ contactName });
@@ -1094,9 +1112,9 @@ const TrustedContactHistory = (props) => {
           contactEmail={''}
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
-          } Hexa wallet- link will expire in ${
+            } Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+            } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
@@ -1106,7 +1124,7 @@ const TrustedContactHistory = (props) => {
             setTimeout(() => {
               setRenderTimer(true);
             }, 2);
-            if(isOTPType){
+            if (isOTPType) {
               (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
             }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -1219,13 +1237,15 @@ const TrustedContactHistory = (props) => {
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.firstName + ' ' + chosenContact.lastName
-                  : chosenContact.firstName && !chosenContact.lastName
-                  ? chosenContact.firstName
-                  : !chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.lastName
-                  : 'Friends and Family'}
+                {chosenContact.firstName === 'F&F request' && chosenContact.contactsWalletName !== undefined && chosenContact.contactsWalletName !== ""
+                  ? `${chosenContact.contactsWalletName}'s wallet`
+                  : chosenContact.firstName && chosenContact.lastName
+                    ? chosenContact.firstName + ' ' + chosenContact.lastName
+                    : chosenContact.firstName && !chosenContact.lastName
+                      ? chosenContact.firstName
+                      : !chosenContact.firstName && chosenContact.lastName
+                        ? chosenContact.lastName
+                        : 'Friends and Family'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -1262,8 +1282,8 @@ const TrustedContactHistory = (props) => {
               source={
                 shared || activateReshare
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
