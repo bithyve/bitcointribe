@@ -44,8 +44,7 @@ export default function Login(props) {
   );
 
   if (reLogin) {
-    if(props.navigation.state.params.isPasscodeCheck) props.navigation.goBack();
-    else props.navigation.pop(2);
+    props.navigation.pop(2);
     dispatch(switchReLogin(false, true));
   }
 

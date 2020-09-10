@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0ABCF5EEB6A24513A21B391F /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
+		1389C458521310930DA9D69B /* libPods-HEXA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 15A73D92456B9412E5D7490B /* libPods-HEXA.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -17,56 +18,6 @@
 		6111482F2506463F00ED433D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
 		611148352506478E00ED433D /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611148312506478E00ED433D /* PdfGenerate.swift */; };
 		6111483A250647BD00ED433D /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 61114839250647BD00ED433D /* PdfPassword.m */; };
-		617379BE2506677000D4DA9C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		617379BF2506677000D4DA9C /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 61114839250647BD00ED433D /* PdfPassword.m */; };
-		617379C02506677000D4DA9C /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611148312506478E00ED433D /* PdfGenerate.swift */; };
-		617379C12506677000D4DA9C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		617379C32506677000D4DA9C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
-		617379C62506677000D4DA9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		617379C72506677000D4DA9C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		617379C82506677000D4DA9C /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */; };
-		617379C92506677000D4DA9C /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */; };
-		617379CA2506677000D4DA9C /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
-		617379CB2506677000D4DA9C /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
-		617379CC2506677000D4DA9C /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
-		617379CD2506677000D4DA9C /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
-		617379CE2506677000D4DA9C /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
-		617379CF2506677000D4DA9C /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
-		617379D02506677000D4DA9C /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
-		617379D12506677000D4DA9C /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
-		617379D22506677000D4DA9C /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
-		617379D32506677000D4DA9C /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */; };
-		617379D42506677000D4DA9C /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
-		617379D52506677000D4DA9C /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
-		617379D62506677000D4DA9C /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
-		617379D72506677000D4DA9C /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */; };
-		617379E1250667CD00D4DA9C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF234250654F600A8E6DF /* GoogleService-Info.plist */; };
-		617379E5250669A000D4DA9C /* HEXA.Dev-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 617379E4250669A000D4DA9C /* HEXA.Dev-Info.plist */; };
-		617379E725066A0A00D4DA9C /* HEXA.Stage-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 617379E625066A0A00D4DA9C /* HEXA.Stage-Info.plist */; };
-		619CF23F250660FB00A8E6DF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		619CF240250660FB00A8E6DF /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 61114839250647BD00ED433D /* PdfPassword.m */; };
-		619CF241250660FB00A8E6DF /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611148312506478E00ED433D /* PdfGenerate.swift */; };
-		619CF242250660FB00A8E6DF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		619CF244250660FB00A8E6DF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
-		619CF247250660FB00A8E6DF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		619CF249250660FB00A8E6DF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		619CF24A250660FB00A8E6DF /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */; };
-		619CF24B250660FB00A8E6DF /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */; };
-		619CF24C250660FB00A8E6DF /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
-		619CF24D250660FB00A8E6DF /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
-		619CF24E250660FB00A8E6DF /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
-		619CF24F250660FB00A8E6DF /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
-		619CF250250660FB00A8E6DF /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
-		619CF251250660FB00A8E6DF /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
-		619CF252250660FB00A8E6DF /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
-		619CF253250660FB00A8E6DF /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
-		619CF254250660FB00A8E6DF /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
-		619CF255250660FB00A8E6DF /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */; };
-		619CF256250660FB00A8E6DF /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
-		619CF257250660FB00A8E6DF /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
-		619CF259250660FB00A8E6DF /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
-		619CF25A250660FB00A8E6DF /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */; };
-		61B5223E25076DED002F73B2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF22F250654D100A8E6DF /* GoogleService-Info.plist */; };
 		61B5223F25076DF5002F73B2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF232250654E300A8E6DF /* GoogleService-Info.plist */; };
 		656E35D57E0B42E8B8745C5C /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
 		6FE58ECD5691497784662337 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
@@ -76,7 +27,6 @@
 		A0647B856EF5484EB9D37E71 /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
 		B8D1041D05D6411F9D52E7D6 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
 		C0D2EBAD35E54C34BB47A2C0 /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
-		DD52D1510B51988AC990D264 /* libPods-HEXA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 718825A85F9883C88CFB6592 /* libPods-HEXA.a */; };
 		DF98272D8CB14F19972464BB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
 		E59524329FB64B6B9EB4F44A /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
 		EC871328B5214142B36CC294 /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
@@ -88,7 +38,7 @@
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* HEXATests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HEXATests.m; sourceTree = "<group>"; };
-		09683E643A77162AE547A7E9 /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
+		0CF648DC9935A5CEB3142D8F /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Hexa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hexa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = HEXA/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = HEXA/AppDelegate.m; sourceTree = "<group>"; };
@@ -96,6 +46,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HEXA/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HEXA/main.m; sourceTree = "<group>"; };
 		158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-MediumItalic.ttf"; path = "../src/assets/fonts/FiraSans-MediumItalic.ttf"; sourceTree = "<group>"; };
+		15A73D92456B9412E5D7490B /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BDE786A62844DE89D7EE379 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		227A2A160AEE42F4999170A1 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Bold.ttf"; path = "../src/assets/fonts/FiraSans-Bold.ttf"; sourceTree = "<group>"; };
@@ -112,19 +63,15 @@
 		61114838250647BD00ED433D /* PdfPassword.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PdfPassword.h; sourceTree = "<group>"; };
 		61114839250647BD00ED433D /* PdfPassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PdfPassword.m; sourceTree = "<group>"; };
 		6111483C25064A4F00ED433D /* Hexa.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Hexa.entitlements; path = HEXA/Hexa.entitlements; sourceTree = "<group>"; };
-		617379DE2506677000D4DA9C /* HEXA Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		617379E4250669A000D4DA9C /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "../../../hexa/ios/HEXA.Dev-Info.plist"; sourceTree = "<group>"; };
-		617379E625066A0A00D4DA9C /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "HEXA.Stage-Info.plist"; sourceTree = "<group>"; };
 		617379E825066B5200D4DA9C /* HEXA-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HEXA-Bridging-Header.h"; sourceTree = "<group>"; };
 		619CF22F250654D100A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Staging/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		619CF232250654E300A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Production/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		619CF234250654F600A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Development/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		619CF261250660FB00A8E6DF /* HEXA Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		619CF262250660FB00A8E6DF /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "/Users/muneerpp/workspace/myremotedeveloper/newapp/HEXA/ios/HEXA.Dev-Info.plist"; sourceTree = "<absolute>"; };
 		67A86A5BF4334540878AED10 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		6A234933673440BFB6559B6D /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		70412DE9AEA54C18972F9DD5 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
-		718825A85F9883C88CFB6592 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Regular.ttf"; path = "../src/assets/fonts/FiraSans-Regular.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HEXA/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8A1B98A7327A4AD8A5860B74 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -133,7 +80,6 @@
 		9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Medium.ttf"; path = "../src/assets/fonts/FiraSans-Medium.ttf"; sourceTree = "<group>"; };
 		9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-BookItalic.ttf"; path = "../src/assets/fonts/FiraSans-BookItalic.ttf"; sourceTree = "<group>"; };
-		ACF63AD546D4EA339AC11D75 /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Light.ttf"; path = "../src/assets/fonts/OpenSans-Light.ttf"; sourceTree = "<group>"; };
 		C1B0A87F089E485685570E93 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		C88B0D378D49456C80224451 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -146,6 +92,7 @@
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EE6F36351DD345FAB2CDA5DE /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-LightItalic.ttf"; path = "../src/assets/fonts/OpenSans-LightItalic.ttf"; sourceTree = "<group>"; };
+		FED202A105AFE3BBD57D440E /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,23 +101,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6111482F2506463F00ED433D /* CloudKit.framework in Frameworks */,
-				DD52D1510B51988AC990D264 /* libPods-HEXA.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		617379C22506677000D4DA9C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				617379C32506677000D4DA9C /* CloudKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		619CF243250660FB00A8E6DF /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				619CF244250660FB00A8E6DF /* CloudKit.framework in Frameworks */,
+				1389C458521310930DA9D69B /* libPods-HEXA.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,7 +128,6 @@
 		13B07FAE1A68108700A75B9A /* HEXA */ = {
 			isa = PBXGroup;
 			children = (
-				617379E625066A0A00D4DA9C /* HEXA.Stage-Info.plist */,
 				619CF22F250654D100A8E6DF /* GoogleService-Info.plist */,
 				619CF234250654F600A8E6DF /* GoogleService-Info.plist */,
 				619CF232250654E300A8E6DF /* GoogleService-Info.plist */,
@@ -224,7 +154,7 @@
 				6111482E2506463F00ED433D /* CloudKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				718825A85F9883C88CFB6592 /* libPods-HEXA.a */,
+				15A73D92456B9412E5D7490B /* libPods-HEXA.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -257,8 +187,6 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* Hexa.app */,
-				619CF261250660FB00A8E6DF /* HEXA Dev.app */,
-				617379DE2506677000D4DA9C /* HEXA Stage.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -266,8 +194,8 @@
 		9FD0418BDBDF3D36477ED773 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				ACF63AD546D4EA339AC11D75 /* Pods-HEXA.debug.xcconfig */,
-				09683E643A77162AE547A7E9 /* Pods-HEXA.release.xcconfig */,
+				0CF648DC9935A5CEB3142D8F /* Pods-HEXA.debug.xcconfig */,
+				FED202A105AFE3BBD57D440E /* Pods-HEXA.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -318,13 +246,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "HEXA" */;
 			buildPhases = (
-				94097DFDF6395EAC82420E33 /* [CP] Check Pods Manifest.lock */,
+				A7213EF72B6C0B1407566080 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				F246F0C8D28B2529D21AA28B /* [CP] Copy Pods Resources */,
+				88FE813A908A34436C277ED9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -333,44 +261,6 @@
 			name = HEXA;
 			productName = HEXA;
 			productReference = 13B07F961A680F5B00A75B9A /* Hexa.app */;
-			productType = "com.apple.product-type.application";
-		};
-		617379BA2506677000D4DA9C /* HEXA Stage */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 617379DB2506677000D4DA9C /* Build configuration list for PBXNativeTarget "HEXA Stage" */;
-			buildPhases = (
-				617379BC2506677000D4DA9C /* Start Packager */,
-				617379BD2506677000D4DA9C /* Sources */,
-				617379C22506677000D4DA9C /* Frameworks */,
-				617379C52506677000D4DA9C /* Resources */,
-				617379D92506677000D4DA9C /* Bundle React Native code and images */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "HEXA Stage";
-			productName = HEXA;
-			productReference = 617379DE2506677000D4DA9C /* HEXA Stage.app */;
-			productType = "com.apple.product-type.application";
-		};
-		619CF23B250660FB00A8E6DF /* HEXA Dev */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 619CF25E250660FB00A8E6DF /* Build configuration list for PBXNativeTarget "HEXA Dev" */;
-			buildPhases = (
-				619CF23D250660FB00A8E6DF /* Start Packager */,
-				619CF23E250660FB00A8E6DF /* Sources */,
-				619CF243250660FB00A8E6DF /* Frameworks */,
-				619CF246250660FB00A8E6DF /* Resources */,
-				619CF25C250660FB00A8E6DF /* Bundle React Native code and images */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "HEXA Dev";
-			productName = HEXA;
-			productReference = 619CF261250660FB00A8E6DF /* HEXA Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -384,14 +274,6 @@
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = Y5TCB759QL;
 						LastSwiftMigration = 1170;
-						ProvisioningStyle = Automatic;
-					};
-					617379BA2506677000D4DA9C = {
-						DevelopmentTeam = Y5TCB759QL;
-						ProvisioningStyle = Automatic;
-					};
-					619CF23B250660FB00A8E6DF = {
-						DevelopmentTeam = Y5TCB759QL;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -409,9 +291,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				619CF23B250660FB00A8E6DF /* HEXA Dev */,
 				13B07F861A680F5B00A75B9A /* HEXA */,
-				617379BA2506677000D4DA9C /* HEXA Stage */,
 			);
 		};
 /* End PBXProject section */
@@ -443,60 +323,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		617379C52506677000D4DA9C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				617379E725066A0A00D4DA9C /* HEXA.Stage-Info.plist in Resources */,
-				617379C62506677000D4DA9C /* LaunchScreen.storyboard in Resources */,
-				617379C72506677000D4DA9C /* Images.xcassets in Resources */,
-				617379C82506677000D4DA9C /* FiraSans-Bold.ttf in Resources */,
-				617379C92506677000D4DA9C /* FiraSans-BookItalic.ttf in Resources */,
-				617379CA2506677000D4DA9C /* FiraSans-Italic.ttf in Resources */,
-				617379CB2506677000D4DA9C /* FiraSans-Medium.ttf in Resources */,
-				617379CC2506677000D4DA9C /* FiraSans-MediumItalic.ttf in Resources */,
-				617379CD2506677000D4DA9C /* FiraSans-Regular.ttf in Resources */,
-				617379CE2506677000D4DA9C /* FiraSans-SemiBold.ttf in Resources */,
-				617379CF2506677000D4DA9C /* OpenSans-Bold.ttf in Resources */,
-				617379D02506677000D4DA9C /* OpenSans-BoldItalic.ttf in Resources */,
-				617379D12506677000D4DA9C /* OpenSans-ExtraBold.ttf in Resources */,
-				617379D22506677000D4DA9C /* OpenSans-Italic.ttf in Resources */,
-				617379D32506677000D4DA9C /* OpenSans-Light.ttf in Resources */,
-				617379D42506677000D4DA9C /* OpenSans-LightItalic.ttf in Resources */,
-				617379D52506677000D4DA9C /* OpenSans-Regular.ttf in Resources */,
-				617379D62506677000D4DA9C /* OpenSans-Semibold.ttf in Resources */,
-				617379D72506677000D4DA9C /* OpenSans-SemiboldItalic.ttf in Resources */,
-				61B5223E25076DED002F73B2 /* GoogleService-Info.plist in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		619CF246250660FB00A8E6DF /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				619CF247250660FB00A8E6DF /* LaunchScreen.storyboard in Resources */,
-				619CF249250660FB00A8E6DF /* Images.xcassets in Resources */,
-				619CF24A250660FB00A8E6DF /* FiraSans-Bold.ttf in Resources */,
-				619CF24B250660FB00A8E6DF /* FiraSans-BookItalic.ttf in Resources */,
-				619CF24C250660FB00A8E6DF /* FiraSans-Italic.ttf in Resources */,
-				619CF24D250660FB00A8E6DF /* FiraSans-Medium.ttf in Resources */,
-				617379E5250669A000D4DA9C /* HEXA.Dev-Info.plist in Resources */,
-				619CF24E250660FB00A8E6DF /* FiraSans-MediumItalic.ttf in Resources */,
-				619CF24F250660FB00A8E6DF /* FiraSans-Regular.ttf in Resources */,
-				619CF250250660FB00A8E6DF /* FiraSans-SemiBold.ttf in Resources */,
-				619CF251250660FB00A8E6DF /* OpenSans-Bold.ttf in Resources */,
-				619CF252250660FB00A8E6DF /* OpenSans-BoldItalic.ttf in Resources */,
-				619CF253250660FB00A8E6DF /* OpenSans-ExtraBold.ttf in Resources */,
-				619CF254250660FB00A8E6DF /* OpenSans-Italic.ttf in Resources */,
-				619CF255250660FB00A8E6DF /* OpenSans-Light.ttf in Resources */,
-				619CF256250660FB00A8E6DF /* OpenSans-LightItalic.ttf in Resources */,
-				619CF257250660FB00A8E6DF /* OpenSans-Regular.ttf in Resources */,
-				619CF259250660FB00A8E6DF /* OpenSans-Semibold.ttf in Resources */,
-				617379E1250667CD00D4DA9C /* GoogleService-Info.plist in Resources */,
-				619CF25A250660FB00A8E6DF /* OpenSans-SemiboldItalic.ttf in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -514,95 +340,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		617379BC2506677000D4DA9C /* Start Packager */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Start Packager";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		617379D92506677000D4DA9C /* Bundle React Native code and images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native code and images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		619CF23D250660FB00A8E6DF /* Start Packager */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Start Packager";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		619CF25C250660FB00A8E6DF /* Bundle React Native code and images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native code and images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		94097DFDF6395EAC82420E33 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HEXA-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F246F0C8D28B2529D21AA28B /* [CP] Copy Pods Resources */ = {
+		88FE813A908A34436C277ED9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -652,6 +390,28 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HEXA/Pods-HEXA-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		A7213EF72B6C0B1407566080 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HEXA-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -685,34 +445,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		617379BD2506677000D4DA9C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				617379BE2506677000D4DA9C /* AppDelegate.m in Sources */,
-				617379BF2506677000D4DA9C /* PdfPassword.m in Sources */,
-				617379C02506677000D4DA9C /* PdfGenerate.swift in Sources */,
-				617379C12506677000D4DA9C /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		619CF23E250660FB00A8E6DF /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				619CF23F250660FB00A8E6DF /* AppDelegate.m in Sources */,
-				619CF240250660FB00A8E6DF /* PdfPassword.m in Sources */,
-				619CF241250660FB00A8E6DF /* PdfGenerate.swift in Sources */,
-				619CF242250660FB00A8E6DF /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ACF63AD546D4EA339AC11D75 /* Pods-HEXA.debug.xcconfig */;
+			baseConfigurationReference = 0CF648DC9935A5CEB3142D8F /* Pods-HEXA.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -742,7 +480,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 09683E643A77162AE547A7E9 /* Pods-HEXA.release.xcconfig */;
+			baseConfigurationReference = FED202A105AFE3BBD57D440E /* Pods-HEXA.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -761,118 +499,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
 				PRODUCT_NAME = Hexa;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
-		};
-		617379DC2506677000D4DA9C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y5TCB759QL;
-				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = "$(SRCROOT)/HEXA.Stage-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.staging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
-		617379DD2506677000D4DA9C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y5TCB759QL;
-				INFOPLIST_FILE = "$(SRCROOT)/HEXA.Stage-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.staging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
-		};
-		619CF25F250660FB00A8E6DF /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Development";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y5TCB759QL;
-				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = "$(SRCROOT)/../../HEXA/ios/HEXA.Dev-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
-		619CF260250660FB00A8E6DF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Development";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y5TCB759QL;
-				INFOPLIST_FILE = "$(SRCROOT)/../../HEXA/ios/HEXA.Dev-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.1.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1001,24 +627,6 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		617379DB2506677000D4DA9C /* Build configuration list for PBXNativeTarget "HEXA Stage" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				617379DC2506677000D4DA9C /* Debug */,
-				617379DD2506677000D4DA9C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		619CF25E250660FB00A8E6DF /* Build configuration list for PBXNativeTarget "HEXA Dev" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				619CF25F250660FB00A8E6DF /* Debug */,
-				619CF260250660FB00A8E6DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

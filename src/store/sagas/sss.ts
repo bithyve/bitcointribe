@@ -81,7 +81,8 @@ import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
-var Mailer = require('NativeModules').RNMail;
+// var Mailer = require('NativeModules').RNMail;
+import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 
@@ -195,7 +196,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-          payload.contactInfo.contactName
+        payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -215,8 +216,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-            .UPLOADED_AT <
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -311,7 +312,6 @@ function* uploadEncMetaShareWorker({ payload }) {
       );
     } else {
       // adding transfer details to he ephemeral data
-
       const data: EphemeralDataElements = {
         ...payload.data,
         shareTransferDetails: {
@@ -766,7 +766,7 @@ function* sharePersonalCopyWorker({ payload }) {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[selectedPersonalCopy.type].path
+                    personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -793,7 +793,7 @@ function* sharePersonalCopyWorker({ payload }) {
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                  personalCopyDetails[selectedPersonalCopy.type].path
+                personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -803,8 +803,8 @@ function* sharePersonalCopyWorker({ payload }) {
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {
-            let errorMessage = idx(err, (_) => _.message);
-            if (errorMessage !== 'User did not share') {
+            let errorMessage = idx(err, _ => _.message)
+            if (errorMessage !== "User did not share") {
               throw new Error(`Share failed: ${err}`);
             }
           }
@@ -873,8 +873,8 @@ function* sharePersonalCopyWorker({ payload }) {
         try {
           yield call(Share.open, shareOptions);
         } catch (err) {
-          let errorMessage = idx(err, (_) => _.message);
-          if (errorMessage !== 'User did not share') {
+          let errorMessage = idx(err, _ => _.message)
+          if (errorMessage !== "User did not share") {
             throw new Error(`Share failed: ${err}`);
           }
         }

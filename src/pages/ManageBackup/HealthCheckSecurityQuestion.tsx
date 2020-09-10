@@ -28,7 +28,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
-    (state) => state.storage.database.WALLET_SETUP,
+    state => state.storage.database.WALLET_SETUP,
   );
   let [QuestionCounter, setQuestionCounter] = useState(0);
   let [AnswerCounter, setAnswerCounter] = useState(0);
@@ -39,7 +39,6 @@ function HealthCheckSecurityQuestion(props) {
     id: '',
     question: '',
   });
-  const [showAnswer, setShowAnswer] = useState(false);
   const [answer, setAnswer] = useState('');
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
@@ -50,22 +49,22 @@ function HealthCheckSecurityQuestion(props) {
 
   const setConfirm = () => {
     if (answer.length > 0 && answer != securityAnswer) {
-      if (AnswerCounter < 2) {
-        AnswerCounter++;
-        setAnswerCounter(AnswerCounter);
+        if (AnswerCounter < 2) {
+          AnswerCounter++;
+          setAnswerCounter(AnswerCounter);
+        } else {
+          props.navigation.navigate('ReLogin');
+          setAnswer(securityAnswer);
+          setErrorText('');
+          return;
+        }
+        setErrorText('Answer is incorrect');
       } else {
-        props.navigation.navigate('ReLogin', {isPasscodeCheck: true});
-        setShowAnswer(true);
         setErrorText('');
-        return;
       }
-      setErrorText('Answer is incorrect');
-    } else {
-      setErrorText('');
-    }
-  };
+  }
 
-  const setBackspace = (event) => {
+  const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
       setErrorText('');
     }
@@ -77,10 +76,10 @@ function HealthCheckSecurityQuestion(props) {
     }
   }, [answer]);
 
-  useEffect(() => {
+  useEffect(()=>{
     if ((!errorText && !answer && answer) || answer) setIsDisabled(false);
     else setIsDisabled(true);
-  }, [answer, errorText]);
+  }, [answer, errorText])
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -98,20 +97,18 @@ function HealthCheckSecurityQuestion(props) {
             </View>
             <TouchableOpacity
               onPress={() => {
-                KnowMoreBottomSheet.current.snapTo(1);
+                  KnowMoreBottomSheet.current.snapTo(1);
               }}
-              style={{ marginLeft: 'auto' }}
-            >
+              style={{ marginLeft: 'auto' }}>
               <Text
                 style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  // marginLeft: 'auto',
-                }}
-              >
-                Know more
-              </Text>
-            </TouchableOpacity>
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                // marginLeft: 'auto',
+                }}>
+                  Know more
+                </Text>
+              </TouchableOpacity>
           </View>
           <ScrollView style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
             <View style={styles.dropdownBox}>
@@ -139,6 +136,7 @@ function HealthCheckSecurityQuestion(props) {
                   setBackspace(event);
                 }}
                 onChangeText={(text) => {
+                  
                   setAnswer(text);
                 }}
                 keyboardType={
@@ -169,73 +167,52 @@ function HealthCheckSecurityQuestion(props) {
                 </Text>
               ) : null}
             </View>
-            {showAnswer && (
-              <View
-                style={{
-                  ...styles.inputBox,
-                  width: '100%',
-                  marginBottom: hp('1%'),
-                  borderColor: Colors.borderColor,
-                  justifyContent: 'center'
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: RFValue(13),
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  {securityAnswer}
-                </Text>
-              </View>
-            )}
           </ScrollView>
+          
         </View>
         <View
-          style={{
-            paddingLeft: wp('6%'),
-            paddingRight: wp('6%'),
-            height: hp('15%'),
-            justifyContent: 'center',
-          }}
-        >
-          <AppBottomSheetTouchableWrapper
-            disabled={isDisabled}
-            onPress={() => {
-              setConfirm();
-              if (answer.trim() == securityAnswer.trim()) {
-                AsyncStorage.setItem(
-                  'SecurityAnsTimestamp',
-                  JSON.stringify(Date.now()),
-                ).then(() => {
-                  props.onPressConfirm();
-                });
-              } else {
-                setErrorText('Answer is incorrect');
-              }
-              setIsDisabled(false);
-            }}
             style={{
-              ...styles.questionConfirmButton,
-              backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+              paddingLeft: wp('6%'),
+              paddingRight: wp('6%'),
+              height: hp('15%'),
+              justifyContent: 'center',
             }}
           >
-            <Text style={styles.proceedButtonText}>
-              {!errorText ? 'Confirm' : 'Try Again'}
-            </Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
+            <AppBottomSheetTouchableWrapper
+              disabled={isDisabled}
+              onPress={() => {
+                setConfirm();
+                if (answer.trim() == securityAnswer.trim()) {
+                  AsyncStorage.setItem(
+                    'SecurityAnsTimestamp',
+                    JSON.stringify(Date.now()),
+                  ).then(() => {
+                    props.onPressConfirm();
+                  });
+                } else {
+                  setErrorText('Answer is incorrect');
+                }
+                setIsDisabled(false);
+              }}
+              style={{...styles.questionConfirmButton, backgroundColor: isDisabled? Colors.lightBlue: Colors.blue}}
+            >
+              <Text style={styles.proceedButtonText}>
+                {!errorText ? 'Confirm' : 'Try Again'}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
       </View>
       <BottomSheet
         onCloseStart={() => {
-          KnowMoreBottomSheet.current.snapTo(0);
+            KnowMoreBottomSheet.current.snapTo(0);
         }}
         enabledInnerScrolling={false}
         ref={KnowMoreBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('32%') : hp('36%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('32%')
+          : hp('36%'),
         ]}
         renderContent={() => (
           <TestAccountHelperModalContents

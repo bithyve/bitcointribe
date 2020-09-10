@@ -78,7 +78,6 @@ export default class TrustedContactsService {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
-    isGuardian?: boolean,
   ):
     | {
         status: number;
@@ -104,7 +103,6 @@ export default class TrustedContactsService {
           encodedPublicKey,
           encKey,
           contactsWalletName,
-          isGuardian,
         ),
       };
     } catch (err) {
