@@ -51,7 +51,7 @@ export default function AddContactAddressBook(props) {
   const data = {
     firstName: 'F&F request',
     lastName: 'awaiting',
-    name: 'F&F request awaiting'
+    name: 'F&F request awaiting',
   };
 
   useEffect(() => {
@@ -210,7 +210,7 @@ export default function AddContactAddressBook(props) {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -359,14 +359,17 @@ export default function AddContactAddressBook(props) {
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>
-              {props.modalTitle ? props.modalTitle : 'Add Contact'}
+              {props.modalTitle ? props.modalTitle : 'Associate a contact'}
             </Text>
             <Text style={styles.modalHeaderInfoText}>
               {'Select a contact from your phones address book'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
-            onPress={() => addContact()}
+            onPress={() => {
+              //addContact()
+              props.onSkipContinue([data]);
+            }}
             style={{
               height: wp('8%'),
               width: wp('22%'),
@@ -385,14 +388,14 @@ export default function AddContactAddressBook(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Add New
+              Skip
             </Text>
-            <FontAwesome
+            {/* <FontAwesome
               name="plus"
               color={Colors.white}
               size={10}
               style={{ marginLeft: 5 }}
-            />
+            /> */}
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
@@ -412,29 +415,29 @@ export default function AddContactAddressBook(props) {
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map((value) => {
-                return (
-                  <View style={styles.selectedContactView}>
-                    <Text style={styles.selectedContactNameText}>
-                      {value.name ? value.name.split(' ')[0] : ''}{' '}
-                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {value.name ? value.name.split(' ')[1] : ''}
+                  return (
+                    <View style={styles.selectedContactView}>
+                      <Text style={styles.selectedContactNameText}>
+                        {value.name ? value.name.split(' ')[0] : ''}{' '}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {value.name ? value.name.split(' ')[1] : ''}
+                        </Text>
                       </Text>
-                    </Text>
-                    <AppBottomSheetTouchableWrapper
-                      onPress={() => onCancel(value)}
-                    >
-                      <AntDesign
-                        name="close"
-                        size={17}
-                        color={Colors.white}
-                      />
-                    </AppBottomSheetTouchableWrapper>
-                  </View>
-                );
-              })
+                      <AppBottomSheetTouchableWrapper
+                        onPress={() => onCancel(value)}
+                      >
+                        <AntDesign
+                          name="close"
+                          size={17}
+                          color={Colors.white}
+                        />
+                      </AppBottomSheetTouchableWrapper>
+                    </View>
+                  );
+                })
               : null}
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
+          {/* <View style={{ alignItems: 'flex-end' }}>
             <AppBottomSheetTouchableWrapper
               style={{ marginRight: 10, padding: 10 }}
               onPress={() => props.onSkipContinue([data])}
@@ -447,9 +450,9 @@ export default function AddContactAddressBook(props) {
                 onPress={() => props.onSkipContinue([data])}
               >
                 Skip Contact
-            </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View>
+              </Text>
+            </AppBottomSheetTouchableWrapper> 
+          </View> */}
           <View style={[styles.searchBoxContainer]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons

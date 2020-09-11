@@ -2140,7 +2140,7 @@ export default function Home(props) {
     return (
       <AddContactAddressBook
         isLoadContacts={isLoadContacts}
-        modalTitle={'Add contact to Friends and Family'}
+        modalTitle={'Associate a contact to Friends and Family'}
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={(selectedContacts) => {
