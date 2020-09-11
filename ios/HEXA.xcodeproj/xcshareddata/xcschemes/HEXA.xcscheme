@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cp ${PROJECT_DIR}/../.env.production ${PROJECT_DIR}/../.env  # replace .env.staging for your file&#10;">
+               scriptText = "echo &quot;.emv.production&quot; &gt; /tmp/enfile&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
@@ -37,16 +37,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "HEXATests.xctest"
-               BlueprintName = "HEXATests"
-               ReferencedContainer = "container:HEXA.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
