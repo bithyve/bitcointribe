@@ -75,7 +75,7 @@ const accountData = [
     account_name: 'Donation Account',
     type: DONATION_ACCOUNT,
     checked: false,
-    image: require('../../assets/images/icons/icon_donation_account.png'), //icon_donation_white
+    image: require('../../assets/images/icons/icon_donation_hexa.png'), //icon_donation_white
   },
 ]
 class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccountStateTypes> {
@@ -178,8 +178,8 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                   color: Colors.lightTextColor,
                 }}
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-            </Text>
+                Some of these details can be displayed on the Donation web-view
+              </Text>
             </View>
             <View style={styles.modalTextBoxView}>
               <TextInput
@@ -233,7 +233,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                   }} />
               </View>
             </View>
-            <View style={{ marginVertical: 15, marginLeft: 10 }}>
+            <View style={{ marginVertical: 10, marginLeft: 10 }}>
               <Text style={styles.modalInfoText}>
                 By clicking proceed you agree to our{' '}
                 <Text style={{
@@ -247,7 +247,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
             </View>
             <View
               style={{
-                marginVertical: 20,
+                marginVertical: 10,
               }}
             >
               <AppBottomSheetTouchableWrapper
@@ -412,9 +412,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.AccountDetailBottomSheet as any}
-          snapPoints={[
-            -50, hp('85%'),
-          ]}
+          snapPoints={[-50, hp('90%')]}
           renderContent={this.renderAccountDetailModalContent}
           renderHeader={this.renderAccountDetailModalHeader}
         />

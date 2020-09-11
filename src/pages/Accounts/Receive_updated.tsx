@@ -97,6 +97,10 @@ export default function Receive(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+
+  const derivativeAccountDetails =
+    props.navigation.state.params.derivativeAccountDetails;
+
   const carouselIndex = props.navigation.state.params.carouselIndex
     ? props.navigation.state.params.carouselIndex
     : null;
@@ -143,10 +147,11 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -383,10 +388,11 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
@@ -630,7 +636,9 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    serviceType == TEST_ACCOUNT
+                    derivativeAccountDetails
+                      ? require('../../assets/images/icons/icon_donation_hexa.png')
+                      : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
                         ? require('../../assets/images/icons/icon_regular.png')

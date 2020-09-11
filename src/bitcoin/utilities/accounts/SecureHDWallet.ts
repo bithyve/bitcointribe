@@ -1270,15 +1270,18 @@ export default class SecureHDWallet extends Bitcoin {
       );
       console.log({ txb });
 
-      inputs.forEach((input) =>
-        txb.addInput(input.txId, input.vout, nSequence),
+      for (const input of inputs) {
+        txb.addInput(input.txId, input.vout, nSequence);
+      }
+
+      const sortedOuts = await this.sortOutputs(
+        outputs,
+        derivativeAccountDetails,
       );
 
-      const sortedOuts = await this.sortOutputs(outputs);
-      sortedOuts.forEach((output) => {
-        console.log('Adding Output:', output);
+      for (const output of sortedOuts) {
         txb.addOutput(output.address, output.value);
-      });
+      }
 
       return {
         txb,
@@ -1306,8 +1309,8 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
       const childIndexArray = [];
-      inputs.forEach((input) => {
-        console.log('Signing Input:', input);
+
+      for (const input of inputs) {
         const { multiSig, primaryPriv, childIndex } = this.getSigningEssentials(
           input.address,
         );
@@ -1321,10 +1324,14 @@ export default class SecureHDWallet extends Bitcoin {
         );
         childIndexArray.push({
           childIndex,
-          inputIdentifier: { txId: input.txId, vout: input.vout },
+          inputIdentifier: {
+            txId: input.txId,
+            vout: input.vout,
+            value: input.value,
+          },
         });
-        vin += 1;
-      });
+        vin++;
+      }
 
       return { signedTxb: txb, childIndexArray };
     } catch (err) {

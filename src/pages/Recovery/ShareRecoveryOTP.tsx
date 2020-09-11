@@ -88,7 +88,7 @@ export default function ShareRecoveryOTP(props) {
             Tap on OTP to copy
           </Text>
           <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-            This OTP is only valid for 10 minutes, if the OTP{'\n'}expires you
+            This OTP is only valid for 24 hours, if the OTP{'\n'}expires you
             will be asked to create a new one
           </Text>
           <View style={styles.separator} />

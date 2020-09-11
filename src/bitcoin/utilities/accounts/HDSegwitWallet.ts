@@ -321,10 +321,6 @@ export default class HDSegwitWallet extends Bitcoin {
         account.contactDetails.nextFreeAddressIndex = 0;
 
       for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
-        if (account.contactDetails.nextFreeAddressIndex + itr < 0) {
-          continue;
-        }
-
         const address = this.getAddress(
           false,
           account.contactDetails.nextFreeAddressIndex + itr,
@@ -339,18 +335,18 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
-      if (!availableAddress) {
-        const address = this.getAddress(
-          false,
-          account.contactDetails.nextFreeAddressIndex + itr,
-          account.contactDetails.xpub,
-        );
-        availableAddress = address;
+      if (!availableAddress)
         account.contactDetails.nextFreeAddressIndex += itr + 1;
-      }
 
-      account.contactDetails.receivingAddress = availableAddress;
-      return { address: availableAddress };
+      account.contactDetails.receivingAddress = availableAddress
+        ? availableAddress
+        : this.getAddress(
+            false,
+            account.contactDetails.nextFreeAddressIndex + itr,
+            account.contactDetails.xpub,
+          );
+
+      return { address: account.contactDetails.receivingAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -849,22 +845,18 @@ export default class HDSegwitWallet extends Bitcoin {
       let itr;
       for (itr = 0; itr < this.gapLimit + 1; itr++) {
         const address = this.getAddress(false, itr, xpub);
-        const txCounts = await this.getTxCounts([address]); // ensuring availability
+        const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
-          // free address found
           availableAddress = address;
           break;
         }
       }
 
-      if (!availableAddress) {
-        console.log(
-          'Failed to find a free address in the external address cycle, using the next address without checking',
-        );
-        availableAddress = this.getAddress(false, itr);
-      }
-
-      return { address: availableAddress };
+      return {
+        address: availableAddress
+          ? availableAddress
+          : this.getAddress(false, itr),
+      };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -1292,15 +1284,18 @@ export default class HDSegwitWallet extends Bitcoin {
         this.network,
       );
 
-      inputs.forEach((input) =>
-        txb.addInput(input.txId, input.vout, nSequence),
+      for (const input of inputs) {
+        txb.addInput(input.txId, input.vout, nSequence);
+      }
+
+      const sortedOuts = await this.sortOutputs(
+        outputs,
+        derivativeAccountDetails,
       );
 
-      const sortedOuts = await this.sortOutputs(outputs);
-      sortedOuts.forEach((output) => {
-        console.log('Adding Output:', output);
+      for (const output of sortedOuts) {
         txb.addOutput(output.address, output.value);
-      });
+      }
 
       return {
         txb,
@@ -1318,13 +1313,11 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
-      inputs.forEach((input) => {
-        console.log('Signing Input:', input);
-
+      for (const input of inputs) {
         const keyPair = this.getKeyPair(
           this.addressToPrivateKey(input.address),
         );
-        console.log({ keyPair });
+
         txb.sign(
           vin,
           keyPair,
@@ -1333,8 +1326,8 @@ export default class HDSegwitWallet extends Bitcoin {
           input.value,
           witnessScript,
         );
-        vin += 1;
-      });
+        vin++;
+      }
 
       return txb;
     } catch (err) {

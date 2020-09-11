@@ -47,6 +47,7 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -575,8 +576,24 @@ class SendToContact extends Component<
       if (
         instance.bitcoinAmount &&
         instance.selectedContact.id !== selectedContact.id
-      )
+      ) {
         recipientsList.push(instance);
+      } else if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id === selectedContact.id
+      ) {
+        if (selectedContact.id === DONATION_ACCOUNT) {
+          if (
+            instance.selectedContact.account_number ===
+              selectedContact.account_number &&
+            instance.selectedContact.type === selectedContact.type
+          ) {
+            // skip (current donation instance), get added as currentRecipientInstance
+          } else {
+            recipientsList.push(instance);
+          }
+        }
+      }
     });
     recipientsList.push(currentRecipientInstance);
     const instance =
@@ -594,10 +611,16 @@ class SendToContact extends Component<
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        if (recipientId === REGULAR_ACCOUNT || recipientId === SECURE_ACCOUNT) {
-          // recipient: sibling account
+        if (
+          recipientId === REGULAR_ACCOUNT ||
+          recipientId === SECURE_ACCOUNT ||
+          recipientId === DONATION_ACCOUNT
+        ) {
+          // recipient: account
           recipients.push({
             id: recipientId,
+            type: item.selectedContact.type, // underlying accountType (used in case of derv acc(here donation))
+            accountNumber: item.selectedContact.account_number, // donation acc number
             address: null,
             amount: parseInt(item.bitcoinAmount),
           });
@@ -637,10 +660,23 @@ class SendToContact extends Component<
           transfer[serviceType].transfer.details[i].selectedContact.id ==
           selectedContact.id
         ) {
-          removeTransferDetails(
-            serviceType,
-            transfer[serviceType].transfer.details[i],
-          );
+          if (selectedContact.id === DONATION_ACCOUNT) {
+            if (
+              transfer[serviceType].transfer.details[i].selectedContact
+                .account_number === selectedContact.account_number &&
+              transfer[serviceType].transfer.details[i].selectedContact.type ===
+                selectedContact.type
+            )
+              removeTransferDetails(
+                serviceType,
+                transfer[serviceType].transfer.details[i],
+              );
+          } else {
+            removeTransferDetails(
+              serviceType,
+              transfer[serviceType].transfer.details[i],
+            );
+          }
         }
       }
       addTransferDetails(serviceType, {
@@ -677,9 +713,9 @@ class SendToContact extends Component<
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(balance)
       : switchOn
-        ? UsNumberFormat(balance)
+        ? UsNumberFormat(spendableBalance)
         : exchangeRates
-          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
           : null;
   };
 
@@ -747,11 +783,13 @@ class SendToContact extends Component<
             </TouchableOpacity>
             <Image
               source={
-                serviceType == TEST_ACCOUNT
-                  ? require('../../assets/images/icons/icon_test.png')
-                  : serviceType == REGULAR_ACCOUNT
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : require('../../assets/images/icons/icon_secureaccount.png')
+                this.state.derivativeAccountDetails
+                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  : serviceType == TEST_ACCOUNT
+                    ? require('../../assets/images/icons/icon_test.png')
+                    : serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -784,15 +822,17 @@ class SendToContact extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {serviceType == 'TEST_ACCOUNT'
-                ? 'Test Account'
-                : serviceType == 'SECURE_ACCOUNT'
-                  ? 'Savings Account'
-                  : serviceType == 'REGULAR_ACCOUNT'
-                    ? 'Checking Account'
-                    : serviceType == 'S3_SERVICE'
-                      ? 'S3 Service'
-                      : ''}
+              {this.state.derivativeAccountDetails
+                ? 'Donation Account'
+                : serviceType == 'TEST_ACCOUNT'
+                  ? 'Test Account'
+                  : serviceType == 'SECURE_ACCOUNT'
+                    ? 'Savings Account'
+                    : serviceType == 'REGULAR_ACCOUNT'
+                      ? 'Checking Account'
+                      : serviceType == 'S3_SERVICE'
+                        ? 'S3 Service'
+                        : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -866,18 +906,20 @@ class SendToContact extends Component<
                                     >
                                       {item && item.selectedContact
                                         ? nameToInitials(
-                                          item.selectedContact.firstName &&
-                                            item.selectedContact.lastName
-                                            ? item.selectedContact.firstName +
-                                            ' ' +
-                                            item.selectedContact.lastName
+                                          item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                                            ? `${item.selectedContact.contactsWalletName}'s wallet`
                                             : item.selectedContact.firstName &&
-                                              !item.selectedContact.lastName
-                                              ? item.selectedContact.firstName
-                                              : !item.selectedContact.firstName &&
-                                                item.selectedContact.lastName
-                                                ? item.selectedContact.lastName
-                                                : '',
+                                              item.selectedContact.lastName
+                                              ? item.selectedContact.firstName +
+                                              ' ' +
+                                              item.selectedContact.lastName
+                                              : item.selectedContact.firstName &&
+                                                !item.selectedContact.lastName
+                                                ? item.selectedContact.firstName
+                                                : !item.selectedContact.firstName &&
+                                                  item.selectedContact.lastName
+                                                  ? item.selectedContact.lastName
+                                                  : '',
                                         )
                                         : ''}
                                     </Text>
@@ -919,7 +961,9 @@ class SendToContact extends Component<
                         </TouchableOpacity>
                       </View>
                       <Text style={styles.name} numberOfLines={1}>
-                        {item.selectedContact.name ||
+                        {item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                          ? `${item.selectedContact.contactsWalletName}'s wallet`
+                          : item.selectedContact.name ||
                           item.selectedContact.account_name ||
                           item.selectedContact.id}
                       </Text>
@@ -1257,10 +1301,24 @@ class SendToContact extends Component<
                           transfer[serviceType].transfer.details[i]
                             .selectedContact.id == selectedContact.id
                         ) {
-                          removeTransferDetails(
-                            serviceType,
-                            transfer[serviceType].transfer.details[i],
-                          );
+                          if (selectedContact.id === DONATION_ACCOUNT) {
+                            if (
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.account_number ===
+                                selectedContact.account_number &&
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.type === selectedContact.type
+                            )
+                              removeTransferDetails(
+                                serviceType,
+                                transfer[serviceType].transfer.details[i],
+                              );
+                          } else {
+                            removeTransferDetails(
+                              serviceType,
+                              transfer[serviceType].transfer.details[i],
+                            );
+                          }
                         }
                       }
                       addTransferDetails(serviceType, {

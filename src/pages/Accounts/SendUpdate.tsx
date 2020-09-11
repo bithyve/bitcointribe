@@ -34,11 +34,15 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import {
+  TrustedContactDerivativeAccountElements,
+  DonationDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
@@ -145,8 +149,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   }
 
   componentDidMount = () => {
+    this.updateAccountData();
     this.props.clearTransfer(this.state.serviceType);
-    this.getBalances();
+    this.getAccountBalances();
     if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
     this.checkNShowHelperModal();
     this.setRecipientAddress();
@@ -166,7 +171,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.accounts !== this.props.accounts) {
-      this.getBalances();
+      this.getAccountBalances();
     }
 
     if (
@@ -187,7 +192,55 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
-  getBalances = () => {
+  updateAccountData = () => {
+    const defaultAccountData = [
+      {
+        id: REGULAR_ACCOUNT,
+        account_name: 'Checking Account',
+        type: REGULAR_ACCOUNT,
+        checked: false,
+        image: require('../../assets/images/icons/icon_regular_account.png'),
+      },
+      {
+        id: SECURE_ACCOUNT,
+        account_name: 'Savings Account',
+        type: SECURE_ACCOUNT,
+        checked: false,
+        image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+      },
+    ];
+
+    const donationAccountData = [];
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts = this.props.accounts[serviceType].service[
+        serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+      ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donationInstance = {
+          id: DONATION_ACCOUNT,
+          account_number: index,
+          account_name: 'Donation Account',
+          type: serviceType,
+          checked: false,
+          image: require('../../assets/images/icons/icon_donation_account.png'),
+        };
+        donationAccountData.push(donationInstance);
+      }
+    }
+
+    this.setState({
+      accountData: [...defaultAccountData, ...donationAccountData],
+    });
+  };
+
+  getAccountBalances = () => {
     const { accounts } = this.props;
     const { serviceType } = this.state;
 
@@ -253,11 +306,34 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
     else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
+
+    let donationsBalance = {};
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+        donationsBalance[serviceType + index] =
+          donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+      }
+    }
+
     this.setState({
       balances: {
         testBalance,
         regularBalance,
         secureBalance,
+        donationsBalance,
       },
     });
   };
@@ -438,7 +514,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       transfer[serviceType].transfer.details.length &&
         transfer[serviceType].transfer.details.map((contact) => {
           if (contact.selectedContact.id === item.id) {
-            return (isNavigate = false);
+            if (item.id === DONATION_ACCOUNT) {
+              if (
+                item.account_number ===
+                  contact.selectedContact.account_number &&
+                item.type === contact.selectedContact.type
+              )
+                return (isNavigate = false);
+            } else {
+              return (isNavigate = false);
+            }
           }
         });
       if (isNavigate) {
@@ -650,7 +735,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     </TouchableOpacity>
                     <Image
                       source={
-                        serviceType == TEST_ACCOUNT
+                        this.state.derivativeAccountDetails
+                          ? require('../../assets/images/icons/icon_donation_hexa.png')
+                          : serviceType == TEST_ACCOUNT
                           ? require('../../assets/images/icons/icon_test.png')
                           : serviceType == REGULAR_ACCOUNT
                             ? require('../../assets/images/icons/icon_regular.png')
@@ -844,10 +931,34 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                 transfer[serviceType].transfer.details[i]
                                   .selectedContact;
                               if (element.id == Items.item.id) {
-                                checked = true;
+                                if (element.id === DONATION_ACCOUNT) {
+                                  if (
+                                    element.account_number ===
+                                      Items.item.account_number &&
+                                    element.type === Items.item.type
+                                  )
+                                    checked = true;
+                                } else {
+                                  checked = true;
+                                }
                               }
                             }
-                            if (Items.item.type != serviceType) {
+
+                            const { derivativeAccountDetails } = this.state;
+                            if (
+                              Items.item.type != serviceType ||
+                              Items.item.id === DONATION_ACCOUNT ||
+                              derivativeAccountDetails
+                            ) {
+                              if (
+                                derivativeAccountDetails &&
+                                derivativeAccountDetails.type ===
+                                  Items.item.id &&
+                                serviceType === Items.item.type &&
+                                derivativeAccountDetails.number ===
+                                  Items.item.account_number
+                              )
+                                return;
                               return (
                                 <AccountsListSend
                                   accounts={Items.item}

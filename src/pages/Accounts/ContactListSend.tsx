@@ -37,15 +37,16 @@ function getImageIcon(item) {
             }}
           >
             {item
-              ? nameToInitials(
-                  item.firstName && item.lastName
-                    ? item.firstName + ' ' + item.lastName
-                    : item.firstName && !item.lastName
+              ? nameToInitials(item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== ""
+                ? `${item.contactsWalletName}'s wallet`
+                : item.firstName && item.lastName
+                  ? item.firstName + ' ' + item.lastName
+                  : item.firstName && !item.lastName
                     ? item.firstName
                     : !item.firstName && item.lastName
-                    ? item.lastName
-                    : '',
-                )
+                      ? item.lastName
+                      : '',
+              )
               : ''}
           </Text>
         </View>
@@ -55,29 +56,30 @@ function getImageIcon(item) {
 }
 
 const ContactListSend = ({ transfer, Items, onSelectContact }) => {
-    //console.log("Items,", Items);
+  //console.log("Items,", Items);
   return (
     <TouchableOpacity onPress={() => onSelectContact(Items)}>
-          <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
-            {transfer.details &&
-              transfer.details.length > 0 &&
-              transfer.details.map((contact) => {
-                if (contact.selectedContact.id === Items.id) {
-                  return (
-                    <Image
-                      style={styles.checkmarkStyle}
-                      source={require('../../assets/images/icons/checkmark.png')}
-                      resizeMode="contain"
-                    />
-                  );
-                }
-              })}
-            {getImageIcon(Items)}
-            <Text numberOfLines={1} style={styles.contactName}>
-              {Items.name}
-            </Text>
-          </View>
-        </TouchableOpacity>
+      <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
+        {transfer.details &&
+          transfer.details.length > 0 &&
+          transfer.details.map((contact) => {
+            if (contact.selectedContact.id === Items.id) {
+              return (
+                <Image
+                  style={styles.checkmarkStyle}
+                  source={require('../../assets/images/icons/checkmark.png')}
+                  resizeMode="contain"
+                />
+              );
+            }
+          })}
+        {getImageIcon(Items)}
+        <Text numberOfLines={1} style={styles.contactName}>
+          {Items.firstName === 'F&F request' && Items.contactsWalletName !== undefined && Items.contactsWalletName !== ""
+            ? `${Items.contactsWalletName}'s wallet` : Items.name}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
