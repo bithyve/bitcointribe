@@ -412,7 +412,7 @@ export default function ContactList(props) {
             })
           : null}
       </View>
-      <View style={{ flexDirection: 'row' }}>
+      {/* <View style={{ flexDirection: 'row' }}>
         <AppBottomSheetTouchableWrapper
           style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
           onPress={() => addContact()}
@@ -424,7 +424,7 @@ export default function ContactList(props) {
             }}
             onPress={() => addContact()}
           >
-            Associate a contact
+            Add contact
           </Text>
         </AppBottomSheetTouchableWrapper>
         {props.isShowSkipContact && (
@@ -443,7 +443,7 @@ export default function ContactList(props) {
             </Text>
           </AppBottomSheetTouchableWrapper>
         )}
-      </View>
+      </View> */}
       <View style={[styles.searchBoxContainer]}>
         <View style={styles.searchBoxIcon}>
           <EvilIcons
