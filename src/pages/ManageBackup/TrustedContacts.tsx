@@ -9,10 +9,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-const TrustedContacts = props => {
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+const TrustedContacts = (props) => {
   const [contacts, setContacts] = useState([]);
   const index = props.index;
-  const selectedContactsList = useCallback(list => {
+  const selectedContactsList = useCallback((list) => {
     if (list.length > 0) setContacts([...list]);
   }, []);
 
@@ -62,12 +63,45 @@ const TrustedContacts = props => {
         style={{
           ...BackupStyles.modalHeaderTitleView,
           paddingTop: hp('0.5%'),
+          flexDirection: 'row',
           alignItems: 'center',
           marginLeft: 20,
         }}
       >
-        <Text style={BackupStyles.modalHeaderTitleText}>Select Contact</Text>
+        <Text style={BackupStyles.modalHeaderTitleText}>
+          Associate a contact
+        </Text>
+        <AppBottomSheetTouchableWrapper
+          onPress={() => {
+            const data = {
+              firstName: 'F&F request',
+              lastName: 'awaiting',
+              name: 'F&F request awaiting',
+            };
+            onPressSkip(data);
+          }}
+          style={{
+            height: wp('13%'),
+            width: wp('35%'),
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+          }}
+        >
+          <Text
+            style={{
+              ...{
+                color: Colors.white,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansMedium,
+              },
+              color: Colors.blue,
+            }}
+          >
+            Skip
+          </Text>
+        </AppBottomSheetTouchableWrapper>
       </View>
+
       <View style={{ flex: 1 }}>
         <Text
           style={{
@@ -78,7 +112,7 @@ const TrustedContacts = props => {
             marginTop: 5,
           }}
         >
-          Select contact to{' '}
+          Associate contact to{' '}
           <Text
             style={{
               fontFamily: Fonts.FiraSansMediumItalic,

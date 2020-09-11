@@ -26,11 +26,11 @@ import { textWithoutEncoding, email } from 'react-native-communications';
 import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
 
-const Contacts = props => {
+const Contacts = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   console.log('isErrorSendingFailed', isErrorSendingFailed);
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
@@ -44,7 +44,7 @@ const Contacts = props => {
 
   const dispatch = useDispatch();
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
@@ -54,7 +54,7 @@ const Contacts = props => {
     communicationModeBottomSheet.current.snapTo(1);
   };
 
-  const communicate = async selectedContactMode => {
+  const communicate = async (selectedContactMode) => {
     if (!SHARES_TRANSFER_DETAILS[props.index]) {
       Alert.alert('Failed to share');
       return;
@@ -147,7 +147,9 @@ const Contacts = props => {
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('2%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Friends and Family</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>
+            Friends and Family
+          </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
@@ -165,7 +167,7 @@ const Contacts = props => {
             marginTop: 5,
           }}
         >
-          Select contact to{' '}
+          Associate contact to{' '}
           <Text
             style={{
               fontFamily: Fonts.FiraSansMediumItalic,

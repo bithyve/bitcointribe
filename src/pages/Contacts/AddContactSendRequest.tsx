@@ -383,8 +383,11 @@ export default function AddContactSendRequest(props) {
             setTimeout(() => {
               setRenderTimer(true);
             }, 2);
-            if(isOTPType){ shareOtpWithTrustedContactBottomSheet.current.snapTo(1); }
-            else{ openTimer(); }
+            if (isOTPType) {
+              shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+            } else {
+              openTimer();
+            }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -483,7 +486,7 @@ export default function AddContactSendRequest(props) {
         OTP={OTP}
       />
     );
-  }, [ OTP, renderTimer]);
+  }, [OTP, renderTimer]);
 
   const renderShareOtpWithTrustedContactHeader = useCallback(() => {
     return (
@@ -531,7 +534,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add Contact{' '}
+                Associate a contact{' '}
               </Text>
               <Text
                 style={{
@@ -791,7 +794,7 @@ export default function AddContactSendRequest(props) {
         <BottomSheet
           onCloseEnd={() => {
             if (SelectedContact.length > 0) {
-              setRenderTimer(false)
+              setRenderTimer(false);
             }
           }}
           enabledInnerScrolling={true}
