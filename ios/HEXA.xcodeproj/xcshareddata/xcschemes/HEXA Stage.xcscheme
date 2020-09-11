@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cp ${PROJECT_DIR}/../.env.staging ${PROJECT_DIR}/../.env  # replace .env.staging for your file&#10;">
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;echo &quot;.env.staging&quot; &gt; /tmp/envfile&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
@@ -23,9 +23,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "617379BA2506677000D4DA9C"
-               BuildableName = "HEXA Stage.app"
-               BlueprintName = "HEXA Stage"
+               BlueprintIdentifier = "6182F79E250B2742005B6ECE"
+               BuildableName = "Hexa Stage.app"
+               BlueprintName = "Hexa Stage"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,6 +49,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "6182F79E250B2742005B6ECE"
+            BuildableName = "Hexa Stage.app"
+            BlueprintName = "Hexa Stage"
+            ReferencedContainer = "container:HEXA.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -56,15 +66,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "617379BA2506677000D4DA9C"
-            BuildableName = "HEXA Stage.app"
-            BlueprintName = "HEXA Stage"
+            BlueprintIdentifier = "6182F79E250B2742005B6ECE"
+            BuildableName = "Hexa Stage.app"
+            BlueprintName = "Hexa Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
