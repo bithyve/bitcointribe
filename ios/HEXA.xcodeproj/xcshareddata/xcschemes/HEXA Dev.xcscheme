@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cp ${PROJECT_DIR}/../.env.development ${PROJECT_DIR}/../.env  # replace .env.staging for your file&#10;">
+               scriptText = "echo &quot;.env.development&quot; &gt; /tmp/envfile&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
@@ -23,9 +23,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Hexa.app"
-               BlueprintName = "HEXA"
+               BlueprintIdentifier = "6182F772250B23D7005B6ECE"
+               BuildableName = "HEXA Dev.app"
+               BlueprintName = "HEXA Dev"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -53,21 +53,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "619CF23B250660FB00A8E6DF"
+            BlueprintIdentifier = "6182F772250B23D7005B6ECE"
             BuildableName = "HEXA Dev.app"
             BlueprintName = "HEXA Dev"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Hexa.app"
-            BlueprintName = "HEXA"
-            ReferencedContainer = "container:HEXA.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -75,16 +66,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Hexa.app"
-            BlueprintName = "HEXA"
-            ReferencedContainer = "container:HEXA.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
