@@ -79,26 +79,33 @@ const makeFullName = (item) => {
   return item.firstName == 'Secondary' && item.lastName == 'Device'
     ? 'Keeper Device'
     : item.firstName && item.lastName
-      ? item.firstName + ' ' + item.lastName
-      : item.firstName && !item.lastName
-        ? item.firstName
-        : !item.firstName && item.lastName
-          ? item.lastName
-          : '';
-}
+    ? item.firstName + ' ' + item.lastName
+    : item.firstName && !item.lastName
+    ? item.firstName
+    : !item.firstName && item.lastName
+    ? item.lastName
+    : '';
+};
 
 const getImageIcon = (item) => {
   if (item) {
     if (item.image && item.image.uri) {
       return <Image source={item.image} style={styles.imageIconStyle} />;
     } else {
-      if (item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== "") {
+      if (
+        item.firstName === 'F&F request' &&
+        item.contactsWalletName !== undefined &&
+        item.contactsWalletName !== ''
+      ) {
         return (
           <View style={styles.imageIconViewStyle}>
             <Text style={styles.imageIconText}>
               {item
-                ? nameToInitials(item.contactsWalletName && item.contactsWalletName !== ""
-                  ? `${item.contactsWalletName}'s Wallet` : makeFullName(item))
+                ? nameToInitials(
+                    item.contactsWalletName && item.contactsWalletName !== ''
+                      ? `${item.contactsWalletName}'s Wallet`
+                      : makeFullName(item),
+                  )
                 : ''}
             </Text>
           </View>
@@ -109,16 +116,16 @@ const getImageIcon = (item) => {
             <Text style={styles.imageIconText}>
               {item
                 ? nameToInitials(
-                  item.firstName == 'Secondary' && item.lastName == 'Device'
-                    ? 'Keeper Device'
-                    : item.firstName && item.lastName
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                )
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>
@@ -131,7 +138,7 @@ const getImageIcon = (item) => {
 class AddressBookContents extends PureComponent<
   AddressBookContentsPropTypes,
   AddressBookContentsStateTypes
-  > {
+> {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
   focusListener: any;
@@ -209,7 +216,7 @@ class AddressBookContents extends PureComponent<
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -241,7 +248,7 @@ class AddressBookContents extends PureComponent<
             contactsWalletName,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           const hasTrustedAddress = !!trustedAddress;
 
@@ -344,13 +351,20 @@ class AddressBookContents extends PureComponent<
           />
         );
       } else {
-        if (item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== "") {
+        if (
+          item.firstName === 'F&F request' &&
+          item.contactsWalletName !== undefined &&
+          item.contactsWalletName !== ''
+        ) {
           return (
             <View style={styles.imageIconViewStyle}>
               <Text style={styles.imageIconText}>
                 {item
-                  ? nameToInitials(item.contactsWalletName && item.contactsWalletName !== ""
-                    ? `${item.contactsWalletName}'s Wallet` : makeFullName(item))
+                  ? nameToInitials(
+                      item.contactsWalletName && item.contactsWalletName !== ''
+                        ? `${item.contactsWalletName}'s Wallet`
+                        : makeFullName(item),
+                    )
                   : ''}
               </Text>
             </View>
@@ -376,16 +390,16 @@ class AddressBookContents extends PureComponent<
               >
                 {item
                   ? nameToInitials(
-                    item.firstName == 'Secondary' && item.lastName == 'Device'
-                      ? 'Keeper Device'
-                      : item.firstName && item.lastName
+                      item.firstName == 'Secondary' && item.lastName == 'Device'
+                        ? 'Keeper Device'
+                        : item.firstName && item.lastName
                         ? item.firstName + ' ' + item.lastName
                         : item.firstName && !item.lastName
-                          ? item.firstName
-                          : !item.firstName && item.lastName
-                            ? item.lastName
-                            : '',
-                  )
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+                    )
                   : ''}
               </Text>
             </View>
@@ -425,22 +439,25 @@ class AddressBookContents extends PureComponent<
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.firstName === 'F&F request' && contact.contactsWalletName !== undefined && contact.contactsWalletName !== ""
-              ? `${contact.contactsWalletName}'s ` :
-              contact.firstName && contact.firstName != 'Secondary'
-                ? contact.firstName + ' '
-                : contact.firstName && contact.firstName == 'Secondary'
-                  ? 'Keeper '
-                  : ''
-            }
+            {contact.firstName === 'F&F request' &&
+            contact.contactsWalletName !== undefined &&
+            contact.contactsWalletName !== ''
+              ? `${contact.contactsWalletName}'s `
+              : contact.firstName && contact.firstName != 'Secondary'
+              ? contact.firstName + ' '
+              : contact.firstName && contact.firstName == 'Secondary'
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.firstName === 'F&F request' && contact.contactsWalletName !== undefined && contact.contactsWalletName !== ""
-                ? 'Wallet' :
-                contact.lastName && contact.lastName != 'Device'
-                  ? contact.lastName + ' '
-                  : contact.lastName && contact.lastName == 'Device'
-                    ? 'Device '
-                    : ''}
+              {contact.firstName === 'F&F request' &&
+              contact.contactsWalletName !== undefined &&
+              contact.contactsWalletName !== ''
+                ? 'Wallet'
+                : contact.lastName && contact.lastName != 'Device'
+                ? contact.lastName + ' '
+                : contact.lastName && contact.lastName == 'Device'
+                ? 'Device '
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -452,53 +469,53 @@ class AddressBookContents extends PureComponent<
             <View>
               {!(contact.hasXpub || contact.hasTrustedAddress) &&
                 (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                  !contact.hasTrustedChannel ? (
-                    <View
+                !contact.hasTrustedChannel ? (
+                  <View
+                    style={{
+                      width: wp('15%'),
+                      height: wp('6%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: Colors.borderColor,
+                      marginRight: 10,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
                       style={{
-                        width: wp('15%'),
-                        height: wp('6%'),
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: Colors.borderColor,
-                        marginRight: 10,
-                        borderRadius: 5,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(10),
-                          fontFamily: Fonts.FiraSansRegular,
-                        }}
-                      >
-                        Expired
-                    </Text>
-                    </View>
-                  ) : (
-                    <CountDown
-                      onFinish={() =>
-                        this.setState({ updateList: !this.state.updateList })
-                      }
-                      id={index}
-                      size={12}
-                      until={minute}
-                      digitStyle={{
-                        backgroundColor: '#FFF',
-                        borderWidth: 0,
-                        borderColor: '#FFF',
-                        margin: -10,
-                      }}
-                      digitTxtStyle={{
                         color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
+                        fontSize: RFValue(10),
                         fontFamily: Fonts.FiraSansRegular,
                       }}
-                      separatorStyle={{ color: Colors.textColorGrey }}
-                      timeToShow={['H', 'M', 'S']}
-                      timeLabels={{ h: null, m: null, s: null }}
-                      showSeparator
-                    />
-                  ))}
+                    >
+                      Expired
+                    </Text>
+                  </View>
+                ) : (
+                  <CountDown
+                    onFinish={() =>
+                      this.setState({ updateList: !this.state.updateList })
+                    }
+                    id={index}
+                    size={12}
+                    until={minute}
+                    digitStyle={{
+                      backgroundColor: '#FFF',
+                      borderWidth: 0,
+                      borderColor: '#FFF',
+                      margin: -10,
+                    }}
+                    digitTxtStyle={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                    separatorStyle={{ color: Colors.textColorGrey }}
+                    timeToShow={['H', 'M', 'S']}
+                    timeLabels={{ h: null, m: null, s: null }}
+                    showSeparator
+                  />
+                ))}
             </View>
           ) : null}
           <View style={styles.xpubIconView}>
@@ -618,8 +635,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'My Keepers');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -635,8 +652,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, "I'm Keeper of");
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -653,8 +670,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'Other Contacts');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                   <TouchableOpacity
                     onPress={() => {
                       setTimeout(() => {
@@ -676,7 +693,9 @@ class AddressBookContents extends PureComponent<
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>Add Contact</Text>
+                      <Text style={styles.contactText}>
+                        Associate a contact
+                      </Text>
                     </View>
                   </TouchableOpacity>
                 </View>
