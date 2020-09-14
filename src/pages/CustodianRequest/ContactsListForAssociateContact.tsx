@@ -21,7 +21,7 @@ const ContactsListForAssociateContact = (props) => {
   const data = {
     firstName: 'F&F request',
     lastName: 'awaiting',
-    name: 'F&F request awaiting'
+    name: 'F&F request awaiting',
   };
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');

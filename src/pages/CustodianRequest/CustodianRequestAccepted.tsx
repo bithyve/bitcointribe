@@ -9,7 +9,7 @@ import {
 } from 'react-native-responsive-screen';
 import { useDispatch } from 'react-redux';
 import { updateMSharesHealth } from '../../store/actions/sss';
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function CustodianRequestAccepted(props) {
   const requester = props.navigation.getParam('requester');
@@ -19,7 +19,7 @@ export default function CustodianRequestAccepted(props) {
   }, []);
 
   const onPressAssociateContacts = () => {
-    props.navigation.navigate("ContactsListForAssociateContact");
+    props.navigation.navigate('ContactsListForAssociateContact');
   };
 
   return (
@@ -72,7 +72,7 @@ export default function CustodianRequestAccepted(props) {
             onPress={() => onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>Associate Contact</Text>
+            <Text style={styles.proceedButtonText}>Associate a contact</Text>
           </AppBottomSheetTouchableWrapper>
           <AppBottomSheetTouchableWrapper
             onPress={() => props.navigation.replace('Home')}
