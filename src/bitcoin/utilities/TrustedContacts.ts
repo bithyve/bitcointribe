@@ -95,6 +95,7 @@ export default class TrustedContacts {
   };
 
   public trustedContacts: Contacts = {};
+  public skippedContactsCount: number = 0;
   constructor(stateVars) {
     this.initializeStateVars(stateVars);
   }

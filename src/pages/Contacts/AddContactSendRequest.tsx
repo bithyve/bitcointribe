@@ -145,7 +145,7 @@ export default function AddContactSendRequest(props) {
 
   const createTrustedContact = useCallback(async () => {
     if (Contact && Contact.firstName) {
-      const contactName = `${Contact.firstName} ${
+      let contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
       }`
         .toLowerCase()
@@ -161,11 +161,22 @@ export default function AddContactSendRequest(props) {
         info = Contact.emails[0].email;
       }
 
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+      if (contactName === 'F&F request awaiting') {
+        // handling skipped contact
+        let { skippedContactsCount } = trustedContacts.tc;
+        if (!skippedContactsCount) {
+          skippedContactsCount = 1;
+        } else {
+          skippedContactsCount++;
+        }
+        contactName = `F&F request awaiting ${skippedContactsCount}`;
+      }
+
       const contactInfo = {
         contactName,
         info: info.trim(),
       };
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = fcmTokenValue;
