@@ -135,6 +135,10 @@ export default class TrustedContacts {
   public initializeStateVars = (stateVars) => {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {};
+    this.skippedContactsCount =
+      stateVars && stateVars.skippedContactsCount
+        ? stateVars.skippedContactsCount
+        : this.skippedContactsCount;
   };
 
   public decodePublicKey = (publicKey: string) => {
@@ -150,6 +154,10 @@ export default class TrustedContacts {
       throw new Error(
         'TC Init failed: initialization already exists against the supplied',
       );
+    }
+
+    if (contactName.slice(0, 20) === 'f&f request awaiting') {
+      this.skippedContactsCount++;
     }
 
     const keyPair = ec.genKeyPair();

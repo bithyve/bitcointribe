@@ -48,12 +48,6 @@ export default function AddContactAddressBook(props) {
   ] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
 
-  const data = {
-    firstName: 'F&F request',
-    lastName: 'awaiting',
-    name: 'F&F request awaiting',
-  };
-
   useEffect(() => {
     if (!props.addContactModalOpened) {
       setSelectedContacts([]);
@@ -368,7 +362,7 @@ export default function AddContactAddressBook(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => {
               //addContact()
-              props.onSkipContinue([data]);
+              props.onSkipContinue();
             }}
             style={{
               height: wp('8%'),

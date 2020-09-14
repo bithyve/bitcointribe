@@ -162,17 +162,6 @@ export default function AddContactSendRequest(props) {
       }
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      if (contactName === 'F&F request awaiting') {
-        // handling skipped contact
-        let { skippedContactsCount } = trustedContacts.tc;
-        if (!skippedContactsCount) {
-          skippedContactsCount = 1;
-        } else {
-          skippedContactsCount++;
-        }
-        contactName = `F&F request awaiting ${skippedContactsCount}`;
-      }
-
       const contactInfo = {
         contactName,
         info: info.trim(),
@@ -243,6 +232,7 @@ export default function AddContactSendRequest(props) {
       console.log('Err: Contact missing');
       return;
     }
+    console.log({ Contact });
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
