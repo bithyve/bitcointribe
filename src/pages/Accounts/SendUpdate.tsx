@@ -656,6 +656,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             isWard,
             trustedAddress,
             trustedTestAddress,
+            contactsWalletName,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ];
@@ -675,6 +676,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               hasTrustedAddress,
               isGuardian,
               isWard,
+              contactsWalletName,
               ...contactInfo,
             });
           }
