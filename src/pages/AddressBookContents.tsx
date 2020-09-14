@@ -693,9 +693,7 @@ class AddressBookContents extends PureComponent<
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>
-                        Associate a contact
-                      </Text>
+                      <Text style={styles.contactText}>Add a Contact</Text>
                     </View>
                   </TouchableOpacity>
                 </View>

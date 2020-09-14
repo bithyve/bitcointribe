@@ -534,7 +534,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Associate a contact{' '}
+                Add a contact{' '}
               </Text>
               <Text
                 style={{
