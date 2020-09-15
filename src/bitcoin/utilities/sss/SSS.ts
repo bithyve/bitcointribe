@@ -411,7 +411,7 @@ export default class SSS {
       .pbkdf2Sync(
         password,
         config.HEXA_ID,
-        config.KEY_STRECH_ITERATIONS,
+        config.KEY_STRETCH_ITERATIONS,
         SSS.cipherSpec.keyLength / 2,
         'sha256',
       )
