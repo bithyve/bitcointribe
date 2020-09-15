@@ -110,15 +110,13 @@ export default function AddContactSendRequest(props) {
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
 
-          const presentContactName = `${trustedContact.firstName} ${
-            trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+          const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
+            }`
             .toLowerCase()
             .trim();
 
-          const selectedContactName = `${contact.firstName} ${
-            contact.lastName ? contact.lastName : ''
-          }`
+          const selectedContactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
+            }`
             .toLowerCase()
             .trim();
 
@@ -208,7 +206,7 @@ export default function AddContactSendRequest(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -234,9 +232,8 @@ export default function AddContactSendRequest(props) {
     }
     console.log({ Contact });
 
-    const contactName = `${Contact.firstName} ${
-      Contact.lastName ? Contact.lastName : ''
-    }`
+    const contactName = `${Contact.firstName} ${Contact.lastName ? Contact.lastName : ''
+      }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -369,11 +366,9 @@ export default function AddContactSendRequest(props) {
           subHeaderText={'Send to your contact'}
           contactText={'Adding to Friends and Family:'}
           contact={Contact ? Contact : null}
-          infoText={`Click here to accept contact request from ${
-            WALLET_SETUP.walletName
-          } Hexa wallet - link will expire in ${
-            config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+          infoText={`Click here to accept contact request from ${WALLET_SETUP.walletName
+            } Hexa wallet - link will expire in ${config.TC_REQUEST_EXPIRY / (60000 * 60)
+            } hours`}
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
@@ -606,10 +601,10 @@ export default function AddContactSendRequest(props) {
                   {Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact.firstName && !Contact.lastName
-                    ? Contact.firstName
-                    : !Contact.firstName && Contact.lastName
-                    ? Contact.lastName
-                    : ''}
+                      ? Contact.firstName
+                      : !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : ''}
                 </Text>
                 {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
                   <Text
@@ -658,41 +653,41 @@ export default function AddContactSendRequest(props) {
                 />
               </View>
             ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    position: 'absolute',
+                    marginLeft: 15,
+                    marginRight: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.backgroundColor,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                    shadowColor: Colors.shadowBlue,
+                    shadowOpacity: 1,
+                    shadowOffset: { width: 2, height: 2 },
                   }}
                 >
-                  {nameToInitials(
-                    Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
-                  )}
-                </Text>
-              </View>
-            )}
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(
+                      Contact.firstName && Contact.lastName
+                        ? Contact.firstName + ' ' + Contact.lastName
+                        : Contact.firstName && !Contact.lastName
+                          ? Contact.firstName
+                          : !Contact.firstName && Contact.lastName
+                            ? Contact.lastName
+                            : '',
+                    )}
+                  </Text>
+                </View>
+              )}
           </View>
         </View>
         <View style={{ marginTop: 'auto' }}>
