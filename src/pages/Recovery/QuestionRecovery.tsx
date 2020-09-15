@@ -204,7 +204,7 @@ export default function RecoveryQuestionModalContents(props) {
                   walletName,
                 })}
               >
-                or choose my own Question
+                Or choose your own question
               </Text>
             </TouchableOpacity>
 
