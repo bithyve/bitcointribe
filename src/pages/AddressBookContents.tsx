@@ -246,9 +246,12 @@ class AddressBookContents extends PureComponent<
             isWard,
             trustedAddress,
             contactsWalletName,
+            otp,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ];
+
+          if (!connectedVia && otp) connectedVia = otp;
 
           const hasTrustedAddress = !!trustedAddress;
 
