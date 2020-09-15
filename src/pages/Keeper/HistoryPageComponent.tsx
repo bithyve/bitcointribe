@@ -246,7 +246,7 @@ const HistoryPageComponent = (props) => {
           </Text>
         </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.onPressIgnore()}
+            onPress={() => props.onPressChangeQuestion()}
             style={{
               height: wp('13%'),
               width: wp('40%'),

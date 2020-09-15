@@ -11,6 +11,7 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
+  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -50,6 +51,7 @@ interface ManageBackupStateTypes {
   selectedId: any;
   isLevel2: boolean;
   securityAtLevel: any;
+  health: any;
 }
 
 interface ManageBackupPropsTypes {
@@ -59,7 +61,7 @@ interface ManageBackupPropsTypes {
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
-
+  overallHealth: any;
 }
 
 class ManageBackup extends Component<
@@ -82,15 +84,81 @@ class ManageBackup extends Component<
     this.state = {
       securityAtLevel: 0,
       selectedId: 0,
+      health: [
+        {
+          level: 1,
+          levelInfo: [
+            {
+              keeperType: null,
+              type: 'cloud',
+              lastUpdated: '1599807936',
+              created: '1599807936',
+              status: 'accessible',
+              shareId: 'abcd',
+            },
+            {
+              keeperType: null,
+              type: 'securityQuestion',
+              lastUpdated: '1599807936',
+              created: '1599807936',
+              status: 'accessible',
+              shareId: 'xyz',
+            },
+          ],
+          levelStatus: 'good',
+        },
+        {
+          level: 2,
+          levelInfo: [
+            {
+              keeperType: 'primaryKeeper',
+              type: 'device',
+              lastUpdated: null,
+              created: null,
+              status: 'notAccessible',
+              shareId: 'pqr',
+            },
+            {
+              keeperType: 'otherKeeper',
+              type: 'contact',
+              lastUpdated: null,
+              created: null,
+              status: 'notAccessible',
+              shareId: 'qwe',
+            },
+          ],
+          levelStatus: 'notSetup',
+        },
+        {
+          level: 3,
+          levelInfo: [
+            {
+              keeperType: 'otherKeeper',
+              type: 'contact',
+              lastUpdated: null,
+              created: null,
+              status: 'notAccessible',
+              shareId: 'dsfsd',
+            },
+            {
+              keeperType: 'otherKeeper',
+              type: 'pdf',
+              lastUpdated: null,
+              created: null,
+              status: 'notAccessible',
+              shareId: 'dsfs',
+            },
+          ],
+          levelStatus: 'notSetup',
+        },
+      ],
       levelData: [
         {
           type: 'icloud',
-          health: 0,
           status: 'good',
-          title: 'Level 1',
+          level: 1,
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          isSetupDone: true,
           keeper1: {
             name: '',
             keeper1Done: false,
@@ -105,13 +173,11 @@ class ManageBackup extends Component<
         },
         {
           type: 'keeper',
-          health: 0,
-          status: 'ugly',
-          title: 'Level 2',
+          status: 'notSetup',
+          level: 2,
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          isSetupDone: true,
           keeper1: {
             name: 'iPad Pro',
             keeper1Done: true,
@@ -126,14 +192,12 @@ class ManageBackup extends Component<
         },
         {
           type: 'keeper',
-          health: 0,
-          status: '',
-          title: 'Level 3',
+          status: 'notSetup',
+          level: 3,
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           manageText: 'Setup',
-          isSetupDone: false,
           keeper1: {
             name: '',
             keeper1Done: false,
@@ -154,19 +218,22 @@ class ManageBackup extends Component<
   setSelectedCards = () => {
     const { levelData } = this.state;
     for (let a = 0; a < levelData.length; a++) {
-      if (levelData[a].status == 'ugly')
+      if (levelData[a].status == 'notSetup'){
         this.setState({ selectedId: levelData[a].id });
+        break;
+      }
     }
+    this.modifyLevelStatus();
     let level = 1;
     if (
       levelData.findIndex(
-        (value) => value.status == 'ugly' || value.status == '',
+        (value) => value.status == 'bad' || value.status == 'notSetup',
       )
     )
       level =
         levelData[
           levelData.findIndex(
-            (value) => value.status == 'ugly' || value.status == '',
+            (value) => value.status == 'bad' || value.status == 'notSetup',
           ) - 1
         ].id;
     this.setState({ securityAtLevel: level });
@@ -176,10 +243,24 @@ class ManageBackup extends Component<
     this.setSelectedCards();
   };
 
+  modifyLevelStatus = () =>{
+    let { levelData, health } = this.state;
+    for (let i = 0; i < levelData.length; i++) {
+      const element = levelData[i];
+      if(health[i].levelInfo[1].status == 'accessible'){
+        levelData[i].keeper2.keeper2Done = true;
+      }
+      if(health[i].levelInfo[0].status == 'accessible'){
+        levelData[i].keeper2.keeper2Done = true;
+      }
+    }
+    this.setState({levelData: levelData});
+  }
+
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
-    if (value.id === 2) {
+    if (value === 2) {
       this.setState({ isLevel2: true });
     } else {
       this.setState({ isLevel2: false });
@@ -199,30 +280,51 @@ class ManageBackup extends Component<
     // var ICloudBackup = NativeModules.ICloudBackup;
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
-      encryptedCloudDataJson = await CloudData(this.props.database);
-      console.log('encryptedDatabase', encryptedCloudDataJson);
+    encryptedCloudDataJson = await CloudData(this.props.database);
+    console.log('encryptedDatabase', encryptedCloudDataJson);
     if (Platform.OS == 'ios') {
       /**TODO iOS Login check and checkIfFileExist()*/
       console.log('call for icloud upload');
     } else {
       let data = {
-        encryptedCloudDataJson : encryptedCloudDataJson,
+        encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,
-      }
-    GoogleDriveLogin(data, this.setCloudBackupStatus);
-        console.log('call for google drive upload', this.props.cloudBackupStatus);
+      };
+      GoogleDriveLogin(data, this.setCloudBackupStatus);
+      console.log('call for google drive upload', this.props.cloudBackupStatus);
     }
   };
 
   setCloudBackupStatus = () => {
-    this.props.setCloudBackupStatus({status: true});
+    this.props.setCloudBackupStatus({ status: true });
     console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
-  }
+  };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    console.log('this.props.overallHealth', this.props.overallHealth);
+    if (prevProps.overallHealth != this.props.overallHealth)
+      this.setState({ health: this.props.overallHealth });
+    else {
+      (async () => {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        if (storedHealth) {
+          this.setState({ health: JSON.parse(storedHealth) });
+        }
+      })();
+    }
+  };
 
   render() {
-    const { levelData, selectedId, isLevel2, securityAtLevel } = this.state;
-    const { navigation } = this.props;
+    const {
+      levelData,
+      selectedId,
+      isLevel2,
+      securityAtLevel,
+      health,
+    } = this.state;
+    const { navigation, overallHealth } = this.props;
+    // console.log('selectedId', selectedId)
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -287,7 +389,7 @@ class ManageBackup extends Component<
                   style={{
                     borderRadius: 10,
                     marginTop: wp('7%'),
-                    backgroundColor: value.isSetupDone
+                    backgroundColor: value.status == 'good' || value.status == 'bad'
                       ? Colors.blue
                       : Colors.backgroundColor,
                     shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
@@ -303,20 +405,12 @@ class ManageBackup extends Component<
                 >
                   <View style={styles.cardView}>
                     <View style={{ flexDirection: 'row' }}>
-                      {value.isSetupDone ? (
+                      {value.status == 'good' || value.status == 'bad' ? (
                         <View
                           style={{
                             ...styles.cardHealthImageView,
-                            elevation:
-                              selectedId == value.id || selectedId == 0
-                                ? 10
-                                : 0,
-                            backgroundColor:
-                              value.status == 'ugly'
-                                ? Colors.red
-                                : value.status == 'good'
-                                ? Colors.green
-                                : Colors.yellow,
+                            elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
+                            backgroundColor: value.status == 'good' ? Colors.green : Colors.red,
                           }}
                         >
                           {value.status == 'good' ? (
@@ -347,17 +441,13 @@ class ManageBackup extends Component<
                       <TouchableOpacity
                         style={{
                           ...styles.cardButtonView,
-                          backgroundColor: value.isSetupDone
-                            ? Colors.deepBlue
-                            : Colors.white,
+                          backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
                         }}
                       >
                         <Text
                           style={{
                             ...styles.cardButtonText,
-                            color: value.isSetupDone
-                              ? Colors.white
-                              : Colors.textColorGrey,
+                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                           }}
                         >
                           Know More
@@ -370,23 +460,19 @@ class ManageBackup extends Component<
                         <Text
                           style={{
                             ...styles.levelText,
-                            color: value.isSetupDone
-                              ? Colors.white
-                              : Colors.textColorGrey,
+                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                           }}
                         >
-                          {value.title}
+                          Level {value.level}
                         </Text>
                         <Text
                           style={{
                             ...styles.levelInfoText,
-                            color: value.isSetupDone
-                              ? Colors.white
-                              : Colors.textColorGrey,
+                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                           }}
                         >
-                          {value.isSetupDone
-                            ? value.health
+                          {value.status == 'notSetup'
+                            ? value.status == 'good'
                               ? value.infoGreen
                               : value.infoRed
                             : value.infoGray}
@@ -401,13 +487,11 @@ class ManageBackup extends Component<
                           style={{
                             ...styles.manageButtonText,
                             padding: 10,
-                            color: value.isSetupDone
-                              ? Colors.white
-                              : Colors.black,
+                            color: value.status == 'notSetup' ? Colors.black : Colors.white,
                           }}
                           onPress={() => this.selectId(value.id)}
                         >
-                          {value.isSetupDone ? 'Manage' : 'Setup'}
+                          {value.status == 'notSetup' ? 'Setup' : 'Manage'}
                         </Text>
                         <AntDesign
                           name={
@@ -415,9 +499,7 @@ class ManageBackup extends Component<
                               ? 'arrowup'
                               : 'arrowright'
                           }
-                          color={
-                            value.isSetupDone ? Colors.white : Colors.black
-                          }
+                          color={value.status == 'notSetup' ? Colors.black : Colors.white}
                           size={12}
                         />
                       </TouchableOpacity>
@@ -433,9 +515,7 @@ class ManageBackup extends Component<
                           <Text
                             numberOfLines={2}
                             style={{
-                              color: value.isSetupDone
-                                ? Colors.white
-                                : Colors.textColorGrey,
+                              color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                               fontFamily: Fonts.FiraSansRegular,
                               fontSize: RFValue(10),
                             }}
@@ -447,12 +527,14 @@ class ManageBackup extends Component<
                           <View
                             style={{ flexDirection: 'row', marginTop: 'auto' }}
                           >
-                            <TouchableOpacity style={styles.appBackupButton}
-                            onPress={()=>{
-                              if(!this.props.cloudBackupStatus){
-                                this.GoogleDriveLogin();
-                              }
-                            }}>
+                            <TouchableOpacity
+                              style={styles.appBackupButton}
+                              onPress={() => {
+                                if (!this.props.cloudBackupStatus) {
+                                  this.GoogleDriveLogin();
+                                }
+                              }}
+                            >
                               <Image
                                 source={require('../../assets/images/icons/reset.png')}
                                 style={styles.resetImage}
@@ -470,8 +552,12 @@ class ManageBackup extends Component<
                               style={{
                                 ...styles.appBackupButton,
                                 width: wp('41%'),
-                                borderColor: Colors.red,
-                                borderWidth: 0.5,
+                                borderColor: value.keeper2.keeper2Done
+                                ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue
+                                : Colors.red,
+                                borderWidth: value.keeper2.keeper2Done
+                                ? 0
+                                : 0.5,
                                 marginLeft: 'auto',
                               }}
                               onPress={() =>
@@ -491,7 +577,8 @@ class ManageBackup extends Component<
                                   position: 'relative',
                                 }}
                               >
-                                <View
+                                {!value.keeper2.keeper2Done
+                                ? <View
                                   style={{
                                     backgroundColor: Colors.red,
                                     width: wp('1%'),
@@ -501,7 +588,7 @@ class ManageBackup extends Component<
                                     right: 0,
                                     borderRadius: wp('1%') / 2,
                                   }}
-                                />
+                                /> : null}
                               </ImageBackground>
                               <Text
                                 style={{
@@ -520,9 +607,7 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.isSetupDone
-                                  ? Colors.deepBlue
-                                  : Colors.white,
+                                backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
@@ -572,14 +657,12 @@ class ManageBackup extends Component<
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
-                                  color: value.isSetupDone
-                                    ? Colors.white
-                                    : Colors.textColorGrey,
+                                  color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                                   fontSize: RFValue(11),
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.isSetupDone
+                                {value.status == 'good' || value.status == 'bad'
                                   ? value.keeper1.name
                                   : value.id == 2
                                   ? 'Add Primary Keeper'
@@ -589,13 +672,11 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.isSetupDone
-                                  ? Colors.deepBlue
-                                  : Colors.white,
+                                backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: Colors.red,
+                                borderColor: value.keeper2.keeper2Done ? Colors.red : value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
                                 borderWidth: value.keeper2.keeper2Done
                                   ? 0
                                   : 0.5,
@@ -643,13 +724,11 @@ class ManageBackup extends Component<
                                 style={{
                                   ...styles.cardButtonText,
                                   fontSize: RFValue(11),
-                                  color: value.isSetupDone
-                                    ? Colors.white
-                                    : Colors.textColorGrey,
+                                  color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.isSetupDone && value.keeper2.keeper2Done
+                                {(value.status == 'bad' || value.status == 'good') && value.keeper2.keeper2Done
                                   ? value.keeper2.name
                                   : 'Add Keeper'}
                               </Text>
@@ -728,9 +807,13 @@ class ManageBackup extends Component<
           renderContent={() => (
             <SetupPrimaryKeeper
               title={'Setup Primary Keeper\non a Personal Device'}
-              subText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
+              subText={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
               textToCopy={'http://hexawallet.io/keeperapp'}
-              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
+              info={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+              }
               proceedButtonText={'Proceed'}
               backButtonText={'Back'}
               onPressBack={() => {
@@ -764,7 +847,8 @@ const mapStateToProps = (state) => {
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
-    cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+    cloudBackupStatus:
+      idx(state, (_) => _.preferences.cloudBackupStatus) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
   };

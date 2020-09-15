@@ -180,24 +180,26 @@ export default function NewOwnQuestions(props) {
     }
   }, [confirmAnswer]);
 
+  const onPressConfirm = () => {
+    (loaderBottomSheet as any).current.snapTo(1);
+    seLoaderMessages();
+    setTimeout(() => {
+      setElevation(0);
+    }, 0.2);
+    setTimeout(() => {
+      setIsLoaderStart(true);
+      setIsEditable(false);
+      setIsDisabled(true);
+    }, 2);
+  }
+
   const setButtonVisible = () => {
     setTimeout(() => {
       setAnsError('');
     }, 2);
     return (
       <TouchableOpacity
-        onPress={() => {
-          (loaderBottomSheet as any).current.snapTo(1);
-          seLoaderMessages();
-          setTimeout(() => {
-            setElevation(0);
-          }, 0.2);
-          setTimeout(() => {
-            setIsLoaderStart(true);
-            setIsEditable(false);
-            setIsDisabled(true);
-          }, 2);
-        }}
+        onPress={()=> walletName ? onPressConfirm() : alert('sdf')}
         style={{ ...styles.buttonView, elevation: Elevation }}
       >
         {/* {!loading.initializing ? ( */}

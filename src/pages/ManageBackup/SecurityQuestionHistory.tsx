@@ -312,15 +312,15 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-         enabledInnerScrolling={true}
+        enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
-         enabledGestureInteraction={false}
-         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,

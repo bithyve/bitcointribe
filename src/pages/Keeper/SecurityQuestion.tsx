@@ -31,6 +31,7 @@ function SecurityQuestion(props) {
   let [AnswerCounter, setAnswerCounter] = useState(0);
   const securityQuestion = security.question;
   const securityAnswer = security.answer;
+  const [showAnswer, setShowAnswer] = useState(false);
   const [answer, setAnswer] = useState('');
   const [errorText, setErrorText] = useState('');
   const [isDisabled, setIsDisabled] = useState(true);
@@ -44,8 +45,8 @@ function SecurityQuestion(props) {
         AnswerCounter++;
         setAnswerCounter(AnswerCounter);
       } else {
-        props.navigation.navigate('ReLogin');
-        setAnswer(securityAnswer);
+        props.navigation.navigate('ReLogin', {isPasscodeCheck: true});
+        setShowAnswer(true);
         setErrorText('');
         return;
       }
@@ -150,6 +151,27 @@ function SecurityQuestion(props) {
                 </Text>
               ) : null}
             </View>
+            {showAnswer && (
+              <View
+                style={{
+                  ...styles.inputBox,
+                  width: '100%',
+                  marginBottom: hp('1%'),
+                  borderColor: Colors.borderColor,
+                  justifyContent: 'center'
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: RFValue(13),
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {securityAnswer}
+                </Text>
+              </View>
+            )}
           </ScrollView>
         </View>
         <View

@@ -29,6 +29,9 @@ import ModalHeader from '../../components/ModalHeader';
 import HealthCheckSecurityQuestion from '../ManageBackup/HealthCheckSecurityQuestion';
 import BottomSheet from 'reanimated-bottom-sheet';
 import SecurityQuestion from './SecurityQuestion';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import { checkMSharesHealth } from '../../store/actions/sss';
 
 const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
@@ -61,9 +64,6 @@ const SecurityQuestionHistory = (props) => {
     setHealthCheckSuccessBottomSheet,
   ] = useState(React.createRef());
 
-  const updateAutoHighlightFlags = props.navigation.getParam(
-    'updateAutoHighlightFlags',
-  );
   const next = props.navigation.getParam('next');
   const dispatch = useDispatch();
 
@@ -72,17 +72,19 @@ const SecurityQuestionHistory = (props) => {
       <SecurityQuestion
         onFocus={()=>{
           if (Platform.OS == 'ios')
-            (this.refs.SecurityQuestionBottomSheet as any).snapTo(2);
+            (SecurityQuestionBottomSheet as any).current.snapTo(2);
         }}
         onBlur={()=>{
           if (Platform.OS == 'ios')
-            (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+            (SecurityQuestionBottomSheet as any).current.snapTo(1);
         }}
         onPressConfirm={async () => {
           Keyboard.dismiss();
+          saveConfirmationHistory();
           setTimeout(() => {
             (SecurityQuestionBottomSheet as any).current.snapTo(0);
           }, 2);
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -98,34 +100,34 @@ const SecurityQuestionHistory = (props) => {
     );
   }, []);
 
-  //   const renderHealthCheckSuccessModalContent = useCallback(() => {
-  //     return (
-  //       <ErrorModalContents
-  //         modalRef={HealthCheckSuccessBottomSheet}
-  //         title={'Health Check Successful'}
-  //         info={'Question Successfully Backed Up'}
-  //         note={'Hexa will remind you to help\nremember the answer'}
-  //         proceedButtonText={'View Health'}
-  //         isIgnoreButton={false}
-  //         onPressProceed={() => {
-  //           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-  //           dispatch(checkMSharesHealth());
-  //           props.navigation.goBack();
-  //         }}
-  //         isBottomImage={true}
-  //       />
-  //     );
-  //   }, []);
+    const renderHealthCheckSuccessModalContent = useCallback(() => {
+      return (
+        <ErrorModalContents
+          modalRef={HealthCheckSuccessBottomSheet}
+          title={'Health Check Successful'}
+          info={'Question Successfully Backed Up'}
+          note={'Hexa will remind you to help\nremember the answer'}
+          proceedButtonText={'View Health'}
+          isIgnoreButton={false}
+          onPressProceed={() => {
+            (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+            dispatch(checkMSharesHealth());
+            props.navigation.goBack();
+          }}
+          isBottomImage={true}
+        />
+      );
+    }, []);
 
-  //   const renderHealthCheckSuccessModalHeader = useCallback(() => {
-  //     return (
-  //       <ModalHeader
-  //         // onPressHeader={() => {
-  //         //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-  //         // }}
-  //       />
-  //     );
-  //   }, []);
+    const renderHealthCheckSuccessModalHeader = useCallback(() => {
+      return (
+        <ModalHeader
+          // onPressHeader={() => {
+          //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+          // }}
+        />
+      );
+    }, []);
 
   const sortedHistory = (history) => {
     const currentHistory = history.filter((element) => {
@@ -259,11 +261,22 @@ const SecurityQuestionHistory = (props) => {
         />
        </View>
        <BottomSheet
-         enabledInnerScrolling={true}
+        enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
+      />
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={HealthCheckSuccessBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderHealthCheckSuccessModalContent}
+        renderHeader={renderHealthCheckSuccessModalHeader}
       />
     </View>
   );

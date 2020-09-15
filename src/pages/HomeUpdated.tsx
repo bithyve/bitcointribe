@@ -2242,19 +2242,17 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
       encryptedCloudDataJson = await CloudData(this.props.database);
-      console.log('encryptedDatabase', encryptedCloudDataJson);
       this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     if (Platform.OS == 'ios') {
       /**TODO iOS Login check and checkIfFileExist()*/
-      console.log('call for icloud upload');
     } else {
       let data = {
         encryptedCloudDataJson : encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,
       }
-    GoogleDriveLogin(data, this.setCloudBackupStatus);
-        console.log('call for google drive upload', this.props.cloudBackupStatus);
+      GoogleDriveLogin(data, this.setCloudBackupStatus);
+      console.log('call for google drive upload', this.props.cloudBackupStatus);
     }
   };
 
