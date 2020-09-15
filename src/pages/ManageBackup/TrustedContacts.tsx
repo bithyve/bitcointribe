@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
+import { useSelector } from 'react-redux';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
 import Colors from '../../common/Colors';
@@ -10,9 +11,15 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+
 const TrustedContacts = (props) => {
   const [contacts, setContacts] = useState([]);
   const index = props.index;
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
   const selectedContactsList = useCallback((list) => {
     if (list.length > 0) setContacts([...list]);
   }, []);
@@ -31,9 +38,25 @@ const TrustedContacts = (props) => {
     props.onPressContinue(contacts, index);
   }, [contacts, props.onPressContinue]);
 
-  const onPressSkip = (value) => {
-    const data = [value];
-    props.onPressContinue(data, index);
+  const onPressSkip = () => {
+    let { skippedContactsCount } = trustedContacts.tc;
+    let data;
+    if (!skippedContactsCount) {
+      skippedContactsCount = 1;
+      data = {
+        firstName: 'F&F request',
+        lastName: `awaiting ${skippedContactsCount}`,
+        name: `F&F request awaiting ${skippedContactsCount}`,
+      };
+    } else {
+      data = {
+        firstName: 'F&F request',
+        lastName: `awaiting ${skippedContactsCount + 1}`,
+        name: `F&F request awaiting ${skippedContactsCount + 1}`,
+      };
+    }
+
+    props.onPressContinue([data], index);
   };
 
   const renderContactList = useCallback(
@@ -72,14 +95,7 @@ const TrustedContacts = (props) => {
           Associate a contact
         </Text>
         <AppBottomSheetTouchableWrapper
-          onPress={() => {
-            const data = {
-              firstName: 'F&F request',
-              lastName: 'awaiting',
-              name: 'F&F request awaiting',
-            };
-            onPressSkip(data);
-          }}
+          onPress={onPressSkip}
           style={{
             height: wp('13%'),
             width: wp('35%'),

@@ -688,10 +688,11 @@ class ContactDetailsNew extends PureComponent<
         );
       }
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a entity',
-      );
+      // case: OTP
+      // Alert.alert(
+      //   'Invalid Contact',
+      //   'Cannot add a contact without phone-num/email as a entity',
+      // );
     }
   };
 
