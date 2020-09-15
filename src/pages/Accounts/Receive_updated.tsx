@@ -883,9 +883,26 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
-            onSkipContinue={(data) =>
-              onPressContinue(data)
-            }
+            onSkipContinue={() => {
+              let { skippedContactsCount } = trustedContacts.tc;
+              let data;
+              if (!skippedContactsCount) {
+                skippedContactsCount = 1;
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                };
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                };
+              }
+
+              onPressContinue([data]);
+            }}
           />
         )}
         renderHeader={() => (

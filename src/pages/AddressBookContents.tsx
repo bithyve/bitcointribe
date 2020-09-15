@@ -557,28 +557,25 @@ class AddressBookContents extends PureComponent<
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
         onSkipContinue={() => {
-          console.log('here 2');
           let { skippedContactsCount } = this.props.trustedContactsService.tc;
-          console.log({ skippedContactsCount });
           let data;
           if (!skippedContactsCount) {
             skippedContactsCount = 1;
             data = {
-              firstName: 'f&f request',
+              firstName: 'F&F request',
               lastName: `awaiting ${skippedContactsCount}`,
-              name: `f&f request awaiting ${skippedContactsCount}`,
+              name: `F&F request awaiting ${skippedContactsCount}`,
             };
           } else {
             data = {
-              firstName: 'f&f request',
+              firstName: 'F&F request',
               lastName: `awaiting ${skippedContactsCount + 1}`,
-              name: `f&f request awaiting ${skippedContactsCount + 1}`,
+              name: `F&F request awaiting ${skippedContactsCount + 1}`,
             };
           }
-          console.log({ data });
 
           navigation.navigate('AddContactSendRequest', {
-            SelectedContact: data,
+            SelectedContact: [data],
           });
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
