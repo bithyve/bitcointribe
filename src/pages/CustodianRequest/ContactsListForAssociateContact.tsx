@@ -16,6 +16,11 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const ContactsListForAssociateContact = (props) => {
   const data = {
@@ -42,15 +47,13 @@ const ContactsListForAssociateContact = (props) => {
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
 
-          const presentContactName = `${trustedContact.firstName} ${
-            trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+          const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
+            }`
             .toLowerCase()
             .trim();
 
-          const selectedContactName = `${contacts[0].firstName} ${
-            contacts[0].lastName ? contacts[0].lastName : ''
-          }`
+          const selectedContactName = `${contacts[0].firstName} ${contacts[0].lastName ? contacts[0].lastName : ''
+            }`
             .toLowerCase()
             .trim();
 
@@ -60,10 +63,9 @@ const ContactsListForAssociateContact = (props) => {
         trustedContactsInfo.push(contacts[0]);
         Toast(
           // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
-          `${
-            isGuardian
-              ? 'You have been successfully added as a Keeper'
-              : 'Contact successfully added to Friends and Family'
+          `${isGuardian
+            ? 'You have been successfully added as a Keeper'
+            : 'Contact successfully added to Friends and Family'
           }`,
         );
         postAssociation(contacts[0]);
@@ -77,10 +79,9 @@ const ContactsListForAssociateContact = (props) => {
       trustedContactsInfo[3] = contacts[0];
       // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
       Toast(
-        `${
-          isGuardian
-            ? 'You have been successfully added as a Keeper'
-            : 'Contact successfully added to Friends and Family'
+        `${isGuardian
+          ? 'You have been successfully added as a Keeper'
+          : 'Contact successfully added to Friends and Family'
         }`,
       );
       postAssociation(contacts[0]);
@@ -128,11 +129,40 @@ const ContactsListForAssociateContact = (props) => {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>
               {'Associate a contact'}
             </Text>
           </View>
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => {
+              //addContact()
+              props.navigation.navigate('AddContactSendRequest', {
+                SelectedContact: [data],
+              });
+            }}
+            style={{
+              height: wp('8%'),
+              width: wp('22%'),
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: Colors.blue,
+              justifyContent: 'center',
+              borderRadius: 8,
+              alignSelf: 'center',
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Skip
+            </Text>
+          </AppBottomSheetTouchableWrapper>
         </View>
       </View>
       <Text style={styles.modalSubheaderText}>
