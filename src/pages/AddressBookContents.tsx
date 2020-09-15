@@ -556,9 +556,26 @@ class AddressBookContents extends PureComponent<
         onPressBack={() => {
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
-        onSkipContinue={(data) => {
+        onSkipContinue={() => {
+          let { skippedContactsCount } = this.props.trustedContactsService.tc;
+          let data;
+          if (!skippedContactsCount) {
+            skippedContactsCount = 1;
+            data = {
+              firstName: 'F&F request',
+              lastName: `awaiting ${skippedContactsCount}`,
+              name: `F&F request awaiting ${skippedContactsCount}`,
+            };
+          } else {
+            data = {
+              firstName: 'F&F request',
+              lastName: `awaiting ${skippedContactsCount + 1}`,
+              name: `F&F request awaiting ${skippedContactsCount + 1}`,
+            };
+          }
+
           navigation.navigate('AddContactSendRequest', {
-            SelectedContact: data,
+            SelectedContact: [data],
           });
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
@@ -693,9 +710,7 @@ class AddressBookContents extends PureComponent<
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>
-                        Associate a contact
-                      </Text>
+                      <Text style={styles.contactText}>Add a Contact</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
