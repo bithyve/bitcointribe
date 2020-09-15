@@ -3163,14 +3163,30 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   0,
                 );
               }}
-              onSkipContinue={(data) => {
-                if (data && data.length) {
-                  navigation.navigate('AddContactSendRequest', {
-                    SelectedContact: data,
-                  });
-                  (this.refs
-                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+              onSkipContinue={() => {
+                let { skippedContactsCount } = this.props.trustedContacts.tc;
+                let data;
+                if (!skippedContactsCount) {
+                  skippedContactsCount = 1;
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount}`,
+                    name: `F&F request awaiting ${skippedContactsCount}`,
+                  };
+                } else {
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount + 1}`,
+                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                  };
                 }
+
+                navigation.navigate('AddContactSendRequest', {
+                  SelectedContact: [data],
+                });
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
               }}
             />
           )}

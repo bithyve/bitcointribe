@@ -48,12 +48,6 @@ export default function AddContactAddressBook(props) {
   ] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
 
-  const data = {
-    firstName: 'F&F request',
-    lastName: 'awaiting',
-    name: 'F&F request awaiting',
-  };
-
   useEffect(() => {
     if (!props.addContactModalOpened) {
       setSelectedContacts([]);
@@ -368,7 +362,7 @@ export default function AddContactAddressBook(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => {
               //addContact()
-              props.onSkipContinue([data]);
+              props.onSkipContinue();
             }}
             style={{
               height: wp('8%'),
@@ -440,14 +434,14 @@ export default function AddContactAddressBook(props) {
           {/* <View style={{ alignItems: 'flex-end' }}>
             <AppBottomSheetTouchableWrapper
               style={{ marginRight: 10, padding: 10 }}
-              onPress={() => props.onSkipContinue([data])}
+              onPress={() => props.onSkipContinue()}
             >
               <Text
                 style={{
                   fontSize: RFValue(13, 812),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
-                onPress={() => props.onSkipContinue([data])}
+                onPress={() => props.onSkipContinue()}
               >
                 Skip Contact
               </Text>

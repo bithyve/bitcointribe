@@ -14,11 +14,16 @@ export default class TrustedContactsService {
     const { tc } = JSON.parse(json);
     const {
       trustedContacts,
+      skippedContactsCount,
     }: {
       trustedContacts: Contacts;
+      skippedContactsCount: number;
     } = tc;
 
-    return new TrustedContactsService({ trustedContacts });
+    return new TrustedContactsService({
+      trustedContacts,
+      skippedContactsCount,
+    });
   };
 
   public static encryptPub = (

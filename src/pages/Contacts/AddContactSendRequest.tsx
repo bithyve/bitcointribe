@@ -143,8 +143,9 @@ export default function AddContactSendRequest(props) {
 
   const createTrustedContact = useCallback(async () => {
     if (Contact && Contact.firstName) {
-      const contactName = `${Contact.firstName} ${Contact.lastName ? Contact.lastName : ''
-        }`
+      let contactName = `${Contact.firstName} ${
+        Contact.lastName ? Contact.lastName : ''
+      }`
         .toLowerCase()
         .trim();
 
@@ -158,11 +159,11 @@ export default function AddContactSendRequest(props) {
         info = Contact.emails[0].email;
       }
 
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const contactInfo = {
         contactName,
         info: info.trim(),
       };
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = fcmTokenValue;
@@ -229,6 +230,7 @@ export default function AddContactSendRequest(props) {
       console.log('Err: Contact missing');
       return;
     }
+    console.log({ Contact });
 
     const contactName = `${Contact.firstName} ${Contact.lastName ? Contact.lastName : ''
       }`
@@ -528,7 +530,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Associate a contact{' '}
+                Add a contact{' '}
               </Text>
               <Text
                 style={{
