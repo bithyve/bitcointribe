@@ -1,125 +1,120 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { PureComponent } from 'react';
 import {
   View,
   StyleSheet,
   StatusBar,
   Text,
-  Image,
   TouchableOpacity,
   FlatList,
   ImageBackground,
   Platform,
   AsyncStorage,
   Linking,
-  NativeModules,
   Alert,
 } from 'react-native';
-import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
-import ToggleSwitch from '../components/ToggleSwitch';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CommonStyles from '../common/Styles';
-import NoInternetModalContents from '../components/NoInternetModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
-import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import HomePageShield from '../components/HomePageShield';
-import TransactionDetailsContents from '../components/TransactionDetailsContents';
-import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
-import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import HealthCheckSecurityQuestionModalContents from '../components/HealthCheckSecurityQuestionModalContents';
-import HealthCheckGoogleAuthModalContents from '../components/HealthCheckGoogleAuthModalContents';
-import SettingManagePin from './SettingManagePin';
 import { AppState } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
+import * as RNLocalize from 'react-native-localize';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
+  FAST_BITCOINS,
+  DONATION_ACCOUNT,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
+import NoInternetModalContents from '../components/NoInternetModalContents';
+import NetInfo from '@react-native-community/netinfo';
 import {
-  checkMSharesHealth,
-  updateMSharesHealth,
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
-  ErrorSending,
-  ErrorReceiving,
-  UploadSuccessfully,
 } from '../store/actions/sss';
-import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
-import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
-import moment from 'moment';
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
+import { createRandomString } from '../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../store/actions/trustedContacts';
+import { updateLastSeen } from '../store/actions/preferences';
+
+import {
+  approveTrustedContact,
+  fetchEphemeralChannel,
+  fetchTrustedChannel,
+  clearPaymentDetails,
+} from '../store/actions/trustedContacts';
 import {
   updateFCMTokens,
   fetchNotifications,
+  notificationsUpdated,
 } from '../store/actions/notifications';
-import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
-import { UsNumberFormat } from '../common/utilities';
+import { storeFbtcData } from '../store/actions/fbtc';
+import {
+  setCurrencyCode,
+  setCurrencyToggleValue,
+} from '../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
-import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-// const { Value, abs, sub, min } = Animated
-// const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
-// const position = new Value( 1 )
-// const opacity = min( abs( sub( position, 1 ) ), 0.8 )
-// const zeroIndex = snapPoints.length - 1
-// const height = snapPoints[ 0 ]
-import {
-  timeFormatter,
-  createRandomString,
-} from '../common/CommonFunctions/timeFormatter';
+import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
 import Config from 'react-native-config';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import {
-  approveTrustedContact,
-  fetchEphemeralChannel,
-  clearPaymentDetails,
-} from '../store/actions/trustedContacts';
-import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
+import HomeList from '../components/home/home-list';
+import HomeHeader from '../components/home/home-header';
 import idx from 'idx';
-import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
+import CustomBottomTabs from '../components/home/custom-bottom-tabs';
+import { initialCardData, closingCardData } from '../stubs/initialCardData';
+import { initialTransactionData } from '../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
 } from '../store/actions/accounts';
 import {
-  TrustedContactDerivativeAccount,
-  EphemeralDataElements,
+  trustedChannelActions,
+  DonationDerivativeAccountElements,
 } from '../bitcoin/utilities/Interface';
-import * as RNLocalize from 'react-native-localize';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import moment from 'moment';
+import { withNavigationFocus } from 'react-navigation';
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
+import semver from 'semver';
+import {
+  updatePreference,
+  setFCMToken,
+  setSecondaryDeviceAddress,
+} from '../store/actions/preferences';
+import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 
 export const isCompatible = async (method: string, version: string) => {
-  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+  if (!semver.valid(version)) {
+    // handling exceptions: off standard versioning
+    if (version === '0.9') version = '0.9.0';
+    else if (version === '1.0') version = '1.0.0';
+  }
+
+  if (version && semver.gt(version, DeviceInfo.getVersion())) {
     // checking compatibility via Relay
     const res = await RelayServices.checkCompatibility(method, version);
     if (res.status !== 200) {
@@ -143,298 +138,1556 @@ export const isCompatible = async (method: string, version: string) => {
   return true;
 };
 
-export default function Home(props) {
-  // const trustedContacts: TrustedContactsService = useSelector(
-  //   (state) => state.trustedContacts.service,
-  // );
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     dispatch(initializeTrustedContact('Blake'));
-  //   }, 4000); // letting other db insertion happen
-  // }, []);
-  // //console.log(trustedContacts.tc.trustedContacts['Blake']);
-  const [
-    TrustedContactRequestBottomSheet,
-    setTrustedContactRequestBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
+const getIconByAccountType = (type) => {
+  if (type == 'saving') {
+    return require('../assets/images/icons/icon_regular.png');
+  } else if (type == 'regular') {
+    return require('../assets/images/icons/icon_regular.png');
+  } else if (type == 'secure') {
+    return require('../assets/images/icons/icon_secureaccount.png');
+  } else if (type == 'test') {
+    return require('../assets/images/icons/icon_test.png');
+  } else if (type === 'Donation Account') {
+    return require('../assets/images/icons/icon_donation_hexa.png');
+  } else {
+    return require('../assets/images/icons/icon_test.png');
+  }
+};
 
-  const [SelectedContact, setSelectedContact] = useState([]);
-  const notificationList = useSelector((state) => state.notifications);
-  const [NotificationList, setNotificationList] = useState([]);
-  const [
-    notificationsListBottomSheet,
-    setNotificationsListBottomSheet,
-  ] = useState(React.createRef());
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-  const [buttonText, setButtonText] = useState('Try again');
-  const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-  const isUploadSuccessfully = useSelector(
-    (state) => state.sss.uploadSuccessfully,
+const TransactionHeader = ({ openCloseModal }) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={10}
+      onPress={() => openCloseModal()}
+      style={styles.modalHeaderContainer}
+    >
+      <View style={styles.modalHeaderHandle} />
+      <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+    </TouchableOpacity>
   );
-  const isErrorReceivingFailed = useSelector(
-    (state) => state.sss.errorReceiving,
-  );
-  let [AtCloseEnd, setAtCloseEnd] = useState(false);
-  let [loading, setLoading] = useState(false);
-  // let [AssociatedContact, setAssociatedContact] = useState([]);
-  // let [SelectedContacts, setSelectedContacts] = useState([]);
-  // let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
-  let [associatedContactName, setAssociatedContactName] = useState('');
-  const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
-  let SecondaryDeviceStatus = useSelector(
-    (state) => state.sss.downloadedMShare,
-  );
-  const [CurrencyCode, setCurrencyCode] = useState('USD');
-  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
-    false,
-  );
-  const [addBottomSheetsFlag, setAddBottomSheetsFlag] = useState(false);
-  const [addSubBottomSheetsFlag, setAddSubBottomSheetsFlag] = useState(false);
-  const [
-    familyAndFriendsBookBottomSheetsFlag,
-    setFamilyAndFriendsBookBottomSheetsFlag,
-  ] = useState(false);
-  const WALLET_SETUP = useSelector(
-    (state) => state.storage.database.WALLET_SETUP,
-  );
-  // alert(status);
-  // const DECENTRALIZED_BACKUP = useSelector(
-  //   state => state.storage.database.DECENTRALIZED_BACKUP,
-  // );
-  const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
-  const accounts = useSelector((state) => state.accounts);
+};
 
-  const paymentDetails = useSelector(
-    (state) => state.trustedContacts.paymentDetails,
+const TrustedContactRequestContent = ({
+  bottomSheetRef,
+  trustedContactRequest,
+  recoveryRequest,
+  onPressAccept,
+  onPressReject,
+  onPhoneNumberChange,
+  isRequestModalOpened,
+}) => {
+  if (!trustedContactRequest && !recoveryRequest) return;
+  let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
+    trustedContactRequest || recoveryRequest;
+
+  return (
+    <TrustedContactRequest
+      isRequestModalOpened={isRequestModalOpened}
+      isQR={isQR}
+      inputType={
+        hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
+      }
+      isGuardian={isGuardian}
+      isRecovery={isRecovery}
+      hint={hint}
+      bottomSheetRef={bottomSheetRef}
+      trustedContactName={requester}
+      onPressAccept={(key) => onPressAccept(key)}
+      onPressReject={(key) => {
+        onPressReject(key);
+      }}
+      onPhoneNumberChange={(text) => {
+        onPhoneNumberChange(text);
+      }}
+    />
   );
-  // const exchangeRate = props.navigation.state.params
-  //   ? props.navigation.state.params.exchangeRates
-  //   : null;
-  const dispatch = useDispatch();
-  const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
-  useEffect(() => {
-    if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
-  }, [accounts.exchangeRates]);
+};
 
-  const s3Service = useSelector((state) => state.sss.service);
-  useEffect(() => {
-    if (s3Service) {
-      const { healthCheckInitialized } = s3Service.sss;
-      if (!healthCheckInitialized) dispatch(initHealthCheck());
-    }
-  }, [s3Service]);
+interface HomeStateTypes {
+  notificationLoading: boolean;
+  notificationData?: any[];
+  cardData?: any[];
+  switchOn: boolean;
+  CurrencyCode: string;
+  balances: any;
+  selectedBottomTab: string;
+  transactions: any[];
+  modalData: any;
+  knowMoreBottomSheetsFlag: boolean;
+  qrBottomSheetsFlag: boolean;
+  tabBarIndex: number;
+  addSubBottomSheetsFlag: boolean;
+  openModal: string;
+  atCloseEnd: boolean;
+  loading: boolean;
+  secondaryDeviceOtp: any;
+  selectedTransactionItem: any;
+  deepLinkModalOpen: boolean;
+  currencyCode: string;
+  errorMessageHeader: string;
+  errorMessage: string;
+  buttonText: string;
+  selectedContact: any[];
+  notificationDataChange: boolean;
+  appState: string;
+  fbBTCAccount: any;
+  transactionsLoading: boolean;
+  trustedContactRequest: any;
+  recoveryRequest: any;
+  custodyRequest: any;
+  isLoadContacts: boolean;
+  canNavigate: boolean;
+  lastActiveTime: string;
+  isContactOpen: boolean;
+  isCameraOpen: boolean;
+  isLoading: boolean;
+  isRequestModalOpened: boolean;
+  isBalanceLoading: boolean;
+  addContactModalOpened: boolean;
+}
 
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-    accumulativeBalance: 0,
-  });
-  // const transactionsParam = props.navigation.getParam('transactions');
-  const [transactionLoading, setTransactionLoading] = useState(true);
-  const [transactions, setTransactions] = useState([]);
-  const [NotificationDataChange, setNotificationDataChange] = useState(false);
-  const [NotificationData, setNotificationData] = useState([]);
-  const [notificationLoading, setNotificationLoading] = useState(true);
-  const [qrData, setqrData] = useState('');
-  const currencyCode = [
-    'BRL',
-    'CNY',
-    'JPY',
-    'GBP',
-    'KRW',
-    'RUB',
-    'TRY',
-    'INR',
-    'EUR',
-  ];
+interface HomePropsTypes {
+  navigation: any;
+  notificationList: any[];
+  exchangeRates: any[];
+  accounts: any[];
+  walletName: string;
+  UNDER_CUSTODY: any;
+  fetchNotifications: any;
+  updateFCMTokens: any;
+  downloadMShare: any;
+  approveTrustedContact: any;
+  fetchTrustedChannel: any;
+  fetchEphemeralChannel: any;
+  uploadRequestedShare: any;
+  s3Service: any;
+  initHealthCheck: any;
+  overallHealth: any;
+  fetchDerivativeAccBalTx: any;
+  addTransferDetails: any;
+  paymentDetails: any;
+  clearPaymentDetails: any;
+  trustedContacts: TrustedContactsService;
+  isFocused: boolean;
+  notificationListNew: any;
+  notificationsUpdated: any;
+  FBTCAccountData: any;
+  storeFbtcData: any;
+  setCurrencyCode: any;
+  currencyCode: any;
+  setCurrencyToggleValue: any;
+  currencyToggleValue: any;
+  updatePreference: any;
+  fcmTokenValue: any;
+  setFCMToken: any;
+  setSecondaryDeviceAddress: any;
+  secondaryDeviceAddressValue: any;
+  releaseCasesValue: any;
+  updateLastSeen: any;
+}
 
-  function setCurrencyCodeToImage(currencyName, currencyColor) {
-    console.log('currencyColor', currencyColor);
-    return (
-      <View
-        style={{
-          marginRight: 5,
-          marginBottom: wp('0.7%'),
-        }}
-      >
-        <MaterialCommunityIcons
-          name={currencyName}
-          color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
-          size={wp('3.5%')}
-        />
-      </View>
-    );
+class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
+  focusListener: any;
+  appStateListener: any;
+  firebaseNotificationListener: any;
+  notificationOpenedListener: any;
+  NoInternetBottomSheet: any;
+  unsubscribe: any;
+
+  static whyDidYouRender = true;
+
+  constructor(props) {
+    super(props);
+    this.focusListener = null;
+    this.appStateListener = null;
+    this.NoInternetBottomSheet = React.createRef();
+    this.unsubscribe = null;
+    this.state = {
+      notificationData: [],
+      cardData: [],
+      switchOn: false,
+      CurrencyCode: 'USD',
+      balances: {},
+      qrBottomSheetsFlag: false,
+      selectedBottomTab: 'Transactions',
+      transactions: [],
+      knowMoreBottomSheetsFlag: false,
+      modalData: initialTransactionData,
+      tabBarIndex: 999,
+      addSubBottomSheetsFlag: false,
+      openModal: 'closed',
+      atCloseEnd: false,
+      loading: false,
+      secondaryDeviceOtp: {},
+      selectedTransactionItem: null,
+      deepLinkModalOpen: false,
+      currencyCode: 'USD',
+      errorMessageHeader: '',
+      errorMessage: '',
+      buttonText: '',
+      selectedContact: [],
+      notificationDataChange: false,
+      appState: '',
+      fbBTCAccount: {},
+      transactionsLoading: true,
+      trustedContactRequest: null,
+      recoveryRequest: null,
+      custodyRequest: null,
+      isLoadContacts: false,
+      canNavigate: false,
+      lastActiveTime: moment().toISOString(),
+      isContactOpen: false,
+      isCameraOpen: false,
+      notificationLoading: true,
+      isLoading: true,
+      isRequestModalOpened: false,
+      isBalanceLoading: true,
+      addContactModalOpened: false,
+    };
   }
 
-  const getCurrencyImage = (currencyCodeValue, color) => {
-    switch (currencyCodeValue) {
-      case 'BRL':
-        return setCurrencyCodeToImage('currency-brl', color);
-      case 'CNY':
-      case 'JPY':
-        return setCurrencyCodeToImage('currency-cny', color);
-      case 'GBP':
-        return setCurrencyCodeToImage('currency-gbp', color);
-      case 'KRW':
-        return setCurrencyCodeToImage('currency-krw', color);
-      case 'RUB':
-        return setCurrencyCodeToImage('currency-rub', color);
-      case 'TRY':
-        return setCurrencyCodeToImage('currency-try', color);
-      case 'INR':
-        return setCurrencyCodeToImage('currency-inr', color);
-      case 'EUR':
-        return setCurrencyCodeToImage('currency-eur', color);
-      default:
-        break;
-    }
-  };
-
-  const onNotificationClicked = async (value) => {
-    let asyncNotifications = JSON.parse(
+  onPressNotifications = async () => {
+    let notificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
-    let tempNotificationData = NotificationData;
-    for (let i = 0; i < tempNotificationData.length; i++) {
-      const element = tempNotificationData[i];
-      if (element.notificationId == value.notificationId) {
-        if (
-          asyncNotifications &&
-          asyncNotifications.length &&
-          asyncNotifications.findIndex(
-            (item) => item.notificationId == value.notificationId,
-          ) > -1
-        ) {
-          asyncNotifications[
-            asyncNotifications.findIndex(
-              (item) => item.notificationId == value.notificationId,
-            )
-          ].read = true;
-        }
-        tempNotificationData[i].read = true;
+    let tmpList = [];
+    if (notificationList) {
+      for (let i = 0; i < notificationList.length; i++) {
+        const element = notificationList[i];
+        let obj = {
+          ...element,
+          read: element.isMandatory ? false : true,
+        };
+        tmpList.push(obj);
       }
     }
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify(asyncNotifications),
-    );
-    setNotificationData(tempNotificationData);
-    setNotificationDataChange(!NotificationDataChange);
+    await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+    tmpList.sort(function (left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    this.setState({
+      notificationData: tmpList,
+      notificationDataChange: !this.state.notificationDataChange,
+    });
+    setTimeout(() => {
+      this.setState({ notificationLoading: false });
+    }, 500);
+    (this.refs.notificationsListBottomSheet as any).snapTo(1);
+  };
 
-    if (value.type == 'release') {
-      RelayServices.fetchReleases(value.info.split(' ')[1])
-        .then(async (res) => {
-          if (res.data.releases.length) {
-            let releaseNotes = res.data.releases.length
-              ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
-              : '';
-            props.navigation.navigate('UpdateApp', {
-              releaseData: [releaseNotes],
-              isOpenFromNotificationList: true,
-              releaseNumber: value.info.split(' ')[1],
+  onSwitchToggle = (switchOn) => {
+    this.setState({
+      switchOn,
+    });
+  };
+
+  processQRData = async (qrData) => {
+    const { accounts, addTransferDetails, navigation } = this.props;
+
+    const network = Bitcoin.networkType(qrData);
+    if (network) {
+      const serviceType =
+        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
+
+      const service = accounts[serviceType].service;
+      const { type } = service.addressDiff(qrData);
+      if (type) {
+        let item;
+        switch (type) {
+          case 'address':
+            const recipientAddress = qrData;
+            item = {
+              id: recipientAddress,
+            };
+
+            addTransferDetails(serviceType, {
+              selectedContact: item,
             });
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+            });
+            break;
+
+          case 'paymentURI':
+            let address, options;
+            try {
+              const res = service.decodePaymentURI(qrData);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
+
+            item = {
+              id: address,
+            };
+
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            });
+
+            navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+              bitcoinAmount: options.amount
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
+            });
+            break;
+
+          default:
+            Toast('Invalid QR');
+            break;
+        }
+
+        return;
+      }
+    }
+
+    try {
+      const scannedData = JSON.parse(qrData);
+      if (scannedData.ver) {
+        if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
+      }
+      switch (scannedData.type) {
+        case 'trustedGuardian':
+          const trustedGruardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            approvedTC: scannedData.approvedTC,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            info: scannedData.info,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+            version: scannedData.ver,
+          };
+          this.setState(
+            {
+              loading: false,
+              secondaryDeviceOtp: trustedGruardianRequest,
+              trustedContactRequest: trustedGruardianRequest,
+              recoveryRequest: null,
+              isLoadContacts: true,
+            },
+            () => {
+              setTimeout(() => {
+                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+              }, 2);
+
+              if (this.state.tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                  deepLinkModalOpen: true,
+                });
+              }
+              setTimeout(() => {
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              }, 2);
+            },
+          );
+
+          break;
+
+        case 'secondaryDeviceGuardian':
+          const secondaryDeviceGuardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            info: scannedData.info,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+            version: scannedData.ver,
+          };
+
+          this.setState(
+            {
+              loading: false,
+              secondaryDeviceOtp: secondaryDeviceGuardianRequest,
+              trustedContactRequest: secondaryDeviceGuardianRequest,
+              recoveryRequest: null,
+            },
+            () => {
+              // TODO -- figure out why its not closing with out timeout
+              setTimeout(() => {
+                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+              }, 2);
+
+              if (this.state.tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                  deepLinkModalOpen: true,
+                });
+              }
+              setTimeout(() => {
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              }, 2);
+            },
+          );
+
+          break;
+
+        case 'trustedContactQR':
+          const tcRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            info: scannedData.info,
+            type: scannedData.type,
+            isQR: true,
+            version: scannedData.ver,
+          };
+
+          this.setState(
+            {
+              loading: false,
+              secondaryDeviceOtp: tcRequest,
+              trustedContactRequest: tcRequest,
+              recoveryRequest: null,
+            },
+            () => {
+              // TODO -- figure out why its not closing with out timeout
+              setTimeout(() => {
+                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+              }, 2);
+
+              if (this.state.tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                  deepLinkModalOpen: true,
+                });
+              }
+              setTimeout(() => {
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              }, 2);
+            },
+          );
+
+          break;
+
+        case 'paymentTrustedContactQR':
+          const paymentTCRequest = {
+            isPaymentRequest: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            info: scannedData.info,
+            type: scannedData.type,
+            isQR: true,
+            version: scannedData.ver,
+          };
+
+          this.setState(
+            {
+              loading: false,
+              secondaryDeviceOtp: paymentTCRequest,
+              trustedContactRequest: paymentTCRequest,
+              recoveryRequest: null,
+            },
+            () => {
+              // TODO -- figure out why its not closing with out timeout
+              setTimeout(() => {
+                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+              }, 2);
+
+              if (this.state.tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                  deepLinkModalOpen: true,
+                });
+              }
+              setTimeout(() => {
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              }, 2);
+            },
+          );
+
+          break;
+
+        case 'recoveryQR':
+          const recoveryRequest = {
+            isRecovery: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.KEY,
+            isQR: true,
+          };
+          this.setState(
+            {
+              loading: false,
+              recoveryRequest: recoveryRequest,
+              trustedContactRequest: null,
+            },
+            () => {
+              setTimeout(() => {
+                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+              }, 2);
+
+              if (this.state.tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                  deepLinkModalOpen: true,
+                });
+              }
+              setTimeout(() => {
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              }, 2);
+            },
+          );
+          break;
+
+        case 'ReverseRecoveryQR':
+          Alert.alert(
+            'Restoration QR Identified',
+            'Restoration QR only works during restoration mode',
+          );
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Toast('Invalid QR');
     }
   };
 
-  useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].service
+  setAccountCardData = (newCardData) => {
+    let newArrayFinal = [];
+    let tempArray = [];
+    for (let a = 0; a < newCardData.length; a++) {
+      tempArray.push(newCardData[a]);
+      if (
+        tempArray.length == 2 ||
+        newCardData[newCardData.length - 1].id == tempArray[0].id
+      ) {
+        newArrayFinal.push(tempArray);
+        tempArray = [];
+      }
+    }
+    if (newArrayFinal) {
+      this.setState({
+        cardData: newArrayFinal,
+      });
+    }
+  };
+
+  updateAccountCardData = () => {
+    let { accounts } = this.props;
+    const defaultCardData = initialCardData;
+    let idIndex = initialCardData[initialCardData.length - 1].id;
+
+    const additionalCardData = [];
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+        idIndex++;
+        const donationCardInstance = {
+          id: idIndex,
+          title: 'Donation Account',
+          unit: 'sats',
+          amount: donAcc.balances
+            ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
+            : 0,
+          account: `Donate Bitcoin`,
+          accountType: serviceType,
+          bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+        };
+        additionalCardData.push(donationCardInstance);
+      }
+    }
+
+    this.setAccountCardData([
+      ...defaultCardData,
+      ...additionalCardData,
+      ...closingCardData,
+    ]);
+  };
+
+  scheduleNotification = async () => {
+    const channelId = new firebase.notifications.Android.Channel(
+      'Default',
+      'Default',
+      firebase.notifications.Android.Importance.High,
+    );
+    firebase.notifications().android.createChannel(channelId);
+    const notification = new firebase.notifications.Notification()
+      .setTitle('We have not seen you in a while!')
+      .setBody(
+        'Opening your app regularly ensures you get all the notifications and security updates',
+      )
+      .setNotificationId('1')
+      .setSound('default')
+      .setData({
+        title: 'We have not seen you in a while!',
+        body:
+          'Opening your app regularly ensures you get all the notifications and security updates',
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
+
+    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        //repeatInterval: 'hour',
+      })
+      .then(() => { })
+      .catch(
+        (err) => { }, //console.log('err', err)
+      );
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
+        //console.log('logging notifications', notifications);
+      });
+  };
+
+  onAppStateChange = async (nextAppState) => {
+    const { appState } = this.state;
+    try {
+      if (appState === nextAppState) return;
+      this.setState(
+        {
+          appState: nextAppState,
+        },
+        async () => {
+          if (nextAppState === 'active') {
+            this.scheduleNotification();
+          }
+          if (nextAppState === 'inactive' || nextAppState == 'background') {
+            this.props.updatePreference({
+              key: 'isInternetModalCome',
+              value: false,
+            });
+            // TODO -- fix this part
+            // await AsyncStorage.setItem(
+            //   'isInternetModalCome',
+            //   JSON.stringify(false),
+            // );
+          }
+        },
+      );
+    } catch (error) { }
+  };
+
+  componentDidMount = () => {
+    this.updateAccountCardData();
+    this.getBalances();
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange,
+    );
+    this.bootStrapNotifications();
+    this.setUpFocusListener();
+    this.getNewTransactionNotifications();
+    Linking.addEventListener('url', this.handleDeepLink);
+    setTimeout(() => {
+      this.setState({
+        transactionsLoading: false,
+      });
+    }, 1000);
+
+    this.unsubscribe = NetInfo.addEventListener((state) => {
+      setTimeout(() => {
+        if (state.isInternetReachable === null) {
+          return;
+        }
+
+        if (state.isInternetReachable) {
+          (this.NoInternetBottomSheet as any).current.snapTo(0);
+        } else {
+          (this.NoInternetBottomSheet as any).current.snapTo(1);
+        }
+      }, 1000);
+    });
+
+    // health check
+
+    const { s3Service, initHealthCheck } = this.props;
+    const { healthCheckInitialized } = s3Service.sss;
+    if (!healthCheckInitialized) {
+      initHealthCheck();
+    }
+
+    // call this once deeplink is detected aswell
+    this.handleDeeplinkModal();
+
+    setTimeout(() => {
+      this.setState(
+        {
+          isLoading: false,
+        },
+        () => this.props.updateLastSeen(new Date()),
+      );
+    }, 2);
+  };
+
+  getNewTransactionNotifications = async () => {
+    const { notificationListNew } = this.props;
+    let newTransactions = [];
+    const { accounts, fetchDerivativeAccBalTx } = this.props;
+    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+
+    let newTransactionsRegular =
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
+    let newTransactionsSecure =
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
+
+    if (newTransactionsRegular && newTransactionsRegular.length)
+      newTransactions.push(...newTransactionsRegular);
+    if (newTransactionsSecure && newTransactionsSecure.length)
+      newTransactions.push(...newTransactionsSecure);
+
+    if (newTransactions.length) {
+      // let asyncNotification = notificationListNew;
+      let asyncNotification = JSON.parse(
+        await AsyncStorage.getItem('notificationList'),
+      );
+      let asyncNotificationList = [];
+      if (asyncNotification.length) {
+        asyncNotificationList = [];
+        for (let i = 0; i < asyncNotification.length; i++) {
+          asyncNotificationList.push(asyncNotification[i]);
+        }
+      }
+
+      for (let i = 0; i < newTransactions.length; i++) {
+        let present = false;
+        for (const tx of asyncNotificationList) {
+          if (
+            tx.notificationsData &&
+            newTransactions[i].txid === tx.notificationsData.txid
+          )
+            present = true;
+        }
+        if (present) continue;
+
+        let obj = {
+          type: 'contact',
+          isMandatory: false,
+          read: false,
+          title: 'Alert from FastBitcoins',
+          time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+          date: new Date(),
+          info: 'You have a new transaction',
+          notificationId: createRandomString(17),
+          notificationsData: newTransactions[i],
+        };
+        asyncNotificationList.push(obj);
+        let notificationDetails = {
+          id: obj.notificationId,
+          title: obj.title,
+          body: obj.info,
+        };
+        this.localNotification(notificationDetails);
+      }
+      //this.props.notificationsUpdated(asyncNotificationList);
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(asyncNotificationList),
+      );
+      asyncNotificationList.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setTimeout(() => {
+        this.setState({
+          notificationData: asyncNotificationList,
+          notificationDataChange: !this.state.notificationDataChange,
+        });
+      }, 2);
+    }
+  };
+
+  localNotification = async (notificationDetails) => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle(notificationDetails.title)
+      .setBody(notificationDetails.body)
+      .setNotificationId(notificationDetails.id)
+      .setSound('default')
+      .setData({
+        title: notificationDetails.title,
+        body: notificationDetails.body,
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 1);
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+      })
+      .then(() => { })
+      .catch((err) => { });
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => { });
+  };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (
+      prevProps.notificationList !== this.props.notificationList ||
+      prevProps.releaseCasesValue !== this.props.releaseCasesValue
+    ) {
+      this.setupNotificationList();
+    }
+
+    if (prevProps.accounts !== this.props.accounts) {
+      this.getBalances();
+      this.getNewTransactionNotifications();
+      this.updateAccountCardData();
+    }
+
+    if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
+      this.storeFCMToken();
+    }
+
+    if (
+      prevProps.secondaryDeviceAddressValue !==
+      this.props.secondaryDeviceAddressValue
+    ) {
+      this.setSecondaryDeviceAddresses();
+    }
+
+    if (this.props.paymentDetails !== null && this.props.paymentDetails) {
+      const serviceType = REGULAR_ACCOUNT;
+      const {
+        paymentDetails,
+        accounts,
+        navigation,
+        addTransferDetails,
+        clearPaymentDetails,
+      } = this.props;
+      const { balances } = this.state;
+      let { address, paymentURI } = paymentDetails;
+      let options: any = {};
+      if (paymentURI) {
+        try {
+          const details = accounts[serviceType].service.decodePaymentURI(
+            paymentURI,
+          );
+          address = details.address;
+          options = details.options;
+        } catch (err) {
+          Alert.alert('Unable to decode payment URI');
+          return;
+        }
+      }
+
+      const item = {
+        id: address,
+      };
+
+      addTransferDetails(serviceType, {
+        selectedContact: item,
+      });
+
+      clearPaymentDetails();
+
+      navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        bitcoinAmount: options.amount
+          ? `${Math.round(options.amount * 1e8)}`
+          : '',
+      });
+    }
+
+    if (prevState.isLoading && !this.state.isLoading) {
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
+    }
+  };
+
+  handleDeeplinkModal = () => {
+    const custodyRequest = this.props.navigation.getParam('custodyRequest');
+    const recoveryRequest = this.props.navigation.getParam('recoveryRequest');
+    const trustedContactRequest = this.props.navigation.getParam(
+      'trustedContactRequest',
+    );
+    const userKey = this.props.navigation.getParam('userKey');
+
+    if (custodyRequest) {
+      this.setState(
+        {
+          custodyRequest,
+        },
+        () => {
+          if (this.state.tabBarIndex === 999) {
+            this.setState({
+              tabBarIndex: 0,
+              deepLinkModalOpen: true,
+            });
+          }
+
+          setTimeout(() => {
+            if (this.refs.allAccountsBottomSheet) {
+              (this.refs.allAccountsBottomSheet as any).snapTo(0);
+              (this.refs.settingsBottomSheet as any).snapTo(0);
+            }
+
+            (this.refs.custodianRequestBottomSheet as any).snapTo(1);
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          }, 2);
+        },
+      );
+      return;
+    }
+
+    if (recoveryRequest || trustedContactRequest) {
+      this.setState(
+        {
+          recoveryRequest,
+          trustedContactRequest,
+        },
+        () => {
+          if (this.state.tabBarIndex === 999) {
+            this.setState({
+              tabBarIndex: 0,
+              deepLinkModalOpen: true,
+            });
+          }
+          setTimeout(() => {
+            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          }, 2);
+        },
+      );
+
+      return;
+    }
+
+    if (userKey) {
+      this.props.navigation.navigate('PairNewWallet', { userKey });
+      return;
+    }
+
+    return;
+  };
+
+  componentWillUnmount() {
+    if (this.focusListener) {
+      this.focusListener();
+    }
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+    // if (this.appStateListener) {
+    //   this.appStateListener();
+    // }
+    if (this.firebaseNotificationListener) {
+      this.firebaseNotificationListener();
+    }
+    if (this.notificationOpenedListener) {
+      this.notificationOpenedListener();
+    }
+  }
+
+  handleDeepLink = async (event) => {
+    const { navigation, isFocused } = this.props;
+    // if user is in any other screen before opening
+    // deep link , we will navigate user to home first
+    if (!isFocused) {
+      navigation.navigate('Home');
+    }
+    const splits = event.url.split('/');
+
+    if (splits[5] === 'sss') {
+      const requester = splits[4];
+      if (splits[6] === 'ek') {
+        const custodyRequest = {
+          requester,
+          ek: splits[7],
+          uploadedAt: splits[8],
+        };
+        this.setState(
+          {
+            custodyRequest,
+          },
+          () => {
+            if (this.state.tabBarIndex === 999) {
+              this.setState({
+                tabBarIndex: 0,
+                deepLinkModalOpen: true,
+              });
+            }
+            setTimeout(() => {
+              (this.refs.allAccountsBottomSheet as any)
+                .snapTo(0)(this.refs.settingsBottomSheet as any)
+                .snapTo(0)(this.refs.custodianRequestBottomSheet as any)
+                .snapTo(1)(this.refs.transactionTabBarBottomSheet as any)
+                .snapTo(1);
+            }, 2);
+          },
+        );
+        // navigation.navigate('Home', { custodyRequest });
+      } else if (splits[6] === 'rk') {
+        const recoveryRequest = { requester, rk: splits[7] };
+        this.setState(
+          {
+            recoveryRequest,
+            trustedContactRequest: null,
+          },
+          () => {
+            if (this.state.tabBarIndex === 999) {
+              this.setState({
+                tabBarIndex: 0,
+                deepLinkModalOpen: true,
+              });
+            }
+            setTimeout(() => {
+              (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+              (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            }, 2);
+          },
+        );
+      }
+    } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
+      if (splits[3] !== config.APP_STAGE) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
+          }`,
+        );
+      } else {
+        const version = splits.pop().slice(1);
+        if (version) {
+          if (!(await isCompatible(splits[4], version))) return;
+        }
+
+        const trustedContactRequest = {
+          isGuardian: ['tcg', 'atcg'].includes(splits[4]),
+          approvedTC: splits[4] === 'atcg' ? true : false,
+          isPaymentRequest: splits[4] === 'ptc' ? true : false,
+          requester: splits[5],
+          encryptedKey: splits[6],
+          hintType: splits[7],
+          hint: splits[8],
+          uploadedAt: splits[9],
+          version,
+        };
+
+        this.setState(
+          {
+            trustedContactRequest,
+            recoveryRequest: null,
+          },
+          () => {
+            if (this.state.tabBarIndex === 999) {
+              this.setState({
+                tabBarIndex: 0,
+                deepLinkModalOpen: true,
+              });
+            }
+            setTimeout(() => {
+              (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+              (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            }, 2);
+          },
+        );
+      }
+    } else if (splits[4] === 'rk') {
+      const recoveryRequest = {
+        isRecovery: true,
+        requester: splits[5],
+        encryptedKey: splits[6],
+        hintType: splits[7],
+        hint: splits[8],
+      };
+      this.setState(
+        {
+          recoveryRequest,
+          trustedContactRequest: null,
+        },
+        () => {
+          if (this.state.tabBarIndex === 999) {
+            this.setState({
+              tabBarIndex: 0,
+              deepLinkModalOpen: true,
+            });
+          }
+          setTimeout(() => {
+            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          }, 2);
+        },
+      );
+    } else if (splits[4] === 'rrk') {
+      Alert.alert(
+        'Restoration link Identified',
+        'Restoration links only works during restoration mode',
+      );
+    }
+
+    if (event.url.includes('fastbitcoins')) {
+      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
+      navigation.navigate('PairNewWallet', { userKey });
+    }
+  };
+
+  setUpFocusListener = () => {
+    const { navigation } = this.props;
+    this.focusListener = navigation.addListener('didFocus', () => {
+      this.setCurrencyCodeFromAsync();
+      this.getAssociatedContact();
+      this.checkFastBitcoin();
+      this.props.fetchNotifications();
+      this.setState({
+        lastActiveTime: moment().toISOString(),
+      });
+    });
+
+    setTimeout(() => {
+      if (this.refs.transactionTabBarBottomSheet) {
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      }
+
+      if (this.refs.addTabBarBottomSheet) {
+        (this.refs.addTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.qrTabBarBottomSheet) {
+        (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+      }
+
+      if (this.refs.moreTabBarBottomSheet) {
+        (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      }
+    }, 500);
+
+    this.getAssociatedContact();
+    this.setCurrencyCodeFromAsync();
+    this.checkFastBitcoin();
+  };
+
+  checkFastBitcoin = async () => {
+    const { FBTCAccountData } = this.props;
+    let getFBTCAccount = FBTCAccountData || {};
+    // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    this.setState({ fbBTCAccount: getFBTCAccount });
+    return;
+  };
+
+  setSecondaryDeviceAddresses = async () => {
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
+    // JSON.parse(
+    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
+    // );
+    if (!secondaryDeviceOtpTemp) {
+      secondaryDeviceOtpTemp = [];
+    }
+    if (
+      secondaryDeviceOtpTemp.findIndex(
+        (value) => value.otp == (this.state.secondaryDeviceOtp as any).otp,
+      ) == -1
+    ) {
+      secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
+      this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
+      // await AsyncStorage.setItem(
+      //   'secondaryDeviceAddress',
+      //   JSON.stringify(secondaryDeviceOtpTemp),
+      // );
+    }
+  };
+
+  getAssociatedContact = async () => {
+    // TODO -- need to check this
+    let AssociatedContact = JSON.parse(
+      await AsyncStorage.getItem('AssociatedContacts'),
+    );
+    // setAssociatedContact(AssociatedContact);
+    this.setSecondaryDeviceAddresses();
+  };
+
+  setCurrencyCodeFromAsync = async () => {
+    const { currencyCode, currencyToggleValue } = this.props;
+    let currencyCodeTmp = currencyCode;
+    if (!currencyCodeTmp) {
+      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    }
+    if (!currencyCodeTmp) {
+      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
+      //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      this.setState({
+        currencyCode: RNLocalize.getCurrencies()[0],
+      });
+    } else {
+      this.setState({
+        currencyCode: currencyCodeTmp,
+      });
+    }
+    let currencyToggleValueTmp = currencyToggleValue;
+    if (!currencyToggleValueTmp) {
+      currencyToggleValueTmp = await AsyncStorage.getItem(
+        'currencyToggleValue',
+      );
+    }
+    this.setState({
+      switchOn: currencyToggleValueTmp ? true : false,
+    });
+  };
+
+  bootStrapNotifications = async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if (!enabled) {
+      await firebase
+        .messaging()
+        .requestPermission()
+        .then(() => {
+          // User has authorized
+          this.createNotificationListeners();
+          this.storeFCMToken();
+          this.scheduleNotification();
+        })
+        .catch((error) => {
+          // User has rejected permissions
+          //console.log(
+          // 'PERMISSION REQUEST :: notification permission rejected',
+          //  error,
+          //);
+        });
+    } else {
+      this.createNotificationListeners();
+      this.storeFCMToken();
+      this.scheduleNotification();
+    }
+  };
+
+  storeFCMToken = async () => {
+    const fcmToken = await firebase.messaging().getToken();
+    let fcmArray = [fcmToken];
+    let fcmTokenFromAsync = this.props.fcmTokenValue;
+    if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem
+      await AsyncStorage.setItem('fcmToken', fcmToken);
+      this.props.updateFCMTokens(fcmArray);
+    } else if (!fcmTokenFromAsync) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem
+      await AsyncStorage.setItem('fcmToken', fcmToken);
+      this.props.updateFCMTokens(fcmArray);
+    }
+  };
+
+  onNotificationArrives = async (notification) => {
+    this.props.fetchNotifications();
+    const { title, body } = notification;
+    const deviceTrayNotification = new firebase.notifications.Notification()
+      .setTitle(title)
+      .setBody(body)
+      .setNotificationId(notification.notificationId)
+      .setSound('default')
+      .android.setPriority(firebase.notifications.Android.Priority.High)
+      .android.setChannelId(
+        notification.android.channelId
+          ? notification.android.channelId
+          : 'foregroundNotification',
+      ) // previously created
+      .android.setAutoCancel(true); // To remove notification when tapped on it
+
+    const channelId = new firebase.notifications.Android.Channel(
+      notification.android.channelId,
+      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+      firebase.notifications.Android.Importance.High,
+    );
+    firebase.notifications().android.createChannel(channelId);
+    firebase.notifications().displayNotification(deviceTrayNotification);
+  };
+
+  createNotificationListeners = async () => {
+    /*
+     * Triggered when a particular notification has been received in foreground
+     * */
+    this.firebaseNotificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        this.onNotificationArrives(notification);
+      });
+
+    /*
+     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+     * */
+    this.notificationOpenedListener = firebase
+      .notifications()
+      .onNotificationOpened(async (notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+        this.props.fetchNotifications();
+        this.onNotificationOpen(notificationOpen.notification);
+      });
+
+    /*
+     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+     * */
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
+      const { title, body } = notificationOpen.notification;
+
+      this.props.fetchNotifications();
+      this.onNotificationOpen(notificationOpen.notification);
+    }
+    /*
+     * Triggered for data only payload in foreground
+     * */
+    firebase.messaging().onMessage((message) => {
+      //process data message
+    });
+  };
+
+  onNotificationOpen = async (item) => {
+    let content = JSON.parse(item._data.content);
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (!asyncNotificationList) {
+      asyncNotificationList = [];
+    }
+    let readStatus = true;
+    if (content.notificationType == 'release') {
+      let releaseCases = this.props.releaseCasesValue;
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      if (releaseCases.ignoreClick) {
+        readStatus = true;
+      } else if (releaseCases.remindMeLaterClick) {
+        readStatus = false;
+      } else {
+        readStatus = false;
+      }
+    }
+    let obj = {
+      type: content.notificationType,
+      isMandatory: false,
+      read: readStatus,
+      title: item.title,
+      time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+      date: new Date(),
+      info: item.body,
+      notificationId: content.notificationId,
+    };
+    asyncNotificationList.push(obj);
+    // this.props.notificationsUpdated(asyncNotificationList);
+
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotificationList),
+    );
+    asyncNotificationList.sort(function (left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    this.setState({
+      notificationData: asyncNotificationList,
+      notificationDataChange: !this.state.notificationDataChange,
+    });
+    this.onPressNotifications();
+  };
+
+  getBalances = () => {
+    const { accounts } = this.props;
+
+    let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
 
+    if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
+
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
-    const trustedAccounts: TrustedContactDerivativeAccount =
-      accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        TRUSTED_CONTACTS
-      ];
-    if (trustedAccounts.instance.using) {
-      for (
-        let accountNumber = 1;
-        accountNumber <= trustedAccounts.instance.using;
-        accountNumber++
-      ) {
-        // console.log({
-        //   accountNumber,
-        //   balances: trustedAccounts[accountNumber].balances,
-        //   transactions: trustedAccounts[accountNumber].transactions,
-        // });
-        if (trustedAccounts[accountNumber].balances) {
-          regularBalance +=
-            trustedAccounts[accountNumber].balances.balance +
-            trustedAccounts[accountNumber].balances.unconfirmedBalance;
-        }
+    // regular derivative accounts
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      const derivativeAccount =
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        dAccountType
+        ];
+      if (derivativeAccount && derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
 
-        if (trustedAccounts[accountNumber].transactions) {
-          trustedAccounts[
-            accountNumber
-          ].transactions.transactionDetails.forEach((tx) => {
-            let include = true;
-            for (const currentTx of regularTransactions) {
-              if (tx.txid === currentTx.txid) {
-                include = false;
-                break;
+          if (derivativeAccount[accountNumber].transactions) {
+            derivativeAccount[
+              accountNumber
+            ].transactions.transactionDetails.forEach((tx) => {
+              let include = true;
+              for (const currentTx of regularTransactions) {
+                if (tx.txid === currentTx.txid) {
+                  include = false;
+                  break;
+                }
               }
-            }
-            if (include) regularTransactions.push(tx);
-          });
+              if (include) regularTransactions.push(tx);
+            });
+          }
         }
       }
     }
 
-    const secureBalance = accounts[SECURE_ACCOUNT].service
+    let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
-    const accumulativeBalance = regularBalance + secureBalance;
+    // secure derivative accounts
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+        dAccountType
+        ];
+      if (derivativeAccount && derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+
+          if (derivativeAccount[accountNumber].transactions) {
+            derivativeAccount[
+              accountNumber
+            ].transactions.transactionDetails.forEach((tx) => {
+              let include = true;
+              for (const currentTx of secureTransactions) {
+                if (tx.txid === currentTx.txid) {
+                  include = false;
+                  break;
+                }
+              }
+              if (include) secureTransactions.push(tx);
+            });
+          }
+        }
+      }
+    }
+
+    // donation transactions
+    const donationTxs = [];
+    let donationsBalance = 0;
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      const derivativeAccounts =
+        accounts[serviceType].service[
+          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+        ].derivativeAccounts;
+
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+
+      for (
+        let index = 1;
+        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
+        index++
+      ) {
+        const donAcc: DonationDerivativeAccountElements =
+          derivativeAccounts[DONATION_ACCOUNT][index];
+
+        if (donAcc.balances)
+          donationsBalance +=
+            donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+        if (
+          donAcc.transactions &&
+          donAcc.transactions.transactionDetails.length
+        )
+          donationTxs.push(...donAcc.transactions.transactionDetails);
+      }
+    }
+
+    const accumulativeBalance =
+      regularBalance + secureBalance + donationsBalance;
 
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
+      ...donationTxs,
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-      accumulativeBalance,
+
+    this.setState({
+      balances: {
+        testBalance,
+        regularBalance,
+        secureBalance,
+        accumulativeBalance,
+      },
+      transactions: accumulativeTransactions,
+      isBalanceLoading: false,
     });
-    setTransactions(accumulativeTransactions);
 
     // if (balancesParam) {
     //   if (
@@ -463,357 +1716,40 @@ export default function Home(props) {
     //   });
     //   setTransactions(accumulativeTransactions);
     // }
-  }, [accounts]);
+  };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setTransactionLoading(false);
-    }, 1000);
-  }, [transactions]);
-
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
-    id: '',
-    question: '',
-  });
-  const [FBTCAccount, setFBTCAccount] = useState({});
-  const [answer, setAnswer] = useState('');
-  const [openmodal, setOpenmodal] = useState('closed');
-  const [tabBarZIndex, setTabBarZIndex] = useState(999);
-  const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
-  const [tabSelected, setTabSelected] = useState('sell');
-  const [switchOn, setSwitchOn] = useState(true);
-  const [selected, setSelected] = useState('Transactions');
-  // const [RegenerateBottomSheet, setRegenerateBottomSheet] = useState(
-  //   React.createRef(),
-  // );
-  // const [
-  //   ShareRecoverySecretBottomSheet,
-  //   setShareRecoverySecretBottomSheet,
-  // ] = useState(React.createRef());
-  // const [
-  //   ShareRecoverySecretOtpBottomSheet,
-  //   setShareRecoverySecretOtpBottomSheet,
-  // ] = useState(React.createRef());
-  // const [
-  //   HealthCheckSuccessBottomSheet,
-  //   setHealthCheckSuccessBottomSheet,
-  // ] = useState(React.createRef());
-  // const [
-  //   HealthCheckGoogleAuthBottomSheet,
-  //   setHealthCheckGoogleAuthBottomSheet,
-  // ] = useState(React.createRef());
-  // const [
-  //   HealthCheckSecurityQuestionBottomSheet,
-  //   setHealthCheckSecurityQuestionBottomSheet,
-  // ] = useState(React.createRef());
-  const [
-    ContactSelectedFromAddressBookBottomSheet,
-    setContactSelectedFromAddressBookBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    AddContactAddressBookBookBottomSheet,
-    setAddContactAddressBookBottomSheet,
-  ] = useState(React.createRef());
-  const [isLoadContacts, setIsLoadContacts] = useState(false);
-  const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-    React.createRef(),
-  );
-  // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
-  //   React.createRef(),
-  // );
-  const [
-    CustodianRequestBottomSheet,
-    setCustodianRequestBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    RecoverySecretRequestBottomSheet,
-    setRecoverySecretRequestBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    CustodianRequestOtpBottomSheet,
-    setCustodianRequestOtpBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestRejectedBottomSheet,
-    setCustodianRequestRejectedBottomSheet,
-  ] = useState(React.createRef());
-  // const [
-  //   CustodianRequestAcceptBottomSheet,
-  //   setCustodianRequestAcceptBottomSheet,
-  // ] = useState(React.createRef());
-  const [settingsBottomSheet, setSettingsBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [transactionTabBarBottomSheet, setTransactionBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [addTabBarBottomSheet, setAddTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [QrTabBarBottomSheet, setQrTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [moreTabBarBottomSheet, setMoreTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [newData, setNewData] = useState([]);
-  const custodyRequest = props.navigation.getParam('custodyRequest');
-  const recoveryRequest = props.navigation.getParam('recoveryRequest');
-  const trustedContactRequest = props.navigation.getParam(
-    'trustedContactRequest',
-  );
-
-  const [data, setData] = useState([
-    {
-      id: 1,
-      title: 'Test Account',
-      unit: 't-sats',
-      amount: '400,000',
-      account: `Learn Bitcoin`,
-      accountType: 'test',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
-    },
-    {
-      id: 2,
-      title: 'Savings Account',
-      unit: 'sats',
-      amount: '60,000',
-      account: 'Multi-factor security',
-      accountType: 'secure',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
-    },
-    {
-      id: 3,
-      title: 'Checking Account',
-      unit: 'sats',
-      amount: '5,000',
-      account: 'Fast and easy',
-      accountType: 'regular',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
-    },
-    {
-      id: 4,
-      title: 'Add Account',
-      unit: '',
-      amount: '',
-      account: '',
-      accountType: 'add',
-      bitcoinicon: require('../assets/images/icons/icon_add.png'),
-    },
-  ]);
-
-  const [transactionData, setTransactionData] = useState([
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '11 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '12 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-  ]);
-  const [modaldata, setModaldata] = useState(transactionData);
-  const [
-    TransactionDetailsBottomSheet,
-    setTransactionDetailsBottomSheet,
-  ] = useState(React.createRef());
-  const [transactionItem, setTransactionItem] = useState({});
-  const [
-    TransactionDetailsHelperBottomSheet,
-    setTransactionDetailsHelperBottomSheet,
-  ] = useState(React.createRef());
-  const [isHelperDone, setIsHelperDone] = useState(true);
-
-  function getIconByAccountType(type) {
-    if (type == 'saving') {
-      return require('../assets/images/icons/icon_regular.png');
-    } else if (type == 'regular') {
-      return require('../assets/images/icons/icon_regular.png');
-    } else if (type == 'secure') {
-      return require('../assets/images/icons/icon_secureaccount.png');
-    } else if (type == 'test') {
-      return require('../assets/images/icons/icon_test.png');
-    } else {
-      return require('../assets/images/icons/icon_test.png');
+  onPressSettingsElements = async (type, currencycode) => {
+    const { navigation, currencyCode } = this.props;
+    if (type == 'ManagePin') {
+      return navigation.navigate('SettingManagePin', {
+        managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
+      });
+    } else if (type == 'ChangeCurrency') {
+      let currency = currencyCode;
+      //await AsyncStorage.getItem('currencyCode');
+      navigation.navigate('ChangeCurrency');
+      this.setState({
+        currencyCode: currency,
+      });
+    } else if (type == 'ChangeWalletName') {
+      navigation.navigate('SettingWalletNameChange');
     }
-  }
+  };
 
-  useEffect(() => {
-    getNotificationList();
-    getNewTransactionNotifications();
-    let notificationOnFocusListener = props.navigation.addListener(
-      'didFocus',
+  managePinSuccessProceed = (pin) => {
+    this.setState(
+      {
+        tabBarIndex: 999,
+      },
       () => {
-        getNewTransactionNotifications();
-        getNotificationList();
+        (this.refs.settingsBottomSheet as any).snapTo(0);
       },
     );
-    return () => {
-      notificationOnFocusListener.remove();
-    };
-  }, []);
-
-  function randomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  const getNewTransactionNotifications = async () => {
-    let newTransactions = [];
-    const derivativeAccountType = 'FAST_BITCOINS';
-    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
-    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
-    if (
-      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
-      secureAccount.derivativeAccounts[derivativeAccountType][1].xpub
-    )
-      dispatch(fetchDerivativeAccBalTx(SECURE_ACCOUNT, derivativeAccountType));
-
-    if (
-      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
-      regularAccount.derivativeAccounts[derivativeAccountType][1].xpub
-    )
-      dispatch(fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType));
-
-    let newTransactionsRegular =
-      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
-      regularAccount.derivativeAccounts[derivativeAccountType][1]
-        .newTransactions;
-    let newTransactionsSecure =
-      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
-      secureAccount.derivativeAccounts[derivativeAccountType][1]
-        .newTransactions;
-
-    if (
-      newTransactionsRegular &&
-      newTransactionsRegular.length &&
-      newTransactionsSecure &&
-      newTransactionsSecure.length
-    ) {
-      newTransactions = [...newTransactionsRegular, ...newTransactionsSecure];
-    } else if (newTransactionsRegular && newTransactionsRegular.length)
-      newTransactions = [...newTransactionsRegular];
-    else if (newTransactionsSecure && newTransactionsSecure.length)
-      newTransactions = [...newTransactionsSecure];
-
-    //console.log('newTransactions', newTransactions);
-
-    if (newTransactions.length) {
-      let asyncNotification = JSON.parse(
-        await AsyncStorage.getItem('notificationList'),
-      );
-      let asyncNotificationList = [];
-      if (asyncNotification.length) {
-        asyncNotificationList = [];
-        for (let i = 0; i < asyncNotification.length; i++) {
-          asyncNotificationList.push(asyncNotification[i]);
-        }
-      }
-      let tmpList = asyncNotificationList;
-      let obj = {
-        type: 'contact',
-        isMandatory: false,
-        read: false,
-        title: 'New FastBitcoin Transactions',
-        time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
-        date: new Date(),
-        info: newTransactions.length + ' New FBTC transactions',
-        notificationId: createRandomString(17),
-      };
-      tmpList.push(obj);
-
-      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
-      let notificationDetails = {
-        id: obj.notificationId,
-        title: obj.title,
-        body: obj.info,
-      };
-      localNotification(notificationDetails);
-      tmpList.sort(function (left, right) {
-        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
-      });
-      setTimeout(() => {
-        setNotificationData(tmpList);
-        setNotificationDataChange(!NotificationDataChange);
-      }, 2);
-    }
   };
 
-  const getNotificationList = async () => {
-    dispatch(fetchNotifications());
-  };
-
-  useEffect(() => {
-    setupNotificationList();
-  }, [notificationList]);
-
-  const onNotificationListOpen = async () => {
+  onNotificationListOpen = async () => {
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -826,6 +1762,8 @@ export default function Home(props) {
           );
         }
       }
+      // this.props.notificationsUpdated(asyncNotificationList);
+
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -833,12 +1771,435 @@ export default function Home(props) {
       asyncNotificationList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
-      setNotificationData(asyncNotificationList);
-      setNotificationDataChange(!NotificationDataChange);
+
+      this.setState({
+        notificationData: asyncNotificationList,
+        notificationDataChange: !this.state.notificationDataChange,
+      });
     }
   };
 
-  const setupNotificationList = async () => {
+  onPressSaveBitcoinElements = (type) => {
+    const { navigation } = this.props;
+    if (type == 'voucher') {
+      navigation.navigate('VoucherScanner');
+    } else if (type == 'existingBuyingMethods') {
+      navigation.navigate('ExistingSavingMethods');
+    }
+  };
+
+  onTrustedContactRequestAccept = (key) => {
+    this.setState({
+      tabBarIndex: 999,
+      deepLinkModalOpen: false,
+    });
+    setTimeout(() => {
+      (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+    }, 1);
+    this.processDLRequest(key, false);
+  };
+
+  onTrustedContactReject = (key) => {
+    setTimeout(() => {
+      this.setState({
+        tabBarIndex: 999,
+        deepLinkModalOpen: false,
+      });
+    }, 2);
+    (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+    // this.processDLRequest(key, true);
+  };
+
+  onPhoneNumberChange = () => { };
+
+  selectTab = (tabTitle) => {
+    if (tabTitle == 'More') {
+      this.setState(
+        {
+          knowMoreBottomSheetsFlag: true,
+          selectedBottomTab: tabTitle,
+        },
+        () => {
+          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+          (this.refs.addTabBarBottomSheet as any).snapTo(0);
+          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+          (this.refs.moreTabBarBottomSheet as any).snapTo(2);
+        },
+      );
+      return;
+    }
+    if (tabTitle == 'Transactions') {
+      this.setState(
+        {
+          modalData: initialTransactionData,
+          selectedBottomTab: tabTitle,
+        },
+        () => {
+          (this.refs.transactionTabBarBottomSheet as any).snapTo(2);
+          (this.refs.addTabBarBottomSheet as any).snapTo(0);
+          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+        },
+      );
+      return;
+    }
+    if (tabTitle == 'Add') {
+      this.setState(
+        {
+          modalData: [],
+          selectedBottomTab: tabTitle,
+        },
+        () => {
+          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+          (this.refs.addTabBarBottomSheet as any).snapTo(2);
+          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+        },
+      );
+      return;
+    }
+    if (tabTitle == 'QR') {
+      this.setState(
+        {
+          modalData: initialTransactionData,
+          selectedBottomTab: tabTitle,
+        },
+        () => {
+          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+          (this.refs.addTabBarBottomSheet as any).snapTo(0);
+          (this.refs.qrTabBarBottomSheet as any).snapTo(2);
+          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+        },
+      );
+      return;
+    }
+  };
+
+  processDLRequest = (key, rejected) => {
+    const { trustedContactRequest, recoveryRequest } = this.state;
+    let {
+      requester,
+      isGuardian,
+      approvedTC,
+      encryptedKey,
+      publicKey,
+      info,
+      isQR,
+      uploadedAt,
+      isRecovery,
+      version,
+    } = trustedContactRequest || recoveryRequest;
+    const {
+      UNDER_CUSTODY,
+      uploadRequestedShare,
+      navigation,
+      approveTrustedContact,
+      fetchEphemeralChannel,
+      fetchTrustedChannel,
+      walletName,
+      trustedContacts,
+    } = this.props;
+
+    if (!isRecovery) {
+      if (requester === walletName) {
+        Toast('Cannot be your own Contact/Guardian');
+        return;
+      }
+
+      let expiry = config.TC_REQUEST_EXPIRY;
+      if (!semver.valid(version)) {
+        // expiry support for 0.7, 0.9 and 1.0
+        expiry = config.LEGACY_TC_REQUEST_EXPIRY;
+      }
+
+      if (uploadedAt && Date.now() - uploadedAt > expiry) {
+        Alert.alert(
+          `${isQR ? 'QR' : 'Link'} expired!`,
+          `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
+        );
+        this.setState({
+          loading: false,
+        });
+      } else {
+        if (isGuardian && UNDER_CUSTODY[requester]) {
+          Alert.alert(
+            'Failed to accept',
+            `You already custody a share against the wallet name: ${requester}`,
+          );
+          this.setState({
+            loading: false,
+          });
+        } else {
+          if (!publicKey) {
+            try {
+              publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                .decryptedPub;
+              info = key;
+            } catch (err) {
+              Alert.alert(
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
+              );
+              return;
+            }
+          }
+
+          let existingContact, existingContactName;
+          Object.keys(trustedContacts.tc.trustedContacts).forEach(
+            (contactName) => {
+              const contact = trustedContacts.tc.trustedContacts[contactName];
+              if (contact.contactsPubKey === publicKey) {
+                existingContactName = contactName;
+                existingContact = contact;
+              }
+            },
+          );
+          if (existingContactName && !approvedTC) {
+            Toast('Contact already exists against this request');
+            return;
+          }
+
+          if (publicKey && !rejected) {
+            if (!approvedTC) {
+              navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  let contactName = '';
+                  if (contact) {
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
+                      }`
+                      .toLowerCase()
+                      .trim();
+                  } else {
+                    // contactName = `${requester}'s Wallet`.toLowerCase();
+                    Alert.alert('Contact association failed');
+                    return;
+                  }
+                  if (!semver.valid(version)) {
+                    // for 0.7, 0.9 and 1.0: info remains null
+                    info = null;
+                  }
+
+                  const contactInfo = {
+                    contactName,
+                    info,
+                  };
+
+                  approveTrustedContact(
+                    contactInfo,
+                    publicKey,
+                    true,
+                    requester,
+                    isGuardian,
+                  );
+                },
+                isGuardian,
+              });
+            } else {
+              if (!existingContactName) {
+                Alert.alert(
+                  'Invalid Link/QR',
+                  'You are not a valid trusted contact for approving this request',
+                );
+                return;
+              }
+              const contactInfo = {
+                contactName: existingContactName,
+                info,
+              };
+
+              fetchTrustedChannel(
+                contactInfo,
+                trustedChannelActions.downloadShare,
+                requester,
+              );
+            }
+          } else if (publicKey && rejected) {
+            // don't associate; only fetch the payment details from EC
+            // fetchEphemeralChannel(null, null, publicKey);
+          }
+        }
+      }
+    } else {
+      if (requester === walletName) {
+        Toast('You do not host any key of your own');
+        return;
+      }
+
+      if (!UNDER_CUSTODY[requester]) {
+        this.setState(
+          {
+            loading: false,
+            errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
+            errorMessage: `Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore`,
+            buttonText: 'Okay',
+          },
+          () => {
+            (this.refs.errorBottomSheet as any).snapTo(1);
+          },
+        );
+      } else {
+        if (!publicKey) {
+          try {
+            publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+              .decryptedPub;
+          } catch (err) {
+            Alert.alert(
+              'Invalid Number/Email',
+              'Decryption failed due to invalid input, try again.',
+            );
+          }
+        }
+        if (publicKey) {
+          uploadRequestedShare(recoveryRequest.requester, publicKey);
+        }
+      }
+    }
+  };
+
+  openCloseModal = () => {
+    const { openModal, selectedBottomTab } = this.state;
+    if (openModal === 'closed') {
+      this.setState(
+        {
+          openModal: 'half',
+        },
+        () => {
+          if (selectedBottomTab === 'Transactions') {
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          }
+        },
+      );
+    }
+    if (openModal === 'half') {
+      this.setState(
+        {
+          openModal: 'full',
+        },
+        () => {
+          if (selectedBottomTab === 'Transactions') {
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(2);
+          }
+        },
+      );
+    }
+    if (openModal === 'full') {
+      this.setState(
+        {
+          openModal: 'closed',
+        },
+        () => {
+          if (selectedBottomTab === 'Transactions') {
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+          }
+        },
+      );
+    }
+  };
+
+  onNotificationClicked = async (value) => {
+    const { notificationListNew } = this.props;
+    //let asyncNotifications = notificationListNew;
+    let asyncNotifications = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    const { notificationData } = this.state;
+    const { navigation } = this.props;
+    let tempNotificationData = notificationData;
+    for (let i = 0; i < tempNotificationData.length; i++) {
+      const element = tempNotificationData[i];
+      if (element.notificationId == value.notificationId) {
+        if (
+          asyncNotifications &&
+          asyncNotifications.length &&
+          asyncNotifications.findIndex(
+            (item) => item.notificationId == value.notificationId,
+          ) > -1
+        ) {
+          asyncNotifications[
+            asyncNotifications.findIndex(
+              (item) => item.notificationId == value.notificationId,
+            )
+          ].read = true;
+        }
+        tempNotificationData[i].read = true;
+      }
+    }
+    // this.props.notificationsUpdated(asyncNotifications);
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotifications),
+    );
+
+    this.setState({
+      notificationData: tempNotificationData,
+      notificationDataChange: !this.state.notificationDataChange,
+    });
+
+    if (value.info.includes('Trusted Contact request accepted by')) {
+      navigation.navigate('AddressBookContents');
+      return;
+    }
+
+    if (value.type == 'release') {
+      RelayServices.fetchReleases(value.info.split(' ')[1])
+        .then(async (res) => {
+          if (res.data.releases.length) {
+            let releaseNotes = res.data.releases.length
+              ? res.data.releases.find((el) => {
+                return el.build === value.info.split(' ')[1];
+              })
+              : '';
+            navigation.navigate('UpdateApp', {
+              releaseData: [releaseNotes],
+              isOpenFromNotificationList: true,
+              releaseNumber: value.info.split(' ')[1],
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    if (value.type == 'contact') {
+      setTimeout(() => {
+        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      }, 2);
+      this.selectTab('Transactions');
+    }
+  };
+
+  onPressElement = (item) => {
+    const { navigation } = this.props;
+    if (item.title == 'Backup Health') {
+      navigation.navigate('ManageBackup');
+      return;
+    }
+    if (item.title == 'Friends and Family') {
+      navigation.navigate('AddressBookContents');
+      return;
+    } else if (item.title == 'Wallet Settings') {
+      (this.refs.settingsBottomSheet as any).snapTo(1);
+      setTimeout(() => {
+        this.setState({
+          tabBarIndex: 0,
+        });
+      }, 10);
+    } else if (item.title == 'Funding Sources') {
+      navigation.navigate('ExistingSavingMethods');
+    } else if (item.title === 'Hexa Community (Telegram)') {
+      let url = 'https://t.me/HexaWallet';
+      Linking.openURL(url)
+        .then((data) => { })
+        .catch((e) => {
+          alert('Make sure Telegram installed on your device');
+        });
+      return;
+    }
+  };
+
+  setupNotificationList = async () => {
+    const { notificationListNew } = this.props;
+    // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -850,14 +2211,16 @@ export default function Home(props) {
       }
     }
     let tmpList = asyncNotificationList;
+    const { notificationList } = this.props;
     if (notificationList) {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = JSON.parse(
-            await AsyncStorage.getItem('releaseCases'),
-          );
+          let releaseCases = this.props.releaseCasesValue;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('releaseCases'),
+          // );
           if (element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
@@ -876,9 +2239,9 @@ export default function Home(props) {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -920,2760 +2283,1055 @@ export default function Home(props) {
           tmpList.push(obj);
         }
       }
+      //this.props.notificationsUpdated(tmpList);
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
-      setNotificationData(tmpList);
-      setNotificationLoading(false);
-      setNotificationDataChange(!NotificationDataChange);
-    }
-  };
 
-  const onNotificationOpen = async (item) => {
-    let content = JSON.parse(item._data.content);
-    let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem('notificationList'),
-    );
-    if (!asyncNotificationList) {
-      asyncNotificationList = [];
-    }
-    let readStatus = true;
-    if (content.notificationType == 'release') {
-      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
-      if (releaseCases.ignoreClick) {
-        readStatus = true;
-      } else if (releaseCases.remindMeLaterClick) {
-        readStatus = false;
-      } else {
-        readStatus = false;
-      }
-    }
-    let obj = {
-      type: content.notificationType,
-      isMandatory: false,
-      read: readStatus,
-      title: item.title,
-      time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
-      date: new Date(),
-      info: item.body,
-      notificationId: content.notificationId,
-    };
-    asyncNotificationList.push(obj);
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify(asyncNotificationList),
-    );
-    asyncNotificationList.sort(function (left, right) {
-      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
-    });
-    setNotificationData(asyncNotificationList);
-    setNotificationDataChange(!NotificationDataChange);
-  };
-
-  useEffect(function () {
-    AppState.addEventListener('change', onAppStateChange);
-    (async () => {
-      const enabled = await firebase.messaging().hasPermission();
-      if (!enabled) {
-        await firebase
-          .messaging()
-          .requestPermission()
-          .then(() => {
-            // User has authorized
-            createNotificationListeners();
-            storeFCMToken();
-            scheduleNotification();
-          })
-          .catch((error) => {
-            // User has rejected permissions
-            //console.log(
-            // 'PERMISSION REQUEST :: notification permission rejected',
-            //  error,
-            //);
-          });
-      } else {
-        createNotificationListeners();
-        storeFCMToken();
-        scheduleNotification();
-      }
-    })();
-
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      setCurrencyCodeFromAsync();
-      // getAssociatedContact();
-      checkFastBitcoin();
-    });
-    // getAssociatedContact();
-    setCurrencyCodeFromAsync();
-    updateAccountCardData();
-    checkFastBitcoin();
-    (transactionTabBarBottomSheet as any).current.snapTo(1);
-    (addTabBarBottomSheet as any).current.snapTo(0);
-    (QrTabBarBottomSheet as any).current.snapTo(0);
-    (moreTabBarBottomSheet as any).current.snapTo(0);
-    // AppState.addEventListener('change', handleAppStateChange);
-
-    Linking.addEventListener('url', handleDeepLink);
-    // return () => Linking.removeEventListener("url", handleDeepLink);
-
-    // HC up-streaming
-    // if (DECENTRALIZED_BACKUP) {
-    //   if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-    //     dispatch(updateMSharesHealth());
-    //   }
-    // }
-    return () => {
-      focusListener.remove();
-    };
-  }, []);
-
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
-
-  const checkFastBitcoin = async () => {
-    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
-  };
-
-  const onAppStateChange = async (nextAppState) => {
-    handleAppStateChange(nextAppState);
-    try {
-      if (this.appState == nextAppState) return;
-      this.appState = nextAppState;
-      if (this.appState == 'active') {
-        scheduleNotification();
-      }
-    } catch (error) {}
-  };
-
-  const createNotificationListeners = async () => {
-    /*
-     * Triggered when a particular notification has been received in foreground
-     * */
-    this.notificationListener = firebase
-      .notifications()
-      .onNotification((notification) => {
-        onNotificationArrives(notification);
+      this.setState({
+        notificationData: tmpList,
+        notificationDataChange: !this.state.notificationDataChange,
       });
-
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened(async (notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
-        // let data = JSON.parse(notificationOpen.notification.data.content);
-        // if(data.notificationType == "release"){
-        //   props.navigation.navigate('UpdateApp', {releaseData: data})
-        // }
-        getNotificationList();
-        onNotificationOpen(notificationOpen.notification);
-      });
-
-    /*
-     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-     * */
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification();
-    if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
-      getNotificationList();
-      onNotificationOpen(notificationOpen.notification);
-    }
-    /*
-     * Triggered for data only payload in foreground
-     * */
-    this.messageListener = firebase.messaging().onMessage((message) => {
-      //process data message
-    });
-  };
-
-  const scheduleNotification = async () => {
-    const notification = new firebase.notifications.Notification()
-      .setTitle('We have not seen you in a while!')
-      .setBody(
-        'Opening your app regularly ensures you get all the notifications and security updates',
-      )
-      .setNotificationId('1')
-      .setSound('default')
-      .setData({
-        title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
-      })
-      .android.setChannelId('reminder')
-      .android.setPriority(firebase.notifications.Android.Priority.High);
-
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-    const date = new Date();
-    date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
-    // date.setSeconds(date.getSeconds() + Number(Config.NOTIFICATION_HOUR));
-
-    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        //repeatInterval: 'hour',
-      })
-      .then(() => {})
-      .catch(
-        (err) => {}, //console.log('err', err)
-      );
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then((notifications) => {
-        //console.log('logging notifications', notifications);
-      });
-  };
-
-  const localNotification = async (notificationDetails) => {
-    const notification = new firebase.notifications.Notification()
-      .setTitle(notificationDetails.title)
-      .setBody(notificationDetails.body)
-      .setNotificationId(notificationDetails.id)
-      .setSound('default')
-      .setData({
-        title: notificationDetails.title,
-        body: notificationDetails.body,
-      })
-      .android.setChannelId('reminder')
-      .android.setPriority(firebase.notifications.Android.Priority.High);
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-    const date = new Date();
-    date.setSeconds(date.getSeconds() + 1);
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-      })
-      .then(() => {})
-      .catch((err) => {});
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then((notifications) => {});
-  };
-
-  const onNotificationArrives = async (notification) => {
-    getNotificationList();
-    const { title, body } = notification;
-    const deviceTrayNotification = new firebase.notifications.Notification()
-      .setTitle(title)
-      .setBody(body)
-      .setNotificationId(notification.notificationId)
-      .setSound('default')
-      .android.setPriority(firebase.notifications.Android.Priority.High)
-      .android.setChannelId(
-        notification.android.channelId
-          ? notification.android.channelId
-          : 'foregroundNotification',
-      ) // previously created
-      .android.setAutoCancel(true); // To remove notification when tapped on it
-
-    const channelId = new firebase.notifications.Android.Channel(
-      notification.android.channelId,
-      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
-      firebase.notifications.Android.Importance.High,
-    );
-    firebase.notifications().android.createChannel(channelId);
-    firebase.notifications().displayNotification(deviceTrayNotification);
-  };
-
-  // //console.log("notification.data", JSON.parse(notification.data.content));
-  //   let data = JSON.parse(notification.data.content);
-  //   if(data.notificationType == "release"){
-  //     props.navigation.navigate('UpdateApp', {releaseData: data})
-  //   }
-
-  // useEffect(() => {
-  //   const unsubscribe = firebase
-  //     .messaging()
-  //     .onMessage(async (remoteMessage) => {
-  //       //console.log('A new FCM message arrived!', remoteMessage);
-  //     });
-
-  //   return unsubscribe;
-  // }, []);
-
-  // const notifications = useSelector(
-  //   (state) => state.notifications.notifications,
-  // );
-  // //console.log({ notifications });
-  // useEffect(() => {
-  //   dispatch(fetchNotifications());
-  // }, []);
-
-  const storeFCMToken = async () => {
-    const fcmToken = await firebase.messaging().getToken();
-    let fcmArray = [fcmToken];
-    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
-    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
-      await AsyncStorage.setItem('fcmToken', fcmToken);
-      dispatch(updateFCMTokens(fcmArray));
-    } else if (!fcmTokenFromAsync) {
-      await AsyncStorage.setItem('fcmToken', fcmToken);
-      dispatch(updateFCMTokens(fcmArray));
     }
   };
-  const setCurrencyCodeFromAsync = async () => {
-    ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
-    if (!currencyCodeTmp) {
-      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
-      setCurrencyCode(RNLocalize.getCurrencies()[0]);
-    } else {
-      setCurrencyCode(currencyCodeTmp);
-    }
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
-    setSwitchOn(currencyToggleValueTmp ? true : false);
+
+  setCurrencyToggleValue = (temp) => {
+    this.props.setCurrencyToggleValue(temp);
   };
 
-  // const getOverAllHealthFromAsync = async () => {
-  //   if (!overallHealth) {
-  //     const storedHealth = await AsyncStorage.getItem('overallHealth');
-  //     if (storedHealth) {
-  //       setOverallHealth(JSON.parse(storedHealth));
-  //     }
-  //   }
-  // };
-
-  const renderErrorModalContent = useCallback(() => {
+  render() {
+    const {
+      cardData,
+      switchOn,
+      CurrencyCode,
+      transactions,
+      balances,
+      selectedBottomTab,
+      modalData,
+      qrBottomSheetsFlag,
+      selectedTransactionItem,
+      tabBarIndex,
+      deepLinkModalOpen,
+      knowMoreBottomSheetsFlag,
+      errorMessageHeader,
+      errorMessage,
+      buttonText,
+      addSubBottomSheetsFlag,
+      selectedContact,
+      notificationData,
+      fbBTCAccount,
+      loading,
+      atCloseEnd,
+      transactionsLoading,
+      currencyCode,
+      trustedContactRequest,
+      recoveryRequest,
+      custodyRequest,
+      isLoadContacts,
+      isLoading,
+      isRequestModalOpened,
+      isBalanceLoading,
+      addContactModalOpened,
+    } = this.state;
+    const {
+      navigation,
+      notificationList,
+      exchangeRates,
+      accounts,
+      walletName,
+      UNDER_CUSTODY,
+      downloadMShare,
+      overallHealth,
+    } = this.props;
     return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={errorMessageHeader}
-        info={errorMessage}
-        proceedButtonText={buttonText}
-        onPressProceed={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../assets/images/icons/errorImage.png')}
-      />
-    );
-  }, [errorMessage, errorMessageHeader, buttonText]);
-
-  const renderErrorModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  if (isErrorSendingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Key');
-      setErrorMessage(
-        'There was an error while sending your Recovery Key, please try again in a little while',
-      );
-      setButtonText('Try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorSending(null));
-  }
-
-  useEffect(() => {
-    if (isUploadSuccessfully) {
-      setTimeout(() => {
-        setErrorMessageHeader('Sending successful');
-        setErrorMessage(
-          'The Recovery Key has been sent, the receiver needs to accept ',
-        );
-        setButtonText('Done');
-      }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
-      dispatch(UploadSuccessfully(null));
-    }
-  }, [isUploadSuccessfully]);
-
-  useEffect(() => {
-    if (isErrorReceivingFailed) {
-      setTimeout(() => {
-        setErrorMessageHeader('Error sending Recovery Secret');
-        setErrorMessage(
-          'There was an error while sending your Recovery Secret, please try again in a little while',
-        );
-        setButtonText('Try again');
-      }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
-      dispatch(ErrorSending(null));
-    }
-  }, [isErrorReceivingFailed]);
-
-  const updateAccountCardData = () => {
-    let newArrayFinal = [];
-    let tempArray = [];
-    for (let a = 0; a < data.length; a++) {
-      tempArray.push(data[a]);
-      if (
-        tempArray.length == 2 ||
-        data[data.length - 1].id == tempArray[0].id
-      ) {
-        newArrayFinal.push(tempArray);
-        tempArray = [];
-      }
-    }
-    if (newArrayFinal) {
-      setNewData(newArrayFinal);
-    }
-  };
-
-  const setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
-    if (!secondaryDeviceOtpTemp) {
-      secondaryDeviceOtpTemp = [];
-    }
-    if (
-      secondaryDeviceOtpTemp.findIndex(
-        (value) => value.otp == (secondaryDeviceOtp as any).otp,
-      ) == -1
-    ) {
-      secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
-      await AsyncStorage.setItem(
-        'secondaryDeviceAddress',
-        JSON.stringify(secondaryDeviceOtpTemp),
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (
-      (secondaryDeviceOtp as any).otp &&
-      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp] &&
-      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp].status
-    ) {
-      if ((secondaryDeviceOtp as any).type == 'trustedContactQR') {
-        props.navigation.navigate('CustodianRequestAccepted', {
-          requester: (secondaryDeviceOtp as any).requester,
-        });
-      }
-      if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
-        Toast('Recovery Key received successfully');
-        setSecondaryDeviceAddresses();
-      }
-      // getAssociatedContact();
-    }
-  }, [SecondaryDeviceStatus]);
-
-  const processQRData = async (qrData) => {
-    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
-    const { type } = regularService.addressDiff(qrData);
-    if (type) {
-      const serviceType = REGULAR_ACCOUNT; // default service type
-      let item;
-      switch (type) {
-        case 'address':
-          const recipientAddress = qrData;
-          item = {
-            id: recipientAddress,
-          };
-          dispatch(
-            addTransferDetails(serviceType, {
-              selectedContact: item,
-            }),
-          );
-
-          props.navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-          });
-          break;
-
-        case 'paymentURI':
-          const { address, options } = regularService.decodePaymentURI(qrData);
-          item = {
-            id: address,
-          };
-
-          dispatch(
-            addTransferDetails(serviceType, {
-              selectedContact: item,
-            }),
-          );
-
-          props.navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-            bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
-              : '',
-          });
-          break;
-
-        default:
-          Toast('Invalid QR');
-          break;
-      }
-
-      return;
-    }
-
-    try {
-      const scannedData = JSON.parse(qrData);
-      if (scannedData.ver) {
-        if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
-      }
-      switch (scannedData.type) {
-        case 'trustedGuardian':
-          const trustedGruardianRequest = {
-            isGuardian: scannedData.isGuardian,
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            uploadedAt: scannedData.uploadedAt,
-            type: scannedData.type,
-            isQR: true,
-          };
-          setLoading(false);
-          setSecondaryDeviceOtp(trustedGruardianRequest);
-          props.navigation.navigate('Home', {
-            trustedContactRequest: trustedGruardianRequest,
-            recoveryRequest: null,
-          });
-          break;
-
-        case 'secondaryDeviceGuardian':
-          const secondaryDeviceGuardianRequest = {
-            isGuardian: scannedData.isGuardian,
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            uploadedAt: scannedData.uploadedAt,
-            type: scannedData.type,
-            isQR: true,
-          };
-
-          setLoading(false);
-          setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
-          props.navigation.navigate('Home', {
-            trustedContactRequest: secondaryDeviceGuardianRequest,
-            recoveryRequest: null,
-          });
-          break;
-
-        case 'trustedContactQR':
-          const tcRequest = {
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            type: scannedData.type,
-            isQR: true,
-          };
-          setLoading(false);
-          setSecondaryDeviceOtp(tcRequest);
-          props.navigation.navigate('Home', {
-            trustedContactRequest: tcRequest,
-            recoveryRequest: null,
-          });
-          break;
-
-        case 'paymentTrustedContactQR':
-          const paymentTCRequest = {
-            isPaymentRequest: true,
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            type: scannedData.type,
-            isQR: true,
-          };
-          setLoading(false);
-          setSecondaryDeviceOtp(tcRequest);
-          props.navigation.navigate('Home', {
-            trustedContactRequest: paymentTCRequest,
-            recoveryRequest: null,
-          });
-          break;
-
-        case 'recoveryQR':
-          const recoveryRequest = {
-            isRecovery: true,
-            requester: scannedData.requester,
-            publicKey: scannedData.KEY,
-            isQR: true,
-          };
-          setLoading(false);
-          props.navigation.navigate('Home', {
-            recoveryRequest,
-            trustedContactRequest: null,
-          });
-          break;
-
-        case 'ReverseRecoveryQR':
-          Alert.alert(
-            'Restoration QR Identified',
-            'Restoration QR only works during restoration mode',
-          );
-          break;
-
-        default:
-          break;
-      }
-    } catch (err) {
-      Toast('Invalid QR');
-    }
-  };
-
-  function renderTransactionHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => openCloseModal()}
-        style={styles.modalHeaderContainer}
+      <ImageBackground
+        source={require('../assets/images/home-bg.png')}
+        style={{ width: '100%', height: '100%', flex: 1 }}
+        imageStyle={{ resizeMode: 'stretch' }}
       >
-        <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  const renderTransactionDetailsContents = useCallback(() => {
-    return (
-      <TransactionDetails
-        item={transactionItem}
-        onPressKnowMore={() => {
-          (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
-        }}
-      />
-    );
-  }, [transactionItem]);
-
-  const renderTransactionDetailsHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          if (TransactionDetailsBottomSheet.current)
-            (TransactionDetailsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [transactionItem]);
-
-  function renderAddContent() {
-    return (
-      <AddModalContents
-        onPressElements={(type) => {
-          if (type == 'buyBitcoins') {
-            setTimeout(() => {
-              // setAddSubBottomSheetsFlag(true);
-              // setTabBarZIndex(0);
-              setSelectToAdd(type);
-            }, 2);
-            props.navigation.navigate('VoucherScanner');
-          } else if (type == 'addContact') {
-            setTimeout(() => {
-              //setAddSubBottomSheetsFlag(true);
-              // setAddBottomSheetsFlag(true);
-              setIsLoadContacts(true);
-              setTabBarZIndex(0);
-              setSelectToAdd(type);
-            }, 2);
-            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
-          }
-        }}
-        addData={modaldata}
-      />
-    );
-  }
-
-  function renderAddHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => openCloseModal()}
-        style={styles.modalHeaderContainer}
-      >
-        <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  function renderQrContent() {
-    return (
-      <QrCodeModalContents
-        modalRef={QrTabBarBottomSheet}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => processQRData(qrData)}
-        onPressQrScanner={() => {
-          props.navigation.navigate('QrScanner', {
-            scanedCode: processQRData,
-          });
-        }}
-      />
-    );
-  }
-
-  function renderQrHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => openCloseModal()}
-        style={styles.modalHeaderContainer}
-      >
-        <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'Scan QR'}</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  function renderMoreContent() {
-    return (
-      <MoreHomePageTabContents
-        onPressElements={(item) => onPressElement(item)}
-        isExistingSavingMethod={isEmpty(FBTCAccount)}
-      />
-    );
-  }
-
-  function renderMoreHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => openCloseModal()}
-        style={styles.modalHeaderContainer}
-      >
-        <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  function openCloseModal() {
-    if (openmodal == 'closed') {
-      setOpenmodal('half');
-    }
-    if (openmodal == 'half') {
-      setOpenmodal('full');
-    }
-    if (openmodal == 'full') {
-      setOpenmodal('closed');
-    }
-  }
-
-  useEffect(() => {
-    setTimeout(() => {
-      setQrBottomSheetsFlag(false);
-    }, 10);
-    if (selected == 'Transactions') {
-      if (openmodal == 'closed') {
-        (transactionTabBarBottomSheet as any).current.snapTo(1);
-      }
-      if (openmodal == 'half') {
-        (transactionTabBarBottomSheet as any).current.snapTo(2);
-      }
-      if (openmodal == 'full') {
-        (transactionTabBarBottomSheet as any).current.snapTo(3);
-      }
-    } else if (selected == 'Add') {
-      if (openmodal == 'closed') {
-        setTimeout(() => {
-          setQrBottomSheetsFlag(false);
-        }, 10);
-        (addTabBarBottomSheet as any).current.snapTo(1);
-      }
-      if (openmodal == 'half' || openmodal == 'full') {
-        (addTabBarBottomSheet as any).current.snapTo(2);
-      }
-    } else if (selected == 'QR') {
-      if (openmodal == 'closed') {
-        setTimeout(() => {
-          setQrBottomSheetsFlag(false);
-        }, 10);
-        (QrTabBarBottomSheet as any).current.snapTo(1);
-      }
-      if (openmodal == 'half' || openmodal == 'full') {
-        setTimeout(() => {
-          setQrBottomSheetsFlag(true);
-        }, 10);
-        (QrTabBarBottomSheet as any).current.snapTo(2);
-      }
-    } else if (selected == 'More') {
-      if (openmodal == 'closed') {
-        (moreTabBarBottomSheet as any).current.snapTo(1);
-      }
-      if (openmodal == 'half' || openmodal == 'full') {
-        (moreTabBarBottomSheet as any).current.snapTo(2);
-      }
-    }
-  }, [openmodal]);
-
-  async function selectTab(tabTitle) {
-    if (tabTitle == 'More') {
-      setTimeout(() => {
-        setKnowMoreBottomSheetsFlag(true);
-        setSelected(tabTitle);
-        setSelected(tabTitle);
-      }, 2);
-      (transactionTabBarBottomSheet as any).current.snapTo(0);
-      (addTabBarBottomSheet.current as any).snapTo(0);
-      (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(2);
-    }
-    if (tabTitle == 'Transactions') {
-      setTimeout(() => {
-        setModaldata(transactionData);
-        setSelected(tabTitle);
-      }, 2);
-      (transactionTabBarBottomSheet as any).current.snapTo(2);
-      (addTabBarBottomSheet.current as any).snapTo(0);
-      (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
-    }
-    if (tabTitle == 'Add') {
-      setTimeout(() => {
-        setAddBottomSheetsFlag(true);
-        setModaldata([]);
-        setSelected(tabTitle);
-      }, 2);
-      (transactionTabBarBottomSheet as any).current.snapTo(0);
-      (addTabBarBottomSheet.current as any).snapTo(2);
-      (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
-    }
-    if (tabTitle == 'QR') {
-      setTimeout(() => {
-        setModaldata(transactionData);
-        setSelected(tabTitle);
-      }, 2);
-      (transactionTabBarBottomSheet as any).current.snapTo(0);
-      (addTabBarBottomSheet.current as any).snapTo(0);
-      (QrTabBarBottomSheet.current as any).snapTo(2);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
-    }
-  }
-
-  const renderNoInternetModalContent = () => {
-    return (
-      <NoInternetModalContents
-        onPressTryAgain={() => {}}
-        onPressIgnore={() => {
-          (NoInternetBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderNoInternetModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (NoInternetBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  // const renderErrorModalContent = () => {
-  //   return (
-  //     <ErrorModalContents
-  //       modalRef={ErrorBottomSheet}
-  //       title={'Something went wrong'}
-  //       info={'There seems to a problem'}
-  //       note={'Please try again'}
-  //       proceedButtonText={'Try Again'}
-  //       isIgnoreButton={true}
-  //       onPressProceed={() => {
-  //         (ErrorBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       onPressIgnore={() => {
-  //         (ErrorBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       isBottomImage={true}
-  //       bottomImage={require('../assets/images/icons/errorImage.png')}
-  //     />
-  //   );
-  // };
-
-  // const renderErrorModalHeader = () => {
-  //   return (
-  //     <ModalHeader
-  //       onPressHeader={() => {
-  //         (ErrorBottomSheet as any).current.snapTo(0);
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const { UNDER_CUSTODY } = useSelector(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
-  );
-  const renderCustodianRequestModalContent = useCallback(() => {
-    if (!custodyRequest) return;
-
-    return (
-      <CustodianRequestModalContents
-        loading={loading}
-        userName={custodyRequest.requester}
-        onPressAcceptSecret={() => {
-          setLoading(true);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-            setDeepLinkModalOpen(false);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-
-          if (
-            Date.now() - custodyRequest.uploadedAt >
-            config.TC_REQUEST_EXPIRY
-          ) {
-            Alert.alert(
-              'Request expired!',
-              'Please ask the sender to initiate a new request',
-            );
-            setLoading(false);
-          } else {
-            if (UNDER_CUSTODY[custodyRequest.requester]) {
-              Alert.alert(
-                'Failed to store',
-                'You cannot custody multiple shares of the same user.',
-              );
-              setLoading(false);
-            } else {
-              if (custodyRequest.isQR) {
-                dispatch(downloadMShare(custodyRequest.ek, custodyRequest.otp));
-                setLoading(false);
-              } else {
-                props.navigation.navigate('CustodianRequestOTP', {
-                  custodyRequest,
-                });
-                setLoading(false);
-              }
-            }
-          }
-        }}
-        onPressRejectSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
-        }}
-      />
-    );
-  }, [custodyRequest, loading]);
-
-  // const renderRecoveryRequestModalContent = useCallback(() => {
-  //   if (!recoveryRequest) return <View></View>;
-
-  //   return (
-  //     <CustodianRequestModalContents
-  //       userName={recoveryRequest.requester}
-  //       onPressAcceptSecret={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
-  //         props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
-  //       }}
-  //       onPressRejectSecret={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, [recoveryRequest]);
-
-  // const renderCustodianRequestOtpModalContent = () => {
-  //   return (
-  //     <CustodianRequestOtpModalContents
-  //       title1stLine={'Enter OTP to'}
-  //       title2ndLine={'accept request'}
-  //       info1stLine={'Please enter the 6 digit OTP the owner'}
-  //       info2ndLine={'of secret shared with you'}
-  //       subInfo1stLine={
-  //         'The OTP is time sensitive, please be sure to enter the OTP '
-  //       }
-  //       subInfo2ndLine={'shared within 15minutes'}
-  //       modalRef={CustodianRequestOtpBottomSheet}
-  //       onPressConfirm={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const renderCustodianRequestRejectedModalContent = useCallback(() => {
-    if (!custodyRequest) return <View></View>;
-    return (
-      <CustodianRequestRejectedModalContents
-        onPressViewThrustedContacts={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
-        }}
-        userName={custodyRequest.requester}
-      />
-    );
-  }, [custodyRequest]);
-
-  // const renderCustodianRequestAcceptModalContent = () => {
-  //   if (!custodyRequest) return <View></View>;
-  //   return (
-  //     <CustodianRequestAcceptModalContents
-  //       userName={custodyRequest.requester}
-  //       onPressAssociateContacts={() => {}}
-  //       onPressSkip={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const renderCustodianRequestModalHeader = useCallback(() => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-            setDeepLinkModalOpen(false);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  // const renderRecoveryRequestModalHeader = useCallback(() => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, []);
-
-  const onPressElement = (item) => {
-    if (item.title == 'Backup Health') {
-      props.navigation.navigate('ManageBackup');
-    }
-    if (item.title == 'Friends and Family') {
-      props.navigation.navigate('AddressBookContents');
-    } else if (item.title == 'Wallet Settings') {
-      (settingsBottomSheet as any).current.snapTo(1);
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
-    } else if (item.title == 'Funding Sources') {
-      props.navigation.navigate('ExistingSavingMethods');
-    }
-    // else if (item.title == 'All accounts and funds') {
-    //   (AllAccountsBottomSheet as any).current.snapTo(1);
-    //   setTimeout(() => {
-    //     setTabBarZIndex(0);
-    //   }, 10);
-    // }
-  };
-
-  const managePinSuccessProceed = (pin) => {
-    setTimeout(() => {
-      setTabBarZIndex(999);
-    }, 10);
-    (settingsBottomSheet as any).current.snapTo(0);
-  };
-
-  const onPressSettingsElements = async (type, currencycode) => {
-    if (type == 'ManagePin') {
-      return props.navigation.navigate('SettingManagePin', {
-        managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
-      });
-    } else if (type == 'ChangeCurrency') {
-      let currency = await AsyncStorage.getItem('currencyCode');
-      props.navigation.navigate('ChangeCurrency');
-      setCurrencyCode(currency);
-    } else if (type == 'ChangeWalletName') {
-      props.navigation.navigate('SettingWalletNameChange');
-    }
-  };
-
-  const renderSettingsContents = () => {
-    return (
-      <SettingsContents
-        currencyCode={CurrencyCode}
-        onPressManagePin={(type, currencycode) =>
-          onPressSettingsElements(type, currencycode)
-        }
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 10);
-          (settingsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderSettingsHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 10);
-          (settingsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderAllAccountsContents = () => {
-    return (
-      <AllAccountsContents
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 10);
-          (AllAccountsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderAllAccountsHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 10);
-          (AllAccountsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  // const getAssociatedContact = async () => {
-  //   let SelectedContacts = JSON.parse(
-  //     await AsyncStorage.getItem('SelectedContacts'),
-  //   );
-  //   setSelectedContacts(SelectedContacts);
-  //   let AssociatedContact = JSON.parse(
-  //     await AsyncStorage.getItem('AssociatedContacts'),
-  //   );
-  //   setAssociatedContact(AssociatedContact);
-  //   let SecondaryDeviceAddress = JSON.parse(
-  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
-  //   );
-  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  // };
-
-  // const renderCustodianRequestOtpModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const renderCustodianRequestRejectedModalHeader = useCallback(() => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  // const renderCustodianRequestAcceptModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const onPressSaveBitcoinElements = (type) => {
-    if (type == 'voucher') {
-      props.navigation.navigate('VoucherScanner');
-    }
-  };
-
-  const renderAddContactAddressBookContents = () => {
-    return (
-      <AddContactAddressBook
-        isLoadContacts={isLoadContacts}
-        modalTitle={'Associate a contact to Friends and Family'}
-        modalRef={AddContactAddressBookBookBottomSheet}
-        proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={(selectedContacts) => {
-          setSelectedContact(selectedContacts);
-          props.navigation.navigate('AddContactSendRequest', {
-            SelectedContact: selectedContacts,
-          });
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-        onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact);
-        }}
-        onPressBack={() => {
-          setTimeout(() => {
-            setFamilyAndFriendsBookBottomSheetsFlag(false);
-          }, 2);
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderAddContactAddressBookHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setFamilyAndFriendsBookBottomSheetsFlag(false);
-          }, 2);
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  // const submitRecoveryQuestion = () => {
-  //   (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);
-  //   (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(1);
-  //   Keyboard.dismiss();
-  // };
-
-  // const renderHealthCheckSecurityQuestionContents = () => {
-  //   return (
-  //     <HealthCheckSecurityQuestionModalContents
-  //       onQuestionSelect={ value => {
-  //         setDropdownBoxValue( value );
-  //       } }
-  //       onTextChange={ text => {
-  //         setAnswer( text );
-  //       } }
-  //       onPressConfirm={ () => submitRecoveryQuestion() }
-  //       onPressKnowMore={ () => { } }
-  //       bottomSheetRef={ HealthCheckSecurityQuestionBottomSheet }
-  //     />
-  //   );
-  // };
-
-  // const renderHealthCheckSecurityQuestionHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={ () => {
-  //         ( HealthCheckSecurityQuestionBottomSheet as any ).current.snapTo( 0 );
-  //       } }
-  //     />
-  //   );
-  // };
-
-  let isNavigate = false;
-  let isContactOpen = false;
-  let isCameraOpen = false;
-  const handleAppStateChange = async (nextAppState) => {
-    AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
-      (response) => {
-        isContactOpen = JSON.parse(response[0][1]);
-        isCameraOpen = JSON.parse(response[1][1]);
-      },
-    );
-    let keyArray = [
-      ['isCameraOpen', JSON.stringify(true)],
-      ['isContactOpen', JSON.stringify(true)],
-    ];
-    if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
-    if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
-    if (isContactOpen || isContactOpen) {
-      AsyncStorage.multiSet(keyArray, () => {});
-      return;
-    }
-    var blockApp = setTimeout(() => {
-      if (isNavigate) {
-        props.navigation.navigate('ReLogin');
-      }
-    }, 15000);
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
-      clearTimeout(blockApp);
-      isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
-    } else {
-      isNavigate = false;
-    }
-  };
-
-  const handleDeepLink = useCallback(async (event) => {
-    const splits = event.url.split('/');
-
-    if (splits[5] === 'sss') {
-      const requester = splits[4];
-      if (splits[6] === 'ek') {
-        const custodyRequest = {
-          requester,
-          ek: splits[7],
-          uploadedAt: splits[8],
-        };
-        props.navigation.navigate('Home', { custodyRequest });
-      } else if (splits[6] === 'rk') {
-        const recoveryRequest = { requester, rk: splits[7] };
-        props.navigation.navigate('Home', {
-          recoveryRequest,
-          trustedContactRequest: null,
-        });
-      }
-    } else if (
-      splits[4] === 'tc' ||
-      splits[4] === 'tcg' ||
-      splits[4] === 'ptc'
-    ) {
-      if (splits[3] !== config.APP_STAGE) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
-          }`,
-        );
-      } else {
-        const version = splits.pop().slice(1);
-        if (version) {
-          if (!(await isCompatible(splits[4], version))) return;
-        }
-
-        const trustedContactRequest = {
-          isGuardian: splits[4] === 'tcg' ? true : false,
-          isPaymentRequest: splits[4] === 'ptc' ? true : false,
-          requester: splits[5],
-          encryptedKey: splits[6],
-          hintType: splits[7],
-          hint: splits[8],
-          uploadedAt: splits[9],
-        };
-        props.navigation.navigate('Home', {
-          trustedContactRequest,
-          recoveryRequest: null,
-        });
-      }
-    } else if (splits[4] === 'rk') {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[5],
-        encryptedKey: splits[6],
-        hintType: splits[7],
-        hint: splits[8],
-      };
-      props.navigation.navigate('Home', {
-        recoveryRequest,
-        trustedContactRequest: null,
-      });
-    } else if (splits[4] === 'rrk') {
-      Alert.alert(
-        'Restoration link Identified',
-        'Restoration links only works during restoration mode',
-      );
-    }
-
-    if (event.url.includes('fastbitcoins')) {
-      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-      props.navigation.navigate('VoucherScanner', { userKey });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (custodyRequest) {
-      if (tabBarZIndex == 999) {
-        setTimeout(() => {
-          setTabBarZIndex(0);
-          setDeepLinkModalOpen(true);
-        }, 2);
-      }
-      setTimeout(() => {
-        if (AllAccountsBottomSheet.current && settingsBottomSheet.current) {
-          (AllAccountsBottomSheet as any).current.snapTo(0);
-          (settingsBottomSheet.current as any).snapTo(0);
-        }
-        (CustodianRequestBottomSheet as any).current.snapTo(1);
-        (transactionTabBarBottomSheet as any).current.snapTo(1);
-      }, 30);
-    }
-
-    if (recoveryRequest) {
-      if (tabBarZIndex == 999) {
-        setTimeout(() => {
-          setTabBarZIndex(0);
-          setDeepLinkModalOpen(true);
-        }, 2);
-      }
-      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
-      (transactionTabBarBottomSheet as any).current.snapTo(1);
-    }
-
-    if (trustedContactRequest) {
-      if (tabBarZIndex == 999) {
-        setTimeout(() => {
-          setTabBarZIndex(0);
-          setDeepLinkModalOpen(true);
-        }, 2);
-      }
-      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
-      (transactionTabBarBottomSheet as any).current.snapTo(1);
-    }
-  }, [custodyRequest, recoveryRequest, trustedContactRequest]);
-
-  // const s3Service = useSelector(state => state.sss.service);
-  const [overallHealth, setOverallHealth] = useState();
-
-  const health = useSelector((state) => state.sss.overallHealth);
-  useEffect(() => {
-    if (health) setOverallHealth(health);
-  }, [health]);
-
-  // useEffect(() => {
-  //   dispatch(runTest());
-  // }, []);
-
-  // useEffect(() => {
-  //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     //console.log('Connection type', state.type);
-  //     //console.log('Is connected?', state.isConnected);
-  //
-  //     if (!state.isConnected) {
-  //       (NoInternetBottomSheet as any).current.snapTo(1);
-  //     } else {
-  //       (NoInternetBottomSheet as any).current.snapTo(0);
-  //     }
-  //   });
-
-  //   // return unsubscribe; // unsubscribing
-  // }, []);
-
-  // const renderRecoverySecretRequestModalContent = useCallback(() => {
-  //   if (!recoveryRequest) return <View></View>;
-  //   return (
-  //     <RecoverySecretRequestModalContents
-  //       name={recoveryRequest.requester}
-  //       title={'You have a Recovery Request\nfrom your Trusted Contact'}
-  //       infoText={
-  //         'Please contact the sender to get\nthe OTP and share the secret'
-  //       }
-  //       subTitle={'Message from the Sender'}
-  //       subTitleInfo={
-  //         'I am trying to restore my Hexa wallet and need the Recovery Key shared with you'
-  //       }
-  //       acceptButtonName={'Accept Request'}
-  //       rejectButtonName={'Reject Request'}
-  //       onPressAccept={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //         if (!UNDER_CUSTODY[recoveryRequest.requester]) {
-  //           Alert.alert(
-  //             'Failed to send!',
-  //             'You do not host any secret for this user.',
-  //           );
-  //           setLoading(false);
-  //         } else {
-  //           if (recoveryRequest.isQR) {
-  //             dispatch(
-  //               uploadRequestedShare(
-  //                 recoveryRequest.requester,
-  //                 recoveryRequest.rk,
-  //                 recoveryRequest.otp,
-  //               ),
-  //             );
-  //           } else {
-  //             props.navigation.navigate('RecoveryRequestOTP', {
-  //               recoveryRequest,
-  //             });
-  //           }
-  //         }
-  //       }}
-  //       onPressReject={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, [recoveryRequest]);
-
-  // const renderRecoverySecretRequestModalHeader = useCallback(() => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //       }}
-  //     />
-  //   );
-  // }, []);
-
-  // const renderShareRecoverySecretQrCodeModalContent = () => {
-  //   return (
-  //     <ShareRecoverySecretModalContents
-  //       title={'Share Recovery Secret\nto trusted contact'}
-  //       infoText={
-  //         'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
-  //       }
-  //       sunInfoText={
-  //         'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
-  //       }
-  //       shareVia={'qr'}
-  //       name={'Pamela Aalto'}
-  //       contactInfo={'+44 0000 000000'}
-  //       buttonText={'Share via QR'}
-  //       onPressRequest={() => {
-  //         ShareRecoverySecretBottomSheet.current.snapTo(1);
-  //       }}
-  //       onPressViaQr={() => {}}
-  //       modalRef={ShareRecoverySecretBottomSheet}
-  //     />
-  //   );
-  // };
-
-  // const renderShareRecoverySecretQrCodeModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  // const renderShareRecoverySecretOtpModalContent = () => {
-  //   return (
-  //     <ShareRecoverySecretModalContents
-  //       title={'Share Recovery Secret\nto trusted contact'}
-  //       infoText={
-  //         'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
-  //       }
-  //       sunInfoText={
-  //         'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
-  //       }
-  //       shareVia={'otp'}
-  //       name={'Pamela Aalto'}
-  //       contactInfo={'+44 0000 000000'}
-  //       buttonText={'Share via QR'}
-  //       onPressRequest={() => {
-  //         ShareRecoverySecretOtpBottomSheet.current.snapTo(1);
-  //       }}
-  //       onPressViaQr={() => {}}
-  //       modalRef={ShareRecoverySecretOtpBottomSheet}
-  //     />
-  //   );
-  // };
-
-  // const renderShareRecoverySecretOtpModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  // const renderRegenerateContent = () => {
-  //   return (
-  //     <ErrorModalContents
-  //       modalRef={RegenerateBottomSheet}
-  //       title={'Regenerate\nRecovery Secrets'}
-  //       info={'Did you make too many errors?'}
-  //       note={'You can regenerate your Recovery Secrets\nand start over'}
-  //       proceedButtonText={'Regenerate'}
-  //       cancelButtonText={'Back'}
-  //       isIgnoreButton={true}
-  //       onPressProceed={() => {
-  //         (RegenerateBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       onPressIgnore={() => {
-  //         (RegenerateBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       isBottomImage={false}
-  //     />
-  //   );
-  // };
-
-  // const renderRegenerateHeader = () => {
-  //   return (
-  //     <ModalHeader
-  //       onPressHeader={() => {
-  //         (RegenerateBottomSheet as any).current.snapTo(0);
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //       }}
-  //     />
-  //   );
-  // };
-
-  const onPressNotifications = () => {
-    (notificationsListBottomSheet as any).current.snapTo(1);
-  };
-
-  const renderNotificationsContent = useCallback(() => {
-    return (
-      <NotificationListContent
-        notificationLoading={notificationLoading}
-        NotificationData={NotificationData}
-        onNotificationClicked={(value) => onNotificationClicked(value)}
-        onPressBack={() => {
-          (notificationsListBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [NotificationData, NotificationDataChange]);
-
-  const renderNotificationsHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (notificationsListBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [NotificationData, NotificationDataChange]);
-
-  useEffect(() => {
-    if (paymentDetails) {
-      const serviceType = REGULAR_ACCOUNT;
-      let { address, paymentURI } = paymentDetails;
-      let options: any = {};
-      if (paymentURI) {
-        const details = accounts[serviceType].service.decodePaymentURI(
-          paymentURI,
-        );
-        address = details.address;
-        options = details.options;
-      }
-
-      const item = {
-        id: address,
-      };
-      dispatch(
-        addTransferDetails(serviceType, {
-          selectedContact: item,
-        }),
-      );
-
-      dispatch(clearPaymentDetails());
-
-      props.navigation.navigate('SendToContact', {
-        selectedContact: item,
-        serviceType,
-        bitcoinAmount: options.amount
-          ? `${Math.round(options.amount * 1e8)}`
-          : '',
-      });
-    }
-  }, [paymentDetails]);
-
-  const processDLRequest = useCallback(
-    (key, rejected?) => {
-      let {
-        requester,
-        isGuardian,
-        encryptedKey,
-        publicKey,
-        isQR,
-        uploadedAt,
-        isRecovery,
-      } = trustedContactRequest || recoveryRequest;
-
-      if (!isRecovery) {
-        if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
-          );
-          setLoading(false);
-        } else {
-          if (isGuardian && UNDER_CUSTODY[requester]) {
-            Alert.alert(
-              'Failed to store',
-              'You cannot custody multiple shares of the same user.',
-            );
-            setLoading(false);
-          } else {
-            if (!publicKey) {
-              try {
-                publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
-                  .decryptedPub;
-              } catch (err) {
-                //console.log({ err });
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.',
-                );
-              }
-            }
-            if (publicKey && !rejected) {
-              props.navigation.navigate('ContactsListForAssociateContact', {
-                postAssociation: (contact) => {
-                  const contactName = `${contact.firstName} ${
-                    contact.lastName ? contact.lastName : ''
-                  }`.toLowerCase();
-                  if (isGuardian) {
-                    dispatch(
-                      approveTrustedContact(
-                        contactName,
-                        publicKey,
-                        true,
-                        requester,
-                      ),
-                    );
-                  } else {
-                    dispatch(
-                      approveTrustedContact(contactName, publicKey, true),
-                    );
-                  }
-                  setAssociatedContactName(contactName);
-                },
-                isGuardian,
-              });
-            } else if (publicKey && rejected) {
-              // don't associate; only fetch the payment details from EC
-              dispatch(fetchEphemeralChannel(null, null, publicKey));
-            }
-          }
-        }
-      } else {
-        if (!UNDER_CUSTODY[requester]) {
-          Alert.alert(
-            'Failed to send!',
-            'You do not hold any Key of this user.',
-          );
-          setLoading(false);
-        } else {
-          if (!publicKey) {
-            try {
-              publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
-                .decryptedPub;
-            } catch (err) {
-              console.log({ err });
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.',
-              );
-            }
-          }
-          if (publicKey) {
-            dispatch(
-              uploadRequestedShare(recoveryRequest.requester, publicKey),
-            );
-          }
-        }
-      }
-
-      TrustedContactRequestBottomSheet.current.snapTo(0);
-    },
-    [trustedContactRequest, recoveryRequest],
-  );
-
-  const renderTrustedContactRequestContent = useCallback(() => {
-    if (!trustedContactRequest && !recoveryRequest) return;
-    console.log({ trustedContactRequest, recoveryRequest });
-
-    let {
-      requester,
-      hintType,
-      hint,
-      isGuardian,
-      isQR,
-      isRecovery,
-      isPaymentRequest,
-    } = trustedContactRequest || recoveryRequest;
-
-    return (
-      <TrustedContactRequest
-        isQR={isQR}
-        inputType={
-          hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
-        }
-        isGuardian={isGuardian}
-        isRecovery={isRecovery}
-        isPayment={isPaymentRequest}
-        hint={hint}
-        bottomSheetRef={TrustedContactRequestBottomSheet}
-        trustedContactName={requester}
-        onPressAccept={(key) => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-            setDeepLinkModalOpen(false);
-          }, 2);
-          processDLRequest(key);
-        }}
-        onPressReject={(key) => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-            setDeepLinkModalOpen(false);
-          }, 2);
-          TrustedContactRequestBottomSheet.current.snapTo(0);
-          processDLRequest(key, true);
-        }}
-      />
-    );
-  }, [trustedContactRequest, recoveryRequest]);
-
-  const renderTrustedContactRequestHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-            setDeepLinkModalOpen(false);
-          }, 2);
-          TrustedContactRequestBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  return (
-    <ImageBackground
-      source={require('../assets/images/home-bg.png')}
-      style={{ width: '100%', height: '100%', flex: 1 }}
-      imageStyle={{ resizeMode: 'stretch' }}
-    >
-      <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <View
-        style={{
-          flex: 3.8,
-          paddingTop:
-            Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('5%') : 0,
-        }}
-      >
-        <View style={{ ...styles.headerViewContainer, flex: 1 }}>
-          <View style={{ flexDirection: 'row', height: '100%' }}>
-            <View style={{ ...styles.headerTitleViewContainer }}>
-              <TouchableOpacity
-                onPress={() => onPressNotifications()}
-                style={{
-                  height: wp('10%'),
-                  width: wp('10%'),
-                  justifyContent: 'center',
-                }}
-              >
-                <ImageBackground
-                  source={require('../assets/images/icons/icon_notification.png')}
-                  style={{ width: wp('6%'), height: wp('6%') }}
-                  resizeMode={'contain'}
-                >
-                  {NotificationData.findIndex((value) => value.read == false) >
-                  -1 ? (
-                    <View
-                      style={{
-                        backgroundColor: Colors.red,
-                        height: wp('2.5%'),
-                        width: wp('2.5%'),
-                        borderRadius: wp('2.5%') / 2,
-                        alignSelf: 'flex-end',
-                      }}
-                    />
-                  ) : null}
-                </ImageBackground>
-              </TouchableOpacity>
-              <View style={{ marginBottom: wp('2%') }}>
-                <Text
-                  style={styles.headerTitleText}
-                >{`${walletName}’s Wallet`}</Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    marginBottom: wp('3%'),
-                  }}
-                >
-                  {switchOn ? (
-                    <Image
-                      style={{
-                        ...CommonStyles.homepageAmountImage,
-                        marginBottom: wp('1.5%'),
-                      }}
-                      source={require('../assets/images/icons/icon_bitcoin_light.png')}
-                    />
-                  ) : currencyCode.includes(CurrencyCode) ? (
-                    getCurrencyImage(CurrencyCode, 'light')
-                  ) : (
-                    <Image
-                      style={{
-                        ...styles.cardBitCoinImage,
-                        marginBottom: wp('1.5%'),
-                      }}
-                      source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-                    />
-                  )}
-                  <Text
-                    style={{
-                      ...CommonStyles.homepageAmountText,
-                      color: Colors.white,
-                    }}
-                  >
-                    {switchOn
-                      ? UsNumberFormat(balances.accumulativeBalance)
-                      : exchangeRates
-                      ? (
-                          (balances.accumulativeBalance / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)
-                      : 0}
-                  </Text>
-                  <Text
-                    style={{
-                      ...CommonStyles.homepageAmountUnitText,
-                      color: Colors.white,
-                    }}
-                  >
-                    {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-                  </Text>
-                </View>
-                <MessageAsPerHealth
-                  health={
-                    overallHealth ? (overallHealth as any).overallStatus : 0
-                  }
+        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <View
+          style={{
+            flex: 3.8,
+            paddingTop:
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('5%') : 0,
+          }}
+        >
+          <HomeHeader
+            onPressNotifications={this.onPressNotifications}
+            notificationData={notificationData}
+            walletName={walletName}
+            switchOn={switchOn}
+            getCurrencyImageByRegion={getCurrencyImageByRegion}
+            balances={balances}
+            exchangeRates={exchangeRates}
+            CurrencyCode={currencyCode}
+            navigation={this.props.navigation}
+            overallHealth={overallHealth}
+            onSwitchToggle={this.onSwitchToggle}
+            setCurrencyToggleValue={this.setCurrencyToggleValue}
+          />
+        </View>
+
+        <View style={{ flex: 7 }}>
+          <View style={styles.cardViewContainer}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={cardData}
+              extraData={{
+                balances,
+                switchOn,
+                walletName,
+                currencyCode,
+                accounts,
+                exchangeRates,
+              }}
+              keyExtractor={(_, index) => String(index)}
+              renderItem={(Items) => (
+                <HomeList
+                  isBalanceLoading={isBalanceLoading}
+                  Items={Items}
+                  navigation={navigation}
+                  getIconByAccountType={getIconByAccountType}
+                  switchOn={switchOn}
+                  accounts={accounts}
+                  CurrencyCode={currencyCode}
+                  balances={balances}
+                  exchangeRates={exchangeRates}
                 />
-              </View>
-              <TouchableOpacity
-                onPress={() => {
-                  props.navigation.navigate('ManageBackup');
-                }}
-                style={styles.headerButton}
-              >
-                <Text style={styles.headerButtonText}>Manage Backup</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.headerToggleSwitchContainer}>
-              <ToggleSwitch
-                currencyCodeValue={CurrencyCode}
-                onpress={async () => {
-                  setSwitchOn(!switchOn);
-                  let temp = !switchOn ? 'true' : '';
-                  await AsyncStorage.setItem('currencyToggleValue', temp);
-                }}
-                toggle={switchOn}
-              />
-              <TouchableOpacity
-                activeOpacity={10}
-                onPress={() => {
-                  props.navigation.navigate('ManageBackup');
-                }}
-              >
-                <HomePageShield
-                  shieldStatus={
-                    overallHealth ? (overallHealth as any).overallStatus : 0
-                  }
-                />
-              </TouchableOpacity>
-            </View>
+              )}
+            />
           </View>
         </View>
-      </View>
-      <View style={{ flex: 7 }}>
-        <View style={styles.cardViewContainer}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={newData}
-            extraData={{ balances, switchOn, walletName }}
-            renderItem={(Items) => {
-              return (
-                <View style={{ flexDirection: 'column' }}>
-                  {Items.item.map((value) => {
-                    if (value.accountType === 'add') {
-                      return (
-                        <TouchableOpacity disabled={true}>
-                          <CardView
-                            cornerRadius={10}
-                            style={{
-                              ...styles.card,
-                              opacity: 0.4,
-                              backgroundColor: Colors.borderColor,
-                            }}
-                          >
-                            <View
-                              style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Image
-                                style={{ width: wp('10%'), height: wp('10%') }}
-                                source={require('../assets/images/icons/icon_add.png')}
-                              />
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontSize: RFValue(11),
-                                }}
-                              >
-                                Add Account
-                              </Text>
-                            </View>
-                          </CardView>
-                        </TouchableOpacity>
-                      );
-                    } else {
-                      return (
-                        <TouchableOpacity
-                          onPress={() => {
-                            props.navigation.navigate('Accounts', {
-                              serviceType:
-                                value.accountType === 'test'
-                                  ? TEST_ACCOUNT
-                                  : value.accountType === 'regular'
-                                  ? REGULAR_ACCOUNT
-                                  : SECURE_ACCOUNT,
-                              index:
-                                value.accountType === 'test'
-                                  ? 0
-                                  : value.accountType === 'regular'
-                                  ? 1
-                                  : 2,
-                            });
-                          }}
-                        >
-                          <CardView cornerRadius={10} style={styles.card}>
-                            <View style={{ flexDirection: 'row' }}>
-                              <Image
-                                style={{ width: wp('10%'), height: wp('10%') }}
-                                source={getIconByAccountType(value.accountType)}
-                              />
-                              {value.accountType == 'secure' ? (
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    // alert('2FA');
-                                  }}
-                                  style={{
-                                    marginLeft: 'auto',
-                                    paddingLeft: 10,
-                                    paddingBottom: 10,
-                                  }}
-                                >
-                                  <Text
-                                    style={{
-                                      color: Colors.blue,
-                                      fontSize: RFValue(11),
-                                      fontFamily: Fonts.FiraSansRegular,
-                                    }}
-                                  >
-                                    2FA
-                                  </Text>
-                                </TouchableOpacity>
-                              ) : null}
-                            </View>
-                            <View
-                              style={{ flex: 1, justifyContent: 'flex-end' }}
-                            >
-                              <Text style={styles.cardTitle}>
-                                {value.title}
-                              </Text>
-                              <Text
-                                style={{
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  color: Colors.textColorGrey,
-                                  fontSize: RFValue(11),
-                                }}
-                              >
-                                {value.account}
-                              </Text>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'flex-end',
-                                  marginTop: hp('1%'),
-                                }}
-                              >
-                                {value.accountType === 'test' || switchOn ? (
-                                  <Image
-                                    style={styles.cardBitCoinImage}
-                                    source={value.bitcoinicon}
-                                  />
-                                ) : currencyCode.includes(CurrencyCode) ? (
-                                  getCurrencyImage(CurrencyCode, 'light_blue')
-                                ) : (
-                                  <Image
-                                    style={styles.cardBitCoinImage}
-                                    source={getCurrencyImageByRegion(
-                                      CurrencyCode,
-                                      'light_blue',
-                                    )}
-                                  />
-                                )}
-                                <Text
-                                  style={
-                                    accounts.accountsSynched
-                                      ? styles.cardAmountText
-                                      : styles.cardAmountTextGrey
-                                  }
-                                >
-                                  {switchOn
-                                    ? value.accountType === 'test'
-                                      ? UsNumberFormat(balances.testBalance)
-                                      : value.accountType === 'regular'
-                                      ? UsNumberFormat(balances.regularBalance)
-                                      : UsNumberFormat(balances.secureBalance)
-                                    : value.accountType === 'test'
-                                    ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular' &&
-                                      exchangeRates
-                                    ? (
-                                        (balances.regularBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : exchangeRates
-                                    ? (
-                                        (balances.secureBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : 0}
-                                </Text>
-                                <Text style={styles.cardAmountUnitText}>
-                                  {switchOn
-                                    ? value.unit
-                                    : value.accountType === 'test'
-                                    ? value.unit
-                                    : CurrencyCode.toLocaleLowerCase()}
-                                </Text>
-                              </View>
-                            </View>
-                          </CardView>
-                        </TouchableOpacity>
-                      );
-                    }
-                  })}
-                </View>
+
+        <CustomBottomTabs
+          tabBarZIndex={tabBarIndex}
+          selectTab={this.selectTab}
+          selected={selectedBottomTab}
+        />
+        {/* {isLoading ? <Loader /> : null} */}
+
+        {!isLoading && (
+          <BottomSheet
+            onOpenEnd={() => {
+              this.setState({
+                atCloseEnd: true,
+                isLoading: false,
+              });
+            }}
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (this.state.selectedBottomTab == 'Transactions') {
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
               );
             }}
-          />
-        </View>
-      </View>
-      {/* <TouchableWithoutFeedback>
-        <Animated.View
-          style={
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              flex: 1,
-              backgroundColor: '#000',
-              opacity,
-            }
-          }
-        />
-      </TouchableWithoutFeedback> */}
-      <BottomSheet
-        onOpenEnd={() => {
-          setAtCloseEnd(true);
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          if (selected == 'Transactions')
-            (transactionTabBarBottomSheet as any).current.snapTo(1);
-        }}
-        onCloseStart={() => {
-          setAtCloseEnd(false);
-          setQrBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        ref={transactionTabBarBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('18%')
-            : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={() => (
-          <TransactionsContent
-            transactionLoading={transactionLoading}
-            transactions={transactions}
-            AtCloseEnd={AtCloseEnd}
-            setTransactionItem={setTransactionItem}
-            setTabBarZIndex={setTabBarZIndex}
-            TransactionDetailsBottomSheet={TransactionDetailsBottomSheet}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+                atCloseEnd: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'transactionTabBarBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                  ? hp('19%')
+                  : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <TransactionsContent
+                infoBoxInfoText={''}
+                isFromAccount={false}
+                transactionLoading={transactionsLoading}
+                transactions={transactions}
+                AtCloseEnd={atCloseEnd}
+                setTransactionItem={(item) =>
+                  this.setState({ selectedTransactionItem: item })
+                }
+                setTabBarZIndex={(index) =>
+                  this.setState({ tabBarIndex: index })
+                }
+                TransactionDetailsBottomSheet={
+                  this.refs.transactionDetailsBottomSheet
+                }
+              />
+            )}
+            renderHeader={() => (
+              <TransactionHeader openCloseModal={this.openCloseModal} />
+            )}
           />
         )}
-        renderHeader={renderTransactionHeader}
-      />
-      <BottomSheet
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          if (selected == 'Add')
-            (addTabBarBottomSheet as any).current.snapTo(1);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        ref={addTabBarBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('18%')
-            : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
-        ]}
-        renderContent={renderAddContent}
-        renderHeader={renderAddHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          if (selected == 'QR') {
-            setQrBottomSheetsFlag(true);
-          } else {
-            setQrBottomSheetsFlag(false);
-          }
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          if (selected == 'QR') (QrTabBarBottomSheet as any).current.snapTo(1);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        // initialSnap={ zeroIndex }
-        // snapPoints={ snapPoints }
-        // callbackNode={ position }
-        // ref={bottomSheet}
-        ref={QrTabBarBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('18%')
-            : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderQrContent}
-        renderHeader={renderQrHeader}
-      />
-      <BottomSheet
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          if (selected == 'More')
-            (moreTabBarBottomSheet as any).current.snapTo(1);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        ref={moreTabBarBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('18%')
-            : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
-        ]}
-        renderContent={renderMoreContent}
-        renderHeader={renderMoreHeader}
-      />
-      <BottomSheet
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={NoInternetBottomSheet as any}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderNoInternetModalContent}
-        renderHeader={renderNoInternetModalHeader}
-      />
-      <BottomSheet
-        onCloseEnd={() => {
-          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
-            setTabBarZIndex(999);
-          }
-        }}
-        onOpenEnd={() => {
-          if (tabBarZIndex == 999) {
-            setTabBarZIndex(0);
-          }
-          setDeepLinkModalOpen(true);
-        }}
-        enabledInnerScrolling={true}
-        ref={CustodianRequestBottomSheet as any}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderCustodianRequestModalContent}
-        renderHeader={renderCustodianRequestModalHeader}
-      />
-      {/* <BottomSheet
-        onCloseEnd={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-        }}
-        onOpenEnd={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-        enabledInnerScrolling={true}
-        ref={RecoverySecretRequestBottomSheet as any}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderRecoverySecretRequestModalContent}
-        renderHeader={renderRecoverySecretRequestModalHeader}
-      /> */}
-      <BottomSheet
-        onCloseEnd={() => {
-          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
-            setTabBarZIndex(999);
-          }
-        }}
-        onOpenEnd={() => {
-          if (tabBarZIndex == 999) {
-            setTabBarZIndex(0);
-          }
-          setDeepLinkModalOpen(true);
-        }}
-        enabledInnerScrolling={true}
-        ref={TrustedContactRequestBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('95%'),
-        ]}
-        renderContent={renderTrustedContactRequestContent}
-        renderHeader={renderTrustedContactRequestHeader}
-      />
-      {/* <BottomSheet
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={RecoveryRequestBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderRecoveryRequestModalContent}
-        renderHeader={renderRecoveryRequestModalHeader}
-      /> */}
-      {/* <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={CustodianRequestOtpBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('67%') : hp('60%'),
-          Platform.OS == 'ios' ? hp('80%') : hp('70%'),
-        ]}
-        renderContent={renderCustodianRequestOtpModalContent}
-        renderHeader={renderCustodianRequestOtpModalHeader}
-      /> */}
-      <BottomSheet
-        onCloseStart={() => {
-          setTabBarZIndex(999);
-        }}
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={CustodianRequestRejectedBottomSheet as any}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderCustodianRequestRejectedModalContent}
-        renderHeader={renderCustodianRequestRejectedModalHeader}
-      />
-      {KnowMoreBottomSheetsFlag ? (
+
+        {!isLoading && (
+          <BottomSheet
+            ref="addTabBarBottomSheet"
+            onCloseEnd={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+
+              if (selectedBottomTab == 'Add') {
+                (this.refs.addTabBarBottomSheet as any).snapTo(1);
+              }
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                  ? hp('19%')
+                  : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <AddModalContents
+                onPressElements={(type) => {
+                  if (type == 'buyBitcoins') {
+                    this.props.navigation.navigate('VoucherScanner');
+                  } else if (type == 'addContact') {
+                    this.setState(
+                      {
+                        // addSubBottomSheetsFlag: true,
+                        isLoadContacts: true,
+                        tabBarIndex: 0,
+                      },
+                      () =>
+                        (this.refs
+                          .addContactAddressBookBookBottomSheet as any).snapTo(
+                            1,
+                          ),
+                    );
+                  }
+                }}
+                addData={modalData}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={this.openCloseModal}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            ref="qrTabBarBottomSheet"
+            onOpenEnd={() => {
+              this.setState({
+                qrBottomSheetsFlag: selectedBottomTab === 'QR',
+              });
+            }}
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (selectedBottomTab === 'QR') {
+                    (this.refs.qrTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
+              );
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                  ? hp('19%')
+                  : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <QrCodeModalContents
+                modalRef={this.refs.qrTabBarBottomSheet}
+                isOpenedFlag={qrBottomSheetsFlag}
+                onQrScan={(qrData) => this.processQRData(qrData)}
+                onPressQrScanner={() => {
+                  navigation.navigate('QrScanner', {
+                    scanedCode: this.processQRData,
+                  });
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={this.openCloseModal}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              this.setState(
+                {
+                  qrBottomSheetsFlag: false,
+                },
+                () => {
+                  if (selectedBottomTab == 'More') {
+                    (this.refs.moreTabBarBottomSheet as any).snapTo(1);
+                  }
+                },
+              );
+            }}
+            onCloseStart={() => {
+              this.setState({
+                qrBottomSheetsFlag: false,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'moreTabBarBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('18%')
+                : Platform.OS == 'android'
+                  ? hp('19%')
+                  : hp('18%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <MoreHomePageTabContents
+                onPressElements={(item) => this.onPressElement(item)}
+              />
+            )}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={() => this.openCloseModal()}
+                style={styles.modalHeaderContainer}
+              >
+                <View style={styles.modalHeaderHandle} />
+                <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              if (tabBarIndex === 0 && !deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            onOpenEnd={() => {
+              if (tabBarIndex == 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+              this.setState({
+                deepLinkModalOpen: true,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'custodianRequestBottomSheet'}
+            snapPoints={[-50, hp('60%')]}
+            renderContent={() => {
+              if (!custodyRequest) {
+                return null;
+              }
+
+              return (
+                <CustodianRequestModalContents
+                  loading={loading}
+                  userName={custodyRequest.requester}
+                  onPressAcceptSecret={() => {
+                    this.setState(
+                      {
+                        loading: true,
+                        tabBarIndex: 0,
+                        deepLinkModalOpen: true,
+                      },
+                      () => {
+                        (this.refs.custodianRequestBottomSheet as any).snapTo(
+                          0,
+                        );
+                      },
+                    );
+
+                    if (Date.now() - custodyRequest.uploadedAt > 600000) {
+                      Alert.alert(
+                        'Request expired!',
+                        'Please ask the sender to initiate a new request',
+                      );
+                      this.setState({
+                        loading: false,
+                      });
+                    } else {
+                      if (UNDER_CUSTODY[custodyRequest.requester]) {
+                        Alert.alert(
+                          'Failed to store',
+                          'You cannot custody multiple shares of the same user.',
+                        );
+                        this.setState({ loading: false });
+                      } else {
+                        if (custodyRequest.isQR) {
+                          downloadMShare(custodyRequest.ek, custodyRequest.otp);
+                          this.setState({
+                            loading: false,
+                          });
+                        } else {
+                          navigation.navigate('CustodianRequestOTP', {
+                            custodyRequest,
+                          });
+                          this.setState({
+                            loading: false,
+                          });
+                        }
+                      }
+                    }
+                  }}
+                  onPressRejectSecret={() => {
+                    this.setState(
+                      {
+                        tabBarIndex: 0,
+                      },
+                      () => {
+                        (this.refs.custodianRequestBottomSheet as any).snapTo(
+                          0,
+                        );
+                        (this.refs
+                          .custodianRequestRejectedBottomSheet as any).snapTo(
+                            1,
+                          );
+                      },
+                    );
+                  }}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <TransparentHeaderModal
+                onPressheader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                      deepLinkModalOpen: false,
+                    },
+                    () =>
+                      (this.refs.custodianRequestBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        )}
+        {!isLoading && (
+          <BottomSheet
+            onCloseEnd={() => {
+              if (tabBarIndex === 0) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+              this.setState({
+                isRequestModalOpened: false,
+              });
+            }}
+            onOpenEnd={() => {
+              if (tabBarIndex === 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+              this.setState({
+                deepLinkModalOpen: true,
+                isRequestModalOpened: true,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'trustedContactRequestBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('70%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('95%')
+                : hp('95%'),
+            ]}
+            renderContent={() => {
+              if (!trustedContactRequest && !recoveryRequest) {
+                return;
+              }
+              return (
+                <TrustedContactRequestContent
+                  isRequestModalOpened={this.state.isRequestModalOpened}
+                  trustedContactRequest={trustedContactRequest}
+                  recoveryRequest={recoveryRequest}
+                  onPressAccept={this.onTrustedContactRequestAccept}
+                  onPressReject={this.onTrustedContactReject}
+                  onPhoneNumberChange={this.onPhoneNumberChange}
+                  bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <ModalHeader
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                      deepLinkModalOpen: false,
+                    },
+                    () => {
+                      (this.refs
+                        .trustedContactRequestBottomSheet as any).snapTo(0);
+                    },
+                  );
+                }}
+              />
+            )}
+          />
+        )}
+
+        {!isLoading && (
+          <BottomSheet
+            onCloseStart={() => {
+              this.setState({
+                tabBarIndex: 999,
+              });
+            }}
+            onOpenEnd={() => {
+              this.setState({
+                tabBarIndex: 0,
+              });
+            }}
+            enabledInnerScrolling={true}
+            ref={'custodianRequestRejectedBottomSheet'}
+            snapPoints={[-50, hp('60%')]}
+            renderContent={() => {
+              if (!custodyRequest) return null;
+              return (
+                <CustodianRequestRejectedModalContents
+                  onPressViewThrustedContacts={() => {
+                    this.setState(
+                      {
+                        tabBarIndex: 999,
+                      },
+                      () => {
+                        (this.refs
+                          .custodianRequestRejectedBottomSheet as any).snapTo(
+                            0,
+                          );
+                      },
+                    );
+                  }}
+                  userName={custodyRequest.requester}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <TransparentHeaderModal
+                onPressheader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () =>
+                      (this.refs
+                        .custodianRequestRejectedBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        )}
+        {knowMoreBottomSheetsFlag ? (
+          <BottomSheet
+            onOpenEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+            }}
+            onCloseEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            enabledInnerScrolling={true}
+            ref={'allAccountsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <AllAccountsContents
+                onPressBack={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => (this.refs.allAccountsBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => (this.refs.allAccountsBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
+
+        {!isLoading && (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            onCloseEnd={() => {
+              this.setState({
+                tabBarIndex: 999,
+              });
+            }}
+            onCloseStart={() => {
+              this.setState({
+                tabBarIndex: 999,
+              });
+            }}
+            onOpenEnd={() => {
+              this.setState({
+                tabBarIndex: 0,
+              });
+            }}
+            ref={'transactionDetailsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('82%')
+                : hp('82%'),
+            ]}
+            renderContent={() => (
+              <TransactionDetails
+                item={selectedTransactionItem}
+                onPressKnowMore={() => {
+                  (this.refs.transactionDetailsBottomSheet as any).snapTo(1);
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  if (this.refs.transactionDetailsBottomSheet)
+                    (this.refs.transactionDetailsBottomSheet as any).snapTo(0);
+                }}
+              />
+            )}
+          />
+        )}
+
+        {knowMoreBottomSheetsFlag ? (
+          <BottomSheet
+            onOpenEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+            }}
+            onCloseEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            enabledInnerScrolling={true}
+            ref={'settingsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <SettingsContents
+                currencyCode={CurrencyCode}
+                onPressManagePin={(type, currencycode) =>
+                  this.onPressSettingsElements(type, currencycode)
+                }
+                onPressBack={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => {
+                      (this.refs.settingsBottomSheet as any).snapTo(0);
+                    },
+                  );
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => (this.refs.settingsBottomSheet as any).snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
+
         <BottomSheet
           onOpenEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(0);
-            }
+            this.setState({
+              tabBarIndex: 0,
+            });
           }}
           onCloseEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(999);
-            }
+            this.setState({
+              tabBarIndex: 999,
+            });
           }}
           enabledInnerScrolling={true}
-          ref={AllAccountsBottomSheet as any}
+          ref={'errorBottomSheet'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('65%'),
+              ? hp('35%')
+              : hp('40%'),
           ]}
-          renderContent={renderAllAccountsContents}
-          renderHeader={renderAllAccountsHeader}
+          renderContent={() => (
+            <ErrorModalContents
+              modalRef={this.refs.errorBottomSheet}
+              title={errorMessageHeader}
+              info={errorMessage}
+              proceedButtonText={buttonText}
+              onPressProceed={() => {
+                this.setState(
+                  {
+                    tabBarIndex: 999,
+                  },
+                  () => {
+                    (this.refs.errorBottomSheet as any).snapTo(0);
+                  },
+                );
+              }}
+              isBottomImage={true}
+              bottomImage={require('../assets/images/icons/errorImage.png')}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                this.setState(
+                  {
+                    tabBarIndex: 999,
+                  },
+                  () => (this.refs.errorBottomSheet as any).snapTo(0),
+                );
+              }}
+            />
+          )}
         />
-      ) : null}
-      {KnowMoreBottomSheetsFlag ? (
+
         <BottomSheet
-          onOpenEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(0);
-            }
-          }}
           onCloseEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(999);
-            }
+            this.setState({
+              addContactModalOpened: false,
+            });
+          }}
+          onOpenEnd={() => {
+            this.setState({
+              tabBarIndex: 0,
+              addContactModalOpened: true,
+            });
+          }}
+          onOpenStart={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onCloseStart={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
           }}
           enabledInnerScrolling={true}
-          ref={settingsBottomSheet as any}
+          ref={'addContactAddressBookBookBottomSheet'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('65%'),
+              ? hp('82%')
+              : hp('82%'),
           ]}
-          renderContent={renderSettingsContents}
-          renderHeader={renderSettingsHeader}
+          renderContent={() => (
+            <AddContactAddressBook
+              addContactModalOpened={addContactModalOpened}
+              isLoadContacts={isLoadContacts}
+              modalRef={this.refs.addContactAddressBookBookBottomSheet}
+              proceedButtonText={'Confirm & Proceed'}
+              onPressContinue={() => {
+                if (selectedContact && selectedContact.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: selectedContact,
+                  });
+                  (this.refs
+                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+                }
+              }}
+              onSelectContact={(selectedContact) => {
+                this.setState({
+                  selectedContact,
+                });
+              }}
+              onPressBack={() => {
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
+              }}
+              onSkipContinue={() => {
+                let { skippedContactsCount } = this.props.trustedContacts.tc;
+                let data;
+                if (!skippedContactsCount) {
+                  skippedContactsCount = 1;
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount}`,
+                    name: `F&F request awaiting ${skippedContactsCount}`,
+                  };
+                } else {
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount + 1}`,
+                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                  };
+                }
+
+                navigation.navigate('AddContactSendRequest', {
+                  SelectedContact: [data],
+                });
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.white}
+              backgroundColor={Colors.white}
+              onPressHeader={() => {
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
+              }}
+            />
+          )}
         />
-      ) : null}
-      {/* <BottomSheet
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={CustodianRequestAcceptBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderCustodianRequestAcceptModalContent}
-        renderHeader={renderCustodianRequestAcceptModalHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenEnd={() => {}}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={transactionDetailsBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
-        ]}
-        renderContent={renderTransactionDetailsContents}
-        renderHeader={renderTransactionDetailsHeader}
-      /> */}
 
-      <BottomSheet
-        enabledInnerScrolling={true}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        onCloseStart={() => {
-          setTabBarZIndex(999);
-        }}
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        ref={TransactionDetailsBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderTransactionDetailsContents}
-        renderHeader={renderTransactionDetailsHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-          // setFamilyAndFriendsBookBottomSheetsFlag(true);
-        }}
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseStart={() => {
-          setTabBarZIndex(999);
-          setFamilyAndFriendsBookBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        ref={AddContactAddressBookBookBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderAddContactAddressBookContents}
-        renderHeader={renderAddContactAddressBookHeader}
-      />
-
-      <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          onNotificationListOpen();
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={notificationsListBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderNotificationsContent}
-        renderHeader={renderNotificationsHeader}
-      />
-      {/* <BottomSheet
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={HealthCheckSecurityQuestionBottomSheet}
-        snapPoints={[
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('67%') : hp('75%'),
-          Platform.OS == 'ios' ? hp('90%') : hp('72%'),
-        ]}
-        renderContent={renderHealthCheckSecurityQuestionContents}
-        renderHeader={renderHealthCheckSecurityQuestionHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        // onCloseEnd={() => { setTabBarZIndex(999); }}
-        enabledInnerScrolling={true}
-        ref={HealthCheckGoogleAuthBottomSheet}
-        snapPoints={[-50, hp('58%'), hp('90%')]}
-        renderContent={renderHealthCheckGoogleAuthContents}
-        renderHeader={renderHealthCheckGoogleAuthHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderHealthCheckSuccessModalContent}
-        renderHeader={renderHealthCheckSuccessModalHeader}
-      /> */}
-
-      {/* <BottomSheet
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={ShareRecoverySecretBottomSheet}
-        snapPoints={[
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('75%'),
-        ]}
-        renderContent={renderShareRecoverySecretQrCodeModalContent}
-        renderHeader={renderShareRecoverySecretQrCodeModalHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={ShareRecoverySecretOtpBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('75%'),
-          hp('95%'),
-        ]}
-        renderContent={renderShareRecoverySecretOtpModalContent}
-        renderHeader={renderShareRecoverySecretOtpModalHeader}
-      /> */}
-      {/* <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={RegenerateBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderRegenerateContent}
-        renderHeader={renderRegenerateHeader}
-      /> */}
-
-      {/* TODO: If we open full modal above tab bar first change zIndex to 0 and when we close that modal please zIndex to 999 by using setTabBarZIndex(0) or setTabBarZIndex(999) */}
-      <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
-        <TouchableOpacity
-          onPress={() => selectTab('Transactions')}
-          style={styles.tabBarTabView}
-        >
-          {selected == 'Transactions' ? (
-            <View style={styles.activeTabStyle}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_transactions_active.png')}
-                style={{ width: 25, height: 25, resizeMode: 'contain' }}
-              />
-              <Text style={styles.activeTabTextStyle}>transactions</Text>
-            </View>
-          ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
+        <BottomSheet
+          onOpenEnd={() => {
+            this.setState(
+              {
+                tabBarIndex: 0,
+              },
+              () => this.onNotificationListOpen(),
+            );
+          }}
+          onCloseEnd={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
+          }}
+          enabledInnerScrolling={true}
+          ref={'notificationsListBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('82%')
+              : hp('82%'),
+          ]}
+          renderContent={() => (
+            <NotificationListContent
+              notificationLoading={this.state.notificationLoading}
+              NotificationData={notificationData}
+              onNotificationClicked={(value) =>
+                this.onNotificationClicked(value)
+              }
+              onPressBack={() => {
+                (this.refs.notificationsListBottomSheet as any).snapTo(0);
+              }}
+            />
           )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => selectTab('Add')}
-          style={styles.tabBarTabView}
-        >
-          {selected == 'Add' ? (
-            <View style={styles.activeTabStyle}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_add_active.png')}
-                style={styles.tabBarImage}
-              />
-              <Text style={styles.activeTabTextStyle}>add</Text>
-            </View>
-          ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_add.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                (this.refs.notificationsListBottomSheet as any).snapTo(0);
+              }}
+            />
           )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => selectTab('QR')}
-          style={styles.tabBarTabView}
-        >
-          {selected == 'QR' ? (
-            <View style={styles.activeTabStyle}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_qr_active.png')}
-                style={styles.tabBarImage}
-              />
-              <Text style={styles.activeTabTextStyle}>qr</Text>
-            </View>
-          ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
+        />
+        <BottomSheet
+          onOpenEnd={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onOpenStart={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onCloseStart={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
+          }}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={this.NoInternetBottomSheet}
+          snapPoints={[-50, hp('60%')]}
+          renderContent={() => (
+            <NoInternetModalContents
+              onPressTryAgain={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+              onPressIgnore={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+            />
           )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tabBarTabView}
-          onPress={() => selectTab('More')}
-        >
-          {selected == 'More' ? (
-            <View style={styles.activeTabStyle}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_more.png')}
-                style={styles.tabBarImage}
-              />
-              <Text style={styles.activeTabTextStyle}>more</Text>
-            </View>
-          ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_more.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
+          renderHeader={() => (
+            <ModalHeader
+            // onPressHeader={() => {
+            //   (this.NoInternetBottomSheet as any).current.snapTo(0);
+            // }}
+            />
           )}
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
-  );
+        />
+      </ImageBackground>
+    );
+  }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    notificationList: state.notifications,
+    exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
+    accounts: state.accounts || [],
+    walletName:
+      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+    UNDER_CUSTODY: idx(
+      state,
+      (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+    ),
+    s3Service: idx(state, (_) => _.sss.service),
+    overallHealth: idx(state, (_) => _.sss.overallHealth),
+    trustedContacts: idx(state, (_) => _.trustedContacts.service),
+    paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
+    notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
+    secondaryDeviceAddressValue: idx(
+      state,
+      (_) => _.preferences.secondaryDeviceAddressValue,
+    ),
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
+  };
+};
+
+export default withNavigationFocus(
+  connect(mapStateToProps, {
+    fetchEphemeralChannel,
+    fetchNotifications,
+    updateFCMTokens,
+    downloadMShare,
+    approveTrustedContact,
+    fetchTrustedChannel,
+    uploadRequestedShare,
+    initHealthCheck,
+    fetchDerivativeAccBalTx,
+    addTransferDetails,
+    clearPaymentDetails,
+    notificationsUpdated,
+    storeFbtcData,
+    setCurrencyCode,
+    setCurrencyToggleValue,
+    updatePreference,
+    setFCMToken,
+    setSecondaryDeviceAddress,
+    updateAddressBookLocally,
+    updateLastSeen,
+  })(Home),
+);
 
 const styles = StyleSheet.create({
   card: {
@@ -3746,8 +3404,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
