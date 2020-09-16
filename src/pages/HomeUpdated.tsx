@@ -2238,6 +2238,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cloudData = async () => {
     const { walletName, regularAccount } = this.props;
     let encryptedCloudDataJson;
+    let shares;
     // var ICloudBackup = NativeModules.ICloudBackup;
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
@@ -2247,6 +2248,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
       /**TODO iOS Login check and checkIfFileExist()*/
     } else {
       let data = {
+        shares: shares,
         encryptedCloudDataJson : encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,

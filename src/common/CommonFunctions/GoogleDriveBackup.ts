@@ -78,6 +78,7 @@ export const GoogleDriveLogin = (data, callback) => {
       walletId: data.walletId,
       data: dataObject.encryptedCloudDataJson,
       dateTime: new Date(),
+      shares: dataObject.shares
     };
     WalletData.push(tempData);
 
@@ -142,10 +143,12 @@ export const GoogleDriveLogin = (data, callback) => {
               walletId: data.walletId,
               data: dataObject.encryptedCloudDataJson,
               dateTime: moment(new Date()),
+              shares: dataObject.shares
             };
             newArray.push(tempData);
           } else {
             newArray[index].data = dataObject.encryptedCloudDataJson;
+            newArray[index].shares = dataObject.shares;
             newArray[index].dateTime = moment(new Date());
           }
           //console.log('ARR', newArray);

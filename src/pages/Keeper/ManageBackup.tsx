@@ -277,6 +277,7 @@ class ManageBackup extends Component<
   GoogleDriveLogin = async () => {
     const { walletName, regularAccount } = this.props;
     let encryptedCloudDataJson;
+    let shares;
     // var ICloudBackup = NativeModules.ICloudBackup;
     // ICloudBackup.initBackup();
     // console.log('CalendarManager', ICloudBackup)
@@ -287,6 +288,7 @@ class ManageBackup extends Component<
       console.log('call for icloud upload');
     } else {
       let data = {
+        shares: shares,
         encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,
