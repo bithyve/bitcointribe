@@ -12,21 +12,21 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import Fonts from './../common/Fonts';
+import Fonts from '../../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
+import Colors from '../../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../components/TransparentHeaderModal';
-import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
-import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
-import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddModalContents from '../components/AddModalContents';
-import QrCodeModalContents from '../components/QrCodeModalContents';
+import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
+import MoreHomePageTabContents from '../../components/MoreHomePageTabContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import AddModalContents from '../../components/AddModalContents';
+import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import {
@@ -36,77 +36,78 @@ import {
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
   DONATION_ACCOUNT,
-} from '../common/constants/serviceTypes';
-import AllAccountsContents from '../components/AllAccountsContents';
-import SettingsContents from '../components/SettingsContents';
+} from '../../common/constants/serviceTypes';
+import AllAccountsContents from '../../components/AllAccountsContents';
+import SettingsContents from '../../components/SettingsContents';
 import { connect } from 'react-redux';
-import NoInternetModalContents from '../components/NoInternetModalContents';
+import NoInternetModalContents from '../../components/NoInternetModalContents';
 import NetInfo from '@react-native-community/netinfo';
 import {
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
-} from '../store/actions/sss';
-import { createRandomString } from '../common/CommonFunctions/timeFormatter';
-import { updateAddressBookLocally } from '../store/actions/trustedContacts';
-import { updateLastSeen } from '../store/actions/preferences';
+} from '../../store/actions/sss';
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
+import { updateLastSeen } from '../../store/actions/preferences';
 
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
   clearPaymentDetails,
-} from '../store/actions/trustedContacts';
+} from '../../store/actions/trustedContacts';
 import {
   updateFCMTokens,
   fetchNotifications,
   notificationsUpdated,
-} from '../store/actions/notifications';
-import { storeFbtcData } from '../store/actions/fbtc';
+} from '../../store/actions/notifications';
+import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
-} from '../store/actions/preferences';
-import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
-import ErrorModalContents from '../components/ErrorModalContents';
-import ModalHeader from '../components/ModalHeader';
-import TransactionDetails from './Accounts/TransactionDetails';
-import Toast from '../components/Toast';
+} from '../../store/actions/preferences';
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+import TransactionDetails from '../Accounts/TransactionDetails';
+import Toast from '../../components/Toast';
 import firebase from 'react-native-firebase';
-import NotificationListContent from '../components/NotificationListContent';
-import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+import NotificationListContent from '../../components/NotificationListContent';
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import Config from 'react-native-config';
-import RelayServices from '../bitcoin/services/RelayService';
-import AddContactAddressBook from './Contacts/AddContactAddressBook';
-import TrustedContactRequest from './Contacts/TrustedContactRequest';
-import config from '../bitcoin/HexaConfig';
-import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import TransactionsContent from '../components/home/transaction-content';
-import HomeList from '../components/home/home-list';
-import HomeHeader from '../components/home/home-header';
+import RelayServices from '../../bitcoin/services/RelayService';
+import AddContactAddressBook from '../Contacts/AddContactAddressBook';
+import TrustedContactRequest from '../Contacts/TrustedContactRequest';
+import config from '../../bitcoin/HexaConfig';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import TransactionsContent from '../../components/home/transaction-content';
+import HomeList from '../../components/home/home-list';
+import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
-import CustomBottomTabs from '../components/home/custom-bottom-tabs';
-import { initialCardData, closingCardData } from '../stubs/initialCardData';
-import { initialTransactionData } from '../stubs/initialTransactionData';
+import CustomBottomTabs from '../../components/home/custom-bottom-tabs';
+import { initialCardData, closingCardData } from '../../stubs/initialCardData';
+import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
-} from '../store/actions/accounts';
+} from '../../store/actions/accounts';
 import {
   trustedChannelActions,
   DonationDerivativeAccountElements,
-} from '../bitcoin/utilities/Interface';
+} from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
-import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
+import CustodianRequestModalContents from '../../components/CustodianRequestModalContents';
 import semver from 'semver';
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-} from '../store/actions/preferences';
-import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
-import Loader from '../components/loader';
+} from '../../store/actions/preferences';
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin';
+import Loader from '../../components/loader';
+import TrustedContactRequestContent from './TrustedContactRequestContent';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -165,42 +166,6 @@ const TransactionHeader = ({ openCloseModal }) => {
       <View style={styles.modalHeaderHandle} />
       <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
     </TouchableOpacity>
-  );
-};
-
-const TrustedContactRequestContent = ({
-  bottomSheetRef,
-  trustedContactRequest,
-  recoveryRequest,
-  onPressAccept,
-  onPressReject,
-  onPhoneNumberChange,
-  isRequestModalOpened,
-}) => {
-  if (!trustedContactRequest && !recoveryRequest) return;
-  let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
-    trustedContactRequest || recoveryRequest;
-
-  return (
-    <TrustedContactRequest
-      isRequestModalOpened={isRequestModalOpened}
-      isQR={isQR}
-      inputType={
-        hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
-      }
-      isGuardian={isGuardian}
-      isRecovery={isRecovery}
-      hint={hint}
-      bottomSheetRef={bottomSheetRef}
-      trustedContactName={requester}
-      onPressAccept={(key) => onPressAccept(key)}
-      onPressReject={(key) => {
-        onPressReject(key);
-      }}
-      onPhoneNumberChange={(text) => {
-        onPhoneNumberChange(text);
-      }}
-    />
   );
 };
 
@@ -294,6 +259,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   notificationOpenedListener: any;
   NoInternetBottomSheet: any;
   unsubscribe: any;
+
+  qrTabBarBottomSheetRef = createRef<BottomSheet>();
+  trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
+  transactionDetailsBottomSheetRef = createRef<BottomSheet>();
+  settingsBottomSheetRef = createRef<BottomSheet>();
+  transactionTabBarBottomSheetRef = createRef<BottomSheet>();
+  allAccountsBottomSheetRef = createRef<BottomSheet>();
+  custodianRequestBottomSheetRef = createRef<BottomSheet>();
+  errorBottomSheetRef = createRef<BottomSheet>();
+  addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
+  notificationsListBottomSheetRef = createRef<BottomSheet>();
+  addTabBarBottomSheetRef = createRef<BottomSheet>();
+  moreTabBarBottomSheetRef = createRef<BottomSheet>();
+  custodianRequestRejectedBottomSheetRef = createRef<BottomSheet>();
+  noInternetBottomSheetRef = createRef<BottomSheet>();
 
   static whyDidYouRender = true;
 
