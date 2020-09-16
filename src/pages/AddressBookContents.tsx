@@ -251,7 +251,11 @@ class AddressBookContents extends PureComponent<
             contactName.toLowerCase().trim()
           ];
 
-          if (!connectedVia && otp) connectedVia = otp;
+          let usesOTP = false;
+          if (!connectedVia && otp) {
+            usesOTP = true;
+            connectedVia = otp;
+          }
 
           const hasTrustedAddress = !!trustedAddress;
 
@@ -275,6 +279,7 @@ class AddressBookContents extends PureComponent<
           const element = {
             contactName,
             connectedVia,
+            usesOTP,
             hasXpub,
             hasTrustedAddress,
             isGuardian,
@@ -464,7 +469,13 @@ class AddressBookContents extends PureComponent<
             </Text>
           </Text>
           {contact.connectedVia ? (
-            <Text style={styles.phoneText}>{contact.connectedVia}</Text>
+            <Text style={styles.phoneText}>
+              {contact.usesOTP
+                ? !contact.hasTrustedChannel
+                  ? 'OTP: ' + contact.connectedVia
+                  : ''
+                : contact.connectedVia}
+            </Text>
           ) : null}
         </View>
         <View style={styles.getImageView}>
