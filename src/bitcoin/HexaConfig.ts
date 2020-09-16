@@ -34,8 +34,8 @@ class HexaConfig {
     keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
     iv: Buffer.alloc(16, 0),
   };
-  public KEY_STRECH_ITERATIONS = parseInt(
-    Config.BIT_KEY_STRECH_ITERATIONS.trim(),
+  public KEY_STRETCH_ITERATIONS = parseInt(
+    Config.BIT_KEY_STRETCH_ITERATIONS.trim(),
     10,
   );
   public BH_SERVERS = {
@@ -54,7 +54,7 @@ class HexaConfig {
   public SSS_TOTAL: number = parseInt(Config.BIT_SSS_TOTAL.trim(), 10);
   public SSS_THRESHOLD: number = parseInt(Config.BIT_SSS_THRESHOLD.trim(), 10);
   public MSG_ID_LENGTH: number = parseInt(Config.BIT_MSG_ID_LENGTH.trim(), 10);
-  public SCHUNK_SIZE: number = parseInt(Config.BIT_SCHUNK_SIZE.trim(), 10);
+  public CHUNK_SIZE: number = parseInt(Config.BIT_CHUNK_SIZE.trim(), 10);
   public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR.trim(), 10);
   public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
   public DPATH_PURPOSE: number = parseInt(Config.BIT_DPATH_PURPOSE.trim(), 10);

@@ -63,8 +63,17 @@ import {
   setSavingWarning,
 } from '../../store/actions/preferences';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function Receive(props) {
+  const [isOTPType, setIsOTPType] = useState(false);
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [OTP, setOTP] = useState('');
+  const [renderTimer, setRenderTimer] = useState(false);
+
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
@@ -284,6 +293,8 @@ export default function Receive(props) {
 
           console.log({ otpDL });
           setReceiveLink(otpDL);
+          setOTP(otp);
+          setIsOTPType(true);
         } else {
           Alert.alert('Invalid Contact', 'Something went wrong.');
           return;
@@ -503,6 +514,34 @@ export default function Receive(props) {
     serviceType,
     service,
   ]);
+
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        renderTimer={renderTimer}
+        onPressOk={(index) => {
+          setTimeout(() => {
+            setRenderTimer(false);
+          }, 2);
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        onPressBack={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        OTP={OTP}
+      />
+    );
+  }, [OTP, renderTimer]);
+
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = isReceiveHelperDoneValue;
@@ -883,9 +922,26 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
-            onSkipContinue={(data) =>
-              onPressContinue(data)
-            }
+            onSkipContinue={() => {
+              let { skippedContactsCount } = trustedContacts.tc;
+              let data;
+              if (!skippedContactsCount) {
+                skippedContactsCount = 1;
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                };
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                };
+              }
+
+              onPressContinue([data]);
+            }}
           />
         )}
         renderHeader={() => (
@@ -934,9 +990,15 @@ export default function Receive(props) {
               if (SendViaLinkBottomSheet.current)
                 (SendViaLinkBottomSheet as any).current.snapTo(0);
             }}
-            onPressDone={() =>
-              (SendViaLinkBottomSheet as any).current.snapTo(0)
-            }
+            onPressDone={() => {
+              if (isOTPType) {
+                setTimeout(() => {
+                  setRenderTimer(true);
+                }, 2);
+                shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+              }
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+            }}
           />
         )}
         renderHeader={() => (
@@ -1008,6 +1070,15 @@ export default function Receive(props) {
             // }}
           />
         )}
+      />
+
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={shareOtpWithTrustedContactBottomSheet}
+        snapPoints={[-30, hp('65%')]}
+        renderContent={renderShareOtpWithTrustedContactContent}
+        renderHeader={renderShareOtpWithTrustedContactHeader}
       />
     </View>
   );

@@ -69,7 +69,7 @@ export default class HDSegwitWallet extends Bitcoin {
     value: number;
     address: string;
     status?: any;
-  }>;
+  }> = [];
 
   constructor(
     mnemonic?: string,

@@ -1978,9 +1978,13 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`.toLowerCase();
+                    }`
+                      .toLowerCase()
+                      .trim();
                   } else {
-                    contactName = `${requester}'s Wallet`.toLowerCase();
+                    // contactName = `${requester}'s Wallet`.toLowerCase();
+                    Alert.alert('Contact association failed');
+                    return;
                   }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -3163,14 +3167,30 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   0,
                 );
               }}
-              onSkipContinue={(data) => {
-                if (data && data.length) {
-                  navigation.navigate('AddContactSendRequest', {
-                    SelectedContact: data,
-                  });
-                  (this.refs
-                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+              onSkipContinue={() => {
+                let { skippedContactsCount } = this.props.trustedContacts.tc;
+                let data;
+                if (!skippedContactsCount) {
+                  skippedContactsCount = 1;
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount}`,
+                    name: `F&F request awaiting ${skippedContactsCount}`,
+                  };
+                } else {
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount + 1}`,
+                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                  };
                 }
+
+                navigation.navigate('AddContactSendRequest', {
+                  SelectedContact: [data],
+                });
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
               }}
             />
           )}
