@@ -1978,9 +1978,13 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`.toLowerCase();
+                    }`
+                      .toLowerCase()
+                      .trim();
                   } else {
-                    contactName = `${requester}'s Wallet`.toLowerCase();
+                    // contactName = `${requester}'s Wallet`.toLowerCase();
+                    Alert.alert('Contact association failed');
+                    return;
                   }
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null

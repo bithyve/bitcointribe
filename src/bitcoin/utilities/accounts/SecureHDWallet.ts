@@ -60,7 +60,7 @@ export default class SecureHDWallet extends Bitcoin {
     value: number;
     address: string;
     status?: any;
-  }>;
+  }> = [];
   private primaryMnemonic: string;
   private walletID: string;
   private usedAddresses: string[];
