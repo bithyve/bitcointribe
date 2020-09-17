@@ -152,6 +152,7 @@ export interface DonationDerivativeAccountElements
     displayBalance: boolean;
     displayTransactions: boolean;
   };
+  disableAccount: boolean;
 }
 
 // Base Dervative Account

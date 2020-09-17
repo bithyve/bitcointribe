@@ -854,6 +854,7 @@ export default class HDSegwitWallet extends Bitcoin {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
+    disableAccount: boolean = false,
   ): Promise<{ setupSuccessful: Boolean }> => {
     const accountType = DONATION_ACCOUNT;
     let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
@@ -885,6 +886,7 @@ export default class HDSegwitWallet extends Bitcoin {
       subject,
       description,
       configuration,
+      disableAccount,
     };
 
     let res: AxiosResponse;
@@ -919,9 +921,17 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public updateDonationPreferences = async (
     accountNumber: number,
-    configuration: {
-      displayBalance: boolean;
-      displayTransactions: boolean;
+    preferences: {
+      disableAccount?: boolean;
+      configuration?: {
+        displayBalance: boolean;
+        displayTransactions: boolean;
+      };
+      accountDetails?: {
+        donee: string;
+        subject: string;
+        description: string;
+      };
     },
   ): Promise<{ updated: Boolean }> => {
     const donationAcc: DonationDerivativeAccountElements = this
@@ -938,7 +948,7 @@ export default class HDSegwitWallet extends Bitcoin {
         HEXA_ID,
         donationId: donationAcc.id,
         walletID: this.getWalletId().walletId,
-        configuration,
+        preferences,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -949,9 +959,24 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!updated) {
       throw new Error('Preference updation failed');
     }
-    this.derivativeAccounts[DONATION_ACCOUNT][
-      accountNumber
-    ].configuration = configuration;
+
+    const { configuration, disableAccount, accountDetails } = preferences;
+    if (configuration)
+      this.derivativeAccounts[DONATION_ACCOUNT][
+        accountNumber
+      ].configuration = configuration;
+
+    if (disableAccount !== undefined)
+      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration;
+
+    if (accountDetails) {
+      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].donee =
+        accountDetails.donee;
+      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].subject =
+        accountDetails.subject;
+      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].description =
+        accountDetails.description;
+    }
 
     return { updated };
   };

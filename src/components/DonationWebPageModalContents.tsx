@@ -20,6 +20,7 @@ import Toast from '../components/Toast';
 import { updateDonationPreferences } from '../store/actions/accounts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import config from '../bitcoin/HexaConfig';
+import preferences from '../store/reducers/preferences';
 
 export default function DonationWebPageModalContents(props) {
   const [saveEnabled, setSaveEnabled] = useState(false);
@@ -60,11 +61,13 @@ export default function DonationWebPageModalContents(props) {
       displayBalance: isDonationTotalEnable,
       displayTransactions: isDonationTransactionEnable,
     };
+
+    const preferences = { configuration };
     const { serviceType, accountNumber } = props;
     console.log({ serviceType, accountNumber });
     Toast('Your preferences would be updated shortly');
     dispatch(
-      updateDonationPreferences(serviceType, accountNumber, configuration),
+      updateDonationPreferences(serviceType, accountNumber, preferences),
     );
   }, [
     isDonationTotalEnable,
