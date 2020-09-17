@@ -41,6 +41,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.drive.DriveScopes;
 import com.google.gson.Gson;
 
@@ -55,6 +56,7 @@ import static io.hexawallet.hexa.DriveServiceHelper.getGoogleDriveService;
 public class GoogleDrive extends ReactContextBaseJavaModule {
     private ReactApplicationContext mContext;
     private static final int REQUEST_CODE_SIGN_IN = 100;
+    private static final int REQUEST_AUTHORIZATION = 101;
     private GoogleSignInClient mGoogleSignInClient;
     private DriveServiceHelper mDriveServiceHelper;
     private static final String TAG = "GoogleDrive";
@@ -104,7 +106,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             public void run() {
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
-                        .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com")
+                        .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
                         .requestScopes(new Scope(DriveScopes.DRIVE_APPDATA))
                         .build();
 
@@ -143,7 +145,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                 }
             });
         } else{
-            mDriveServiceHelper = new DriveServiceHelper(getGoogleDriveService(mContext, accougetDriveClientnt, "hexa"));
+            mDriveServiceHelper = new DriveServiceHelper(getGoogleDriveService(mContext.getApplicationContext(), accougetDriveClientnt, "hexa"));
             setData(accougetDriveClientnt, false);
         }
 
@@ -158,7 +160,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private void handleSignInResult(GoogleSignInResult result, Boolean isSilent) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            mDriveServiceHelper = new DriveServiceHelper(getGoogleDriveService(mContext, acct, "hexa"));
+            mDriveServiceHelper = new DriveServiceHelper(getGoogleDriveService(mContext.getApplicationContext(), acct, "hexa"));
             setData(acct, true);
 
         } else {
@@ -218,6 +220,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private class ActivityEventListener extends BaseActivityEventListener {
         @Override
         public void onActivityResult(Activity activity, final int requestCode, final int resultCode, final Intent intent) {
+            Log.d(TAG, "onActivityResult : " + requestCode);
             if (requestCode == REQUEST_CODE_SIGN_IN) {
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
                 handleSignInResult(result, false);
@@ -233,7 +236,8 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         if (mDriveServiceHelper == null) {
             return;
         }
-            mDriveServiceHelper.uploadFile(metaData)
+        final Activity activity = getCurrentActivity();
+            mDriveServiceHelper.uploadFile(activity, metaData)
                     .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                         @Override
                         public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
@@ -259,9 +263,11 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             return null;
         }
         JSONObject jsonObj = null;
+        final Activity activity = getCurrentActivity();
         List<GoogleDriveFileHolder> googleDriveFileHolders = new ArrayList<>();
         try {
             jsonObj = new JSONObject(metaData);
+            Log.d(TAG, "jsonObj: " + jsonObj.getString("name") + jsonObj.getString("mimeType"));
             mDriveServiceHelper.searchFile(jsonObj.getString("name"),jsonObj.getString("mimeType"))
                     .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
                         @Override
@@ -289,15 +295,16 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
+                            Log.d(TAG, "onFailure sdfdfdsaf: " + e.getMessage());
                             WritableMap map = Arguments.createMap();
                             map.putString(EVENT_KEY, ON_FAILURE);
                             listOfFilesAvailable.invoke(map, null);
                         }
                     });
 
-        } catch (Exception e) {
-            Log.d(TAG, " uploadFile onFailure: " + e.getMessage());
+        }
+        catch (Exception e) {
+            Log.d(TAG, " checkIfFileExist Exception: " + e.getMessage());
         }
         return googleDriveFileHolders;
     }
@@ -354,7 +361,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     }
                 });
         } catch (Exception e) {
-            Log.d(TAG, " uploadFile onFailure: " + e.getMessage());
+            Log.d(TAG, " readFile Exception: " + e.getMessage());
         }
     }
 }

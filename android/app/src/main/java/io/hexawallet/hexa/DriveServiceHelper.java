@@ -17,6 +17,7 @@ package io.hexawallet.hexa;
  */
 
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,8 +34,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
@@ -67,6 +70,7 @@ import javax.annotation.Nullable;
  * file picker UI via Storage Access Framework.
  */
 public class DriveServiceHelper {
+    private static final int REQUEST_AUTHORIZATION = 101;
     private final Executor mExecutor = Executors.newSingleThreadExecutor();
     private final Drive mDriveService;
 
@@ -117,7 +121,7 @@ public class DriveServiceHelper {
     public static Drive getGoogleDriveService(Context context, GoogleSignInAccount account, String appName) {
         GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(
-                        context, Collections.singleton(DriveScopes.DRIVE_FILE));
+                        context, Collections.singleton(DriveScopes.DRIVE_APPDATA));
         credential.setSelectedAccount(account.getAccount());
         com.google.api.services.drive.Drive googleDriveService =
                 new com.google.api.services.drive.Drive.Builder(
@@ -185,13 +189,13 @@ public class DriveServiceHelper {
         return tmpFile;
     }
 
-    public Task<GoogleDriveFileHolder> uploadFile(String metadata) {
+    public Task<GoogleDriveFileHolder> uploadFile(Activity activity,String metadata) {
         Log.d(TAG, " metadata: " + metadata);
         //queryFiles();
         JSONObject jsonObj = null;
         try {
             jsonObj = new JSONObject(metadata);
-            return uploadFile(createLocalFile(jsonObj.getString("data"), jsonObj.getString("name")), jsonObj.getString("mimeType"), null);
+            return uploadFile(activity, createLocalFile(jsonObj.getString("data"), jsonObj.getString("name")), jsonObj.getString("mimeType"), null);
         } catch (Exception e) {
             Log.d(TAG, " uploadFile onFailure: " + e.getMessage());
         }
@@ -199,7 +203,7 @@ public class DriveServiceHelper {
 
     }
 
-    public Task<GoogleDriveFileHolder> uploadFile(final java.io.File localFile, final String mimeType, @Nullable final String folderId) {
+    public Task<GoogleDriveFileHolder> uploadFile(Activity activity,final java.io.File localFile, final String mimeType, @Nullable final String folderId) {
         return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {
@@ -219,20 +223,25 @@ public class DriveServiceHelper {
                         .setParents(root)
                         .setMimeType(mimeType)
                         .setName(localFile.getName());
-                Log.d(TAG, " uploadFile metadata: " + metadata);
+                Log.d(TAG, " uploadFile metadata1 : " + metadata);
                 InputStream targetStream = new FileInputStream(localFile);
                 InputStreamContent inputStreamContent = new InputStreamContent(mimeType, targetStream);
-               // FileContent fileContent = new FileContent(mimeType, localFile);
-                //Log.d(TAG, " uploadFile fileContent: " + fileContent);
-                Log.d(TAG, "mDriveService" + mDriveService);
-
+                Log.d(TAG, "mDriveService " + mDriveService);
+                Log.d(TAG, "inputStreamContent " + inputStreamContent);
                 GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
 
                 try{
                     File fileMeta = mDriveService.files().create(metadata, inputStreamContent).execute();
-                    Log.d(TAG, " uploadFile fileMeta: " + fileMeta);
+                    if (fileMeta == null) {
+                        throw new IOException("Null result when requesting file creation.");
+                    }
+                    Log.d(TAG, " uploadFile fileMeta 2: " + fileMeta);
                     googleDriveFileHolder.setId(fileMeta.getId());
                     googleDriveFileHolder.setName(fileMeta.getName());
+                }
+                catch (UserRecoverableAuthIOException e) {
+                    Log.d(TAG, " UserRecoverableAuthIOException  " + e.getIntent());
+                    activity.startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
                 }
                 catch (Exception e){
                     Log.e("shjdgfkjsdgfkjdsgjkfsdghf", " EXCEPTION", e);
@@ -247,37 +256,48 @@ public class DriveServiceHelper {
     private static final String TAG = "DriveServiceHelper";
 
     public Task<List<GoogleDriveFileHolder>> searchFile(final String fileName, final String mimeType) {
-        Log.d(TAG, "inside searchFile" + fileName + mimeType);
-        return Tasks.call(mExecutor, new Callable<List<GoogleDriveFileHolder>>() {
-            @Override
-            public List<GoogleDriveFileHolder> call() throws Exception {
-                List<GoogleDriveFileHolder> googleDriveFileHolderList = new ArrayList<>();
-                // Retrive the metadata as a File object.
-                FileList result = mDriveService.files().list()
-                        .setQ("name = '" + fileName + "' and mimeType ='" + mimeType + "'")
-                        .setSpaces("appDataFolder")
-                        .setFields("files")
-                        //.setFields("files(id,name,size,createdTime,modifiedTime,starred)")
-                        .execute();
+        Log.d(TAG, "inside searchFile " + fileName + mimeType);
+        try {
+            return Tasks.call(mExecutor, new Callable<List<GoogleDriveFileHolder>>() {
+                @Override
+                public List<GoogleDriveFileHolder> call() throws Exception {
+                    List<GoogleDriveFileHolder> googleDriveFileHolderList = new ArrayList<>();
+                    // Retrive the metadata as a File object.
+                    try {
+                        FileList result = mDriveService.files().list()
+                                .setQ("name = '" + fileName + "' and mimeType ='" + mimeType + "'")
+                                .setSpaces("appDataFolder")
+                                .setFields("files")
+                                //.setFields("files(id,name,size,createdTime,modifiedTime,starred)")
+                                .execute();
 
-                Log.d(TAG, "searchFile" + result + result.getFiles().size());
-                Log.d(TAG, "searchFile" + result.getFiles().size());
-                for (int i = 0; i < result.getFiles().size(); i++) {
-                    GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
-                    googleDriveFileHolder.setId(result.getFiles().get(i).getId());
-                    googleDriveFileHolder.setName(result.getFiles().get(i).getName());
-                    googleDriveFileHolder.setModifiedTime(result.getFiles().get(i).getModifiedTime());
-                    googleDriveFileHolder.setSize(result.getFiles().get(i).getSize());
-                    googleDriveFileHolder.setMimeType(result.getFiles().get(i).getMimeType());
-                    googleDriveFileHolder.setCreatedTime(result.getFiles().get(i).getCreatedTime());
-                    googleDriveFileHolder.setStarred(result.getFiles().get(i).getStarred());
+                    Log.d(TAG, "searchFile" + result + result.getFiles().size());
+                    Log.d(TAG, "searchFile" + result.getFiles().size());
+                    for (int i = 0; i < result.getFiles().size(); i++) {
+                        GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
+                        googleDriveFileHolder.setId(result.getFiles().get(i).getId());
+                        googleDriveFileHolder.setName(result.getFiles().get(i).getName());
+                        googleDriveFileHolder.setModifiedTime(result.getFiles().get(i).getModifiedTime());
+                        googleDriveFileHolder.setSize(result.getFiles().get(i).getSize());
+                        googleDriveFileHolder.setMimeType(result.getFiles().get(i).getMimeType());
+                        googleDriveFileHolder.setCreatedTime(result.getFiles().get(i).getCreatedTime());
+                        googleDriveFileHolder.setStarred(result.getFiles().get(i).getStarred());
 
-                    googleDriveFileHolderList.add(googleDriveFileHolder);
+                        googleDriveFileHolderList.add(googleDriveFileHolder);
+                    }
+                    Log.d(TAG, "searchFile sdgdgdg" + googleDriveFileHolderList);
+                    return googleDriveFileHolderList;
+                    } catch (Exception e){
+                        Log.d(TAG, "searchFile e" + e);
+                    }
+                    return Collections.EMPTY_LIST;
                 }
-                Log.d(TAG, "searchFile sdgdgdg" + googleDriveFileHolderList);
-                return googleDriveFileHolderList;
-            }
-        });
+            });
+        }
+        catch (Exception e){
+            Log.d(TAG, "searchFile error" + e);
+        }
+        return null;
     }
 
     /**

@@ -34,7 +34,7 @@ export const GoogleDriveLogin = (data, callback) => {
 
   export const handleLogin = async (e, data) => {
     const result = e || data;
-   // console.log('GOOGLE ReSULT', data);
+    console.log('GOOGLE ReSULT', data);
    // console.log('Error', e);
     if (result.eventName == 'onLogin') {
       if (!(await checkPermission())) {
