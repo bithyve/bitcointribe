@@ -24,7 +24,7 @@ export default function QrCodeModalContents(props) {
 	const barcodeRecognized = async (barcodes) => {
 		if (barcodes.data) {
 			setOpenCameraFlag(false);
-			props.modalRef ? props.modalRef.snapTo(1) : ''; // closes modal
+			props.onClose();
 			props.onQrScan(getFormattedString(barcodes.data));
 		}
 	};
@@ -106,9 +106,9 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-					{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
-						placeholderTextColor={Colors.borderColor} 
-						style={styles.qrModalTextInput} 
+					{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'}
+						placeholderTextColor={Colors.borderColor}
+						style={styles.qrModalTextInput}
 						autoCorrect={false}
 						/> : null}
 					 */}

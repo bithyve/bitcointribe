@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { createRef, PureComponent, Ref } from 'react';
 import {
   View,
   StyleSheet,
@@ -291,8 +291,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
-  NoInternetBottomSheet: any;
   unsubscribe: any;
+
+  qrTabBarBottomSheetRef = createRef<BottomSheet>();
+  trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
+  transactionDetailsBottomSheetRef = createRef<BottomSheet>();
+  settingsBottomSheetRef = createRef<BottomSheet>();
+  transactionTabBarBottomSheetRef = createRef<BottomSheet>();
+  allAccountsBottomSheetRef = createRef<BottomSheet>();
+  custodianRequestBottomSheetRef = createRef<BottomSheet>();
+  errorBottomSheetRef = createRef<BottomSheet>();
+  addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
+  notificationsListBottomSheetRef = createRef<BottomSheet>();
+  addTabBarBottomSheetRef = createRef<BottomSheet>();
+  moreTabBarBottomSheetRef = createRef<BottomSheet>();
+  custodianRequestRejectedBottomSheetRef = createRef<BottomSheet>();
+  noInternetBottomSheetRef = createRef<BottomSheet>();
+
+
 
   static whyDidYouRender = true;
 
@@ -300,7 +316,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     super(props);
     this.focusListener = null;
     this.appStateListener = null;
-    this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null;
     this.state = {
       notificationData: [],
@@ -372,7 +387,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     setTimeout(() => {
       this.setState({ notificationLoading: false });
     }, 500);
-    (this.refs.notificationsListBottomSheet as any).snapTo(1);
+    this.notificationsListBottomSheetRef.current.snapTo(1);
   };
 
   onSwitchToggle = (switchOn) => {
@@ -474,7 +489,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             },
             () => {
               setTimeout(() => {
-                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+                this.qrTabBarBottomSheetRef.current.snapTo(0);
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -484,8 +499,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current.snapTo(1);
               }, 2);
             },
           );
@@ -514,7 +529,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             () => {
               // TODO -- figure out why its not closing with out timeout
               setTimeout(() => {
-                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+                this.qrTabBarBottomSheetRef.current.snapTo(0);
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -524,8 +539,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current.snapTo(1);
               }, 2);
             },
           );
@@ -552,7 +567,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             () => {
               // TODO -- figure out why its not closing with out timeout
               setTimeout(() => {
-                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+                this.qrTabBarBottomSheetRef.current.snapTo(0);
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -562,8 +577,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current.snapTo(1);
               }, 2);
             },
           );
@@ -591,7 +606,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             () => {
               // TODO -- figure out why its not closing with out timeout
               setTimeout(() => {
-                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+                this.qrTabBarBottomSheetRef.current.snapTo(0);
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -601,8 +616,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current.snapTo(1);
               }, 2);
             },
           );
@@ -624,7 +639,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             },
             () => {
               setTimeout(() => {
-                (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+                this.qrTabBarBottomSheetRef.current.snapTo(0);
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -634,8 +649,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current.snapTo(1);
               }, 2);
             },
           );
@@ -817,9 +832,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
 
         if (state.isInternetReachable) {
-          (this.NoInternetBottomSheet as any).current.snapTo(0);
+          this.noInternetBottomSheetRef.current.snapTo(0);
         } else {
-          (this.NoInternetBottomSheet as any).current.snapTo(1);
+          this.noInternetBottomSheetRef.current.snapTo(1);
         }
       }, 1000);
     });
@@ -1022,8 +1037,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if (prevState.isLoading && !this.state.isLoading) {
-      if (this.refs.transactionTabBarBottomSheet) {
-        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      if (this.transactionTabBarBottomSheetRef.current) {
+        this.transactionTabBarBottomSheetRef.current.snapTo(1);
       }
     }
   };
@@ -1050,13 +1065,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
 
           setTimeout(() => {
-            if (this.refs.allAccountsBottomSheet) {
-              (this.refs.allAccountsBottomSheet as any).snapTo(0);
-              (this.refs.settingsBottomSheet as any).snapTo(0);
+            if (this.allAccountsBottomSheetRef.current) {
+              this.allAccountsBottomSheetRef.current.snapTo(0);
+              this.settingsBottomSheetRef.current.snapTo(0);
             }
 
-            (this.refs.custodianRequestBottomSheet as any).snapTo(1);
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            this.custodianRequestBottomSheetRef.current.snapTo(1);
+            this.transactionTabBarBottomSheetRef.current.snapTo(1);
           }, 2);
         },
       );
@@ -1077,8 +1092,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }
           setTimeout(() => {
-            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+            this.transactionTabBarBottomSheetRef.current.snapTo(1);
           }, 2);
         },
       );
@@ -1141,11 +1156,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              (this.refs.allAccountsBottomSheet as any)
-                .snapTo(0)(this.refs.settingsBottomSheet as any)
-                .snapTo(0)(this.refs.custodianRequestBottomSheet as any)
-                .snapTo(1)(this.refs.transactionTabBarBottomSheet as any)
-                .snapTo(1);
+              this.allAccountsBottomSheetRef.current.snapTo(0);
+              this.settingsBottomSheetRef.current.snapTo(0);
+              this.custodianRequestBottomSheetRef.current.snapTo(1);
+              this.transactionTabBarBottomSheetRef.current.snapTo(1);
             }, 2);
           },
         );
@@ -1165,8 +1179,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-              (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+              this.transactionTabBarBottomSheetRef.current.snapTo(1);
             }, 2);
           },
         );
@@ -1209,8 +1223,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-              (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+              this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+              this.transactionTabBarBottomSheetRef.current.snapTo(1);
             }, 2);
           },
         );
@@ -1236,8 +1250,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }
           setTimeout(() => {
-            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            this.trustedContactRequestBottomSheetRef.current.snapTo(1);
+            this.transactionTabBarBottomSheetRef.current.snapTo(1);
           }, 2);
         },
       );
@@ -1267,20 +1281,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     });
 
     setTimeout(() => {
-      if (this.refs.transactionTabBarBottomSheet) {
-        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      if (this.transactionTabBarBottomSheetRef.current) {
+        this.transactionTabBarBottomSheetRef.current.snapTo(1);
       }
 
-      if (this.refs.addTabBarBottomSheet) {
-        (this.refs.addTabBarBottomSheet as any).snapTo(0);
+      if (this.addTabBarBottomSheetRef.current) {
+        this.addTabBarBottomSheetRef.current.snapTo(0);
       }
 
-      if (this.refs.qrTabBarBottomSheet) {
-        (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+      if (this.qrTabBarBottomSheetRef.current) {
+        this.qrTabBarBottomSheetRef.current.snapTo(0);
       }
 
-      if (this.refs.moreTabBarBottomSheet) {
-        (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+      if (this.moreTabBarBottomSheetRef.current) {
+        this.moreTabBarBottomSheetRef.current.snapTo(0);
       }
     }, 500);
 
@@ -1742,7 +1756,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         tabBarIndex: 999,
       },
       () => {
-        (this.refs.settingsBottomSheet as any).snapTo(0);
+        this.settingsBottomSheetRef.current.snapTo(0);
       },
     );
   };
@@ -1794,7 +1808,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       deepLinkModalOpen: false,
     });
     setTimeout(() => {
-      (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+      this.trustedContactRequestBottomSheetRef.current.snapTo(0);
     }, 1);
     this.processDLRequest(key, false);
   };
@@ -1806,7 +1820,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         deepLinkModalOpen: false,
       });
     }, 2);
-    (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+    this.trustedContactRequestBottomSheetRef.current.snapTo(0);
     // this.processDLRequest(key, true);
   };
 
@@ -1820,10 +1834,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectedBottomTab: tabTitle,
         },
         () => {
-          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
-          (this.refs.addTabBarBottomSheet as any).snapTo(0);
-          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-          (this.refs.moreTabBarBottomSheet as any).snapTo(2);
+          this.transactionTabBarBottomSheetRef.current.snapTo(0);
+          this.addTabBarBottomSheetRef.current.snapTo(0);
+          this.qrTabBarBottomSheetRef.current.snapTo(0);
+          this.moreTabBarBottomSheetRef.current.snapTo(2);
         },
       );
       return;
@@ -1835,10 +1849,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectedBottomTab: tabTitle,
         },
         () => {
-          (this.refs.transactionTabBarBottomSheet as any).snapTo(2);
-          (this.refs.addTabBarBottomSheet as any).snapTo(0);
-          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+          this.transactionTabBarBottomSheetRef.current.snapTo(2);
+          this.addTabBarBottomSheetRef.current.snapTo(0);
+          this.qrTabBarBottomSheetRef.current.snapTo(0);
+          this.moreTabBarBottomSheetRef.current.snapTo(0);
         },
       );
       return;
@@ -1850,10 +1864,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectedBottomTab: tabTitle,
         },
         () => {
-          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
-          (this.refs.addTabBarBottomSheet as any).snapTo(2);
-          (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+          this.transactionTabBarBottomSheetRef.current.snapTo(0);
+          this.addTabBarBottomSheetRef.current.snapTo(2);
+          this.qrTabBarBottomSheetRef.current.snapTo(0);
+          this.moreTabBarBottomSheetRef.current.snapTo(0);
         },
       );
       return;
@@ -1865,10 +1879,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectedBottomTab: tabTitle,
         },
         () => {
-          (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
-          (this.refs.addTabBarBottomSheet as any).snapTo(0);
-          (this.refs.qrTabBarBottomSheet as any).snapTo(2);
-          (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+          this.transactionTabBarBottomSheetRef.current.snapTo(0);
+          this.addTabBarBottomSheetRef.current.snapTo(0);
+          this.qrTabBarBottomSheetRef.current.snapTo(2);
+          this.moreTabBarBottomSheetRef.current.snapTo(0);
         },
       );
       return;
@@ -2034,7 +2048,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             buttonText: 'Okay',
           },
           () => {
-            (this.refs.errorBottomSheet as any).snapTo(1);
+            this.errorBottomSheetRef.current.snapTo(1);
           },
         );
       } else {
@@ -2065,7 +2079,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
         () => {
           if (selectedBottomTab === 'Transactions') {
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            this.transactionTabBarBottomSheetRef.current.snapTo(1);
           }
         },
       );
@@ -2077,7 +2091,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
         () => {
           if (selectedBottomTab === 'Transactions') {
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(2);
+            this.transactionTabBarBottomSheetRef.current.snapTo(2);
           }
         },
       );
@@ -2089,7 +2103,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
         () => {
           if (selectedBottomTab === 'Transactions') {
-            (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+            this.transactionTabBarBottomSheetRef.current.snapTo(0);
           }
         },
       );
@@ -2162,7 +2176,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if (value.type == 'contact') {
       setTimeout(() => {
-        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+        this.notificationsListBottomSheetRef.current.snapTo(0);
       }, 2);
       this.selectTab('Transactions');
     }
@@ -2178,7 +2192,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('AddressBookContents');
       return;
     } else if (item.title == 'Wallet Settings') {
-      (this.refs.settingsBottomSheet as any).snapTo(1);
+      this.settingsBottomSheetRef.current.snapTo(1);
       setTimeout(() => {
         this.setState({
           tabBarIndex: 0,
@@ -2428,7 +2442,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 },
                 () => {
                   if (this.state.selectedBottomTab == 'Transactions') {
-                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    this.transactionTabBarBottomSheetRef.current.snapTo(1);
                   }
                 },
               );
@@ -2440,7 +2454,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'transactionTabBarBottomSheet'}
+            ref={this.transactionTabBarBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2469,7 +2483,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   this.setState({ tabBarIndex: index })
                 }
                 TransactionDetailsBottomSheet={
-                  this.refs.transactionDetailsBottomSheet
+                  this.transactionDetailsBottomSheetRef.current
                 }
               />
             )}
@@ -2481,14 +2495,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         {!isLoading && (
           <BottomSheet
-            ref="addTabBarBottomSheet"
+            ref={this.addTabBarBottomSheetRef}
             onCloseEnd={() => {
               this.setState({
                 qrBottomSheetsFlag: false,
               });
 
               if (selectedBottomTab == 'Add') {
-                (this.refs.addTabBarBottomSheet as any).snapTo(1);
+                this.addTabBarBottomSheetRef.current.snapTo(1);
               }
             }}
             onCloseStart={() => {
@@ -2520,11 +2534,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         isLoadContacts: true,
                         tabBarIndex: 0,
                       },
-                      () =>
-                        (this.refs
-                          .addContactAddressBookBookBottomSheet as any).snapTo(
-                            1,
-                          ),
+                      () => {
+                        this.addContactAddressBookBottomSheetRef.current.snapTo(1);
+                      },
                     );
                   }
                 }}
@@ -2546,7 +2558,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         {!isLoading && (
           <BottomSheet
-            ref="qrTabBarBottomSheet"
+            ref={this.qrTabBarBottomSheetRef}
             onOpenEnd={() => {
               this.setState({
                 qrBottomSheetsFlag: selectedBottomTab === 'QR',
@@ -2559,7 +2571,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 },
                 () => {
                   if (selectedBottomTab === 'QR') {
-                    (this.refs.qrTabBarBottomSheet as any).snapTo(1);
+                    this.qrTabBarBottomSheetRef.current.snapTo(1);
                   }
                 },
               );
@@ -2583,7 +2595,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             ]}
             renderContent={() => (
               <QrCodeModalContents
-                modalRef={this.refs.qrTabBarBottomSheet}
+                onClose={() => this.qrTabBarBottomSheetRef.current.snapTo(1) }
                 isOpenedFlag={qrBottomSheetsFlag}
                 onQrScan={(qrData) => this.processQRData(qrData)}
                 onPressQrScanner={() => {
@@ -2615,7 +2627,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 },
                 () => {
                   if (selectedBottomTab == 'More') {
-                    (this.refs.moreTabBarBottomSheet as any).snapTo(1);
+                    this.moreTabBarBottomSheetRef.current.snapTo(1);
                   }
                 },
               );
@@ -2626,7 +2638,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'moreTabBarBottomSheet'}
+            ref={this.moreTabBarBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2676,7 +2688,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'custodianRequestBottomSheet'}
+            ref={this.custodianRequestBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) {
@@ -2695,7 +2707,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         deepLinkModalOpen: true,
                       },
                       () => {
-                        (this.refs.custodianRequestBottomSheet as any).snapTo(
+                        this.custodianRequestBottomSheetRef.current.snapTo(
                           0,
                         );
                       },
@@ -2739,13 +2751,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 0,
                       },
                       () => {
-                        (this.refs.custodianRequestBottomSheet as any).snapTo(
-                          0,
-                        );
-                        (this.refs
-                          .custodianRequestRejectedBottomSheet as any).snapTo(
-                            1,
-                          );
+                        this.custodianRequestBottomSheetRef.current.snapTo(0);
+                        this.custodianRequestRejectedBottomSheetRef.current.snapTo(1);
                       },
                     );
                   }}
@@ -2760,8 +2767,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       tabBarIndex: 999,
                       deepLinkModalOpen: false,
                     },
-                    () =>
-                      (this.refs.custodianRequestBottomSheet as any).snapTo(0),
+                    () => {
+                      this.custodianRequestBottomSheetRef.current.snapTo(0);
+                    },
                   );
                 }}
               />
@@ -2792,7 +2800,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'trustedContactRequestBottomSheet'}
+            ref={this.trustedContactRequestBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2814,7 +2822,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   onPressAccept={this.onTrustedContactRequestAccept}
                   onPressReject={this.onTrustedContactReject}
                   onPhoneNumberChange={this.onPhoneNumberChange}
-                  bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
+                  bottomSheetRef={this.trustedContactRequestBottomSheetRef}
                 />
               );
             }}
@@ -2827,8 +2835,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       deepLinkModalOpen: false,
                     },
                     () => {
-                      (this.refs
-                        .trustedContactRequestBottomSheet as any).snapTo(0);
+                      this.trustedContactRequestBottomSheetRef.current.snapTo(0);
                     },
                   );
                 }}
@@ -2850,7 +2857,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'custodianRequestRejectedBottomSheet'}
+            ref={this.custodianRequestRejectedBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
@@ -2862,10 +2869,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 999,
                       },
                       () => {
-                        (this.refs
-                          .custodianRequestRejectedBottomSheet as any).snapTo(
-                            0,
-                          );
+                        this.custodianRequestRejectedBottomSheetRef.current.snapTo(0);
                       },
                     );
                   }}
@@ -2880,9 +2884,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {
                       tabBarIndex: 999,
                     },
-                    () =>
-                      (this.refs
-                        .custodianRequestRejectedBottomSheet as any).snapTo(0),
+                    () => {
+                      this.custodianRequestRejectedBottomSheetRef.current.snapTo(0);
+                    },
                   );
                 }}
               />
@@ -2906,7 +2910,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
             }}
             enabledInnerScrolling={true}
-            ref={'allAccountsBottomSheet'}
+            ref={this.allAccountsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2920,7 +2924,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {
                       tabBarIndex: 999,
                     },
-                    () => (this.refs.allAccountsBottomSheet as any).snapTo(0),
+                    () => this.allAccountsBottomSheetRef.current.snapTo(0),
                   );
                 }}
               />
@@ -2934,7 +2938,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {
                       tabBarIndex: 999,
                     },
-                    () => (this.refs.allAccountsBottomSheet as any).snapTo(0),
+                    () => this.allAccountsBottomSheetRef.current.snapTo(0),
                   );
                 }}
               />
@@ -2960,7 +2964,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 tabBarIndex: 0,
               });
             }}
-            ref={'transactionDetailsBottomSheet'}
+            ref={this.transactionDetailsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2971,7 +2975,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <TransactionDetails
                 item={selectedTransactionItem}
                 onPressKnowMore={() => {
-                  (this.refs.transactionDetailsBottomSheet as any).snapTo(1);
+                  this.transactionDetailsBottomSheetRef.current.snapTo(1);
                 }}
               />
             )}
@@ -2980,8 +2984,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 borderColor={Colors.white}
                 backgroundColor={Colors.white}
                 onPressHeader={() => {
-                  if (this.refs.transactionDetailsBottomSheet)
-                    (this.refs.transactionDetailsBottomSheet as any).snapTo(0);
+                  if (this.transactionDetailsBottomSheetRef.current)
+                    this.transactionDetailsBottomSheetRef.current.snapTo(0);
                 }}
               />
             )}
@@ -3005,7 +3009,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
             }}
             enabledInnerScrolling={true}
-            ref={'settingsBottomSheet'}
+            ref={this.settingsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3024,7 +3028,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       tabBarIndex: 999,
                     },
                     () => {
-                      (this.refs.settingsBottomSheet as any).snapTo(0);
+                      this.settingsBottomSheetRef.current.snapTo(0);
                     },
                   );
                 }}
@@ -3039,7 +3043,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {
                       tabBarIndex: 999,
                     },
-                    () => (this.refs.settingsBottomSheet as any).snapTo(0),
+                    () => this.settingsBottomSheetRef.current.snapTo(0),
                   );
                 }}
               />
@@ -3059,7 +3063,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={'errorBottomSheet'}
+          ref={this.errorBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3068,7 +3072,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <ErrorModalContents
-              modalRef={this.refs.errorBottomSheet}
               title={errorMessageHeader}
               info={errorMessage}
               proceedButtonText={buttonText}
@@ -3078,7 +3081,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     tabBarIndex: 999,
                   },
                   () => {
-                    (this.refs.errorBottomSheet as any).snapTo(0);
+                    this.errorBottomSheetRef.current.snapTo(0);
                   },
                 );
               }}
@@ -3093,7 +3096,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   {
                     tabBarIndex: 999,
                   },
-                  () => (this.refs.errorBottomSheet as any).snapTo(0),
+                  () => this.errorBottomSheetRef.current.snapTo(0),
                 );
               }}
             />
@@ -3123,7 +3126,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={'addContactAddressBookBookBottomSheet'}
+          ref={this.addContactAddressBookBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3134,15 +3137,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <AddContactAddressBook
               addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
-              modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
                 if (selectedContact && selectedContact.length) {
                   navigation.navigate('AddContactSendRequest', {
                     SelectedContact: selectedContact,
                   });
-                  (this.refs
-                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
+                  this.addContactAddressBookBottomSheetRef.current.snapTo(0);
                 }
               }}
               onSelectContact={(selectedContact) => {
@@ -3151,7 +3152,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                this.addContactAddressBookBottomSheetRef.current.snapTo(
                   0,
                 );
               }}
@@ -3176,7 +3177,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 navigation.navigate('AddContactSendRequest', {
                   SelectedContact: [data],
                 });
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                this.addContactAddressBookBottomSheetRef.current.snapTo(
                   0,
                 );
               }}
@@ -3187,7 +3188,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                this.addContactAddressBookBottomSheetRef.current.snapTo(
                   0,
                 );
               }}
@@ -3210,7 +3211,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={'notificationsListBottomSheet'}
+          ref={this.notificationsListBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3225,14 +3226,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.onNotificationClicked(value)
               }
               onPressBack={() => {
-                (this.refs.notificationsListBottomSheet as any).snapTo(0);
+                this.notificationsListBottomSheetRef.current.snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                (this.refs.notificationsListBottomSheet as any).snapTo(0);
+                this.notificationsListBottomSheetRef.current.snapTo(0);
               }}
             />
           )}
@@ -3255,22 +3256,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={this.NoInternetBottomSheet}
+          ref={this.noInternetBottomSheetRef}
           snapPoints={[-50, hp('60%')]}
           renderContent={() => (
             <NoInternetModalContents
               onPressTryAgain={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
+                this.noInternetBottomSheetRef.current.snapTo(0);
               }}
               onPressIgnore={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
+                this.noInternetBottomSheetRef.current.snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
             // onPressHeader={() => {
-            //   (this.NoInternetBottomSheet as any).current.snapTo(0);
+            //   this.noInternetBottomSheetRef.current.snapTo(0);
             // }}
             />
           )}

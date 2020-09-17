@@ -108,13 +108,13 @@ export default function TrustedContactRequest(props) {
             onFocus={() => {
               if (Platform.OS === 'ios') {
                 setOnBlurFocus(true);
-                props.bottomSheetRef.snapTo(2);
+                props.bottomSheetRef.current.snapTo(2);
               }
             }}
             onBlur={() => {
               checkForValidation(EmailId);
               setOnBlurFocus(false);
-              props.bottomSheetRef.snapTo(1);
+              props.bottomSheetRef.current.snapTo(1);
             }}
             value={EmailId}
           />
@@ -158,13 +158,13 @@ export default function TrustedContactRequest(props) {
             onFocus={() => {
               if (Platform.OS === 'ios') {
                 setOnBlurFocus(true);
-                props.bottomSheetRef.snapTo(2);
+                props.bottomSheetRef.current.snapTo(2);
               }
             }}
             onBlur={() => {
               checkForValidation(PhoneNumber);
               setOnBlurFocus(false);
-              props.bottomSheetRef.snapTo(1);
+              props.bottomSheetRef.current.snapTo(1);
             }}
             value={PhoneNumber}
           />
@@ -246,9 +246,9 @@ export default function TrustedContactRequest(props) {
                 onFocus={() => {
                   if (Platform.OS == 'ios') {
                     if (passcodeArray.length == 0 && i == 0) {
-                      props.bottomSheetRef.snapTo(2);
+                      props.bottomSheetRef.current.snapTo(2);
                     } else {
-                      props.bottomSheetRef.snapTo(2);
+                      props.bottomSheetRef.current.snapTo(2);
                     }
                   }
                 }}
@@ -258,7 +258,7 @@ export default function TrustedContactRequest(props) {
                       (passcodeArray.length == 0 || passcodeArray.length == 6) &&
                       i == 5
                     ) {
-                      props.bottomSheetRef.snapTo(1);
+                      props.bottomSheetRef.current.snapTo(1);
                     }
                   }
                 }}
