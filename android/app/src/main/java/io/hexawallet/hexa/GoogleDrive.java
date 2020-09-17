@@ -74,6 +74,8 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private final String LIST_IS_EMPTY = "listEmpty";
     private final String SUCCESSFULLY_UPDATE = "successFullyUpdate";
     private final String SUCCESSFULLY_UPLOAD = "successFullyUpload";
+    private final String ON_FAILURE = "failure";
+
 
     public GoogleDrive(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
@@ -288,7 +290,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
-                            listOfFilesAvailable.invoke(null, e);
+                            WritableMap map = Arguments.createMap();
+                            map.putString(EVENT_KEY, ON_FAILURE);
+                            listOfFilesAvailable.invoke(map, null);
                         }
                     });
 

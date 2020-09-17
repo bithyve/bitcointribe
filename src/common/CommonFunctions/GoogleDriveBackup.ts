@@ -61,9 +61,12 @@ export const GoogleDriveLogin = (data, callback) => {
        // console.log('err, data', data, err);
         const result = err || data;
        // console.log('checkFileIsAvailable', result);
-        if (result.eventName == 'listEmpty') {
+        if (result && result.eventName == 'listEmpty') {
           createFile();
-        } else {
+        } else if(result.eventName == 'failure'){
+          console.log("FAILURE");
+        } 
+        else {
           readFile(result);
         }
       },
