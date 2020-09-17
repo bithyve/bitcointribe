@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { createRef, PureComponent } from 'react';
 import {
   View,
   StyleSheet,
@@ -142,17 +142,17 @@ export const isCompatible = async (method: string, version: string) => {
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
-    return require('../assets/images/icons/icon_regular.png');
+    return require('../../assets/images/icons/icon_regular.png');
   } else if (type == 'regular') {
-    return require('../assets/images/icons/icon_regular.png');
+    return require('../../assets/images/icons/icon_regular.png');
   } else if (type == 'secure') {
-    return require('../assets/images/icons/icon_secureaccount.png');
+    return require('../../assets/images/icons/icon_secureaccount.png');
   } else if (type == 'test') {
-    return require('../assets/images/icons/icon_test.png');
+    return require('../../assets/images/icons/icon_test.png');
   } else if (type === 'Donation Account') {
-    return require('../assets/images/icons/icon_donation_hexa.png');
+    return require('../../assets/images/icons/icon_donation_hexa.png');
   } else {
-    return require('../assets/images/icons/icon_test.png');
+    return require('../../assets/images/icons/icon_test.png');
   }
 };
 
@@ -688,7 +688,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             : 0,
           account: `Donate Bitcoin`,
           accountType: serviceType,
-          bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+          bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
         };
         additionalCardData.push(donationCardInstance);
       }
@@ -2327,7 +2327,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } = this.props;
     return (
       <ImageBackground
-        source={require('../assets/images/home-bg.png')}
+        source={require('../../assets/images/home-bg.png')}
         style={{ width: '100%', height: '100%', flex: 1 }}
         imageStyle={{ resizeMode: 'stretch' }}
       >
@@ -2394,6 +2394,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
         {isLoading ? <Loader /> : null}
 
+        {/* Bottom Sheets */}
         {!isLoading && (
           <BottomSheet
             onOpenEnd={() => {
@@ -2525,6 +2526,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         )}
 
+        {/* QR Code Bottom Sheet */}
         {!isLoading && (
           <BottomSheet
             ref="qrTabBarBottomSheet"
@@ -2545,11 +2547,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 },
               );
             }}
-            onCloseStart={() => {
-              this.setState({
-                qrBottomSheetsFlag: false,
-              });
-            }}
+            // onCloseStart={() => {
+              // this.setState({
+                // qrBottomSheetsFlag: false,
+              // });
+            // }}
             enabledInnerScrolling={true}
             snapPoints={[
               -50,
@@ -2564,8 +2566,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             ]}
             renderContent={() => (
               <QrCodeModalContents
-                modalRef={this.refs.qrTabBarBottomSheet}
-                isOpenedFlag={qrBottomSheetsFlag}
+                onClose={() => this.qrTabBarBottomSheetRef.current.snapTo(1) }
                 onQrScan={(qrData) => this.processQRData(qrData)}
                 onPressQrScanner={() => {
                   navigation.navigate('QrScanner', {
@@ -3064,7 +3065,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 );
               }}
               isBottomImage={true}
-              bottomImage={require('../assets/images/icons/errorImage.png')}
+              bottomImage={require('../../assets/images/icons/errorImage.png')}
             />
           )}
           renderHeader={() => (
