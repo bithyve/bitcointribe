@@ -40,7 +40,7 @@ const AccountsListSend = ({
           <Image
             style={styles.image}
             source={accounts.image}
-            resizeMode="center"
+            resizeMode={'contain'}
           />
           <Text
             style={{
