@@ -468,6 +468,12 @@ export default class HDSegwitWallet extends Bitcoin {
     for (const utxo of UTXOs) {
       if (utxo.status) {
         if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        else {
+          if (internalAddresses.includes(utxo.address)) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push(utxo);
+          }
+        }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
         confirmedUTXOs.push(utxo);
@@ -695,6 +701,12 @@ export default class HDSegwitWallet extends Bitcoin {
           for (const utxo of UTXOs) {
             if (utxo.status) {
               if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+              else {
+                if (internalAddresses.includes(utxo.address)) {
+                  // defaulting utxo's on the change branch to confirmed
+                  confirmedUTXOs.push(utxo);
+                }
+              }
             } else {
               // utxo's from fallback won't contain status var (defaulting them as confirmed)
               confirmedUTXOs.push(utxo);
@@ -879,16 +891,38 @@ export default class HDSegwitWallet extends Bitcoin {
       usedAddresses,
       receivingAddresses,
       nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
       utxos,
       balances,
       transactions,
       lastSynched,
     } = res.data;
 
+    const internalAddresses = [];
+    for (
+      let itr = 0;
+      itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
+      itr++
+    ) {
+      internalAddresses.push(
+        this.getAddress(
+          true,
+          itr,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
+        ),
+      );
+    }
+
     const confirmedUTXOs = [];
     for (const utxo of utxos) {
       if (utxo.status) {
         if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+        else {
+          if (internalAddresses.includes(utxo.address)) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push(utxo);
+          }
+        }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
         confirmedUTXOs.push(utxo);
@@ -930,6 +964,9 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccounts[accountType][
       accountNumber
     ].nextFreeAddressIndex = nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].nextFreeChangeAddressIndex = nextFreeChangeAddressIndex;
     this.derivativeAccounts[accountType][
       accountNumber
     ].receivingAddress = this.getAddress(
