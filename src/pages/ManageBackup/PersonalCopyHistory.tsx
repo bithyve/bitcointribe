@@ -237,6 +237,7 @@ const PersonalCopyHistory = (props) => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
+      console.log('/PersonalCopyHistory ', { personalCopyDetails })
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
         // saveInTransitHistory();
