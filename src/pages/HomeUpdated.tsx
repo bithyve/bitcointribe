@@ -393,6 +393,10 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   onPressNotifications = async () => {
+    const iCloud = NativeModules.iCloud;
+    console.log(iCloud.startBackup("From React Native data in string format"));
+    let backedJson = iCloud.downloadBackup();
+    console.log("BackedUp JSON: ",backedJson);
     let notificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
