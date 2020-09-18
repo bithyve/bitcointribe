@@ -1385,7 +1385,26 @@ export default class HDSegwitWallet extends Bitcoin {
       ][derivativeAccountDetails.number].confirmedUTXOs;
       inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
     } else {
-      inputUTXOs = this.confirmedUTXOs;
+      const derivativeUTXOs = [];
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const derivativeInstance = derivativeAccount[accountNumber];
+            if (
+              derivativeInstance.confirmedUTXOs &&
+              derivativeInstance.confirmedUTXOs.length
+            )
+              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs);
+          }
+        }
+      }
+
+      inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
     console.log({ inputUTXOs });
 
@@ -1432,7 +1451,26 @@ export default class HDSegwitWallet extends Bitcoin {
       ][derivativeAccountDetails.number].confirmedUTXOs;
       inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
     } else {
-      inputUTXOs = this.confirmedUTXOs;
+      const derivativeUTXOs = [];
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const derivativeInstance = derivativeAccount[accountNumber];
+            if (
+              derivativeInstance.confirmedUTXOs &&
+              derivativeInstance.confirmedUTXOs.length
+            )
+              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs);
+          }
+        }
+      }
+
+      inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
     console.log({ inputUTXOs });
 
