@@ -58,7 +58,8 @@ export default function QrCodeModalContents(props) {
     return qrString;
   };
 
-  return (<View style={styles.modalContentContainer}>
+  return (
+  <View style={styles.modalContentContainer}>
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : undefined} enabled keyboardVerticalOffset={150}>
       <ScrollView style={styles.qrModalScrollView}>
         <Text style={styles.modalSubheaderText}>{'Scan a Bitcoin address or any Hexa QR'}</Text>
