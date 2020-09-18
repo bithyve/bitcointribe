@@ -1940,6 +1940,35 @@ export default class SecureHDWallet extends Bitcoin {
                 };
               }
             }
+
+            for (
+              let itr = 0;
+              itr <=
+              derivativeInstance.nextFreeChangeAddressIndex +
+                this.derivativeGapLimit;
+              itr++
+            ) {
+              const multiSig = this.createSecureMultiSig(
+                itr,
+                true,
+                derivativeInstance.xpub,
+              );
+              const possibleAddress = multiSig.address;
+              if (possibleAddress === address) {
+                return {
+                  multiSig,
+                  primaryPriv: this.deriveDerivativeChildXKey(
+                    derivativeInstance.xpriv,
+                    itr,
+                    true,
+                  ),
+                  secondaryPriv: this.secondaryXpriv
+                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    : null,
+                  childIndex: itr,
+                };
+              }
+            }
           }
         }
       }
@@ -1994,9 +2023,10 @@ export default class SecureHDWallet extends Bitcoin {
   private deriveDerivativeChildXKey = (
     extendedKey: string, // account xpub
     childIndex: number,
+    internal: boolean = false,
   ): string => {
     const xKey = bip32.fromBase58(extendedKey, this.network);
-    const childXKey = xKey.derive(0).derive(childIndex); // deriving on external chain
+    const childXKey = xKey.derive(internal ? 1 : 0).derive(childIndex); // deriving on external chain
     return childXKey.toBase58();
   };
 

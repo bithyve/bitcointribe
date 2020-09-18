@@ -1793,6 +1793,25 @@ export default class HDSegwitWallet extends Bitcoin {
                   );
                 }
               }
+
+              for (
+                let itr = 0;
+                itr <=
+                derivativeInstance.nextFreeChangeAddressIndex +
+                  this.derivativeGapLimit; // would always be greater than
+                itr++
+              ) {
+                if (
+                  this.getAddress(true, itr, derivativeInstance.xpub) ===
+                  address
+                ) {
+                  return this.getPrivateKey(
+                    true,
+                    itr,
+                    derivativeInstance.xpriv,
+                  );
+                }
+              }
             }
           }
         }
