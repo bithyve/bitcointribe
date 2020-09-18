@@ -546,15 +546,24 @@ export default class SecureHDWallet extends Bitcoin {
 
     // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
-    let { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
-      accountNumber
-    ];
+    let {
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+    } = this.derivativeAccounts[accountType][accountNumber];
     // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
     if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
       nextFreeAddressIndex = 0;
+    if (nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex)
+      nextFreeChangeAddressIndex = 0;
 
     const externalAddresses = [];
-    for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
+    const internalAddresses = [];
+
+    for (
+      let itr = 0;
+      itr < nextFreeAddressIndex + this.derivativeGapLimit;
+      itr++
+    ) {
       externalAddresses.push(
         this.createSecureMultiSig(
           itr,
@@ -564,17 +573,33 @@ export default class SecureHDWallet extends Bitcoin {
       );
     }
 
+    for (
+      let itr = 0;
+      itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
+      itr++
+    ) {
+      internalAddresses.push(
+        this.createSecureMultiSig(
+          itr,
+          true,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
+        ).address,
+      );
+    }
+
+    const usedAddresses = [...externalAddresses, ...internalAddresses];
     this.derivativeAccounts[accountType][
       accountNumber
-    ].usedAddresses = externalAddresses;
+    ].usedAddresses = usedAddresses;
 
     const res = await this.fetchBalanceTransactionsByAddresses(
       externalAddresses,
-      [],
-      externalAddresses,
+      internalAddresses,
+      usedAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
         1,
-      0,
+      this.derivativeAccounts[accountType][accountNumber]
+        .nextFreeChangeAddressIndex - 1,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
@@ -589,7 +614,6 @@ export default class SecureHDWallet extends Bitcoin {
         confirmedUTXOs.push(utxo);
       }
     }
-    this.confirmedUTXOs.push(...confirmedUTXOs); // pushing confirmed derivative utxos to the pre-existing utxo pool from parent acc
 
     const lastSyncTime =
       this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
@@ -613,12 +637,18 @@ export default class SecureHDWallet extends Bitcoin {
     this.derivativeAccounts[accountType][
       accountNumber
     ].newTransactions = newTransactions;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].confirmedUTXOs = confirmedUTXOs;
     this.derivativeAccounts[accountType][accountNumber].balances = balances;
     this.derivativeAccounts[accountType][
       accountNumber
     ].transactions = transactions;
     this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
       res.nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].nextFreeChangeAddressIndex = res.nextFreeChangeAddressIndex;
     this.derivativeAccounts[accountType][
       accountNumber
     ].receivingAddress = this.createSecureMultiSig(
@@ -649,20 +679,25 @@ export default class SecureHDWallet extends Bitcoin {
         accountNumber++
       ) {
         // await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
-        let { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
-          accountNumber
-        ];
+        let {
+          nextFreeAddressIndex,
+          nextFreeChangeAddressIndex,
+        } = this.derivativeAccounts[dAccountType][accountNumber];
         // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
         if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
           nextFreeAddressIndex = 0;
+        if (nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex)
+          nextFreeChangeAddressIndex = 0;
 
-        const consumedAddresses = [];
+        const externalAddresses = [];
+        const internalAddresses = [];
+
         for (
           let itr = 0;
           itr < nextFreeAddressIndex + this.derivativeGapLimit;
           itr++
         ) {
-          consumedAddresses.push(
+          externalAddresses.push(
             this.createSecureMultiSig(
               itr,
               false,
@@ -671,11 +706,27 @@ export default class SecureHDWallet extends Bitcoin {
           );
         }
 
+        for (
+          let itr = 0;
+          itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
+          itr++
+        ) {
+          internalAddresses.push(
+            this.createSecureMultiSig(
+              itr,
+              true,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
+            ).address,
+          );
+        }
+
+        const usedAddresses = [...externalAddresses, ...internalAddresses];
+
         this.derivativeAccounts[dAccountType][accountNumber][
           'usedAddresses'
-        ] = consumedAddresses;
-        console.log({ derivativeAccUsedAddresses: consumedAddresses });
-        batchedDerivativeAddresses.push(...consumedAddresses);
+        ] = usedAddresses;
+        console.log({ derivativeAccUsedAddresses: usedAddresses });
+        batchedDerivativeAddresses.push(...usedAddresses);
       }
     }
 
@@ -709,7 +760,6 @@ export default class SecureHDWallet extends Bitcoin {
         (addressSpecificTxs) => !!addressSpecificTxs.TotalTransactions,
       );
 
-      const UTXOs = [];
       const addressesInfo = Txs;
       console.log({ addressesInfo });
 
@@ -729,6 +779,42 @@ export default class SecureHDWallet extends Bitcoin {
           };
 
           const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
+          const {
+            nextFreeAddressIndex,
+            nextFreeChangeAddressIndex,
+          } = derivativeAccounts[accountNumber];
+          const externalAddresses = [];
+          const internalAddresses = [];
+
+          for (
+            let itr = 0;
+            itr < nextFreeAddressIndex + this.derivativeGapLimit;
+            itr++
+          ) {
+            externalAddresses.push(
+              this.createSecureMultiSig(
+                itr,
+                false,
+                this.derivativeAccounts[dAccountType][accountNumber].xpub,
+              ).address,
+            );
+          }
+
+          for (
+            let itr = 0;
+            itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
+            itr++
+          ) {
+            internalAddresses.push(
+              this.createSecureMultiSig(
+                itr,
+                true,
+                this.derivativeAccounts[dAccountType][accountNumber].xpub,
+              ).address,
+            );
+          }
+
+          const UTXOs = [];
           for (const addressSpecificUTXOs of Utxos) {
             for (const utxo of addressSpecificUTXOs) {
               const { value, Address, status, vout, txid } = utxo;
@@ -750,6 +836,16 @@ export default class SecureHDWallet extends Bitcoin {
             }
           }
 
+          const confirmedUTXOs = [];
+          for (const utxo of UTXOs) {
+            if (utxo.status) {
+              if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+            } else {
+              // utxo's from fallback won't contain status var (defaulting them as confirmed)
+              confirmedUTXOs.push(utxo);
+            }
+          }
+
           const transactions: Transactions = {
             totalTransactions: 0,
             confirmedTransactions: 0,
@@ -757,8 +853,9 @@ export default class SecureHDWallet extends Bitcoin {
             transactionDetails: [],
           };
 
-          let lastUsedAddressIndex =
-            derivativeAccounts[accountNumber].nextFreeAddressIndex - 1;
+          let lastUsedAddressIndex = nextFreeAddressIndex - 1;
+          let lastUsedChangeAddressIndex = nextFreeChangeAddressIndex - 1;
+
           const txMap = new Map();
           for (const addressInfo of addressesInfo) {
             if (!addressInUse.includes(addressInfo.Address)) continue;
@@ -809,12 +906,22 @@ export default class SecureHDWallet extends Bitcoin {
               }
             });
 
-            const addressIndex = addressInUse.indexOf(addressInfo.Address);
+            const addressIndex = externalAddresses.indexOf(addressInfo.Address);
             if (addressIndex > -1) {
               lastUsedAddressIndex =
                 addressIndex > lastUsedAddressIndex
                   ? addressIndex
                   : lastUsedAddressIndex;
+            } else {
+              const changeAddressIndex = internalAddresses.indexOf(
+                addressInfo.Address,
+              );
+              if (changeAddressIndex > -1) {
+                lastUsedChangeAddressIndex =
+                  changeAddressIndex > lastUsedChangeAddressIndex
+                    ? changeAddressIndex
+                    : lastUsedChangeAddressIndex;
+              }
             }
           }
 
@@ -847,6 +954,9 @@ export default class SecureHDWallet extends Bitcoin {
           ].newTransactions = newTransactions;
           this.derivativeAccounts[dAccountType][
             accountNumber
+          ].confirmedUTXOs = confirmedUTXOs;
+          this.derivativeAccounts[dAccountType][
+            accountNumber
           ].balances = balances;
           this.derivativeAccounts[dAccountType][
             accountNumber
@@ -854,6 +964,9 @@ export default class SecureHDWallet extends Bitcoin {
           this.derivativeAccounts[dAccountType][
             accountNumber
           ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
+          this.derivativeAccounts[dAccountType][
+            accountNumber
+          ].nextFreeChangeAddressIndex = lastUsedChangeAddressIndex + 1;
           this.derivativeAccounts[dAccountType][
             accountNumber
           ].receivingAddress = this.createSecureMultiSig(
@@ -864,17 +977,6 @@ export default class SecureHDWallet extends Bitcoin {
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
-
-      const confirmedUTXOs = [];
-      for (const utxo of UTXOs) {
-        if (utxo.status) {
-          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
-        } else {
-          // utxo's from fallback won't contain status var (defaulting them as confirmed)
-          confirmedUTXOs.push(utxo);
-        }
-      }
-      this.confirmedUTXOs.push(...confirmedUTXOs);
 
       return { synched: true };
     } catch (err) {
@@ -1350,7 +1452,28 @@ export default class SecureHDWallet extends Bitcoin {
       ][derivativeAccountDetails.number].confirmedUTXOs;
       inputUTXOs = derivativeUtxos ? derivativeUtxos : [];
     } else {
-      inputUTXOs = this.confirmedUTXOs;
+      const derivativeUTXOs = [];
+      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+        if (dAccountType === TRUSTED_CONTACTS) continue;
+
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const derivativeInstance = derivativeAccount[accountNumber];
+            if (
+              derivativeInstance.confirmedUTXOs &&
+              derivativeInstance.confirmedUTXOs.length
+            )
+              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs);
+          }
+        }
+      }
+
+      inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
 
     console.log('Input UTXOs:', inputUTXOs);
