@@ -1212,25 +1212,15 @@ export default class SecureHDWallet extends Bitcoin {
       if (!output.address) {
         let changeAddress;
         if (derivativeAccountDetails) {
-          const {
-            xpub,
-            nextFreeAddressIndex,
-            receivingAddress,
-          } = this.derivativeAccounts[derivativeAccountDetails.type][
-            derivativeAccountDetails.number
-          ];
-          changeAddress = receivingAddress;
+          const { xpub, nextFreeChangeAddressIndex } = this.derivativeAccounts[
+            derivativeAccountDetails.type
+          ][derivativeAccountDetails.number];
 
-          this.derivativeAccounts[derivativeAccountDetails.type][
-            derivativeAccountDetails.number
-          ].receivingAddress = this.createSecureMultiSig(
-            nextFreeAddressIndex + 1,
-            false,
+          changeAddress = this.createSecureMultiSig(
+            nextFreeChangeAddressIndex,
+            true,
             xpub,
           ).address;
-          this.derivativeAccounts[derivativeAccountDetails.type][
-            derivativeAccountDetails.number
-          ].nextFreeAddressIndex++;
         } else {
           changeAddress = this.createSecureMultiSig(
             this.nextFreeChangeAddressIndex,
@@ -1959,6 +1949,7 @@ export default class SecureHDWallet extends Bitcoin {
           .digest('hex'),
         xpriv,
         nextFreeAddressIndex: 0,
+        nextFreeChangeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;
 

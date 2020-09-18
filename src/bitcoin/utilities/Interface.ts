@@ -93,6 +93,7 @@ export interface DerivativeAccountElements {
   xpriv: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
+  nextFreeChangeAddressIndex?: number;
   receivingAddress?: string;
   confirmedUTXOs?: {
     txId: string;
