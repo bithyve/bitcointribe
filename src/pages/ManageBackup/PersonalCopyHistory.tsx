@@ -237,7 +237,6 @@ const PersonalCopyHistory = (props) => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
-      console.log('/PersonalCopyHistory ', { personalCopyDetails })
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
         // saveInTransitHistory();
@@ -248,8 +247,8 @@ const PersonalCopyHistory = (props) => {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           // saveInTransitHistory();
         } 
-        // verify if the copy is exists else, it should be generated
-        // This should idealy be another set of action, watcher, worker, reducer
+        // verify if personal copy exists else, it should be generated
+        // TODO: This should ideally be another set of action, watcher, worker and reducer
         // but I am too lazy :(
         if (!await verifyPersonalCopyAccess(personalCopyDetails[selectedPersonalCopy.type])) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));

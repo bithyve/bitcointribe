@@ -599,7 +599,6 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePersonalCopyWorker({ payload }) {
-  console.log('-*- generatePC saga called ', payload)
   // yield put(switchS3Loader('generatePDF'));
   const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
   const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
