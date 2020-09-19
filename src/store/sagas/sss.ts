@@ -84,6 +84,7 @@ import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
+import RNFS from 'react-native-fs';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -599,10 +600,10 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePersonalCopyWorker({ payload }) {
-  console.log('sagas/sss/generatePersonalCopyWorker ', { payload })
+  console.log('sagas/sss/generatePersonalCopyWorker ', { payload });
   // yield put(switchS3Loader('generatePDF'));
   const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
-  console.log({ selectedPersonalCopy })
+  console.log({ selectedPersonalCopy });
   const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.createQR, shareIndex);
@@ -647,8 +648,7 @@ function* generatePersonalCopyWorker({ payload }) {
       security.answer,
     );
 
-    console.log('/sagas/sss/generatePersonalCopy ', {pdfPath})
-
+    console.log('/sagas/sss/generatePersonalCopy ', { pdfPath });
 
     const pdfPathNew = yield call(
       generatePDF,
@@ -660,16 +660,16 @@ function* generatePersonalCopyWorker({ payload }) {
       security.answer,
     );
 
-    console.log('/sagas/sss/generatePersonalCopy ', {pdfPathNew})
-
-
+    console.log('/sagas/sss/generatePersonalCopy ', { pdfPathNew });
 
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
 
-    console.log('sagas/sss/generatePersonalCopyWorker ', { personalCopyDetails })
+    console.log('sagas/sss/generatePersonalCopyWorker ', {
+      personalCopyDetails,
+    });
 
     if (!personalCopyDetails) {
       personalCopyDetails = {
@@ -690,7 +690,9 @@ function* generatePersonalCopyWorker({ payload }) {
         },
       };
     }
-    console.log('sagas/sss/generatePersonalCopyWorker setting async ', { personalCopyDetails })
+    console.log('sagas/sss/generatePersonalCopyWorker setting async ', {
+      personalCopyDetails,
+    });
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
@@ -754,15 +756,16 @@ export const generatePersonalCopyWatcher = createWatcher(
 );
 
 function* sharePersonalCopyWorker({ payload }) {
-
   /*
   Generate PDF Code Start
   */
 
- console.log('sagas/sss/generatePersonalCopyWorker ', { payload })
- // yield put(switchS3Loader('generatePDF'));
- const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
- console.log({ selectedPersonalCopy })
+  console.log('sagas/sss/generatePersonalCopyWorker ', { payload });
+  // yield put(switchS3Loader('generatePDF'));
+  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
+  console.log({ selectedPersonalCopy });
+
+  /*
  const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
  const s3Service: S3Service = yield select((state) => state.sss.service);
  const res = yield call(s3Service.createQR, shareIndex);
@@ -911,15 +914,17 @@ function* sharePersonalCopyWorker({ payload }) {
  */
 
   const { shareVia, isEmailOtherOptions } = payload;
-  console.log('sagas/sss/sharePersonalCopyWorker ', { payload })
+  console.log('sagas/sss/sharePersonalCopyWorker ', { payload });
   try {
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
 
-    console.log('sagas/sss/sharePersonalCopyWorker get async ', { personalCopyDetails })
-    
+    console.log('sagas/sss/sharePersonalCopyWorker get async ', {
+      personalCopyDetails,
+    });
+
     if (!personalCopyDetails)
       throw new Error('Personal copy not found/generated');
     personalCopyDetails = JSON.parse(personalCopyDetails);
@@ -929,12 +934,31 @@ function* sharePersonalCopyWorker({ payload }) {
     const { security } = yield select(
       (state) => state.storage.database.WALLET_SETUP,
     );
-      
-    
-    console.log('path is ', personalCopyDetails[selectedPersonalCopy.type].path)
-    
-    
-      switch (shareVia) {
+
+    console.log(
+      'path is ',
+      personalCopyDetails[selectedPersonalCopy.type].path,
+    );
+
+
+  // new code begin
+
+  const path =
+    Platform.OS == 'android'
+      ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+      : personalCopyDetails[selectedPersonalCopy.type].path;
+
+  console.log({ path });
+  RNFS.readFile(path)
+    .then((res) => {})
+    .catch((err) => {
+      console.log('err.code', err.code);
+      if(err.code=='ENOENT') console.log(' succesfully caught error ')
+    });
+
+  // new code end
+
+    switch (shareVia) {
       case 'Email':
         if (!isEmailOtherOptions) {
           yield call(
@@ -946,7 +970,7 @@ function* sharePersonalCopyWorker({ payload }) {
               //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
               //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
               isHTML: true,
-              attachment: {
+              x: {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
@@ -957,7 +981,7 @@ function* sharePersonalCopyWorker({ payload }) {
               },
             },
             (err, event) => {
-              console.log({ event, err });
+              console.log('/sss/sharePersonalCopyWorker', { event, err });
               // on delayed error (rollback the changes that happened post switch case)
               setTimeout(() => {
                 AsyncStorage.setItem(
