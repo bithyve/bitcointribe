@@ -109,7 +109,7 @@ import {
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin';
 import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
-import Animated, { Extrapolate, interpolate } from 'react-native-reanimated';
+import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -188,9 +188,7 @@ interface HomeStateTypes {
   modalData: any;
   knowMoreBottomSheetsFlag: boolean;
   tabBarIndex: number;
-  addSubBottomSheetsFlag: boolean;
   bottomSheetState: BottomSheetState;
-  atCloseEnd: boolean;
   loading: boolean;
   secondaryDeviceOtp: any;
   selectedTransactionItem: any;
@@ -266,10 +264,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   NoInternetBottomSheet: any;
   unsubscribe: any;
 
-  // transactionTabBarBottomSheetRef = createRef<BottomSheet>();
   transactionTabBarBottomSheetRef = createRef<RNBottomSheet>();
-  // qrTabBarBottomSheetRef = createRef<BottomSheet>();
   qrTabBarBottomSheetRef = createRef<RNBottomSheet>();
+  addTabBarBottomSheetRef = createRef<RNBottomSheet>();
+  moreTabBarBottomSheetRef = createRef<RNBottomSheet>();
+
   trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
   transactionDetailsBottomSheetRef = createRef<BottomSheet>();
   settingsBottomSheetRef = createRef<BottomSheet>();
@@ -278,10 +277,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   errorBottomSheetRef = createRef<BottomSheet>();
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
   notificationsListBottomSheetRef = createRef<BottomSheet>();
-  // addTabBarBottomSheetRef = createRef<BottomSheet>();
-  addTabBarBottomSheetRef = createRef<RNBottomSheet>();
-  // moreTabBarBottomSheetRef = createRef<BottomSheet>();
-  moreTabBarBottomSheetRef = createRef<RNBottomSheet>();
   custodianRequestRejectedBottomSheetRef = createRef<BottomSheet>();
   noInternetBottomSheetRef = createRef<BottomSheet>();
 
@@ -304,9 +299,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       knowMoreBottomSheetsFlag: false,
       modalData: initialTransactionData,
       tabBarIndex: 999,
-      addSubBottomSheetsFlag: false,
       bottomSheetState: BottomSheetState.Closed,
-      atCloseEnd: false,
       loading: false,
       secondaryDeviceOtp: {},
       selectedTransactionItem: null,
@@ -1785,17 +1778,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     }, 2);
     this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
-    // this.processDLRequest(key, true);
+    // this.processDLReques t(key, true);
   };
 
   onPhoneNumberChange = () => { };
 
-  // TODO: Refactor
   handleBottomTabSelection = (tab: BottomTab) => {
+    const knowMoreBottomSheetsFlag = tab === BottomTab.More;
+
     if (tab === BottomTab.More) {
       this.setState(
         {
-          knowMoreBottomSheetsFlag: true,
+          knowMoreBottomSheetsFlag,
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
         },
@@ -1806,11 +1800,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.expand();
         },
       );
-      return;
-    }
-    if (tab === BottomTab.Transactions) {
+    } if (tab === BottomTab.Transactions) {
       this.setState(
         {
+          knowMoreBottomSheetsFlag,
           modalData: initialTransactionData,
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
@@ -1822,11 +1815,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.close();
         },
       );
-      return;
-    }
-    if (tab === BottomTab.Add) {
+    } if (tab === BottomTab.Add) {
       this.setState(
         {
+          knowMoreBottomSheetsFlag,
           modalData: [],
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
@@ -1838,11 +1830,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.close();
         },
       );
-      return;
-    }
-    if (tab === BottomTab.QR) {
+    } else if (tab === BottomTab.QR) {
       this.setState(
         {
+          knowMoreBottomSheetsFlag,
           modalData: initialTransactionData,
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
@@ -1854,7 +1845,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.close();
         },
       );
-      return;
     }
   };
 
@@ -2040,18 +2030,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
 
-  closeBottomSheet = () => {
-    const ref = this.getActiveBottomSheetRef();
+  handleBottomSheetPositionChange = (
+    bottomSheetRef: React.RefObject<RNBottomSheet>,
+    newIndex: number
+  ) => {
+    if (newIndex === 0) {
+      bottomSheetRef.current?.snapTo(1);
+    } else if (newIndex === 1) {
+      this.setState({ bottomSheetState: BottomSheetState.Closed });
+    } else if (newIndex > 1) {
+      this.setState({ bottomSheetState: BottomSheetState.Open });
+    }
+  };
 
+
+  closeBottomSheet = () => {
     this.setState(
       { bottomSheetState: BottomSheetState.Closed },
       () => {
-        ref.current?.snapTo(0);
+        this.getActiveBottomSheetRef().current?.snapTo(0);
       },
     );
-  }
+  };
 
-  getActiveBottomSheetRef(): React.RefObject<RNBottomSheet> {
+  getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> => {
     switch (this.state.selectedBottomTab) {
       case BottomTab.Transactions:
         return this.transactionTabBarBottomSheetRef;
@@ -2064,20 +2066,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       default:
         return this.transactionTabBarBottomSheetRef;
     }
-  }
+  };
 
   expandModalOnHeaderTap = () => {
-    this.getActiveBottomSheetRef().current?.expand();
-  }
+    this.setState(
+      { bottomSheetState: BottomSheetState.Open },
+      () => {
+        this.getActiveBottomSheetRef().current?.expand();
+      }
+    );
+  };
 
   handleBottomSheetHeaderTap = () => {
     const { bottomSheetState } = this.state;
 
     if (bottomSheetState === BottomSheetState.Closed) {
-      this.setState(
-        { bottomSheetState: BottomSheetState.Open },
-        this.expandModalOnHeaderTap,
-      );
+      this.expandModalOnHeaderTap();
     } else {
       this.closeBottomSheet();
     }
@@ -2303,12 +2307,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       errorMessageHeader,
       errorMessage,
       buttonText,
-      addSubBottomSheetsFlag,
       selectedContact,
       notificationData,
       fbBTCAccount,
       loading,
-      atCloseEnd,
       transactionsLoading,
       currencyCode,
       trustedContactRequest,
@@ -2392,7 +2394,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </View>
         </View>
 
-        <BottomSheetBackground sheetState={this.state.bottomSheetState} onPress={this.closeBottomSheet} />
+        <BottomSheetBackground isVisible={this.state.bottomSheetState === BottomSheetState.Open} onPress={this.closeBottomSheet} />
 
         <CustomBottomTabs
           tabBarZIndex={tabBarIndex}
@@ -2403,61 +2405,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         {/* Bottom Sheets */}
         {!isLoading && (
-          // <BottomSheet
-          //   onOpenEnd={() => {
-          //     this.setState({
-          //       atCloseEnd: true,
-          //       isLoading: false,
-          //     });
-          //   }}
-          //   onCloseEnd={() => {
-          //     if (this.state.selectedBottomTab === BottomTab.Transactions) {
-          //       this.transactionTabBarBottomSheetRef.current?.snapTo(1);
-          //     }
-          //   }}
-          //   onCloseStart={() => {
-          //     this.setState({
-          //       atCloseEnd: false,
-          //     });
-          //   }}
-          //   enabledInnerScrolling={true}
-          //   ref={this.transactionTabBarBottomSheetRef}
-          //   snapPoints={[
-          //     -50,
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('18%')
-          //       : Platform.OS == 'android'
-          //         ? hp('19%')
-          //         : hp('18%'),
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('65%')
-          //       : hp('64%'),
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('82%')
-          //       : hp('82%'),
-          //   ]}
-          //   renderContent={() => (
-          //     <TransactionsContent
-          //       infoBoxInfoText={''}
-          //       isFromAccount={false}
-          //       transactionLoading={transactionsLoading}
-          //       transactions={transactions}
-          //       AtCloseEnd={atCloseEnd}
-          //       setTransactionItem={(item) =>
-          //         this.setState({ selectedTransactionItem: item })
-          //       }
-          //       setTabBarZIndex={(index) =>
-          //         this.setState({ tabBarIndex: index })
-          //       }
-          //       TransactionDetailsBottomSheet={
-          //         this.transactionDetailsBottomSheetRef.current
-          //       }
-          //     />
-          //   )}
-          //   renderHeader={() => (
-          //     <TransactionHeader onPress={this.handleBottomSheetHeaderTap} />
-          //   )}
-          // />
           <RNBottomSheet
             ref={this.transactionTabBarBottomSheetRef}
             snapPoints={[
@@ -2474,79 +2421,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            onChange={(newPositionIndex: number) => {
+              this.handleBottomSheetPositionChange(this.transactionTabBarBottomSheetRef, newPositionIndex)
+            }}
           >
             <BottomSheetView>
               <BottomSheetHeader title="Transactions" onPress={this.handleBottomSheetHeaderTap} />
 
               <TransactionsContent
-                infoBoxInfoText={''}
                 isFromAccount={false}
                 transactionLoading={transactionsLoading}
                 transactions={transactions}
-                AtCloseEnd={atCloseEnd}
                 setTransactionItem={(item) =>
                   this.setState({ selectedTransactionItem: item })
                 }
                 setTabBarZIndex={(index) =>
                   this.setState({ tabBarIndex: index })
                 }
-                TransactionDetailsBottomSheet={this.transactionDetailsBottomSheetRef.current}
+                transactionDetailsBottomSheetRef={this.transactionDetailsBottomSheetRef}
               />
             </BottomSheetView>
           </RNBottomSheet>
         )}
 
         {!isLoading && (
-          // <BottomSheet
-          //   ref={this.addTabBarBottomSheetRef}
-          //   onCloseEnd={() => {
-          //     if (selectedBottomTab === BottomTab.Add) {
-          //       this.addTabBarBottomSheetRef.current?.snapTo(1);
-          //     }
-          //   }}
-          //   enabledInnerScrolling={true}
-          //   snapPoints={[
-          //     -50,
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('18%')
-          //       : Platform.OS == 'android'
-          //         ? hp('19%')
-          //         : hp('18%'),
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('65%')
-          //       : hp('64%'),
-          //   ]}
-          //   renderContent={() => (
-          //     <AddModalContents
-          //       onPressElements={(type) => {
-          //         if (type == 'buyBitcoins') {
-          //           this.props.navigation.navigate('VoucherScanner');
-          //         } else if (type == 'addContact') {
-          //           this.setState(
-          //             {
-          //               isLoadContacts: true,
-          //               tabBarIndex: 0,
-          //             },
-          //             () => {
-          //               this.addContactAddressBookBottomSheetRef.current?.snapTo(1);
-          //             },
-          //           );
-          //         }
-          //       }}
-          //       addData={modalData}
-          //     />
-          //   )}
-          //   renderHeader={() => (
-          //     <TouchableOpacity
-          //       activeOpacity={10}
-          //       onPress={this.handleBottomSheetHeaderTap}
-          //       style={styles.modalHeaderContainer}
-          //     >
-          //       <View style={styles.modalHeaderHandle} />
-          //       <Text style={styles.modalHeaderTitleText}>{'Add' + this.state.bottomSheetState}</Text>
-          //     </TouchableOpacity>
-          //   )}
-          // />
           <RNBottomSheet
             ref={this.addTabBarBottomSheetRef}
             snapPoints={[
@@ -2560,6 +2458,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            onChange={(newPositionIndex: number) => {
+              this.handleBottomSheetPositionChange(this.addTabBarBottomSheetRef, newPositionIndex)
+            }}
           >
             <BottomSheetView>
               <BottomSheetHeader title="Add" onPress={this.handleBottomSheetHeaderTap} />
@@ -2602,6 +2503,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            onChange={(newPositionIndex: number) => {
+              this.handleBottomSheetPositionChange(this.qrTabBarBottomSheetRef, newPositionIndex)
+            }}
           >
             <BottomSheetView>
               <BottomSheetHeader title="QR" onPress={this.handleBottomSheetHeaderTap} />
@@ -2617,109 +2521,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             </BottomSheetView>
           </RNBottomSheet>
-          // <BottomSheet
-          //   ref={this.qrTabBarBottomSheetRef}
-          //   onOpenEnd={() => {
-          //     this.setState({
-          //       qrBottomSheetsFlag: selectedBottomTab === 'QR',
-          //     });
-          //   }}
-          //   onCloseEnd={() => {
-          //     this.setState(
-          //       {
-          //         qrBottomSheetsFlag: false,
-          //       },
-          //       () => {
-          //         if (selectedBottomTab === 'QR') {
-          //           this.qrTabBarBottomSheetRef.current?.snapTo(1);
-          //         }
-          //       },
-          //     );
-          //   }}
-          //   // onCloseStart={() => {
-          //     // this.setState({
-          //       // qrBottomSheetsFlag: false,
-          //     // });
-          //   // }}
-          //   enabledInnerScrolling={true}
-          //   snapPoints={[
-          //     -50,
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('18%')
-          //       : Platform.OS == 'android'
-          //         ? hp('19%')
-          //         : hp('18%'),
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('82%')
-          //       : hp('82%'),
-          //   ]}
-          //   renderContent={() => (
-          //     <QrCodeModalContents
-          //       onClose={() => this.qrTabBarBottomSheetRef.current?.snapTo(1) }
-          //       onQrScan={(qrData) => this.processQRData(qrData)}
-          //       onPressQrScanner={() => {
-          //         navigation.navigate('QrScanner', {
-          //           scanedCode: this.processQRData,
-          //         });
-          //       }}
-          //     />
-          //   )}
-          //   renderHeader={() => (
-          //     <TouchableOpacity
-          //       activeOpacity={10}
-          //       onPress={this.openCloseModal}
-          //       style={styles.modalHeaderContainer}
-          //     >
-          //       <View style={styles.modalHeaderHandle} />
-          //       <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
-          //     </TouchableOpacity>
-          //   )}
-          // />
         )}
 
         {!isLoading && (
-          // <BottomSheet
-          //   onCloseEnd={() => {
-          //     this.setState(
-          //       {
-          //         qrBottomSheetsFlag: false,
-          //       },
-          //       () => {
-          //         if (selectedBottomTab == BottomTab.More) {
-          //           this.moreTabBarBottomSheetRef.current?.snapTo(1);
-          //         }
-          //       },
-          //     );
-          //   }}
-          //   enabledInnerScrolling={true}
-          //   ref={this.moreTabBarBottomSheetRef}
-          //   snapPoints={[
-          //     -50,
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('18%')
-          //       : Platform.OS == 'android'
-          //         ? hp('19%')
-          //         : hp('18%'),
-          //     Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          //       ? hp('65%')
-          //       : hp('64%'),
-          //   ]}
-          //   renderContent={() => (
-          //     <MoreHomePageTabContents
-          //       onPressElements={(item) => this.onPressElement(item)}
-          //     />
-          //   )}
-          //   renderHeader={() => (
-          //     <TouchableOpacity
-          //       activeOpacity={10}
-          //       onPress={this.handleBottomSheetHeaderTap}
-          //       style={styles.modalHeaderContainer}
-          //     >
-          //       <View style={styles.modalHeaderHandle} />
-          //       <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
-          //     </TouchableOpacity>
-          //   )}
-          // />
           <RNBottomSheet
             ref={this.moreTabBarBottomSheetRef}
             snapPoints={[
@@ -2733,13 +2537,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            onChange={(newPositionIndex: number) => {
+              this.handleBottomSheetPositionChange(this.moreTabBarBottomSheetRef, newPositionIndex);
+            }}
           >
             <BottomSheetView>
                 <BottomSheetHeader title="More" onPress={this.handleBottomSheetHeaderTap} />
 
               <MoreHomePageTabContents
                 onPressElements={(item) => this.onPressElement(item)}
-                />
+              />
             </BottomSheetView>
           </RNBottomSheet>
         )}
@@ -3040,7 +2847,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 tabBarIndex: 0,
               });
             }}
-            // ref={this.transactionDetailsBottomSheetRef}
+            ref={this.transactionDetailsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3051,7 +2858,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <TransactionDetails
                 item={selectedTransactionItem}
                 onPressKnowMore={() => {
-                  // this.transactionDetailsBottomSheetRef.current?.snapTo(1);
+                  this.transactionDetailsBottomSheetRef.current?.snapTo(1);
                 }}
               />
             )}
@@ -3060,8 +2867,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 borderColor={Colors.white}
                 backgroundColor={Colors.white}
                 onPressHeader={() => {
-                  // if (this.transactionDetailsBottomSheetRef.current)
-                  // this.transactionDetailsBottomSheetRef.current?.snapTo(0);
+                  this.transactionDetailsBottomSheetRef.current?.snapTo(0);
                 }}
               />
             )}
@@ -3203,7 +3009,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={this.addTabBarBottomSheetRef}
+          ref={this.addContactAddressBookBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3387,45 +3193,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-
-export interface ___Props {
-  sheetState: BottomSheetState;
-  onPress: () => void;
-}
-
-
-const BottomSheetBackground: React.FC<___Props> = ({ sheetState, onPress }: ___Props) => {
-  const isVisible = useMemo(() => {
-    return sheetState === BottomSheetState.Closed ? false : true;
-  }, [sheetState]);
-
-  // styles
-  const overlayStyle = useMemo(() => {
-    console.log('isVisible: ' + isVisible);
-    return {
-      ...styles.modalOverlayBackground,
-      opacity: isVisible ? 1.0 : 0.0,
-      // opacity: interpolate(animatedPositionIndex, {
-      // inputRange: [0, 2],
-      // outputRange: [0, 1],
-      // extrapolate: Extrapolate.CLAMP,
-      // }),
-    };
-  }, [sheetState, isVisible]
-    // [animatedPositionIndex]
-  );
-
-  const overlayPointerEvents = useMemo(() => {
-    return isVisible ? 'auto' : 'none';
-  }, [sheetState, isVisible]);
-
-  return (
-    <Animated.View pointerEvents={overlayPointerEvents} style={overlayStyle}>
-      <TouchableOpacity style={{ ...StyleSheet.absoluteFillObject }} onPress={onPress} activeOpacity={1} />
-    </Animated.View>
-  );
-}
-
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
@@ -3519,23 +3286,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     flexDirection: 'row',
     alignItems: 'center',
-    height:
-      Platform.OS == 'ios' && DeviceInfo.hasNotch()
-        ? 50
-        : Platform.OS == 'android'
-          ? 43
-          : 40,
   },
+
   modalHeaderTitleText: {
+    paddingBottom: 6,
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 15,
-  },
-
-  modalOverlayBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
 
   headerViewContainer: {
