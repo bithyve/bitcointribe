@@ -17,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { getIconByStatus } from './utils';
+import { getIconByStatus, verifyPersonalCopyAccess } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
@@ -245,6 +245,9 @@ const PersonalCopyHistory = (props) => {
         personalCopyDetails = JSON.parse(personalCopyDetails);
 
         if (!personalCopyDetails[selectedPersonalCopy.type]) {
+          dispatch(generatePersonalCopy(selectedPersonalCopy));
+          // saveInTransitHistory();
+        } else if (!verifyPersonalCopyAccess(personalCopyDetails[selectedPersonalCopy.type])) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           // saveInTransitHistory();
         } else setPersonalCopyDetails(personalCopyDetails);
