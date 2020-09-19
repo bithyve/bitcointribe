@@ -3,8 +3,6 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  Text,
-  TouchableOpacity,
   FlatList,
   ImageBackground,
   Platform,
@@ -12,15 +10,12 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import Fonts from '../../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
 import DeviceInfo from 'react-native-device-info';
-import { RFValue } from 'react-native-responsive-fontsize';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../../components/MoreHomePageTabContents';
@@ -30,6 +25,7 @@ import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import Colors from '../../common/Colors';
 
 import {
   TEST_ACCOUNT,
@@ -110,6 +106,7 @@ import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin';
 import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
+import BottomSheetHeader from './BottomSheetHeader';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -158,17 +155,6 @@ const getIconByAccountType = (type) => {
   }
 };
 
-const BottomSheetHeader = ({ title, onPress }) => {
-  return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={onPress}
-      style={styles.modalHeaderContainer}
-    >
-      <Text style={styles.modalHeaderTitleText}>{title}</Text>
-    </TouchableOpacity>
-  );
-};
 
 // TODO: Move this somewhere else and re-use it from there.
 export enum BottomSheetState {
@@ -2708,7 +2694,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   onPressAccept={this.onTrustedContactRequestAccept}
                   onPressReject={this.onTrustedContactReject}
                   onPhoneNumberChange={this.onPhoneNumberChange}
-                  bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
+                  bottomSheetRef={this.trustedContactRequestBottomSheetRef}
                 />
               );
             }}
@@ -2957,7 +2943,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <ErrorModalContents
-              modalRef={this.refs.errorBottomSheet}
               title={errorMessageHeader}
               info={errorMessage}
               proceedButtonText={buttonText}
@@ -3023,7 +3008,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <AddContactAddressBook
               addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
-              modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
                 if (selectedContact && selectedContact.length) {
@@ -3222,54 +3206,6 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
-  card: {
-    margin: 0,
-    width: wp('42.6%'),
-    height: hp('20.1%'),
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
-    marginRight: wp('2%'),
-    marginBottom: wp('2%'),
-    padding: wp('3'),
-    backgroundColor: Colors.white,
-  },
-  cardTitle: {
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.blue,
-    fontSize: RFValue(10),
-  },
-  activeTabStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.backgroundColor,
-    padding: 7,
-    borderRadius: 7,
-    width: 120,
-    height: 40,
-    justifyContent: 'center',
-  },
-  activeTabTextStyle: {
-    marginLeft: 8,
-    color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
-  },
-  bottomTabBarContainer: {
-    backgroundColor: Colors.white,
-    justifyContent: 'space-evenly',
-    display: 'flex',
-    marginTop: 'auto',
-    flexDirection: 'row',
-    height: hp('12%'),
-    alignItems: 'center',
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
-    paddingBottom: DeviceInfo.hasNotch() ? hp('4%') : 0,
-  },
   cardViewContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor,
@@ -3283,147 +3219,5 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
     paddingLeft: wp('3%'),
-  },
-
-  modalHeaderContainer: {
-    backgroundColor: Colors.white,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  modalHeaderTitleText: {
-    paddingBottom: 6,
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
-  },
-
-  headerViewContainer: {
-    marginTop: hp('2%'),
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  headerTitleViewContainer: {
-    flex: 7,
-    justifyContent: 'space-between',
-  },
-  headerTitleText: {
-    color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(25),
-    marginBottom: wp('3%'),
-  },
-  headerToggleSwitchContainer: {
-    flex: 3,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
-  headerInfoText: {
-    fontSize: RFValue(12),
-    color: Colors.white,
-  },
-  headerButton: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: hp('5%'),
-    width: wp('35%'),
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerButtonText: {
-    fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
-    color: Colors.white,
-  },
-  cardBitCoinImage: {
-    width: wp('3%'),
-    height: wp('3%'),
-    marginRight: 5,
-    resizeMode: 'contain',
-    marginBottom: wp('0.7%'),
-  },
-  cardAmountText: {
-    color: Colors.black,
-    fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
-    marginRight: 5,
-    marginTop: 'auto',
-    lineHeight: RFValue(17),
-  },
-  cardAmountTextGrey: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
-    marginRight: 5,
-    marginTop: 'auto',
-    lineHeight: RFValue(17),
-  },
-  cardAmountUnitText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    marginTop: 'auto',
-    lineHeight: RFValue(17),
-  },
-  tabBarImage: {
-    width: 21,
-    height: 21,
-    resizeMode: 'contain',
-  },
-  tabBarTabView: {
-    padding: wp('5%'),
-  },
-  transactionModalElementView: {
-    backgroundColor: Colors.backgroundColor,
-    padding: hp('1%'),
-    flexDirection: 'row',
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  modalElementInfoView: {
-    padding: hp('1%'),
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  transactionModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(12),
-    marginBottom: 3,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  transactionModalDateText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  transactionModalAmountView: {
-    padding: 10,
-    flexDirection: 'row',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  transactionModalAmountText: {
-    marginLeft: 5,
-    marginRight: 5,
-    fontSize: RFValue(20),
-    fontFamily: Fonts.OpenSans,
-  },
-  transactionModalAmountUnitText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.OpenSans,
-  },
-  separatorView: {
-    marginLeft: 15,
-    marginRight: 15,
-    height: 1,
-    backgroundColor: Colors.borderColor,
-  },
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
   },
 });
