@@ -11,20 +11,16 @@ export const getIconByStatus = status => {
   }
 };
 
-export const verifyPersonalCopyAccess = personalCopyDetails => {
-  console.log('-*- about to verify file access -*-')
+export const verifyPersonalCopyAccess = async personalCopyDetails => {
   const path =
     Platform.OS == 'android'
       ? 'file://' + personalCopyDetails.path
       : personalCopyDetails.path;
 
-  console.log({ path });
-  RNFS.readFile(path)
-    .then((res) => { return true })
-    .catch((err) => {
-      console.log('err.code', err.code);
-      if(err.code=='ENOENT') console.log(' succesfully caught error ')
-      return false
-    });
-    return true
+  try {
+    return RNFS.exists(path)
+  } catch(err) {
+    console.log('error checking file, err', err);
+    return false
+  }
 }
