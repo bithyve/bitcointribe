@@ -269,6 +269,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   addTabBarBottomSheetRef = createRef<RNBottomSheet>();
   moreTabBarBottomSheetRef = createRef<RNBottomSheet>();
 
+  // TODO: Completely replace `BottomSheet` with `RNBottomSheet` a la the refs above (https://trello.com/c/boUNRk6t)
   trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
   transactionDetailsBottomSheetRef = createRef<BottomSheet>();
   settingsBottomSheetRef = createRef<BottomSheet>();
@@ -284,10 +285,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor(props) {
     super(props);
+
     this.focusListener = null;
     this.appStateListener = null;
     this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null;
+
     this.state = {
       notificationData: [],
       cardData: [],
