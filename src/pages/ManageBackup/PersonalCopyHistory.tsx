@@ -246,7 +246,7 @@ const PersonalCopyHistory = (props) => {
         if (!personalCopyDetails[selectedPersonalCopy.type]) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           // saveInTransitHistory();
-        } 
+        }
         // verify if personal copy exists else, it should be generated
         // TODO: This should ideally be another set of action, watcher, worker and reducer
         // but I am too lazy :(
