@@ -84,7 +84,6 @@ import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
-import RNFS from 'react-native-fs';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -600,10 +599,9 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePersonalCopyWorker({ payload }) {
-  console.log('sagas/sss/generatePersonalCopyWorker ', { payload });
+  console.log('-*- generatePC saga called ', payload)
   // yield put(switchS3Loader('generatePDF'));
   const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
-  console.log({ selectedPersonalCopy });
   const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.createQR, shareIndex);
@@ -648,28 +646,10 @@ function* generatePersonalCopyWorker({ payload }) {
       security.answer,
     );
 
-    console.log('/sagas/sss/generatePersonalCopy ', { pdfPath });
-
-    const pdfPathNew = yield call(
-      generatePDF,
-      pdfData,
-      `Hexa_Recovery_Key_${walletName}_${shareIndex - 2}.pdf`,
-      // `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
-      // `Hexa Share ${shareIndex + 1}`,
-      `Hexa Recovery Key for ${walletName}'s Wallet`,
-      security.answer,
-    );
-
-    console.log('/sagas/sss/generatePersonalCopy ', { pdfPathNew });
-
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
-
-    console.log('sagas/sss/generatePersonalCopyWorker ', {
-      personalCopyDetails,
-    });
 
     if (!personalCopyDetails) {
       personalCopyDetails = {
@@ -690,9 +670,7 @@ function* generatePersonalCopyWorker({ payload }) {
         },
       };
     }
-    console.log('sagas/sss/generatePersonalCopyWorker setting async ', {
-      personalCopyDetails,
-    });
+
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
@@ -756,175 +734,13 @@ export const generatePersonalCopyWatcher = createWatcher(
 );
 
 function* sharePersonalCopyWorker({ payload }) {
-  /*
-  Generate PDF Code Start
-  */
+  const { shareVia, selectedPersonalCopy, isEmailOtherOptions } = payload;
 
-  console.log('sagas/sss/generatePersonalCopyWorker ', { payload });
-  // yield put(switchS3Loader('generatePDF'));
-  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
-  console.log({ selectedPersonalCopy });
-
-  /*
- const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
- const s3Service: S3Service = yield select((state) => state.sss.service);
- const res = yield call(s3Service.createQR, shareIndex);
- if (res.status !== 200) {
-   console.log({ err: res.err });
-   return;
- }
-
- const secureAccount: SecureAccount = yield select(
-   (state) => state.accounts[SECURE_ACCOUNT].service,
- );
- const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
- if (!secondaryMnemonic) {
-   throw new Error(
-     'Personal copies generation failed; secondary mnemonic missing',
-   );
- }
- const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
- const secureAssets = {
-   secondaryMnemonic,
-   secondaryXpub: secondary,
-   bhXpub: bh,
- };
-
- const pdfData = {
-   qrData: res.data.qrData,
-   ...secureAssets,
- };
-
- const { security, walletName } = yield select(
-   (state) => state.storage.database.WALLET_SETUP,
- );
-
- try {
-   const pdfPath = yield call(
-     generatePDF,
-     pdfData,
-     `Hexa_Recovery_Key_${walletName}_${shareIndex - 2}.pdf`,
-     // `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
-     // `Hexa Share ${shareIndex + 1}`,
-     `Hexa Recovery Key for ${walletName}'s Wallet`,
-     security.answer,
-   );
-
-   console.log('/sagas/sss/generatePersonalCopy ', {pdfPath})
-
-
-   const pdfPathNew = yield call(
-     generatePDF,
-     pdfData,
-     `Hexa_Recovery_Key_${walletName}_${shareIndex - 2}.pdf`,
-     // `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
-     // `Hexa Share ${shareIndex + 1}`,
-     `Hexa Recovery Key for ${walletName}'s Wallet`,
-     security.answer,
-   );
-
-   console.log('/sagas/sss/generatePersonalCopy ', {pdfPathNew})
-
-
-
-   let personalCopyDetails = yield call(
-     AsyncStorage.getItem,
-     'personalCopyDetails',
-   );
-
-   console.log('sagas/sss/generatePersonalCopyWorker ', { personalCopyDetails })
-
-   if (!personalCopyDetails) {
-     personalCopyDetails = {
-       [selectedPersonalCopy.type]: {
-         path: pdfPath,
-         shared: false,
-         sharingDetails: {},
-       },
-     };
-   } else {
-     personalCopyDetails = JSON.parse(personalCopyDetails);
-     personalCopyDetails = {
-       ...personalCopyDetails,
-       [selectedPersonalCopy.type]: {
-         path: pdfPath,
-         shared: false,
-         sharingDetails: {},
-       },
-     };
-   }
-   console.log('sagas/sss/generatePersonalCopyWorker setting async ', { personalCopyDetails })
-   yield call(
-     AsyncStorage.setItem,
-     'personalCopyDetails',
-     JSON.stringify(personalCopyDetails),
-   );
-
-   // reset PDF health (if present) post reshare
-   let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
-   if (storedPDFHealth) {
-     const { pdfHealth } = s3Service.sss;
-     storedPDFHealth = JSON.parse(storedPDFHealth);
-     storedPDFHealth = {
-       ...storedPDFHealth,
-       [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
-     };
-
-     yield call(
-       AsyncStorage.setItem,
-       'PDF Health',
-       JSON.stringify(storedPDFHealth),
-     );
-   }
-
-   yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
-
-   // if (Object.keys(personalCopyDetails).length == 2) {
-   //   // remove sec-mne once both the personal copies are generated
-   //   const { removed } = secureAccount.removeSecondaryMnemonic();
-   //   if (!removed) console.log('Failed to remove sec-mne');
-   // }
-
-   // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
-   const blockPCShare = yield call(AsyncStorage.getItem, 'blockPCShare');
-   if (blockPCShare) {
-     if (secureAccount.secureHDWallet.secondaryMnemonic) {
-       const { removed } = secureAccount.removeSecondaryMnemonic();
-       if (!removed) {
-         console.log('Failed to remove the secondary mnemonic');
-       }
-     }
-   }
-
-   const { SERVICES } = yield select((state) => state.storage.database);
-   const updatedSERVICES = {
-     ...SERVICES,
-     SECURE_ACCOUNT: JSON.stringify(secureAccount),
-     S3_SERVICE: JSON.stringify(s3Service),
-   };
-
-   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
- } catch (err) {
-   console.log({ err });
-   yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
- }
-
- /*
- Generate PDF Code End
- */
-
-  const { shareVia, isEmailOtherOptions } = payload;
-  console.log('sagas/sss/sharePersonalCopyWorker ', { payload });
   try {
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
-
-    console.log('sagas/sss/sharePersonalCopyWorker get async ', {
-      personalCopyDetails,
-    });
-
     if (!personalCopyDetails)
       throw new Error('Personal copy not found/generated');
     personalCopyDetails = JSON.parse(personalCopyDetails);
@@ -934,29 +750,6 @@ function* sharePersonalCopyWorker({ payload }) {
     const { security } = yield select(
       (state) => state.storage.database.WALLET_SETUP,
     );
-
-    console.log(
-      'path is ',
-      personalCopyDetails[selectedPersonalCopy.type].path,
-    );
-
-
-  // new code begin
-
-  const path =
-    Platform.OS == 'android'
-      ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
-      : personalCopyDetails[selectedPersonalCopy.type].path;
-
-  console.log({ path });
-  RNFS.readFile(path)
-    .then((res) => {})
-    .catch((err) => {
-      console.log('err.code', err.code);
-      if(err.code=='ENOENT') console.log(' succesfully caught error ')
-    });
-
-  // new code end
 
     switch (shareVia) {
       case 'Email':
@@ -970,7 +763,7 @@ function* sharePersonalCopyWorker({ payload }) {
               //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
               //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
               isHTML: true,
-              x: {
+              attachment: {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
@@ -981,7 +774,7 @@ function* sharePersonalCopyWorker({ payload }) {
               },
             },
             (err, event) => {
-              console.log('/sss/sharePersonalCopyWorker', { event, err });
+              console.log({ event, err });
               // on delayed error (rollback the changes that happened post switch case)
               setTimeout(() => {
                 AsyncStorage.setItem(
