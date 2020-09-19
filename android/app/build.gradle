@@ -106,7 +106,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 111
+        versionCode 112
         versionName "1.1.2"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
@@ -180,6 +180,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-fs')
     implementation project(':react-native-check-app-install')
     implementation project(':react-native-localize')
     implementation project(':react-native-config')

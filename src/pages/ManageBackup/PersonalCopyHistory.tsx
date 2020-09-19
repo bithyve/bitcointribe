@@ -17,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { getIconByStatus } from './utils';
+import { getIconByStatus, verifyPersonalCopyAccess } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
@@ -237,7 +237,6 @@ const PersonalCopyHistory = (props) => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
-      console.log('/PersonalCopyHistory ', { personalCopyDetails })
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
         // saveInTransitHistory();
@@ -245,6 +244,13 @@ const PersonalCopyHistory = (props) => {
         personalCopyDetails = JSON.parse(personalCopyDetails);
 
         if (!personalCopyDetails[selectedPersonalCopy.type]) {
+          dispatch(generatePersonalCopy(selectedPersonalCopy));
+          // saveInTransitHistory();
+        }
+        // verify if personal copy exists else, it should be generated
+        // TODO: This should ideally be another set of action, watcher, worker and reducer
+        // but I am too lazy :(
+        if (!await verifyPersonalCopyAccess(personalCopyDetails[selectedPersonalCopy.type])) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           // saveInTransitHistory();
         } else setPersonalCopyDetails(personalCopyDetails);
