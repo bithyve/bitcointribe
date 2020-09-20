@@ -10,22 +10,22 @@ const BottomSheetHeader = ({ title, onPress }) => {
     <TouchableOpacity
       activeOpacity={1}
       onPress={onPress}
-      style={styles.bottomSheetHeaderContainer}
+      style={styles.headerContainer}
     >
-      <Text style={styles.bottomSheetHeaderTitleText}>{title}</Text>
+      <Text style={styles.titleText}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
 
 const styles = StyleSheet.create({
-  bottomSheetHeaderContainer: {
+  headerContainer: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  bottomSheetHeaderTitleText: {
+  titleText: {
     paddingBottom: 6,
     color: Colors.blue,
     fontSize: RFValue(18),

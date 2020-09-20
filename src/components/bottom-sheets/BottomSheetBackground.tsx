@@ -30,8 +30,8 @@ const BottomSheetBackground: React.FC<Props> = ({ isVisible, onPress }: Props) =
   function animateOpacity() {
     Animated.timing(opacity, {
       toValue: isVisible ? 1.0 : 0.0,
-      duration: 300,
-      easing: Easing.inOut(Easing.cubic),
+      duration: 259,
+      easing: Easing.inOut(Easing.quad),
     }).start();
   }
 
