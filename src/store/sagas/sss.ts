@@ -189,7 +189,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    if (payload.contactInfo.contactName === 'Secondary Device') {
+    if (payload.contactInfo.contactName === 'secondary device') {
       delete trustedContacts.tc.trustedContacts[
         payload.contactInfo.contactName
       ]; // removing secondary device's TC

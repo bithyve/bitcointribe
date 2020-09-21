@@ -101,6 +101,8 @@ const SecondaryDeviceHistory = (props) => {
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),
   );
+  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [guardianExists, setGuardianExists] = useState(false);
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
@@ -323,14 +325,20 @@ const SecondaryDeviceHistory = (props) => {
     updateEphemeralChannelLoader,
   ]);
 
-  const onPressReshare = () => {
-    if (blockReshare) {
-      (QrBottomSheet.current as any).snapTo(1);
-    } else {
-      createGuardian();
-      (secondaryDeviceBottomSheet as any).current.snapTo(1);
+  useEffect(() => {
+    const firstName = 'Secondary';
+    const lastName = 'Device';
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim();
+    const tcInstance = trustedContacts.tc.trustedContacts[contactName];
+    console.log({ tcInstance });
+    if (tcInstance) {
+      if (tcInstance.symmetricKey) {
+        setGuardianExists(true);
+      }
     }
-  };
+  }, [trustedContacts]);
 
   useEffect(() => {
     (async () => {
@@ -603,7 +611,13 @@ const SecondaryDeviceHistory = (props) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           (ReshareBottomSheet as any).current.snapTo(0);
-          onPressReshare();
+
+          if (blockReshare) {
+            (QrBottomSheet.current as any).snapTo(1);
+          } else {
+            createGuardian();
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+          }
         }}
         onPressIgnore={() => {
           (ReshareBottomSheet as any).current.snapTo(0);
@@ -611,13 +625,54 @@ const SecondaryDeviceHistory = (props) => {
         isBottomImage={false}
       />
     );
-  }, [onPressReshare]);
+  }, []);
 
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
       // onPressHeader={() => {
       //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
+      />
+    );
+  }, []);
+
+  const renderChangeContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ChangeBottomSheet}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper'}
+        note={
+          'You can change the Keeper you selected to send your Recovery Key'
+        }
+        proceedButtonText={'Change'}
+        cancelButtonText={'Back'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+
+          if (blockReshare) {
+            (QrBottomSheet.current as any).snapTo(1);
+          } else {
+            const changeKeeper = true;
+            createGuardian(changeKeeper);
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+          }
+        }}
+        onPressIgnore={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  }, []);
+
+  const renderChangeHeader = useCallback(() => {
+    return (
+      <ModalHeader
+      // onPressHeader={() => {
+      //   (ChangeBottomSheet as any).current.snapTo(0);
       // }}
       />
     );
@@ -737,7 +792,7 @@ const SecondaryDeviceHistory = (props) => {
           IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
           reshareInfo={
-            isReshare
+            isReshare && !guardianExists
               ? 'Want to send the Recovery Key again to the same device? '
               : null
           }
@@ -748,6 +803,9 @@ const SecondaryDeviceHistory = (props) => {
           }
           onPressReshare={() => {
             (ReshareBottomSheet as any).current.snapTo(1);
+          }}
+          onPressChange={() => {
+            (ChangeBottomSheet as any).current.snapTo(1);
           }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
@@ -832,6 +890,17 @@ const SecondaryDeviceHistory = (props) => {
         ]}
         renderContent={renderReshareContent}
         renderHeader={renderReshareHeader}
+      />
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={ChangeBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderChangeContent}
+        renderHeader={renderChangeHeader}
       />
     </View>
   );
