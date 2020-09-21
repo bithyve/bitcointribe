@@ -106,6 +106,7 @@ import {
   setSecondaryDeviceAddress,
 } from '../store/actions/preferences';
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
+import Loader from '../components/loader';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -2411,7 +2412,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {/* {isLoading ? <Loader /> : null} */}
+        {isLoading ? <Loader /> : null}
 
         {!isLoading && (
           <BottomSheet
