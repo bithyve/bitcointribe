@@ -651,7 +651,6 @@ function* generatePersonalCopyWorker({ payload }) {
       'personalCopyDetails',
     );
     // console.log('/sagas/sss ', {personalCopyDetails})
-    console.log('before ', personalCopyDetails)
     if (!personalCopyDetails) {
       personalCopyDetails = {
         [selectedPersonalCopy.type]: {
@@ -671,7 +670,6 @@ function* generatePersonalCopyWorker({ payload }) {
           sharingDetails: {},
         },
       };
-      console.log('after ', personalCopyDetails)
     }
     // console.log('/sagas/sss ', {personalCopyDetails})
     yield call(
