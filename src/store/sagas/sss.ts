@@ -84,6 +84,7 @@ import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
+import { failedST3 } from '../actions/accounts';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -650,6 +651,7 @@ function* generatePersonalCopyWorker({ payload }) {
       'personalCopyDetails',
     );
     // console.log('/sagas/sss ', {personalCopyDetails})
+    console.log('before ', personalCopyDetails)
     if (!personalCopyDetails) {
       personalCopyDetails = {
         [selectedPersonalCopy.type]: {
@@ -660,14 +662,16 @@ function* generatePersonalCopyWorker({ payload }) {
       };
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
+      const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
           path: pdfPath,
-          shared: false,
+          shared: !!originalSharedStatus,
           sharingDetails: {},
         },
       };
+      console.log('after ', personalCopyDetails)
     }
     // console.log('/sagas/sss ', {personalCopyDetails})
     yield call(
