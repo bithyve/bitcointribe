@@ -239,7 +239,7 @@ const PersonalCopyHistory = (props) => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
-      console.log('/PersonalCopyHistory ', { personalCopyDetails });
+      personalCopyDetails = JSON.parse(personalCopyDetails);
       if (
         !personalCopyDetails ||
         !personalCopyDetails[selectedPersonalCopy.type] ||
@@ -248,9 +248,9 @@ const PersonalCopyHistory = (props) => {
         ))
       ) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
+
         // saveInTransitHistory();
       } else {
-        personalCopyDetails = JSON.parse(personalCopyDetails);
         setPersonalCopyDetails(personalCopyDetails);
       }
     })();
