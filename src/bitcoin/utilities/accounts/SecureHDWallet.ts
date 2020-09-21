@@ -60,7 +60,7 @@ export default class SecureHDWallet extends Bitcoin {
     value: number;
     address: string;
     status?: any;
-  }>;
+  }> = [];
   private primaryMnemonic: string;
   private walletID: string;
   private usedAddresses: string[];
@@ -318,7 +318,7 @@ export default class SecureHDWallet extends Bitcoin {
     chunk: string,
     pos: number,
   ): Promise<{ isValid: boolean }> => {
-    if (chunk.length !== config.SCHUNK_SIZE) {
+    if (chunk.length !== config.CHUNK_SIZE) {
       throw new Error('Invalid number of characters');
     }
 

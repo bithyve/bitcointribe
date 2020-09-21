@@ -1,3 +1,6 @@
+import { Platform } from 'react-native';
+import RNFS from 'react-native-fs';
+
 export const getIconByStatus = status => {
   if (status == "Ugly") {
     return require("../../assets/images/icons/icon_error_red.png");
@@ -7,3 +10,20 @@ export const getIconByStatus = status => {
     return require("../../assets/images/icons/icon_check.png");
   }
 };
+
+export const verifyPersonalCopyAccess = async personalCopyDetails => {
+  const path =
+    Platform.OS == 'android'
+      ? 'file://' + personalCopyDetails.path
+      : personalCopyDetails.path;
+
+  try {
+    return RNFS.exists(path)
+  } catch(err) {
+    console.log('error checking file, err', err);
+    // error in verifying file access
+    // to err on the side of caution lets 
+    // just declare that the file may not exist
+    return false
+  }
+}

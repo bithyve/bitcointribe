@@ -202,6 +202,8 @@ PODS:
   - RNFirebase (5.3.1):
     - Firebase/Core
     - React
+  - RNFS (2.16.6):
+    - React
   - RNGestureHandler (1.3.0):
     - React
   - RNLocalize (1.4.1):
@@ -288,6 +290,7 @@ DEPENDENCIES:
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios/RNFirebase.podspec`)
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
   - RNLocalize (from `../node_modules/react-native-localize`)
   - RNOS (from `../node_modules/react-native-os`)
@@ -404,6 +407,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-device-info"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios/RNFirebase.podspec"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :podspec: "../node_modules/react-native-gesture-handler/RNGestureHandler.podspec"
   RNLocalize:
@@ -508,6 +513,7 @@ SPEC CHECKSUMS:
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
+  RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
@@ -531,6 +537,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: ee84328f93944edd163ed35f7bf5ce0383faa559
+PODFILE CHECKSUM: f0bbb553ff1ab8d8aec9f7f1b27f494d65a52d93
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.8.4
