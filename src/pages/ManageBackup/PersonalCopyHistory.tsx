@@ -247,8 +247,8 @@ const PersonalCopyHistory = (props) => {
           personalCopyDetails[selectedPersonalCopy.type],
         ))
       ) {
-        setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
         dispatch(generatePersonalCopy(selectedPersonalCopy));
+        setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
         // saveInTransitHistory();
       } else {
         setPersonalCopyDetails(personalCopyDetails);
