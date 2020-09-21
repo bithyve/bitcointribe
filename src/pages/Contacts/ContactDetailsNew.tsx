@@ -688,10 +688,11 @@ class ContactDetailsNew extends PureComponent<
         );
       }
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a entity',
-      );
+      // case: OTP
+      // Alert.alert(
+      //   'Invalid Contact',
+      //   'Cannot add a contact without phone-num/email as a entity',
+      // );
     }
   };
 
@@ -1034,7 +1035,13 @@ class ContactDetailsNew extends PureComponent<
                     : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
-                  <Text style={styles.phoneText}>{contact.connectedVia}</Text>
+                  <Text style={styles.phoneText}>
+                    {contact.usesOTP
+                      ? !contact.hasTrustedChannel
+                        ? 'OTP: ' + contact.connectedVia
+                        : ''
+                      : contact.connectedVia}
+                  </Text>
                 ) : null}
               </View>
               {this.Contact.hasTrustedChannel &&

@@ -640,7 +640,7 @@ export default function ManageBackup(props) {
           }, 2);
           (PersonalCopyQRScannerBottomSheet as any).current.snapTo(0);
         }}
-        onPressProceed={() => { }}
+        onPressProceed={() => {}}
         onPressIgnore={() => {
           setTimeout(() => {
             setLoadCamera(false);
@@ -800,16 +800,31 @@ export default function ManageBackup(props) {
       setContacts(selectedContacts);
 
       if (selectedContacts[0]) {
-        let tempContact = selectedContacts[0];
-        const { contactsWalletName } = trustedContactsService.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
-        tempContact.contactsWalletName = contactsWalletName;
-        pageData[1].personalInfo = tempContact;
+        let contactSelected = selectedContacts[0];
+        const contactName = `${contactSelected.firstName} ${
+          contactSelected.lastName ? contactSelected.lastName : ''
+        }`
+          .toLowerCase()
+          .trim();
+
+        const {
+          contactsWalletName,
+        } = trustedContactsService.tc.trustedContacts[contactName];
+        contactSelected.contactsWalletName = contactsWalletName;
+        pageData[1].personalInfo = contactSelected;
       }
       if (selectedContacts[1]) {
-        let tempContact = selectedContacts[1];
-        const { contactsWalletName } = trustedContactsService.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
-        tempContact.contactsWalletName = contactsWalletName;
-        pageData[2].personalInfo = tempContact;
+        let contactSelected = selectedContacts[1];
+        const contactName = `${contactSelected.firstName} ${
+          contactSelected.lastName ? contactSelected.lastName : ''
+        }`
+          .toLowerCase()
+          .trim();
+        const {
+          contactsWalletName,
+        } = trustedContactsService.tc.trustedContacts[contactName];
+        contactSelected.contactsWalletName = contactsWalletName;
+        pageData[2].personalInfo = contactSelected;
       }
       setPageData([...pageData]);
     }
@@ -1320,7 +1335,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[1].personalInfo =
           contacts[
-          contacts.findIndex((value) => value && value.type == 'contact1')
+            contacts.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
@@ -1328,7 +1343,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[2].personalInfo =
           contacts[
-          contacts.findIndex((value) => value && value.type == 'contact2')
+            contacts.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
@@ -1372,10 +1387,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
@@ -1385,10 +1400,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
@@ -1398,10 +1413,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
@@ -1411,10 +1426,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
@@ -1424,10 +1439,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
@@ -1437,10 +1452,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-              ? Colors.yellow
-              : item.status == 'Good'
-                ? Colors.green
-                : Colors.textColorGrey,
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
       };
     }
     return {
@@ -1451,17 +1466,13 @@ export default function ManageBackup(props) {
 
   const makeFullName = (item) => {
     return item.personalInfo.firstName && item.personalInfo.lastName
-      ? item.personalInfo.firstName +
-      ' ' +
-      item.personalInfo.lastName
-      : item.personalInfo.firstName &&
-        !item.personalInfo.lastName
-        ? item.personalInfo.firstName
-        : !item.personalInfo.firstName &&
-          item.personalInfo.lastName
-          ? item.personalInfo.lastName
-          : '';
-  }
+      ? item.personalInfo.firstName + ' ' + item.personalInfo.lastName
+      : item.personalInfo.firstName && !item.personalInfo.lastName
+      ? item.personalInfo.firstName
+      : !item.personalInfo.firstName && item.personalInfo.lastName
+      ? item.personalInfo.lastName
+      : '';
+  };
 
   const getImageIcon = (item) => {
     if (item.type == 'contact1' || item.type == 'contact2') {
@@ -1479,7 +1490,11 @@ export default function ManageBackup(props) {
             />
           );
         } else {
-          if (item.personalInfo.firstName === 'F&F request' && item.personalInfo.contactsWalletName !== undefined && item.personalInfo.contactsWalletName !== "") {
+          if (
+            item.personalInfo.firstName === 'F&F request' &&
+            item.personalInfo.contactsWalletName !== undefined &&
+            item.personalInfo.contactsWalletName !== ''
+          ) {
             return (
               <View
                 style={{
@@ -1499,8 +1514,12 @@ export default function ManageBackup(props) {
                   }}
                 >
                   {item.personalInfo
-                    ? nameToInitials(item.personalInfo.contactsWalletName && item.personalInfo.contactsWalletName !== ""
-                      ? `${item.personalInfo.contactsWalletName}'s Wallet` : makeFullName(item))
+                    ? nameToInitials(
+                        item.personalInfo.contactsWalletName &&
+                          item.personalInfo.contactsWalletName !== ''
+                          ? `${item.personalInfo.contactsWalletName}'s Wallet`
+                          : makeFullName(item),
+                      )
                     : ''}
                 </Text>
               </View>
@@ -1526,18 +1545,19 @@ export default function ManageBackup(props) {
                 >
                   {item.personalInfo
                     ? nameToInitials(
-                      item.personalInfo.firstName && item.personalInfo.lastName
-                        ? item.personalInfo.firstName +
-                        ' ' +
-                        item.personalInfo.lastName
-                        : item.personalInfo.firstName &&
-                          !item.personalInfo.lastName
+                        item.personalInfo.firstName &&
+                          item.personalInfo.lastName
+                          ? item.personalInfo.firstName +
+                              ' ' +
+                              item.personalInfo.lastName
+                          : item.personalInfo.firstName &&
+                            !item.personalInfo.lastName
                           ? item.personalInfo.firstName
                           : !item.personalInfo.firstName &&
                             item.personalInfo.lastName
-                            ? item.personalInfo.lastName
-                            : '',
-                    )
+                          ? item.personalInfo.lastName
+                          : '',
+                      )
                     : ''}
                 </Text>
               </View>
@@ -1552,13 +1572,20 @@ export default function ManageBackup(props) {
   const getCardTitle = (item) => {
     if (item.type === 'contact1' || item.type === 'contact2') {
       if (item.personalInfo) {
-        if (item.personalInfo.firstName === 'F&F request' && item.personalInfo.contactsWalletName !== undefined && item.personalInfo.contactsWalletName !== "") {
-          return item.personalInfo.contactsWalletName && item.personalInfo.contactsWalletName !== ""
-          ? `${item.personalInfo.contactsWalletName}'s Wallet`
-          : makeFullName(item);
+        if (
+          item.personalInfo.firstName === 'F&F request' &&
+          item.personalInfo.contactsWalletName !== undefined &&
+          item.personalInfo.contactsWalletName !== ''
+        ) {
+          return item.personalInfo.contactsWalletName &&
+            item.personalInfo.contactsWalletName !== ''
+            ? `${item.personalInfo.contactsWalletName}'s Wallet`
+            : makeFullName(item);
         } else {
           if (item.personalInfo.firstName && item.personalInfo.lastName) {
-            return item.personalInfo.firstName + ' ' + item.personalInfo.lastName;
+            return (
+              item.personalInfo.firstName + ' ' + item.personalInfo.lastName
+            );
           }
           if (!item.personalInfo.firstName && item.personalInfo.lastName) {
             return item.personalInfo.lastName;
@@ -1591,60 +1618,78 @@ export default function ManageBackup(props) {
   const getCardSubText = (item) => {
     if (item.type == 'secondaryDevice') {
       if (autoHighlightFlags.secondaryDevice) {
-        return item.status == 'Ugly' ? 'Confirm by logging on the Keeper Device'
-          : item.status == 'Bad' ? 'Confirm by logging on the Keeper Device'
-            : item.status == 'Good' ? 'The Recovery Key is accessible'
-              : 'Use one of your other device with Hexa';
+        return item.status == 'Ugly'
+          ? 'Confirm by logging on the Keeper Device'
+          : item.status == 'Bad'
+          ? 'Confirm by logging on the Keeper Device'
+          : item.status == 'Good'
+          ? 'The Recovery Key is accessible'
+          : 'Use one of your other device with Hexa';
       } else {
         return 'Use one of your other device with Hexa';
       }
     }
     if (item.type == 'contact1') {
       if (autoHighlightFlags.trustedContact1) {
-        return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
-          : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
-            : item.status == 'Good' ? 'The Recovery Key is accessible'
-              : 'Select a contact as a Keeper';
+        return item.status == 'Ugly'
+          ? 'Confirm by asking the contact to go online'
+          : item.status == 'Bad'
+          ? 'Confirm by asking the contact to go online'
+          : item.status == 'Good'
+          ? 'The Recovery Key is accessible'
+          : 'Select a contact as a Keeper';
       } else {
         return 'Select a contact as a Keeper';
       }
     }
     if (item.type == 'contact2') {
       if (autoHighlightFlags.trustedContact2) {
-        return item.status == 'Ugly' ? 'Confirm by asking the contact to go online'
-          : item.status == 'Bad' ? 'Confirm by asking the contact to go online'
-            : item.status == 'Good' ? 'The Recovery Key is accessible'
-              : 'Select a contact as a Keeper';
+        return item.status == 'Ugly'
+          ? 'Confirm by asking the contact to go online'
+          : item.status == 'Bad'
+          ? 'Confirm by asking the contact to go online'
+          : item.status == 'Good'
+          ? 'The Recovery Key is accessible'
+          : 'Select a contact as a Keeper';
       } else {
         return 'Select a contact as a Keeper';
       }
     }
     if (item.type == 'copy1') {
       if (autoHighlightFlags.personalCopy1) {
-        return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
-          : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
-            : item.status == 'Good' ? 'The Recovery Key is accessible'
-              : 'Secure your Recovery Key as a file (pdf)';
+        return item.status == 'Ugly'
+          ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Bad'
+          ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Good'
+          ? 'The Recovery Key is accessible'
+          : 'Secure your Recovery Key as a file (pdf)';
       } else {
         return 'Secure your Recovery Key as a file (pdf)';
       }
     }
     if (item.type == 'copy2') {
       if (autoHighlightFlags.personalCopy2) {
-        return item.status == 'Ugly' ? 'Confirm by scanning pdf’s first QR'
-          : item.status == 'Bad' ? 'Confirm by scanning pdf’s first QR'
-            : item.status == 'Good' ? 'The Recovery Key is accessible'
-              : 'Secure your Recovery Key as a file (pdf)';
+        return item.status == 'Ugly'
+          ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Bad'
+          ? 'Confirm by scanning pdf’s first QR'
+          : item.status == 'Good'
+          ? 'The Recovery Key is accessible'
+          : 'Secure your Recovery Key as a file (pdf)';
       } else {
         return 'Secure your Recovery Key as a file (pdf)';
       }
     }
     if (item.type == 'security') {
       if (autoHighlightFlags.securityAns) {
-        return item.status == 'Ugly' ? 'Confirm the Security Question and Answer'
-          : item.status == 'Bad' ? 'Confirm the Security Question and Answer'
-            : item.status == 'Good' ? 'Security Question and Answer confirmed'
-              : 'Last Backup';
+        return item.status == 'Ugly'
+          ? 'Confirm the Security Question and Answer'
+          : item.status == 'Bad'
+          ? 'Confirm the Security Question and Answer'
+          : item.status == 'Good'
+          ? 'Security Question and Answer confirmed'
+          : 'Last Backup';
       } else {
         return 'Last Backup';
       }
@@ -1744,12 +1789,12 @@ export default function ManageBackup(props) {
                       shieldStatus={overallHealth.overallStatus}
                     />
                   ) : (
-                      <HomePageShield
-                        circleShadowColor={Colors.borderColor}
-                        shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                        shieldStatus={0}
-                      />
-                    )}
+                    <HomePageShield
+                      circleShadowColor={Colors.borderColor}
+                      shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                      shieldStatus={0}
+                    />
+                  )}
                 </View>
               </View>
               <View style={{ marginBottom: 10 }}>
@@ -1865,20 +1910,22 @@ export default function ManageBackup(props) {
                           <View style={{ flex: 1, flexDirection: 'row' }}>
                             <Text style={styles.cardTimeText}>
                               {getCardSubText(item)}
-                              {(item.type === 'security' || (item.type === 'secondaryDevice' &&
-                                item.status !== 'Ugly')) && (
-                                  <Text
-                                    style={{
-                                      color: Colors.textColorGrey,
-                                      fontSize: RFValue(10),
-                                      fontFamily: Fonts.FiraSansMediumItalic,
-                                      fontWeight: 'bold',
-                                      fontStyle: 'italic',
-                                    }}
-                                  >
-                                    {' '}{getTime(item.time)}
-                                  </Text>
-                                )}
+                              {(item.type === 'security' ||
+                                (item.type === 'secondaryDevice' &&
+                                  item.status !== 'Ugly')) && (
+                                <Text
+                                  style={{
+                                    color: Colors.textColorGrey,
+                                    fontSize: RFValue(10),
+                                    fontFamily: Fonts.FiraSansMediumItalic,
+                                    fontWeight: 'bold',
+                                    fontStyle: 'italic',
+                                  }}
+                                >
+                                  {' '}
+                                  {getTime(item.time)}
+                                </Text>
+                              )}
                             </Text>
                           </View>
                         </View>
@@ -2002,24 +2049,24 @@ export default function ManageBackup(props) {
                 }}
               >
                 {autoHighlightFlags.secondaryDevice &&
-                  autoHighlightFlags.trustedContact1 &&
-                  autoHighlightFlags.trustedContact2 &&
-                  autoHighlightFlags.personalCopy1 &&
-                  autoHighlightFlags.personalCopy2 &&
-                  autoHighlightFlags.securityAns
+                autoHighlightFlags.trustedContact1 &&
+                autoHighlightFlags.trustedContact2 &&
+                autoHighlightFlags.personalCopy1 &&
+                autoHighlightFlags.personalCopy2 &&
+                autoHighlightFlags.securityAns
                   ? 'Confirm Shares'
                   : 'Complete Setup'}
               </Text>
             </TouchableOpacity>
           </View>
         ) : (
-            <ScrollView
-              contentContainerStyle={{
-                backgroundColor: Colors.backgroundColor,
-              }}
-              refreshControl={<RefreshControl refreshing={!is_initiated} />}
-            />
-          )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
       </View>
     </View>
   );

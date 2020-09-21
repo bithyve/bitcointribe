@@ -10,28 +10,47 @@
 
 Make sure you have `rn-nodeify` as a global dependency. If you don't, run `npm install -g rn-nodeify`.
 
-```
+```sh
 git clone https://github.com/bithyve/hexa.git
 cd hexa
 yarn install
 ```
 
-If you're on windows, open setup.bat in a text editor and enter your user account name where prompted. If you changed the location of the android sdk during installation, enter the path to the sdk instead of the one already present.
+### Running the Setup Script
+
+#### MacOS or Linux
+
+```sh
+./setup.sh
+```
+
+#### Windows
+
+Open `setup.bat` in a text editor and enter your user account name where prompted. If you changed the location of the android sdk during installation, enter the path to the sdk instead of the one already present.
 Then, from the command prompt, run:
 
-```
+```sh
 setup.bat
 ```
 
-Make sure you have `.env` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the required values then the app will crash.
+### Configuring Environment Variables
 
-### Run on iOS
+Make sure you have `.env` similar to `.env.example` in your project's root directory before running Hexa. If this file is not present with the required values then the app will crash.
+
+```sh
+cp .env.example .env
+```
+
+
+## Running HEXA
+
+### Running on iOS
 
 ```
 yarn ios
 ```
 
-### Run on Android
+### Running on Android
 
 ```
 yarn android

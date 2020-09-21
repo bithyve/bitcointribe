@@ -65,3 +65,6 @@ buck-out/
 env*
 !.env.example
 ios/Podfile.lock
+
+# VSCode
+.vscode/.react

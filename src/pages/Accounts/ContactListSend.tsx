@@ -1,11 +1,5 @@
 import React, { memo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Fonts from './../../common/Fonts';
@@ -37,16 +31,19 @@ function getImageIcon(item) {
             }}
           >
             {item
-              ? nameToInitials(item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== ""
-                ? `${item.contactsWalletName}'s wallet`
-                : item.firstName && item.lastName
-                  ? item.firstName + ' ' + item.lastName
-                  : item.firstName && !item.lastName
+              ? nameToInitials(
+                  item.firstName === 'F&F request' &&
+                    item.contactsWalletName !== undefined &&
+                    item.contactsWalletName !== ''
+                    ? `${item.contactsWalletName}'s wallet`
+                    : item.firstName && item.lastName
+                    ? item.firstName + ' ' + item.lastName
+                    : item.firstName && !item.lastName
                     ? item.firstName
                     : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-              )
+                    ? item.lastName
+                    : '',
+                )
               : ''}
           </Text>
         </View>
@@ -75,8 +72,11 @@ const ContactListSend = ({ transfer, Items, onSelectContact }) => {
           })}
         {getImageIcon(Items)}
         <Text numberOfLines={1} style={styles.contactName}>
-          {Items.firstName === 'F&F request' && Items.contactsWalletName !== undefined && Items.contactsWalletName !== ""
-            ? `${Items.contactsWalletName}'s wallet` : Items.name}
+          {Items.firstName === 'F&F request' &&
+          Items.contactsWalletName !== undefined &&
+          Items.contactsWalletName !== ''
+            ? `${Items.contactsWalletName}'s wallet`
+            : Items.name}
         </Text>
       </View>
     </TouchableOpacity>

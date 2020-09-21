@@ -25,9 +25,9 @@ export default function AddModalContents(props) {
     // 	type:'pairAccount'
     // },
     {
-      title: 'Associate a contact',
+      title: 'Add a Contact',
       image: require('../assets/images/icons/icon_addcontact.png'),
-      info: 'Associate contacts from your Address Book',
+      info: 'Add contacts from your Address Book',
       type: 'addContact',
     },
     // {
