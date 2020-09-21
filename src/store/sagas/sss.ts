@@ -649,7 +649,7 @@ function* generatePersonalCopyWorker({ payload }) {
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
-
+    // console.log('/sagas/sss ', {personalCopyDetails})
     if (!personalCopyDetails) {
       personalCopyDetails = {
         [selectedPersonalCopy.type]: {
@@ -669,7 +669,7 @@ function* generatePersonalCopyWorker({ payload }) {
         },
       };
     }
-
+    // console.log('/sagas/sss ', {personalCopyDetails})
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
@@ -678,6 +678,7 @@ function* generatePersonalCopyWorker({ payload }) {
 
     // reset PDF health (if present) post reshare
     let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    // console.log('/sagas/sss ', {storedPDFHealth})
     if (storedPDFHealth) {
       const { pdfHealth } = s3Service.sss;
       storedPDFHealth = JSON.parse(storedPDFHealth);
@@ -685,7 +686,7 @@ function* generatePersonalCopyWorker({ payload }) {
         ...storedPDFHealth,
         [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
       };
-
+      // console.log('/sagas/sss ', {storedPDFHealth})
       yield call(
         AsyncStorage.setItem,
         'PDF Health',
