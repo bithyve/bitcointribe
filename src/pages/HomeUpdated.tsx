@@ -118,7 +118,7 @@ import SSS from '../bitcoin/utilities/sss/SSS';
 import { encrypt, decrypt } from '../common/encryption';
 import WalletName from './RestoreHexaWithKeeper/WalletName';
 import SettingsContents from './SettingsContents';
-import { GoogleDriveLogin } from '../common/CommonFunctions/GoogleDriveBackup';
+import { CloudDataBackup } from '../common/CommonFunctions/CloudBackup';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -393,10 +393,7 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   onPressNotifications = async () => {
-    const iCloud = NativeModules.iCloud;
-    console.log(iCloud.startBackup("From React Native data in string format"));
-    let backedJson = iCloud.downloadBackup();
-    console.log("BackedUp JSON: ",backedJson);
+    
     let notificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -2248,18 +2245,14 @@ class HomeUpdated extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // console.log('CalendarManager', ICloudBackup)
       encryptedCloudDataJson = await CloudData(this.props.database);
       this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-    if (Platform.OS == 'ios') {
-      /**TODO iOS Login check and checkIfFileExist()*/
-    } else {
       let data = {
         shares: shares,
         encryptedCloudDataJson : encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,
       }
-      GoogleDriveLogin(data, this.setCloudBackupStatus);
+      CloudDataBackup(data, this.setCloudBackupStatus);
       console.log('call for google drive upload', this.props.cloudBackupStatus);
-    }
   };
 
   setCloudBackupStatus = () => {

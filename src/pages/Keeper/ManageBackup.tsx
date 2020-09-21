@@ -44,7 +44,7 @@ import SetupPrimaryKeeper from './SetupPrimaryKeeper';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
-import { GoogleDriveLogin } from '../../common/CommonFunctions/GoogleDriveBackup';
+import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -283,19 +283,14 @@ class ManageBackup extends Component<
     // console.log('CalendarManager', ICloudBackup)
     encryptedCloudDataJson = await CloudData(this.props.database);
     console.log('encryptedDatabase', encryptedCloudDataJson);
-    if (Platform.OS == 'ios') {
-      /**TODO iOS Login check and checkIfFileExist()*/
-      console.log('call for icloud upload');
-    } else {
-      let data = {
+    let data = {
         shares: shares,
         encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
         regularAccount: regularAccount,
       };
-      GoogleDriveLogin(data, this.setCloudBackupStatus);
+      CloudDataBackup(data, this.setCloudBackupStatus);
       console.log('call for google drive upload', this.props.cloudBackupStatus);
-    }
   };
 
   setCloudBackupStatus = () => {
