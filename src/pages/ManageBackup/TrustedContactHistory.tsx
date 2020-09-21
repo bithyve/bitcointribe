@@ -534,9 +534,13 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
-        title={'Reshare Recovery Key\nwith Keeper'}
-        info={'Did your Keeper not receive the Recovery Key?'}
-        note={'You can reshare the Recovery Key with your Keeper'}
+        title={'Reshare with the same contact?'}
+        info={
+          'Proceed if you want to reshare the link/ QR with the same contact'
+        }
+        note={
+          'For a different contact, please go back and choose ‘Change contact’'
+        }
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -1348,7 +1352,7 @@ const TrustedContactHistory = (props) => {
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
             (shared || activateReshare) && !guardianExists
-              ? 'Want to send the Recovery Key again to the same destination? '
+              ? 'Want to send the Recovery Key again to the same contact? '
               : null
           }
           changeInfo={
