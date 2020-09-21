@@ -796,7 +796,9 @@ class SendConfirmation_updated extends Component<
                       </Text>
                     ) : null
                 ) : (
-                    <Text>2 hours</Text>
+                    <View style={[styles.priorityValueContainer]}>
+                      <Text style={styles.priorityTableText}>~2 hours</Text>
+                    </View>
                   )}
               </View>
               <View style={styles.priorityValueContainer}>
@@ -1523,7 +1525,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginRight: 10,
+    justifyContent: 'center',
   },
 });
