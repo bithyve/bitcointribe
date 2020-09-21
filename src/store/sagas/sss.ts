@@ -662,12 +662,13 @@ function* generatePersonalCopyWorker({ payload }) {
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
       const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
+      const originalSharingDetails = personalCopyDetails[selectedPersonalCopy.type] && personalCopyDetails[selectedPersonalCopy.type].sharingDetails ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails : {}
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
           path: pdfPath,
           shared: !!originalSharedStatus,
-          sharingDetails: {},
+          sharingDetails: originalSharingDetails,
         },
       };
     }
