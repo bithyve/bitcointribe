@@ -122,7 +122,9 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
                   hintType: splits[7],
                   hint: splits[8],
                   uploadedAt: splits[9],
+                  version,
                 };
+
                 this.props.navigation.replace('Login', {
                   trustedContactRequest,
                 });
