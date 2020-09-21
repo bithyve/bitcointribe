@@ -67,8 +67,9 @@ import { storeFbtcData } from '../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
+  setCloudBackupStatus
 } from '../store/actions/preferences';
-import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
+import { getCurrencyImageByRegion, CloudData } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
@@ -107,6 +108,8 @@ import {
   setSecondaryDeviceAddress,
 } from '../store/actions/preferences';
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
+import { CloudDataBackup } from '../common/CommonFunctions/CloudBackup';
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -245,6 +248,7 @@ interface HomeStateTypes {
   isRequestModalOpened: boolean;
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
+  encryptedCloudDataJson: any;
 }
 
 interface HomePropsTypes {
@@ -285,6 +289,10 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   updateLastSeen: any;
+  setCloudBackupStatus : any;
+  cloudBackupStatus: any;
+  regularAccount: RegularAccount;
+  database: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -344,6 +352,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isRequestModalOpened: false,
       isBalanceLoading: true,
       addContactModalOpened: false,
+      encryptedCloudDataJson: [],
     };
   }
 
@@ -844,7 +853,33 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         () => this.props.updateLastSeen(new Date()),
       );
     }, 2);
+
+    this.cloudData();
   };
+
+  cloudData = async () => {
+    const { walletName, regularAccount } = this.props;
+    let encryptedCloudDataJson;
+    let shares;
+    // var ICloudBackup = NativeModules.ICloudBackup;
+    // ICloudBackup.initBackup();
+    // console.log('CalendarManager', ICloudBackup)
+      encryptedCloudDataJson = await CloudData(this.props.database);
+      this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
+      let data = {
+        shares: shares,
+        encryptedCloudDataJson : encryptedCloudDataJson,
+        walletName: walletName,
+        regularAccount: regularAccount,
+      }
+      CloudDataBackup(data, this.setCloudBackupStatus);
+      console.log('call for google drive upload', this.props.cloudBackupStatus);
+  };
+
+  setCloudBackupStatus = () => {
+    this.props.setCloudBackupStatus({status: true});
+    console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
+  }
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -3306,6 +3341,9 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
+    cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    database: idx(state, (_) => _.storage.database) || {},
   };
 };
 
@@ -3331,6 +3369,7 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
+    setCloudBackupStatus
   })(Home),
 );
 
