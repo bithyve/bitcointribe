@@ -453,6 +453,32 @@ export default class S3Service {
     }
   };
 
+  public generateLevel1Shares = (
+    answer: string,
+  ):
+    | {
+        status: number;
+        data: {
+          encryptedSecrets: string[];
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { shares } = this.sss.generateLevel1Shares();
+      const { encryptedSecrets } = this.sss.encryptSecrets(shares, answer);
+      return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
+    } catch (err) {
+      return { status: 510, err: err.message, message: ErrMap[510] };
+    }
+  };
+
   public encryptStaticNonPMDD = (
     staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD,
   ):

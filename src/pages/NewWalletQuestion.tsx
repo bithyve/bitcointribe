@@ -31,6 +31,7 @@ import BottomInfoBox from '../components/BottomInfoBox';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
+import { initializeHealthSetup } from '../store/actions/health';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import {
@@ -204,6 +205,7 @@ export default function NewWalletQuestion(props) {
           answer,
         };
         dispatch(initializeSetup(walletName, security));
+        if (security.answer) dispatch(initializeHealthSetup());
         const current = Date.now();
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
@@ -489,7 +491,6 @@ export default function NewWalletQuestion(props) {
                           : 'visible-password'
                       }
                       onChangeText={(text) => {
-                        
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -581,7 +582,6 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={(text) => {
-                        
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
@@ -646,16 +646,20 @@ export default function NewWalletQuestion(props) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={{
-              flexDirection: 'row',
-               marginLeft: 25,
-               marginRight: 25,
-               paddingBottom: 10,
-               paddingTop: 10,
-            }}
-            onPress={()=> props.navigation.navigate('NewOwnQuestions',{
-              walletName,
-            })}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                marginLeft: 25,
+                marginRight: 25,
+                paddingBottom: 10,
+                paddingTop: 10,
+              }}
+              onPress={() =>
+                props.navigation.navigate('NewOwnQuestions', {
+                  walletName,
+                })
+              }
+            >
               <Text
                 style={{
                   fontFamily: Fonts.FiraSansMediumItalic,
@@ -664,9 +668,11 @@ export default function NewWalletQuestion(props) {
                   fontSize: RFValue(12),
                   color: Colors.blue,
                 }}
-                onPress={()=> props.navigation.navigate('NewOwnQuestions',{
-                  walletName,
-                })}
+                onPress={() =>
+                  props.navigation.navigate('NewOwnQuestions', {
+                    walletName,
+                  })
+                }
               >
                 Or choose your own question
               </Text>
