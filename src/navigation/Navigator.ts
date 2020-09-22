@@ -77,7 +77,7 @@ import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
-import Receive from '../pages/Accounts/Receive_updated';
+import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
