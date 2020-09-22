@@ -23,62 +23,60 @@ import {
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
 import { isCompatible } from './Home';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 interface HomePropsTypes {
-  initializeDB: any
-  navigation: any
-  lastSeen: any
+  initializeDB: any;
+  navigation: any;
+  lastSeen: any;
 }
 
-interface HomeStateTypes { }
-
+interface HomeStateTypes {}
 
 class Launch extends Component<HomePropsTypes, HomeStateTypes> {
-  errorBottomSheet: any
+  errorBottomSheet: any;
   constructor(props) {
     super(props);
     this.errorBottomSheet = React.createRef();
   }
 
-
   componentDidMount = () => {
     this.props.initializeDB();
     // AppState.addEventListener("change", this.handleAppStateChange);
-    this.handleDeeplink()
+    this.handleDeeplink();
   };
-
-
 
   handleAppStateChange = async (nextAppState) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
-    let walletExists = await AsyncStorage.getItem("walletExists")
-    let lastSeen = await AsyncStorage.getItem("lastSeen")
+    let walletExists = await AsyncStorage.getItem('walletExists');
+    let lastSeen = await AsyncStorage.getItem('lastSeen');
     if (!walletExists) {
-      return
+      return;
     }
 
     if (Platform.OS === 'android' && nextAppState === 'background') {
       // if no last seen don't do anything
       if (lastSeen) {
         this.props.navigation.navigate('Intermediate');
-        return
+        return;
       }
-      return
+      return;
     }
 
-    if (Platform.OS === 'ios' && (nextAppState === 'inactive' || nextAppState == 'background')) {
+    if (
+      Platform.OS === 'ios' &&
+      (nextAppState === 'inactive' || nextAppState == 'background')
+    ) {
       // if no last seen don't do anything
       if (lastSeen) {
         this.props.navigation.navigate('Intermediate');
-        return
+        return;
       }
 
-      return
+      return;
     }
   };
-
 
   handleDeeplink = async () => {
     try {
@@ -101,15 +99,12 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
                 const recoveryRequest = { requester, rk: splits[7] };
                 this.props.navigation.replace('Login', { recoveryRequest });
               }
-            } else if (
-              splits[4] === 'tc' ||
-              splits[4] === 'tcg' ||
-              splits[4] === 'ptc'
-            ) {
+            } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
               if (splits[3] !== config.APP_STAGE) {
                 Alert.alert(
                   'Invalid deeplink',
-                  `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
+                  `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+                    splits[3]
                   }`,
                 );
               } else {
@@ -119,14 +114,17 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
                 }
 
                 const trustedContactRequest = {
-                  isGuardian: splits[4] === 'tcg' ? true : false,
+                  isGuardian: ['tcg', 'atcg'].includes(splits[4]),
+                  approvedTC: splits[4] === 'atcg' ? true : false,
                   isPaymentRequest: splits[4] === 'ptc' ? true : false,
                   requester: splits[5],
                   encryptedKey: splits[6],
                   hintType: splits[7],
                   hint: splits[8],
                   uploadedAt: splits[9],
+                  version,
                 };
+
                 this.props.navigation.replace('Login', {
                   trustedContactRequest,
                 });
@@ -159,12 +157,10 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
     } catch (err) {
       (this.errorBottomSheet as any).current.snapTo(1);
     }
-
-  }
-
+  };
 
   render() {
-    console.log("lastSeen", this.props.lastSeen);
+    console.log('lastSeen', this.props.lastSeen);
     return (
       <View style={styles.container}>
         <Video
@@ -188,32 +184,37 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
           ref={this.errorBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('35%')
+              : hp('40%'),
           ]}
-          renderContent={() => <ErrorModalContents
-            modalRef={this.errorBottomSheet}
-            title={'Login error'}
-            info={'Error while loging in, please try again'}
-            proceedButtonText={'Open Setting'}
-            isIgnoreButton={true}
-            onPressProceed={() => {
-              (this.errorBottomSheet as any).current.snapTo(0);
-            }}
-            onPressIgnore={() => {
-              (this.errorBottomSheet as any).current.snapTo(0);
-            }}
-            isBottomImage={true}
-            bottomImage={require('../assets/images/icons/errorImage.png')}
-          />}
-          renderHeader={() =>
+          renderContent={() => (
+            <ErrorModalContents
+              modalRef={this.errorBottomSheet}
+              title={'Login error'}
+              info={'Error while loging in, please try again'}
+              proceedButtonText={'Open Setting'}
+              isIgnoreButton={true}
+              onPressProceed={() => {
+                (this.errorBottomSheet as any).current.snapTo(0);
+              }}
+              onPressIgnore={() => {
+                (this.errorBottomSheet as any).current.snapTo(0);
+              }}
+              isBottomImage={true}
+              bottomImage={require('../assets/images/icons/errorImage.png')}
+            />
+          )}
+          renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
                 (this.errorBottomSheet as any).current.snapTo(0);
               }}
-            />}
+            />
+          )}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -224,7 +225,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-
-export default connect(null, { initializeDB })(Launch)
+export default connect(null, { initializeDB })(Launch);

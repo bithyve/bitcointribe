@@ -110,6 +110,7 @@ import {
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 import { CloudDataBackup } from '../common/CommonFunctions/CloudBackup';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+import Loader from '../components/loader';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -2447,7 +2448,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {/* {isLoading ? <Loader /> : null} */}
+        {isLoading ? <Loader /> : null}
 
         {!isLoading && (
           <BottomSheet
