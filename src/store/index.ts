@@ -19,7 +19,7 @@ import preferencesReducer from './reducers/preferences';
 const config = {
   key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ['setupAndAuth', "accounts"]
+  blacklist: ['setupAndAuth']
 };
 
 import {
