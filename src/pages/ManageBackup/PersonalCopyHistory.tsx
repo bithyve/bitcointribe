@@ -114,7 +114,9 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
-  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(React.createRef());
+  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(
+    React.createRef(),
+  );
 
   useEffect(() => {
     if (personalCopiesGenerated === false) {
@@ -237,23 +239,19 @@ const PersonalCopyHistory = (props) => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
-      if (!personalCopyDetails) {
+      personalCopyDetails = JSON.parse(personalCopyDetails);
+      if (
+        !personalCopyDetails ||
+        !personalCopyDetails[selectedPersonalCopy.type] ||
+        !(await verifyPersonalCopyAccess(
+          personalCopyDetails[selectedPersonalCopy.type],
+        ))
+      ) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
+        setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
         // saveInTransitHistory();
       } else {
-        personalCopyDetails = JSON.parse(personalCopyDetails);
-
-        if (!personalCopyDetails[selectedPersonalCopy.type]) {
-          dispatch(generatePersonalCopy(selectedPersonalCopy));
-          // saveInTransitHistory();
-        }
-        // verify if personal copy exists else, it should be generated
-        // TODO: This should ideally be another set of action, watcher, worker and reducer
-        // but I am too lazy :(
-        if (!await verifyPersonalCopyAccess(personalCopyDetails[selectedPersonalCopy.type])) {
-          dispatch(generatePersonalCopy(selectedPersonalCopy));
-          // saveInTransitHistory();
-        } else setPersonalCopyDetails(personalCopyDetails);
+        setPersonalCopyDetails(personalCopyDetails);
       }
     })();
   }, [generated, shared]);
@@ -315,9 +313,9 @@ const PersonalCopyHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -461,15 +459,18 @@ const PersonalCopyHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <PersonalCopyHelpContents 
-    titleClicked={()=>{
-      if (HelpBottomSheet.current)
+    return (
+      <PersonalCopyHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
             (HelpBottomSheet as any).current.snapTo(0);
-    }}/>;
+        }}
+      />
+    );
   };
 
   const renderMailOptionsHeader = () => {
-    return(
+    return (
       <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
@@ -479,22 +480,34 @@ const PersonalCopyHistory = (props) => {
         }}
       />
     );
-  }
+  };
 
   const renderMailOptionsContent = () => {
-    return(
-      <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
-          <Image style={{}} source={require('../../assets/images/icons/icon_email.png')} />
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableOpacity
+          style={{ flexDirection: 'column' }}
+          onPress={() => {}}
+        >
+          <Image
+            style={{}}
+            source={require('../../assets/images/icons/icon_email.png')}
+          />
           <Text style={{}}>Default App</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
-          <Image style={{}} source={require('../../assets/images/icons/openlink.png')} />
+        <TouchableOpacity
+          style={{ flexDirection: 'column' }}
+          onPress={() => {}}
+        >
+          <Image
+            style={{}}
+            source={require('../../assets/images/icons/openlink.png')}
+          />
           <Text style={{}}>Default App</Text>
         </TouchableOpacity>
       </View>
     );
-  }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
