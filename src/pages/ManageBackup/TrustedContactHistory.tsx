@@ -126,11 +126,11 @@ const TrustedContactHistory = (props) => {
   );
 
   const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
+    (state) => state.accounts[REGULAR_ACCOUNT].account,
   );
 
   const testAccount: TestAccount = useSelector(
-    (state) => state.accounts[TEST_ACCOUNT].service,
+    (state) => state.accounts[TEST_ACCOUNT].account,
   );
 
   let trustedContactsInfo = useSelector(

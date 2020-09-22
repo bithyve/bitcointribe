@@ -94,7 +94,7 @@ const PersonalCopyHistory = (props) => {
   ] = useState(React.createRef());
 
   const secureAccount: SecureAccount = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].account,
   );
 
   const updateAutoHighlightFlags = props.navigation.getParam(
