@@ -85,7 +85,7 @@ import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import TransactionsContent from '../components/home/transaction-content';
 import HomeList from '../components/home/home-list';
-import HomeHeader from '../components/home/home-header';
+import HomeHeader from '../components/home/home-header_update';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
 import { initialCardData, closingCardData } from '../stubs/initialCardData';
