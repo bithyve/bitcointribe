@@ -559,7 +559,43 @@ export default class SSS {
     const shares = secrets.share(
       this.stringToHex(this.mnemonic),
       config.SSS_TOTAL,
-      SSS.threshold,
+      config.SSS_THRESHOLD,
+    );
+
+    for (let itr = 0; itr < shares.length; itr++) {
+      const checksum = SSS.calculateChecksum(shares[itr]);
+      shares[itr] = shares[itr] + checksum;
+    }
+
+    return { shares };
+  };
+
+  public generateLevel1Shares = (): {
+    shares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      this.stringToHex(this.mnemonic),
+      config.SSS_LEVEL1_TOTAL,
+      config.SSS_LEVEL1_THRESHOLD,
+    );
+
+    for (let itr = 0; itr < shares.length; itr++) {
+      const checksum = SSS.calculateChecksum(shares[itr]);
+      shares[itr] = shares[itr] + checksum;
+    }
+
+    return { shares };
+  };
+
+  public generateLevel2Shares = (): {
+    shares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      this.stringToHex(this.mnemonic),
+      config.SSS_LEVEL2_TOTAL,
+      config.SSS_LEVEL2_THRESHOLD,
     );
 
     for (let itr = 0; itr < shares.length; itr++) {
@@ -966,7 +1002,7 @@ export default class SSS {
       this.metaShares.push(metaShare);
       index++;
     }
-    if (this.metaShares.length !== 5) {
+    if (this.metaShares.length !== 3) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
     }

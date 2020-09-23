@@ -807,10 +807,10 @@ export default function ManageBackup(props) {
           .toLowerCase()
           .trim();
 
-        const {
-          contactsWalletName,
-        } = trustedContactsService.tc.trustedContacts[contactName];
-        contactSelected.contactsWalletName = contactsWalletName;
+        const tcInstance =
+          trustedContactsService.tc.trustedContacts[contactName];
+        if (tcInstance)
+          contactSelected.contactsWalletName = tcInstance.contactsWalletName;
         pageData[1].personalInfo = contactSelected;
       }
       if (selectedContacts[1]) {
@@ -820,10 +820,10 @@ export default function ManageBackup(props) {
         }`
           .toLowerCase()
           .trim();
-        const {
-          contactsWalletName,
-        } = trustedContactsService.tc.trustedContacts[contactName];
-        contactSelected.contactsWalletName = contactsWalletName;
+        const tcInstance =
+          trustedContactsService.tc.trustedContacts[contactName];
+        if (tcInstance)
+          contactSelected.contactsWalletName = tcInstance.contactsWalletName;
         pageData[2].personalInfo = contactSelected;
       }
       setPageData([...pageData]);

@@ -84,6 +84,7 @@ import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
+import { failedST3 } from '../actions/accounts';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -189,7 +190,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    if (payload.contactInfo.contactName === 'Secondary Device') {
+    if (payload.contactInfo.contactName === 'secondary device') {
       delete trustedContacts.tc.trustedContacts[
         payload.contactInfo.contactName
       ]; // removing secondary device's TC
@@ -649,7 +650,7 @@ function* generatePersonalCopyWorker({ payload }) {
       AsyncStorage.getItem,
       'personalCopyDetails',
     );
-
+    // console.log('/sagas/sss ', {personalCopyDetails})
     if (!personalCopyDetails) {
       personalCopyDetails = {
         [selectedPersonalCopy.type]: {
@@ -660,16 +661,18 @@ function* generatePersonalCopyWorker({ payload }) {
       };
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
+      const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
+      const originalSharingDetails = personalCopyDetails[selectedPersonalCopy.type] && personalCopyDetails[selectedPersonalCopy.type].sharingDetails ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails : {}
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
           path: pdfPath,
-          shared: false,
-          sharingDetails: {},
+          shared: !!originalSharedStatus,
+          sharingDetails: originalSharingDetails,
         },
       };
     }
-
+    // console.log('/sagas/sss ', {personalCopyDetails})
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
@@ -678,6 +681,7 @@ function* generatePersonalCopyWorker({ payload }) {
 
     // reset PDF health (if present) post reshare
     let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    // console.log('/sagas/sss ', {storedPDFHealth})
     if (storedPDFHealth) {
       const { pdfHealth } = s3Service.sss;
       storedPDFHealth = JSON.parse(storedPDFHealth);
@@ -685,7 +689,7 @@ function* generatePersonalCopyWorker({ payload }) {
         ...storedPDFHealth,
         [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
       };
-
+      // console.log('/sagas/sss ', {storedPDFHealth})
       yield call(
         AsyncStorage.setItem,
         'PDF Health',

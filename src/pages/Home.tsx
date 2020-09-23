@@ -11,6 +11,8 @@ import {
   AsyncStorage,
   Linking,
   Alert,
+  NativeModules,
+  PermissionsAndroid,
 } from 'react-native';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -19,7 +21,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo, { isPinOrFingerprintSet } from 'react-native-device-info';
 import { RFValue } from 'react-native-responsive-fontsize';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
@@ -27,6 +29,7 @@ import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
+import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import {
@@ -48,6 +51,9 @@ import {
   initHealthCheck,
   uploadRequestedShare,
 } from '../store/actions/sss';
+import {
+  updateHealth
+} from '../store/actions/health';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../store/actions/trustedContacts';
 import { updateLastSeen } from '../store/actions/preferences';
@@ -95,6 +101,7 @@ import {
   addTransferDetails,
 } from '../store/actions/accounts';
 import {
+  TrustedContactDerivativeAccount,
   trustedChannelActions,
   DonationDerivativeAccountElements,
 } from '../bitcoin/utilities/Interface';
@@ -110,6 +117,7 @@ import {
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin';
 import { CloudDataBackup } from '../common/CommonFunctions/CloudBackup';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+import Loader from '../components/loader';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -268,6 +276,7 @@ interface HomePropsTypes {
   s3Service: any;
   initHealthCheck: any;
   overallHealth: any;
+  levelHealth: any[];
   fetchDerivativeAccBalTx: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -293,6 +302,7 @@ interface HomePropsTypes {
   cloudBackupStatus: any;
   regularAccount: RegularAccount;
   database: any;
+  updateHealth: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -861,9 +871,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { walletName, regularAccount } = this.props;
     let encryptedCloudDataJson;
     let shares;
-    // var ICloudBackup = NativeModules.ICloudBackup;
-    // ICloudBackup.initBackup();
-    // console.log('CalendarManager', ICloudBackup)
       encryptedCloudDataJson = await CloudData(this.props.database);
       this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
       let data = {
@@ -874,6 +881,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
       CloudDataBackup(data, this.setCloudBackupStatus);
       console.log('call for google drive upload', this.props.cloudBackupStatus);
+      this.updateHealthForCloud(shares);
   };
 
   setCloudBackupStatus = () => {
@@ -1934,6 +1942,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       fetchTrustedChannel,
       walletName,
       trustedContacts,
+      updateHealth
     } = this.props;
 
     if (!isRecovery) {
@@ -2204,6 +2213,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  updateHealthForCloud = (shares) =>{
+    let levelHealth = this.props.levelHealth;
+    if(this.props.cloudBackupStatus){
+      if(levelHealth[0].levelInfo[0].type == 'cloud'){
+        levelHealth[0].levelInfo[0].lastUpdated = moment(new Date()).valueOf();
+        levelHealth[0].levelInfo[0].created = moment(new Date()).valueOf();
+        levelHealth[0].levelInfo[0].status = 'accessible';
+        levelHealth[0].levelInfo[0].shareId = JSON.stringify(shares);
+      }
+      if(levelHealth[0].levelInfo[1].type == 'securityQuestion' && levelHealth[0].levelInfo[1].created){
+        levelHealth[0].levelStatus = 'good';
+      }
+    }
+    updateHealth(levelHealth);
+  }
+
   onPressElement = (item) => {
     const { navigation } = this.props;
     if (item.title == 'Backup Health') {
@@ -2214,6 +2239,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('AddressBookContents');
       return;
     } else if (item.title == 'Wallet Settings') {
+      navigation.navigate('SettingsContents');
       (this.refs.settingsBottomSheet as any).snapTo(1);
       setTimeout(() => {
         this.setState({
@@ -2379,6 +2405,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       UNDER_CUSTODY,
       downloadMShare,
       overallHealth,
+      levelHealth,
     } = this.props;
     return (
       <ImageBackground
@@ -2447,7 +2474,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {/* {isLoading ? <Loader /> : null} */}
+        {isLoading ? <Loader /> : null}
 
         {!isLoading && (
           <BottomSheet
@@ -3192,6 +3219,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 );
               }}
               onSkipContinue={() => {
+                // if (data && data.length) {
+                //   navigation.navigate('AddContactSendRequest', {
+                //     SelectedContact: data,
+                //   });
+                //   (this.refs
+                //     .addContactAddressBookBookBottomSheet as any).snapTo(0);
+                // }
                 let { skippedContactsCount } = this.props.trustedContacts.tc;
                 let data;
                 if (!skippedContactsCount) {
@@ -3344,6 +3378,7 @@ const mapStateToProps = (state) => {
     cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
+    levelHealth: idx(state, (_) => _.health.levelHealth),
   };
 };
 
@@ -3369,7 +3404,8 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
-    setCloudBackupStatus
+    setCloudBackupStatus,
+    updateHealth,
   })(Home),
 );
 

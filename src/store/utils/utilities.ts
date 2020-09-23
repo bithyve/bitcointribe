@@ -34,7 +34,8 @@ export const serviceGenerator = async (
     res = s3Service.restoreMetaShares(metaShares);
     if (res.status !== 200) throw new Error('Share restoration failed');
   } else {
-    res = s3Service.generateShares(securityAns);
+    res = s3Service.generateLevel1Shares(securityAns);
+    // res = s3Service.generateShares(securityAns);
     if (res.status !== 200) throw new Error('Share generation failed');
   }
 

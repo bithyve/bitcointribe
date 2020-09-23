@@ -51,7 +51,6 @@ interface ManageBackupStateTypes {
   selectedId: any;
   isLevel2: boolean;
   securityAtLevel: any;
-  health: any;
 }
 
 interface ManageBackupPropsTypes {
@@ -62,6 +61,7 @@ interface ManageBackupPropsTypes {
   regularAccount: RegularAccount;
   database: any;
   overallHealth: any;
+  levelHealth: any[];
 }
 
 class ManageBackup extends Component<
@@ -84,74 +84,6 @@ class ManageBackup extends Component<
     this.state = {
       securityAtLevel: 0,
       selectedId: 0,
-      health: [
-        {
-          level: 1,
-          levelInfo: [
-            {
-              keeperType: null,
-              type: 'cloud',
-              lastUpdated: '1599807936',
-              created: '1599807936',
-              status: 'accessible',
-              shareId: 'abcd',
-            },
-            {
-              keeperType: null,
-              type: 'securityQuestion',
-              lastUpdated: '1599807936',
-              created: '1599807936',
-              status: 'accessible',
-              shareId: 'xyz',
-            },
-          ],
-          levelStatus: 'good',
-        },
-        {
-          level: 2,
-          levelInfo: [
-            {
-              keeperType: 'primaryKeeper',
-              type: 'device',
-              lastUpdated: null,
-              created: null,
-              status: 'notAccessible',
-              shareId: 'pqr',
-            },
-            {
-              keeperType: 'otherKeeper',
-              type: 'contact',
-              lastUpdated: null,
-              created: null,
-              status: 'notAccessible',
-              shareId: 'qwe',
-            },
-          ],
-          levelStatus: 'notSetup',
-        },
-        {
-          level: 3,
-          levelInfo: [
-            {
-              keeperType: 'otherKeeper',
-              type: 'contact',
-              lastUpdated: null,
-              created: null,
-              status: 'notAccessible',
-              shareId: 'dsfsd',
-            },
-            {
-              keeperType: 'otherKeeper',
-              type: 'pdf',
-              lastUpdated: null,
-              created: null,
-              status: 'notAccessible',
-              shareId: 'dsfs',
-            },
-          ],
-          levelStatus: 'notSetup',
-        },
-      ],
       levelData: [
         {
           type: 'icloud',
@@ -244,13 +176,14 @@ class ManageBackup extends Component<
   };
 
   modifyLevelStatus = () =>{
-    let { levelData, health } = this.state;
+    let { levelData } = this.state;
+    let { levelHealth } = this.props;
     for (let i = 0; i < levelData.length; i++) {
       const element = levelData[i];
-      if(health[i].levelInfo[1].status == 'accessible'){
+      if(levelHealth[i].levelInfo[1].status == 'accessible'){
         levelData[i].keeper2.keeper2Done = true;
       }
-      if(health[i].levelInfo[0].status == 'accessible'){
+      if(levelHealth[i].levelInfo[0].status == 'accessible'){
         levelData[i].keeper2.keeper2Done = true;
       }
     }
@@ -299,17 +232,17 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    console.log('this.props.overallHealth', this.props.overallHealth);
-    if (prevProps.overallHealth != this.props.overallHealth)
-      this.setState({ health: this.props.overallHealth });
-    else {
-      (async () => {
-        const storedHealth = await AsyncStorage.getItem('overallHealth');
-        if (storedHealth) {
-          this.setState({ health: JSON.parse(storedHealth) });
-        }
-      })();
-    }
+    // console.log('this.props.overallHealth', this.props.overallHealth);
+    // if (prevProps.overallHealth != this.props.overallHealth)
+    //   this.setState({ health: this.props.overallHealth });
+    // else {
+    //   (async () => {
+    //     const storedHealth = await AsyncStorage.getItem('overallHealth');
+    //     if (storedHealth) {
+    //       this.setState({ health: JSON.parse(storedHealth) });
+    //     }
+    //   })();
+    // }
   };
 
   render() {
@@ -318,9 +251,8 @@ class ManageBackup extends Component<
       selectedId,
       isLevel2,
       securityAtLevel,
-      health,
     } = this.state;
-    const { navigation, overallHealth } = this.props;
+    const { navigation, overallHealth, levelHealth } = this.props;
     // console.log('selectedId', selectedId)
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -848,6 +780,7 @@ const mapStateToProps = (state) => {
       idx(state, (_) => _.preferences.cloudBackupStatus) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
+    levelHealth: idx(state, (_) => _.health.levelHealth),
   };
 };
 

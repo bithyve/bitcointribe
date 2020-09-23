@@ -10,6 +10,7 @@ import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
+import healthReducer from './reducers/health';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
@@ -110,6 +111,10 @@ import {
   trustedChannelsSyncWatcher,
   removeTrustedContactWatcher,
 } from './sagas/trustedContacts';
+
+import {
+  initHealthDataWatcher
+} from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
 import reducer from './reducers/fbtc';
@@ -214,6 +219,9 @@ const rootSaga = function* () {
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
     trustedChannelsSyncWatcher,
+
+    // Health 
+    initHealthDataWatcher,
   ];
 
   yield all(
@@ -237,6 +245,7 @@ const rootReducer = combineReducers({
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
+  health: healthReducer,
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,

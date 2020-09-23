@@ -53,6 +53,10 @@ class HexaConfig {
   };
   public SSS_TOTAL: number = parseInt(Config.BIT_SSS_TOTAL.trim(), 10);
   public SSS_THRESHOLD: number = parseInt(Config.BIT_SSS_THRESHOLD.trim(), 10);
+  public SSS_LEVEL1_TOTAL: number = parseInt(Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10);
+  public SSS_LEVEL1_THRESHOLD: number = parseInt(Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10);
+  public SSS_LEVEL2_TOTAL: number = parseInt(Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10);
+  public SSS_LEVEL2_THRESHOLD: number = parseInt(Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10);
   public MSG_ID_LENGTH: number = parseInt(Config.BIT_MSG_ID_LENGTH.trim(), 10);
   public CHUNK_SIZE: number = parseInt(Config.BIT_CHUNK_SIZE.trim(), 10);
   public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR.trim(), 10);
