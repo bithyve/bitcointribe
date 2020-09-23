@@ -63,8 +63,17 @@ import {
   setSavingWarning,
 } from '../../store/actions/preferences';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function Receive(props) {
+  const [isOTPType, setIsOTPType] = useState(false);
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [OTP, setOTP] = useState('');
+  const [renderTimer, setRenderTimer] = useState(false);
+
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
@@ -97,6 +106,14 @@ export default function Receive(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+
+  const derivativeAccountDetails =
+    props.navigation.state.params.derivativeAccountDetails;
+
+  const carouselIndex = props.navigation.state.params.carouselIndex
+    ? props.navigation.state.params.carouselIndex
+    : null;
+
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
@@ -139,10 +156,11 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -275,6 +293,8 @@ export default function Receive(props) {
 
           console.log({ otpDL });
           setReceiveLink(otpDL);
+          setOTP(otp);
+          setIsOTPType(true);
         } else {
           Alert.alert('Invalid Contact', 'Something went wrong.');
           return;
@@ -379,10 +399,11 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
@@ -494,6 +515,34 @@ export default function Receive(props) {
     service,
   ]);
 
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        renderTimer={renderTimer}
+        onPressOk={(index) => {
+          setTimeout(() => {
+            setRenderTimer(false);
+          }, 2);
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        onPressBack={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        OTP={OTP}
+      />
+    );
+  }, [OTP, renderTimer]);
+
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = isReceiveHelperDoneValue;
     if (!isReceiveHelperDone1) {
@@ -544,7 +593,7 @@ export default function Receive(props) {
 
   const onPressBack = () => {
     if (getServiceType) {
-      getServiceType(serviceType);
+      getServiceType(serviceType, carouselIndex);
     }
     props.navigation.goBack();
   };
@@ -626,7 +675,9 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    serviceType == TEST_ACCOUNT
+                    derivativeAccountDetails
+                      ? require('../../assets/images/icons/icon_donation_hexa.png')
+                      : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
                       ? require('../../assets/images/icons/icon_regular.png')
@@ -643,7 +694,9 @@ export default function Receive(props) {
                       fontSize: RFValue(12),
                     }}
                   >
-                    {serviceType == TEST_ACCOUNT
+                    {derivativeAccountDetails
+                      ? 'Donation Account'
+                      : serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
                       ? 'Checking Account'
@@ -869,6 +922,26 @@ export default function Receive(props) {
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
             }}
+            onSkipContinue={() => {
+              let { skippedContactsCount } = trustedContacts.tc;
+              let data;
+              if (!skippedContactsCount) {
+                skippedContactsCount = 1;
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                };
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                };
+              }
+
+              onPressContinue([data]);
+            }}
           />
         )}
         renderHeader={() => (
@@ -917,9 +990,15 @@ export default function Receive(props) {
               if (SendViaLinkBottomSheet.current)
                 (SendViaLinkBottomSheet as any).current.snapTo(0);
             }}
-            onPressDone={() =>
-              (SendViaLinkBottomSheet as any).current.snapTo(0)
-            }
+            onPressDone={() => {
+              if (isOTPType) {
+                setTimeout(() => {
+                  setRenderTimer(true);
+                }, 2);
+                shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+              }
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+            }}
           />
         )}
         renderHeader={() => (
@@ -991,6 +1070,15 @@ export default function Receive(props) {
             // }}
           />
         )}
+      />
+
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={shareOtpWithTrustedContactBottomSheet}
+        snapPoints={[-30, hp('65%')]}
+        renderContent={renderShareOtpWithTrustedContactContent}
+        renderHeader={renderShareOtpWithTrustedContactHeader}
       />
     </View>
   );

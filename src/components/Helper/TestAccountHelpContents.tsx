@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function TestAccountHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -39,6 +41,7 @@ export default function TestAccountHelpContents(props) {
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
+        ref={scrollViewRef}
         style={{
           flex: 1,
           backgroundColor: Colors.blue,
@@ -50,13 +53,13 @@ export default function TestAccountHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('10%'),
+              marginTop: wp('5%'),
               marginBottom: wp('3%')
             }}
           >
             The Test Account is designed as an account that enables people
             to experience Bitcoin without buying bitcoin. It comes
-            preloaded with test bitcoin that you can send to other 
+            preloaded with test bitcoin that you can send to other
             users on Bitcoin Testnet
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -68,13 +71,18 @@ export default function TestAccountHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('15%'),
+              // marginBottom: wp('15%'),
             }}
           >
             The Bitcoin Testnet is similar to Bitcoin Mainnet and has Test
             bitcoin for people to experiment with. Test bitcoin can not be
             sent to wallets that only support Bitcoin Mainnet
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollToEnd({ animated: true })
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
           <View
             style={{
               borderStyle: 'dotted',
@@ -101,10 +109,10 @@ export default function TestAccountHelpContents(props) {
             />
           </View>
           <View style={styles.bottomLinkView}>
-            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
+            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
               Use the Test Account to learn all the features of the Checking Account
             </Text>
-            <View style={{...styles.linkView, marginTop: wp('7%')}}>
+            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
               <Text style={styles.toKnowMoreText}>To know more,</Text>
               <AppBottomSheetTouchableWrapper
                 style={{ marginLeft: 5 }}
@@ -116,7 +124,7 @@ export default function TestAccountHelpContents(props) {
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
-          <View style={{...styles.separatorView, marginBottom: wp('7%')}} />
+          <View style={{ ...styles.separatorView, marginBottom: wp('7%') }} />
         </View>
       </ScrollView>
     </View>
@@ -171,7 +179,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('89%'),
+    height: hp('80%'),
     justifyContent: 'space-between',
   },
   separatorView: {

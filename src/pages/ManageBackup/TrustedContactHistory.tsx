@@ -174,6 +174,7 @@ const TrustedContactHistory = (props) => {
   const [activateReshare, setActivateReshare] = useState(
     props.navigation.getParam('activateReshare'),
   );
+  const [guardianExists, setGuardianExists] = useState(false);
   const next = props.navigation.getParam('next');
   const selectedTitle = props.navigation.getParam('selectedTitle');
   const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
@@ -198,6 +199,23 @@ const TrustedContactHistory = (props) => {
     setContactInfo();
   }, []);
 
+  useEffect(() => {
+    if (chosenContact) {
+      const contactName = `${chosenContact.firstName} ${
+        chosenContact.lastName ? chosenContact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+      const tcInstance = trustedContacts.tc.trustedContacts[contactName];
+      console.log({ tcInstance });
+      if (tcInstance) {
+        if (tcInstance.symmetricKey) {
+          setGuardianExists(true);
+        }
+      }
+    }
+  }, [trustedContacts, chosenContact]);
+
   const setContactInfo = useCallback(async () => {
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
@@ -209,10 +227,25 @@ const TrustedContactHistory = (props) => {
       // }
 
       if (index == 1 && selectedContacts[0]) {
-        setChosenContact(selectedContacts[0]);
+        let tempContact = selectedContacts[0];
+        const tcInstance =
+          trustedContacts.tc.trustedContacts[
+            tempContact.name.toLowerCase().trim()
+          ];
+        if (tcInstance)
+          tempContact.contactsWalletName = tcInstance.contactsWalletName;
+        setChosenContact(tempContact);
       }
       if (index == 2 && selectedContacts[1]) {
-        setChosenContact(selectedContacts[1]);
+        let tempContact = selectedContacts[1];
+
+        const tcInstance =
+          trustedContacts.tc.trustedContacts[
+            tempContact.name.toLowerCase().trim()
+          ];
+        if (tcInstance)
+          tempContact.contactsWalletName = tcInstance.contactsWalletName;
+        setChosenContact(tempContact);
       }
     }
   }, [index, trustedContactsInfo]);
@@ -501,9 +534,13 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
-        title={'Reshare Recovery Key\nwith Keeper'}
-        info={'Did your Keeper not receive the Recovery Key?'}
-        note={'You can reshare the Recovery Key with your Keeper'}
+        title={'Reshare with the same contact?'}
+        info={
+          'Proceed if you want to reshare the link/ QR with the same contact'
+        }
+        note={
+          'For a different contact, please go back and choose ‘Change contact’'
+        }
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -614,7 +651,10 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (overallHealth) {
-      if (overallHealth.sharesInfo[index] && overallHealth.sharesInfo[index].updatedAt) {
+      if (
+        overallHealth.sharesInfo[index] &&
+        overallHealth.sharesInfo[index].updatedAt
+      ) {
         setShared(true);
       }
     }
@@ -626,6 +666,16 @@ const TrustedContactHistory = (props) => {
       (trustedContactsBottomSheet as any).current.snapTo(1);
     }
   }, [next]);
+
+  const makeFullName = (chosenContact) => {
+    return chosenContact.firstName && chosenContact.lastName
+      ? chosenContact.firstName + ' ' + chosenContact.lastName
+      : chosenContact.firstName && !chosenContact.lastName
+      ? chosenContact.firstName
+      : !chosenContact.firstName && chosenContact.lastName
+      ? chosenContact.lastName
+      : '';
+  };
 
   const getImageIcon = () => {
     if (chosenContact.name) {
@@ -664,7 +714,12 @@ const TrustedContactHistory = (props) => {
                 lineHeight: 13, //... One for top and one for bottom alignment
               }}
             >
-              {chosenContact && chosenContact.name
+              {chosenContact &&
+              chosenContact.firstName === 'F&F request' &&
+              chosenContact.contactsWalletName !== undefined &&
+              chosenContact.contactsWalletName !== ''
+                ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
+                : chosenContact && chosenContact.name
                 ? nameToInitials(
                     chosenContact.firstName && chosenContact.lastName
                       ? chosenContact.firstName + ' ' + chosenContact.lastName
@@ -1058,14 +1113,14 @@ const TrustedContactHistory = (props) => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
-            (shareBottomSheet as any).current.snapTo(0)
+            (shareBottomSheet as any).current.snapTo(0);
             // setChosenContactIndex(index);
           }}
           onPressViaLink={(index) => {
             createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
-            (shareBottomSheet as any).current.snapTo(0)
+            (shareBottomSheet as any).current.snapTo(0);
             // setChosenContactIndex(index);
           }}
         />
@@ -1106,7 +1161,7 @@ const TrustedContactHistory = (props) => {
             setTimeout(() => {
               setRenderTimer(true);
             }, 2);
-            if(isOTPType){
+            if (isOTPType) {
               (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
             }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -1219,7 +1274,11 @@ const TrustedContactHistory = (props) => {
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.firstName && chosenContact.lastName
+                {chosenContact.firstName === 'F&F request' &&
+                chosenContact.contactsWalletName !== undefined &&
+                chosenContact.contactsWalletName !== ''
+                  ? `${chosenContact.contactsWalletName}'s wallet`
+                  : chosenContact.firstName && chosenContact.lastName
                   ? chosenContact.firstName + ' ' + chosenContact.lastName
                   : chosenContact.firstName && !chosenContact.lastName
                   ? chosenContact.firstName
@@ -1292,8 +1351,8 @@ const TrustedContactHistory = (props) => {
           }}
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
-            shared || activateReshare
-              ? 'Want to send the Recovery Key again to the same destination? '
+            (shared || activateReshare) && !guardianExists
+              ? 'Want to send the Recovery Key again to the same contact? '
               : null
           }
           changeInfo={

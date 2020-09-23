@@ -15,6 +15,7 @@ export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
+export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
@@ -25,6 +26,8 @@ export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
+export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
+export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 // export const fetchAddress = (serviceType) => {
 //   return { type: FETCH_ADDR, payload: { serviceType } };
 // };
@@ -53,10 +56,20 @@ export const fetchBalanceTx = (
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
-export const transferST1 = (serviceType, recipients, averageTxFees?) => {
+export const transferST1 = (
+  serviceType,
+  recipients,
+  averageTxFees?,
+  derivativeAccountDetails?: { type: string; number: number },
+) => {
   return {
     type: TRANSFER_ST1,
-    payload: { serviceType, recipients, averageTxFees },
+    payload: {
+      serviceType,
+      recipients,
+      averageTxFees,
+      derivativeAccountDetails,
+    },
   };
 };
 
@@ -64,11 +77,18 @@ export const transferST2 = (
   serviceType,
   txnPriority,
   customTxPrerequisites?,
+  derivativeAccountDetails?: { type: string; number: number },
   nSequence?,
 ) => {
   return {
     type: TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
+    payload: {
+      serviceType,
+      txnPriority,
+      customTxPrerequisites,
+      derivativeAccountDetails,
+      nSequence,
+    },
   };
 };
 
@@ -76,11 +96,18 @@ export const alternateTransferST2 = (
   serviceType,
   txnPriority,
   customTxPrerequisites?,
+  derivativeAccountDetails?: { type: string; number: number },
   nSequence?,
 ) => {
   return {
     type: ALTERNATE_TRANSFER_ST2,
-    payload: { serviceType, txnPriority, customTxPrerequisites, nSequence },
+    payload: {
+      serviceType,
+      txnPriority,
+      customTxPrerequisites,
+      derivativeAccountDetails,
+      nSequence,
+    },
   };
 };
 
@@ -129,6 +156,17 @@ export const syncDerivativeAccounts = (serviceTypes: string[]) => {
   return {
     type: SYNC_DERIVATIVE_ACCOUNTS,
     payload: { serviceTypes },
+  };
+};
+
+export const syncViaXpubAgent = (
+  serviceType,
+  derivativeAccountType,
+  accountNumber,
+) => {
+  return {
+    type: SYNC_VIA_XPUB_AGENT,
+    payload: { serviceType, derivativeAccountType, accountNumber },
   };
 };
 
@@ -195,6 +233,36 @@ export const setAverageTxFee = (data) => {
   };
 };
 
+export const setupDonationAccount = (
+  serviceType: string,
+  donee: string,
+  subject: string,
+  description: string,
+  configuration: {
+    displayBalance: boolean;
+    displayTransactions: boolean;
+  },
+) => {
+  return {
+    type: SETUP_DONATION_ACCOUNT,
+    payload: { serviceType, donee, subject, description, configuration },
+  };
+};
+
+export const updateDonationPreferences = (
+  serviceType: string,
+  accountNumber: number,
+  configuration: {
+    displayBalance: boolean;
+    displayTransactions: boolean;
+  },
+) => {
+  return {
+    type: UPDATE_DONATION_PREFERENCES,
+    payload: { serviceType, accountNumber, configuration },
+  };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -213,6 +281,7 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED';
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
+export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -281,4 +350,8 @@ export const secondaryXprivGenerated = (generated) => {
 
 export const twoFAResetted = (resetted) => {
   return { type: TWO_FA_RESETTED, payload: { resetted } };
+};
+
+export const settedDonationAccount = (serviceType, successful) => {
+  return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
 };

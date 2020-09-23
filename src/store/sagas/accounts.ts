@@ -24,6 +24,7 @@ import {
   testcoinsReceived,
   SYNC_ACCOUNTS,
   accountsSynched,
+  settedDonationAccount,
   FETCH_BALANCE_TX,
   EXCHANGE_RATE,
   exchangeRatesCalculated,
@@ -41,6 +42,9 @@ import {
   syncDerivativeAccounts,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
+  SETUP_DONATION_ACCOUNT,
+  UPDATE_DONATION_PREFERENCES,
+  SYNC_VIA_XPUB_AGENT,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -48,6 +52,7 @@ import {
   SECURE_ACCOUNT,
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
@@ -400,7 +405,7 @@ function* syncDerivativeAccountsWorker({ payload }) {
 
     const res = yield call(
       service.syncDerivativeAccountsBalanceTxs,
-      Object.keys(config.DERIVATIVE_ACC),
+      config.DERIVATIVE_ACC_TO_SYNC,
     );
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -435,8 +440,70 @@ export const syncDerivativeAccountsWatcher = createWatcher(
   SYNC_DERIVATIVE_ACCOUNTS,
 );
 
+function* syncViaXpubAgentWorker({ payload }) {
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+
+  const { serviceType, derivativeAccountType, accountNumber } = payload;
+  const service = yield select((state) => state.accounts[serviceType].service);
+
+  const preFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
+
+  const res = yield call(
+    service.syncViaXpubAgent,
+    derivativeAccountType,
+    accountNumber,
+  );
+
+  const postFetchDerivativeAccount = JSON.stringify(
+    serviceType === REGULAR_ACCOUNT
+      ? service.hdWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ]
+      : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
+          accountNumber
+        ],
+  );
+
+  if (res.status === 200) {
+    if (postFetchDerivativeAccount !== preFetchDerivativeAccount) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [serviceType]: JSON.stringify(service),
+      };
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log('Failed to sync derivative account');
+  }
+
+  yield put(switchLoader(payload.serviceType, 'balanceTx'));
+}
+
+export const syncViaXpubAgentWatcher = createWatcher(
+  syncViaXpubAgentWorker,
+  SYNC_VIA_XPUB_AGENT,
+);
+
 function* processRecipients(
-  recipients: [{ id: string; address: string; amount: number }],
+  recipients: [
+    {
+      id: string;
+      address: string;
+      amount: number;
+      type?: string;
+      accountNumber?: number;
+    },
+  ],
   serviceType: string,
 ) {
   const addressedRecipients = [];
@@ -453,19 +520,29 @@ function* processRecipients(
   const trustedContactsServices: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
-
   for (const recipient of recipients) {
     if (recipient.address) addressedRecipients.push(recipient);
     // recipient: explicit address
     else {
       if (!recipient.id) throw new Error('Invalid recipient');
-      if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
-        // recipient: sibling account
+      if (
+        recipient.id === REGULAR_ACCOUNT ||
+        recipient.id === SECURE_ACCOUNT ||
+        recipient.id === DONATION_ACCOUNT
+      ) {
+        // recipient: account
         const subInstance =
-          recipient.id === REGULAR_ACCOUNT
+          recipient.type === REGULAR_ACCOUNT
             ? regularAccount.hdWallet
             : secureAccount.secureHDWallet;
-        let { receivingAddress } = subInstance; // available based on serviceType
+
+        let receivingAddress;
+        if (recipient.id === DONATION_ACCOUNT) {
+          receivingAddress = subInstance.getReceivingAddress(
+            recipient.id,
+            recipient.accountNumber,
+          );
+        } else receivingAddress = subInstance.getReceivingAddress(); // available based on serviceType
         if (!receivingAddress) {
           throw new Error(
             `Failed to generate receiving address for recipient: ${recipient.id}`,
@@ -551,7 +628,7 @@ function* processRecipients(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  let { recipients, averageTxFees } = payload;
+  let { recipients, averageTxFees, derivativeAccountDetails } = payload;
   console.log({ recipients });
 
   try {
@@ -564,7 +641,12 @@ function* transferST1Worker({ payload }) {
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
-  const res = yield call(service.transferST1, recipients, averageTxFees);
+  const res = yield call(
+    service.transferST1,
+    recipients,
+    averageTxFees,
+    derivativeAccountDetails,
+  );
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -583,6 +665,7 @@ function* transferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
 
@@ -601,6 +684,7 @@ function* transferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -652,6 +736,7 @@ function* alternateTransferST2Worker({ payload }) {
     serviceType,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   } = payload;
   if (serviceType !== SECURE_ACCOUNT) return;
@@ -672,6 +757,7 @@ function* alternateTransferST2Worker({ payload }) {
     txPrerequisites,
     txnPriority,
     customTxPrerequisites,
+    derivativeAccountDetails,
     nSequence,
   );
   if (res.status === 200) {
@@ -967,4 +1053,71 @@ function* startupSyncWorker({ payload }) {
 export const startupSyncWatcher = createWatcher(
   startupSyncWorker,
   STARTUP_SYNC,
+);
+
+function* setupDonationAccountWorker({ payload }) {
+  const { serviceType, donee, subject, description, configuration } = payload;
+  const service = yield select((state) => state.accounts[serviceType].service);
+
+  const res = yield call(
+    service.setupDonationAccount,
+    donee,
+    subject,
+    description,
+    configuration,
+  );
+
+  if (res.status === 200) {
+    console.log({ res });
+    if (!res.data.setupSuccessful) {
+      yield put(settedDonationAccount(serviceType, false));
+      throw new Error('Donation account setup failed');
+    }
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(settedDonationAccount(serviceType, true));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  }
+}
+
+export const setupDonationAccountWatcher = createWatcher(
+  setupDonationAccountWorker,
+  SETUP_DONATION_ACCOUNT,
+);
+
+function* updateDonationPreferencesWorker({ payload }) {
+  const { serviceType, accountNumber, configuration } = payload;
+  const service = yield select((state) => state.accounts[serviceType].service);
+
+  const res = yield call(
+    service.updateDonationPreferences,
+    accountNumber,
+    configuration,
+  );
+
+  if (res.status === 200) {
+    console.log({ res });
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  }
+}
+
+export const updateDonationPreferencesWatcher = createWatcher(
+  updateDonationPreferencesWorker,
+  UPDATE_DONATION_PREFERENCES,
 );

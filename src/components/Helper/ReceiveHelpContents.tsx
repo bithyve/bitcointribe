@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function ReceiveHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -57,15 +59,17 @@ export default function ReceiveHelpContents(props) {
         }}
       />
       <ScrollView
+        ref={scrollViewRef}
         style={styles.modalContainer}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('80%')}
         decelerationRate="fast"
       >
         <View
           style={{
-            height: hp('89%'),
+            height: hp('80%'),
             justifyContent: 'space-between',
             paddingBottom: hp('6%'),
+            marginTop: hp('4%')
           }}
         >
           <Text
@@ -113,6 +117,11 @@ export default function ReceiveHelpContents(props) {
             bitcoin{'\n'}from Friends and Family, please check the{'\n'}checkbox
             above
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
@@ -128,7 +137,7 @@ export default function ReceiveHelpContents(props) {
         </View>
         <View
           style={{
-            height: hp('89%'),
+            height: hp('80%'),
             justifyContent: 'space-between',
             paddingTop: hp('2%'),
             paddingBottom: hp('6%'),

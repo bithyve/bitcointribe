@@ -4,8 +4,10 @@ import {
   DerivativeAccount,
   DerivativeAccounts,
   TrustedContactDerivativeAccount,
+  DonationDerivativeAccount,
 } from './utilities/Interface';
 import Config from 'react-native-config';
+import { DONATION_ACCOUNT } from '../common/constants/serviceTypes';
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -32,8 +34,8 @@ class HexaConfig {
     keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
     iv: Buffer.alloc(16, 0),
   };
-  public KEY_STRECH_ITERATIONS = parseInt(
-    Config.BIT_KEY_STRECH_ITERATIONS.trim(),
+  public KEY_STRETCH_ITERATIONS = parseInt(
+    Config.BIT_KEY_STRETCH_ITERATIONS.trim(),
     10,
   );
   public BH_SERVERS = {
@@ -52,7 +54,7 @@ class HexaConfig {
   public SSS_TOTAL: number = parseInt(Config.BIT_SSS_TOTAL.trim(), 10);
   public SSS_THRESHOLD: number = parseInt(Config.BIT_SSS_THRESHOLD.trim(), 10);
   public MSG_ID_LENGTH: number = parseInt(Config.BIT_MSG_ID_LENGTH.trim(), 10);
-  public SCHUNK_SIZE: number = parseInt(Config.BIT_SCHUNK_SIZE.trim(), 10);
+  public CHUNK_SIZE: number = parseInt(Config.BIT_CHUNK_SIZE.trim(), 10);
   public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR.trim(), 10);
   public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
   public DPATH_PURPOSE: number = parseInt(Config.BIT_DPATH_PURPOSE.trim(), 10);
@@ -154,7 +156,7 @@ class HexaConfig {
     },
   };
 
-  FAST_BITCOINS: DerivativeAccount = {
+  public FAST_BITCOINS: DerivativeAccount = {
     series: parseInt(Config.BIT_FAST_BITCOINS_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10),
@@ -162,7 +164,7 @@ class HexaConfig {
     },
   };
 
-  TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
+  public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10),
     instance: {
@@ -171,10 +173,23 @@ class HexaConfig {
     },
   };
 
+  public DONATION_ACCOUNT: DonationDerivativeAccount = {
+    series: parseInt(Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10),
+    instance: {
+      max: parseInt(Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10),
+      using: 0,
+    },
+  };
+
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
+    DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
+
+  public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
+    (account) => account !== DONATION_ACCOUNT,
+  );
 
   constructor(env: string) {
     this.ENVIRONMENT = env;

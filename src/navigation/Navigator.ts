@@ -14,8 +14,7 @@ import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
-// import Home from '../pages/Home';
-import Home from '../pages/HomeUpdated';
+import Home from '../pages/Home';
 import ReLogin from '../pages/ReLogin';
 import Accounts from '../pages/Accounts/Index_New';
 import ManageBackup from '../pages/ManageBackup';
@@ -83,6 +82,7 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
+import AddNewAccount from '../pages/Accounts/AddNewAccount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -154,6 +154,7 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
+    AddNewAccount,
     Send: {
       screen: Send,
       navigationOptions: {

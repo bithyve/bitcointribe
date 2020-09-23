@@ -14,11 +14,16 @@ export default class TrustedContactsService {
     const { tc } = JSON.parse(json);
     const {
       trustedContacts,
+      skippedContactsCount,
     }: {
       trustedContacts: Contacts;
+      skippedContactsCount: number;
     } = tc;
 
-    return new TrustedContactsService({ trustedContacts });
+    return new TrustedContactsService({
+      trustedContacts,
+      skippedContactsCount,
+    });
   };
 
   public static encryptPub = (
@@ -78,6 +83,7 @@ export default class TrustedContactsService {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
+    isGuardian?: boolean,
   ):
     | {
         status: number;
@@ -103,6 +109,7 @@ export default class TrustedContactsService {
           encodedPublicKey,
           encKey,
           contactsWalletName,
+          isGuardian,
         ),
       };
     } catch (err) {

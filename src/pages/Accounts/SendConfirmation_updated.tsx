@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   AsyncStorage,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -26,6 +27,7 @@ import {
   transferST2,
   clearTransfer,
   fetchBalanceTx,
+  syncViaXpubAgent,
   alternateTransferST2,
 } from '../../store/actions/accounts';
 import { UsNumberFormat, timeConvertNear30 } from '../../common/utilities';
@@ -57,6 +59,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import RecipientSendConfirmation from './RecipientSendConfirmation';
 import RadioButton from '../../components/RadioButton';
 import CustomPriorityContent from './CustomPriorityContent';
+import Toast from '../../components/Toast';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -74,6 +77,7 @@ interface SendConfirmationStateTypes {
   customFeePerByteErr: string;
   averageTxFees: any;
   customTxPrerequisites: any;
+  derivativeAccountDetails: { type: string; number: number };
 }
 
 interface SendConfirmationPropsTypes {
@@ -83,6 +87,7 @@ interface SendConfirmationPropsTypes {
   trustedContactsService: any;
   exchangeRates: any;
   fetchBalanceTx: any;
+  syncViaXpubAgent: any;
   clearTransfer: any;
   alternateTransferST2: any;
   transferST2: any;
@@ -136,6 +141,9 @@ class SendConfirmation_updated extends Component<
       customEstimatedBlock: 0,
       averageTxFees: this.props.averageTxFees,
       customTxPrerequisites: null,
+      derivativeAccountDetails: this.props.navigation.getParam(
+        'derivativeAccountDetails',
+      ),
     };
   }
 
@@ -200,10 +208,9 @@ class SendConfirmation_updated extends Component<
     const receivers = [];
     transfer.details.forEach((details) => {
       if (details.selectedContact && details.selectedContact.firstName) {
-        const contactName = `${details.selectedContact.firstName} ${
-          details.selectedContact.lastName
-            ? details.selectedContact.lastName
-            : ''
+        const contactName = `${details.selectedContact.firstName} ${details.selectedContact.lastName
+          ? details.selectedContact.lastName
+          : ''
           }`
           .toLowerCase()
           .trim();
@@ -247,14 +254,22 @@ class SendConfirmation_updated extends Component<
         this.updateDescription(transfer.txid, transfer.details[0].note);
       }
       this.storeTrustedContactsHistory(transfer.details);
-      this.props.fetchBalanceTx(this.serviceType, {
-        loader: true,
-        syncTrustedDerivative:
-          this.serviceType === REGULAR_ACCOUNT ||
-            this.serviceType === SECURE_ACCOUNT
-            ? true
-            : false,
-      });
+      if (this.state.derivativeAccountDetails) {
+        this.props.syncViaXpubAgent(
+          this.serviceType,
+          this.state.derivativeAccountDetails.type,
+          this.state.derivativeAccountDetails.number,
+        );
+      } else {
+        this.props.fetchBalanceTx(this.serviceType, {
+          loader: true,
+          syncTrustedDerivative:
+            this.serviceType === REGULAR_ACCOUNT ||
+              this.serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        });
+      }
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
       }, 10);
@@ -326,6 +341,7 @@ class SendConfirmation_updated extends Component<
     const customTxPrerequisites = service.calculateCustomFee(
       outputs,
       parseInt(amount),
+      this.state.derivativeAccountDetails,
     );
 
     if (customTxPrerequisites.inputs) {
@@ -377,12 +393,14 @@ class SendConfirmation_updated extends Component<
         this.serviceType,
         txPriority,
         this.state.customTxPrerequisites,
+        this.state.derivativeAccountDetails,
       );
     } else {
       this.props.transferST2(
         this.serviceType,
         txPriority,
         this.state.customTxPrerequisites,
+        this.state.derivativeAccountDetails,
       );
     }
   };
@@ -487,11 +505,13 @@ class SendConfirmation_updated extends Component<
             </TouchableOpacity>
             <Image
               source={
-                this.serviceType == TEST_ACCOUNT
-                  ? require('../../assets/images/icons/icon_test.png')
-                  : this.serviceType == REGULAR_ACCOUNT
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : require('../../assets/images/icons/icon_secureaccount.png')
+                this.state.derivativeAccountDetails
+                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  : this.serviceType == TEST_ACCOUNT
+                    ? require('../../assets/images/icons/icon_test.png')
+                    : this.serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -500,11 +520,14 @@ class SendConfirmation_updated extends Component<
                 {'Send Confirmation'}
               </Text>
               <Text style={styles.headerText}>
-                {this.serviceType == TEST_ACCOUNT
+                How urgent is the transaction?
+                {/* {this.state.derivativeAccountDetails
+                  ? 'Donation Account'
+                  : this.serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : this.serviceType == REGULAR_ACCOUNT
-                    ? 'Checking Account'
-                    : 'Savings Account'}
+                  ? 'Checking Account'
+                  : 'Savings Account'} */}
               </Text>
             </View>
             <TouchableOpacity
@@ -527,12 +550,12 @@ class SendConfirmation_updated extends Component<
         </View>
         <ScrollView>
           <View style={styles.availableBalanceView}>
-            {/* <Text style={styles.accountTypeTextBalanceView}>
-              {this.getServiceTypeAccount()}
-            </Text> */}
             <Text style={styles.accountTypeTextBalanceView}>
-              {'Available to spend '}
-              <Text style={styles.accountTypeTextBalanceView}>
+              {this.getServiceTypeAccount()}
+            </Text>
+            <Text style={styles.availableToSpendText}>
+              {' (Available to spend '}
+              <Text style={styles.availableToSpendText}>
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : switchOn
@@ -544,12 +567,12 @@ class SendConfirmation_updated extends Component<
                       ).toFixed(2)
                       : null}
               </Text>
-              <Text style={styles.accountTypeTextBalanceView}>
+              <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
-                  ? ' t-sats'
+                  ? ' t-sats)'
                   : switchOn
-                    ? ' sats'
-                    : ' ' + CurrencyCode.toLocaleLowerCase()}
+                    ? ' sats)'
+                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
           </View>
@@ -704,20 +727,22 @@ class SendConfirmation_updated extends Component<
                     High
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   {transfer &&
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        ~{(transfer.stage1.txPrerequisites['high'].estimatedBlocks + 1) * 10}{' '}minutes
-                        {/* {transfer.stage1.txPrerequisites['high'].estimatedBlocks * 10}{' '}
-                        -{' '}
-                        {(transfer.stage1.txPrerequisites['high'].estimatedBlocks + 1) * 10}{' '}
-                        minutes */}
+                        ~
+                        {
+                          timeConvertNear30((transfer.stage1.txPrerequisites['high']
+                            .estimatedBlocks +
+                            1) *
+                            10)
+                        }
                       </Text>
                     ) : null}
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -747,13 +772,19 @@ class SendConfirmation_updated extends Component<
                   Medium
                 </Text>
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={styles.priorityValueContainer}>
                 {!this.isSendMax ? (
                   transfer &&
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        ~{timeConvertNear30((transfer.stage1.txPrerequisites['medium'].estimatedBlocks + 1) * 10)}
+                        ~
+                        {timeConvertNear30(
+                          (transfer.stage1.txPrerequisites['medium']
+                            .estimatedBlocks +
+                            1) *
+                          10,
+                        )}
                         {/* {transfer.stage1.txPrerequisites['medium']
                           .estimatedBlocks * 10}{' '}
                       -{' '}
@@ -765,10 +796,12 @@ class SendConfirmation_updated extends Component<
                       </Text>
                     ) : null
                 ) : (
-                    <Text>120 - 130</Text>
+                    <View style={[styles.priorityValueContainer]}>
+                      <Text style={styles.priorityTableText}>~2 hours</Text>
+                    </View>
                   )}
               </View>
-              <View style={styles.priorityDataContainer}>
+              <View style={styles.priorityValueContainer}>
                 <Text style={styles.priorityTableText}>
                   {this.convertBitCoinToCurrency(
                     transfer.stage1 && transfer.stage1.txPrerequisites
@@ -804,12 +837,18 @@ class SendConfirmation_updated extends Component<
                     Low
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   {transfer &&
                     transfer.stage1 &&
                     transfer.stage1.txPrerequisites ? (
                       <Text style={styles.priorityTableText}>
-                        ~{timeConvertNear30((transfer.stage1.txPrerequisites['low'].estimatedBlocks + 1) * 10)}
+                        ~
+                        {timeConvertNear30(
+                          (transfer.stage1.txPrerequisites['low']
+                            .estimatedBlocks +
+                            1) *
+                          10,
+                        )}
                         {/* {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
                           10}{' '}
                       -{' '}
@@ -820,7 +859,7 @@ class SendConfirmation_updated extends Component<
                       </Text>
                     ) : null}
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(
                       transfer.stage1 && transfer.stage1.txPrerequisites
@@ -856,14 +895,15 @@ class SendConfirmation_updated extends Component<
                     Custom
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
-                    ~{(this.state.customEstimatedBlock + 1) * 10} minutes
-                    {/* {this.state.customEstimatedBlock * 10} - {' '}
-                    {(this.state.customEstimatedBlock + 1) * 10} minutes */}
+                    ~
+                    {timeConvertNear30(
+                    (this.state.customEstimatedBlock + 1) * 10,
+                  )}
                   </Text>
                 </View>
-                <View style={styles.priorityDataContainer}>
+                <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
                     {this.convertBitCoinToCurrency(this.state.customFeePerByte)}
                     {' ' + this.getCorrectCurrencySymbol()}
@@ -1212,7 +1252,7 @@ class SendConfirmation_updated extends Component<
           }}
           enabledInnerScrolling={true}
           ref={'CustomPriorityBottomSheet'}
-          snapPoints={[-50, hp('65%')]}
+          snapPoints={[-50, hp('75%')]}
           renderContent={() => (
             <CustomPriorityContent
               title={'Custom Priority'}
@@ -1222,10 +1262,12 @@ class SendConfirmation_updated extends Component<
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
-              onPressOk={(amount, customEstimatedBlock) =>
-                this.handleCustomFee(amount, customEstimatedBlock)
-              }
+              onPressOk={(amount, customEstimatedBlock) => {
+                Keyboard.dismiss();
+                this.handleCustomFee(amount, customEstimatedBlock);
+              }}
               onPressCancel={() => {
+                Keyboard.dismiss();
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
               }}
@@ -1234,6 +1276,7 @@ class SendConfirmation_updated extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
+                Keyboard.dismiss();
                 if (this.refs.CustomPriorityBottomSheet as any)
                   (this.refs.CustomPriorityBottomSheet as any).snapTo(0);
               }}
@@ -1260,6 +1303,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchBalanceTx,
+    syncViaXpubAgent,
     clearTransfer,
     alternateTransferST2,
     transferST2,
@@ -1349,6 +1393,11 @@ const styles = StyleSheet.create({
   availableBalanceUnitText: {
     color: Colors.blue,
     fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansMediumItalic,
+  },
+  textTsats: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(7),
     fontFamily: Fonts.FiraSansMediumItalic,
   },
   totalMountView: {
@@ -1446,7 +1495,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
     color: Colors.greyTextColor,
-    textAlign: 'center',
+    textAlign: 'right',
   },
   priorityTableHeadingContainer: {
     flex: 1,
@@ -1467,6 +1516,12 @@ const styles = StyleSheet.create({
     paddingBottom: hp('1.5%'),
   },
   priorityDataContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priorityValueContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',

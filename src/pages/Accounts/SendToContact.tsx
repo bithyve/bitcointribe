@@ -149,18 +149,18 @@ export default function SendToContact(props) {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -179,16 +179,16 @@ export default function SendToContact(props) {
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
       : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        //      .unconfirmedBalance
-        0;
+      //      .unconfirmedBalance
+      0;
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -356,7 +356,7 @@ export default function SendToContact(props) {
           // recipient: trusted contact
           const contactName = `${item.selectedContact.firstName} ${
             item.selectedContact.lastName ? item.selectedContact.lastName : ''
-          }`.toLowerCase();
+            }`.toLowerCase();
           recipients.push({
             id: contactName,
             address: null,
@@ -397,10 +397,10 @@ export default function SendToContact(props) {
               item.account_name === 'Checking Account'
                 ? require('../../assets/images/icons/icon_regular.png')
                 : item.account_name === 'Savings Account'
-                ? require('../../assets/images/icons/icon_secureaccount.png')
-                : item.account_name === 'Test Account'
-                ? require('../../assets/images/icons/icon_test_white.png')
-                : require('../../assets/images/icons/icon_user.png')
+                  ? require('../../assets/images/icons/icon_secureaccount.png')
+                  : item.account_name === 'Test Account'
+                    ? require('../../assets/images/icons/icon_test_white.png')
+                    : require('../../assets/images/icons/icon_user.png')
             }
             style={styles.circleShapeView}
           />
@@ -429,14 +429,14 @@ export default function SendToContact(props) {
               >
                 {item
                   ? nameToInitials(
-                      item.firstName && item.lastName
-                        ? item.firstName + ' ' + item.lastName
-                        : item.firstName && !item.lastName
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
                         ? item.firstName
                         : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-                    )
+                          ? item.lastName
+                          : '',
+                  )
                   : ''}
               </Text>
             ) : item && item.id ? (
@@ -450,11 +450,11 @@ export default function SendToContact(props) {
                 @
               </Text>
             ) : (
-              <Image
-                source={require('../../assets/images/icons/icon_user.png')}
-                style={styles.circleShapeView}
-              />
-            )}
+                  <Image
+                    source={require('../../assets/images/icons/icon_user.png')}
+                    style={styles.circleShapeView}
+                  />
+                )}
           </View>
         );
       }
@@ -504,10 +504,10 @@ export default function SendToContact(props) {
         >
           {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` +
-              `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
+            `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
             : CurrencySymbol +
-              ' ' +
-              `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
+            ' ' +
+            `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
     );
@@ -577,14 +577,14 @@ export default function SendToContact(props) {
           'There seems to be a problem' + '\n' + transfer.stage1.failed
             ? transfer.stage1.err === 'Insufficient balance'
               ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
-                //   `\n\nPlease reduce the transfer amount by ${(
-                //     parseFloat(netAmount) +
-                //     parseFloat(fee) -
-                //     parseFloat(balance)
-                //   ).toFixed(
-                //     switchOn ? 0 : 2,
-                //   )} in order to conduct this transaction`
-                'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
+              //   `\n\nPlease reduce the transfer amount by ${(
+              //     parseFloat(netAmount) +
+              //     parseFloat(fee) -
+              //     parseFloat(balance)
+              //   ).toFixed(
+              //     switchOn ? 0 : 2,
+              //   )} in order to conduct this transaction`
+              'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
               : 'Something went wrong, please try again.'
             : 'Something went wrong, please try again.'
         }
@@ -634,7 +634,7 @@ export default function SendToContact(props) {
           height: wp('13%'),
           backgroundColor: switchOn ? Colors.white : Colors.backgroundColor,
         }}
-        // onPress={()=>setSwitchOn(!switchOn)}
+      // onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           <Image
@@ -657,8 +657,8 @@ export default function SendToContact(props) {
                 ? 'Enter amount in t-sats'
                 : 'Enter amount in sats'
               : serviceType == TEST_ACCOUNT
-              ? 'Converted amount in t-sats'
-              : 'Converted amount in sats'
+                ? 'Converted amount in t-sats'
+                : 'Converted amount in sats'
           }
           editable={switchOn}
           value={bitcoinAmount}
@@ -698,19 +698,19 @@ export default function SendToContact(props) {
           height: wp('13%'),
           backgroundColor: !switchOn ? Colors.white : Colors.backgroundColor,
         }}
-        // onPress={()=>setSwitchOn(!switchOn)}
+      // onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           {currencyCode.includes(CurrencyCode) ? (
             setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode), 'gray')
           ) : (
-            <Image
-              style={{
-                ...styles.textBoxImage,
-              }}
-              source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
-            />
-          )}
+              <Image
+                style={{
+                  ...styles.textBoxImage,
+                }}
+                source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
+              />
+            )}
           {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
@@ -919,10 +919,10 @@ export default function SendToContact(props) {
         {serviceType == TEST_ACCOUNT
           ? UsNumberFormat(balance)
           : switchOn
-          ? UsNumberFormat(balance)
-          : exchangeRates
-          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-          : null}
+            ? UsNumberFormat(balance)
+            : exchangeRates
+              ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+              : null}
       </Text>
     );
   };
@@ -962,8 +962,8 @@ export default function SendToContact(props) {
               serviceType == TEST_ACCOUNT
                 ? require('../../assets/images/icons/icon_test.png')
                 : serviceType == REGULAR_ACCOUNT
-                ? require('../../assets/images/icons/icon_regular.png')
-                : require('../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : require('../../assets/images/icons/icon_secureaccount.png')
             }
             style={{ width: wp('10%'), height: wp('10%') }}
           />
@@ -979,8 +979,8 @@ export default function SendToContact(props) {
               {serviceType == TEST_ACCOUNT
                 ? 'Test Account'
                 : serviceType == REGULAR_ACCOUNT
-                ? 'Checking Account'
-                : 'Savings Account'}
+                  ? 'Checking Account'
+                  : 'Savings Account'}
             </Text>
           </View>
         </View>
@@ -1034,8 +1034,8 @@ export default function SendToContact(props) {
               {serviceType == TEST_ACCOUNT
                 ? ' t-sats )'
                 : switchOn
-                ? ' sats )'
-                : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats )'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
             </Text>
           </Text>
           {isFromAddressBook && (
@@ -1064,82 +1064,82 @@ export default function SendToContact(props) {
                 >
                   <View style={{ flexDirection: 'row' }}>
                     {item.selectedContact &&
-                    item.selectedContact.account_name ? (
-                      <Image
-                        source={
-                          item.selectedContact.account_name ===
-                          'Checking Account'
-                            ? require('../../assets/images/icons/icon_regular.png')
-                            : item.selectedContact.account_name ===
-                              'Savings Account'
-                            ? require('../../assets/images/icons/icon_secureaccount.png')
-                            : item.selectedContact.account_name ===
-                              'Test Account'
-                            ? require('../../assets/images/icons/icon_test_white.png')
-                            : require('../../assets/images/icons/icon_user.png')
-                        }
-                        style={styles.circleShapeView}
-                      />
-                    ) : item.selectedContact.image ? (
-                      <Image
-                        source={item.selectedContact.image}
-                        style={styles.circleShapeView}
-                      />
-                    ) : (
-                      <View
-                        style={{
-                          ...styles.circleShapeView,
-                          backgroundColor: Colors.shadowBlue,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {item.selectedContact &&
-                        item.selectedContact.firstName ? (
-                          <Text
+                      item.selectedContact.account_name ? (
+                        <Image
+                          source={
+                            item.selectedContact.account_name ===
+                              'Checking Account'
+                              ? require('../../assets/images/icons/icon_regular.png')
+                              : item.selectedContact.account_name ===
+                                'Savings Account'
+                                ? require('../../assets/images/icons/icon_secureaccount.png')
+                                : item.selectedContact.account_name ===
+                                  'Test Account'
+                                  ? require('../../assets/images/icons/icon_test_white.png')
+                                  : require('../../assets/images/icons/icon_user.png')
+                          }
+                          style={styles.circleShapeView}
+                        />
+                      ) : item.selectedContact.image ? (
+                        <Image
+                          source={item.selectedContact.image}
+                          style={styles.circleShapeView}
+                        />
+                      ) : (
+                          <View
                             style={{
-                              textAlign: 'center',
-                              fontSize: 13,
-                              lineHeight: 13, //... One for top and one for bottom alignment
+                              ...styles.circleShapeView,
+                              backgroundColor: Colors.shadowBlue,
+                              alignItems: 'center',
+                              justifyContent: 'center',
                             }}
                           >
-                            {item && item.selectedContact
-                              ? nameToInitials(
-                                  item.selectedContact.firstName &&
-                                    item.selectedContact.lastName
-                                    ? item.selectedContact.firstName +
+                            {item.selectedContact &&
+                              item.selectedContact.firstName ? (
+                                <Text
+                                  style={{
+                                    textAlign: 'center',
+                                    fontSize: 13,
+                                    lineHeight: 13, //... One for top and one for bottom alignment
+                                  }}
+                                >
+                                  {item && item.selectedContact
+                                    ? nameToInitials(
+                                      item.selectedContact.firstName &&
+                                        item.selectedContact.lastName
+                                        ? item.selectedContact.firstName +
                                         ' ' +
                                         item.selectedContact.lastName
-                                    : item.selectedContact.firstName &&
-                                      !item.selectedContact.lastName
-                                    ? item.selectedContact.firstName
-                                    : !item.selectedContact.firstName &&
-                                      item.selectedContact.lastName
-                                    ? item.selectedContact.lastName
-                                    : '',
-                                )
-                              : ''}
-                          </Text>
-                        ) : item &&
-                          item.selectedContact &&
-                          item.selectedContact.id ? (
-                          <Text
-                            style={{
-                              textAlign: 'center',
-                              fontSize: 18,
-                              lineHeight: 18, //... One for top and one for bottom alignment
-                            }}
-                          >
-                            @
-                          </Text>
-                        ) : (
-                          <Image
-                            source={require('../../assets/images/icons/icon_user.png')}
-                            style={styles.circleShapeView}
-                          />
+                                        : item.selectedContact.firstName &&
+                                          !item.selectedContact.lastName
+                                          ? item.selectedContact.firstName
+                                          : !item.selectedContact.firstName &&
+                                            item.selectedContact.lastName
+                                            ? item.selectedContact.lastName
+                                            : '',
+                                    )
+                                    : ''}
+                                </Text>
+                              ) : item &&
+                                item.selectedContact &&
+                                item.selectedContact.id ? (
+                                  <Text
+                                    style={{
+                                      textAlign: 'center',
+                                      fontSize: 18,
+                                      lineHeight: 18, //... One for top and one for bottom alignment
+                                    }}
+                                  >
+                                    @
+                                  </Text>
+                                ) : (
+                                  <Image
+                                    source={require('../../assets/images/icons/icon_user.png')}
+                                    style={styles.circleShapeView}
+                                  />
+                                )}
+                          </View>
                         )}
-                      </View>
-                    )}
                     {/* {getImageIcon(item.selectedContact)} */}
                     <TouchableOpacity
                       style={styles.closeMarkStyle}
@@ -1176,17 +1176,17 @@ export default function SendToContact(props) {
                   >
                     {switchOn
                       ? `${
-                          item.bitcoinAmount
-                            ? item.bitcoinAmount
-                            : bitcoinAmount
-                        } sats`
+                      item.bitcoinAmount
+                        ? item.bitcoinAmount
+                        : bitcoinAmount
+                      } sats`
                       : CurrencySymbol +
-                        ' ' +
-                        `${
-                          item.currencyAmount
-                            ? item.currencyAmount
-                            : currencyAmount
-                        }`}
+                      ' ' +
+                      `${
+                      item.currencyAmount
+                        ? item.currencyAmount
+                        : currencyAmount
+                      }`}
                   </Text>
                 </View>
               );
@@ -1228,7 +1228,7 @@ export default function SendToContact(props) {
                       ? Colors.white
                       : Colors.backgroundColor,
                   }}
-                  // onPress={()=>setSwitchOn(!switchOn)}
+                // onPress={()=>setSwitchOn(!switchOn)}
                 >
                   <View style={styles.amountInputImage}>
                     {currencyCode.includes(CurrencyCode) ? (
@@ -1247,13 +1247,13 @@ export default function SendToContact(props) {
                         />
                       </View>
                     ) : (
-                      <Image
-                        style={{
-                          ...styles.textBoxImage,
-                        }}
-                        source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
-                      />
-                    )}
+                        <Image
+                          style={{
+                            ...styles.textBoxImage,
+                          }}
+                          source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
+                        />
+                      )}
                     {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
@@ -1324,7 +1324,7 @@ export default function SendToContact(props) {
                       ? Colors.white
                       : Colors.backgroundColor,
                   }}
-                  // onPress={()=>setSwitchOn(!switchOn)}
+                // onPress={()=>setSwitchOn(!switchOn)}
                 >
                   <View style={styles.amountInputImage}>
                     <Image
@@ -1480,11 +1480,11 @@ export default function SendToContact(props) {
                 }}
               >
                 {(!isConfirmDisabled && loading.transfer) ||
-                (isConfirmDisabled && loading.transfer) ? (
-                  <ActivityIndicator size="small" color={Colors.white} />
-                ) : (
-                  <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
-                )}
+                  (isConfirmDisabled && loading.transfer) ? (
+                    <ActivityIndicator size="small" color={Colors.white} />
+                  ) : (
+                    <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                  )}
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1594,14 +1594,14 @@ export default function SendToContact(props) {
               'There seems to be a problem' + '\n' + transfer.stage1.failed
                 ? transfer.stage1.err === 'Insufficient balance'
                   ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
-                    //   `\n\nPlease reduce the transfer amount by ${(
-                    //     parseFloat(netAmount) +
-                    //     parseFloat(fee) -
-                    //     parseFloat(balance)
-                    //   ).toFixed(
-                    //     switchOn ? 0 : 2,
-                    //   )} in order to conduct this transaction`
-                    'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
+                  //   `\n\nPlease reduce the transfer amount by ${(
+                  //     parseFloat(netAmount) +
+                  //     parseFloat(fee) -
+                  //     parseFloat(balance)
+                  //   ).toFixed(
+                  //     switchOn ? 0 : 2,
+                  //   )} in order to conduct this transaction`
+                  'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
                   : transfer.stage1.err
                 : 'Something went wrong'
             }

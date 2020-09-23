@@ -72,15 +72,15 @@ const HomeList = ({
       {Items.item.map((value) => {
         if (value.accountType === 'add') {
           return (
-            <TouchableOpacity disabled={true}>
-              <CardView
-                cornerRadius={10}
-                style={{
-                  ...styles.card,
-                  opacity: 0.4,
-                  backgroundColor: Colors.borderColor,
-                }}
-              >
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('AddNewAccount')}
+            >
+              <CardView cornerRadius={10} style={{
+                ...styles.card,
+                opacity: 0.4,
+                backgroundColor: Colors.borderColor,
+              }}>
                 <View
                   style={{
                     flex: 1,
@@ -98,7 +98,7 @@ const HomeList = ({
                       fontSize: RFValue(11),
                     }}
                   >
-                    Add Account
+                    Add to my wallet
                   </Text>
                 </View>
               </CardView>
@@ -113,14 +113,14 @@ const HomeList = ({
                     value.accountType === 'test'
                       ? TEST_ACCOUNT
                       : value.accountType === 'regular'
-                      ? REGULAR_ACCOUNT
-                      : SECURE_ACCOUNT,
+                        ? REGULAR_ACCOUNT
+                        : SECURE_ACCOUNT,
                   index:
                     value.accountType === 'test'
                       ? 0
                       : value.accountType === 'regular'
-                      ? 1
-                      : 2,
+                        ? 1
+                        : 2,
                 });
               }}
             >
@@ -128,7 +128,11 @@ const HomeList = ({
                 <View style={{ flexDirection: 'row' }}>
                   <Image
                     style={{ width: wp('10%'), height: wp('10%') }}
-                    source={getIconByAccountType(value.accountType)}
+                    source={getIconByAccountType(
+                      value.title === 'Donation Account'
+                        ? value.title
+                        : value.accountType,
+                    )}
                   />
                   {value.accountType == 'secure' ? (
                     <TouchableOpacity
@@ -182,68 +186,75 @@ const HomeList = ({
                       />
                     </View>
                   ) : (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        marginTop: hp('1%'),
-                      }}
-                    >
-                      {value.accountType === 'test' || switchOn ? (
-                        <Image
-                          style={styles.cardBitCoinImage}
-                          source={value.bitcoinicon}
-                        />
-                      ) : currencyCode.includes(CurrencyCode) ? (
-                        setCurrencyCodeToImage(
-                          getCurrencyImageName(CurrencyCode),
-                          'light_blue',
-                        )
-                      ) : (
-                        <Image
-                          style={styles.cardBitCoinImage}
-                          source={getCurrencyImageByRegion(
-                            CurrencyCode,
-                            'light_blue',
-                          )}
-                        />
-                      )}
-                      <Text
-                        style={
-                          accounts.accountsSynched
-                            ? styles.cardAmountText
-                            : styles.cardAmountTextGrey
-                        }
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                          marginTop: hp('1%'),
+                        }}
                       >
-                        {switchOn
-                          ? value.accountType === 'test'
-                            ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === 'regular'
-                            ? UsNumberFormat(balances.regularBalance)
-                            : UsNumberFormat(balances.secureBalance)
-                          : value.accountType === 'test'
-                          ? UsNumberFormat(balances.testBalance)
-                          : value.accountType === 'regular' && exchangeRates
-                          ? (
-                              (balances.regularBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
-                            ).toFixed(2)
-                          : exchangeRates
-                          ? (
-                              (balances.secureBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
-                            ).toFixed(2)
-                          : 0}
-                      </Text>
-                      <Text style={styles.cardAmountUnitText}>
-                        {switchOn
-                          ? value.unit
-                          : value.accountType === 'test'
-                          ? value.unit
-                          : CurrencyCode.toLocaleLowerCase()}
-                      </Text>
-                    </View>
-                  )}
+                        {value.accountType === 'test' || switchOn ? (
+                          <Image
+                            style={styles.cardBitCoinImage}
+                            source={value.bitcoinicon}
+                          />
+                        ) : currencyCode.includes(CurrencyCode) ? (
+                          setCurrencyCodeToImage(
+                            getCurrencyImageName(CurrencyCode),
+                            'light_blue',
+                          )
+                        ) : (
+                              <Image
+                                style={styles.cardBitCoinImage}
+                                source={getCurrencyImageByRegion(
+                                  CurrencyCode,
+                                  'light_blue',
+                                )}
+                              />
+                            )}
+                        <Text
+                          style={
+                            accounts.accountsSynched
+                              ? styles.cardAmountText
+                              : styles.cardAmountTextGrey
+                          }
+                        >
+                          {switchOn
+                            ? value.title === 'Donation Account'
+                              ? UsNumberFormat(value.amount)
+                              : value.accountType === 'test'
+                                ? UsNumberFormat(balances.testBalance)
+                                : value.accountType === 'regular'
+                                  ? UsNumberFormat(balances.regularBalance)
+                                  : UsNumberFormat(balances.secureBalance)
+                            : value.title === 'Donation Account' && exchangeRates
+                              ? (
+                                (value.amount / 1e8) *
+                                exchangeRates[CurrencyCode].last
+                              ).toFixed(2)
+                              : value.accountType === 'test'
+                                ? UsNumberFormat(balances.testBalance)
+                                : value.accountType === 'regular' && exchangeRates
+                                  ? (
+                                    (balances.regularBalance / 1e8) *
+                                    exchangeRates[CurrencyCode].last
+                                  ).toFixed(2)
+                                  : exchangeRates
+                                    ? (
+                                      (balances.secureBalance / 1e8) *
+                                      exchangeRates[CurrencyCode].last
+                                    ).toFixed(2)
+                                    : value.amount}
+                        </Text>
+                        <Text style={styles.cardAmountUnitText}>
+                          {switchOn
+                            ? value.unit
+                            : value.accountType === 'test'
+                              ? value.unit
+                              : CurrencyCode.toLocaleLowerCase()}
+                        </Text>
+                      </View>
+                    )}
                 </View>
               </CardView>
             </TouchableOpacity>
@@ -325,8 +336,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

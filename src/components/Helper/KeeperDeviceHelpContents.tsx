@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -16,8 +16,10 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function KeeperDeviceHelpContents(props) {
+  const scrollViewRef = useRef();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -57,18 +59,21 @@ export default function KeeperDeviceHelpContents(props) {
         }}
       />
       <ScrollView
+        ref={scrollViewRef}
         style={styles.modalContainer}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('85%')}
         decelerationRate="fast"
       >
-        <View style={{ height: hp('89%') }}>
+        <View style={{
+          height: hp('85%'), justifyContent: 'space-between', paddingBottom: hp('6%'),
+          marginTop: hp('2%')
+        }}>
           <Text
             style={{
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
-              marginTop: hp('2%'), 
               marginLeft: wp('5%'),
               marginRight: wp('5%')
             }}
@@ -77,7 +82,7 @@ export default function KeeperDeviceHelpContents(props) {
             is a device on which you have Hexa installed. This device must be
             different from the one you are using right now
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('5%'), marginBottom: hp('5%') }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/keeper_device_recovery_key.png')}
               style={{
@@ -100,7 +105,12 @@ export default function KeeperDeviceHelpContents(props) {
             If your Keeper Device is not accessible, it is possible to restore
             it using your primary device and one of your Keepers.
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('7%')}}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('85%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
                 borderStyle: 'dotted',
@@ -115,9 +125,10 @@ export default function KeeperDeviceHelpContents(props) {
         </View>
         <View
           style={{
-            height: hp('89%'),
-            paddingTop: hp('2%'),
+            height: hp('85%'),
+            // paddingTop: hp('2%'),
             paddingBottom: hp('6%'),
+            justifyContent: 'space-between'
           }}
         >
           <Text
@@ -134,7 +145,7 @@ export default function KeeperDeviceHelpContents(props) {
             migrate from Hexa to another wallet at any time. The Keeper also
             stores the 2FA Key required to spend from the Savings Account
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('5%'), marginBottom: hp('5%') }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/keeper_device_recovery_key_2.png')}
               style={{
@@ -158,12 +169,30 @@ export default function KeeperDeviceHelpContents(props) {
             be used to derive your addresses and private keys at any time. This
             string is also called a “mnemonic”.
           </Text>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('170%'), animated: true });
+          }}>
+            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          </TouchableOpacity>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
+                width: wp('80%'),
+                height: 0,
+              }}
+            />
+          </View>
         </View>
         <View
           style={{
-            height: hp('89%'),
-            paddingTop: hp('2%'),
+            height: hp('85%'),
+            // paddingTop: hp('2%'),
             paddingBottom: hp('6%'),
+            justifyContent: 'space-between'
           }}
         >
           <Text
@@ -180,7 +209,7 @@ export default function KeeperDeviceHelpContents(props) {
             person with access to your primary device does not have access to
             your Savings Account
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center',  marginTop: hp('5%'), marginBottom: hp('5%') }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/keeper_device_recovery_key_3.png')}
               style={{

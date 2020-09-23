@@ -95,6 +95,7 @@ export default class TrustedContacts {
   };
 
   public trustedContacts: Contacts = {};
+  public skippedContactsCount: number = 0;
   constructor(stateVars) {
     this.initializeStateVars(stateVars);
   }
@@ -134,6 +135,10 @@ export default class TrustedContacts {
   public initializeStateVars = (stateVars) => {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {};
+    this.skippedContactsCount =
+      stateVars && stateVars.skippedContactsCount
+        ? stateVars.skippedContactsCount
+        : this.skippedContactsCount;
   };
 
   public decodePublicKey = (publicKey: string) => {
@@ -149,6 +154,10 @@ export default class TrustedContacts {
       throw new Error(
         'TC Init failed: initialization already exists against the supplied',
       );
+    }
+
+    if (contactName.slice(0, 20) === 'f&f request awaiting') {
+      this.skippedContactsCount++;
     }
 
     const keyPair = ec.genKeyPair();
@@ -183,6 +192,7 @@ export default class TrustedContacts {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
+    isGuardian?: boolean,
   ): {
     channelAddress: string;
     ephemeralAddress: string;
@@ -229,7 +239,7 @@ export default class TrustedContacts {
       },
       contactsPubKey: encodedPublicKey,
       contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
-      isWard: contactsWalletName ? true : false,
+      isWard: isGuardian ? true : false,
     };
     return {
       channelAddress,
@@ -657,6 +667,13 @@ export default class TrustedContacts {
 
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        const { walletName } = data.data ? data.data : { walletName: null };
+        if (walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: walletName,
+          };
+        }
         return { updated, data };
       }
       return { updated };
@@ -702,6 +719,12 @@ export default class TrustedContacts {
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey)
           .data;
+        if (data.walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: data.walletName,
+          };
+        }
       }
 
       if (contactsWalletName) {

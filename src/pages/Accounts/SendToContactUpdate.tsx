@@ -47,6 +47,7 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -102,6 +103,7 @@ interface SendToContactStateTypes {
   serviceType: string;
   averageTxFees: any;
   spendableBalance: any;
+  derivativeAccountDetails: { type: string; number: number };
   sweepSecure: any;
   removeItem: any;
   switchOn: boolean;
@@ -138,6 +140,9 @@ class SendToContact extends Component<
       serviceType: this.props.navigation.getParam('serviceType'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
+      derivativeAccountDetails: this.props.navigation.getParam(
+        'derivativeAccountDetails',
+      ),
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       removeItem: {},
       switchOn: true,
@@ -189,7 +194,7 @@ class SendToContact extends Component<
         });
       }
     });
-    this.getBalances();
+    this.getAccountBalances();
     this.setCurrencyCodeFromAsync();
     if (!averageTxFees) this.storeAverageTxFees();
 
@@ -206,6 +211,7 @@ class SendToContact extends Component<
 
   updateSpendableBalance = () => {
     const { serviceType, spendableBalances } = this.state;
+    if (this.state.derivativeAccountDetails) return;
     if (serviceType === TEST_ACCOUNT) {
       this.setState({ spendableBalance: spendableBalances.testBalance });
     } else if (serviceType == REGULAR_ACCOUNT) {
@@ -217,7 +223,7 @@ class SendToContact extends Component<
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.accounts !== this.props.accounts) {
-      this.getBalances();
+      this.getAccountBalances();
     }
 
     if (
@@ -266,7 +272,7 @@ class SendToContact extends Component<
     }
   };
 
-  getBalances = () => {
+  getAccountBalances = () => {
     const { spendableBalance, serviceType } = this.state;
     const { accounts } = this.props;
 
@@ -281,12 +287,12 @@ class SendToContact extends Component<
       0;
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -307,14 +313,14 @@ class SendToContact extends Component<
       0;
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
-      if (derivativeAccount.instance.using) {
+      if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -482,6 +488,7 @@ class SendToContact extends Component<
       spendableBalance,
       averageTxFees,
       isSendMax,
+      derivativeAccountDetails,
     } = this.state;
     const { transfer } = this.props;
     if (!recipients.length) return;
@@ -499,6 +506,7 @@ class SendToContact extends Component<
           recipients,
           averageTxFees,
           isSendMax,
+          derivativeAccountDetails,
         });
       }
     }
@@ -529,6 +537,7 @@ class SendToContact extends Component<
     const { fee } = this.props.service[serviceType].service.calculateSendMaxFee(
       recipientsList.length + 1, // +1 for the current instance
       averageTxFees,
+      this.state.derivativeAccountDetails,
     );
 
     if (spendableBalance) {
@@ -559,7 +568,6 @@ class SendToContact extends Component<
       serviceType,
       averageTxFees,
     } = this.state;
-    console.log({ state: this.state, averageTxFees });
     const { transfer, service, transferST1 } = this.props;
 
     const recipients = [];
@@ -575,8 +583,24 @@ class SendToContact extends Component<
       if (
         instance.bitcoinAmount &&
         instance.selectedContact.id !== selectedContact.id
-      )
+      ) {
         recipientsList.push(instance);
+      } else if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id === selectedContact.id
+      ) {
+        if (selectedContact.id === DONATION_ACCOUNT) {
+          if (
+            instance.selectedContact.account_number ===
+              selectedContact.account_number &&
+            instance.selectedContact.type === selectedContact.type
+          ) {
+            // skip (current donation instance), get added as currentRecipientInstance
+          } else {
+            recipientsList.push(instance);
+          }
+        }
+      }
     });
     recipientsList.push(currentRecipientInstance);
     const instance =
@@ -594,10 +618,16 @@ class SendToContact extends Component<
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        if (recipientId === REGULAR_ACCOUNT || recipientId === SECURE_ACCOUNT) {
-          // recipient: sibling account
+        if (
+          recipientId === REGULAR_ACCOUNT ||
+          recipientId === SECURE_ACCOUNT ||
+          recipientId === DONATION_ACCOUNT
+        ) {
+          // recipient: account
           recipients.push({
             id: recipientId,
+            type: item.selectedContact.type, // underlying accountType (used in case of derv acc(here donation))
+            accountNumber: item.selectedContact.account_number, // donation acc number
             address: null,
             amount: parseInt(item.bitcoinAmount),
           });
@@ -615,7 +645,12 @@ class SendToContact extends Component<
       }
     });
     this.setState({ recipients: recipients });
-    transferST1(serviceType, recipients, averageTxFees);
+    transferST1(
+      serviceType,
+      recipients,
+      averageTxFees,
+      this.state.derivativeAccountDetails,
+    );
   };
 
   onConfirm = () => {
@@ -637,10 +672,23 @@ class SendToContact extends Component<
           transfer[serviceType].transfer.details[i].selectedContact.id ==
           selectedContact.id
         ) {
-          removeTransferDetails(
-            serviceType,
-            transfer[serviceType].transfer.details[i],
-          );
+          if (selectedContact.id === DONATION_ACCOUNT) {
+            if (
+              transfer[serviceType].transfer.details[i].selectedContact
+                .account_number === selectedContact.account_number &&
+              transfer[serviceType].transfer.details[i].selectedContact.type ===
+                selectedContact.type
+            )
+              removeTransferDetails(
+                serviceType,
+                transfer[serviceType].transfer.details[i],
+              );
+          } else {
+            removeTransferDetails(
+              serviceType,
+              transfer[serviceType].transfer.details[i],
+            );
+          }
         }
       }
       addTransferDetails(serviceType, {
@@ -659,34 +707,28 @@ class SendToContact extends Component<
     const {
       serviceType,
       spendableBalance,
-      RegularAccountBalance,
-      SavingAccountBalance,
       switchOn,
       exchangeRates,
       CurrencyCode,
-      spendableBalances,
     } = this.state;
-    let balance = spendableBalance;
-    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
-    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
-    if (serviceType == REGULAR_ACCOUNT)
-      balance = spendableBalances.regularBalance;
-    if (serviceType == SECURE_ACCOUNT)
-      balance = spendableBalances.secureBalance;
 
     return serviceType == TEST_ACCOUNT
-      ? UsNumberFormat(balance)
+      ? UsNumberFormat(spendableBalance)
       : switchOn
-        ? UsNumberFormat(balance)
+        ? UsNumberFormat(spendableBalance)
         : exchangeRates
-          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
           : null;
   };
 
   getIsMinimumAllowedStatus = () => {
     const { bitcoinAmount } = this.state;
-    return bitcoinAmount.length > 0 && Number(bitcoinAmount) >= 0 && Number(bitcoinAmount) < 550 ? true : false;
-  }
+    return bitcoinAmount.length > 0 &&
+      Number(bitcoinAmount) >= 0 &&
+      Number(bitcoinAmount) < 550
+      ? true
+      : false;
+  };
 
   render() {
     const {
@@ -747,22 +789,27 @@ class SendToContact extends Component<
             </TouchableOpacity>
             <Image
               source={
-                serviceType == TEST_ACCOUNT
-                  ? require('../../assets/images/icons/icon_test.png')
-                  : serviceType == REGULAR_ACCOUNT
-                    ? require('../../assets/images/icons/icon_regular.png')
-                    : require('../../assets/images/icons/icon_secureaccount.png')
+                this.state.derivativeAccountDetails
+                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  : serviceType == TEST_ACCOUNT
+                    ? require('../../assets/images/icons/icon_test.png')
+                    : serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
             <View style={{ marginLeft: wp('2.5%') }}>
               <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
               <Text style={styles.sendText}>
-                {serviceType == TEST_ACCOUNT
+                Enter amount/ details
+                {/* {this.state.derivativeAccountDetails
+                  ? 'Donation Account'
+                  : serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : serviceType == REGULAR_ACCOUNT
-                    ? 'Checking Account'
-                    : 'Savings Account'}
+                  ? 'Checking Account'
+                  : 'Savings Account'} */}
               </Text>
             </View>
           </View>
@@ -783,15 +830,17 @@ class SendToContact extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {serviceType == 'TEST_ACCOUNT'
-                ? 'Test Account'
-                : serviceType == 'SECURE_ACCOUNT'
-                  ? 'Savings Account'
-                  : serviceType == 'REGULAR_ACCOUNT'
-                    ? 'Checking Account'
-                    : serviceType == 'S3_SERVICE'
-                      ? 'S3 Service'
-                      : ''}
+              {this.state.derivativeAccountDetails
+                ? 'Donation Account'
+                : serviceType == 'TEST_ACCOUNT'
+                  ? 'Test Account'
+                  : serviceType == 'SECURE_ACCOUNT'
+                    ? 'Savings Account'
+                    : serviceType == 'REGULAR_ACCOUNT'
+                      ? 'Checking Account'
+                      : serviceType == 'S3_SERVICE'
+                        ? 'S3 Service'
+                        : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -865,18 +914,20 @@ class SendToContact extends Component<
                                     >
                                       {item && item.selectedContact
                                         ? nameToInitials(
-                                          item.selectedContact.firstName &&
-                                            item.selectedContact.lastName
-                                            ? item.selectedContact.firstName +
-                                            ' ' +
-                                            item.selectedContact.lastName
+                                          item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                                            ? `${item.selectedContact.contactsWalletName}'s wallet`
                                             : item.selectedContact.firstName &&
-                                              !item.selectedContact.lastName
-                                              ? item.selectedContact.firstName
-                                              : !item.selectedContact.firstName &&
-                                                item.selectedContact.lastName
-                                                ? item.selectedContact.lastName
-                                                : '',
+                                              item.selectedContact.lastName
+                                              ? item.selectedContact.firstName +
+                                              ' ' +
+                                              item.selectedContact.lastName
+                                              : item.selectedContact.firstName &&
+                                                !item.selectedContact.lastName
+                                                ? item.selectedContact.firstName
+                                                : !item.selectedContact.firstName &&
+                                                  item.selectedContact.lastName
+                                                  ? item.selectedContact.lastName
+                                                  : '',
                                         )
                                         : ''}
                                     </Text>
@@ -918,7 +969,9 @@ class SendToContact extends Component<
                         </TouchableOpacity>
                       </View>
                       <Text style={styles.name} numberOfLines={1}>
-                        {item.selectedContact.name ||
+                        {item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                          ? `${item.selectedContact.contactsWalletName}'s wallet`
+                          : item.selectedContact.name ||
                           item.selectedContact.account_name ||
                           item.selectedContact.id}
                       </Text>
@@ -929,7 +982,7 @@ class SendToContact extends Component<
                             ? item.bitcoinAmount
                             : bitcoinAmount
                           }` +
-                          `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
+                          `${serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
                           : CurrencySymbol +
                           ' ' +
                           `${
@@ -1057,7 +1110,9 @@ class SendToContact extends Component<
                   ) : null}
                   {this.getIsMinimumAllowedStatus() ? (
                     <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>Enter more than 550 sats (min allowed)</Text>
+                      <Text style={styles.errorText}>
+                        Enter more than 550 sats (min allowed)
+                      </Text>
                     </View>
                   ) : null}
                   <TouchableOpacity
@@ -1210,7 +1265,9 @@ class SendToContact extends Component<
                     this.setState({ isConfirmDisabled: true });
                     this.onConfirm();
                   }}
-                  disabled={isConfirmDisabled || this.getIsMinimumAllowedStatus()}
+                  disabled={
+                    isConfirmDisabled || this.getIsMinimumAllowedStatus()
+                  }
                   style={{
                     ...styles.confirmButtonView,
                     backgroundColor: isConfirmDisabled
@@ -1256,10 +1313,24 @@ class SendToContact extends Component<
                           transfer[serviceType].transfer.details[i]
                             .selectedContact.id == selectedContact.id
                         ) {
-                          removeTransferDetails(
-                            serviceType,
-                            transfer[serviceType].transfer.details[i],
-                          );
+                          if (selectedContact.id === DONATION_ACCOUNT) {
+                            if (
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.account_number ===
+                                selectedContact.account_number &&
+                              transfer[serviceType].transfer.details[i]
+                                .selectedContact.type === selectedContact.type
+                            )
+                              removeTransferDetails(
+                                serviceType,
+                                transfer[serviceType].transfer.details[i],
+                              );
+                          } else {
+                            removeTransferDetails(
+                              serviceType,
+                              transfer[serviceType].transfer.details[i],
+                            );
+                          }
                         }
                       }
                       addTransferDetails(serviceType, {

@@ -74,25 +74,43 @@ const getImageIcon = (item) => {
         </View>
       );
     } else {
-      return (
-        <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
-            <Text style={styles.headerImageInitialsText}>
-              {item
-                ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
-                : ''}
-            </Text>
+      if (
+        item.firstName === 'F&F request' &&
+        item.contactsWalletName !== undefined &&
+        item.contactsWalletName !== ''
+      ) {
+        return (
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              <Text style={styles.headerImageInitialsText}>
+                {item
+                  ? nameToInitials(`${item.contactsWalletName}'s Wallet`)
+                  : ''}
+              </Text>
+            </View>
           </View>
-        </View>
-      );
+        );
+      } else {
+        return (
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              <Text style={styles.headerImageInitialsText}>
+                {item
+                  ? nameToInitials(
+                      item.firstName && item.lastName
+                        ? item.firstName + ' ' + item.lastName
+                        : item.firstName && !item.lastName
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+                    )
+                  : ''}
+              </Text>
+            </View>
+          </View>
+        );
+      }
     }
   }
 };
@@ -359,7 +377,9 @@ class ContactDetailsNew extends PureComponent<
 
   onPressResendRequest = () => {
     if (this.index < 3) {
-      (this.ReshareBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        (this.ReshareBottomSheet as any).current.snapTo(1);
+      }, 2);
     } else {
       this.props.navigation.navigate('AddContactSendRequest', {
         SelectedContact: [this.Contact],
@@ -668,10 +688,11 @@ class ContactDetailsNew extends PureComponent<
         );
       }
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a entity',
-      );
+      // case: OTP
+      // Alert.alert(
+      //   'Invalid Contact',
+      //   'Cannot add a contact without phone-num/email as a entity',
+      // );
     }
   };
 
@@ -1005,12 +1026,22 @@ class ContactDetailsNew extends PureComponent<
                   ellipsizeMode="clip"
                   numberOfLines={1}
                 >
-                  {this.Contact.contactName == 'Secondary Device'
+                  {this.Contact.firstName === 'F&F request' &&
+                  this.Contact.contactsWalletName !== undefined &&
+                  this.Contact.contactsWalletName !== ''
+                    ? `${this.Contact.contactsWalletName}'s Wallet`
+                    : this.Contact.contactName == 'Secondary Device'
                     ? 'Keeper Device'
                     : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
-                  <Text style={styles.phoneText}>{contact.connectedVia}</Text>
+                  <Text style={styles.phoneText}>
+                    {contact.usesOTP
+                      ? !contact.hasTrustedChannel
+                        ? 'OTP: ' + contact.connectedVia
+                        : ''
+                      : contact.connectedVia}
+                  </Text>
                 ) : null}
               </View>
               {this.Contact.hasTrustedChannel &&
@@ -1026,6 +1057,7 @@ class ContactDetailsNew extends PureComponent<
                     this.setState({
                       isSendDisabled: true,
                     });
+
                     this.Contact.hasXpub || this.Contact.hasTrustedAddress
                       ? this.onPressSend()
                       : this.Contact.contactName != 'Secondary Device'
