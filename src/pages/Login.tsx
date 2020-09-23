@@ -316,17 +316,16 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          setTimeout(() => {
-            if (loaderBottomSheet.current) {
-              loaderBottomSheet.current.snapTo(0);
-            }
-            props.navigation.navigate('Home', {
-              custodyRequest,
-              recoveryRequest,
-              trustedContactRequest,
-              userKey,
-            });
-          }, 2);
+          if (loaderBottomSheet.current) {
+            loaderBottomSheet.current.snapTo(0);
+          }
+          props.navigation.navigate('Home', {
+            custodyRequest,
+            recoveryRequest,
+            trustedContactRequest,
+            userKey,
+          });
+
           if (dbFetched) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
@@ -343,7 +342,7 @@ export default function Login(props) {
             }, 2500);
             dispatch(startupSync());
           }
-        } else props.navigation.replace('RestoreAndRecoverWallet');
+        } else { props.navigation.replace('RestoreAndRecoverWallet') };
       });
     }
   }, [isAuthenticated, dbFetched]);
