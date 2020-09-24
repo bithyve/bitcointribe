@@ -34,6 +34,9 @@ import {
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
+  ADD_NEW_ACCOUNT,
+  newAccountAdded,
+  newAccountAddFailed,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -49,6 +52,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
+import { NewAccountPayload } from '../../common/data/models/NewAccountPayload';
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -1058,4 +1062,26 @@ function* updateDonationPreferencesWorker({ payload }) {
 export const updateDonationPreferencesWatcher = createWatcher(
   updateDonationPreferencesWorker,
   UPDATE_DONATION_PREFERENCES,
+);
+
+
+export function* addNewAccount(payload: NewAccountPayload) {
+  // TODO: Devise some way to reference and call a new account creation service here.
+  // const newAccountService = "";
+
+  try {
+    // TODO: Yield a result by calling the account creation service with the `NewAccountPayload`.
+    // const res = yield call(
+    //   newAccountService.generateNewAccount,
+    //   ...payload,
+    // );
+    yield put(newAccountAdded({ account: payload }));
+  } catch(error) {
+    yield put(newAccountAddFailed({ account: payload, error }));
+  }
+}
+
+export const addNewAccountWatcher = createWatcher(
+  addNewAccount,
+  ADD_NEW_ACCOUNT,
 );

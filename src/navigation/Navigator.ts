@@ -57,11 +57,12 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
-import AddNewAccount from '../pages/Accounts/AddNewAccount';
-import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
+import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
+import AddNewCheckingAccountDetails from '../pages/Accounts/AddNew/CheckingAccount/AddNewCheckingAccountDetails';
 import HomeStack from './stacks/home/HomeStack';
 import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
 import SendStack from './stacks/send/SendStack';
+
 
 
 const SetupNavigator = createStackNavigator(
@@ -91,7 +92,7 @@ const SetupNavigator = createStackNavigator(
   {
     initialRouteName: 'Launch',
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: ({ navigation }) => ({
+    defaultNavigationOptions: () => ({
       header: null,
     }),
   },
@@ -129,8 +130,18 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    AddNewAccount,
-    AddNewDonationAccount,
+    AddNewAccount: {
+      screen: NewAccountTypeSelectionList,
+      navigationOptions: {
+        headerShown: false
+      },
+    },
+    AddNewCheckingAccountDetails: {
+      screen: AddNewCheckingAccountDetails,
+      navigationOptions: {
+        headerShown: false
+      },
+    },
     Send: {
       screen: SendStack,
     },
