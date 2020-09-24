@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, StatusBar, Platform, SafeAreaView, SectionList } from 'react-native';
-import { NewAccountPayload } from '../../../common/data/models/NewAccountPayload';
+import { View, Text, StyleSheet, SafeAreaView, SectionList } from 'react-native';
+import { NewAccountPayload, NewServiceAccountPayload } from '../../../common/data/models/NewAccountPayload';
 import NEW_ACCOUNT_CHOICES from './NewAccountChoices';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
@@ -8,6 +8,11 @@ import { Button } from 'react-native-elements';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import AccountKind from '../../../common/data/enums/AccountKind';
+import useAccountGenerationCompletionEffect from '../../../utils/hooks/UseAccountGenerationCompletionEffect';
+import { addNewAccount } from '../../../store/actions/accounts';
+import { useDispatch } from "react-redux";
+import { goHomeAction } from '../../../navigation/actions/NavigationActions';
+import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -45,6 +50,11 @@ export interface Props {
 const NewAccountTypeSelectionList: React.FC<Props> = ({
   navigation,
 }: Props) => {
+  useAccountGenerationCompletionEffect(() => {
+    navigation.dispatch(goHomeAction);
+  });
+
+  const dispatch = useDispatch();
   const [selectedChoice, setSelectedChoice] = useState<NewAccountPayload>(null);
 
   const canProceed = useMemo(() => {
@@ -71,12 +81,19 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
       case AccountKind.TEST:
       case AccountKind.REGULAR:
       case AccountKind.SECURE:
+      case AccountKind.DONATION:
         navigation.navigate('AddNewHexaAccountDetails', {
           currentPayload: selectedChoice,
         });
         break;
-      case AccountKind.SERVICE:
+      case AccountKind.TRUSTED_CONTACTS:
+        dispatch(addNewAccount({ payload: selectedChoice }));
         break;
+      case AccountKind.SERVICE:
+        if ((selectedChoice as NewServiceAccountPayload).serviceAccountKind == ServiceAccountKind.FAST_BITCOINS) {
+          dispatch(addNewAccount({ payload: selectedChoice }));
+          break;
+        }
       case AccountKind.FULLY_IMPORTED_WALLET:
       case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
         break;
