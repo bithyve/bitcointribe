@@ -4,10 +4,9 @@ import Fonts from "../Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 
 
-
 const actionButton = {
-  borderRadius: 12,
-  height: 44,
+  borderRadius: 10,
+  minHeight: 50,
   minWidth: 144,
   justifyContent: 'center',
   alignItems: 'center',
@@ -21,6 +20,7 @@ const ButtonStyles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
+    elevation: 5,
   },
 
   actionButtonText: {
