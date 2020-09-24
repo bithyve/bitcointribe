@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import idx from 'idx';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import Styles from '../common/Styles';
+import Styles from '../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
