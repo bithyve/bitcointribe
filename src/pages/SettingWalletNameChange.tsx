@@ -18,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles';
+import CommonStyles from '../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import ContactList from '../components/ContactList';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -34,7 +34,7 @@ export default function SettingWalletNameChange(props) {
     question: '',
   });
   const [answerInputStyle, setAnswerInputStyle] = useState(styles.inputBox);
-  
+
   const [answer, setAnswer] = useState('');
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -60,7 +60,7 @@ export default function SettingWalletNameChange(props) {
         <Text style={styles.headerInfoText}>
                 To change wallet name,{'\n'}confirm Secret Question and answer
         </Text>
-         
+
 
          <TouchableOpacity
                 activeOpacity={10}
@@ -166,14 +166,14 @@ export default function SettingWalletNameChange(props) {
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setAnswerInputStyle(styles.inputBoxFocused);
-                        
+
                       }}
-                      
+
                       onKeyPress={e => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
                             setAnswer('');
-                           
+
                           }, 70);
                         }
                       }}

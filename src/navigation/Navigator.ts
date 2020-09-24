@@ -82,8 +82,8 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
-import AddNewAccount from '../pages/Accounts/AddNewAccount';
-import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
+import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
+import AddNewCheckingAccountDetails from '../pages/Accounts/AddNew/CheckingAccount/AddNewCheckingAccountDetails';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -155,8 +155,18 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    AddNewAccount,
-    AddNewDonationAccount,
+    AddNewAccount: {
+      screen: NewAccountTypeSelectionList,
+      navigationOptions: {
+        headerShown: false
+      },
+    },
+    AddNewCheckingAccountDetails: {
+      screen: AddNewCheckingAccountDetails,
+      navigationOptions: {
+        headerShown: false
+      },
+    },
     Send: {
       screen: Send,
       navigationOptions: {
