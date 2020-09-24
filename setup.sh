@@ -7,7 +7,9 @@ cp mods/react-native-mail/RNMailModule.java node_modules/react-native-mail/andro
 rn-nodeify --install --hack --yarn
 
 # ios dependency installation
-cd ios && pod install
+cd ios
+rm -f Podfile.lock
+pod install
 
 # android SDK location configuration
 cd ../android

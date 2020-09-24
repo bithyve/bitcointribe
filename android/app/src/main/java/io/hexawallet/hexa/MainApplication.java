@@ -3,6 +3,7 @@ package io.hexawallet.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.rnfs.RNFSPackage;
 import com.rpt.reactnativecheckpackageinstallation.CheckPackageInstallationPackage;
 import com.reactcommunity.rnlocalize.RNLocalizePackage;
@@ -72,6 +73,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            new LinearGradientPackage(),
             new RNFSPackage(),
             new CheckPackageInstallationPackage(),
             new RNLocalizePackage(),

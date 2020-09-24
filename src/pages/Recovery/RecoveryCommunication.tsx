@@ -23,7 +23,7 @@ import RadioButton from '../../components/RadioButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import commonStyle from '../../common/Styles';
+import commonStyle from '../../common/Styles/Styles';
 import { requestShare, downloadMShare } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';

@@ -16,7 +16,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 
 const WalletCreationSuccess = props => {
   useEffect(() => {}, []);

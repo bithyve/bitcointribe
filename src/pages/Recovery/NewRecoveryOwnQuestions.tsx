@@ -19,7 +19,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import QuestionList from '../../common/QuestionList';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -137,7 +137,7 @@ export default function NewRecoveryOwnQuestions(props) {
                 and enter its answer
               </Text>
             </View>
-           
+
           </View>
 
               <View
@@ -194,7 +194,7 @@ export default function NewRecoveryOwnQuestions(props) {
                     autoCorrect={false}
                     editable={isEditable}
                     autoCapitalize="none"
-                    
+
                     keyboardType={
                       Platform.OS == 'ios'
                         ? 'ascii-capable'
@@ -211,7 +211,7 @@ export default function NewRecoveryOwnQuestions(props) {
                     }}
                     onBlur={() => {
                       setAnswerInputStyle(styles.inputBox);
-                      
+
                     }}
                     onKeyPress={(e) => {
                       if (e.nativeEvent.key === 'Backspace') {
@@ -221,9 +221,9 @@ export default function NewRecoveryOwnQuestions(props) {
                       }
                     }}
                   />
-                 
+
                 </View>
-               
+
               </View>
               <View
                 style={{
