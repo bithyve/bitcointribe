@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { NewAccountPayload } from '../../../../common/data/models/NewAccountPayload';
 import NavigationHeader from '../NavigationHeader';
 import FormStyles from '../../../../common/Styles/Forms';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import { Input, Button } from 'react-native-elements';
-import { useDispatch, useSelector } from 'react-redux'
-import { addNewAccount, newAccountAddCompleted } from '../../../../store/actions/accounts';
+import { useDispatch } from 'react-redux'
+import { addNewAccount } from '../../../../store/actions/accounts';
+import useAccountGenerationCompletionEffect from '../../../../utils/hooks/UseAccountGenerationCompletionEffect';
+import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
 
 export interface Props {
   navigation: any;
@@ -21,8 +23,6 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
   const currentPayload: NewAccountPayload = useMemo(() => {
     return navigation.getParam('currentPayload');
   }, [navigation.state.params]);
-
-  const { hasNewAccountGenerationSucceeded } = useSelector(state => state.accounts);
 
   const [accountName, setAccountName] = useState(currentPayload.title);
   const [accountDescription, setAccountDescription] = useState('');
@@ -40,13 +40,9 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
 
   // TODO: We need a bit more design clarity about what to do after new
   // account creation succeeds or fails.
-  useEffect(() => {
-    if (hasNewAccountGenerationSucceeded) {
-      dispatch(newAccountAddCompleted());
-      navigation.popToTop();
-    }
-  }, [hasNewAccountGenerationSucceeded]);
-
+  useAccountGenerationCompletionEffect(() => {
+    navigation.dispatch(goHomeAction);
+  });
 
   function handleProceedButtonPress() {
     currentPayload.customDisplayName = accountName;
