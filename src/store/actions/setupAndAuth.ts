@@ -7,6 +7,11 @@ export const RE_LOGIN = 'RE_LOGIN';
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED';
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED';
 
+import * as Cipher from '../../common/encryption';
+import * as SecureStore from '../../storage/secure-store';
+
+
+
 export const storeCreds = passcode => {
   return { type: STORE_CREDS, payload: { passcode } };
 };
@@ -67,3 +72,26 @@ export const credsChanged = changed => {
 export const pinChangedFailed = isFailed => {
   return { type: PIN_CHANGED_FAILED, payload: { isFailed } };
 };
+
+
+// handle thunk way
+export const validatePin = (passcode) => {
+  return async (dispatch) => {
+    let key;
+    let error;
+    try {
+      const hash = await Cipher.hash(passcode);
+      const encryptedKey = await SecureStore.fetch(hash);
+      key = Cipher.decrypt(encryptedKey, hash);
+      if (key) {
+        dispatch(credsAuthenticated(true))
+      } else {
+        dispatch(credsAuthenticated(false))
+      }
+    } catch (error) {
+      console.log(error)
+      dispatch(credsAuthenticated(false))
+    }
+    return { error, key }
+  }
+}
