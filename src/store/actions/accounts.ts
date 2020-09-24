@@ -1,4 +1,8 @@
+import { Action } from "redux";
 // types and action creators: dispatched by components and sagas
+
+import { NewAccountPayload } from "../../common/data/models/NewAccountPayload";
+
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
 export const TRANSFER_ST1 = 'TRANSFER_ST1';
@@ -24,6 +28,8 @@ export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
+export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
+
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -261,6 +267,19 @@ export const updateDonationPreferences = (
   };
 };
 
+export interface AddNewAccountAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT;
+  payload: NewAccountPayload;
+};
+
+export const addNewAccount = ({ payload }: { payload: NewAccountPayload }): AddNewAccountAction => {
+  return {
+    type: ADD_NEW_ACCOUNT,
+    payload,
+  }
+}
+
+
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED';
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED';
@@ -278,6 +297,8 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
+export const NEW_ACCOUNT_ADDED = 'NEW_ACCOUNT_ADDED';
+export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
 
 export const testcoinsReceived = (serviceType, service) => {
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
@@ -341,4 +362,20 @@ export const twoFAResetted = (resetted) => {
 
 export const settedDonationAccount = (serviceType, successful) => {
   return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
+};
+
+
+export const newAccountAddFailed = (
+  {
+    account,
+    error
+}: {
+  account: NewAccountPayload,
+  error: Error
+}) => {
+  return { type: NEW_ACCOUNT_ADD_FAILED, payload: { account, error } };
+}
+
+export const newAccountAdded = ({ account }: { account: NewAccountPayload }) => {
+  return { type: NEW_ACCOUNT_ADDED, payload: account };
 };

@@ -19,6 +19,9 @@ import {
   AVERAGE_TX_FEE,
   SETTED_DONATION_ACC,
   SETUP_DONATION_ACCOUNT,
+  ADD_NEW_ACCOUNT,
+  NEW_ACCOUNT_ADDED,
+  NEW_ACCOUNT_ADD_FAILED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -29,6 +32,8 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
+import { stat } from 'react-native-fs';
 
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
@@ -104,6 +109,9 @@ const initialState: {
     test?: any;
     secure?: any;
   };
+  isGeneratingNewAccount: Boolean;
+  hasNewAccountGenerationError: Boolean;
+  addedAccounts: BaseAccount[],
 } = {
   servicesEnriched: false,
   accountsSynched: false,
@@ -111,16 +119,20 @@ const initialState: {
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
+  isGeneratingNewAccount: false,
+  hasNewAccountGenerationError: false,
+  addedAccounts: [],
 };
 
 export default (state = initialState, action) => {
-  const account = action.payload ? action.payload.serviceType : null;
+  const accountType = action.payload ? action.payload.serviceType : null;
+
   switch (action.type) {
     case TESTCOINS_RECEIVED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           service: action.payload.service,
         },
       };
@@ -128,11 +140,11 @@ export default (state = initialState, action) => {
     case TRANSACTIONS_FETCHED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transactions: action.payload.transactions,
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transactions: false,
           },
         },
@@ -141,15 +153,15 @@ export default (state = initialState, action) => {
     case TRANSFER_ST1_EXECUTED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             stage1: { ...action.payload.result },
             executed: 'ST1',
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -158,18 +170,18 @@ export default (state = initialState, action) => {
     case TRANSFER_ST1_FAILED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             stage1: {
-              ...state[account].transfer.stage1,
+              ...state[accountType].transfer.stage1,
               failed: true,
               ...action.payload.errorDetails,
             },
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -178,12 +190,12 @@ export default (state = initialState, action) => {
     case ADD_TRANSFER_DETAILS:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             details: [
-              ...state[account].transfer.details,
+              ...state[accountType].transfer.details,
               action.payload.recipientData,
             ],
           },
@@ -193,11 +205,11 @@ export default (state = initialState, action) => {
     case REMOVE_TRANSFER_DETAILS:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
-            details: [...state[account].transfer.details].filter(
+            ...state[accountType].transfer,
+            details: [...state[accountType].transfer.details].filter(
               (item) => item !== action.payload.recipientData,
             ),
           },
@@ -208,20 +220,20 @@ export default (state = initialState, action) => {
       if (!action.payload.stage)
         return {
           ...state,
-          [account]: {
-            ...state[account],
+          [accountType]: {
+            ...state[accountType],
             transfer: {
-              ...initialState[account].transfer,
+              ...initialState[accountType].transfer,
             },
           },
         };
       else if (action.payload.stage === 'stage1')
         return {
           ...state,
-          [account]: {
-            ...state[account],
+          [accountType]: {
+            ...state[accountType],
             transfer: {
-              ...state[account].transfer,
+              ...state[accountType].transfer,
               stage1: {},
               stage2: {},
               stage3: {},
@@ -232,10 +244,10 @@ export default (state = initialState, action) => {
       else if (action.payload.stage === 'stage2')
         return {
           ...state,
-          [account]: {
-            ...state[account],
+          [accountType]: {
+            ...state[accountType],
             transfer: {
-              ...state[account].transfer,
+              ...state[accountType].transfer,
               stage2: {},
               stage3: {},
               executed: 'ST1',
@@ -245,10 +257,10 @@ export default (state = initialState, action) => {
       else if (action.payload.stage === 'stage3')
         return {
           ...state,
-          [account]: {
-            ...state[account],
+          [accountType]: {
+            ...state[accountType],
             transfer: {
-              ...state[account].transfer,
+              ...state[accountType].transfer,
               stage3: {},
               executed: 'ST2',
             },
@@ -260,15 +272,15 @@ export default (state = initialState, action) => {
         case REGULAR_ACCOUNT || TEST_ACCOUNT:
           return {
             ...state,
-            [account]: {
-              ...state[account],
+            [accountType]: {
+              ...state[accountType],
               transfer: {
-                ...state[account].transfer,
+                ...state[accountType].transfer,
                 txid: action.payload.result,
                 executed: 'ST2',
               },
               loading: {
-                ...state[account].loading,
+                ...state[accountType].loading,
                 transfer: false,
               },
             },
@@ -277,15 +289,15 @@ export default (state = initialState, action) => {
         case SECURE_ACCOUNT:
           return {
             ...state,
-            [account]: {
-              ...state[account],
+            [accountType]: {
+              ...state[accountType],
               transfer: {
-                ...state[account].transfer,
+                ...state[accountType].transfer,
                 stage2: { ...action.payload.result },
                 executed: 'ST2',
               },
               loading: {
-                ...state[account].loading,
+                ...state[accountType].loading,
                 transfer: false,
               },
             },
@@ -295,15 +307,15 @@ export default (state = initialState, action) => {
     case ALTERNATE_TRANSFER_ST2_EXECUTED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             txid: action.payload.result,
             executed: 'ST2',
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -312,18 +324,18 @@ export default (state = initialState, action) => {
     case TRANSFER_ST2_FAILED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             stage2: {
-              ...state[account].transfer.stage2,
+              ...state[accountType].transfer.stage2,
               failed: true,
               ...action.payload.errorDetails,
             },
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -332,15 +344,15 @@ export default (state = initialState, action) => {
     case TRANSFER_ST3_EXECUTED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             txid: action.payload.result,
             executing: false,
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -349,18 +361,18 @@ export default (state = initialState, action) => {
     case TRANSFER_ST3_FAILED:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           transfer: {
-            ...state[account].transfer,
+            ...state[accountType].transfer,
             stage3: {
-              ...state[account].transfer.stage3,
+              ...state[accountType].transfer.stage3,
               failed: true,
               ...action.payload.errorDetails,
             },
           },
           loading: {
-            ...state[account].loading,
+            ...state[accountType].loading,
             transfer: false,
           },
         },
@@ -387,11 +399,11 @@ export default (state = initialState, action) => {
     case ACCOUNTS_LOADING:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           loading: {
-            ...state[account].loading,
-            [action.payload.beingLoaded]: !state[account].loading[
+            ...state[accountType].loading,
+            [action.payload.beingLoaded]: !state[accountType].loading[
               action.payload.beingLoaded
             ],
           },
@@ -439,8 +451,8 @@ export default (state = initialState, action) => {
     case SETUP_DONATION_ACCOUNT:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           donationAccount: {
             settedup: false,
             loading: true,
@@ -451,15 +463,38 @@ export default (state = initialState, action) => {
     case SETTED_DONATION_ACC:
       return {
         ...state,
-        [account]: {
-          ...state[account],
+        [accountType]: {
+          ...state[accountType],
           donationAccount: {
-            ...state[account].donationAccount,
+            ...state[accountType].donationAccount,
             settedup: action.payload.successful,
             loading: false,
-          },
-        },
+          }
+        }
       };
+
+    case ADD_NEW_ACCOUNT:
+      return {
+        ...state,
+        isGeneratingNewAccount: true,
+        hasNewAccountGenerationError: false,
+      };
+
+    case NEW_ACCOUNT_ADDED:
+      return {
+        ...state,
+        isGeneratingNewAccount: false,
+        addedAccounts: state.addedAccounts.concat(action.payload),
+      };
+
+
+    case NEW_ACCOUNT_ADD_FAILED: {
+      return {
+        ...state,
+        isGeneratingNewAccount: false,
+        hasNewAccountGenerationError: true,
+      };
+    }
   }
   return state;
 };
