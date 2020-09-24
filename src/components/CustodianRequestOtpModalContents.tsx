@@ -16,7 +16,7 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import CommonStyle from "../common/Styles";
+import CommonStyle from "../common/Styles/Styles";
 export default function CustodianRequestOtpModalContents(props) {
   const [passcode, setPasscode] = useState("");
   const inputRef = useRef(null);
