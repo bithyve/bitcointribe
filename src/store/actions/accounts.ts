@@ -289,7 +289,6 @@ export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
   return { type: ADD_NEW_ACCOUNT_COMPLETED };
 };
 
-newAccountAddCompleted
 
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED';
