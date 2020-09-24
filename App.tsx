@@ -3,7 +3,6 @@ import React, { Component, useState, useEffect } from 'react';
 import Navigator from './src/navigation/Navigator';
 import { store, Provider } from './src/store';
 import NoInternetModalContents from './src/components/NoInternetModalContents';
-import TransparentHeaderModal from './src/components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,

@@ -663,7 +663,6 @@ export default function Accounts(props) {
         isFromAccount={true}
         transactionLoading={transactionLoading}
         transactions={transactions}
-        AtCloseEnd={false}
         setTransactionItem={(item) =>
           this.setState({ selectedTransactionItem: item })
         }

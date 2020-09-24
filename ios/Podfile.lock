@@ -109,7 +109,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PDFGenerator (3.1.0)
-  - Protobuf (3.12.0)
+  - Protobuf (3.13.0)
   - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
@@ -210,7 +210,7 @@ PODS:
     - React
   - RNOS (1.2.6):
     - React
-  - RNReanimated (1.4.0):
+  - RNReanimated (1.13.0):
     - React
   - RNScreens (1.0.0-alpha.23):
     - React
@@ -498,7 +498,7 @@ SPEC CHECKSUMS:
   jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  Protobuf: 2793fcd0622a00b546c60e7cbbcc493e043e9bb9
+  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
@@ -517,7 +517,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
-  RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
+  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
@@ -539,4 +539,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: f0bbb553ff1ab8d8aec9f7f1b27f494d65a52d93
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
