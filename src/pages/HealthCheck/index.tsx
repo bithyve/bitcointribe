@@ -14,7 +14,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -65,7 +65,7 @@ export default function HealthCheck(props) {
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('Ugly');
   const [contacts, setContacts] = useState([]);
-  
+
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     width: wp("5%"),
     height: wp("5%"),
     resizeMode: "contain",
-    
+
   },
   knowMoreButtonText: {
     color: Colors.white,

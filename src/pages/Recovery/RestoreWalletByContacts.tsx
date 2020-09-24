@@ -12,7 +12,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import HeaderTitle from '../../components/HeaderTitle';
 import ContactList from '../../components/ContactList';
 

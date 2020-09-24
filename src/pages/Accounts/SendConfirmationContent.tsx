@@ -16,7 +16,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import commonStyle from '../../common/Styles';
+import commonStyle from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../../common/CommonFunctions';
@@ -41,7 +41,7 @@ export default function SendConfirmationContent(props) {
           }
         }}
         SelectedContactId={SelectedContactId}
-        serviceType={props.serviceType}  
+        serviceType={props.serviceType}
       />
     );
   };

@@ -18,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles';
+import CommonStyles from '../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomInfoBox from '../components/BottomInfoBox';
@@ -28,7 +28,7 @@ import ModalHeader from '../components/ModalHeader';
 import WalletNameChangeSuccessModalContents from '../components/WalletNameChangeSuccessModalContents';
 
 export default function SettingNewWalletName(props) {
-  
+
   const [answerInputStyle, setAnswerInputStyle] = useState(styles.inputBox);
   const [
     WalletNameChangeSuccessBottomSheet,
@@ -169,7 +169,7 @@ export default function SettingNewWalletName(props) {
         renderHeader={renderWalletNameChangeSuccessHeader}
       />
       </View>
-      
+
     </SafeAreaView>
   );
 }

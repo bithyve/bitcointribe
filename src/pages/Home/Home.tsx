@@ -109,6 +109,7 @@ import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
+import getIconByAccountType from '../../utils/accounts/GetIconByAccountType';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -141,20 +142,17 @@ export const isCompatible = async (method: string, version: string) => {
   return true;
 };
 
-const getIconByAccountType = (type) => {
-  if (type == 'saving') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'regular') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'secure') {
-    return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type == 'test') {
-    return require('../../assets/images/icons/icon_test.png');
-  } else if (type === 'Donation Account') {
-    return require('../../assets/images/icons/icon_donation_hexa.png');
-  } else {
-    return require('../../assets/images/icons/icon_test.png');
-  }
+const TransactionHeader = ({ openCloseModal }) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={10}
+      onPress={() => openCloseModal()}
+      style={styles.modalHeaderContainer}
+    >
+      <View style={styles.modalHeaderHandle} />
+      <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+    </TouchableOpacity>
+  );
 };
 
 // TODO: Move this somewhere else and re-use it from there.
@@ -166,7 +164,7 @@ export enum BottomSheetState {
 interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
-  cardData?: any[];
+  cardColumnData?: any[];
   switchOn: boolean;
   CurrencyCode: string;
   balances: any;
@@ -280,7 +278,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.state = {
       notificationData: [],
-      cardData: [],
+      cardColumnData: [],
       switchOn: false,
       CurrencyCode: 'USD',
       balances: {},
@@ -318,6 +316,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       addContactModalOpened: false,
     };
   }
+
+  navigateToAddNewAccountScreen = () => {
+    this.props.navigation.navigate('AddNewAccount');
+  };
 
   onPressNotifications = async () => {
     let notificationList = JSON.parse(
@@ -641,24 +643,28 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setAccountCardData = (newCardData) => {
-    let newArrayFinal = [];
-    let tempArray = [];
-    for (let a = 0; a < newCardData.length; a++) {
-      tempArray.push(newCardData[a]);
-      if (
-        tempArray.length == 2 ||
-        newCardData[newCardData.length - 1].id == tempArray[0].id
-      ) {
-        newArrayFinal.push(tempArray);
-        tempArray = [];
+  makeAccountCardColumns = (accountData) => {
+    if (accountData.length <= 2) {
+      return [accountData];
+    }
+
+    let columns = [];
+    let currentColumn = [];
+
+    for (let account of accountData) {
+      currentColumn.push(account);
+
+      if (currentColumn.length == 2) {
+        columns.push(currentColumn);
+        currentColumn = [];
       }
     }
-    if (newArrayFinal) {
-      this.setState({
-        cardData: newArrayFinal,
-      });
+
+    if (currentColumn.length > 0) {
+      columns.push(currentColumn);
     }
+
+    this.setState({ cardColumnData: columns });
   };
 
   updateAccountCardData = () => {
@@ -698,7 +704,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    this.setAccountCardData([
+    this.makeAccountCardColumns([
       ...defaultCardData,
       ...additionalCardData,
       ...closingCardData,
@@ -2291,7 +2297,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      cardData,
+      cardColumnData,
       switchOn,
       CurrencyCode,
       transactions,
@@ -2361,11 +2367,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         </View>
 
         <View style={{ flex: 7 }}>
-          <View style={styles.cardViewContainer}>
+          <View style={styles.accountCardsContainer}>
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
-              data={cardData}
+              data={cardColumnData}
               extraData={{
                 balances,
                 switchOn,
@@ -2380,12 +2386,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   isBalanceLoading={isBalanceLoading}
                   Items={Items}
                   navigation={navigation}
-                  getIconByAccountType={getIconByAccountType}
                   switchOn={switchOn}
                   accounts={accounts}
                   CurrencyCode={currencyCode}
                   balances={balances}
                   exchangeRates={exchangeRates}
+                  onAddNewAccountPressed={this.navigateToAddNewAccountScreen}
                 />
               )}
             />
@@ -3246,7 +3252,7 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
-  cardViewContainer: {
+  accountCardsContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor,
     marginTop: hp('4%'),

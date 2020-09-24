@@ -19,7 +19,7 @@ import {
 } from "react-native-responsive-screen";
 import BottomInfoBox from "../../components/BottomInfoBox";
 import DeviceInfo from "react-native-device-info";
-import commonStyle from "../../common/Styles";
+import commonStyle from "../../common/Styles/Styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function WalletNameRecovery(props) {
@@ -53,7 +53,7 @@ export default function WalletNameRecovery(props) {
                 color: Colors.blue,
                 fontSize: RFValue(18),
                 fontFamily: Fonts.FiraSansMedium,
-                marginLeft: 20, 
+                marginLeft: 20,
               }}
             >
               Type in the name{"\n"}of your wallet
@@ -75,7 +75,7 @@ export default function WalletNameRecovery(props) {
             style={{
               ...inputStyle,
               marginTop: hp("5%"),
-              marginLeft: 20, 
+              marginLeft: 20,
               marginRight: 20,
             }}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
@@ -94,7 +94,7 @@ export default function WalletNameRecovery(props) {
             }}
           />
 </View>
-        
+
         {walletName ? (
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
@@ -109,12 +109,12 @@ export default function WalletNameRecovery(props) {
           ) : (
             <View style={{
               flexDirection: "row",
-              
+
               paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
               paddingTop: 30,
               alignItems: "center",
               }}>
-                
+
               <BottomInfoBox
                 title={"Wallet Name"}
                 infoText={
@@ -124,7 +124,7 @@ export default function WalletNameRecovery(props) {
             </View>
 
           )}
-        
+
       </KeyboardAvoidingView>
     </View>
   </SafeAreaView>

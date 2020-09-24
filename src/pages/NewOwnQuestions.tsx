@@ -19,7 +19,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../common/Fonts';
 import Colors from '../common/Colors';
 import QuestionList from '../common/QuestionList';
-import CommonStyles from '../common/Styles';
+import CommonStyles from '../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -319,7 +319,7 @@ export default function NewOwnQuestions(props) {
                   }}
                 />
               </View>
-              {question ? 
+              {question ?
               (<View style={{ marginTop: 15 }}>
                 <View
                   style={{
@@ -350,7 +350,7 @@ export default function NewOwnQuestions(props) {
                         : 'visible-password'
                     }
                     onChangeText={(text) => {
-                      
+
                       setAnswer(text);
                       setAnswerMasked(text);
                     }}
@@ -436,7 +436,7 @@ export default function NewOwnQuestions(props) {
                       setBackspace(event);
                     }}
                     onChangeText={(text) => {
-                      
+
                       setTempAns(text);
                       setConfirmAnswerMasked(text);
                     }}
