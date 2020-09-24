@@ -98,7 +98,7 @@ interface SendConfirmationPropsTypes {
 class SendConfirmation extends Component<
   SendConfirmationPropsTypes,
   SendConfirmationStateTypes
-  > {
+> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -107,6 +107,7 @@ class SendConfirmation extends Component<
   unsubscribe: any;
   serviceType: any;
   sweepSecure: any;
+  donationId: string;
   spendableBalance: any;
   transfer: any;
   loading: any;
@@ -119,6 +120,8 @@ class SendConfirmation extends Component<
     this.sweepSecure = props.navigation.getParam('sweepSecure');
     this.spendableBalance = props.navigation.getParam('spendableBalance');
     this.isSendMax = props.navigation.getParam('isSendMax');
+    this.donationId = props.navigation.getParam('donationId');
+
     if (this.isSendMax) {
       setTimeout(() => {
         this.onPrioritySelect('Medium Fee');
@@ -208,10 +211,11 @@ class SendConfirmation extends Component<
     const receivers = [];
     transfer.details.forEach((details) => {
       if (details.selectedContact && details.selectedContact.firstName) {
-        const contactName = `${details.selectedContact.firstName} ${details.selectedContact.lastName
-          ? details.selectedContact.lastName
-          : ''
-          }`
+        const contactName = `${details.selectedContact.firstName} ${
+          details.selectedContact.lastName
+            ? details.selectedContact.lastName
+            : ''
+        }`
           .toLowerCase()
           .trim();
         const recipient =
@@ -249,6 +253,16 @@ class SendConfirmation extends Component<
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
     } else if (transfer.txid) {
+      if (this.donationId) {
+        if (transfer.details[0].note) {
+          const txNote = {
+            txId: transfer.txid,
+            note: transfer.details[0].note,
+          };
+          RelayServices.sendDonationNote(this.donationId, txNote);
+        }
+      }
+
       this.sendNotifications();
       if (transfer.details[0].note) {
         this.updateDescription(transfer.txid, transfer.details[0].note);
@@ -265,7 +279,7 @@ class SendConfirmation extends Component<
           loader: true,
           syncTrustedDerivative:
             this.serviceType === REGULAR_ACCOUNT ||
-              this.serviceType === SECURE_ACCOUNT
+            this.serviceType === SECURE_ACCOUNT
               ? true
               : false,
         });
@@ -451,10 +465,10 @@ class SendConfirmation extends Component<
     return this.serviceType == TEST_ACCOUNT
       ? UsNumberFormat(value)
       : switchOn
-        ? UsNumberFormat(value)
-        : exchangeRates
-          ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-          : null;
+      ? UsNumberFormat(value)
+      : exchangeRates
+      ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+      : null;
   };
 
   getCorrectCurrencySymbol = () => {
@@ -462,8 +476,8 @@ class SendConfirmation extends Component<
     return this.serviceType == TEST_ACCOUNT
       ? 't-sats'
       : switchOn
-        ? 'sats'
-        : CurrencyCode.toLocaleLowerCase();
+      ? 'sats'
+      : CurrencyCode.toLocaleLowerCase();
   };
 
   onPrioritySelect = (priority) => {
@@ -508,10 +522,10 @@ class SendConfirmation extends Component<
                 this.state.derivativeAccountDetails
                   ? require('../../assets/images/icons/icon_donation_account.png')
                   : this.serviceType == TEST_ACCOUNT
-                    ? require('../../assets/images/icons/icon_test.png')
-                    : this.serviceType == REGULAR_ACCOUNT
-                      ? require('../../assets/images/icons/icon_regular.png')
-                      : require('../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../assets/images/icons/icon_test.png')
+                  : this.serviceType == REGULAR_ACCOUNT
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -559,20 +573,20 @@ class SendConfirmation extends Component<
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : switchOn
-                    ? UsNumberFormat(this.spendableBalance)
-                    : exchangeRates
-                      ? (
-                        (this.spendableBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                      : null}
+                  ? UsNumberFormat(this.spendableBalance)
+                  : exchangeRates
+                  ? (
+                      (this.spendableBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                  : null}
               </Text>
               <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
                   ? ' t-sats)'
                   : switchOn
-                    ? ' sats)'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats)'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
           </View>
@@ -665,13 +679,13 @@ class SendConfirmation extends Component<
                   {this.serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(totalAmount)
                     : switchOn
-                      ? UsNumberFormat(totalAmount)
-                      : exchangeRates
-                        ? (
-                          (totalAmount / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)
-                        : null}
+                    ? UsNumberFormat(totalAmount)
+                    : exchangeRates
+                    ? (
+                        (totalAmount / 1e8) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : null}
                   {/* {totalAmount} */}
                 </Text>
                 <Text style={styles.amountUnitText}>
@@ -679,8 +693,8 @@ class SendConfirmation extends Component<
                   {this.serviceType == TEST_ACCOUNT
                     ? ' t-sats'
                     : switchOn
-                      ? ' sats'
-                      : ' ' + CurrencyCode.toLocaleLowerCase()}
+                    ? ' sats'
+                    : ' ' + CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
@@ -729,18 +743,18 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   {transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {
-                          timeConvertNear30((transfer.stage1.txPrerequisites['high']
-                            .estimatedBlocks +
-                            1) *
-                            10)
-                        }
-                      </Text>
-                    ) : null}
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['high']
+                          .estimatedBlocks +
+                          1) *
+                          10,
+                      )}
+                    </Text>
+                  ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -775,17 +789,17 @@ class SendConfirmation extends Component<
               <View style={styles.priorityValueContainer}>
                 {!this.isSendMax ? (
                   transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {timeConvertNear30(
-                          (transfer.stage1.txPrerequisites['medium']
-                            .estimatedBlocks +
-                            1) *
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['medium']
+                          .estimatedBlocks +
+                          1) *
                           10,
-                        )}
-                        {/* {transfer.stage1.txPrerequisites['medium']
+                      )}
+                      {/* {transfer.stage1.txPrerequisites['medium']
                           .estimatedBlocks * 10}{' '}
                       -{' '}
                         {(transfer.stage1.txPrerequisites['medium']
@@ -793,13 +807,13 @@ class SendConfirmation extends Component<
                           1) *
                           10}{' '}
                       minutes */}
-                      </Text>
-                    ) : null
+                    </Text>
+                  ) : null
                 ) : (
-                    <View style={[styles.priorityValueContainer]}>
-                      <Text style={styles.priorityTableText}>~2 hours</Text>
-                    </View>
-                  )}
+                  <View style={[styles.priorityValueContainer]}>
+                    <Text style={styles.priorityTableText}>~2 hours</Text>
+                  </View>
+                )}
               </View>
               <View style={styles.priorityValueContainer}>
                 <Text style={styles.priorityTableText}>
@@ -839,25 +853,25 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   {transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {timeConvertNear30(
-                          (transfer.stage1.txPrerequisites['low']
-                            .estimatedBlocks +
-                            1) *
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['low']
+                          .estimatedBlocks +
+                          1) *
                           10,
-                        )}
-                        {/* {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
+                      )}
+                      {/* {transfer.stage1.txPrerequisites['low'].estimatedBlocks *
                           10}{' '}
                       -{' '}
                         {(transfer.stage1.txPrerequisites['low'].estimatedBlocks +
                           1) *
                           10}{' '}
                       minutes */}
-                      </Text>
-                    ) : null}
+                    </Text>
+                  ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -899,8 +913,8 @@ class SendConfirmation extends Component<
                   <Text style={styles.priorityTableText}>
                     ~
                     {timeConvertNear30(
-                    (this.state.customEstimatedBlock + 1) * 10,
-                  )}
+                      (this.state.customEstimatedBlock + 1) * 10,
+                    )}
                   </Text>
                 </View>
                 <View style={styles.priorityValueContainer}>
@@ -1070,12 +1084,12 @@ class SendConfirmation extends Component<
             >
               {(!isConfirmDisabled &&
                 this.props.accounts[this.serviceType].loading.transfer) ||
-                (isConfirmDisabled &&
-                  this.props.accounts[this.serviceType].loading.transfer) ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
-                )}
+              (isConfirmDisabled &&
+                this.props.accounts[this.serviceType].loading.transfer) ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -1105,8 +1119,8 @@ class SendConfirmation extends Component<
                 this.serviceType === TEST_ACCOUNT
                   ? 0
                   : this.serviceType === REGULAR_ACCOUNT
-                    ? 1
-                    : 2,
+                  ? 1
+                  : 2,
               spendableBalance: this.spendableBalance - totalAmount,
             });
           }}
@@ -1147,8 +1161,8 @@ class SendConfirmation extends Component<
                     this.serviceType === TEST_ACCOUNT
                       ? 0
                       : this.serviceType === REGULAR_ACCOUNT
-                        ? 1
-                        : 2,
+                      ? 1
+                      : 2,
                   spendableBalance: this.spendableBalance - totalAmount,
                 });
               }}
@@ -1218,8 +1232,8 @@ class SendConfirmation extends Component<
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('20%')
               : Platform.OS == 'android'
-                ? hp('21%')
-                : hp('20%'),
+              ? hp('21%')
+              : hp('20%'),
           ]}
           renderContent={() => (
             <TestAccountHelperModalContents
@@ -1229,11 +1243,11 @@ class SendConfirmation extends Component<
               helperInfo={
                 'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
               }
-            // continueButtonText={'Ok, got it'}
-            // onPressContinue={() => {
-            //   if (KnowMoreBottomSheet.current)
-            //     (KnowMoreBottomSheet as any).current.snapTo(0);
-            // }}
+              // continueButtonText={'Ok, got it'}
+              // onPressContinue={() => {
+              //   if (KnowMoreBottomSheet.current)
+              //     (KnowMoreBottomSheet as any).current.snapTo(0);
+              // }}
             />
           )}
           renderHeader={() => (
