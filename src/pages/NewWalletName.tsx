@@ -16,7 +16,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../common/Fonts';
 import Colors from '../common/Colors';
-import CommonStyles from '../common/Styles';
+import CommonStyles from '../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -83,7 +83,7 @@ export default function NewWalletName(props) {
               }}
             />
             <View style={{marginLeft: 20,}}>
-              <Text style={{fontSize: RFValue(12), 
+              <Text style={{fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey, }}>
                   No numbers or special characters allowed</Text>
             </View>

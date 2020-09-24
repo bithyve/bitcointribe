@@ -10,7 +10,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import commonStyle from "../common/Styles";
+import commonStyle from "../common/Styles/Styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function SendStatusModalContents(props) {
