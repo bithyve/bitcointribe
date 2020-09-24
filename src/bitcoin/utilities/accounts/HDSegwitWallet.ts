@@ -875,11 +875,19 @@ export default class HDSegwitWallet extends Bitcoin {
       throw new Error(`${accountType}:${accountNumber} does not exists`);
     }
 
+    let accountDetails;
+    if (accountType === DONATION_ACCOUNT) {
+      const { id } = this.derivativeAccounts[accountType][accountNumber];
+      if (id) accountDetails = { donationId: id };
+    }
+
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('fetchXpubInfo', {
         HEXA_ID,
         xpubId: this.derivativeAccounts[accountType][accountNumber].xpubId,
+        accountType,
+        accountDetails,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);

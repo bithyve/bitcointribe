@@ -37,6 +37,7 @@ export interface TransactionDetails {
   recipientAddresses?: string[];
   senderAddresses?: string[];
   blockTime?: number;
+  message?: string;
 }
 
 export interface Transactions {
