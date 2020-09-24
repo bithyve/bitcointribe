@@ -11,7 +11,7 @@ import {
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
+import CommonStyles from "../common/Styles/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
