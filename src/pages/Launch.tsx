@@ -22,13 +22,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
-<<<<<<< HEAD
-import { isCompatible } from './Home';
-import { connect } from 'react-redux';
-=======
 import { isCompatible } from './Home/Home';
 import { connect } from 'react-redux'
->>>>>>> 71bb8e47... Move `Home.tsx` into directory and separate out `TrustedContactRequestContent`
 
 interface HomePropsTypes {
   initializeDB: any;
@@ -230,11 +225,4 @@ const styles = StyleSheet.create({
   },
 });
 
-<<<<<<< HEAD
 export default connect(null, { initializeDB })(Launch);
-=======
-
-
-
-export default connect(null, { initializeDB })(Launch)
->>>>>>> 71bb8e47... Move `Home.tsx` into directory and separate out `TrustedContactRequestContent`
