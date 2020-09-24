@@ -50,6 +50,41 @@ function setCurrencyCodeToImage(currencyName, currencyColor) {
   );
 }
 
+interface AddNewAccountCardProps {
+  onPress: () => {};
+}
+
+const AddNewAccountCard: React.FC<AddNewAccountCardProps> = ({
+  onPress
+}: AddNewAccountCardProps) => {
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <CardView cornerRadius={10} style={[styles.card, styles.addAccountCardContainer]}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Image
+            style={{ width: wp('10%'), height: wp('10%') }}
+            source={require('../../assets/images/icons/icon_add.png')}
+          />
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue(11),
+            }}
+          >
+            Add to my wallet
+          </Text>
+        </View>
+      </CardView>
+    </TouchableOpacity>
+  );
+};
+
 const HomeList = ({
   isBalanceLoading,
   Items,
@@ -289,6 +324,12 @@ const styles = StyleSheet.create({
     padding: wp(3),
     backgroundColor: Colors.white,
   },
+
+  addAccountCardContainer: {
+    opacity: 0.4,
+    backgroundColor: Colors.borderColor,
+  },
+
   cardTitle: {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,

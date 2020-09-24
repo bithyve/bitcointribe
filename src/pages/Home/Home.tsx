@@ -112,7 +112,7 @@ export enum BottomSheetKind {
 interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
-  cardData?: any[];
+  cardColumnData?: any[];
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab | null;
@@ -195,7 +195,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.state = {
       notificationData: [],
-      cardData: [],
+      cardColumnData: [],
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: null,
@@ -218,6 +218,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isBalanceLoading: true,
     };
   }
+
+  navigateToAddNewAccountScreen = () => {
+    this.props.navigation.navigate('AddNewAccount');
+  };
 
   onPressNotifications = async () => {
     let notificationList = JSON.parse(
@@ -485,24 +489,28 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setAccountCardData = (newCardData) => {
-    let newArrayFinal = [];
-    let tempArray = [];
-    for (let a = 0; a < newCardData.length; a++) {
-      tempArray.push(newCardData[a]);
-      if (
-        tempArray.length == 2 ||
-        newCardData[newCardData.length - 1].id == tempArray[0].id
-      ) {
-        newArrayFinal.push(tempArray);
-        tempArray = [];
+  makeAccountCardColumns = (accountData) => {
+    if (accountData.length <= 2) {
+      return [accountData];
+    }
+
+    let columns = [];
+    let currentColumn = [];
+
+    for (let account of accountData) {
+      currentColumn.push(account);
+
+      if (currentColumn.length == 2) {
+        columns.push(currentColumn);
+        currentColumn = [];
       }
     }
-    if (newArrayFinal) {
-      this.setState({
-        cardData: newArrayFinal,
-      });
+
+    if (currentColumn.length > 0) {
+      columns.push(currentColumn);
     }
+
+    this.setState({ cardColumnData: columns });
   };
 
   updateAccountCardData = () => {
@@ -568,9 +576,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    allCards.push(...defaultCardData, ...additionalCardData);
-    this.props.setCardData(allCards);
-    this.setAccountCardData([
+    this.makeAccountCardColumns([
       ...defaultCardData,
       ...additionalCardData,
       ...closingCardData,
@@ -1999,7 +2005,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      cardData,
+      cardColumnData,
       balances,
       selectedBottomTab,
       notificationData,
@@ -2045,35 +2051,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
-        <View style={styles.accountCardsContainer}>
-          <FlatList
-            contentContainerStyle={{
-              paddingTop: 36,
-              alignItems: 'flex-start',
-            }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={cardData}
-            extraData={{
-              balances,
-              walletName,
-              currencyCode,
-              accounts,
-              exchangeRates,
-            }}
-            keyExtractor={(_, index) => String(index)}
-            renderItem={(Items) => (
-              <HomeList
-                isBalanceLoading={isBalanceLoading}
-                Items={Items}
-                navigation={navigation}
-                accounts={accounts}
-                addNewDisable={cardDataProps.length == 4 ? true : false}
-                balances={balances}
-                exchangeRates={exchangeRates}
-              />
-            )}
-          />
+        <View style={{ flex: 7 }}>
+          <View style={styles.accountCardsContainer}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={cardColumnData}
+              extraData={{
+                balances,
+                walletName,
+                currencyCode,
+                accounts,
+                exchangeRates,
+              }}
+              keyExtractor={(_, index) => String(index)}
+              renderItem={(Items) => (
+                <HomeList
+                  isBalanceLoading={isBalanceLoading}
+                  Items={Items}
+                  navigation={navigation}
+                  accounts={accounts}
+                  addNewDisable={cardDataProps.length == 4 ? true : false}
+                  balances={balances}
+                  exchangeRates={exchangeRates}
+                  onAddNewAccountPressed={this.navigateToAddNewAccountScreen}
+                />
+              )}
+            />
+          </View>
         </View>
 
         <View
@@ -2186,14 +2191,14 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create({
   accountCardsContainer: {
-    flex: 7,
     marginTop: 30,
     paddingLeft: 20,
+    height: '100%',
+    backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
-    backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
     width: '100%',
   },
