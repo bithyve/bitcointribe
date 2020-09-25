@@ -690,8 +690,8 @@ export default class HDSegwitWallet extends Bitcoin {
                 });
 
                 if (status.confirmed) balances.balance += value;
-                // else if (changeAddresses && changeAddresses.includes(Address))
-                //   balances.balance += value;
+                else if (internalAddresses.includes(Address))
+                  balances.balance += value;
                 else balances.unconfirmedBalance += value;
               }
             }
