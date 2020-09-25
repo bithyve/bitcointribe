@@ -26,7 +26,7 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import getIconByAccountType from '../../utils/accounts/GetIconByAccountType';
+import { getIconByAccountType } from '../../utils/accounts/IconUtils';
 
 const currencyCode = [
   'BRL',

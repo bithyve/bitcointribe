@@ -11,6 +11,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../../common/Colors';
+import AccountKind from '../../../common/data/enums/AccountKind';
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -36,11 +37,14 @@ function renderSectionHeader({ section }) {
   const kind: SectionKind = section.kind;
 
   return (
-    <Text style={[HeadingStyles.listSectionHeading, styles.listSectionHeading]}>{titleForSectionHeader(kind)}</Text>
-  )
+    <Text style={[HeadingStyles.listSectionHeading, styles.listSectionHeading]}>
+      {titleForSectionHeader(kind)}
+    </Text>
+  );
 }
 
-const StackNavigationHeader = ({ title, onBackPress }) => {
+// TODO: Reuse this elsewhere
+export const NavigationHeader = ({ title, onBackPress }) => {
   return (
     <View style={styles.screenHeader}>
       <TouchableOpacity
@@ -88,9 +92,22 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
   };
 
   function handleProceedButtonPress() {
-    navigation.navigate('AddNewCheckingAccountDetails', {
-      currentPayload: selectedChoice,
-    });
+    switch (selectedChoice.kind) {
+      case AccountKind.TEST:
+      case AccountKind.REGULAR:
+      case AccountKind.SECURE:
+        navigation.navigate('AddNewAccountDetails', {
+          currentPayload: selectedChoice,
+        });
+        break;
+      case AccountKind.SERVICE:
+        break;
+      case AccountKind.FULLY_IMPORTED_WALLET:
+      case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
+        break;
+      default:
+        break;
+    }
   }
 
   function handleChoiceSelection(choice: NewAccountPayload) {
@@ -100,7 +117,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
   return (
     <SafeAreaView style={styles.rootContainer}>
       <SectionList
-        ListHeaderComponent={<StackNavigationHeader title="Add New" onBackPress={() => navigation.goBack() } />}
+        ListHeaderComponent={<NavigationHeader title="Add New" onBackPress={() => navigation.goBack() } />}
         ListFooterComponent={<ListFooter />}
         extraData={[selectedChoice]}
         sections={[
