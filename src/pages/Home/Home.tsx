@@ -82,7 +82,9 @@ import TransactionsContent from '../../components/home/transaction-content';
 import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
-import CustomBottomTabs, { BottomTab } from '../../components/home/custom-bottom-tabs';
+import CustomBottomTabs, {
+  BottomTab,
+} from '../../components/home/custom-bottom-tabs';
 import { initialCardData, closingCardData } from '../../stubs/initialCardData';
 import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
@@ -154,7 +156,6 @@ const getIconByAccountType = (type) => {
     return require('../../assets/images/icons/icon_test.png');
   }
 };
-
 
 // TODO: Move this somewhere else and re-use it from there.
 export enum BottomSheetState {
@@ -382,11 +383,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             break;
 
           case 'paymentURI':
-            let address, options;
+            let address, options, donationId;
             try {
               const res = account.decodePaymentURI(qrData);
               address = res.address;
               options = res.options;
+
+              // checking for donationId to send note
+              if (options && options.message) {
+                try {
+                  // encoded message
+                  const rawMessage = JSON.parse(options.message);
+                  donationId = rawMessage.donationId;
+                } catch (err) {
+                  // normal message
+                }
+              }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
               return;
@@ -406,6 +418,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bitcoinAmount: options.amount
                 ? `${Math.round(options.amount * 1e8)}`
                 : '',
+              donationId,
             });
             break;
 
@@ -728,9 +741,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => { })
+      .then(() => {})
       .catch(
-        (err) => { }, //console.log('err', err)
+        (err) => {}, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -765,7 +778,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
@@ -919,12 +932,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => { })
-      .catch((err) => { });
+      .then(() => {})
+      .catch((err) => {});
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => { });
+      .then((notifications) => {});
   };
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -1149,7 +1162,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[3]
           }`,
         );
       } else {
@@ -1491,6 +1505,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
+
     let regularBalance = accounts[REGULAR_ACCOUNT].account
       ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
       accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
@@ -1541,6 +1556,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     }
+
 
     let secureBalance = accounts[SECURE_ACCOUNT].account
       ? accounts[SECURE_ACCOUNT].account?.secureHDWallet.balances.balance +
@@ -1777,7 +1793,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // this.processDLReques t(key, true);
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   handleBottomTabSelection = (tab: BottomTab) => {
     const knowMoreBottomSheetsFlag = tab === BottomTab.More;
@@ -1796,7 +1812,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.expand();
         },
       );
-    } if (tab === BottomTab.Transactions) {
+    }
+    if (tab === BottomTab.Transactions) {
       this.setState(
         {
           knowMoreBottomSheetsFlag,
@@ -1811,7 +1828,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moreTabBarBottomSheetRef.current?.close();
         },
       );
-    } if (tab === BottomTab.Add) {
+    }
+    if (tab === BottomTab.Add) {
       this.setState(
         {
           knowMoreBottomSheetsFlag,
@@ -1934,8 +1952,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   let contactName = '';
                   if (contact) {
-                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
-                      }`
+                    contactName = `${contact.firstName} ${
+                      contact.lastName ? contact.lastName : ''
+                    }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -2025,10 +2044,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-
   handleBottomSheetPositionChange = (
     bottomSheetRef: React.RefObject<RNBottomSheet>,
-    newIndex: number
+    newIndex: number,
   ) => {
     if (newIndex === 0) {
       bottomSheetRef.current?.snapTo(1);
@@ -2039,14 +2057,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-
   closeBottomSheet = () => {
-    this.setState(
-      { bottomSheetState: BottomSheetState.Closed },
-      () => {
-        this.getActiveBottomSheetRef().current?.snapTo(0);
-      },
-    );
+    this.setState({ bottomSheetState: BottomSheetState.Closed }, () => {
+      this.getActiveBottomSheetRef().current?.snapTo(0);
+    });
   };
 
   getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> => {
@@ -2065,12 +2079,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   expandModalOnHeaderTap = () => {
-    this.setState(
-      { bottomSheetState: BottomSheetState.Open },
-      () => {
-        this.getActiveBottomSheetRef().current?.expand();
-      }
-    );
+    this.setState({ bottomSheetState: BottomSheetState.Open }, () => {
+      this.getActiveBottomSheetRef().current?.expand();
+    });
   };
 
   handleBottomSheetHeaderTap = () => {
@@ -2133,8 +2144,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2176,7 +2187,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (item.title === 'Hexa Community (Telegram)') {
       let url = 'https://t.me/HexaWallet';
       Linking.openURL(url)
-        .then((data) => { })
+        .then((data) => {})
         .catch((e) => {
           alert('Make sure Telegram installed on your device');
         });
@@ -2226,9 +2237,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2390,7 +2401,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </View>
         </View>
 
-        <BottomSheetBackground isVisible={this.state.bottomSheetState === BottomSheetState.Open} onPress={this.closeBottomSheet} />
+        <BottomSheetBackground
+          isVisible={this.state.bottomSheetState === BottomSheetState.Open}
+          onPress={this.closeBottomSheet}
+        />
 
         <CustomBottomTabs
           tabBarZIndex={tabBarIndex}
@@ -2408,8 +2422,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                  ? hp('19%')
-                  : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
@@ -2418,11 +2432,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 : hp('82%'),
             ]}
             onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(this.transactionTabBarBottomSheetRef, newPositionIndex)
+              this.handleBottomSheetPositionChange(
+                this.transactionTabBarBottomSheetRef,
+                newPositionIndex,
+              );
             }}
           >
             <BottomSheetView>
-              <BottomSheetHeader title="Transactions" onPress={this.handleBottomSheetHeaderTap} />
+              <BottomSheetHeader
+                title="Transactions"
+                onPress={this.handleBottomSheetHeaderTap}
+              />
 
               <TransactionsContent
                 isFromAccount={false}
@@ -2434,7 +2454,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 setTabBarZIndex={(index) =>
                   this.setState({ tabBarIndex: index })
                 }
-                transactionDetailsBottomSheetRef={this.transactionDetailsBottomSheetRef}
+                transactionDetailsBottomSheetRef={
+                  this.transactionDetailsBottomSheetRef
+                }
               />
             </BottomSheetView>
           </RNBottomSheet>
@@ -2448,18 +2470,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                  ? hp('19%')
-                  : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
             ]}
             onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(this.addTabBarBottomSheetRef, newPositionIndex)
+              this.handleBottomSheetPositionChange(
+                this.addTabBarBottomSheetRef,
+                newPositionIndex,
+              );
             }}
           >
             <BottomSheetView>
-              <BottomSheetHeader title="Add" onPress={this.handleBottomSheetHeaderTap} />
+              <BottomSheetHeader
+                title="Add"
+                onPress={this.handleBottomSheetHeaderTap}
+              />
 
               <AddModalContents
                 onPressElements={(type) => {
@@ -2472,7 +2500,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 0,
                       },
                       () => {
-                        this.addContactAddressBookBottomSheetRef.current?.snapTo(1);
+                        this.addContactAddressBookBottomSheetRef.current?.snapTo(
+                          1,
+                        );
                       },
                     );
                   }
@@ -2493,18 +2523,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                  ? hp('19%')
-                  : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('82%')
                 : hp('82%'),
             ]}
             onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(this.qrTabBarBottomSheetRef, newPositionIndex)
+              this.handleBottomSheetPositionChange(
+                this.qrTabBarBottomSheetRef,
+                newPositionIndex,
+              );
             }}
           >
             <BottomSheetView>
-              <BottomSheetHeader title="QR" onPress={this.handleBottomSheetHeaderTap} />
+              <BottomSheetHeader
+                title="QR"
+                onPress={this.handleBottomSheetHeaderTap}
+              />
 
               <QrCodeModalContents
                 onClose={() => this.qrTabBarBottomSheetRef.current?.snapTo(1)}
@@ -2527,18 +2563,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                  ? hp('19%')
-                  : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
             ]}
             onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(this.moreTabBarBottomSheetRef, newPositionIndex);
+              this.handleBottomSheetPositionChange(
+                this.moreTabBarBottomSheetRef,
+                newPositionIndex,
+              );
             }}
           >
             <BottomSheetView>
-                <BottomSheetHeader title="More" onPress={this.handleBottomSheetHeaderTap} />
+              <BottomSheetHeader
+                title="More"
+                onPress={this.handleBottomSheetHeaderTap}
+              />
 
               <MoreHomePageTabContents
                 onPressElements={(item) => this.onPressElement(item)}
@@ -2586,9 +2628,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         deepLinkModalOpen: true,
                       },
                       () => {
-                        this.custodianRequestBottomSheetRef.current?.snapTo(
-                          0,
-                        );
+                        this.custodianRequestBottomSheetRef.current?.snapTo(0);
                       },
                     );
 
@@ -2631,7 +2671,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       },
                       () => {
                         this.custodianRequestBottomSheetRef.current?.snapTo(0);
-                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(1);
+                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
+                          1,
+                        );
                       },
                     );
                   }}
@@ -2714,7 +2756,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       deepLinkModalOpen: false,
                     },
                     () => {
-                      this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
+                      this.trustedContactRequestBottomSheetRef.current?.snapTo(
+                        0,
+                      );
                     },
                   );
                 }}
@@ -2748,7 +2792,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 999,
                       },
                       () => {
-                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(0);
+                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
+                          0,
+                        );
                       },
                     );
                   }}
@@ -2764,7 +2810,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       tabBarIndex: 999,
                     },
                     () => {
-                      this.custodianRequestRejectedBottomSheetRef.current?.snapTo(0);
+                      this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
+                        0,
+                      );
                     },
                   );
                 }}
@@ -3030,9 +3078,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(
-                  0,
-                );
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
               }}
               onSkipContinue={() => {
                 let { skippedContactsCount } = this.props.trustedContacts.tc;
@@ -3055,9 +3101,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 navigation.navigate('AddContactSendRequest', {
                   SelectedContact: [data],
                 });
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(
-                  0,
-                );
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
               }}
             />
           )}
@@ -3066,9 +3110,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(
-                  0,
-                );
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
               }}
             />
           )}

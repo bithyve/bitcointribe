@@ -1068,6 +1068,7 @@ function* setupDonationAccountWorker({ payload }) {
     subject,
     description,
     configuration,
+    disableAccount,
   );
 
   if (res.status === 200) {
@@ -1102,7 +1103,7 @@ function* updateDonationPreferencesWorker({ payload }) {
   const res = yield call(
     account.updateDonationPreferences,
     accountNumber,
-    configuration,
+    preferences,
   );
 
   if (res.status === 200) {
