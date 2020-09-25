@@ -1056,7 +1056,14 @@ export const startupSyncWatcher = createWatcher(
 );
 
 function* setupDonationAccountWorker({ payload }) {
-  const { serviceType, donee, subject, description, configuration } = payload;
+  const {
+    serviceType,
+    donee,
+    subject,
+    description,
+    configuration,
+    disableAccount,
+  } = payload;
   const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
@@ -1065,6 +1072,7 @@ function* setupDonationAccountWorker({ payload }) {
     subject,
     description,
     configuration,
+    disableAccount,
   );
 
   if (res.status === 200) {
@@ -1093,13 +1101,13 @@ export const setupDonationAccountWatcher = createWatcher(
 );
 
 function* updateDonationPreferencesWorker({ payload }) {
-  const { serviceType, accountNumber, configuration } = payload;
+  const { serviceType, accountNumber, preferences } = payload;
   const service = yield select((state) => state.accounts[serviceType].service);
 
   const res = yield call(
     service.updateDonationPreferences,
     accountNumber,
-    configuration,
+    preferences,
   );
 
   if (res.status === 200) {

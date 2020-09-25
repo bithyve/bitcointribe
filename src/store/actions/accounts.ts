@@ -242,24 +242,40 @@ export const setupDonationAccount = (
     displayBalance: boolean;
     displayTransactions: boolean;
   },
+  disableAccount?: boolean,
 ) => {
   return {
     type: SETUP_DONATION_ACCOUNT,
-    payload: { serviceType, donee, subject, description, configuration },
+    payload: {
+      serviceType,
+      donee,
+      subject,
+      description,
+      configuration,
+      disableAccount,
+    },
   };
 };
 
 export const updateDonationPreferences = (
   serviceType: string,
   accountNumber: number,
-  configuration: {
-    displayBalance: boolean;
-    displayTransactions: boolean;
+  preferences: {
+    disableAccount?: boolean;
+    configuration?: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
+    };
+    accountDetails?: {
+      donee: string;
+      subject: string;
+      description: string;
+    };
   },
 ) => {
   return {
     type: UPDATE_DONATION_PREFERENCES,
-    payload: { serviceType, accountNumber, configuration },
+    payload: { serviceType, accountNumber, preferences },
   };
 };
 

@@ -8,14 +8,6 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
-export interface Services {
-  REGULAR_ACCOUNT: RegularAccount;
-  TEST_ACCOUNT: TestAccount;
-  SECURE_ACCOUNT: SecureAccount;
-  S3_SERVICE: S3Service;
-  TRUSTED_CONTACTS: TrustedContactsService;
-}
-
 export interface DynamicNonPMDD {
   META_SHARES?: MetaShare[];
 }
