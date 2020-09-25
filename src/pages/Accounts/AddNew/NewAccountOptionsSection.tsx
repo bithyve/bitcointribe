@@ -44,7 +44,6 @@ const NewAccountOptionsSection: React.FC<Props> = ({
                 </TouchableOpacity>
               </View>
             </View>
-
           );
         }}
       />
