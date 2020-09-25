@@ -455,24 +455,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             break;
 
           case 'paymentURI':
-            let address, options, donationId;
+            let address, options;
             try {
               const res = account[serviceType].account.decodePaymentURI(
                 barcodes.data,
               );
               address = res.address;
               options = res.options;
-
-              // checking for donationId to send note
-              if (options && options.message) {
-                try {
-                  // encoded message
-                  const rawMessage = JSON.parse(options.message);
-                  donationId = rawMessage.donationId;
-                } catch (err) {
-                  // normal message
-                }
-              }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
               return;
@@ -494,7 +483,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               bitcoinAmount: options.amount
                 ? `${Math.round(options.amount * 1e8)}`
                 : '',
-              donationId,
             });
             break;
 

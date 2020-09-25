@@ -328,11 +328,7 @@ function* updateEphemeralChannelWorker({ payload }) {
       yield call(insertDBWorker, {
         payload: {
           ...payload.updatedDB,
-          SERVICES: {
-            ...payload.updatedDB.SERVICES,
-            REGULAR_ACCOUNT: updatedSERVICES.REGULAR_ACCOUNT,
-            TRUSTED_CONTACTS: updatedSERVICES.TRUSTED_CONTACTS,
-          },
+          SERVICES: { ...payload.updatedDB.SERVICES, ...updatedSERVICES },
         },
       });
     } else {

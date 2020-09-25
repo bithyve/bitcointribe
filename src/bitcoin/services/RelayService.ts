@@ -170,37 +170,4 @@ export default class RelayServices {
       };
     }
   };
-
-  public static sendDonationNote = async (
-    donationId: string,
-    txNote: { txId: string; note: string },
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          added: Boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await Relay.sendDonationNote(donationId, txNote),
-      };
-    } catch (err) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to deliver donation note',
-      };
-    }
-  };
 }
