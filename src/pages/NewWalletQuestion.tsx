@@ -82,7 +82,7 @@ export default function NewWalletQuestion(props) {
   );
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector((state) => state.accounts);
-  const testAccService = accounts[TEST_ACCOUNT].service;
+  const testAccService = accounts[TEST_ACCOUNT].account;
 
   // const [balances, setBalances] = useState({
   //   testBalance: 0,
@@ -92,31 +92,31 @@ export default function NewWalletQuestion(props) {
   // });
   // const [transactions, setTransactions] = useState([]);
   // useEffect(() => {
-  //   const testBalance = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //   const testBalance = accounts[TEST_ACCOUNT].account
+  //     ? accounts[TEST_ACCOUNT].account.hdWallet.balances.balance +
+  //     accounts[TEST_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
   //     : 0;
-  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //   const regularBalance = accounts[REGULAR_ACCOUNT].account
+  //     ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
+  //     accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
   //     : 0;
-  //   const secureBalance = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-  //     accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+  //   const secureBalance = accounts[SECURE_ACCOUNT].account
+  //     ? accounts[SECURE_ACCOUNT].account.secureHDWallet.balances.balance +
+  //     accounts[SECURE_ACCOUNT].account.secureHDWallet.balances
   //       .unconfirmedBalance
   //     : 0;
   //   const accumulativeBalance = regularBalance + secureBalance;
 
-  //   const testTransactions = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+  //   const testTransactions = accounts[TEST_ACCOUNT].account
+  //     ? accounts[TEST_ACCOUNT].account.hdWallet.transactions.transactionDetails
   //     : [];
-  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+  //   const regularTransactions = accounts[REGULAR_ACCOUNT].account
+  //     ? accounts[REGULAR_ACCOUNT].account.hdWallet.transactions
   //       .transactionDetails
   //     : [];
 
-  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+  //   const secureTransactions = accounts[SECURE_ACCOUNT].account
+  //     ? accounts[SECURE_ACCOUNT].account.secureHDWallet.transactions
   //       .transactionDetails
   //     : [];
   //   const accumulativeTransactions = [
@@ -489,7 +489,7 @@ export default function NewWalletQuestion(props) {
                           : 'visible-password'
                       }
                       onChangeText={(text) => {
-                        
+
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -581,7 +581,7 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={(text) => {
-                        
+
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}

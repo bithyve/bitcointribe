@@ -779,7 +779,7 @@ const mapStateToProps = (state) => {
     (_) => _.trustedContacts.trustedContactsInfo,
   );
   return {
-    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].account),
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     trustedChannelsSyncing: idx(
       state,

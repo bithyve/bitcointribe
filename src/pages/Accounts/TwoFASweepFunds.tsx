@@ -35,10 +35,10 @@ export default function TwoFASweepFunds(props) {
   const [averageTxFees, setAverageTxFees] = useState(props.averageTxFees);
   const serviceType = SECURE_ACCOUNT;
   const sweepSecure = true;
-  const { transfer, loading, service } = useSelector(
+  const { transfer, loading, account } = useSelector(
     (state) => state.accounts[serviceType],
   );
-  const wallet = service.secureHDWallet;
+  const wallet = account.secureHDWallet;
   const [netBalance, setNetBalance] = useState(
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
@@ -156,7 +156,7 @@ export default function TwoFASweepFunds(props) {
                           }}
                           onBlur={() => {
                             const instance =
-                              service.hdWallet || service.secureHDWallet;
+                              account.hdWallet || account.secureHDWallet;
                             let isAddressValid = instance.isValidAddress(
                               recipientAddress,
                             );

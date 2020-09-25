@@ -211,10 +211,10 @@ function* updateEphemeralChannelWorker({ payload }) {
   if (!trustedContacts)
     trustedContacts = yield select((state) => state.trustedContacts.service);
   const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
+    (state) => state.accounts[REGULAR_ACCOUNT].account,
   );
   const testService: TestAccount = yield select(
-    (state) => state.accounts[TEST_ACCOUNT].service,
+    (state) => state.accounts[TEST_ACCOUNT].account,
   );
 
   const { contactInfo, data, fetch } = payload;
@@ -496,11 +496,11 @@ export function* trustedChannelsSyncWorker() {
     (state) => state.trustedContacts.service,
   );
   const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
+    (state) => state.accounts[REGULAR_ACCOUNT].account,
   );
   const preSyncReg = JSON.stringify(regularService);
   const testService: TestAccount = yield select(
-    (state) => state.accounts[TEST_ACCOUNT].service,
+    (state) => state.accounts[TEST_ACCOUNT].account,
   );
 
   yield call(fetchNotificationsWorker); // refreshes DHInfos

@@ -25,7 +25,7 @@ export default function CustomPriorityContent(props) {
   const onCustomFeeChange = useCallback(
     (value) => {
       const { feeRates } =
-        props.service.hdWallet || props.service.secureHDWallet;
+        props.account.hdWallet || props.account.secureHDWallet;
 
       if (feeRates) {
         const customFeeRatePerByte = parseInt(value);
@@ -57,7 +57,7 @@ export default function CustomPriorityContent(props) {
 
       setAmount(value);
     },
-    [props.service],
+    [props.account],
   );
 
   return (

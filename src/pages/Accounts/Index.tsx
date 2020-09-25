@@ -263,11 +263,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
       accounts[serviceType].loading.derivativeBalanceTx;
-    const service = accounts[serviceType].service;
+    const account = accounts[serviceType].account;
     this.wallet =
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
-        ? service.secureHDWallet
-        : service.hdWallet;
+        ? account.secureHDWallet
+        : account.hdWallet;
     this.setAverageTransactionFees();
     this.checkFastBitcoin();
     this.updateCarouselData();
@@ -325,7 +325,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     const additionalCarouselData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].service[
+        accounts[serviceType].account[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -362,12 +362,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   getBalance = () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
-    const service = accounts[serviceType].service;
+    const account = accounts[serviceType].account;
     const wallet =
       serviceType === SECURE_ACCOUNT
-        ? service.secureHDWallet
-        : service.hdWallet;
-    if (service) {
+        ? account.secureHDWallet
+        : account.hdWallet;
+    if (account) {
       let currentBalance;
       let spendableBalance;
       let currentTransactions;
@@ -408,13 +408,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
             if (serviceType === REGULAR_ACCOUNT) {
               derivativeAccount =
-                accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                accounts[REGULAR_ACCOUNT].account.hdWallet.derivativeAccounts[
                   dAccountType
                 ];
             } else if (serviceType === SECURE_ACCOUNT) {
               if (dAccountType === TRUSTED_CONTACTS) continue;
               derivativeAccount =
-                accounts[SECURE_ACCOUNT].service.secureHDWallet
+                accounts[SECURE_ACCOUNT].account.secureHDWallet
                   .derivativeAccounts[dAccountType];
             }
 
@@ -468,8 +468,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   setAverageTransactionFees = async () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
-    const service = accounts[serviceType].service;
-    const instance = service.hdWallet || service.secureHDWallet;
+    const account = accounts[serviceType].account;
+    const instance = account.hdWallet || account.secureHDWallet;
     const storedAverageTxFees = this.props.averageTxFees;
     // const storedAverageTxFees = JSON.parse(
     //   await AsyncStorage.getItem('storedAverageTxFees'),
@@ -530,8 +530,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.setState({ exchangeRates: this.props.accounts.exchangeRates });
     }
     if (
-      prevProps.accounts[this.state.serviceType].service !==
-      this.props.accounts[this.state.serviceType].service
+      prevProps.accounts[this.state.serviceType].account !==
+      this.props.accounts[this.state.serviceType].account
     ) {
       this.getBalance();
       this.balanceTxLoading = this.props.accounts[
@@ -550,12 +550,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       let donationAccUpdated = false;
       for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
         const prevDonationAccounts =
-          prevProps.accounts[serviceType].service[
+          prevProps.accounts[serviceType].account[
             serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
           ].derivativeAccounts;
 
         const updatedDonationAccounts = this.props.accounts[serviceType]
-          .service[
+          .account[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -880,9 +880,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     alignSelf: 'center',
                   }}
                   onPress={() => {
-                    // if (service.secureHDWallet.twoFASetup) {
+                    // if (account.secureHDWallet.twoFASetup) {
                     //   this.props.navigation.navigate('TwoFASetup', {
-                    //     twoFASetup: service.secureHDWallet.twoFASetup,
+                    //     twoFASetup: account.secureHDWallet.twoFASetup,
                     //   });
                     // }
                   }}
