@@ -1,9 +1,10 @@
+import React from 'react';
+import { Text } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import {
   createStackNavigator,
   StackViewTransitionConfigs,
 } from 'react-navigation-stack';
-
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
@@ -84,6 +85,7 @@ import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
 import AddNewAccountDetails from '../pages/Accounts/AddNew/AccountDetails/AddNewAccountDetails';
+import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -139,19 +141,18 @@ const AddNewAccountStack = createStackNavigator(
     AccountTypeSelectionList: {
       screen: NewAccountTypeSelectionList,
       navigationOptions: {
-        headerShown: false,
+        header: ({ navigation }) => {
+          return <NavigationHeader title="Add New" onBackPress={() => navigation.goBack()} />
+        },
       },
     },
     AddNewAccountDetails: {
       screen: AddNewAccountDetails,
-      navigationOptions: {
-        headerShown: false
-      },
+      navigationOptions: AddNewAccountDetails.navigationOptions,
     },
   },
   {
     mode: 'modal',
-    headerMode: 'none',
   },
 );
 
