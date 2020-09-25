@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { iconForAccountKind, iconForServiceAccountKind } from '../../../utils/accounts/IconUtils';
 import AccountKind from "../enums/AccountKind";
 import ServiceAccountKind from "../enums/ServiceAccountKind";
 
@@ -24,7 +25,10 @@ export class NewTestAccountPayload implements NewAccountPayload {
   balance: number;
   customDisplayName: string;
   customDescription: string;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 export class NewSavingsAccountPayload implements NewAccountPayload {
@@ -34,9 +38,12 @@ export class NewSavingsAccountPayload implements NewAccountPayload {
   kind = AccountKind.SECURE;
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDescription: string;
   customDisplayName: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 export class NewCheckingAccountPayload implements NewAccountPayload {
@@ -46,9 +53,12 @@ export class NewCheckingAccountPayload implements NewAccountPayload {
   kind = AccountKind.REGULAR;
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDescription: string;
   customDisplayName: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 
@@ -59,9 +69,12 @@ export class NewTrustedContactsAccountPayload implements NewAccountPayload {
   kind = AccountKind.TRUSTED_CONTACTS;
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDisplayName: string;
   customDescription: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 
@@ -72,9 +85,12 @@ export class NewDonationAccountPayload implements NewAccountPayload {
   shortDescription = "Directly Accept Donations";
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDisplayName: string;
   customDescription: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 
@@ -85,7 +101,6 @@ export class NewServiceAccountPayload implements NewAccountPayload {
   shortDescription: string;
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDisplayName: string;
   customDescription: string;
 
@@ -95,6 +110,10 @@ export class NewServiceAccountPayload implements NewAccountPayload {
     this.title = title;
     this.shortDescription = shortDescription;
     this.serviceAccountKind = serviceAccountKind;
+  }
+
+  get imageSource(): NodeRequire {
+    return iconForServiceAccountKind(this.serviceAccountKind);
   }
 }
 
@@ -106,9 +125,12 @@ export class NewWatchOnlyImportedWalletAccountPayload implements NewAccountPaylo
   shortDescription = "View a non-Hexa wallet as an account";
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDescription: string;
   customDisplayName: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
 
 
@@ -119,7 +141,10 @@ export class NewFullyImportedWalletAccountPayload implements NewAccountPayload {
   shortDescription = "Fully import and manage a non-Hexa wallet.";
   accountNumber: number;
   balance: number;
-  imageSource = require('../../../assets/images/icons/icon_bitcoin_dark.png');
   customDisplayName: string;
   customDescription: string;
+
+  get imageSource(): NodeRequire {
+    return iconForAccountKind(this.kind);
+  }
 }
