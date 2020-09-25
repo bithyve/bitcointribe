@@ -16,7 +16,7 @@ import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDoc
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/index';
+import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
@@ -130,7 +130,7 @@ const MODAL_ROUTES = [
   'RecoveryRequestOTP',
   'Confirmation',
   'TransactionDetails',
-  'Intermediate',
+  'Intermediate'
 ];
 
 const HomeNavigator = createStackNavigator(

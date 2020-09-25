@@ -129,37 +129,4 @@ export default class Relay {
       throw new Error('Failed to deliver notification');
     }
   };
-
-  public static sendDonationNote = async (
-    donationId: string,
-    txNote: { txId: string; note: string },
-  ): Promise<{
-    added: Boolean;
-  }> => {
-    try {
-      let res: AxiosResponse;
-
-      if (!txNote || !txNote.txId || !txNote.note)
-        throw new Error('Failed to send donation note: txid|note missing');
-
-      try {
-        res = await BH_AXIOS.post('addDonationTxNote', {
-          HEXA_ID,
-          donationId,
-          txNote,
-        });
-        console.log({ res });
-      } catch (err) {
-        console.log({ err });
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
-      }
-      const { added } = res.data;
-      if (!added) throw new Error();
-
-      return { added };
-    } catch (err) {
-      throw new Error('Failed to deliver donation note');
-    }
-  };
 }

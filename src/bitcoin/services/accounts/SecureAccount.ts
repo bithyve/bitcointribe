@@ -540,7 +540,6 @@ export default class SecureAccount {
       displayBalance: boolean;
       displayTransactions: boolean;
     },
-    disableAccount?: boolean,
   ): Promise<
     | {
         status: number;
@@ -565,7 +564,6 @@ export default class SecureAccount {
           subject,
           description,
           configuration,
-          disableAccount,
         ),
       };
     } catch (err) {
@@ -579,17 +577,9 @@ export default class SecureAccount {
 
   public updateDonationPreferences = async (
     accountNumber: number,
-    preferences: {
-      disableAccount?: boolean;
-      configuration?: {
-        displayBalance: boolean;
-        displayTransactions: boolean;
-      };
-      accountDetails?: {
-        donee: string;
-        subject: string;
-        description: string;
-      };
+    configuration: {
+      displayBalance: boolean;
+      displayTransactions: boolean;
     },
   ): Promise<
     | {
@@ -612,7 +602,7 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.updateDonationPreferences(
           accountNumber,
-          preferences,
+          configuration,
         ),
       };
     } catch (err) {
