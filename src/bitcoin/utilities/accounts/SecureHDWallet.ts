@@ -835,8 +835,8 @@ export default class SecureHDWallet extends Bitcoin {
                 });
 
                 if (status.confirmed) balances.balance += value;
-                // else if (changeAddresses && changeAddresses.includes(Address))
-                //   balances.balance += value;
+                else if (internalAddresses.includes(Address))
+                  balances.balance += value;
                 else balances.unconfirmedBalance += value;
               }
             }
@@ -1044,11 +1044,7 @@ export default class SecureHDWallet extends Bitcoin {
     } = res.data;
 
     const internalAddresses = [];
-    for (
-      let itr = 0;
-      itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
-      itr++
-    ) {
+    for (let itr = 0; itr < nextFreeChangeAddressIndex + this.gapLimit; itr++) {
       internalAddresses.push(
         this.createSecureMultiSig(
           itr,
@@ -2114,7 +2110,7 @@ export default class SecureHDWallet extends Bitcoin {
       );
     else
       childPrimaryPub = this.getPub(
-        this.deriveDerivativeChildXKey(derivativeXpub, childIndex),
+        this.deriveDerivativeChildXKey(derivativeXpub, childIndex, internal),
       );
 
     const childRecoveryPub = this.getPub(
