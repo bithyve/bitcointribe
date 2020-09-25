@@ -60,8 +60,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 10,
     minHeight: 88,
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
   },
 
   contentContainer: {
