@@ -111,7 +111,7 @@ export default function SendToContact(props) {
   const [recipients, setRecipients] = useState([]);
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
-  const account = useSelector((state) => state.accounts[serviceType].account);
+  const service = useSelector((state) => state.accounts[serviceType].service);
 
   useEffect(() => {
     setCurrencyCodeFromAsync();
@@ -146,20 +146,20 @@ export default function SendToContact(props) {
   ];
 
   useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].account
-      ? accounts[TEST_ACCOUNT].account.hdWallet.balances.balance
-      : // +  accounts[TEST_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       0;
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].account
-      ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance
-      : // +  accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].account.hdWallet.derivativeAccounts[
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount.instance.using) {
@@ -176,9 +176,9 @@ export default function SendToContact(props) {
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].account
-      ? accounts[SECURE_ACCOUNT].account.secureHDWallet.balances.balance
-      : // + accounts[SECURE_ACCOUNT].account.secureHDWallet.balances
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
+      : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
       //      .unconfirmedBalance
       0;
 
@@ -187,7 +187,7 @@ export default function SendToContact(props) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].account.secureHDWallet.derivativeAccounts[
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount.instance.using) {
@@ -224,7 +224,7 @@ export default function SendToContact(props) {
     const storedAverageTxFees = JSON.parse(
       await AsyncStorage.getItem('storedAverageTxFees'),
     );
-    const instance = account.hdWallet || account.secureHDWallet;
+    const instance = service.hdWallet || service.secureHDWallet;
 
     //console.log({ storedAverageTxFees });
     if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
@@ -245,7 +245,7 @@ export default function SendToContact(props) {
         );
       }
     } else {
-      const instance = account.hdWallet || account.secureHDWallet;
+      const instance = service.hdWallet || service.secureHDWallet;
       const averageTxFees = await instance.averageTransactionFee();
       setAverageTxFees(averageTxFees);
       await AsyncStorage.setItem(
@@ -332,7 +332,7 @@ export default function SendToContact(props) {
         recipientsList.push(instance);
     });
     recipientsList.push(currentRecipientInstance);
-    const instance = account.hdWallet || account.secureHDWallet;
+    const instance = service.hdWallet || service.secureHDWallet;
 
     recipientsList.map((item) => {
       const recipientId = item.selectedContact.id;

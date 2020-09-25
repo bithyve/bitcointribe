@@ -54,8 +54,8 @@ const ResetTwoFAHelp = (props) => {
   ] = useState(React.createRef());
 
   const additional = useSelector((state) => state.accounts.additional);
-  const account = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].account,
+  const service = useSelector(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
   );
 
   let generatedSecureXPriv;
@@ -70,7 +70,7 @@ const ResetTwoFAHelp = (props) => {
   useEffect(() => {
     if (resettedTwoFA) {
       props.navigation.navigate('TwoFASetup', {
-        twoFASetup: account.secureHDWallet.twoFASetup,
+        twoFASetup: service.secureHDWallet.twoFASetup,
         onPressBack: () => {
           dispatch(clearTransfer(SECURE_ACCOUNT));
           props.navigation.navigate('Accounts', {
@@ -100,8 +100,8 @@ const ResetTwoFAHelp = (props) => {
           serviceType: SECURE_ACCOUNT,
           sweepSecure: true,
           netBalance:
-            account.secureHDWallet.balances.balance +
-            account.secureHDWallet.balances.unconfirmedBalance,
+            service.secureHDWallet.balances.balance +
+            service.secureHDWallet.balances.unconfirmedBalance,
         });
         dispatch(secondaryXprivGenerated(null));
       } else if (generatedSecureXPriv === false) {

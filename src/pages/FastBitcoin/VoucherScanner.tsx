@@ -164,7 +164,7 @@ const VoucherScanner = (props) => {
     amount: '0',
     image: require('../../assets/images/icons/icon_regular.png'),
   });
-  let account = useSelector(
+  let service = useSelector(
     (state) => state.accounts[selectedAccount && selectedAccount.accountType],
   );
 
@@ -228,12 +228,12 @@ const VoucherScanner = (props) => {
   };
 
   useEffect(() => {
-    if (account) {
+    if (service) {
       const accountNumber = 1;
       const { derivativeAccounts } =
         selectedAccount && selectedAccount.accountType === SECURE_ACCOUNT
-          ? account.account.secureHDWallet
-          : account.account.hdWallet;
+          ? service.service.secureHDWallet
+          : service.service.hdWallet;
 
       if (
         derivativeAccounts[FAST_BITCOINS][accountNumber] &&
@@ -244,7 +244,7 @@ const VoucherScanner = (props) => {
         );
       }
     }
-  }, [selectedAccount, account]);
+  }, [selectedAccount, service]);
 
   useEffect(() => {
     if (selectedAccount) {
@@ -255,15 +255,15 @@ const VoucherScanner = (props) => {
   }, [selectedAccount]);
 
   useEffect(() => {
-    let regularBalance = accounts1[REGULAR_ACCOUNT].account
-      ? accounts1[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
-      accounts1[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accounts1[REGULAR_ACCOUNT].service
+      ? accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts1[REGULAR_ACCOUNT].account.hdWallet.derivativeAccounts[
+        accounts1[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount.instance.using) {
@@ -286,9 +286,9 @@ const VoucherScanner = (props) => {
       }
     }
 
-    let secureBalance = accounts1[SECURE_ACCOUNT].account
-      ? accounts1[SECURE_ACCOUNT].account.secureHDWallet.balances.balance +
-      accounts1[SECURE_ACCOUNT].account.secureHDWallet.balances
+    let secureBalance = accounts1[SECURE_ACCOUNT].service
+      ? accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
         .unconfirmedBalance
       : 0;
 
@@ -297,7 +297,7 @@ const VoucherScanner = (props) => {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts1[SECURE_ACCOUNT].account.secureHDWallet.derivativeAccounts[
+        accounts1[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount.instance.using) {

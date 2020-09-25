@@ -71,7 +71,7 @@ interface SendPropsTypes {
   clearTransfer: any;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  account: any;
+  service: any;
   transfer: any;
   accounts: any;
   trustedContactsInfo: any;
@@ -179,8 +179,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
 
     if (
-      prevProps.account[this.state.serviceType].account !==
-      this.props.account[this.state.serviceType].account
+      prevProps.service[this.state.serviceType].service !==
+      this.props.service[this.state.serviceType].service
     ) {
       this.storeAverageTxFees();
     }
@@ -216,7 +216,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     const donationAccountData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts = this.props.accounts[serviceType].account[
+      const derivativeAccounts = this.props.accounts[serviceType].service[
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
       ].derivativeAccounts;
 
@@ -248,17 +248,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { accounts } = this.props;
     const { serviceType } = this.state;
 
-    const testBalance = accounts[TEST_ACCOUNT].account
-      ? accounts[TEST_ACCOUNT].account.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    let regularBalance = accounts[REGULAR_ACCOUNT].account
-      ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    let secureBalance = accounts[SECURE_ACCOUNT].account
-      ? accounts[SECURE_ACCOUNT].account.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].account.secureHDWallet.balances
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
 
@@ -270,12 +270,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         // calculating opposite accounts derivative balance for account tiles
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
-            accounts[REGULAR_ACCOUNT].account.hdWallet.derivativeAccounts[
+            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
               dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
-            accounts[SECURE_ACCOUNT].account.secureHDWallet.derivativeAccounts[
+            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
               dAccountType
             ];
         }
@@ -308,16 +308,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       }
     }
 
-    if (serviceType !== REGULAR_ACCOUNT) {
-      regularBalance += derivativeBalance;
-    }  else if (serviceType !== SECURE_ACCOUNT) {
-      secureBalance += derivativeBalance;
-    }
+    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
+    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
 
     let donationsBalance = {};
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].account[
+        accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -363,7 +360,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   setRecipientAddress = () => {
-    const { account } = this.props;
+    const { service } = this.props;
     const {
       recipientAddress,
       serviceType,
@@ -371,7 +368,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       spendableBalance,
       derivativeAccountDetails,
     } = this.state;
-    // const instance = service[serviceType].account.hdWallet || service[serviceType].account.secureHDWallet;
+    // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
     // // console.log("instance setRecipientAddress", instance);
     // let isAddressValid = instance.isValidAddress(recipientAddress);
     // //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
@@ -381,7 +378,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     //   };
     //   this.onSelectContact(item);
     // }
-    const { type } = account[serviceType].account.addressDiff(
+    const { type } = service[serviceType].service.addressDiff(
       recipientAddress.trim(),
     );
     if (type) {
@@ -397,7 +394,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         case 'paymentURI':
           let address, options;
           try {
-            const res = account[serviceType].account.decodePaymentURI(
+            const res = service[serviceType].service.decodePaymentURI(
               recipientAddress.trim(),
             );
             address = res.address;
@@ -431,7 +428,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   barcodeRecognized = async (barcodes) => {
-    const { account } = this.props;
+    const { service } = this.props;
     const {
       serviceType,
       sweepSecure,
@@ -440,7 +437,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     } = this.state;
     //console.log('barcodes', barcodes);
     if (barcodes.data) {
-      const { type } = account[serviceType].account.addressDiff(
+      const { type } = service[serviceType].service.addressDiff(
         barcodes.data.trim(),
       );
       if (type) {
@@ -457,7 +454,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           case 'paymentURI':
             let address, options;
             try {
-              const res = account[serviceType].account.decodePaymentURI(
+              const res = service[serviceType].service.decodePaymentURI(
                 barcodes.data,
               );
               address = res.address;
@@ -563,14 +560,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   twoFASetupMethod = async () => {
-    const { account, isTwoFASetupDone } = this.props; //(await AsyncStorage.getItem('twoFASetup')
+    const { service, isTwoFASetupDone } = this.props; //(await AsyncStorage.getItem('twoFASetup')
     if (
       !isTwoFASetupDone &&
-      account[this.state.serviceType].account.secureHDWallet.twoFASetup
+      service[this.state.serviceType].service.secureHDWallet.twoFASetup
     ) {
       this.props.navigation.navigate('TwoFASetup', {
         twoFASetup:
-          account[this.state.serviceType].account.secureHDWallet.twoFASetup,
+          service[this.state.serviceType].service.secureHDWallet.twoFASetup,
       });
       this.props.removeTwoFA();
       this.props.setSendHelper(true);
@@ -579,12 +576,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   storeAverageTxFees = async () => {
-    const { account } = this.props;
+    const { service } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
     const instance =
-      account[serviceType].account.hdWallet ||
-      account[serviceType].account.secureHDWallet;
+      service[serviceType].service.hdWallet ||
+      service[serviceType].service.secureHDWallet;
     const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
       ? 'MAINNET'
       : 'TESTNET';
@@ -723,7 +720,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       getServiceType,
       carouselIndex,
     } = this.state;
-    const { clearTransfer, account, transfer, accounts } = this.props;
+    const { clearTransfer, service, transfer, accounts } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -823,8 +820,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       }}
                       onBlur={() => {
                         const instance =
-                          account[serviceType].account.hdWallet ||
-                          account[serviceType].account.secureHDWallet;
+                          service[serviceType].service.hdWallet ||
+                          service[serviceType].service.secureHDWallet;
                         let isAddressValid = instance.isValidAddress(
                           recipientAddress,
                         );
@@ -1053,10 +1050,10 @@ const mapStateToProps = (state) => {
     (_) => _.trustedContacts.trustedContactsInfo,
   );
   return {
-    account: idx(state, (_) => _.accounts),
+    service: idx(state, (_) => _.accounts),
     transfer: idx(state, (_) => _.accounts),
     accounts: state.accounts || [],
-    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].account),
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     trustedContactsInfo,
     isSendHelperDoneValue: idx(

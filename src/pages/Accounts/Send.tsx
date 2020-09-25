@@ -72,7 +72,7 @@ export default function Send(props) {
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let spendableBalance = props.navigation.getParam('spendableBalance');
 
-  const account = useSelector((state) => state.accounts[serviceType].account);
+  const service = useSelector((state) => state.accounts[serviceType].service);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
 
   const getServiceType = props.navigation.getParam('getServiceType')
@@ -92,17 +92,17 @@ export default function Send(props) {
   const [filterContactData, setFilterContactData] = useState([]);
   const accounts = useSelector((state) => state.accounts);
   useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].account
-      ? accounts[TEST_ACCOUNT].account.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    let regularBalance = accounts[REGULAR_ACCOUNT].account
-      ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    let secureBalance = accounts[SECURE_ACCOUNT].account
-      ? accounts[SECURE_ACCOUNT].account.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].account.secureHDWallet.balances
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
         .unconfirmedBalance
       : 0;
 
@@ -114,12 +114,12 @@ export default function Send(props) {
         // calculating opposite accounts derivative balance for account tiles
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
-            accounts[REGULAR_ACCOUNT].account.hdWallet.derivativeAccounts[
+            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
             dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
-            accounts[SECURE_ACCOUNT].account.secureHDWallet.derivativeAccounts[
+            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
             dAccountType
             ];
         }
@@ -186,7 +186,7 @@ export default function Send(props) {
     // },
   ]);
   const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
   const trustedContactsService: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
@@ -209,10 +209,10 @@ export default function Send(props) {
   const twoFASetupMethod = async () => {
     if (
       !(await AsyncStorage.getItem('twoFASetup')) &&
-      account.secureHDWallet.twoFASetup
+      service.secureHDWallet.twoFASetup
     ) {
       props.navigation.navigate('TwoFASetup', {
-        twoFASetup: account.secureHDWallet.twoFASetup,
+        twoFASetup: service.secureHDWallet.twoFASetup,
       });
       dispatch(removeTwoFA());
       await AsyncStorage.setItem('twoFASetup', 'true');
@@ -223,7 +223,7 @@ export default function Send(props) {
     const storedAverageTxFees = JSON.parse(
       await AsyncStorage.getItem('storedAverageTxFees'),
     );
-    const instance = account.hdWallet || account.secureHDWallet;
+    const instance = service.hdWallet || service.secureHDWallet;
 
     if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
       const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
@@ -404,7 +404,7 @@ export default function Send(props) {
   };
 
   useEffect(() => {
-    const { type } = account.addressDiff(recipientAddress.trim());
+    const { type } = service.addressDiff(recipientAddress.trim());
     if (type) {
       let item;
       switch (type) {
@@ -418,7 +418,7 @@ export default function Send(props) {
         case 'paymentURI':
           let address, options;
           try {
-            const res = account.decodePaymentURI(recipientAddress.trim());
+            const res = service.decodePaymentURI(recipientAddress.trim());
             address = res.address;
             options = res.options;
           } catch (err) {
@@ -453,7 +453,7 @@ export default function Send(props) {
   const barcodeRecognized = async (barcodes) => {
     console.log('barcodes', barcodes);
     if (barcodes.data) {
-      const { type } = account.addressDiff(barcodes.data.trim());
+      const { type } = service.addressDiff(barcodes.data.trim());
       if (type) {
         let item;
         switch (type) {
@@ -468,7 +468,7 @@ export default function Send(props) {
           case 'paymentURI':
             let address, options;
             try {
-              const res = account.decodePaymentURI(barcodes.data);
+              const res = service.decodePaymentURI(barcodes.data);
               address = res.address;
               options = res.options;
             } catch (err) {
@@ -672,7 +672,7 @@ export default function Send(props) {
                     }}
                     onBlur={() => {
                       const instance =
-                        account.hdWallet || account.secureHDWallet;
+                        service.hdWallet || service.secureHDWallet;
                       let isAddressValid = instance.isValidAddress(
                         recipientAddress,
                       );

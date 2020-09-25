@@ -361,8 +361,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-      const account = accounts[serviceType].account;
-      const { type } = account.addressDiff(qrData);
+      const service = accounts[serviceType].service;
+      const { type } = service.addressDiff(qrData);
       if (type) {
         let item;
         switch (type) {
@@ -384,7 +384,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           case 'paymentURI':
             let address, options;
             try {
-              const res = account.decodePaymentURI(qrData);
+              const res = service.decodePaymentURI(qrData);
               address = res.address;
               options = res.options;
             } catch (err) {
@@ -655,15 +655,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const additionalCardData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const account = accounts[serviceType].account;
-
-      if (!account) { continue; }
-
-      const derivativeAccounts = account[
+      const derivativeAccounts =
+        accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-      ].derivativeAccounts;
+        ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) { continue; }
+      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
 
       for (
         let index = 1;
@@ -824,15 +821,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { notificationListNew } = this.props;
     let newTransactions = [];
     const { accounts, fetchDerivativeAccBalTx } = this.props;
-    const regularAccount = accounts[REGULAR_ACCOUNT].account?.hdWallet;
-    const secureAccount = accounts[SECURE_ACCOUNT].account?.secureHDWallet;
+    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
 
     let newTransactionsRegular =
-      regularAccount?.derivativeAccounts[FAST_BITCOINS][1] &&
-      regularAccount?.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
     let newTransactionsSecure =
-      secureAccount?.derivativeAccounts[FAST_BITCOINS][1] &&
-      secureAccount?.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
 
     if (newTransactionsRegular && newTransactionsRegular.length)
       newTransactions.push(...newTransactionsRegular);
@@ -966,7 +963,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       let options: any = {};
       if (paymentURI) {
         try {
-          const details = accounts[serviceType].account?.decodePaymentURI(
+          const details = accounts[serviceType].service.decodePaymentURI(
             paymentURI,
           );
           address = details.address;
@@ -1480,37 +1477,37 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBalances = () => {
     const { accounts } = this.props;
 
-    let testBalance = accounts[TEST_ACCOUNT].account
-      ? accounts[TEST_ACCOUNT].account.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    const testTransactions = accounts[TEST_ACCOUNT].account
-      ? accounts[TEST_ACCOUNT].account.hdWallet.transactions.transactionDetails
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
 
     if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].account
-      ? accounts[REGULAR_ACCOUNT].account.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].account.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    let regularTransactions = accounts[REGULAR_ACCOUNT].account
-      ? accounts[REGULAR_ACCOUNT].account.hdWallet.transactions
+    let regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
         .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].account?.hdWallet.derivativeAccounts[
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
-          accountNumber <= derivativeAccount?.instance.using;
+          accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
           // console.log({
@@ -1542,14 +1539,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].account
-      ? accounts[SECURE_ACCOUNT].account?.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].account?.secureHDWallet.balances
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
         .unconfirmedBalance
       : 0;
 
-    const secureTransactions = accounts[SECURE_ACCOUNT].account
-      ? accounts[SECURE_ACCOUNT].account?.secureHDWallet.transactions
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
         .transactionDetails
       : [];
 
@@ -1558,7 +1555,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].account?.secureHDWallet.derivativeAccounts[
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1600,12 +1597,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const donationTxs = [];
     let donationsBalance = 0;
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const account = accounts[serviceType].account;
-
-      if (!account) { continue; }
-
       const derivativeAccounts =
-        account[
+        accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 

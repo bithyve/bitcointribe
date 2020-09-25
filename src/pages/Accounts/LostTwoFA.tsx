@@ -28,7 +28,7 @@ const LostTwoFA = props => {
     resettedTwoFA = additional.secure.twoFAResetted;
   }
   const dispatch = useDispatch();
-  const account = useSelector(state => state.accounts[SECURE_ACCOUNT].account);
+  const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
@@ -41,8 +41,8 @@ const LostTwoFA = props => {
         props.navigation.navigate('Send', {
           serviceType: SECURE_ACCOUNT,
           netBalance:
-            account.secureHDWallet.balances.balance +
-            account.secureHDWallet.balances.unconfirmedBalance,
+            service.secureHDWallet.balances.balance +
+            service.secureHDWallet.balances.unconfirmedBalance,
           sweepSecure: true,
         });
         dispatch(secondaryXprivGenerated(null));
@@ -86,7 +86,7 @@ const LostTwoFA = props => {
   useEffect(() => {
     if (resettedTwoFA) {
       props.navigation.navigate('TwoFASetup', {
-        twoFASetup: account.secureHDWallet.twoFASetup,
+        twoFASetup: service.secureHDWallet.twoFASetup,
         onPressBack: () => {
           dispatch(clearTransfer(SECURE_ACCOUNT));
           props.navigation.navigate('Accounts', {

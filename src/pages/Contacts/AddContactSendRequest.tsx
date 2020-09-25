@@ -91,11 +91,11 @@ export default function AddContactSendRequest(props) {
   );
 
   const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
   const testAccount: TestAccount = useSelector(
-    (state) => state.accounts[TEST_ACCOUNT].account,
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
   const updateEphemeralChannelLoader = useSelector(

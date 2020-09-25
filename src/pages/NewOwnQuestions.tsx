@@ -76,7 +76,7 @@ export default function NewOwnQuestions(props) {
   );
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector((state) => state.accounts);
-  const testAccService = accounts[TEST_ACCOUNT].account;
+  const testAccService = accounts[TEST_ACCOUNT].service;
 
   useEffect(() => {
     (async () => {
@@ -319,7 +319,7 @@ export default function NewOwnQuestions(props) {
                   }}
                 />
               </View>
-              {question ?
+              {question ? 
               (<View style={{ marginTop: 15 }}>
                 <View
                   style={{
@@ -350,7 +350,7 @@ export default function NewOwnQuestions(props) {
                         : 'visible-password'
                     }
                     onChangeText={(text) => {
-
+                      
                       setAnswer(text);
                       setAnswerMasked(text);
                     }}
@@ -436,7 +436,7 @@ export default function NewOwnQuestions(props) {
                       setBackspace(event);
                     }}
                     onChangeText={(text) => {
-
+                      
                       setTempAns(text);
                       setConfirmAnswerMasked(text);
                     }}

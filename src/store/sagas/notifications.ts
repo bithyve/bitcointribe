@@ -19,10 +19,10 @@ function* updateFCMTokensWorker({ payload }) {
     throw new Error('No FCM token found');
   }
 
-  const account: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
-  const { data } = yield call(account.getWalletId);
+  const { data } = yield call(service.getWalletId);
 
   const res = yield call(
     RelayServices.updateFCMTokens,
@@ -89,10 +89,10 @@ export const updateFCMTokensWatcher = createWatcher(
 // );
 
 export function* fetchNotificationsWorker() {
-  const account: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
-  const { data } = yield call(account.getWalletId);
+  const { data } = yield call(service.getWalletId);
 
   const res = yield call(RelayServices.fetchNotifications, data.walletId);
   if (res.status === 200) {

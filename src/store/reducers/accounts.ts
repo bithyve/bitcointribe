@@ -33,7 +33,7 @@ import {
 } from '../../common/constants/serviceTypes';
 
 const ACCOUNT_VARS: {
-  account: RegularAccount | TestAccount | SecureAccount;
+  service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: String;
   balances: {
     balance: Number;
@@ -63,7 +63,7 @@ const ACCOUNT_VARS: {
     loading: Boolean
   }
 } = {
-  account: null,
+  service: null,
   receivingAddress: '',
   balances: {
     balance: 0,
@@ -136,7 +136,7 @@ export default (state = initialState, action) => {
         ...state,
         [account]: {
           ...state[account],
-          service: action.payload.account,
+          service: action.payload.service,
         },
       };
 

@@ -86,17 +86,17 @@ const SecondaryDeviceHistory = (props) => {
   const [secondaryQR, setSecondaryQR] = useState('');
   const s3Service: S3Service = useSelector((state) => state.sss.service);
   const secureAccount: SecureAccount = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].account,
+    (state) => state.accounts[SECURE_ACCOUNT].service,
   );
 
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
   const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
   const testAccount: TestAccount = useSelector(
-    (state) => state.accounts[TEST_ACCOUNT].account,
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),

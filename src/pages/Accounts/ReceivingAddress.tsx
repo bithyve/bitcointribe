@@ -55,11 +55,11 @@ const ReceivingAddress = (props) => {
   ] = useState(React.createRef());
   const dispatch = useDispatch();
 
-  const { loading, account } = useSelector(
+  const { loading, service } = useSelector(
     (state) => state.accounts[serviceType],
   );
   const { receivingAddress } =
-    serviceType === SECURE_ACCOUNT ? account.secureHDWallet : account.hdWallet;
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
   const isReceiveHelperDoneValue =  useSelector((state) => idx(state, (_) => _.preferences.isReceiveHelperDoneValue));
   const savingWarning =  useSelector((state) => idx(state, (_) => _.preferences.savingWarning));
@@ -229,7 +229,7 @@ const ReceivingAddress = (props) => {
                   if(SecureReceiveWarningBottomSheet.current)
                   (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
                 }
-
+                  
                 }
               />
               <Button

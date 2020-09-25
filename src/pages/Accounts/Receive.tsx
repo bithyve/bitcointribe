@@ -121,7 +121,7 @@ export default function Receive(props) {
   const dispatch = useDispatch();
   const [receiveLink, setReceiveLink] = useState('');
   const [receiveQR, setReceiveQR] = useState('');
-  const { loading, account } = useSelector(
+  const { loading, service } = useSelector(
     (state) => state.accounts[serviceType],
   );
   const updateEphemeralChannelLoader = useSelector(
@@ -148,7 +148,7 @@ export default function Receive(props) {
     (state) => state.trustedContacts.service,
   );
   const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].account,
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
   const testAccount: TestAccount = useSelector(
     (state) => state.accounts[TEST_ACCOUNT].service,
@@ -156,7 +156,7 @@ export default function Receive(props) {
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const receivingAddress = account.getReceivingAddress(
+      const receivingAddress = service.getReceivingAddress(
         derivativeAccountDetails ? derivativeAccountDetails.type : null,
         derivativeAccountDetails ? derivativeAccountDetails.number : null,
       );
@@ -164,7 +164,7 @@ export default function Receive(props) {
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
-          receiveAt = account.getPaymentURI(receiveAt, {
+          receiveAt = service.getPaymentURI(receiveAt, {
             amount: parseInt(amount) / 1e8,
           }).paymentURI;
         }
@@ -172,7 +172,7 @@ export default function Receive(props) {
         setReceiveQR(receiveAt);
       }
     }
-  }, [account, amount, AsTrustedContact]);
+  }, [service, amount, AsTrustedContact]);
 
   useEffect(() => {
     if (AsTrustedContact) {
@@ -399,14 +399,14 @@ export default function Receive(props) {
       };
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      const receivingAddress = account.getReceivingAddress(
+      const receivingAddress = service.getReceivingAddress(
         derivativeAccountDetails ? derivativeAccountDetails.type : null,
         derivativeAccountDetails ? derivativeAccountDetails.number : null,
       );
 
       let paymentURI;
       if (amount) {
-        paymentURI = account.getPaymentURI(receivingAddress, {
+        paymentURI = service.getPaymentURI(receivingAddress, {
           amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
@@ -435,7 +435,7 @@ export default function Receive(props) {
 
       let trustedPaymentURI;
       if (amount) {
-        trustedPaymentURI = account.getPaymentURI(trustedReceivingAddress, {
+        trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
           amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
@@ -512,7 +512,7 @@ export default function Receive(props) {
     AsTrustedContact,
     amount,
     serviceType,
-    account,
+    service,
   ]);
 
   const renderShareOtpWithTrustedContactContent = useCallback(() => {
