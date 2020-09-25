@@ -109,7 +109,7 @@ import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
-import getIconByAccountType from '../../utils/accounts/GetIconByAccountType';
+import { getIconByAccountType } from '../../utils/accounts/IconUtils';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
