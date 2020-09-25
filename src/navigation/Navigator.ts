@@ -83,7 +83,7 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
-import AddNewCheckingAccountDetails from '../pages/Accounts/AddNew/CheckingAccount/AddNewCheckingAccountDetails';
+import AddNewAccountDetails from '../pages/Accounts/AddNew/AccountDetails/AddNewAccountDetails';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -134,6 +134,27 @@ const MODAL_ROUTES = [
   'Intermediate',
 ];
 
+const AddNewAccountStack = createStackNavigator(
+  {
+    AccountTypeSelectionList: {
+      screen: NewAccountTypeSelectionList,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    AddNewAccountDetails: {
+      screen: AddNewAccountDetails,
+      navigationOptions: {
+        headerShown: false
+      },
+    },
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  },
+);
+
 const HomeNavigator = createStackNavigator(
   {
     Home: {
@@ -156,16 +177,7 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestAccepted,
     ReceivingAddress,
     AddNewAccount: {
-      screen: NewAccountTypeSelectionList,
-      navigationOptions: {
-        headerShown: false
-      },
-    },
-    AddNewCheckingAccountDetails: {
-      screen: AddNewCheckingAccountDetails,
-      navigationOptions: {
-        headerShown: false
-      },
+      screen: AddNewAccountStack,
     },
     Send: {
       screen: Send,
