@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { Card } from 'react-native-elements';
 import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { NewAccountPayload } from '../../../common/data/models/NewAccountPayload';
 import CardStyles from '../../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
@@ -20,9 +19,9 @@ const AccountOptionCard: React.FC<Props> = ({
   accountPayload,
 }: Props) => {
 
-  const selectionIndicatorStyle = useMemo(() => {
+  const selectionIndicatorContainerStyle = useMemo(() => {
     return {
-      ...styles.selectionIndicator,
+      ...styles.selectionIndicatorContainer,
       borderColor: isSelected ? Colors.blue : Colors.borderColor,
       backgroundColor: isSelected ? Colors.blue : 'transparent',
     };
@@ -76,13 +75,11 @@ const AccountOptionCard: React.FC<Props> = ({
           <Card.Title style={subtitleTextStyle}>{accountPayload.shortDescription}</Card.Title>
         </View>
 
-        <View style={selectionIndicatorStyle}>
+        <View style={selectionIndicatorContainerStyle}>
           {isSelected && (
-            <Entypo
-              style={{ alignSelf: 'center' }}
-              name="check"
-              size={RFValue(12)}
-              color={Colors.white}
+            <Image
+              style={styles.selectionIndicatorImage}
+              source={require('../../../assets/images/icons/checkmark.png')}
             />
           )}
         </View>
@@ -135,13 +132,18 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
-  selectionIndicator: {
+  selectionIndicatorContainer: {
     width: 24,
     height: 24,
     borderRadius: 999,
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  selectionIndicatorImage: {
+    width: '100%',
+    height: '100%',
   },
 });
 
