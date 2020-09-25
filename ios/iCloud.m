@@ -27,9 +27,11 @@ RCT_EXPORT_METHOD(downloadBackup:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   NSLog(@"into native download backup");
   iCloudRestore *restore = [[iCloudRestore alloc]init];
-  
+  NSString* content = @"";
   NSString* filePath = [restore getPath];
-  NSString* content =  [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+  if ( [filePath length] != 0 ){
+    content =  [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+  };
   resolve(content);
 }
 

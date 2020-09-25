@@ -124,7 +124,6 @@ import Foundation
     if query.results.count == 0 { return }
     var fileItem: NSMetadataItem?
     var fileURL: URL?
-    
     for item in query.results {
       
       guard let item = item as? NSMetadataItem else { continue }
@@ -164,9 +163,9 @@ import Foundation
   }
   
   @objc func getPath() -> String{
-    let defaults = UserDefaults.standard
-
-    return defaults.object(forKey: "filePath") as! String
+    let filePath = UserDefaults.standard.object(forKey: "filePatha")
+    
+    return (filePath != nil) ? filePath as! String : ""
   }
   
 }
