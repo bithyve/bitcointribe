@@ -1,3 +1,4 @@
+import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import {
   createStackNavigator,
@@ -65,6 +66,7 @@ import HomeStack from './stacks/home/HomeStack';
 import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
 import SendStack from './stacks/send/SendStack';
 
+import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -114,19 +116,18 @@ const AddNewAccountStack = createStackNavigator(
     AccountTypeSelectionList: {
       screen: NewAccountTypeSelectionList,
       navigationOptions: {
-        headerShown: false,
+        header: ({ navigation }) => {
+          return <NavigationHeader title="Add New" onBackPress={() => navigation.goBack()} />
+        },
       },
     },
     AddNewAccountDetails: {
       screen: AddNewAccountDetails,
-      navigationOptions: {
-        headerShown: false
-      },
+      navigationOptions: AddNewAccountDetails.navigationOptions,
     },
   },
   {
     mode: 'modal',
-    headerMode: 'none',
   },
 );
 
