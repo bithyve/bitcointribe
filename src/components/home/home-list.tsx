@@ -28,6 +28,7 @@ import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getIconByAccountType } from '../../utils/accounts/IconUtils';
+import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
 
 const currencyCode = [
   'BRL',
@@ -57,41 +58,6 @@ function setCurrencyCodeToImage(currencyName, currencyColor) {
     </View>
   );
 }
-
-interface AddNewAccountCardProps {
-  onPress: () => {};
-}
-
-const AddNewAccountCard: React.FC<AddNewAccountCardProps> = ({
-  onPress
-}: AddNewAccountCardProps) => {
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <CardView cornerRadius={10} style={[styles.card, styles.addAccountCardContainer]}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Image
-            style={{ width: wp('10%'), height: wp('10%') }}
-            source={require('../../assets/images/icons/icon_add.png')}
-          />
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(11),
-            }}
-          >
-            Add to my wallet
-          </Text>
-        </View>
-      </CardView>
-    </TouchableOpacity>
-  );
-};
 
 const HomeList = ({
   isBalanceLoading,
@@ -308,11 +274,6 @@ const styles = StyleSheet.create({
     marginBottom: wp('2%'),
     padding: wp('3'),
     backgroundColor: Colors.white,
-  },
-
-  addAccountCardContainer: {
-    opacity: 0.4,
-    backgroundColor: Colors.borderColor,
   },
 
   cardTitle: {
