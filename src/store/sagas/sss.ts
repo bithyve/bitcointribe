@@ -92,7 +92,7 @@ function* generateMetaSharesWorker() {
     (state) => state.storage.database.WALLET_SETUP,
   );
   const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].account,
   );
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
@@ -182,7 +182,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
   const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
+    (state) => state.accounts[REGULAR_ACCOUNT].account,
   );
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
@@ -611,7 +611,7 @@ function* generatePersonalCopyWorker({ payload }) {
   }
 
   const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].account,
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   if (!secondaryMnemonic) {
@@ -1206,7 +1206,7 @@ function* overallHealthWorker({ payload }) {
 
     if (overallHealth.overallStatus === 100) {
       const secureAccount: SecureAccount = yield select(
-        (state) => state.accounts[SECURE_ACCOUNT].service,
+        (state) => state.accounts[SECURE_ACCOUNT].account,
       );
 
       // remove sec-mne once health approaches 100 (disable PC share)
