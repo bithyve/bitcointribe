@@ -1,16 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, Platform, SafeAreaView, SectionList } from 'react-native';
 import { NewAccountPayload } from '../../../common/data/models/NewAccountPayload';
-import { AddNewAccountAction } from '../../../store/actions/accounts';
 import NEW_ACCOUNT_CHOICES from './NewAccountChoices';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import { Button } from 'react-native-elements';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Colors from '../../../common/Colors';
 import AccountKind from '../../../common/data/enums/AccountKind';
 
 export enum SectionKind {
@@ -20,7 +16,6 @@ export enum SectionKind {
 }
 
 const sectionListItemKeyExtractor = index => index;
-
 
 function titleForSectionHeader(kind: SectionKind) {
   switch (kind) {
@@ -42,26 +37,6 @@ function renderSectionHeader({ section }) {
     </Text>
   );
 }
-
-// TODO: Reuse this elsewhere
-export const NavigationHeader = ({ title, onBackPress }) => {
-  return (
-    <View style={styles.screenHeader}>
-      <TouchableOpacity
-        style={{marginRight: 24}}
-        onPress={onBackPress}
-      >
-        <FontAwesome
-          name="long-arrow-left"
-          color={Colors.blue}
-          size={17}
-        />
-      </TouchableOpacity>
-
-      <Text style={HeadingStyles.screenHeadingLarge}>{title}</Text>
-    </View>
-  );
-};
 
 export interface Props {
   navigation: any,
@@ -117,7 +92,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
   return (
     <SafeAreaView style={styles.rootContainer}>
       <SectionList
-        ListHeaderComponent={<NavigationHeader title="Add New" onBackPress={() => navigation.goBack() } />}
+        contentContainerStyle={{ paddingVertical: 12 }}
         ListFooterComponent={<ListFooter />}
         extraData={[selectedChoice]}
         sections={[
@@ -169,6 +144,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
         ]}
         keyExtractor={sectionListItemKeyExtractor}
         renderSectionHeader={renderSectionHeader}
+        stickySectionHeadersEnabled={false}
       >
       </SectionList>
     </SafeAreaView>
@@ -178,25 +154,6 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-
-    ...Platform.select({
-      android: {
-        marginTop: StatusBar.currentHeight,
-      },
-      ios: {
-        marginTop: 22,
-      },
-      'default': {
-        marginTop: 22,
-      },
-    }),
-  },
-
-  screenHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 24,
   },
 
   listSectionHeading: {
