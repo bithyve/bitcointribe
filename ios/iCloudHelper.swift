@@ -163,7 +163,7 @@ import Foundation
   }
   
   @objc func getPath() -> String{
-    let filePath = UserDefaults.standard.object(forKey: "filePatha")
+    let filePath = UserDefaults.standard.object(forKey: "filePath")
     
     return (filePath != nil) ? filePath as! String : ""
   }
