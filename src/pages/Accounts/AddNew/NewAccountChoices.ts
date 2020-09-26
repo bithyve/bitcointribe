@@ -1,5 +1,5 @@
 import ServiceAccountKind from "../../../common/data/enums/ServiceAccountKind";
-import { NewTestAccountPayload, NewCheckingAccountPayload, NewSavingsAccountPayload, NewDonationAccountPayload, NewServiceAccountPayload, NewFullyImportedWalletAccountPayload, NewWatchOnlyImportedWalletAccountPayload } from "../../../common/data/models/NewAccountPayload";
+import { NewTestAccountPayload, NewCheckingAccountPayload, NewSavingsAccountPayload, NewDonationAccountPayload, NewServiceAccountPayload, NewFullyImportedWalletAccountPayload, NewWatchOnlyImportedWalletAccountPayload, NewTrustedContactsAccountPayload } from "../../../common/data/models/NewAccountPayload";
 
 // TODO: Figure out whether or not this will ever be dynamic
 const NEW_ACCOUNT_CHOICES = {
@@ -7,6 +7,7 @@ const NEW_ACCOUNT_CHOICES = {
     new NewTestAccountPayload(),
     new NewSavingsAccountPayload(),
     new NewCheckingAccountPayload(),
+    new NewTrustedContactsAccountPayload(),
     new NewDonationAccountPayload(),
   ],
 
