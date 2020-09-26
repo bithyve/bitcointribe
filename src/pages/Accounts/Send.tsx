@@ -17,7 +17,7 @@ import {
   Alert,
   InteractionManager,
 } from 'react-native';
-import CardView from 'react-native-cardview';
+import FormStyles from '../../common/Styles/Forms';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -824,10 +824,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   onQrScan={(qrData) => this.barcodeRecognized(qrData)}
                 />
                 <View style={styles.view1}>
-                  <View style={styles.textBoxView}>
+                  <View style={FormStyles.textInputContainer}>
                     <TextInput
                       editable={isEditable}
-                      style={styles.textBox}
+                      style={FormStyles.inputText}
                       placeholder={'Enter Address Manually'}
                       keyboardType={
                         Platform.OS == 'ios'
@@ -838,7 +838,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       onChangeText={(text) =>
                         this.setState({ recipientAddress: text })
                       }
-                      placeholderTextColor={Colors.borderColor}
+                      placeholderTextColor={FormStyles.placeholderText.color}
                       onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
@@ -874,7 +874,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   ) : null}
                   {isInvalidAddress ? (
                     <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>
+                      <Text style={FormStyles.errorText}>
                         Enter correct address
                       </Text>
                     </View>
@@ -1188,12 +1188,6 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     marginRight: -20,
   },
-  errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue(11),
-    fontStyle: 'italic',
-  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
@@ -1210,20 +1204,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginBottom: hp('1.5%'),
-  },
-  textBoxView: {
-    flexDirection: 'row',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    height: wp('13%'),
-  },
-  textBox: {
-    flex: 1,
-    paddingLeft: 20,
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
   },
   circleShapeView: {
     width: wp('14%'),
