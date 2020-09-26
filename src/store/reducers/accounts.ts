@@ -24,6 +24,7 @@ import {
   ADD_NEW_ACCOUNT,
   NEW_ACCOUNT_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
+  ADD_NEW_ACCOUNT_COMPLETED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -112,7 +113,8 @@ const initialState: {
     secure?: any;
   };
   isGeneratingNewAccount: Boolean;
-  hasNewAccountGenerationError: Boolean;
+  hasNewAccountGenerationSucceeded: Boolean;
+  hasNewAccountGenerationFailed: Boolean;
   addedAccounts: BaseAccount[],
 } = {
   servicesEnriched: false,
@@ -122,7 +124,8 @@ const initialState: {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
   isGeneratingNewAccount: false,
-  hasNewAccountGenerationError: false,
+  hasNewAccountGenerationSucceeded: false,
+  hasNewAccountGenerationFailed: false,
   addedAccounts: [],
 };
 
@@ -497,24 +500,36 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isGeneratingNewAccount: true,
-        hasNewAccountGenerationError: false,
+        hasNewAccountGenerationSucceeded: false,
+        hasNewAccountGenerationFailed: false,
       };
 
     case NEW_ACCOUNT_ADDED:
       return {
         ...state,
         isGeneratingNewAccount: false,
+        hasNewAccountGenerationSucceeded: true,
         addedAccounts: state.addedAccounts.concat(action.payload),
       };
 
 
-    case NEW_ACCOUNT_ADD_FAILED: {
+    case NEW_ACCOUNT_ADD_FAILED:
       return {
         ...state,
         isGeneratingNewAccount: false,
-        hasNewAccountGenerationError: true,
+        hasNewAccountGenerationSucceeded: false,
+        hasNewAccountGenerationFailed: true,
       };
-    }
+
+    case ADD_NEW_ACCOUNT_COMPLETED:
+      return {
+        ...state,
+        isGeneratingNewAccount: false,
+        hasNewAccountGenerationSucceeded: false,
+        hasNewAccountGenerationFailed: false,
+      };
+
+    default:
+      return state;
   }
-  return state;
 };
