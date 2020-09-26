@@ -1,7 +1,7 @@
 import ServiceAccountKind from "../../../common/data/enums/ServiceAccountKind";
 import { NewTestAccountPayload, NewCheckingAccountPayload, NewSavingsAccountPayload, NewDonationAccountPayload, NewServiceAccountPayload, NewFullyImportedWalletAccountPayload, NewWatchOnlyImportedWalletAccountPayload, NewTrustedContactsAccountPayload } from "../../../common/data/models/NewAccountPayload";
 
-// TODO: Figure out whether or not this will ever be dynamic
+// TODO: Make this a reusable hook that dynamically computes default properties
 const NEW_ACCOUNT_CHOICES = {
   hexaAccounts: [
     new NewTestAccountPayload(),
