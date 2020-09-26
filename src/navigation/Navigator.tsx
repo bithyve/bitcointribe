@@ -59,12 +59,12 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
-import AddNewAccountDetails from '../pages/Accounts/AddNew/AccountDetails/AddNewAccountDetails';
 import HomeStack from './stacks/home/HomeStack';
 import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
 import SendStack from './stacks/send/SendStack';
-
+import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -119,9 +119,9 @@ const AddNewAccountStack = createStackNavigator(
         },
       },
     },
-    AddNewAccountDetails: {
-      screen: AddNewAccountDetails,
-      navigationOptions: AddNewAccountDetails.navigationOptions,
+    AddNewHexaAccountDetails: {
+      screen: AddNewHexaAccountDetails,
+      navigationOptions: AddNewHexaAccountDetails.navigationOptions,
     },
   },
   {
