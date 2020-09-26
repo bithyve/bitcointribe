@@ -1172,7 +1172,9 @@ export const updateDonationPreferencesWatcher = createWatcher(
 );
 
 
-export function* addNewAccount(payload: NewAccountPayload) {
+function* addNewAccount(
+  { payload: account }: { payload: NewAccountPayload }
+) {
   // TODO: Devise some way to reference and call a new account creation service here.
   // const newAccountService = "";
 
@@ -1182,9 +1184,9 @@ export function* addNewAccount(payload: NewAccountPayload) {
     //   newAccountService.generateNewAccount,
     //   ...payload,
     // );
-    yield put(newAccountAdded({ account: payload }));
-  } catch(error) {
-    yield put(newAccountAddFailed({ account: payload, error }));
+    yield put(newAccountAdded({ account }));
+  } catch (error) {
+    yield put(newAccountAddFailed({ account, error }));
   }
 }
 
