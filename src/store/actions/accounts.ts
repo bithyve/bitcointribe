@@ -34,6 +34,7 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
+export const ADD_NEW_ACCOUNT_COMPLETED = 'ADD_NEW_ACCOUNT_COMPLETED';
 
 
 export const fetchBalance = (
@@ -296,6 +297,16 @@ export const addNewAccount = ({ payload }: { payload: NewAccountPayload }): AddN
 }
 
 
+export interface AddNewAccountCompletionAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_COMPLETED;
+};
+
+export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
+  return { type: ADD_NEW_ACCOUNT_COMPLETED };
+};
+
+newAccountAddCompleted
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -390,7 +401,6 @@ export const twoFAResetted = (resetted) => {
 export const settedDonationAccount = (serviceType, successful) => {
   return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
 };
-
 
 export const newAccountAddFailed = (
   {

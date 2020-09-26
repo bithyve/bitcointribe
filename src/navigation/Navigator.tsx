@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import {
   createStackNavigator,
@@ -84,7 +83,7 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
-import AddNewAccountDetails from '../pages/Accounts/AddNew/AccountDetails/AddNewAccountDetails';
+import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 
 const SetupNavigator = createStackNavigator(
@@ -146,9 +145,9 @@ const AddNewAccountStack = createStackNavigator(
         },
       },
     },
-    AddNewAccountDetails: {
-      screen: AddNewAccountDetails,
-      navigationOptions: AddNewAccountDetails.navigationOptions,
+    AddNewHexaAccountDetails: {
+      screen: AddNewHexaAccountDetails,
+      navigationOptions: AddNewHexaAccountDetails.navigationOptions,
     },
   },
   {

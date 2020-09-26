@@ -53,7 +53,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
 
   const ListFooter = () => {
     return (
-      <View style={{ ...styles.listFooterSection}}>
+      <View style={styles.listFooterSection}>
         <Button
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
@@ -71,7 +71,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
       case AccountKind.TEST:
       case AccountKind.REGULAR:
       case AccountKind.SECURE:
-        navigation.navigate('AddNewAccountDetails', {
+        navigation.navigate('AddNewHexaAccountDetails', {
           currentPayload: selectedChoice,
         });
         break;
