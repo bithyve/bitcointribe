@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, SectionList } from 'react-native';
-import { NewAccountPayload, NewServiceAccountPayload } from '../../../common/data/models/NewAccountPayload';
+import AccountPayload, { ExternalServiceAccountPayload } from '../../../common/data/models/AccountPayload/AccountPayload';
 import NEW_ACCOUNT_CHOICES from './NewAccountChoices';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
@@ -13,6 +13,7 @@ import { addNewAccount } from '../../../store/actions/accounts';
 import { useDispatch } from "react-redux";
 import { goHomeAction } from '../../../navigation/actions/NavigationActions';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
+import ServiceAccountPayload from '../../../common/data/models/AccountPayload/ServiceAccountPayload';
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -47,7 +48,7 @@ export interface Props {
   navigation: any,
 }
 
-const NewAccountTypeSelectionList: React.FC<Props> = ({
+const NewAccountSelectionList: React.FC<Props> = ({
   navigation,
 }: Props) => {
   useAccountGenerationCompletionEffect(() => {
@@ -55,7 +56,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
   });
 
   const dispatch = useDispatch();
-  const [selectedChoice, setSelectedChoice] = useState<NewAccountPayload>(null);
+  const [selectedChoice, setSelectedChoice] = useState<AccountPayload>(null);
 
   const canProceed = useMemo(() => {
     return selectedChoice !== null;
@@ -77,6 +78,17 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
   };
 
   function handleProceedButtonPress() {
+    if (selectedChoice instanceof ServiceAccountPayload) {
+      // TODO: Present options for choosing b/w a standalone Service account or adding it to a Hexa account.
+      switch (selectedChoice.serviceAccountKind) {
+        case ServiceAccountKind.FAST_BITCOINS:
+          dispatch(addNewAccount(selectedChoice));
+          break;
+        default:
+          break;
+      }
+    }
+
     switch (selectedChoice.kind) {
       case AccountKind.TEST:
       case AccountKind.REGULAR:
@@ -87,13 +99,13 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
         });
         break;
       case AccountKind.TRUSTED_CONTACTS:
-        dispatch(addNewAccount({ payload: selectedChoice }));
+        dispatch(addNewAccount(selectedChoice));
         break;
-      case AccountKind.SERVICE:
-        if ((selectedChoice as NewServiceAccountPayload).serviceAccountKind == ServiceAccountKind.FAST_BITCOINS) {
-          dispatch(addNewAccount({ payload: selectedChoice }));
-          break;
-        }
+      // case AccountKind.SERVICE:
+        // if ((selectedChoice as ServiceAccountPayload).serviceAccountKind === ServiceAccountKind.FAST_BITCOINS) {
+          // dispatch(addNewAccount({ payload: selectedChoice }));
+          // break;
+        // }
       case AccountKind.FULLY_IMPORTED_WALLET:
       case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
         break;
@@ -102,7 +114,7 @@ const NewAccountTypeSelectionList: React.FC<Props> = ({
     }
   }
 
-  function handleChoiceSelection(choice: NewAccountPayload) {
+  function handleChoiceSelection(choice: AccountPayload) {
     setSelectedChoice(choice);
   }
 
@@ -192,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewAccountTypeSelectionList;
+export default NewAccountSelectionList;

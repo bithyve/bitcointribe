@@ -1,9 +1,8 @@
-import React, { createRef, PureComponent, useMemo } from 'react';
+import React, { createRef, PureComponent } from 'react';
 import {
   View,
   StyleSheet,
   StatusBar,
-  FlatList,
   ImageBackground,
   Platform,
   AsyncStorage,
@@ -12,7 +11,6 @@ import {
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
@@ -36,7 +34,6 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AllAccountsContents from '../../components/AllAccountsContents';
 import SettingsContents from '../../components/SettingsContents';
 import { connect } from 'react-redux';
 import NoInternetModalContents from '../../components/NoInternetModalContents';
@@ -81,13 +78,12 @@ import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import TransactionsContent from '../../components/home/transaction-content';
-import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
   BottomTab,
 } from '../../components/home/custom-bottom-tabs';
-import { initialCardData, closingCardData } from '../../stubs/initialCardData';
+import initialCardData from '../../stubs/HomeScreen/InitialCardData';
 import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
@@ -112,6 +108,12 @@ import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
+import { AccountsState } from '../../store/reducers/accounts';
+import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import WalletKind from '../../common/data/enums/WalletKind';
+import AccountKind from '../../common/data/enums/AccountKind';
+import { DonationAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
+import AccountCardsList from './AccountCardsList';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -144,7 +146,6 @@ export const isCompatible = async (method: string, version: string) => {
   return true;
 };
 
-
 // TODO: Move this somewhere else and re-use it from there.
 export enum BottomSheetState {
   Closed,
@@ -152,9 +153,10 @@ export enum BottomSheetState {
 }
 
 interface HomeStateTypes {
+  accountCardData: AccountPayload[];
+  accountCardColumnData?: Array<[AccountPayload]>;
   notificationLoading: boolean;
   notificationData?: any[];
-  cardColumnData?: any[];
   switchOn: boolean;
   CurrencyCode: string;
   balances: any;
@@ -194,8 +196,8 @@ interface HomeStateTypes {
 interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
-  exchangeRates: any[];
-  accounts: any[];
+  exchangeRates?: any[];
+  accountsState: AccountsState;
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -250,7 +252,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
   transactionDetailsBottomSheetRef = createRef<BottomSheet>();
   settingsBottomSheetRef = createRef<BottomSheet>();
-  allAccountsBottomSheetRef = createRef<BottomSheet>();
   custodianRequestBottomSheetRef = createRef<BottomSheet>();
   errorBottomSheetRef = createRef<BottomSheet>();
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
@@ -269,8 +270,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.unsubscribe = null;
 
     this.state = {
+      accountCardData: [],
       notificationData: [],
-      cardColumnData: [],
+      accountCardColumnData: [],
       switchOn: false,
       CurrencyCode: 'USD',
       balances: {},
@@ -349,14 +351,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   processQRData = async (qrData) => {
-    const { accounts, addTransferDetails, navigation } = this.props;
+    const { accountsState, addTransferDetails, navigation } = this.props;
 
     const network = Bitcoin.networkType(qrData);
     if (network) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-      const service = accounts[serviceType].service;
+      const service = accountsState[serviceType].service;
       const { type } = service.addressDiff(qrData);
       if (type) {
         let item;
@@ -635,15 +637,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  makeAccountCardColumns = (accountData) => {
-    if (accountData.length <= 2) {
-      return [accountData];
+  makes = () => {
+    const accountCardData = this.state.accountCardData;
+
+    if (accountCardData.length <= 2) {
+      return [accountCardData];
     }
 
     let columns = [];
     let currentColumn = [];
 
-    for (let account of accountData) {
+    for (let account of accountCardData) {
       currentColumn.push(account);
 
       if (currentColumn.length == 2) {
@@ -656,77 +660,65 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       columns.push(currentColumn);
     }
 
-    this.setState({ cardColumnData: columns });
+    this.setState({ accountCardColumnData: columns });
   };
 
-  updateAccountCardData = () => {
-    let { accounts } = this.props;
-    const defaultCardData = initialCardData;
-    let idIndex = initialCardData[initialCardData.length - 1].id;
-    const allCards = [];
-    const additionalCardData = [];
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts =
-        accounts[serviceType].service[
-          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts;
 
-      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[carouselAcc]) continue;
+  getDonationAccountsCardDataForWallet = (
+    walletKind: WalletKind.SECURE_HD_WALLET | WalletKind.HD_WALLET
+  ): AccountPayload[] => {
+    const { accountsState } = this.props;
+    const accountKind = walletKind === WalletKind.SECURE_HD_WALLET ?
+      SECURE_ACCOUNT : REGULAR_ACCOUNT;
 
-        for (
-          let index = 1;
-          index <= derivativeAccounts[carouselAcc].instance.using;
-          index++
-        ) {
-          const account = derivativeAccounts[carouselAcc][index];
-          idIndex++;
+    const accountData = accountsState[accountKind].service;
+    if (!accountData) { return []; }
 
-          let title = '';
-          switch (carouselAcc) {
-            case DONATION_ACCOUNT:
-              title = account.subject ? account.subject : 'Donation Account';
-              break;
+    const walletKindKey = walletKind === WalletKind.SECURE_HD_WALLET ?
+      'secureHDWallet' : 'hdWallet';
 
-            case SUB_PRIMARY_ACCOUNT:
-              if (serviceType === REGULAR_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Checking Account';
-              else if (serviceType === SECURE_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Savings Account';
-              break;
-          }
+    const donationAccountData = accountData[walletKindKey].derivativeAccounts[DONATION_ACCOUNT];
+    if (!donationAccountData) { return []; }
 
-          const carouselInstance = {
-            id: idIndex,
-            title,
-            unit: 'sats',
-            amount: account.balances
-              ? account.balances.balance + account.balances.unconfirmedBalance
-              : 0,
-            account:
-              carouselAcc === DONATION_ACCOUNT
-                ? `Accept bitcoin`
-                : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
-            accountType: serviceType,
-            subType: carouselAcc,
-            bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
-          };
-          additionalCardData.push(carouselInstance);
-        }
-      }
+    let cardData = [];
+
+    for (
+      let index = 1;
+      index <= donationAccountData.instance.using;
+      index++
+    ) {
+      const donationAccountElements: DonationDerivativeAccountElements = donationAccountData[index];
+
+      const donationCardInstance = new DonationAccountPayload({
+        balance: donationAccountElements.balances ?
+          donationAccountElements.balances.balance + donationAccountElements.balances.unconfirmedBalance
+          : 0,
+      });
+
+      cardData.push(donationCardInstance);
     }
 
-    this.makeAccountCardColumns([
-      ...defaultCardData,
-      ...additionalCardData,
-      ...closingCardData,
-    ]);
+    return cardData;
+  }
+
+  updateAccountCardData = () => {
+    let donationAccountCardData = [];
+
+    for (const walletKind of [WalletKind.SECURE_HD_WALLET, WalletKind.HD_WALLET]) {
+      const donationAccountCardData = this.getDonationAccountsCardDataForWallet(walletKind);
+
+      donationAccountCardData.push(...donationAccountCardData);
+    }
+
+    this.setState({
+      accountCardData: [
+        ...initialCardData,
+        ...donationAccountCardData,
+        ...this.props.accountsState.addedAccounts,
+      ],
+    }, () => {
+      this.makes();
+    })
   };
 
   scheduleNotification = async () => {
@@ -762,9 +754,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -799,7 +791,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -857,9 +849,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
     let newTransactions = [];
-    const { accounts, fetchDerivativeAccBalTx } = this.props;
-    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
-    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+    const { accountsState, fetchDerivativeAccBalTx } = this.props;
+    const regularAccount = accountsState[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accountsState[SECURE_ACCOUNT].service.secureHDWallet;
 
     let newTransactionsRegular =
       regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
@@ -953,15 +945,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch((err) => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then((notifications) => { });
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = (prevProps: HomePropsTypes, prevState: HomeStateTypes) => {
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
@@ -969,7 +961,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList();
     }
 
-    if (prevProps.accounts !== this.props.accounts) {
+    if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
       this.updateAccountCardData();
@@ -990,17 +982,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const serviceType = REGULAR_ACCOUNT;
       const {
         paymentDetails,
-        accounts,
+        accountsState,
         navigation,
         addTransferDetails,
         clearPaymentDetails,
       } = this.props;
-      const { balances } = this.state;
       let { address, paymentURI } = paymentDetails;
       let options: any = {};
       if (paymentURI) {
         try {
-          const details = accounts[serviceType].service.decodePaymentURI(
+          const details = accountsState[serviceType].service.decodePaymentURI(
             paymentURI,
           );
           address = details.address;
@@ -1057,11 +1048,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
 
           setTimeout(() => {
-            if (this.allAccountsBottomSheetRef.current) {
-              this.allAccountsBottomSheetRef.current?.snapTo(0);
-              this.settingsBottomSheetRef.current?.snapTo(0);
-            }
-
+            this.settingsBottomSheetRef.current?.snapTo(0);
             this.custodianRequestBottomSheetRef.current?.snapTo(1);
             this.transactionTabBarBottomSheetRef.current?.snapTo(1);
           }, 2);
@@ -1148,7 +1135,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              this.allAccountsBottomSheetRef.current?.snapTo(0);
               this.settingsBottomSheetRef.current?.snapTo(0);
               this.custodianRequestBottomSheetRef.current?.snapTo(1);
               this.transactionTabBarBottomSheetRef.current?.snapTo(1);
@@ -1181,8 +1167,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
           }`,
         );
       } else {
@@ -1511,34 +1496,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getBalances = () => {
-    const { accounts } = this.props;
+    const { accountsState } = this.props;
 
-    let testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let testBalance = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    const testTransactions = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
 
     if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accountsState[REGULAR_ACCOUNT].service
+      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    let regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+    let regularTransactions = accountsState[REGULAR_ACCOUNT].service
+      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.transactions
+        .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1575,15 +1560,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+    let secureBalance = accountsState[SECURE_ACCOUNT].service
+      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
-    const secureTransactions = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+    const secureTransactions = accountsState[SECURE_ACCOUNT].service
+      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.transactions
+        .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1591,8 +1576,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1634,7 +1619,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let additionalBalances = 0;
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].service[
+        accountsState[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -1807,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // this.processDLReques t(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     const knowMoreBottomSheetsFlag = tab === BottomTab.More;
@@ -1966,9 +1951,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   let contactName = '';
                   if (contact) {
-                    contactName = `${contact.firstName} ${
-                      contact.lastName ? contact.lastName : ''
-                    }`
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -2056,6 +2040,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     }
+  };
+
+  handleAccountCardSelection = (selectedAccount: AccountPayload) => {
+    // TODO: This should be inferrable from the structure of the `AccountPayload`.
+    const deprecatedServiceType = {
+      [AccountKind.TEST]: TEST_ACCOUNT,
+      [AccountKind.REGULAR]: REGULAR_ACCOUNT,
+      [AccountKind.SECURE]: SECURE_ACCOUNT,
+    }[selectedAccount.kind] || SECURE_ACCOUNT;
+
+    // TODO: We should be able to navigate with an id instead
+    const index = this.state.accountCardData.indexOf(selectedAccount);
+
+    this.props.navigation.navigate('Accounts', {
+      serviceType: deprecatedServiceType,
+      index,
+    });
   };
 
   handleBottomSheetPositionChange = (
@@ -2158,8 +2159,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2201,7 +2202,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (item.title === 'Hexa Community (Telegram)') {
       let url = 'https://t.me/HexaWallet';
       Linking.openURL(url)
-        .then((data) => {})
+        .then((data) => { })
         .catch((e) => {
           alert('Make sure Telegram installed on your device');
         });
@@ -2251,9 +2252,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2314,7 +2315,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      cardColumnData,
+      accountCardColumnData,
       switchOn,
       CurrencyCode,
       transactions,
@@ -2343,17 +2344,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isBalanceLoading,
       addContactModalOpened,
     } = this.state;
+
     const {
       navigation,
       notificationList,
       exchangeRates,
-      accounts,
       walletName,
       UNDER_CUSTODY,
       downloadMShare,
       overallHealth,
       cardDataProps
     } = this.props;
+
     return (
       <ImageBackground
         source={require('../../assets/images/home-bg.png')}
@@ -2386,33 +2388,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         <View style={{ flex: 7 }}>
           <View style={styles.accountCardsContainer}>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={cardColumnData}
-              extraData={{
-                balances,
-                switchOn,
-                walletName,
-                currencyCode,
-                accounts,
-                exchangeRates,
-              }}
-              keyExtractor={(_, index) => String(index)}
-              renderItem={(Items) => (
-                <HomeList
-                  isBalanceLoading={isBalanceLoading}
-                  Items={Items}
-                  navigation={navigation}
-                  switchOn={switchOn}
-                  accounts={accounts}
-                  addNewDisable={cardDataProps.length == 4 ? true : false}
-                  CurrencyCode={currencyCode}
-                  balances={balances}
-                  exchangeRates={exchangeRates}
-                  onAddNewAccountPressed={this.navigateToAddNewAccountScreen}
-                />
-              )}
+            <AccountCardsList
+              columnData={accountCardColumnData}
+              prefersBTCUnits={switchOn}
+              fiatCurrencyCode={currencyCode}
+              isBalanceLoading={isBalanceLoading}
+              onAddNewSelected={this.navigateToAddNewAccountScreen}
+              onCardSelected={this.handleAccountCardSelection}
             />
           </View>
         </View>
@@ -2438,8 +2420,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+                  ? hp('19%')
+                  : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
@@ -2487,8 +2469,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+                  ? hp('19%')
+                  : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
@@ -2541,8 +2523,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+                  ? hp('19%')
+                  : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('82%')
                 : hp('82%'),
@@ -2582,8 +2564,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('18%')
                 : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+                  ? hp('19%')
+                  : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
@@ -2840,58 +2822,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             )}
           />
         )}
-        {knowMoreBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-            }}
-            onCloseEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-            }}
-            enabledInnerScrolling={true}
-            ref={this.allAccountsBottomSheetRef}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-            ]}
-            renderContent={() => (
-              <AllAccountsContents
-                onPressBack={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                  );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
 
         {!isLoading && (
           <BottomSheet
@@ -3225,7 +3155,7 @@ const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications,
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
-    accounts: state.accounts || [],
+    accountsState: state.accounts || {},
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     UNDER_CUSTODY: idx(
@@ -3281,15 +3211,13 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor,
-    marginTop: hp('4%'),
+    marginTop: 30,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
-    paddingTop: hp('1.5%'),
-    paddingBottom: hp('5%'),
+    paddingTop: 16,
     width: '100%',
-    overflow: 'hidden',
-    paddingLeft: wp('3%'),
+    // paddingLeft: 14,
   },
 });
