@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  FlatList,
   ImageBackground,
   Platform,
   AsyncStorage,
@@ -59,19 +58,20 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import HomeList from '../../components/home/home-list';
+import TransactionsContent from '../../components/home/transaction-content';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
-import { initialCardData, closingCardData } from '../../stubs/initialCardData';
+import initialCardData from '../../stubs/HomeScreen/InitialCardData';
+import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
 } from '../../store/actions/accounts';
-import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
+import { trustedChannelActions, DonationDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents';
@@ -91,8 +91,45 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
+import { AccountsState } from '../../store/reducers/accounts';
+import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import WalletKind from '../../common/data/enums/WalletKind';
+import AccountKind from '../../common/data/enums/AccountKind';
+import { DonationAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
+import AccountCardsList from './AccountCardsList';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
+
+export const isCompatible = async (method: string, version: string) => {
+  if (!semver.valid(version)) {
+    // handling exceptions: off standard versioning
+    if (version === '0.9') version = '0.9.0';
+    else if (version === '1.0') version = '1.0.0';
+  }
+
+  if (version && semver.gt(version, DeviceInfo.getVersion())) {
+    // checking compatibility via Relay
+    const res = await RelayServices.checkCompatibility(method, version);
+    if (res.status !== 200) {
+      console.log('Failed to check compatibility');
+      return true;
+    }
+
+    const { compatible, alternatives } = res.data;
+    if (!compatible) {
+      if (alternatives) {
+        if (alternatives.update)
+          Alert.alert('Update your app inorder to process this link/QR');
+        else if (alternatives.message) Alert.alert(alternatives.message);
+      } else {
+        Alert.alert('Incompatible link/QR, updating your app might help');
+      }
+      return false;
+    }
+    return true;
+  }
+  return true;
+};
 
 export enum BottomSheetState {
   Closed,
@@ -110,9 +147,10 @@ export enum BottomSheetKind {
 }
 
 interface HomeStateTypes {
+  accountCardData: AccountPayload[];
+  accountCardColumnData?: Array<[AccountPayload]>;
   notificationLoading: boolean;
   notificationData?: any[];
-  cardColumnData?: any[];
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab | null;
@@ -139,8 +177,8 @@ interface HomeStateTypes {
 interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
-  exchangeRates: any[];
-  accounts: any[];
+  exchangeRates?: any[];
+  accountsState: AccountsState;
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -194,8 +232,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.openBottomSheetOnLaunchTimeout = null;
 
     this.state = {
+      accountCardData: [],
       notificationData: [],
-      cardColumnData: [],
+      accountCardColumnData: [],
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: null,
@@ -254,14 +293,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   processQRData = async (qrData) => {
-    const { accounts, addTransferDetails, navigation } = this.props;
+    const { accountsState, addTransferDetails, navigation } = this.props;
 
     const network = Bitcoin.networkType(qrData);
     if (network) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-      const service = accounts[serviceType].service;
+      const service = accountsState[serviceType].service;
       const { type } = service.addressDiff(qrData);
       if (type) {
         let item;
@@ -489,15 +528,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  makeAccountCardColumns = (accountData) => {
-    if (accountData.length <= 2) {
-      return [accountData];
+  makes = () => {
+    const accountCardData = this.state.accountCardData;
+
+    if (accountCardData.length <= 2) {
+      return [accountCardData];
     }
 
     let columns = [];
     let currentColumn = [];
 
-    for (let account of accountData) {
+    for (let account of accountCardData) {
       currentColumn.push(account);
 
       if (currentColumn.length == 2) {
@@ -510,77 +551,65 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       columns.push(currentColumn);
     }
 
-    this.setState({ cardColumnData: columns });
+    this.setState({ accountCardColumnData: columns });
   };
 
-  updateAccountCardData = () => {
-    let { accounts } = this.props;
-    const defaultCardData = initialCardData;
-    let idIndex = initialCardData.length;
-    const allCards = [];
-    const additionalCardData = [];
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts =
-        accounts[serviceType].service[
-          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts;
 
-      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[carouselAcc]) continue;
+  getDonationAccountsCardDataForWallet = (
+    walletKind: WalletKind.SECURE_HD_WALLET | WalletKind.HD_WALLET
+  ): AccountPayload[] => {
+    const { accountsState } = this.props;
+    const accountKind = walletKind === WalletKind.SECURE_HD_WALLET ?
+      SECURE_ACCOUNT : REGULAR_ACCOUNT;
 
-        for (
-          let index = 1;
-          index <= derivativeAccounts[carouselAcc].instance.using;
-          index++
-        ) {
-          const account = derivativeAccounts[carouselAcc][index];
-          idIndex++;
+    const accountData = accountsState[accountKind].service;
+    if (!accountData) { return []; }
 
-          let title = '';
-          switch (carouselAcc) {
-            case DONATION_ACCOUNT:
-              title = account.subject ? account.subject : 'Donation Account';
-              break;
+    const walletKindKey = walletKind === WalletKind.SECURE_HD_WALLET ?
+      'secureHDWallet' : 'hdWallet';
 
-            case SUB_PRIMARY_ACCOUNT:
-              if (serviceType === REGULAR_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Checking Account';
-              else if (serviceType === SECURE_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Savings Account';
-              break;
-          }
+    const donationAccountData = accountData[walletKindKey].derivativeAccounts[DONATION_ACCOUNT];
+    if (!donationAccountData) { return []; }
 
-          const carouselInstance = {
-            id: idIndex,
-            title,
-            unit: 'sats',
-            amount: account.balances
-              ? account.balances.balance + account.balances.unconfirmedBalance
-              : 0,
-            account:
-              carouselAcc === DONATION_ACCOUNT
-                ? `Accept bitcoin`
-                : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
-            accountType: serviceType,
-            subType: carouselAcc,
-            bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
-          };
-          additionalCardData.push(carouselInstance);
-        }
-      }
+    let cardData = [];
+
+    for (
+      let index = 1;
+      index <= donationAccountData.instance.using;
+      index++
+    ) {
+      const donationAccountElements: DonationDerivativeAccountElements = donationAccountData[index];
+
+      const donationCardInstance = new DonationAccountPayload({
+        balance: donationAccountElements.balances ?
+          donationAccountElements.balances.balance + donationAccountElements.balances.unconfirmedBalance
+          : 0,
+      });
+
+      cardData.push(donationCardInstance);
     }
 
-    this.makeAccountCardColumns([
-      ...defaultCardData,
-      ...additionalCardData,
-      ...closingCardData,
-    ]);
+    return cardData;
+  }
+
+  updateAccountCardData = () => {
+    let donationAccountCardData = [];
+
+    for (const walletKind of [WalletKind.SECURE_HD_WALLET, WalletKind.HD_WALLET]) {
+      const donationAccountCardData = this.getDonationAccountsCardDataForWallet(walletKind);
+
+      donationAccountCardData.push(...donationAccountCardData);
+    }
+
+    this.setState({
+      accountCardData: [
+        ...initialCardData,
+        ...donationAccountCardData,
+        ...this.props.accountsState.addedAccounts,
+      ],
+    }, () => {
+      this.makes();
+    })
   };
 
   scheduleNotification = async () => {
@@ -640,7 +669,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -675,9 +704,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getNewTransactionNotifications = async () => {
     let newTransactions = [];
-    const { accounts } = this.props;
-    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
-    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+    const { accountsState } = this.props;
+    const regularAccount = accountsState[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accountsState[SECURE_ACCOUNT].service.secureHDWallet;
 
     let newTransactionsRegular =
       regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
@@ -784,7 +813,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList();
     }
 
-    if (prevProps.accounts !== this.props.accounts) {
+    if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
       this.updateAccountCardData();
@@ -805,7 +834,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const serviceType = REGULAR_ACCOUNT;
       const {
         paymentDetails,
-        accounts,
+        accountsState,
         navigation,
         addTransferDetails,
         clearPaymentDetails,
@@ -814,7 +843,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       let options: any = {};
       if (paymentURI) {
         try {
-          const details = accounts[serviceType].service.decodePaymentURI(
+          const details = accountsState[serviceType].service.decodePaymentURI(
             paymentURI,
           );
           address = details.address;
@@ -968,7 +997,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1260,29 +1289,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getBalances = () => {
-    const { accounts } = this.props;
+    const { accountsState } = this.props;
 
-    let testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let testBalance = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    const testTransactions = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
 
     if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accountsState[REGULAR_ACCOUNT].service
+      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
+
+    let regularTransactions = accountsState[REGULAR_ACCOUNT].service
+      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.transactions
+        .transactionDetails
+      : [];
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1299,19 +1333,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+    let secureBalance = accountsState[SECURE_ACCOUNT].service
+      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
+
+    const secureTransactions = accountsState[SECURE_ACCOUNT].service
+      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.transactions
+        .transactionDetails
+      : [];
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+        dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1334,7 +1373,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].service[
+        accountsState[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -1410,7 +1449,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet();
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     this.setState({ selectedBottomTab: tab });
@@ -1512,7 +1551,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1598,6 +1637,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     }
+  };
+
+  handleAccountCardSelection = (selectedAccount: AccountPayload) => {
+    // TODO: This should be inferrable from the structure of the `AccountPayload`.
+    const deprecatedServiceType = {
+      [AccountKind.TEST]: TEST_ACCOUNT,
+      [AccountKind.REGULAR]: REGULAR_ACCOUNT,
+      [AccountKind.SECURE]: SECURE_ACCOUNT,
+    }[selectedAccount.kind] || SECURE_ACCOUNT;
+
+    // TODO: We should be able to navigate with an id instead
+    const index = this.state.accountCardData.indexOf(selectedAccount);
+
+    this.props.navigation.navigate('Accounts', {
+      serviceType: deprecatedServiceType,
+      index,
+    });
   };
 
   handleBottomSheetPositionChange = (newIndex: number) => {
@@ -1686,8 +1742,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1746,9 +1802,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2005,7 +2061,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      cardColumnData,
+      accountCardColumnData,
       balances,
       selectedBottomTab,
       notificationData,
@@ -2016,7 +2072,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const {
       navigation,
       exchangeRates,
-      accounts,
       walletName,
       overallHealth,
       cardDataProps,
@@ -2053,30 +2108,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         <View style={{ flex: 7 }}>
           <View style={styles.accountCardsContainer}>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={cardColumnData}
-              extraData={{
-                balances,
-                walletName,
-                currencyCode,
-                accounts,
-                exchangeRates,
-              }}
-              keyExtractor={(_, index) => String(index)}
-              renderItem={(Items) => (
-                <HomeList
-                  isBalanceLoading={isBalanceLoading}
-                  Items={Items}
-                  navigation={navigation}
-                  accounts={accounts}
-                  addNewDisable={cardDataProps.length == 4 ? true : false}
-                  balances={balances}
-                  exchangeRates={exchangeRates}
-                  onAddNewAccountPressed={this.navigateToAddNewAccountScreen}
-                />
-              )}
+            <AccountCardsList
+              columnData={accountCardColumnData}
+              fiatCurrencyCode={currencyCode}
+              isBalanceLoading={isBalanceLoading}
+              onAddNewSelected={this.navigateToAddNewAccountScreen}
+              onCardSelected={this.handleAccountCardSelection}
             />
           </View>
         </View>
@@ -2141,7 +2178,7 @@ const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications,
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
-    accounts: state.accounts || [],
+    accountsState: state.accounts || {},
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     UNDER_CUSTODY: idx(
@@ -2193,6 +2230,8 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     marginTop: 30,
     paddingLeft: 20,
+    paddingTop: 16,
+    width: '100%',
     height: '100%',
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
@@ -2200,7 +2239,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     justifyContent: 'center',
-    width: '100%',
   },
 
   floatingFriendsAndFamilyButtonContainer: {
