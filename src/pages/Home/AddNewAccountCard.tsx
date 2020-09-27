@@ -23,16 +23,17 @@ const AddNewAccountCard: React.FC<Props> = ({
           }}
         >
           <Image
-            style={{ width: widthPercentageToDP(10), height: widthPercentageToDP(10) }}
+            style={{ width: 42, height: 42 }}
             source={require('../../assets/images/icons/icon_add.png')}
           />
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(11),
+              fontSize: RFValue(12),
+              fontWeight: '600',
             }}
           >
-            Add to my wallet
+            Add New
           </Text>
         </View>
       </CardView>

@@ -66,7 +66,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
-import { NewAccountPayload } from '../../common/data/models/NewAccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -1171,14 +1171,12 @@ export const updateDonationPreferencesWatcher = createWatcher(
 );
 
 
-function* addNewAccount(
-  { payload: account }: { payload: NewAccountPayload }
-) {
+function* addNewAccount({ payload: account }: { payload: AccountPayload }) {
   // TODO: Devise some way to reference and call a new account creation service here.
   // const newAccountService = "";
 
   try {
-    // TODO: Yield a result by calling the account creation service with the `NewAccountPayload`.
+    // TODO: Yield a result by calling the account creation service with the `AccountPayload`.
     // const res = yield call(
     //   newAccountService.generateNewAccount,
     //   ...payload,

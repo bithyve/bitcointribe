@@ -76,7 +76,7 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
-import NewAccountTypeSelectionList from '../pages/Accounts/AddNew/NewAccountTypeSelectionList';
+import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
 import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 import { MoreOptionsStack } from './stacks/MoreOptions';
@@ -132,8 +132,8 @@ const MODAL_ROUTES = [
 
 const AddNewAccountStack = createStackNavigator(
   {
-    AccountTypeSelectionList: {
-      screen: NewAccountTypeSelectionList,
+    AccountSelectionList: {
+      screen: NewAccountSelectionList,
       navigationOptions: {
         header: ({ navigation }) => {
           return <NavigationHeader title="Add New" onBackPress={() => navigation.goBack()} />
@@ -147,6 +147,7 @@ const AddNewAccountStack = createStackNavigator(
   },
   {
     mode: 'modal',
+    initialRouteName: 'AccountSelectionList',
   },
 );
 

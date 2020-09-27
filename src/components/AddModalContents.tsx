@@ -14,13 +14,13 @@ export default function AddModalContents(props) {
   const [addData, setAddData] = useState([
     {
       title: `Buy bitcoin into Hexa wallet`,
-      image: require('../assets/images/icons/icon_fastbicoin.png'),
+      image: require('../assets/images/icons/icon_fastbitcoins_light_blue.png'),
       info: 'Redeem a FastBitcoins voucher',
       type: 'buyBitcoins',
     },
     // {
     // 	title: `Pair with FastBitcoins account`,
-    // 	image: require( '../assets/images/icons/icon_fastbicoin.png' ),
+    // 	image: require( '../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
     // 	info: 'If you have completed your registration',
     // 	type:'pairAccount'
     // },
