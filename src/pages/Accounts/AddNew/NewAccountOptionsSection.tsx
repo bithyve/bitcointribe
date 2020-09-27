@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { NewAccountPayload } from '../../../common/data/models/NewAccountPayload';
+import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
 import Colors from '../../../common/Colors';
 import AccountOptionCard from './AccountOptionCard';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import CardStyles from '../../../common/Styles/Cards.js';
 
 export interface Props {
-  choices: NewAccountPayload[];
-  selectedChoice?: NewAccountPayload;
-  onOptionSelected: (NewAccountPayload) => void;
+  choices: AccountPayload[];
+  selectedChoice?: AccountPayload;
+  onOptionSelected: (AccountPayload) => void;
 }
 
-const keyExtractor = (item: NewAccountPayload) => item.uuid;
+const keyExtractor = (item: AccountPayload) => item.uuid;
 
 
 const NewAccountOptionsSection: React.FC<Props> = ({

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { NewAccountPayload } from '../../../../common/data/models/NewAccountPayload';
+import AccountPayload from '../../../../common/data/models/AccountPayload/AccountPayload';
 import NavigationHeader from '../NavigationHeader';
 import FormStyles from '../../../../common/Styles/Forms';
 import ButtonStyles from '../../../../common/Styles/Buttons';
@@ -20,7 +20,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
   const dispatch = useDispatch();
   const nameInputRef = useRef<Input>(null);
 
-  const currentPayload: NewAccountPayload = useMemo(() => {
+  const currentPayload: AccountPayload = useMemo(() => {
     return navigation.getParam('currentPayload');
   }, [navigation.state.params]);
 
@@ -48,7 +48,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
     currentPayload.customDisplayName = accountName;
     currentPayload.customDescription = accountDescription;
 
-    dispatch(addNewAccount({ payload: currentPayload }));
+    dispatch(addNewAccount(currentPayload));
   }
 
   return (
@@ -119,7 +119,7 @@ AddNewHexaAccountDetails.navigationOptions = ({ navigation, navigationOptions })
 
   return {
     header: ({ scene, previous, navigation }) => {
-      const currentPayload: NewAccountPayload = params.currentPayload;
+      const currentPayload: AccountPayload = params.currentPayload;
       const title = `Enter details for the new ${currentPayload.title}`;
 
       return <NavigationHeader
