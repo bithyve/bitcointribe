@@ -37,7 +37,9 @@ import {
 } from '../../common/constants/serviceTypes';
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
 import { stat } from 'react-native-fs';
+import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
 
+// TODO: Remove this in favor of a generalized `AccountPayload` interface
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: String;
@@ -100,13 +102,16 @@ const ACCOUNT_VARS: {
   },
 };
 
-const initialState: {
+export interface AccountsState {
   servicesEnriched: Boolean;
   accountsSynched: Boolean;
-  exchangeRates: any;
+  exchangeRates?: any;
   REGULAR_ACCOUNT: any;
   TEST_ACCOUNT: any;
   SECURE_ACCOUNT: any;
+
+  // TODO: How does this differ from ANY added account? (See `addedAccounts`)
+  // Perhaps we should consolidate the items here into that array?
   additional?: {
     regular?: any;
     test?: any;
@@ -115,8 +120,10 @@ const initialState: {
   isGeneratingNewAccount: Boolean;
   hasNewAccountGenerationSucceeded: Boolean;
   hasNewAccountGenerationFailed: Boolean;
-  addedAccounts: BaseAccount[],
-} = {
+  addedAccounts: AccountPayload[];
+}
+
+const initialState: AccountsState = {
   servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
@@ -129,7 +136,7 @@ const initialState: {
   addedAccounts: [],
 };
 
-export default (state = initialState, action) => {
+export default (state: AccountsState = initialState, action) => {
   const accountType = action.payload ? action.payload.serviceType : null;
 
   switch (action.type) {

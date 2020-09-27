@@ -41,6 +41,7 @@ export function iconForAccountKind(kind: AccountKind): NodeRequire {
   }
 }
 
+
 export function iconForServiceAccountKind(kind: ServiceAccountKind): NodeRequire {
   switch (kind) {
     case ServiceAccountKind.FAST_BITCOINS:

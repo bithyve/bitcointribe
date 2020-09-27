@@ -3,4 +3,8 @@
     "source.fixAll.eslint": true
   },
   "java.configuration.updateBuildConfiguration": "automatic",
+  "cSpell.words": [
+    "Hexa",
+    "uuidv"
+  ],
 }

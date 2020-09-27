@@ -117,6 +117,8 @@ export interface DerivativeAccount {
   series: number;
   instance: {
     max: number;
+
+    // TODO: Is this a count of some sort?
     using: number;
   };
   [accounts: number]: DerivativeAccountElements;

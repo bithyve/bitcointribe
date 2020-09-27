@@ -45,6 +45,7 @@ import {
 } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
+import useExchangeRates from '../utils/hooks/state-selectors/UseExchangeRates';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -189,7 +190,8 @@ export default function NewWalletQuestion(props) {
     })();
   }, [testAccService]);
 
-  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
+  const exchangeRates = useExchangeRates();
+
   useEffect(() => {
     if (!exchangeRates) {
       dispatch(calculateExchangeRate());
