@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { Card } from 'react-native-elements';
 import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { NewAccountPayload } from '../../../common/data/models/NewAccountPayload';
+import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
 import CardStyles from '../../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
 
 export interface Props {
   style?: Record<string, any>;
   isSelected: boolean;
-  accountPayload: NewAccountPayload;
+  accountPayload: AccountPayload;
 }
 
 const AccountOptionCard: React.FC<Props> = ({
