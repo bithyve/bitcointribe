@@ -1,8 +1,7 @@
 import { Action } from "redux";
 // types and action creators: dispatched by components and sagas
 
-import BaseAccount from "../../bitcoin/utilities/accounts/BaseAccount";
-import { NewAccountPayload } from "../../common/data/models/NewAccountPayload";
+import AccountPayload from "../../common/data/models/AccountPayload/AccountPayload";
 
 // export const FETCH_ADDR = 'FETCH_ADDR';
 export const FETCH_BALANCE = 'FETCH_BALANCE';
@@ -289,10 +288,10 @@ export const updateDonationPreferences = (
 
 export interface AddNewAccountAction extends Action {
   type: typeof ADD_NEW_ACCOUNT;
-  payload: NewAccountPayload;
+  payload: AccountPayload;
 };
 
-export const addNewAccount = ({ payload }: { payload: NewAccountPayload }): AddNewAccountAction => {
+export const addNewAccount = (payload: AccountPayload): AddNewAccountAction => {
   return {
     type: ADD_NEW_ACCOUNT,
     payload,
@@ -409,12 +408,12 @@ export const newAccountAddFailed = (
     account,
     error
 }: {
-  account: NewAccountPayload,
+  account: AccountPayload,
   error: Error
 }) => {
   return { type: NEW_ACCOUNT_ADD_FAILED, payload: { account, error } };
 }
 
-export const newAccountAdded = ({ account }: { account: NewAccountPayload }) => {
+export const newAccountAdded = ({ account }: { account: AccountPayload }) => {
   return { type: NEW_ACCOUNT_ADDED, payload: account };
 };

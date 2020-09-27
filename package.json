@@ -8,6 +8,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "clean:android": "cd android/; ./gradlew clean; cd ..;",
+    "clean:ios": "cd ios/ && rm -rf build/ Pods/ Podfile.lock && cd ..",
     "clean:watchman": "watchman watch-del-all",
     "clean:node": "rm -rf node_modules/ && yarn cache clean",
     "log:android": "react-native log-android",

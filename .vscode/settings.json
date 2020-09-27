@@ -1,0 +1,11 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "cSpell.words": [
+    "Hexa",
+    "uuidv"
+  ],
+  "typescript.tsdk": "/Users/briansipple/Projects/BitHyve/hexa/node_modules/typescript/lib",
+}
