@@ -673,28 +673,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const carouselAcc of config.CAROUSEL_ACCOUNTS) {
+        if (!derivativeAccounts[carouselAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
-        idIndex++;
-        const donationCardInstance = {
-          id: idIndex,
-          title: 'Donation Account',
-          unit: 'sats',
-          amount: donAcc.balances
-            ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
-            : 0,
-          account: `Donate Bitcoin`,
-          accountType: serviceType,
-          bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
-        };
-        additionalCardData.push(donationCardInstance);
+        for (
+          let index = 1;
+          index <= derivativeAccounts[carouselAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[carouselAcc][index];
+          idIndex++;
+          const carouselInstance = {
+            id: idIndex,
+            title:
+              carouselAcc === DONATION_ACCOUNT
+                ? 'Donation Account'
+                : serviceType === REGULAR_ACCOUNT
+                ? 'Checking Account'
+                : 'Savings Account',
+            unit: 'sats',
+            amount: account.balances
+              ? account.balances.balance + account.balances.unconfirmedBalance
+              : 0,
+            account:
+              carouselAcc === DONATION_ACCOUNT
+                ? `Donate Bitcoin`
+                : serviceType === REGULAR_ACCOUNT
+                ? 'Fast and easy'
+                : 'Multi-factor security',
+            accountType: serviceType,
+            iconType: serviceType === REGULAR_ACCOUNT ? 'regular' : 'secure',
+          };
+          additionalCardData.push(carouselInstance);
+        }
       }
     }
 

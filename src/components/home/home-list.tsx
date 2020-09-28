@@ -134,6 +134,8 @@ const HomeList = ({
                     source={getIconByAccountType(
                       value.title === 'Donation Account'
                         ? value.title
+                        : value.iconType
+                        ? value.iconType
                         : value.accountType,
                     )}
                   />
