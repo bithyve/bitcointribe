@@ -29,12 +29,16 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
-import { setupDonationAccount } from '../../store/actions/accounts';
+import {
+  setupDonationAccount,
+  fetchDerivativeAccAddress,
+} from '../../store/actions/accounts';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
@@ -54,22 +58,23 @@ interface AddNewAccountPropsTypes {
   walletName: string;
   accounts: any;
   setupDonationAccount: any;
+  fetchDerivativeAccAddress: any;
 }
 const accountData = [
-  // {
-  //   id: REGULAR_ACCOUNT,
-  //   account_name: 'Checking Account',
-  //   type: REGULAR_ACCOUNT,
-  //   checked: false,
-  //   image: require('../../assets/images/icons/icon_regular_account.png'),
-  // },
-  // {
-  //   id: SECURE_ACCOUNT,
-  //   account_name: 'Savings Account',
-  //   type: SECURE_ACCOUNT,
-  //   checked: false,
-  //   image: require('../../assets/images/icons/icon_secureaccount_white.png'),
-  // },
+  {
+    id: REGULAR_ACCOUNT,
+    account_name: 'Checking Account',
+    type: REGULAR_ACCOUNT,
+    checked: false,
+    image: require('../../assets/images/icons/icon_regular_account.png'),
+  },
+  {
+    id: SECURE_ACCOUNT,
+    account_name: 'Savings Account',
+    type: SECURE_ACCOUNT,
+    checked: false,
+    image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+  },
   {
     id: DONATION_ACCOUNT,
     account_name: 'Donation Account',
@@ -442,7 +447,15 @@ class AddNewAccount extends PureComponent<
             }}
             disabled={this.state.isValid}
             onPress={() => {
-              (this.AccountDetailBottomSheet as any).current.snapTo(1);
+              if (this.state.selectedAccount.id === DONATION_ACCOUNT)
+                (this.AccountDetailBottomSheet as any).current.snapTo(1);
+              else {
+                this.props.fetchDerivativeAccAddress(
+                  this.state.selectedAccount.accountType,
+                  SUB_PRIMARY_ACCOUNT,
+                );
+                this.props.navigation.navigate('Accounts');
+              }
             }}
           >
             <Text style={styles.buttonText}>Proceed</Text>
@@ -553,5 +566,6 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     setupDonationAccount,
+    fetchDerivativeAccAddress,
   })(AddNewAccount),
 );
