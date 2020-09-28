@@ -2600,7 +2600,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'custodianRequestBottomSheet'}
+            ref={this.custodianRequestBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) {
@@ -2712,7 +2712,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'trustedContactRequestBottomSheet'}
+            ref={this.trustedContactRequestBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2771,7 +2771,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'custodianRequestRejectedBottomSheet'}
+            ref={this.custodianRequestRejectedBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
@@ -2828,7 +2828,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
             }}
             enabledInnerScrolling={true}
-            ref={'allAccountsBottomSheet'}
+            ref={this.allAccountsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2926,7 +2926,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
             }}
             enabledInnerScrolling={true}
-            ref={'settingsBottomSheet'}
+            ref={this.settingsBottomSheetRef}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2980,7 +2980,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={'errorBottomSheet'}
+          ref={this.errorBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -3122,7 +3122,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={'notificationsListBottomSheet'}
+          ref={this.notificationsListBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
