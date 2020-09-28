@@ -504,7 +504,12 @@ export default class SecureHDWallet extends Bitcoin {
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
-      throw new Error(`${accountType} does not exists`);
+      if (config[accountType])
+        this.derivativeAccounts = {
+          ...this.derivativeAccounts,
+          [accountType]: config[accountType],
+        };
+      else throw new Error(`${accountType} does not exists`);
 
     switch (accountType) {
       case DONATION_ACCOUNT:

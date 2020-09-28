@@ -1574,7 +1574,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   dervAccountType: null,
                   accountNumber: null,
                 };
-            if (!dervAccount && dervAccountType !== DONATION_ACCOUNT) return;
+            if (!dervAccount) return;
+            if (dervAccountType !== DONATION_ACCOUNT) return;
             return (
               <DonationWebPageModalContents
                 account={dervAccount}
