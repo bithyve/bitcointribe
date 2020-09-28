@@ -450,9 +450,22 @@ class AddNewAccount extends PureComponent<
               if (this.state.selectedAccount.id === DONATION_ACCOUNT)
                 (this.AccountDetailBottomSheet as any).current.snapTo(1);
               else {
+                let accountNumber = 1;
+                const dervAccount = SUB_PRIMARY_ACCOUNT;
+                const serviceType = this.state.selectedAccount.type;
+                const derivativeAccounts = this.props.accounts[serviceType]
+                  .service[
+                  serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+                ].derivativeAccounts;
+
+                if (derivativeAccounts[dervAccount])
+                  accountNumber =
+                    derivativeAccounts[dervAccount].instance.using + 1;
+
                 this.props.fetchDerivativeAccAddress(
-                  this.state.selectedAccount.accountType,
-                  SUB_PRIMARY_ACCOUNT,
+                  this.state.selectedAccount.type,
+                  dervAccount,
+                  accountNumber,
                 );
                 this.props.navigation.navigate('Accounts');
               }

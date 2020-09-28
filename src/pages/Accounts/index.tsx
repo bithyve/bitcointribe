@@ -329,29 +329,50 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const carouselAcc of config.CAROUSEL_ACCOUNTS) {
+        if (!derivativeAccounts[carouselAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
-        const donationInstance = {
-          accountType: 'Donation Account',
-          derivativeAccountDetails: {
-            type: DONATION_ACCOUNT,
-            number: index,
-          },
-          accountInfo: donAcc.subject,
-          backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
-          accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
-          type: serviceType,
-          donationAcc: donAcc,
-          accountNumber: index,
-        };
-        additionalCarouselData.push(donationInstance);
+        for (
+          let index = 1;
+          index <= derivativeAccounts[carouselAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[carouselAcc][index];
+
+          let accountType, backgroundImage, accountTypeImage, accountInfo;
+          if (carouselAcc === DONATION_ACCOUNT) {
+            accountType = 'Donation Account';
+            accountInfo = account.subject;
+            backgroundImage = require('../../assets/images/carouselImages/donation_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_donation_account.png');
+          } else if (serviceType === REGULAR_ACCOUNT) {
+            accountType = 'Checking Account';
+            accountInfo = 'Fast and easy';
+            backgroundImage = require('../../assets/images/carouselImages/regular_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_regular_account.png');
+          } else if (serviceType === SECURE_ACCOUNT) {
+            accountType = 'Savings Account';
+            accountInfo = 'Multi-factor security';
+            backgroundImage = require('../../assets/images/carouselImages/savings_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_secureaccount_white.png');
+          }
+
+          const carouselInstance = {
+            accountType,
+            accountInfo,
+            derivativeAccountDetails: {
+              type: carouselAcc,
+              number: index,
+            },
+            backgroundImage,
+            accountTypeImage,
+            type: serviceType,
+            dervAccount: account,
+            dervAccountType: carouselAcc,
+            accountNumber: index,
+          };
+          additionalCarouselData.push(carouselInstance);
+        }
       }
     }
     this.setState({
@@ -373,14 +394,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       let currentTransactions;
 
       const { presentCarouselData } = this.state;
-      if (
-        presentCarouselData &&
-        presentCarouselData.accountType === 'Donation Account'
-      ) {
-        const donationAccount: DonationDerivativeAccountElements =
-          presentCarouselData.donationAcc;
+      if (presentCarouselData && presentCarouselData.dervAccountType) {
+        const account = presentCarouselData.dervAccount;
 
-        const { balances, transactions } = donationAccount;
+        const { balances, transactions } = account;
         currentBalance = balances
           ? balances.balance + balances.unconfirmedBalance
           : 0;
@@ -1509,8 +1526,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 ></View>
               </View>
               {this.state.presentCarouselData &&
-              this.state.presentCarouselData.accountType ===
-                'Donation Account' ? (
+              this.state.presentCarouselData.dervAccountType ===
+                DONATION_ACCOUNT ? (
                 <View
                   style={{
                     flex: 1,
@@ -1549,14 +1566,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           ref={'DonationWebPageBottomSheet'}
           snapPoints={[-50, hp('75%')]}
           renderContent={() => {
-            const { donationAcc, accountNumber } = this.state
+            const { dervAccount, dervAccountType, accountNumber } = this.state
               .presentCarouselData
               ? this.state.presentCarouselData
-              : { donationAcc: null, accountNumber: null };
-            if (!donationAcc) return;
+              : {
+                  dervAccount: null,
+                  dervAccountType: null,
+                  accountNumber: null,
+                };
+            if (!dervAccount && dervAccountType !== DONATION_ACCOUNT) return;
             return (
               <DonationWebPageModalContents
-                account={donationAcc}
+                account={dervAccount}
                 accountNumber={accountNumber}
                 serviceType={this.state.serviceType}
                 close={() =>

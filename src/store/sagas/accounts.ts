@@ -138,11 +138,6 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
   const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
 
-  if (!derivativeAccounts[accountType])
-    throw new Error(
-      `Invalid derivative account: ${accountType} does not exists`,
-    );
-
   console.log({ derivativeAccounts });
   const res = yield call(
     service.getDerivativeAccAddress,
