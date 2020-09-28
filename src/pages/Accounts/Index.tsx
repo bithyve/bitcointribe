@@ -1594,7 +1594,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   isFromAccount={true}
                   transactionLoading={transactionLoading}
                   transactions={transactions}
-                  AtCloseEnd={false}
                   setTransactionItem={
                     (item) => {}
                     //this.setState({ selectedTransactionItem: item })

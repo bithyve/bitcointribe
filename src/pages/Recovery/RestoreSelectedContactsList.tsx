@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -59,7 +59,6 @@ import {
   startupSync,
 } from '../../store/actions/accounts';
 import axios from 'axios';
-import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
@@ -93,9 +92,7 @@ export default function RestoreSelectedContactsList(props) {
   });
   const [answer, setAnswer] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [RestoreByCloudQrCode, setRestoreByCloudQrCode] = useState(
-    React.createRef(),
-  );
+  const restoreByCloudQrCodeRef = useRef<BottomSheet>(null);
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
   const [ErrorBottomSheet1, setErrorBottomSheet1] = useState(React.createRef());
@@ -607,13 +604,13 @@ export default function RestoreSelectedContactsList(props) {
       setTimeout(() => {
         setQrBottomSheetsFlag(false);
       }, 10);
-      (RestoreByCloudQrCode as any).current.snapTo(0);
+      restoreByCloudQrCodeRef.current.snapTo(0);
     }
     if (openmodal == 'full') {
       setTimeout(() => {
         setQrBottomSheetsFlag(true);
       }, 10);
-      (RestoreByCloudQrCode as any).current.snapTo(1);
+      restoreByCloudQrCodeRef.current.snapTo(1);
     }
   }, [openmodal]);
 
@@ -658,7 +655,7 @@ export default function RestoreSelectedContactsList(props) {
         modalRef={RestoreByCloudQrCodeContents}
         isOpenedFlag={QrBottomSheetsFlag}
         onPressBack={() => {
-          (RestoreByCloudQrCode as any).current.snapTo(0);
+          restoreByCloudQrCodeRef.current.snapTo(0);
         }}
       />
     );
@@ -668,7 +665,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (RestoreByCloudQrCode as any).current.snapTo(0);
+          restoreByCloudQrCodeRef.current.snapTo(0);
           openCloseModal();
         }}
       />
@@ -1008,7 +1005,7 @@ export default function RestoreSelectedContactsList(props) {
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={
-            () => (RestoreByCloudQrCode as any).current.snapTo(1)
+            () => restoreByCloudQrCodeRef.current.snapTo(1)
             // props.navigation.navigate('RestoreWalletUsingDocuments')
           }
         >
@@ -1241,13 +1238,13 @@ export default function RestoreSelectedContactsList(props) {
         }}
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          (RestoreByCloudQrCode as any).current.snapTo(0);
+          restoreByCloudQrCodeRef.current.snapTo(0);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={RestoreByCloudQrCode as any}
+        ref={restoreByCloudQrCodeRef}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}

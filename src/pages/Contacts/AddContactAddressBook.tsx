@@ -313,7 +313,6 @@ export default function AddContactAddressBook(props) {
   const renderContactListErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
-        modalRef={contactListErrorBottomSheet}
         title={'Error while accessing your contacts '}
         info={errorMessage}
         proceedButtonText={'Open Setting'}
@@ -445,7 +444,7 @@ export default function AddContactAddressBook(props) {
               >
                 Skip Contact
               </Text>
-            </AppBottomSheetTouchableWrapper> 
+            </AppBottomSheetTouchableWrapper>
           </View> */}
           <View style={[styles.searchBoxContainer]}>
             <View style={styles.searchBoxIcon}>
