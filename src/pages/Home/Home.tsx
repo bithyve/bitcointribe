@@ -833,7 +833,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // health check
 
     const { s3Service, initHealthCheck } = this.props;
-    const { healthCheckInitialized } = s3Service.sss;
+    const { healthCheckInitialized } = s3Service.levelhealth;
     if (!healthCheckInitialized) {
       initHealthCheck();
     }
@@ -856,8 +856,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cloudData = async () => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares = JSON.stringify(s3Service.sss.metaShares);
-    console.log('s3Service.sss.metaShares', s3Service);
+    let shares = JSON.stringify(s3Service.LevelHealth.metaShares);
+    console.log('s3Service.LevelHealth.metaShares', s3Service);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -878,7 +878,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     // CloudDataBackup(data, this.setCloudBackupStatus);
     console.log('call for google drive upload', this.props.cloudBackupStatus);
-    this.updateHealthForCloud(s3Service.sss.metaShares);
+    this.updateHealthForCloud(s3Service.LevelHealth.metaShares);
   };
 
   setCloudBackupStatus = () => {

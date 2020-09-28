@@ -111,7 +111,7 @@ function* generateMetaSharesWorker() {
 
   const appVersion = DeviceInfo.getVersion();
 
-  if (s3Service.sss.metaShares.length) return;
+  if (s3Service.levelhealth.metaShares.length) return;
   const res = yield call(
     s3Service.createMetaShares,
     secureAssets,
@@ -139,11 +139,11 @@ export const generateMetaSharesWatcher = createWatcher(
 
 function* initHCWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
-  const initialized = s3Service.sss.healthCheckInitialized;
+  const initialized = s3Service.levelhealth.healthCheckInitialized;
   if (initialized) return;
 
   yield put(switchS3Loader('initHC'));
-  if (!s3Service.sss.metaShares.length) {
+  if (!s3Service.levelhealth.metaShares.length) {
     s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
   const res = yield call(s3Service.initializeHealth);
@@ -153,7 +153,7 @@ function* initHCWorker() {
     // walletID globalization (in-app)
     const walletID = yield call(AsyncStorage.getItem, 'walletID');
     if (!walletID) {
-      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
     }
 
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -177,7 +177,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   yield put(switchS3Loader('uploadMetaShare'));
 
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  if (!s3Service.sss.metaShares.length) return;
+  if (!s3Service.levelhealth.metaShares.length) return;
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
@@ -483,7 +483,7 @@ function* downloadMetaShareWorker({ payload }) {
       encryptedKey,
       otp,
       existingShares,
-      s3Service.sss.walletId,
+      s3Service.levelhealth.walletId,
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey);
@@ -683,7 +683,7 @@ function* generatePersonalCopyWorker({ payload }) {
     let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
     // console.log('/sagas/sss ', {storedPDFHealth})
     if (storedPDFHealth) {
-      const { pdfHealth } = s3Service.sss;
+      const { pdfHealth } = s3Service.levelhealth;
       storedPDFHealth = JSON.parse(storedPDFHealth);
       storedPDFHealth = {
         ...storedPDFHealth,
@@ -1002,9 +1002,9 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const preFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
+  const preFetchHealth = JSON.stringify(s3Service.levelhealth.healthCheckStatus);
   const res = yield call(s3Service.checkHealth);
-  const postFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
+  const postFetchHealth = JSON.stringify(s3Service.levelhealth.healthCheckStatus);
 
   yield put(calculateOverallHealth(s3Service));
 
@@ -1033,7 +1033,7 @@ export const checkMSharesHealthWatcher = createWatcher(
 
 function* checkPDFHealthWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const { pdfHealth } = s3Service.sss;
+  const { pdfHealth } = s3Service.levelhealth;
   const { scannedQR, index } = payload;
 
   if (scannedQR === pdfHealth[index].qrData) {
@@ -1544,7 +1544,7 @@ function* recoverWalletWorker({ payload }) {
       yield delay(2000); // seconds delay prior to Wallet Image check
       yield put(fetchWalletImage());
 
-      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
       const securityQuestionHistory = {

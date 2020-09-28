@@ -154,7 +154,7 @@ export default function HealthCheck(props) {
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     //WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+    if (!s3Service.levelhealth.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
   const { overallHealth } = useSelector(state => state.sss);
@@ -215,7 +215,7 @@ export default function HealthCheck(props) {
   useEffect(() => {
     // HC down-streaming
     if (s3Service) {
-      const { healthCheckInitialized } = s3Service.sss;
+      const { healthCheckInitialized } = s3Service.levelhealth;
 
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());

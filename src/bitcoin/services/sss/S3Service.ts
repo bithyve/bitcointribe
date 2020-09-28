@@ -13,7 +13,7 @@ import LevelHealth from '../../utilities/LevelHealth/LevelHealth';
 
 export default class S3Service {
   public static fromJSON = (json: string) => {
-    const { sss } = JSON.parse(json);
+    const { levelhealth } = JSON.parse(json);
     const {
       mnemonic,
       encryptedSecrets,
@@ -32,8 +32,7 @@ export default class S3Service {
       walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
-    } = sss;
-    console.log('sss', sss)
+    } = levelhealth;
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
@@ -413,7 +412,6 @@ export default class S3Service {
     }
   };
 
-  public sss: SSS;
   public levelhealth: LevelHealth;
   constructor(
     mnemonic: string,

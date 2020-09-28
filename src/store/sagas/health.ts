@@ -155,11 +155,11 @@ export const updateHealthToRelayWatcher = createWatcher(
 
 function* initHCWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
-  const initialized = s3Service.sss.healthCheckInitialized;
+  const initialized = s3Service.levelhealth.healthCheckInitialized;
   if (initialized) return;
 
   yield put(switchS3Loader('initHC'));
-  if (!s3Service.sss.metaShares.length) {
+  if (!s3Service.levelhealth.metaShares.length) {
     s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
   const res = yield call(s3Service.initializeHealth);
@@ -169,7 +169,7 @@ function* initHCWorker() {
     // walletID globalization (in-app)
     const walletID = yield call(AsyncStorage.getItem, 'walletID');
     if (!walletID) {
-      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
     }
 
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -213,7 +213,7 @@ function* generateMetaSharesWorker() {
 
   const appVersion = DeviceInfo.getVersion();
 
-  if (s3Service.sss.metaShares.length) return;
+  if (s3Service.levelhealth.metaShares.length) return;
   const res = yield call(
     s3Service.createMetaShares,
     secureAssets,

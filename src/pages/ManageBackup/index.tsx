@@ -1360,7 +1360,7 @@ export default function ManageBackup(props) {
   useEffect(() => {
     // HC init and down-streaming
     if (s3Service) {
-      const { healthCheckInitialized } = s3Service.sss;
+      const { healthCheckInitialized } = s3Service.levelhealth;
       if (healthCheckInitialized) {
         (async () => {
           const intialHealthSync = await AsyncStorage.getItem(
