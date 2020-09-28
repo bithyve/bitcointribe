@@ -146,7 +146,7 @@ function* initHCWorker() {
   if (!s3Service.sss.metaShares.length) {
     s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
-  const res = yield call(s3Service.initializeHealthcheck);
+  const res = yield call(s3Service.initializeHealth);
   if (res.status === 200) {
     yield put(healthCheckInitialized());
 

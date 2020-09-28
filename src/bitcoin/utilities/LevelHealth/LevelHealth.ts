@@ -3,7 +3,6 @@ import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import secrets from 'secrets.js-grempe';
 import config from '../../HexaConfig';
-
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
@@ -12,9 +11,10 @@ import {
   EncryptedImage,
   WalletImage,
 } from '../Interface';
+
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID } = config;
-export default class SSS {
+export default class LevelHealth {
   public static cipherSpec: {
     algorithm: string;
     salt: string;
@@ -27,10 +27,10 @@ export default class SSS {
   ): {
     mnemonic: string;
   } => {
-    if (decryptedSecrets.length >= SSS.threshold) {
+    if (decryptedSecrets.length >= LevelHealth.threshold) {
       const secretsArray = [];
       for (const secret of decryptedSecrets) {
-        if (SSS.validShare(secret)) {
+        if (LevelHealth.validShare(secret)) {
           secretsArray.push(secret.slice(0, secret.length - 8));
         } else {
           throw new Error(`Invalid checksum, share: ${secret} is corrupt`);
@@ -38,10 +38,10 @@ export default class SSS {
       }
 
       const recoveredMnemonicHex = secrets.combine(secretsArray);
-      return { mnemonic: SSS.hexToString(recoveredMnemonicHex) };
+      return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
     } else {
       throw new Error(
-        `supplied number of shares are less than the threshold (${SSS.threshold})`,
+        `supplied number of shares are less than the threshold (${LevelHealth.threshold})`,
       );
     }
   };
@@ -52,14 +52,14 @@ export default class SSS {
   ): {
     decryptedSecrets: string[];
   } => {
-    const key = SSS.getDerivedKey(answer);
+    const key = LevelHealth.getDerivedKey(answer);
 
     const decryptedSecrets: string[] = [];
     for (const secret of secretsArray) {
       const decipher = crypto.createDecipheriv(
-        SSS.cipherSpec.algorithm,
+        LevelHealth.cipherSpec.algorithm,
         key,
-        SSS.cipherSpec.iv,
+        LevelHealth.cipherSpec.iv,
       );
       let decrypted = decipher.update(secret, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
@@ -85,9 +85,9 @@ export default class SSS {
   > => {
     let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
     if (otp) {
-      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
     }
-    const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
+    const messageId: string = LevelHealth.getMessageId(key, config.MSG_ID_LENGTH);
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('downloadShare', {
@@ -100,7 +100,7 @@ export default class SSS {
     }
 
     const { share, encryptedDynamicNonPMDD } = res.data;
-    const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
+    const metaShare = LevelHealth.decryptMetaShare(share, key).decryptedMetaShare;
     return { metaShare, encryptedDynamicNonPMDD, messageId };
   };
 
@@ -182,13 +182,13 @@ export default class SSS {
     key?: string,
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
     if (!key) {
-      key = SSS.generateKey(SSS.cipherSpec.keyLength);
+      key = LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength);
     }
-    const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
+    const messageId: string = LevelHealth.getMessageId(key, config.MSG_ID_LENGTH);
     const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
     let encrypted = cipher.update(JSON.stringify(metaShare), 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -201,8 +201,8 @@ export default class SSS {
   };
 
   public static generateRequestCreds = () => {
-    const key = SSS.generateKey(SSS.cipherSpec.keyLength);
-    // const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    const key = LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength);
+    // const { otp, otpEncryptedData } = LevelHealth.encryptViaOTP(key);
     return { key };
   };
 
@@ -214,9 +214,9 @@ export default class SSS {
   ): Promise<{ success: boolean }> => {
     let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
     if (otp) {
-      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
     }
-    const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
+    const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
       key,
     );
@@ -254,10 +254,10 @@ export default class SSS {
       metaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    } = await SSS.downloadShare(encryptedKey, otp);
+    } = await LevelHealth.downloadShare(encryptedKey, otp);
 
-    if (SSS.validateStorage(metaShare, existingShares, walletId)) {
-      // const { deleted } = await SSS.affirmDecryption(messageId);
+    if (LevelHealth.validateStorage(metaShare, existingShares, walletId)) {
+      // const { deleted } = await LevelHealth.affirmDecryption(messageId);
       // if (!deleted) {
       //   console.log('Unable to remove the share from the server');
       // }
@@ -271,16 +271,16 @@ export default class SSS {
   ): {
     decryptedData: any;
   } => {
-    const key = SSS.getDerivedKey(otp);
+    const key = LevelHealth.getDerivedKey(otp);
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
     //   this.cipherSpec.keyLength,
     // );
     const decipher = crypto.createDecipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
 
     try {
@@ -307,9 +307,9 @@ export default class SSS {
     //   this.cipherSpec.keyLength,
     // );
     const decipher = crypto.createDecipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
 
     try {
@@ -412,7 +412,7 @@ export default class SSS {
         password,
         config.HEXA_ID,
         config.KEY_STRETCH_ITERATIONS,
-        SSS.cipherSpec.keyLength / 2,
+        LevelHealth.cipherSpec.keyLength / 2,
         'sha256',
       )
       .toString('hex');
@@ -435,8 +435,8 @@ export default class SSS {
     otpEncryptedData: string;
     otp: string;
   } => {
-    const otp: string = SSS.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-    const key = SSS.getDerivedKey(otp);
+    const otp: string = LevelHealth.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+    const key = LevelHealth.getDerivedKey(otp);
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -444,9 +444,9 @@ export default class SSS {
     // );
 
     const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
     let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -458,7 +458,7 @@ export default class SSS {
   };
 
   public static generateOTP = (otpLength: number): string =>
-    SSS.generateRandomString(otpLength);
+    LevelHealth.generateRandomString(otpLength);
 
   public static generateRandomString = (length: number): string => {
     let randomString: string = '';
@@ -481,13 +481,13 @@ export default class SSS {
       const hash = crypto.createHash('sha512');
       key = hash.update(key).digest('hex');
     }
-    return key.slice(key.length - SSS.cipherSpec.keyLength);
+    return key.slice(key.length - LevelHealth.cipherSpec.keyLength);
   };
 
   private static validShare = (checksumedShare: string): boolean => {
     const extractedChecksum = checksumedShare.slice(checksumedShare.length - 8);
     const recoveredShare = checksumedShare.slice(0, checksumedShare.length - 8);
-    const calculatedChecksum = SSS.calculateChecksum(recoveredShare);
+    const calculatedChecksum = LevelHealth.calculateChecksum(recoveredShare);
     if (calculatedChecksum !== extractedChecksum) {
       return false;
     }
@@ -550,7 +550,7 @@ export default class SSS {
   public stringToHex = (str: string): string => secrets.str2hex(str);
 
   public generateMessageID = (): string =>
-    SSS.generateRandomString(config.MSG_ID_LENGTH);
+    LevelHealth.generateRandomString(config.MSG_ID_LENGTH);
 
   public generateShares = (): {
     shares: string[];
@@ -559,11 +559,47 @@ export default class SSS {
     const shares = secrets.share(
       this.stringToHex(this.mnemonic),
       config.SSS_TOTAL,
-      SSS.threshold
+      config.SSS_THRESHOLD,
     );
 
     for (let itr = 0; itr < shares.length; itr++) {
-      const checksum = SSS.calculateChecksum(shares[itr]);
+      const checksum = LevelHealth.calculateChecksum(shares[itr]);
+      shares[itr] = shares[itr] + checksum;
+    }
+
+    return { shares };
+  };
+
+  public generateLevel1Shares = (): {
+    shares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      this.stringToHex(this.mnemonic),
+      config.SSS_LEVEL1_TOTAL,
+      config.SSS_LEVEL1_THRESHOLD,
+    );
+
+    for (let itr = 0; itr < shares.length; itr++) {
+      const checksum = LevelHealth.calculateChecksum(shares[itr]);
+      shares[itr] = shares[itr] + checksum;
+    }
+
+    return { shares };
+  };
+
+  public generateLevel2Shares = (): {
+    shares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      this.stringToHex(this.mnemonic),
+      config.SSS_LEVEL2_TOTAL,
+      config.SSS_LEVEL2_THRESHOLD,
+    );
+
+    for (let itr = 0; itr < shares.length; itr++) {
+      const checksum = LevelHealth.calculateChecksum(shares[itr]);
       shares[itr] = shares[itr] + checksum;
     }
 
@@ -590,7 +626,7 @@ export default class SSS {
       shareIndex
     ].meta.guardian = contactName.toLowerCase().trim();
     const metaShare: MetaShare = this.metaShares[shareIndex];
-    const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
+    const { encryptedMetaShare, key, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
     );
 
@@ -603,7 +639,7 @@ export default class SSS {
       };
     }
 
-    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    const { otp, otpEncryptedData } = LevelHealth.encryptViaOTP(key);
     return {
       otp,
       encryptedKey: otpEncryptedData,
@@ -613,7 +649,7 @@ export default class SSS {
     };
   };
 
-  public initializeHealthcheck = async (): Promise<{
+  public initializeHealth = async (health: any[]): Promise<{
     success: boolean;
   }> => {
     if (this.healthCheckInitialized)
@@ -631,7 +667,7 @@ export default class SSS {
       res = await BH_AXIOS.post('sharesHealthCheckInit', {
         HEXA_ID,
         walletID: this.walletId,
-        shareIDs,
+        health,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -676,28 +712,16 @@ export default class SSS {
       if (err.code) throw new Error(err.code);
     }
 
-    const updates: Array<{
-      shareId: string;
-      updatedAt: number;
-      reshareVersion: number;
-    }> = res.data.lastUpdateds;
+    const updates: Array<{ shareId: string; updatedAt: number }> =
+      res.data.lastUpdateds;
+
+    console.log('updates', updates)
 
     const shareGuardianMapping = {};
-    for (const { shareId, updatedAt, reshareVersion } of updates) {
+    for (const { shareId, updatedAt } of updates) {
       for (let index = 0; index < metaShares.length; index++) {
         if (metaShares[index] && metaShares[index].shareId === shareId) {
-          const currentReshareVersion =
-            this.healthCheckStatus[index].reshareVersion !== undefined
-              ? this.healthCheckStatus[index].reshareVersion
-              : 0;
-
-          if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
-
-          this.healthCheckStatus[index] = {
-            shareId,
-            updatedAt,
-            reshareVersion,
-          };
+          this.healthCheckStatus[index] = { shareId, updatedAt };
           shareGuardianMapping[index] = {
             shareId,
             updatedAt,
@@ -756,18 +780,18 @@ export default class SSS {
   ): {
     encryptedStaticNonPMDD: string;
   } => {
-    const key = SSS.getDerivedKey(
+    const key = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
     // const key = crypto.scryptSync(
     //   intermediateKey,
-    //   SSS.cipherSpec.salt,
-    //   SSS.cipherSpec.keyLength,
+    //   LevelHealth.cipherSpec.salt,
+    //   LevelHealth.cipherSpec.keyLength,
     // );
     const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
 
     let encrypted = cipher.update(JSON.stringify(staticNonPMDD), 'utf8', 'hex');
@@ -780,19 +804,19 @@ export default class SSS {
   ): {
     decryptedStaticNonPMDD;
   } => {
-    const key = SSS.getDerivedKey(
+    const key = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
     // const key = crypto.scryptSync(
     //   intermediateKey,
-    //   SSS.cipherSpec.salt,
-    //   SSS.cipherSpec.keyLength,
+    //   LevelHealth.cipherSpec.salt,
+    //   LevelHealth.cipherSpec.keyLength,
     // );
 
     const decipher = crypto.createDecipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
     let decrypted = decipher.update(encryptStaticNonPMDD, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
@@ -804,19 +828,19 @@ export default class SSS {
   public encryptDynamicNonPMDD = (
     dynamicNonPMDD: MetaShare[],
   ): { encryptedDynamicNonPMDD: string } => {
-    const key = SSS.getDerivedKey(
+    const key = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
     // const key = crypto.scryptSync(
     //   intermediateKey,
-    //   SSS.cipherSpec.salt,
-    //   SSS.cipherSpec.keyLength,
+    //   LevelHealth.cipherSpec.salt,
+    //   LevelHealth.cipherSpec.keyLength,
     // );
 
     const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
     let encrypted = cipher.update(
       JSON.stringify(dynamicNonPMDD),
@@ -833,19 +857,19 @@ export default class SSS {
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
-    const key = SSS.getDerivedKey(
+    const key = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
     // const key = crypto.scryptSync(
     //   intermediateKey,
-    //   SSS.cipherSpec.salt,
-    //   SSS.cipherSpec.keyLength,
+    //   LevelHealth.cipherSpec.salt,
+    //   LevelHealth.cipherSpec.keyLength,
     // );
 
     const decipher = crypto.createDecipheriv(
-      SSS.cipherSpec.algorithm,
+      LevelHealth.cipherSpec.algorithm,
       key,
-      SSS.cipherSpec.iv,
+      LevelHealth.cipherSpec.iv,
     );
     let decrypted = decipher.update(
       encryptedDynamicNonPMDD.encryptedDynamicNonPMDD,
@@ -949,7 +973,7 @@ export default class SSS {
       if (index === 0) {
         metaShare = {
           encryptedSecret,
-          shareId: SSS.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId(encryptedSecret),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -964,7 +988,7 @@ export default class SSS {
       } else {
         metaShare = {
           encryptedSecret,
-          shareId: SSS.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId(encryptedSecret),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -981,7 +1005,7 @@ export default class SSS {
       this.metaShares.push(metaShare);
       index++;
     }
-    if (this.metaShares.length !== 5) {
+    if (this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
     }
@@ -990,15 +1014,9 @@ export default class SSS {
   };
 
   public reshareMetaShare = (index: number) => {
-    const reshareVersion = this.metaShares[index].meta.reshareVersion + 1;
-    this.metaShares[index].meta.reshareVersion = reshareVersion;
-    this.healthCheckStatus[index] = {
-      // resetting health of the meta-share on resharing
-      ...this.healthCheckStatus[index],
-      updatedAt: 0,
-      reshareVersion,
-    };
-
+    this.metaShares[index].meta.reshareVersion =
+      this.metaShares[index].meta.reshareVersion + 1;
+    console.log({ resharing: this.metaShares[index] });
     return this.metaShares[index];
   };
 
@@ -1081,18 +1099,18 @@ export default class SSS {
   ): {
     encryptedSecrets: string[];
   } => {
-    const key = SSS.getDerivedKey(answer);
+    const key = LevelHealth.getDerivedKey(answer);
     const shareIDs = [];
     for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(
-        SSS.cipherSpec.algorithm,
+        LevelHealth.cipherSpec.algorithm,
         key,
-        SSS.cipherSpec.iv,
+        LevelHealth.cipherSpec.iv,
       );
       let encrypted = cipher.update(secret, 'utf8', 'hex');
       encrypted += cipher.final('hex');
       this.encryptedSecrets.push(encrypted);
-      shareIDs.push(SSS.getShareId(encrypted));
+      shareIDs.push(LevelHealth.getShareId(encrypted));
     }
     this.shareIDs = shareIDs.slice(0, 3); // preserving just the online(relay-transmitted) shareIDs
     return { encryptedSecrets: this.encryptedSecrets };
@@ -1102,16 +1120,16 @@ export default class SSS {
     walletImage: WalletImage,
   ): { encryptedImage: EncryptedImage } => {
     // encrypts Wallet Image
-    const encKey = SSS.getDerivedKey(
+    const encKey = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
 
     const encryptedImage = {};
     for (const key of Object.keys(walletImage)) {
       const cipher = crypto.createCipheriv(
-        SSS.cipherSpec.algorithm,
+        LevelHealth.cipherSpec.algorithm,
         encKey,
-        SSS.cipherSpec.iv,
+        LevelHealth.cipherSpec.iv,
       ); // needs to be re-created per decryption
 
       let encrypted = cipher.update(
@@ -1132,16 +1150,16 @@ export default class SSS {
   ): {
     walletImage: WalletImage;
   } => {
-    const decKey = SSS.getDerivedKey(
+    const decKey = LevelHealth.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
     );
 
     const walletImage = {};
     for (const key of Object.keys(encryptedImage)) {
       const decipher = crypto.createDecipheriv(
-        SSS.cipherSpec.algorithm,
+        LevelHealth.cipherSpec.algorithm,
         decKey,
-        SSS.cipherSpec.iv,
+        LevelHealth.cipherSpec.iv,
       ); // needs to be re-created per decryption
 
       let decrypted = decipher.update(encryptedImage[key], 'hex', 'utf8');

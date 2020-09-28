@@ -18,6 +18,8 @@ const initialState: {
       created: string;
       status: string;
       shareId: string;
+      reshareVersion: number;
+      guardian: string;
     }[];
   }[];
 } = {

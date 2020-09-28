@@ -38,7 +38,7 @@ import {
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AllAccountsContents from '../../components/AllAccountsContents';
-import SettingsContents from '../../components/SettingsContents';
+// import SettingsContents from '../../components/SettingsContents';
 import { connect } from 'react-redux';
 import NoInternetModalContents from '../../components/NoInternetModalContents';
 import NetInfo from '@react-native-community/netinfo';
@@ -796,6 +796,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
+    const regularAcc = new RegularAccount();
+    let res;
+    res = regularAcc.getMnemonic();
+    console.log('mnemonics', res)
     this.updateAccountCardData();
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
@@ -850,20 +854,31 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = async () => {
-    const { walletName, regularAccount } = this.props;
+    const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares;
-      encryptedCloudDataJson = await CloudData(this.props.database);
-      this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-      let data = {
-        shares: shares,
-        encryptedCloudDataJson : encryptedCloudDataJson,
-        walletName: walletName,
-        regularAccount: regularAccount,
-      }
-      CloudDataBackup(data, this.setCloudBackupStatus);
-      console.log('call for google drive upload', this.props.cloudBackupStatus);
-      this.updateHealthForCloud(shares);
+    let shares = JSON.stringify(s3Service.sss.metaShares);
+    console.log('s3Service.sss.metaShares', s3Service);
+    encryptedCloudDataJson = await CloudData(this.props.database);
+    this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
+    let keeperData = [
+      {
+        shareId:'',
+        KeeperType: 'cloud',
+        updated:'',
+        reshareVersion: 0
+      },
+    ]
+    let data = {
+      levelStatus: 1,
+      shares: shares,
+      encryptedCloudDataJson : encryptedCloudDataJson,
+      walletName: walletName,
+      regularAccount: regularAccount,
+      keeperData: JSON.stringify(keeperData)
+    }
+    // CloudDataBackup(data, this.setCloudBackupStatus);
+    console.log('call for google drive upload', this.props.cloudBackupStatus);
+    this.updateHealthForCloud(s3Service.sss.metaShares);
   };
 
   setCloudBackupStatus = () => {
@@ -2201,18 +2216,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   updateHealthForCloud = (shares) =>{
     let levelHealth = this.props.levelHealth;
-    if(this.props.cloudBackupStatus){
+    // health update for 1st upload to cloud 
+    if(this.props.cloudBackupStatus && levelHealth[0].levelStatus == 'notSetup'){
+      let shareId = [];
+      for (let i = 0; i < shares.length; i++) {
+        this.props.s3Service.prepareShareUploadables(i,'cloud');
+        const element = shares[i];
+        shareId.push(element.shareId);
+      }
       if(levelHealth[0].levelInfo[0].type == 'cloud'){
         levelHealth[0].levelInfo[0].lastUpdated = moment(new Date()).valueOf();
         levelHealth[0].levelInfo[0].created = moment(new Date()).valueOf();
         levelHealth[0].levelInfo[0].status = 'accessible';
-        levelHealth[0].levelInfo[0].shareId = JSON.stringify(shares);
+        levelHealth[0].levelInfo[0].shareId = JSON.stringify(shareId);
+        levelHealth[0].levelInfo[0].reshareVersion = 1;
+        levelHealth[0].levelInfo[0].guardian = 'cloud';
       }
       if(levelHealth[0].levelInfo[1].type == 'securityQuestion' && levelHealth[0].levelInfo[1].created){
         levelHealth[0].levelStatus = 'good';
       }
+      updateHealth(levelHealth);
     }
-    updateHealth(levelHealth);
   }
 
   onPressElement = (item) => {

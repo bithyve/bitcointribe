@@ -58,7 +58,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import RecipientSendConfirmation from './RecipientSendConfirmation';
 import RadioButton from '../../components/RadioButton';
-import CustomPriorityContent from './CustomPriorityContent';
+import CustomPriorityContent from '../../components/CustomPriorityContent';
 import Toast from '../../components/Toast';
 
 interface SendConfirmationStateTypes {
