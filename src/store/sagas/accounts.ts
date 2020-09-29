@@ -330,6 +330,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 
 function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   let { serviceType, accountNumber, accountType } = payload;
+  yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
 
   const service = yield select((state) => state.accounts[serviceType].service);
 
@@ -372,7 +373,10 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
       [serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
   } else if (res.status !== 200) {
+    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
+
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to fetch balance/transactions from the indexer');
   }
@@ -523,7 +527,7 @@ function* processRecipients(
       if (
         recipient.id === REGULAR_ACCOUNT ||
         recipient.id === SECURE_ACCOUNT ||
-        recipient.id === DONATION_ACCOUNT
+        config.EJECTED_ACCOUNTS.includes(recipient.id)
       ) {
         // recipient: account
         const subInstance =
@@ -532,7 +536,7 @@ function* processRecipients(
             : secureAccount.secureHDWallet;
 
         let receivingAddress;
-        if (recipient.id === DONATION_ACCOUNT) {
+        if (config.EJECTED_ACCOUNTS.includes(recipient.id)) {
           receivingAddress = subInstance.getReceivingAddress(
             recipient.id,
             recipient.accountNumber,
