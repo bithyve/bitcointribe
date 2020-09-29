@@ -702,6 +702,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? 'Fast and easy'
                 : 'Multi-factor security',
             accountType: serviceType,
+            subType: carouselAcc,
             iconType: serviceType === REGULAR_ACCOUNT ? 'regular' : 'secure',
           };
           additionalCardData.push(carouselInstance);

@@ -21,7 +21,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { UsNumberFormat } from '../../common/utilities';
-
+import config from '../../bitcoin/HexaConfig';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
@@ -220,14 +220,15 @@ const HomeList = ({
                         }
                       >
                         {switchOn
-                          ? value.title === 'Donation Account'
+                          ? config.EJECTED_ACCOUNTS.includes(value.subType)
                             ? UsNumberFormat(value.amount)
                             : value.accountType === TEST_ACCOUNT
                             ? UsNumberFormat(balances.testBalance)
                             : value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)
-                          : value.title === 'Donation Account' && exchangeRates
+                          : config.EJECTED_ACCOUNTS.includes(value.subType) &&
+                            exchangeRates
                           ? (
                               (value.amount / 1e8) *
                               exchangeRates[CurrencyCode].last
