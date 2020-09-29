@@ -21,6 +21,7 @@ const AccountsListSend = ({
   accounts,
   onSelectContact,
   checkedItem,
+  fromAddNewAccount
 }) => {
   // console.log("Items,", accounts);
   return (
@@ -50,7 +51,7 @@ const AccountsListSend = ({
           >
             {accounts.account_name}
           </Text>
-          <Text
+          {!fromAddNewAccount ? <Text
             style={{
               ...styles.accountBalance,
               color: checkedItem ? Colors.white : Colors.borderColor,
@@ -68,7 +69,7 @@ const AccountsListSend = ({
                   ],
                 )
               : 0}
-          </Text>
+          </Text> : null}
           <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
             <TouchableOpacity
               onPress={() => onSelectContact(accounts)}

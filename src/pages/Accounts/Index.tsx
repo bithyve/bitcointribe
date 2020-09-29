@@ -578,19 +578,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       if (this.carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
           if (this.carousel.current as any)
-            //setTimeout(() => {
             (this.carousel.current as any).snapToItem(0, true, false);
-          //}, 1100);
         } else if (serviceType == REGULAR_ACCOUNT) {
           if (this.carousel.current as any)
-            // setTimeout(() => {
             (this.carousel.current as any).snapToItem(1, true, false);
-          //}, 1100);
         } else if (serviceType == SECURE_ACCOUNT) {
           if (this.carousel.current as any)
-            // setTimeout(() => {
             (this.carousel.current as any).snapToItem(2, true, false);
-          // }, 1100);
         }
       }
       this.setState({ serviceType: serviceType });
@@ -1527,7 +1521,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       }
                     }}
                   >
-                    <Text style={styles.buttonText}>Donation Webpage</Text>
+                    <Text style={styles.buttonText}>Donation web view</Text>
                   </AppBottomSheetTouchableWrapper>
                 </View>
               ) : null}
@@ -1547,7 +1541,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
-          snapPoints={[-50, hp('75%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('87%')
+          : hp('89%'),]}
           renderContent={() => {
             const { donationAcc, accountNumber } = this.state
               .presentCarouselData

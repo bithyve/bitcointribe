@@ -5,6 +5,7 @@ import Colors from '../common/Colors';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../common/CommonFunctions/index';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function ToggleSwitch(props) {
   const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
@@ -20,7 +21,7 @@ export default function ToggleSwitch(props) {
   }
 
   return (
-    <TouchableOpacity
+    <AppBottomSheetTouchableWrapper
       activeOpacity={10}
       onPress={() => props.onpress()}
       style={{
@@ -163,6 +164,6 @@ export default function ToggleSwitch(props) {
           </View>
         </View>
       )}
-    </TouchableOpacity>
+    </AppBottomSheetTouchableWrapper>
   );
 }

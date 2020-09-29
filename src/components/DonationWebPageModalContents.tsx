@@ -21,6 +21,8 @@ import { updateDonationPreferences } from '../store/actions/accounts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import config from '../bitcoin/HexaConfig';
 import preferences from '../store/reducers/preferences';
+import CopyThisText from './CopyThisText';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function DonationWebPageModalContents(props) {
   const [saveEnabled, setSaveEnabled] = useState(false);
@@ -77,7 +79,8 @@ export default function DonationWebPageModalContents(props) {
 
   return (
     <View style={styles.modalContentContainer}>
-      <View style={{ height: '100%', marginHorizontal: wp('8%') }}>
+      <ScrollView style={styles.modalContainer}>
+      <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
         <View style={styles.successModalHeaderView}>
           <Text
             style={{
@@ -86,7 +89,7 @@ export default function DonationWebPageModalContents(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Donation Webpage
+           Donation web view
           </Text>
           <Text
             style={{
@@ -163,45 +166,23 @@ export default function DonationWebPageModalContents(props) {
             which will serve up the donation page
           </Text>
         </View>
-        <View style={styles.deeplinkContainerStyle}>
-          <Text
-            style={{
-              color: Colors.lightBlue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
-            }}
-            numberOfLines={1}
-          >
-            {`https://hexawallet.io/${
+        <View
+          style={{
+            marginTop: -20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: 40,
+            marginRight: 40
+          }}
+        >
+        <CopyThisText text={`https://hexawallet.io/${
               config.APP_STAGE === 'app'
                 ? 'donate'
                 : config.APP_STAGE === 'sta'
                 ? 'donate-stage'
                 : 'donate-test'
-            }/?donationid=` + props.account.id}
-          </Text>
-          <TouchableOpacity
-            style={styles.copylinkContainerStyle}
-            onPress={() =>
-              writeToClipboard(
-                `https://hexawallet.io/${
-                  config.APP_STAGE === 'app'
-                    ? 'donate'
-                    : config.APP_STAGE === 'sta'
-                    ? 'donate-stage'
-                    : 'donate-test'
-                }/?donationid=` + props.account.id,
-              )
-            }
-          >
-            <Image
-              source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: wp('10%'), height: wp('10%') }}
-              resizeMode="center"
-            />
-          </TouchableOpacity>
-        </View>
+            }/?donationid=` + props.account.id}/>
+            </View>
         <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>
           <Text style={styles.modalInfoText}>
@@ -209,31 +190,16 @@ export default function DonationWebPageModalContents(props) {
             receiving donations
           </Text>
         </View>
-        <View style={styles.deeplinkContainerStyle}>
-          <Text
-            style={{
-              color: Colors.lightBlue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
-            }}
-            numberOfLines={1}
-          >
-            {`<iframe src="https://hexawallet.io/${
-              config.APP_STAGE === 'app'
-                ? 'donate'
-                : config.APP_STAGE === 'sta'
-                ? 'donate-stage'
-                : 'donate-test'
-            }/?donationid=${
-              props.account.id
-            }" width="400" height="600"></iframe>`}
-          </Text>
-          <TouchableOpacity
-            style={styles.copylinkContainerStyle}
-            onPress={() =>
-              writeToClipboard(
-                `<iframe src="https://hexawallet.io/${
+        <View
+          style={{
+            marginTop: -20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: 40,
+            marginRight: 40
+          }}
+        >
+        <CopyThisText text={`<iframe src="https://hexawallet.io/${
                   config.APP_STAGE === 'app'
                     ? 'donate'
                     : config.APP_STAGE === 'sta'
@@ -241,17 +207,8 @@ export default function DonationWebPageModalContents(props) {
                     : 'donate-test'
                 }/?donationid=${
                   props.account.id
-                }" width="400" height="600"></iframe>`,
-              )
-            }
-          >
-            <Image
-              source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: wp('10%'), height: wp('10%') }}
-              resizeMode="center"
-            />
-          </TouchableOpacity>
-        </View>
+                }" width="400" height="600"></iframe>`}/>
+</View>
         <View style={{ marginTop: 30 }}>
           <AppBottomSheetTouchableWrapper
             style={{ ...styles.buttonStyle, opacity: !saveEnabled ? 0.5 : 1 }}
@@ -265,6 +222,7 @@ export default function DonationWebPageModalContents(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
+      </ScrollView>
     </View>
   );
 }
@@ -273,6 +231,11 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
   },
+  modalContainer: {
+    height: '100%',
+    backgroundColor: Colors.white,
+    width: '100%'
+},
   successModalHeaderView: {
     marginTop: wp('6%'),
   },
