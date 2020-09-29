@@ -482,6 +482,34 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
+  refreshAccountBalance = () => {
+    const { presentCarouselData, serviceType } = this.state;
+    if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
+      const { derivativeAccountDetails } = presentCarouselData;
+      console.log({ derivativeAccountDetails });
+      if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+        this.props.syncViaXpubAgent(
+          serviceType,
+          derivativeAccountDetails.type,
+          derivativeAccountDetails.number,
+        );
+      else
+        this.props.fetchDerivativeAccBalTx(
+          serviceType,
+          derivativeAccountDetails.type,
+          derivativeAccountDetails.number,
+        );
+    } else {
+      this.props.fetchBalanceTx(serviceType, {
+        loader: true,
+        syncTrustedDerivative:
+          serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+            ? true
+            : false,
+      });
+    }
+  };
+
   setAverageTransactionFees = async () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
@@ -1116,36 +1144,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     accounts[serviceType].loading.balanceTx ||
                     accounts[serviceType].loading.derivativeBalanceTx
                   }
-                  onRefresh={() => {
-                    console.log({
-                      state: this.state,
-                      presentCarouselData: this.state.presentCarouselData,
-                    });
-                    const { presentCarouselData } = this.state;
-                    if (
-                      presentCarouselData &&
-                      presentCarouselData.accountType === 'Donation Account'
-                    ) {
-                      const { derivativeAccountDetails } = presentCarouselData;
-                      console.log({ derivativeAccountDetails });
-                      if (derivativeAccountDetails) {
-                        this.props.syncViaXpubAgent(
-                          serviceType,
-                          derivativeAccountDetails.type,
-                          derivativeAccountDetails.number,
-                        );
-                      }
-                    } else {
-                      this.props.fetchBalanceTx(serviceType, {
-                        loader: true,
-                        syncTrustedDerivative:
-                          serviceType === REGULAR_ACCOUNT ||
-                          serviceType === SECURE_ACCOUNT
-                            ? true
-                            : false,
-                      });
-                    }
-                  }}
+                  onRefresh={this.refreshAccountBalance}
                 />
               }
             >
