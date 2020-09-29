@@ -2249,13 +2249,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('AddressBookContents');
       return;
     } else if (item.title == 'Wallet Settings') {
-      // navigation.navigate('SettingsContents');
-      this.settingsBottomSheetRef.current?.snapTo(1);
-      setTimeout(() => {
-        this.setState({
-          tabBarIndex: 0,
-        });
-      }, 10);
+      navigation.navigate('SettingsContents');
+      // this.settingsBottomSheetRef.current?.snapTo(1);
+      // setTimeout(() => {
+      //   this.setState({
+      //     tabBarIndex: 0,
+      //   });
+      // }, 10);
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
     } else if (item.title === 'Hexa Community (Telegram)') {
@@ -2993,7 +2993,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         )}
 
-        {knowMoreBottomSheetsFlag ? (
+        {/* {knowMoreBottomSheetsFlag ? (
           <BottomSheet
             onOpenEnd={() => {
               if (!deepLinkModalOpen) {
@@ -3050,7 +3050,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             )}
           />
-        ) : null}
+        ) : null} */}
 
         <BottomSheet
           onOpenEnd={() => {

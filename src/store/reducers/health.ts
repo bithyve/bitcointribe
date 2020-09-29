@@ -9,8 +9,6 @@ const initialState: {
     levelHealthCheck: Boolean;
   };
   levelHealth: {
-    level: number;
-    levelStatus: string;
     levelInfo: {
       keeperType: string;
       type: string;
@@ -20,7 +18,7 @@ const initialState: {
       shareId: string;
       reshareVersion: number;
       guardian: string;
-    }[];
+    };
   }[];
 } = {
   loading: {

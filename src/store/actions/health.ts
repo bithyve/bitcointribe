@@ -7,6 +7,8 @@
   export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
   export const S3_LOADING = 'S3_LOADING';
   export const PREPARE_MSHARES = 'PREPARE_MSHARES';
+  export const UPDATE_HEALTH = 'UPDATE_HEALTH';
+  
 
   export const initHealthCheck = () => {
     return { type: INIT_HEALTH_CHECK };
