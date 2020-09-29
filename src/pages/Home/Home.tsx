@@ -240,7 +240,7 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  updateLastSeen: any
+  updateLastSeen: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -706,7 +706,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   scheduleNotification = async () => {
-    const channelId = new firebase.notifications.Android.Channel("Default", "Default", firebase.notifications.Android.Importance.High);
+    const channelId = new firebase.notifications.Android.Channel(
+      'Default',
+      'Default',
+      firebase.notifications.Android.Importance.High,
+    );
     firebase.notifications().android.createChannel(channelId);
     const notification = new firebase.notifications.Notification()
       .setTitle('We have not seen you in a while!')
@@ -817,12 +821,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.handleDeeplinkModal();
 
     setTimeout(() => {
-      this.setState({
-        isLoading: false,
-      }, () => this.props.updateLastSeen(new Date()));
+      this.setState(
+        {
+          isLoading: false,
+        },
+        () => this.props.updateLastSeen(new Date()),
+      );
     }, 2);
-
-
   };
 
   getNewTransactionNotifications = async () => {
@@ -1000,7 +1005,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           : '',
       });
     }
-
 
     if (prevState.isLoading && !this.state.isLoading) {
       if (this.transactionTabBarBottomSheetRef.current) {
@@ -1508,7 +1512,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       : [];
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
         dAccountType
@@ -1560,7 +1564,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       : [];
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
@@ -1956,16 +1960,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     contactName,
                     info,
                   };
-                  if (isGuardian) {
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                    );
-                  } else {
-                    approveTrustedContact(contactInfo, publicKey, true);
-                  }
+
+                  approveTrustedContact(
+                    contactInfo,
+                    publicKey,
+                    true,
+                    requester,
+                    isGuardian,
+                  );
                 },
                 isGuardian,
               });
@@ -2172,14 +2174,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (item.title == 'Funding Sources') {
       navigation.navigate('ExistingSavingMethods');
     } else if (item.title === 'Hexa Community (Telegram)') {
-      let url = 'https://t.me/HexaWallet'
+      let url = 'https://t.me/HexaWallet';
       Linking.openURL(url)
-        .then((data) => {
-        })
+        .then((data) => { })
         .catch((e) => {
           alert('Make sure Telegram installed on your device');
         });
-      return
+      return;
     }
   };
 
@@ -2285,9 +2286,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   setCurrencyToggleValue = (temp) => {
     this.props.setCurrencyToggleValue(temp);
   };
-
-
-
 
   render() {
     const {
@@ -2580,15 +2578,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </RNBottomSheet>
         )}
 
-        {
-          !isLoading && <BottomSheet
+        {!isLoading && (
+          <BottomSheet
             onCloseEnd={() => {
               if (tabBarIndex === 0 && !deepLinkModalOpen) {
                 this.setState({
                   tabBarIndex: 999,
                 });
               }
-            }
+            }}
+            onOpenEnd={() => {
+              if (tabBarIndex == 999) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+              this.setState({
+                deepLinkModalOpen: true,
+              });
+            }}
             enabledInnerScrolling={true}
             ref={this.custodianRequestBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
@@ -2644,7 +2652,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         }
                       }
                     }
-                  }
+                  }}
                   onPressRejectSecret={() => {
                     this.setState(
                       {
@@ -2733,7 +2741,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onPressHeader={() => {
                   this.setState(
                     {
-                      tabBarIndex: 0,
+                      tabBarIndex: 999,
+                      deepLinkModalOpen: false,
                     },
                     () => {
                       this.trustedContactRequestBottomSheetRef.current?.snapTo(
@@ -2743,71 +2752,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   );
                 }}
               />
-            );
-        }}
-        renderHeader={() => (
-          <TransparentHeaderModal
-            onPressheader={() => {
-              this.setState(
-                {
-                  tabBarIndex: 999,
-                  deepLinkModalOpen: false,
-                },
-                () =>
-                  (this.refs.custodianRequestBottomSheet as any).snapTo(0),
-              );
-            }}
+            )}
           />
         )}
-      />
-    }
-        {
-          !isLoading && <BottomSheet
-            onCloseEnd={() => {
-              if (tabBarIndex === 0) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-              this.setState({
-                isRequestModalOpened: false,
-              });
-            }}
-            onOpenEnd={() => {
-              if (tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-            }
-            enabledInnerScrolling={true}
-            ref={this.custodianRequestRejectedBottomSheetRef}
-            snapPoints={[-50, hp('60%')]}
-            renderContent={() => {
-              if (!custodyRequest) return null;
-              return (
-                <CustodianRequestRejectedModalContents
-                  onPressViewThrustedContacts={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => {
-                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
-                          0,
-                        );
-                      },
-                    );
-                  },
-              );
-            }}
-          />
-        )}
-      />
-    }
 
-        {
-          !isLoading && <BottomSheet
+        {!isLoading && (
+          <BottomSheet
             onCloseStart={() => {
               this.setState({
                 tabBarIndex: 999,
@@ -2819,7 +2769,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={'custodianRequestRejectedBottomSheet'}
+            ref={this.custodianRequestRejectedBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
@@ -2848,69 +2798,69 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {
                       tabBarIndex: 999,
                     },
-                    () =>
-                      (this.refs
-                        .custodianRequestRejectedBottomSheet as any).snapTo(0),
+                    () => {
+                      this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
+                        0,
+                      );
+                    },
                   );
                 }}
               />
             )}
           />
-        }
-        {
-          knowMoreBottomSheetsFlag ? (
-            <BottomSheet
-              onOpenEnd={() => {
-                if (!deepLinkModalOpen) {
-                  this.setState({
-                    tabBarIndex: 0,
-                  });
-                }
-              }}
-              onCloseEnd={() => {
-                if (!deepLinkModalOpen) {
-                  this.setState({
-                    tabBarIndex: 999,
-                  });
-                }
-              }}
-              enabledInnerScrolling={true}
-              ref={this.allAccountsBottomSheetRef}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('65%')
-                  : hp('64%'),
-              ]}
-              renderContent={() => (
-                <AllAccountsContents
-                  onPressBack={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                    );
-                  }}
-                />
-              )}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.white}
-                  backgroundColor={Colors.white}
-                  onPressHeader={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                    );
-                  }}
-                />
-              )}
-            />
-          ) : null
-        }
+        )}
+        {knowMoreBottomSheetsFlag ? (
+          <BottomSheet
+            onOpenEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+            }}
+            onCloseEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            enabledInnerScrolling={true}
+            ref={this.allAccountsBottomSheetRef}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <AllAccountsContents
+                onPressBack={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
+                  );
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
 
         {!isLoading && (
           <BottomSheet
@@ -2957,66 +2907,64 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         )}
 
-        {
-          knowMoreBottomSheetsFlag ? (
-            <BottomSheet
-              onOpenEnd={() => {
-                if (!deepLinkModalOpen) {
-                  this.setState({
-                    tabBarIndex: 0,
-                  });
+        {knowMoreBottomSheetsFlag ? (
+          <BottomSheet
+            onOpenEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 0,
+                });
+              }
+            }}
+            onCloseEnd={() => {
+              if (!deepLinkModalOpen) {
+                this.setState({
+                  tabBarIndex: 999,
+                });
+              }
+            }}
+            enabledInnerScrolling={true}
+            ref={this.settingsBottomSheetRef}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('64%'),
+            ]}
+            renderContent={() => (
+              <SettingsContents
+                currencyCode={CurrencyCode}
+                onPressManagePin={(type, currencycode) =>
+                  this.onPressSettingsElements(type, currencycode)
                 }
-              }}
-              onCloseEnd={() => {
-                if (!deepLinkModalOpen) {
-                  this.setState({
-                    tabBarIndex: 999,
-                  });
-                }
-              }}
-              enabledInnerScrolling={true}
-              ref={this.settingsBottomSheetRef}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('65%')
-                  : hp('64%'),
-              ]}
-              renderContent={() => (
-                <SettingsContents
-                  currencyCode={CurrencyCode}
-                  onPressManagePin={(type, currencycode) =>
-                    this.onPressSettingsElements(type, currencycode)
-                  }
-                  onPressBack={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => {
-                        this.settingsBottomSheetRef.current?.snapTo(0);
-                      },
-                    );
-                  }}
-                />
-              )}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.white}
-                  backgroundColor={Colors.white}
-                  onPressHeader={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => this.settingsBottomSheetRef.current?.snapTo(0),
-                    );
-                  }}
-                />
-              )}
-            />
-          ) : null
-        }
+                onPressBack={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => {
+                      this.settingsBottomSheetRef.current?.snapTo(0);
+                    },
+                  );
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  this.setState(
+                    {
+                      tabBarIndex: 999,
+                    },
+                    () => this.settingsBottomSheetRef.current?.snapTo(0),
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
 
         <BottomSheet
           onOpenEnd={() => {
@@ -3237,7 +3185,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )}
         />
-      </ImageBackground >
+      </ImageBackground>
     );
   }
 }
