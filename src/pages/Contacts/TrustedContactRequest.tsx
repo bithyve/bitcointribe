@@ -106,8 +106,10 @@ export default function TrustedContactRequest(props) {
             }}
             style={{ flex: 1, fontSize: RFValue(13) }}
             onFocus={() => {
-              setOnBlurFocus(true);
-              props.bottomSheetRef.snapTo(2);
+              if (Platform.OS === 'ios') {
+                setOnBlurFocus(true);
+                props.bottomSheetRef.snapTo(2);
+              }
             }}
             onBlur={() => {
               checkForValidation(EmailId);
@@ -154,8 +156,10 @@ export default function TrustedContactRequest(props) {
             }}
             style={{ flex: 1 }}
             onFocus={() => {
-              setOnBlurFocus(true);
-              props.bottomSheetRef.snapTo(2);
+              if (Platform.OS === 'ios') {
+                setOnBlurFocus(true);
+                props.bottomSheetRef.snapTo(2);
+              }
             }}
             onBlur={() => {
               checkForValidation(PhoneNumber);
@@ -214,47 +218,51 @@ export default function TrustedContactRequest(props) {
                   }
                 }}
                 onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace' && i == 0){
+                  if (e.nativeEvent.key === 'Backspace' && i == 0) {
                     this.textInput.focus();
                     onPressNumber('', 0);
                   }
-                  if (e.nativeEvent.key === 'Backspace' && i == 1){
+                  if (e.nativeEvent.key === 'Backspace' && i == 1) {
                     this.textInput.focus();
                     onPressNumber('', 1);
                   }
-                  if (e.nativeEvent.key === 'Backspace' && i == 2){
+                  if (e.nativeEvent.key === 'Backspace' && i == 2) {
                     this.textInput2.focus();
                     onPressNumber('', 2);
                   }
-                  if (e.nativeEvent.key === 'Backspace' && i == 3){
+                  if (e.nativeEvent.key === 'Backspace' && i == 3) {
                     this.textInput3.focus();
                     onPressNumber('', 3);
                   }
-                  if (e.nativeEvent.key === 'Backspace' && i == 4){
+                  if (e.nativeEvent.key === 'Backspace' && i == 4) {
                     this.textInput4.focus();
                     onPressNumber('', 4);
                   }
-                  if (e.nativeEvent.key === 'Backspace' && i == 5){
+                  if (e.nativeEvent.key === 'Backspace' && i == 5) {
                     this.textInput5.focus();
                     onPressNumber('', 5);
                   }
                 }}
                 onFocus={() => {
-                  if (passcodeArray.length == 0 && i == 0) {
-                    props.bottomSheetRef.snapTo(2);
-                  } else {
-                    props.bottomSheetRef.snapTo(2);
+                  if (Platform.OS == 'ios') {
+                    if (passcodeArray.length == 0 && i == 0) {
+                      props.bottomSheetRef.snapTo(2);
+                    } else {
+                      props.bottomSheetRef.snapTo(2);
+                    }
                   }
                 }}
                 onBlur={() => {
-                  if (
-                    (passcodeArray.length == 0 || passcodeArray.length == 6) &&
-                    i == 5
-                  ) {
-                    props.bottomSheetRef.snapTo(1);
+                  if (Platform.OS == 'ios') {
+                    if (
+                      (passcodeArray.length == 0 || passcodeArray.length == 6) &&
+                      i == 5
+                    ) {
+                      props.bottomSheetRef.snapTo(1);
+                    }
                   }
                 }}
-                //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
+              //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
               />
             );
           })}
@@ -293,8 +301,8 @@ export default function TrustedContactRequest(props) {
       } else if (
         text.length >= 3 &&
         text.charAt(0) +
-          text.replace('.com', '').slice(text.replace('.com', '').length - 2) !=
-          props.hint
+        text.replace('.com', '').slice(text.replace('.com', '').length - 2) !=
+        props.hint
       ) {
         setWrongInputError('Incorrect Email, try again');
         setIsDisabled(true);
@@ -311,7 +319,7 @@ export default function TrustedContactRequest(props) {
         height: '100%',
         backgroundColor: Colors.white,
       }}
-      behavior={Platform.OS == 'ios' ? 'padding' : ''}
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       enabled
     >
       <ScrollView
@@ -330,8 +338,8 @@ export default function TrustedContactRequest(props) {
                     : 'Friends and Family Request'}
                 </Text>
               ) : (
-                <Text style={styles.modalTitleText}>Recovery Key Request</Text>
-              )}
+                  <Text style={styles.modalTitleText}>Recovery Key Request</Text>
+                )}
               <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
                 {props.inputType
                   ? 'Accept the request to add your contact to Friends and Family'
@@ -380,8 +388,8 @@ export default function TrustedContactRequest(props) {
               {props.inputType === 'phone'
                 ? 'Confirm your mobile number'
                 : props.inputType === 'email'
-                ? 'Confirm your email address'
-                : null}
+                  ? 'Confirm your email address'
+                  : null}
             </Text>
           ) : null}
           {!props.isQR ? (
@@ -405,8 +413,8 @@ export default function TrustedContactRequest(props) {
                 {props.inputType === 'phone'
                   ? 'mobile number, '
                   : props.inputType === 'email'
-                  ? 'email address, '
-                  : 'otp, '}
+                    ? 'email address, '
+                    : 'otp, '}
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   to accept the request
                 </Text>
@@ -446,8 +454,8 @@ export default function TrustedContactRequest(props) {
                   props.inputType === 'phone'
                     ? PhoneNumber
                     : props.inputType === 'email'
-                    ? EmailId
-                    : passcode.toUpperCase();
+                      ? EmailId
+                      : passcode.toUpperCase();
                 setTimeout(() => {
                   setPhoneNumber('');
                 }, 2);
@@ -461,8 +469,8 @@ export default function TrustedContactRequest(props) {
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.proceedButtonText}>Accept Request</Text>
-              )}
+                  <Text style={styles.proceedButtonText}>Accept Request</Text>
+                )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -470,8 +478,8 @@ export default function TrustedContactRequest(props) {
                   props.inputType === 'phone'
                     ? PhoneNumber
                     : props.inputType === 'email'
-                    ? EmailId
-                    : null;
+                      ? EmailId
+                      : null;
                 props.onPressReject(key);
               }}
               style={{

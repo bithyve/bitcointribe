@@ -101,8 +101,7 @@ PODS:
   - nanopb/decode (1.30905.0)
   - nanopb/encode (1.30905.0)
   - PDFGenerator (3.1.0)
-  - PromisesObjC (1.2.10)
-  - Protobuf (3.12.0)
+  - Protobuf (3.13.0)
   - QRCoder (1.1.0)
   - RCTRequired (0.63.2)
   - RCTTypeSafety (0.63.2):
@@ -378,7 +377,9 @@ PODS:
     - Fabric
     - Firebase/Core
     - React
-  - RNGestureHandler (1.8.0):
+  - RNFS (2.16.6):
+    - React
+  - RNGestureHandler (1.3.0):
     - React
   - RNLocalize (1.4.1):
     - React
@@ -448,8 +449,9 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - RNFirebase (from `../node_modules/react-native-firebase/ios`)
-  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNFirebase (from `../node_modules/react-native-firebase/ios/RNFirebase.podspec`)
+  - RNFS (from `../node_modules/react-native-fs`)
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
   - RNLocalize (from `../node_modules/react-native-localize`)
   - RNOS (from `../node_modules/react-native-os`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -564,7 +566,9 @@ EXTERNAL SOURCES:
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFirebase:
-    :path: "../node_modules/react-native-firebase/ios"
+    :path: "../node_modules/react-native-firebase/ios/RNFirebase.podspec"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNLocalize:
@@ -610,8 +614,7 @@ SPEC CHECKSUMS:
   jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
-  Protobuf: 2793fcd0622a00b546c60e7cbbcc493e043e9bb9
+  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
@@ -647,19 +650,19 @@ SPEC CHECKSUMS:
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
   RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
-  RNFirebase: 37daa9a346d070f9f6ee1f3b4aaf4c8e3b1d5d1c
-  RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
+  RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
+  RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
+  RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
-  RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
-  RNSecureStorage: 8b2b07278d80c48b3a881c56e604ab147372f243
-  RNShare: ea0393515826ea8d27a0e17cd3d6f3cc210630d9
-  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
-  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
+  RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
+  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
+  RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
   TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
 
-PODFILE CHECKSUM: 3d0ed1ca2bad17b5e1548a9566c818ccbe698557
+PODFILE CHECKSUM: f0bbb553ff1ab8d8aec9f7f1b27f494d65a52d93
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3

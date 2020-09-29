@@ -74,7 +74,11 @@ const getImageIcon = (item) => {
         </View>
       );
     } else {
-      if (item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== "") {
+      if (
+        item.firstName === 'F&F request' &&
+        item.contactsWalletName !== undefined &&
+        item.contactsWalletName !== ''
+      ) {
         return (
           <View style={styles.headerImageView}>
             <View style={styles.headerImageInitials}>
@@ -93,14 +97,14 @@ const getImageIcon = (item) => {
               <Text style={styles.headerImageInitialsText}>
                 {item
                   ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
+                      item.firstName && item.lastName
+                        ? item.firstName + ' ' + item.lastName
+                        : item.firstName && !item.lastName
                         ? item.firstName
                         : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                  )
+                        ? item.lastName
+                        : '',
+                    )
                   : ''}
               </Text>
             </View>
@@ -149,7 +153,7 @@ interface ContactDetailsStateTypes {
 class ContactDetailsNew extends PureComponent<
   ContactDetailsPropTypes,
   ContactDetailsStateTypes
-  > {
+> {
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
@@ -276,7 +280,7 @@ class ContactDetailsNew extends PureComponent<
     if (this.Contact.firstName && SHARES_TRANSFER_DETAILS[this.index]) {
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -373,7 +377,9 @@ class ContactDetailsNew extends PureComponent<
 
   onPressResendRequest = () => {
     if (this.index < 3) {
-      (this.ReshareBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        (this.ReshareBottomSheet as any).current.snapTo(1);
+      }, 2);
     } else {
       this.props.navigation.navigate('AddContactSendRequest', {
         SelectedContact: [this.Contact],
@@ -502,7 +508,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -524,7 +530,7 @@ class ContactDetailsNew extends PureComponent<
       UNDER_CUSTODY[requester] &&
       UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
       Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
-      config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
     ) {
       const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
@@ -554,7 +560,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -588,7 +594,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -645,7 +651,7 @@ class ContactDetailsNew extends PureComponent<
 
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
       let data: EphemeralDataElements = {
@@ -657,7 +663,7 @@ class ContactDetailsNew extends PureComponent<
       if (
         !SHARES_TRANSFER_DETAILS[this.index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[this.index].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -670,7 +676,7 @@ class ContactDetailsNew extends PureComponent<
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -682,10 +688,11 @@ class ContactDetailsNew extends PureComponent<
         );
       }
     } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a entity',
-      );
+      // case: OTP
+      // Alert.alert(
+      //   'Invalid Contact',
+      //   'Cannot add a contact without phone-num/email as a entity',
+      // );
     }
   };
 
@@ -726,7 +733,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -1019,51 +1026,61 @@ class ContactDetailsNew extends PureComponent<
                   ellipsizeMode="clip"
                   numberOfLines={1}
                 >
-                  {this.Contact.firstName === 'F&F request' && this.Contact.contactsWalletName !== undefined && this.Contact.contactsWalletName !== ""
-                    ? `${this.Contact.contactsWalletName}'s Wallet` : this.Contact.contactName == 'Secondary Device'
-                      ? 'Keeper Device'
-                      : contact.contactName}
+                  {this.Contact.firstName === 'F&F request' &&
+                  this.Contact.contactsWalletName !== undefined &&
+                  this.Contact.contactsWalletName !== ''
+                    ? `${this.Contact.contactsWalletName}'s Wallet`
+                    : this.Contact.contactName == 'Secondary Device'
+                    ? 'Keeper Device'
+                    : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
-                  <Text style={styles.phoneText}>{contact.connectedVia}</Text>
+                  <Text style={styles.phoneText}>
+                    {contact.usesOTP
+                      ? !contact.hasTrustedChannel
+                        ? 'OTP: ' + contact.connectedVia
+                        : ''
+                      : contact.connectedVia}
+                  </Text>
                 ) : null}
               </View>
               {this.Contact.hasTrustedChannel &&
+              !(
+                this.Contact.hasXpub || this.Contact.hasTrustedAddress
+              ) ? null : this.Contact.contactName === 'Secondary Device' &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                ) ? null : this.Contact.contactName === 'Secondary Device' &&
-                  !(
+                ) ? null : (
+                <TouchableOpacity
+                  disabled={isSendDisabled}
+                  onPress={() => {
+                    this.setState({
+                      isSendDisabled: true,
+                    });
+
                     this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                  ) ? null : (
-                    <TouchableOpacity
-                      disabled={isSendDisabled}
-                      onPress={() => {
-                        this.setState({
-                          isSendDisabled: true,
-                        });
-                        this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                          ? this.onPressSend()
-                          : this.Contact.contactName != 'Secondary Device'
-                            ? this.onPressResendRequest()
-                            : null;
-                      }}
-                      style={styles.resendContainer}
-                    >
-                      {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
-                        <Image
-                          source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                          style={styles.bitcoinIconStyle}
-                        />
-                      ) : null}
-                      <Text style={styles.sendTextStyle}>
-                        {this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                          ? 'Send'
-                          : this.index < 3
-                            ? 'Reshare'
-                            : 'Resend Request'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                      ? this.onPressSend()
+                      : this.Contact.contactName != 'Secondary Device'
+                      ? this.onPressResendRequest()
+                      : null;
+                  }}
+                  style={styles.resendContainer}
+                >
+                  {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
+                    <Image
+                      source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                      style={styles.bitcoinIconStyle}
+                    />
+                  ) : null}
+                  <Text style={styles.sendTextStyle}>
+                    {this.Contact.hasXpub || this.Contact.hasTrustedAddress
+                      ? 'Send'
+                      : this.index < 3
+                      ? 'Reshare'
+                      : 'Resend Request'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           {Loading ? (
@@ -1102,26 +1119,26 @@ class ContactDetailsNew extends PureComponent<
               />
             </View>
           ) : (
-              <View style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1 }}>
-                  {this.sortedHistory(trustedContactHistory).map((value) => {
-                    if (SelectedOption == value.id) {
-                      return (
-                        <TouchableOpacity
-                          key={value.id}
-                          onPress={() => this.SelectOption(value.id)}
-                          style={styles.selectOptionContainer}
+            <View style={{ flex: 1 }}>
+              <ScrollView style={{ flex: 1 }}>
+                {this.sortedHistory(trustedContactHistory).map((value) => {
+                  if (SelectedOption == value.id) {
+                    return (
+                      <TouchableOpacity
+                        key={value.id}
+                        onPress={() => this.SelectOption(value.id)}
+                        style={styles.selectOptionContainer}
+                      >
+                        <Text
+                          style={{
+                            color: Colors.blue,
+                            fontSize: RFValue(13),
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}
                         >
-                          <Text
-                            style={{
-                              color: Colors.blue,
-                              fontSize: RFValue(13),
-                              fontFamily: Fonts.FiraSansRegular,
-                            }}
-                          >
-                            {value.title}
-                          </Text>
-                          {/* <Text
+                          {value.title}
+                        </Text>
+                        {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(10),
@@ -1131,33 +1148,33 @@ class ContactDetailsNew extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                          <Text style={styles.dateTextStyle}>{value.date}</Text>
-                        </TouchableOpacity>
-                      );
-                    } else {
-                      return (
-                        <TouchableOpacity
-                          key={value.id}
-                          onPress={() => this.SelectOption(value.id)}
-                          style={styles.selectOptionSecond}
+                        <Text style={styles.dateTextStyle}>{value.date}</Text>
+                      </TouchableOpacity>
+                    );
+                  } else {
+                    return (
+                      <TouchableOpacity
+                        key={value.id}
+                        onPress={() => this.SelectOption(value.id)}
+                        style={styles.selectOptionSecond}
+                      >
+                        <View
+                          style={{ flexDirection: 'row', alignItems: 'center' }}
                         >
-                          <View
-                            style={{ flexDirection: 'row', alignItems: 'center' }}
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontSize: RFValue(10),
+                              fontFamily: Fonts.FiraSansRegular,
+                            }}
                           >
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontSize: RFValue(10),
-                                fontFamily: Fonts.FiraSansRegular,
-                              }}
-                            >
-                              {value.title}
-                            </Text>
-                            <Text style={styles.dateTextSecondStyle}>
-                              {value.date}
-                            </Text>
-                          </View>
-                          {/* <Text
+                            {value.title}
+                          </Text>
+                          <Text style={styles.dateTextSecondStyle}>
+                            {value.date}
+                          </Text>
+                        </View>
+                        {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(8),
@@ -1167,20 +1184,20 @@ class ContactDetailsNew extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                        </TouchableOpacity>
-                      );
-                    }
-                  })}
-                </ScrollView>
-                {this.sortedHistory(trustedContactHistory).length <= 1 && (
-                  <BottomInfoBox
-                    backgroundColor={Colors.white}
-                    title={'Note'}
-                    infoText={'The details of your contact will appear here.'}
-                  />
-                )}
-              </View>
-            )}
+                      </TouchableOpacity>
+                    );
+                  }
+                })}
+              </ScrollView>
+              {this.sortedHistory(trustedContactHistory).length <= 1 && (
+                <BottomInfoBox
+                  backgroundColor={Colors.white}
+                  title={'Note'}
+                  infoText={'The details of your contact will appear here.'}
+                />
+              )}
+            </View>
+          )}
           {this.contactsType == "I'm Keeper of" && (
             <View style={styles.keeperViewStyle}>
               <TouchableOpacity
@@ -1199,8 +1216,8 @@ class ContactDetailsNew extends PureComponent<
                   {uploading ? (
                     <ActivityIndicator size="small" />
                   ) : (
-                      <Text style={styles.buttonText}>Help Restore</Text>
-                    )}
+                    <Text style={styles.buttonText}>Help Restore</Text>
+                  )}
                   {/* <Text numberOfLines={1} style={styles.buttonInfo}>
                     Lorem ipsum dolor
                   </Text> */}
@@ -1238,22 +1255,22 @@ class ContactDetailsNew extends PureComponent<
             </View>
           )}
           {this.Contact.isRemovable &&
-            (Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY ||
-              this.Contact.hasTrustedChannel) ? (
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomButton,
-                }}
-                onPress={() => {
-                  this.props.removeTrustedContact(contact.contactName);
-                  this.props.navigation.goBack();
-                }}
-              >
-                <View>
-                  <Text style={styles.buttonText}>Remove</Text>
-                </View>
-              </TouchableOpacity>
-            ) : null}
+          (Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY ||
+            this.Contact.hasTrustedChannel) ? (
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+                this.props.removeTrustedContact(contact.contactName);
+                this.props.navigation.goBack();
+              }}
+            >
+              <View>
+                <Text style={styles.buttonText}>Remove</Text>
+              </View>
+            </TouchableOpacity>
+          ) : null}
         </View>
         <BottomSheet
           enabledInnerScrolling={true}

@@ -16,15 +16,17 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 const ContactsListForAssociateContact = (props) => {
-  const data = {
-    firstName: 'F&F request',
-    lastName: 'awaiting',
-    name: 'F&F request awaiting'
-  };
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');
+
   const isGuardian = props.navigation.getParam('isGuardian');
   const dispatch = useDispatch();
 
@@ -35,8 +37,12 @@ const ContactsListForAssociateContact = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
 
-  const updateTrustedContactsInfo = async () => {
+  const updateTrustedContactsInfo = async (contact?) => {
+    const associatedContact = contact ? contact : contacts[0];
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -48,8 +54,8 @@ const ContactsListForAssociateContact = (props) => {
             .toLowerCase()
             .trim();
 
-          const selectedContactName = `${contacts[0].firstName} ${
-            contacts[0].lastName ? contacts[0].lastName : ''
+          const selectedContactName = `${associatedContact.firstName} ${
+            associatedContact.lastName ? associatedContact.lastName : ''
           }`
             .toLowerCase()
             .trim();
@@ -57,7 +63,7 @@ const ContactsListForAssociateContact = (props) => {
           return presentContactName == selectedContactName;
         }) == -1
       ) {
-        trustedContactsInfo.push(contacts[0]);
+        trustedContactsInfo.push(associatedContact);
         Toast(
           // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
           `${
@@ -66,7 +72,8 @@ const ContactsListForAssociateContact = (props) => {
               : 'Contact successfully added to Friends and Family'
           }`,
         );
-        postAssociation(contacts[0]);
+        console.log({ con: associatedContact });
+        postAssociation(associatedContact);
         props.navigation.navigate('Home');
       } else {
         Toast('Contact already exists');
@@ -74,7 +81,7 @@ const ContactsListForAssociateContact = (props) => {
       }
     } else {
       trustedContactsInfo = [];
-      trustedContactsInfo[3] = contacts[0];
+      trustedContactsInfo[3] = associatedContact;
       // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
       Toast(
         `${
@@ -83,7 +90,8 @@ const ContactsListForAssociateContact = (props) => {
             : 'Contact successfully added to Friends and Family'
         }`,
       );
-      postAssociation(contacts[0]);
+
+      postAssociation(associatedContact);
       props.navigation.navigate('Home');
     }
     await AsyncStorage.setItem(
@@ -128,11 +136,54 @@ const ContactsListForAssociateContact = (props) => {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>
               {'Associate a contact'}
             </Text>
           </View>
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => {
+              let { skippedContactsCount } = trustedContacts.tc;
+              let data;
+              if (!skippedContactsCount) {
+                skippedContactsCount = 1;
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                };
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                };
+              }
+
+              updateTrustedContactsInfo(data);
+            }}
+            style={{
+              height: wp('8%'),
+              width: wp('22%'),
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: Colors.blue,
+              justifyContent: 'center',
+              borderRadius: 8,
+              alignSelf: 'center',
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Skip
+            </Text>
+          </AppBottomSheetTouchableWrapper>
         </View>
       </View>
       <Text style={styles.modalSubheaderText}>
@@ -146,8 +197,8 @@ const ContactsListForAssociateContact = (props) => {
         onPressContinue={updateTrustedContactsInfo}
         onSelectContact={selectedContactsList}
         onPressSkip={() => {
-          selectedContactsList([data]);
-          updateTrustedContactsInfo();
+          // selectedContactsList([data]);
+          // updateTrustedContactsInfo();
         }}
       />
     </View>

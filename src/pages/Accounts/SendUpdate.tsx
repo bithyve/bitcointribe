@@ -323,8 +323,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       ) {
         const donAcc: DonationDerivativeAccountElements =
           derivativeAccounts[DONATION_ACCOUNT][index];
-        donationsBalance[serviceType + index] =
-          donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
+        donationsBalance[serviceType + index] = donAcc.balances
+          ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
+          : 0;
       }
     }
 
@@ -440,13 +441,24 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             break;
 
           case 'paymentURI':
-            let address, options;
+            let address, options, donationId;
             try {
               const res = service[serviceType].service.decodePaymentURI(
                 barcodes.data,
               );
               address = res.address;
               options = res.options;
+
+              // checking for donationId to send note
+              if (options && options.message) {
+                try {
+                  // encoded message
+                  const rawMessage = JSON.parse(options.message);
+                  donationId = rawMessage.donationId;
+                } catch (err) {
+                  // normal message
+                }
+              }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
               return;
@@ -467,6 +479,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               bitcoinAmount: options.amount
                 ? `${Math.round(options.amount * 1e8)}`
                 : '',
+              donationId,
             });
             break;
 
@@ -640,6 +653,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             isWard,
             trustedAddress,
             trustedTestAddress,
+            contactsWalletName,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
             ];
@@ -659,6 +673,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               hasTrustedAddress,
               isGuardian,
               isWard,
+              contactsWalletName,
               ...contactInfo,
             });
           }

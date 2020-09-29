@@ -205,8 +205,7 @@ export default function AddContactAddressBook(props) {
 
   const isTrustedContact = useCallback(
     (selectedContact) => {
-      const contactName = `${selectedContact.firstName} ${
-        selectedContact.lastName ? selectedContact.lastName : ''
+      const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
         }`
         .toLowerCase()
         .trim();
@@ -316,7 +315,6 @@ export default function AddContactAddressBook(props) {
   const renderContactListErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
-        modalRef={contactListErrorBottomSheet}
         title={'Error while accessing your contacts '}
         info={errorMessage}
         proceedButtonText={'Open Setting'}
@@ -356,14 +354,17 @@ export default function AddContactAddressBook(props) {
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>
-              {props.modalTitle ? props.modalTitle : 'Add Contact'}
+              {props.modalTitle ? props.modalTitle : 'Associate a contact'}
             </Text>
             <Text style={styles.modalHeaderInfoText}>
               {'Select a contact from your phones address book'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
-            onPress={() => addContact()}
+            onPress={() => {
+              //addContact()
+              props.onSkipContinue();
+            }}
             style={{
               height: wp('8%'),
               width: wp('22%'),
@@ -382,14 +383,14 @@ export default function AddContactAddressBook(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Add New
+              Skip
             </Text>
-            <FontAwesome
+            {/* <FontAwesome
               name="plus"
               color={Colors.white}
               size={10}
               style={{ marginLeft: 5 }}
-            />
+            /> */}
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
@@ -431,6 +432,22 @@ export default function AddContactAddressBook(props) {
               })
               : null}
           </View>
+          {/* <View style={{ alignItems: 'flex-end' }}>
+            <AppBottomSheetTouchableWrapper
+              style={{ marginRight: 10, padding: 10 }}
+              onPress={() => props.onSkipContinue()}
+            >
+              <Text
+                style={{
+                  fontSize: RFValue(13, 812),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                onPress={() => props.onSkipContinue()}
+              >
+                Skip Contact
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View> */}
           <View style={[styles.searchBoxContainer]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -466,31 +483,31 @@ export default function AddContactAddressBook(props) {
                     selected = true;
                   }
                   // if (item.phoneNumbers || item.emails) {
-                    return (
-                      <AppBottomSheetTouchableWrapper
-                        onPress={() => onContactSelect(index)}
-                        style={styles.contactView}
-                        key={index}
-                      >
-                        <RadioButton
-                          size={15}
-                          color={Colors.lightBlue}
-                          borderColor={Colors.borderColor}
-                          isChecked={item.checked}
-                          onpress={() => onContactSelect(index)}
-                        />
-                        <Text style={styles.contactText}>
-                          {item.name && item.name.split(' ')[0]
-                            ? item.name.split(' ')[0]
-                            : ''}{' '}
-                          <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                            {item.name && item.name.split(' ')[1]
-                              ? item.name.split(' ')[1]
-                              : ''}
-                          </Text>
+                  return (
+                    <AppBottomSheetTouchableWrapper
+                      onPress={() => onContactSelect(index)}
+                      style={styles.contactView}
+                      key={index}
+                    >
+                      <RadioButton
+                        size={15}
+                        color={Colors.lightBlue}
+                        borderColor={Colors.borderColor}
+                        isChecked={item.checked}
+                        onpress={() => onContactSelect(index)}
+                      />
+                      <Text style={styles.contactText}>
+                        {item.name && item.name.split(' ')[0]
+                          ? item.name.split(' ')[0]
+                          : ''}{' '}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {item.name && item.name.split(' ')[1]
+                            ? item.name.split(' ')[1]
+                            : ''}
                         </Text>
-                      </AppBottomSheetTouchableWrapper>
-                    );
+                      </Text>
+                    </AppBottomSheetTouchableWrapper>
+                  );
                   // } else {
                   //   return null;
                   // }

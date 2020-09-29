@@ -14,10 +14,9 @@ import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
-// import Home from '../pages/Home';
-import Home from '../pages/HomeUpdated';
+import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/Index_New';
+import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
@@ -74,11 +73,11 @@ import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContactUpdate';
-import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
+import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
-import Receive from '../pages/Accounts/Receive_updated';
+import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
@@ -131,7 +130,7 @@ const MODAL_ROUTES = [
   'RecoveryRequestOTP',
   'Confirmation',
   'TransactionDetails',
-  'Intermediate'
+  'Intermediate',
 ];
 
 const HomeNavigator = createStackNavigator(

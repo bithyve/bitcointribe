@@ -19,6 +19,8 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
+// import { timer } from '../../utils'
+
 
 function* initDBWorker() {
   try {
@@ -34,10 +36,12 @@ export const initDBWatcher = createWatcher(initDBWorker, INIT_DB);
 
 function* fetchDBWorker() {
   try {
+    // let t = timer('fetchDBWorker')
     const key = yield select((state) => state.storage.key);
     const database = yield call(dataManager.fetch, key);
     if (key && database) {
       yield put(dbFetched(database));
+      // t.stop()
       yield call(servicesEnricherWorker, { payload: { database } });
     } else {
       console.log(

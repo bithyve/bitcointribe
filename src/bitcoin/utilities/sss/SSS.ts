@@ -411,7 +411,7 @@ export default class SSS {
       .pbkdf2Sync(
         password,
         config.HEXA_ID,
-        config.KEY_STRECH_ITERATIONS,
+        config.KEY_STRETCH_ITERATIONS,
         SSS.cipherSpec.keyLength / 2,
         'sha256',
       )
@@ -640,10 +640,11 @@ export default class SSS {
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
 
-      for (let index = 0; index <= shareIDs.length; index++) {
+      for (let index = 0; index < shareIDs.length; index++) {
         this.healthCheckStatus[index] = {
           shareId: shareIDs[index],
           updatedAt: 0,
+          reshareVersion: 0,
         };
       }
     }
@@ -675,14 +676,28 @@ export default class SSS {
       if (err.code) throw new Error(err.code);
     }
 
-    const updates: Array<{ shareId: string; updatedAt: number }> =
-      res.data.lastUpdateds;
+    const updates: Array<{
+      shareId: string;
+      updatedAt: number;
+      reshareVersion: number;
+    }> = res.data.lastUpdateds;
 
     const shareGuardianMapping = {};
-    for (const { shareId, updatedAt } of updates) {
+    for (const { shareId, updatedAt, reshareVersion } of updates) {
       for (let index = 0; index < metaShares.length; index++) {
         if (metaShares[index] && metaShares[index].shareId === shareId) {
-          this.healthCheckStatus[index] = { shareId, updatedAt };
+          const currentReshareVersion =
+            this.healthCheckStatus[index].reshareVersion !== undefined
+              ? this.healthCheckStatus[index].reshareVersion
+              : 0;
+
+          if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+
+          this.healthCheckStatus[index] = {
+            shareId,
+            updatedAt,
+            reshareVersion,
+          };
           shareGuardianMapping[index] = {
             shareId,
             updatedAt,
@@ -975,9 +990,15 @@ export default class SSS {
   };
 
   public reshareMetaShare = (index: number) => {
-    this.metaShares[index].meta.reshareVersion =
-      this.metaShares[index].meta.reshareVersion + 1;
-    console.log({ resharing: this.metaShares[index] });
+    const reshareVersion = this.metaShares[index].meta.reshareVersion + 1;
+    this.metaShares[index].meta.reshareVersion = reshareVersion;
+    this.healthCheckStatus[index] = {
+      // resetting health of the meta-share on resharing
+      ...this.healthCheckStatus[index],
+      updatedAt: 0,
+      reshareVersion,
+    };
+
     return this.metaShares[index];
   };
 

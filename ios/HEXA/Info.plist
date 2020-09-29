@@ -56,44 +56,54 @@
 			<string>whatsapp</string>
 			<string>mailto</string>
 		</array>
-		<key>LSRequiresIPhoneOS</key>
-		<true />
-		<key>NSAppTransportSecurity</key>
-		<dict>
-			<key>NSAllowsArbitraryLoads</key>
-			<true />
-			<key>NSExceptionDomains</key>
-			<dict />
-		</dict>
-		<key>NSAppleMusicUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSBluetoothPeripheralUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSCalendarsUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSCameraUsageDescription</key>
-		<string>$(PRODUCT_NAME) would like to use your camera for scanning QR codes.</string>
-		<key>NSContactsUsageDescription</key>
-		<string>$(PRODUCT_NAME) would like to use your address book to show you a list of your contacts to select from.</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Allow HEXA to use your location</string>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSMicrophoneUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSMotionUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSPhotoLibraryAddUsageDescription</key>
-		<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
-		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSRemindersUsageDescription</key>
-		<string>Allow HEXA to access your reminders</string>
-		<key>NSSpeechRecognitionUsageDescription</key>
-		<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-		<key>NSUbiquitousContainers</key>
+	</dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>mailto</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to use your camera for scanning QR codes.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Address book details like name and image are used for you to better recognize your Hexa Friends and Family contacts. Don’t worry, they don’t get stored anywhere else and are for your eyes only.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Allow HEXA to use your location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Allow HEXA to access your reminders</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.io.hexawallet.hexa</key>
 		<dict>
 			<key>iCloud.io.hexawallet.hexa</key>
 			<dict>

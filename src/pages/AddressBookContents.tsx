@@ -85,20 +85,27 @@ const makeFullName = (item) => {
         : !item.firstName && item.lastName
           ? item.lastName
           : '';
-}
+};
 
 const getImageIcon = (item) => {
   if (item) {
     if (item.image && item.image.uri) {
       return <Image source={item.image} style={styles.imageIconStyle} />;
     } else {
-      if (item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== "") {
+      if (
+        item.firstName === 'F&F request' &&
+        item.contactsWalletName !== undefined &&
+        item.contactsWalletName !== ''
+      ) {
         return (
           <View style={styles.imageIconViewStyle}>
             <Text style={styles.imageIconText}>
               {item
-                ? nameToInitials(item.contactsWalletName && item.contactsWalletName !== ""
-                  ? `${item.contactsWalletName}'s Wallet` : makeFullName(item))
+                ? nameToInitials(
+                  item.contactsWalletName && item.contactsWalletName !== ''
+                    ? `${item.contactsWalletName}'s Wallet`
+                    : makeFullName(item),
+                )
                 : ''}
             </Text>
           </View>
@@ -207,8 +214,7 @@ class AddressBookContents extends PureComponent<
         for (let index = 0; index < trustedContactsInfo.length; index++) {
           const contactInfo = trustedContactsInfo[index];
           if (!contactInfo) continue;
-          const contactName = `${contactInfo.firstName} ${
-            contactInfo.lastName ? contactInfo.lastName : ''
+          const contactName = `${contactInfo.firstName} ${contactInfo.lastName ? contactInfo.lastName : ''
             }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
@@ -239,9 +245,16 @@ class AddressBookContents extends PureComponent<
             isWard,
             trustedAddress,
             contactsWalletName,
+            otp,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
             ];
+
+          let usesOTP = false;
+          if (!connectedVia && otp) {
+            usesOTP = true;
+            connectedVia = otp;
+          }
 
           const hasTrustedAddress = !!trustedAddress;
 
@@ -265,6 +278,7 @@ class AddressBookContents extends PureComponent<
           const element = {
             contactName,
             connectedVia,
+            usesOTP,
             hasXpub,
             hasTrustedAddress,
             isGuardian,
@@ -344,13 +358,20 @@ class AddressBookContents extends PureComponent<
           />
         );
       } else {
-        if (item.firstName === 'F&F request' && item.contactsWalletName !== undefined && item.contactsWalletName !== "") {
+        if (
+          item.firstName === 'F&F request' &&
+          item.contactsWalletName !== undefined &&
+          item.contactsWalletName !== ''
+        ) {
           return (
             <View style={styles.imageIconViewStyle}>
               <Text style={styles.imageIconText}>
                 {item
-                  ? nameToInitials(item.contactsWalletName && item.contactsWalletName !== ""
-                    ? `${item.contactsWalletName}'s Wallet` : makeFullName(item))
+                  ? nameToInitials(
+                    item.contactsWalletName && item.contactsWalletName !== ''
+                      ? `${item.contactsWalletName}'s Wallet`
+                      : makeFullName(item),
+                  )
                   : ''}
               </Text>
             </View>
@@ -425,18 +446,21 @@ class AddressBookContents extends PureComponent<
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.firstName === 'F&F request' && contact.contactsWalletName !== undefined && contact.contactsWalletName !== ""
-              ? `${contact.contactsWalletName}'s ` :
-              contact.firstName && contact.firstName != 'Secondary'
+            {contact.firstName === 'F&F request' &&
+              contact.contactsWalletName !== undefined &&
+              contact.contactsWalletName !== ''
+              ? `${contact.contactsWalletName}'s `
+              : contact.firstName && contact.firstName != 'Secondary'
                 ? contact.firstName + ' '
                 : contact.firstName && contact.firstName == 'Secondary'
                   ? 'Keeper '
-                  : ''
-            }
+                  : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.firstName === 'F&F request' && contact.contactsWalletName !== undefined && contact.contactsWalletName !== ""
-                ? 'Wallet' :
-                contact.lastName && contact.lastName != 'Device'
+              {contact.firstName === 'F&F request' &&
+                contact.contactsWalletName !== undefined &&
+                contact.contactsWalletName !== ''
+                ? 'Wallet'
+                : contact.lastName && contact.lastName != 'Device'
                   ? contact.lastName + ' '
                   : contact.lastName && contact.lastName == 'Device'
                     ? 'Device '
@@ -444,7 +468,13 @@ class AddressBookContents extends PureComponent<
             </Text>
           </Text>
           {contact.connectedVia ? (
-            <Text style={styles.phoneText}>{contact.connectedVia}</Text>
+            <Text style={styles.phoneText}>
+              {contact.usesOTP
+                ? !contact.hasTrustedChannel
+                  ? 'OTP: ' + contact.connectedVia
+                  : ''
+                : contact.connectedVia}
+            </Text>
           ) : null}
         </View>
         <View style={styles.getImageView}>
@@ -539,6 +569,29 @@ class AddressBookContents extends PureComponent<
         onPressBack={() => {
           (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
+        onSkipContinue={() => {
+          let { skippedContactsCount } = this.props.trustedContactsService.tc;
+          let data;
+          if (!skippedContactsCount) {
+            skippedContactsCount = 1;
+            data = {
+              firstName: 'F&F request',
+              lastName: `awaiting ${skippedContactsCount}`,
+              name: `F&F request awaiting ${skippedContactsCount}`,
+            };
+          } else {
+            data = {
+              firstName: 'F&F request',
+              lastName: `awaiting ${skippedContactsCount + 1}`,
+              name: `F&F request awaiting ${skippedContactsCount + 1}`,
+            };
+          }
+
+          navigation.navigate('AddContactSendRequest', {
+            SelectedContact: [data],
+          });
+          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   };
@@ -620,7 +673,7 @@ class AddressBookContents extends PureComponent<
             <View style={{ marginTop: wp('5%') }}>
               <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
-                Contacts whose wallets I can help restore.
+                Contacts whose wallets I can help restore
               </Text>
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
@@ -670,7 +723,7 @@ class AddressBookContents extends PureComponent<
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>Add Contact</Text>
+                      <Text style={styles.contactText}>Add a Contact</Text>
                     </View>
                   </TouchableOpacity>
                 </View>

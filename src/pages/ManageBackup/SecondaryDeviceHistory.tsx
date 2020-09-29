@@ -98,6 +98,11 @@ const SecondaryDeviceHistory = (props) => {
   const testAccount: TestAccount = useSelector(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [guardianExists, setGuardianExists] = useState(false);
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
@@ -193,7 +198,7 @@ const SecondaryDeviceHistory = (props) => {
   );
 
   const createGuardian = useCallback(
-    async (reshare?: boolean) => {
+    async (changeKeeper?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = fcmTokenValue;
       //await AsyncStorage.getItem('fcmToken');
@@ -245,9 +250,9 @@ const SecondaryDeviceHistory = (props) => {
         info,
       };
 
-      if (reshare) {
+      if (changeKeeper) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactInfo, data, true));
+        dispatch(uploadEncMShare(0, contactInfo, data, changeKeeper));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
@@ -319,6 +324,21 @@ const SecondaryDeviceHistory = (props) => {
     uploadMetaShare,
     updateEphemeralChannelLoader,
   ]);
+
+  useEffect(() => {
+    const firstName = 'Secondary';
+    const lastName = 'Device';
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim();
+    const tcInstance = trustedContacts.tc.trustedContacts[contactName];
+    console.log({ tcInstance });
+    if (tcInstance) {
+      if (tcInstance.symmetricKey) {
+        setGuardianExists(true);
+      }
+    }
+  }, [trustedContacts]);
 
   useEffect(() => {
     (async () => {
@@ -525,8 +545,8 @@ const SecondaryDeviceHistory = (props) => {
 
           if (isValid) {
             //create buddyMShare
-            const reshare = true; // increments the version of the meta share
-            createGuardian(reshare);
+            const changeKeeper = true; // increments the version of the meta share
+            createGuardian(changeKeeper);
             (secondaryDeviceBottomSheet.current as any).snapTo(1);
           } else {
             Alert.alert(
@@ -574,6 +594,89 @@ const SecondaryDeviceHistory = (props) => {
       />
     );
   };
+
+  const renderReshareContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ReshareBottomSheet}
+        title={'Reshare with the same device?'}
+        info={
+          'Proceed if you want to reshare the link/ QR with the same device'
+        }
+        note={
+          'For a different device, please go back and choose ‘Change device'
+        }
+        proceedButtonText={'Reshare'}
+        cancelButtonText={'Back'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+
+          if (blockReshare) {
+            (QrBottomSheet.current as any).snapTo(1);
+          } else {
+            createGuardian();
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+          }
+        }}
+        onPressIgnore={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  }, []);
+
+  const renderReshareHeader = useCallback(() => {
+    return (
+      <ModalHeader
+      // onPressHeader={() => {
+      //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
+      />
+    );
+  }, []);
+
+  const renderChangeContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ChangeBottomSheet}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper'}
+        note={
+          'You can change the Keeper you selected to send your Recovery Key'
+        }
+        proceedButtonText={'Change'}
+        cancelButtonText={'Back'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+
+          if (blockReshare) {
+            (QrBottomSheet.current as any).snapTo(1);
+          } else {
+            const changeKeeper = true;
+            createGuardian(changeKeeper);
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+          }
+        }}
+        onPressIgnore={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  }, []);
+
+  const renderChangeHeader = useCallback(() => {
+    return (
+      <ModalHeader
+      // onPressHeader={() => {
+      //   (ChangeBottomSheet as any).current.snapTo(0);
+      // }}
+      />
+    );
+  }, []);
 
   const renderHelpContent = () => {
     return (
@@ -689,20 +792,20 @@ const SecondaryDeviceHistory = (props) => {
           IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
           reshareInfo={
-            isReshare
-              ? 'Want to send the Recovery Key again to the same destination? '
+            isReshare && !guardianExists
+              ? 'Want to send the Recovery Key again to the same device? '
               : null
           }
-          onPressReshare={async () => {
-            // setTimeout(() => {
-            //   setQRModalHeader('Reshare Personal Copy');
-            // }, 2);
-            if (blockReshare) {
-              (QrBottomSheet.current as any).snapTo(1);
-            } else {
-              createGuardian();
-              (secondaryDeviceBottomSheet as any).current.snapTo(1);
-            }
+          changeInfo={
+            isReshare
+              ? 'Want to send the Recovery Key to another device? '
+              : null
+          }
+          onPressReshare={() => {
+            (ReshareBottomSheet as any).current.snapTo(1);
+          }}
+          onPressChange={() => {
+            (ChangeBottomSheet as any).current.snapTo(1);
           }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
@@ -776,6 +879,28 @@ const SecondaryDeviceHistory = (props) => {
         ]}
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
+      />
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={ReshareBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderReshareContent}
+        renderHeader={renderReshareHeader}
+      />
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={ChangeBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderChangeContent}
+        renderHeader={renderChangeHeader}
       />
     </View>
   );

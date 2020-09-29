@@ -37,6 +37,7 @@ export interface TransactionDetails {
   recipientAddresses?: string[];
   senderAddresses?: string[];
   blockTime?: number;
+  message?: string;
 }
 
 export interface Transactions {
@@ -93,6 +94,7 @@ export interface DerivativeAccountElements {
   xpriv: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
+  nextFreeChangeAddressIndex?: number;
   receivingAddress?: string;
   balances?: {
     balance: number;
@@ -145,6 +147,7 @@ export interface DonationDerivativeAccountElements
     displayBalance: boolean;
     displayTransactions: boolean;
   };
+  disableAccount: boolean;
 }
 
 // Base Dervative Account

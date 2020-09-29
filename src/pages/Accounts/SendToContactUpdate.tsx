@@ -109,6 +109,7 @@ interface SendToContactStateTypes {
   CurrencyCode: string;
   CurrencySymbol: string;
   bitcoinAmount: string;
+  donationId: string;
   currencyAmount: string;
   isConfirmDisabled: boolean;
   note: string;
@@ -147,6 +148,7 @@ class SendToContact extends Component<
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
         ? props.navigation.getParam('bitcoinAmount')
         : '',
+      donationId: props.navigation.getParam('donationId'),
       currencyAmount: '',
       isConfirmDisabled: true,
       note: '',
@@ -483,6 +485,8 @@ class SendToContact extends Component<
       spendableBalance,
       averageTxFees,
       isSendMax,
+      derivativeAccountDetails,
+      donationId,
     } = this.state;
     const { transfer } = this.props;
     if (!recipients.length) return;
@@ -500,6 +504,8 @@ class SendToContact extends Component<
           recipients,
           averageTxFees,
           isSendMax,
+          derivativeAccountDetails,
+          donationId,
         });
       }
     }
@@ -585,7 +591,7 @@ class SendToContact extends Component<
         if (selectedContact.id === DONATION_ACCOUNT) {
           if (
             instance.selectedContact.account_number ===
-              selectedContact.account_number &&
+            selectedContact.account_number &&
             instance.selectedContact.type === selectedContact.type
           ) {
             // skip (current donation instance), get added as currentRecipientInstance
@@ -626,8 +632,7 @@ class SendToContact extends Component<
           });
         } else {
           // recipient: trusted contact
-          const contactName = `${item.selectedContact.firstName} ${
-            item.selectedContact.lastName ? item.selectedContact.lastName : ''
+          const contactName = `${item.selectedContact.firstName} ${item.selectedContact.lastName ? item.selectedContact.lastName : ''
             }`.toLowerCase();
           recipients.push({
             id: contactName,
@@ -665,7 +670,7 @@ class SendToContact extends Component<
               transfer[serviceType].transfer.details[i].selectedContact
                 .account_number === selectedContact.account_number &&
               transfer[serviceType].transfer.details[i].selectedContact.type ===
-                selectedContact.type
+              selectedContact.type
             )
               removeTransferDetails(
                 serviceType,
@@ -906,7 +911,12 @@ class SendToContact extends Component<
                                     >
                                       {item && item.selectedContact
                                         ? nameToInitials(
-                                          item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                                          item.selectedContact.firstName ===
+                                            'F&F request' &&
+                                            item.selectedContact
+                                              .contactsWalletName !== undefined &&
+                                            item.selectedContact
+                                              .contactsWalletName !== ''
                                             ? `${item.selectedContact.contactsWalletName}'s wallet`
                                             : item.selectedContact.firstName &&
                                               item.selectedContact.lastName
@@ -961,7 +971,9 @@ class SendToContact extends Component<
                         </TouchableOpacity>
                       </View>
                       <Text style={styles.name} numberOfLines={1}>
-                        {item.selectedContact.firstName === 'F&F request' && item.selectedContact.contactsWalletName !== undefined && item.selectedContact.contactsWalletName !== ""
+                        {item.selectedContact.firstName === 'F&F request' &&
+                          item.selectedContact.contactsWalletName !== undefined &&
+                          item.selectedContact.contactsWalletName !== ''
                           ? `${item.selectedContact.contactsWalletName}'s wallet`
                           : item.selectedContact.name ||
                           item.selectedContact.account_name ||
@@ -969,16 +981,14 @@ class SendToContact extends Component<
                       </Text>
                       <Text style={styles.amountText}>
                         {switchOn
-                          ? `${
-                          item.bitcoinAmount
+                          ? `${item.bitcoinAmount
                             ? item.bitcoinAmount
                             : bitcoinAmount
                           }` +
                           `${serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
                           : CurrencySymbol +
                           ' ' +
-                          `${
-                          item.currencyAmount
+                          `${item.currencyAmount
                             ? item.currencyAmount
                             : currencyAmount
                           }`}
@@ -1305,7 +1315,7 @@ class SendToContact extends Component<
                             if (
                               transfer[serviceType].transfer.details[i]
                                 .selectedContact.account_number ===
-                                selectedContact.account_number &&
+                              selectedContact.account_number &&
                               transfer[serviceType].transfer.details[i]
                                 .selectedContact.type === selectedContact.type
                             )
