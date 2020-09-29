@@ -26,6 +26,7 @@ import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -211,6 +212,13 @@ export default class HDSegwitWallet extends Bitcoin {
         const donationAcc: DonationDerivativeAccountElements = this
           .derivativeAccounts[DONATION_ACCOUNT][accountNumber];
         receivingAddress = donationAcc ? donationAcc.receivingAddress : '';
+        break;
+
+      case SUB_PRIMARY_ACCOUNT:
+        const account = this.derivativeAccounts[SUB_PRIMARY_ACCOUNT][
+          accountNumber
+        ];
+        receivingAddress = account ? account.receivingAddress : '';
         break;
 
       default:

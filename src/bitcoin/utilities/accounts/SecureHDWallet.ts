@@ -19,6 +19,7 @@ import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api';
 
@@ -227,6 +228,13 @@ export default class SecureHDWallet extends Bitcoin {
         const donationAcc: DonationDerivativeAccountElements = this
           .derivativeAccounts[DONATION_ACCOUNT][accountNumber];
         receivingAddress = donationAcc ? donationAcc.receivingAddress : '';
+        break;
+
+      case SUB_PRIMARY_ACCOUNT:
+        const account = this.derivativeAccounts[SUB_PRIMARY_ACCOUNT][
+          accountNumber
+        ];
+        receivingAddress = account ? account.receivingAddress : '';
         break;
 
       default:

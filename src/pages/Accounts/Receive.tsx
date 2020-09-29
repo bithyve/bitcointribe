@@ -41,6 +41,7 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
 import {
@@ -675,7 +676,8 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    derivativeAccountDetails
+                    derivativeAccountDetails &&
+                    derivativeAccountDetails.type === DONATION_ACCOUNT
                       ? require('../../assets/images/icons/icon_donation_hexa.png')
                       : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
@@ -694,7 +696,8 @@ export default function Receive(props) {
                       fontSize: RFValue(12),
                     }}
                   >
-                    {derivativeAccountDetails
+                    {derivativeAccountDetails &&
+                    derivativeAccountDetails.type === DONATION_ACCOUNT
                       ? 'Donation Account'
                       : serviceType == TEST_ACCOUNT
                       ? 'Test Account'
