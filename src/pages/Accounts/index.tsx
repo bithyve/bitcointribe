@@ -40,6 +40,7 @@ import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import {
   fetchBalance,
@@ -329,7 +330,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      for (const carouselAcc of config.CAROUSEL_ACCOUNTS) {
+      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
         if (!derivativeAccounts[carouselAcc]) continue;
 
         for (
@@ -1299,6 +1300,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 <Text style={styles.transactionModalTitleText}>
                                   {item.accountType == FAST_BITCOINS
                                     ? 'FastBitcoins.com'
+                                    : item.accountType === SUB_PRIMARY_ACCOUNT
+                                    ? item.primaryAccType
                                     : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>
@@ -1340,6 +1343,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 <Text style={styles.transactionModalTitleText}>
                                   {item.accountType == FAST_BITCOINS
                                     ? 'FastBitcoins.com'
+                                    : item.accountType === SUB_PRIMARY_ACCOUNT
+                                    ? item.primaryAccType
                                     : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>

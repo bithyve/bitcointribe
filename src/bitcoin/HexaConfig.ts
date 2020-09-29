@@ -199,10 +199,10 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public CAROUSEL_ACCOUNTS = [SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT];
+  public EJECTED_ACCOUNTS = [SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
-    (account) => !this.CAROUSEL_ACCOUNTS.includes(account),
+    (account) => !this.EJECTED_ACCOUNTS.includes(account),
   );
 
   constructor(env: string) {

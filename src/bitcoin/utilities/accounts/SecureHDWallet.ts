@@ -614,6 +614,8 @@ export default class SecureHDWallet extends Bitcoin {
       this.derivativeAccounts[accountType][accountNumber]
         .nextFreeChangeAddressIndex - 1,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
+      null,
+      accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
     );
 
     const { balances, transactions, UTXOs } = res;
@@ -917,6 +919,10 @@ export default class SecureHDWallet extends Bitcoin {
                       ? tx.amount + tx.fee
                       : tx.amount,
                   accountType: tx.accountType,
+                  primaryAccType:
+                    tx.accountType === SUB_PRIMARY_ACCOUNT
+                      ? 'Savings Account'
+                      : null,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed

@@ -673,7 +673,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      for (const carouselAcc of config.CAROUSEL_ACCOUNTS) {
+      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
         if (!derivativeAccounts[carouselAcc]) continue;
 
         for (

@@ -473,6 +473,7 @@ export default class HDSegwitWallet extends Bitcoin {
         .nextFreeChangeAddressIndex - 1,
       accountType,
       contactName,
+      accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
     );
 
     const { balances, transactions, UTXOs } = res;
@@ -781,6 +782,10 @@ export default class HDSegwitWallet extends Bitcoin {
                           )
                           .join(' ')
                       : tx.accountType,
+                  primaryAccType:
+                    tx.accountType === SUB_PRIMARY_ACCOUNT
+                      ? 'Checking Account'
+                      : null,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
