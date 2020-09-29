@@ -22,8 +22,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
-import { isCompatible } from './Home';
-import { connect } from 'react-redux';
+import { isCompatible } from './Home/Home';
+import { connect } from 'react-redux'
 
 interface HomePropsTypes {
   initializeDB: any;

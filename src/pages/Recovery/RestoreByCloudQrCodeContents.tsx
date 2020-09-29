@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { View, Image, Text, StyleSheet, Alert, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
@@ -29,7 +29,7 @@ export default function RestoreByCloudQrCodeContents(props) {
   let [counter, setCounter] = useState(1);
   let [startNumberCounter, setStartNumberCounter] = useState(1);
   const dispatch = useDispatch();
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const errorBottomSheetRef = useRef<BottomSheet>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [processButtonText, setProcessButtonText] = useState('Okay');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
@@ -48,7 +48,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         );
       setProcessButtonText('Try again');
       }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
+      errorBottomSheetRef.current.snapTo(1);
       console.log('shareCode1', shareCode);
       //Alert.alert('Invalid QR', 'Please try again');
       return;
@@ -75,7 +75,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           );
           setProcessButtonText('Okay')
         }, 2);
-        (ErrorBottomSheet as any).current.snapTo(1);
+        errorBottomSheetRef.current.snapTo(1);
         return;
       }
       if (startNumberCounter != startNumber1) {
@@ -87,7 +87,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           );
           setProcessButtonText('Okay')
         }, 2);
-        (ErrorBottomSheet as any).current.snapTo(1);
+        errorBottomSheetRef.current.snapTo(1);
        // Alert.alert('Please scan ' + temp1 + ' QR code');
         return;
       }
@@ -134,12 +134,11 @@ export default function RestoreByCloudQrCodeContents(props) {
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
         proceedButtonText={processButtonText}
         onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          errorBottomSheetRef.current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/errorImage.png')}
@@ -151,7 +150,7 @@ export default function RestoreByCloudQrCodeContents(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          errorBottomSheetRef.current.snapTo(0);
         }}
       />
     );
@@ -165,7 +164,7 @@ export default function RestoreByCloudQrCodeContents(props) {
       );
       setProcessButtonText('Try again');
     }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
+    errorBottomSheetRef.current.snapTo(1);
     dispatch(UnableRecoverShareFromQR(null));
   }
 
@@ -248,8 +247,6 @@ export default function RestoreByCloudQrCodeContents(props) {
       >
         <QrCodeModalContents
           flag={true}
-          //modalRef={props.modalRef}
-          isOpenedFlag={props.isOpenedFlag}
           onQrScan={qrData => getQrCodeData(qrData)}
           onPressQrScanner={() => {
             props.navigation.navigate('QrScanner', {
@@ -305,11 +302,11 @@ export default function RestoreByCloudQrCodeContents(props) {
           )}
         </View>
       </View>
-      
+
     </ScrollView>
     <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={errorBottomSheetRef}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

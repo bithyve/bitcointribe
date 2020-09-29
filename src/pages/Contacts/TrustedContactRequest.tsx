@@ -319,7 +319,7 @@ export default function TrustedContactRequest(props) {
         height: '100%',
         backgroundColor: Colors.white,
       }}
-      behavior={Platform.OS == 'ios' ? 'padding' : ''}
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       enabled
     >
       <ScrollView
