@@ -112,16 +112,11 @@ const HomeList = ({
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('Accounts', {
-                  serviceType:
-                    value.accountType === 'test'
-                      ? TEST_ACCOUNT
-                      : value.accountType === 'regular'
-                      ? REGULAR_ACCOUNT
-                      : SECURE_ACCOUNT,
+                  serviceType: value.accountType,
                   index:
-                    value.accountType === 'test'
+                    value.accountType === TEST_ACCOUNT
                       ? 0
-                      : value.accountType === 'regular'
+                      : value.accountType === REGULAR_ACCOUNT
                       ? 1
                       : 2,
                 });
@@ -139,7 +134,7 @@ const HomeList = ({
                         : value.accountType,
                     )}
                   />
-                  {value.accountType == 'secure' ? (
+                  {value.accountType == SECURE_ACCOUNT ? (
                     <TouchableOpacity
                       onPress={() => {
                         // alert('2FA');
@@ -198,7 +193,7 @@ const HomeList = ({
                         marginTop: hp('1%'),
                       }}
                     >
-                      {value.accountType === 'test' || switchOn ? (
+                      {value.accountType === TEST_ACCOUNT || switchOn ? (
                         <Image
                           style={styles.cardBitCoinImage}
                           source={value.bitcoinicon}
@@ -227,9 +222,9 @@ const HomeList = ({
                         {switchOn
                           ? value.title === 'Donation Account'
                             ? UsNumberFormat(value.amount)
-                            : value.accountType === 'test'
+                            : value.accountType === TEST_ACCOUNT
                             ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === 'regular'
+                            : value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)
                           : value.title === 'Donation Account' && exchangeRates
@@ -237,9 +232,10 @@ const HomeList = ({
                               (value.amount / 1e8) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2)
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? UsNumberFormat(balances.testBalance)
-                          : value.accountType === 'regular' && exchangeRates
+                          : value.accountType === REGULAR_ACCOUNT &&
+                            exchangeRates
                           ? (
                               (balances.regularBalance / 1e8) *
                               exchangeRates[CurrencyCode].last
@@ -254,7 +250,7 @@ const HomeList = ({
                       <Text style={styles.cardAmountUnitText}>
                         {switchOn
                           ? value.unit
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? value.unit
                           : CurrencyCode.toLocaleLowerCase()}
                       </Text>

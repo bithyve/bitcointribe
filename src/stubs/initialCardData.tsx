@@ -1,3 +1,9 @@
+import {
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../common/constants/serviceTypes';
+
 export const initialCardData = [
   {
     id: 1,
@@ -5,7 +11,7 @@ export const initialCardData = [
     unit: 't-sats',
     amount: 0,
     account: `Learn Bitcoin`,
-    accountType: 'test',
+    accountType: TEST_ACCOUNT,
     bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
   },
   {
@@ -14,7 +20,7 @@ export const initialCardData = [
     unit: 'sats',
     amount: 0,
     account: 'Multi-factor security',
-    accountType: 'secure',
+    accountType: SECURE_ACCOUNT,
     bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
   },
   {
@@ -23,7 +29,7 @@ export const initialCardData = [
     unit: 'sats',
     amount: 0,
     account: 'Fast and easy',
-    accountType: 'regular',
+    accountType: REGULAR_ACCOUNT,
     bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
   },
 ];

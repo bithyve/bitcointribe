@@ -144,11 +144,11 @@ export const isCompatible = async (method: string, version: string) => {
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
     return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'regular') {
+  } else if (type == 'regular' || type === REGULAR_ACCOUNT) {
     return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'secure') {
+  } else if (type == 'secure' || type === SECURE_ACCOUNT) {
     return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type == 'test') {
+  } else if (type == 'test' || type === TEST_ACCOUNT) {
     return require('../../assets/images/icons/icon_test.png');
   } else if (type === 'Donation Account') {
     return require('../../assets/images/icons/icon_donation_hexa.png');
