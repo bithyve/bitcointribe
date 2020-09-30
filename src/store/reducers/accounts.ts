@@ -38,6 +38,7 @@ import {
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
 import { stat } from 'react-native-fs';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import { TestAccountPayload, SavingsAccountPayload, CheckingAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
 
 // TODO: Remove this in favor of a generalized `AccountPayload` interface
 const ACCOUNT_VARS: {
@@ -102,25 +103,30 @@ const ACCOUNT_VARS: {
   },
 };
 
-export interface AccountsState {
+export type AccountsState = {
   servicesEnriched: Boolean;
   accountsSynched: Boolean;
   exchangeRates?: any;
+  activeAccounts: AccountPayload[];
+  archivedAccounts: AccountPayload[];
+
+  // TODO: Consider removing these in favor of just looking
+  // up account data from `activeAccounts` using a UUID.
   REGULAR_ACCOUNT: any;
   TEST_ACCOUNT: any;
   SECURE_ACCOUNT: any;
 
-  // TODO: How does this differ from ANY added account? (See `addedAccounts`)
+  // TODO: How does this differ from ANY added account? (See `activeAccounts`)
   // Perhaps we should consolidate the items here into that array?
   additional?: {
     regular?: any;
     test?: any;
     secure?: any;
   };
+
   isGeneratingNewAccount: Boolean;
   hasNewAccountGenerationSucceeded: Boolean;
   hasNewAccountGenerationFailed: Boolean;
-  addedAccounts: AccountPayload[];
 }
 
 const initialState: AccountsState = {
@@ -133,10 +139,15 @@ const initialState: AccountsState = {
   isGeneratingNewAccount: false,
   hasNewAccountGenerationSucceeded: false,
   hasNewAccountGenerationFailed: false,
-  addedAccounts: [],
+  activeAccounts: [
+    new TestAccountPayload(),
+    new SavingsAccountPayload(),
+    new CheckingAccountPayload(),
+  ],
+  archivedAccounts: [],
 };
 
-export default (state: AccountsState = initialState, action) => {
+export default (state: AccountsState = initialState, action): AccountsState => {
   const accountType = action.payload ? action.payload.serviceType : null;
 
   switch (action.type) {
@@ -472,6 +483,7 @@ export default (state: AccountsState = initialState, action) => {
         },
       };
 
+    // TODO: I don't think averageTxFees should be a wallet-wide concern.
     case AVERAGE_TX_FEE:
       return {
         ...state,
@@ -516,7 +528,7 @@ export default (state: AccountsState = initialState, action) => {
         ...state,
         isGeneratingNewAccount: false,
         hasNewAccountGenerationSucceeded: true,
-        addedAccounts: state.addedAccounts.concat(action.payload),
+        activeAccounts: state.activeAccounts.concat(action.payload),
       };
 
 
