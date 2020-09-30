@@ -33,6 +33,7 @@ export interface TransactionDetails {
   transactionType: string;
   amount: number;
   accountType: string;
+  primaryAccType?: string;
   contactName?: string;
   recipientAddresses?: string[];
   senderAddresses?: string[];
@@ -92,6 +93,7 @@ export interface DerivativeAccountElements {
   xpub: string;
   xpubId: string;
   xpriv: string;
+  accountName?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   nextFreeChangeAddressIndex?: number;

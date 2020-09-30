@@ -214,33 +214,45 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       },
     ];
 
-    const donationAccountData = [];
+    const additionalAccountData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts = this.props.accounts[serviceType].service[
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
       ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const accType of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[accType]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donationInstance = {
-          id: DONATION_ACCOUNT,
-          account_number: index,
-          account_name: 'Donation Account',
-          type: serviceType,
-          checked: false,
-          image: require('../../assets/images/icons/icon_donation_account.png'),
-        };
-        donationAccountData.push(donationInstance);
+        for (
+          let index = 1;
+          index <= derivativeAccounts[accType].instance.using;
+          index++
+        ) {
+          const accInstance = {
+            id: accType,
+            account_number: index,
+            account_name:
+              accType === DONATION_ACCOUNT
+                ? 'Donation Account'
+                : serviceType === REGULAR_ACCOUNT
+                ? 'Checking Account'
+                : 'Savings Account',
+            type: serviceType,
+            checked: false,
+            image:
+              accType === DONATION_ACCOUNT
+                ? require('../../assets/images/icons/icon_donation_account.png')
+                : serviceType === REGULAR_ACCOUNT
+                ? require('../../assets/images/icons/icon_regular_account.png')
+                : require('../../assets/images/icons/icon_secureaccount_white.png'),
+          };
+          additionalAccountData.push(accInstance);
+        }
       }
     }
 
     this.setState({
-      accountData: [...defaultAccountData, ...donationAccountData],
+      accountData: [...defaultAccountData, ...additionalAccountData],
     });
   };
 
@@ -311,25 +323,26 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
     else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
 
-    let donationsBalance = {};
+    let additionalBalances = {};
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
         accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const ejectedAcc of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[ejectedAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
-        donationsBalance[serviceType + index] = donAcc.balances
-          ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
-          : 0;
+        for (
+          let index = 1;
+          index <= derivativeAccounts[ejectedAcc].instance.using;
+          index++
+        ) {
+          const acc = derivativeAccounts[ejectedAcc][index];
+          additionalBalances[serviceType + ejectedAcc + index] = acc.balances
+            ? acc.balances.balance + acc.balances.unconfirmedBalance
+            : 0;
+        }
       }
     }
 
@@ -338,7 +351,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         testBalance,
         regularBalance,
         secureBalance,
-        donationsBalance,
+        additionalBalances,
       },
     });
   };
@@ -541,7 +554,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       transfer[serviceType].transfer.details.length &&
         transfer[serviceType].transfer.details.map((contact) => {
           if (contact.selectedContact.id === item.id) {
-            if (item.id === DONATION_ACCOUNT) {
+            if (config.EJECTED_ACCOUNTS.includes(item.id)) {
               if (
                 item.account_number ===
                   contact.selectedContact.account_number &&
@@ -765,7 +778,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     </TouchableOpacity>
                     <Image
                       source={
-                        this.state.derivativeAccountDetails
+                        this.state.derivativeAccountDetails &&
+                        this.state.derivativeAccountDetails.type ===
+                          DONATION_ACCOUNT
                           ? require('../../assets/images/icons/icon_donation_hexa.png')
                           : serviceType == TEST_ACCOUNT
                           ? require('../../assets/images/icons/icon_test.png')
@@ -963,7 +978,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                 transfer[serviceType].transfer.details[i]
                                   .selectedContact;
                               if (element.id == Items.item.id) {
-                                if (element.id === DONATION_ACCOUNT) {
+                                if (
+                                  config.EJECTED_ACCOUNTS.includes(element.id)
+                                ) {
                                   if (
                                     element.account_number ===
                                       Items.item.account_number &&
@@ -979,7 +996,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                             const { derivativeAccountDetails } = this.state;
                             if (
                               Items.item.type != serviceType ||
-                              Items.item.id === DONATION_ACCOUNT ||
+                              config.EJECTED_ACCOUNTS.includes(Items.item.id) ||
                               derivativeAccountDetails
                             ) {
                               if (

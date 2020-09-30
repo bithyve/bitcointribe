@@ -204,6 +204,7 @@ export default class BaseAccount {
     accountType: string,
     accountNumber?: number,
     contactName?: string,
+    accountName?: string,
   ): Promise<
     | {
         status: number;
@@ -225,6 +226,7 @@ export default class BaseAccount {
           accountType,
           accountNumber,
           contactName ? contactName.toLowerCase().trim() : null,
+          accountName,
         ),
       };
     } catch (err) {

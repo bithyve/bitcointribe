@@ -21,7 +21,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { UsNumberFormat } from '../../common/utilities';
-
+import config from '../../bitcoin/HexaConfig';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
@@ -112,16 +112,11 @@ const HomeList = ({
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('Accounts', {
-                  serviceType:
-                    value.accountType === 'test'
-                      ? TEST_ACCOUNT
-                      : value.accountType === 'regular'
-                      ? REGULAR_ACCOUNT
-                      : SECURE_ACCOUNT,
+                  serviceType: value.accountType,
                   index:
-                    value.accountType === 'test'
+                    value.accountType === TEST_ACCOUNT
                       ? 0
-                      : value.accountType === 'regular'
+                      : value.accountType === REGULAR_ACCOUNT
                       ? 1
                       : 2,
                 });
@@ -134,10 +129,12 @@ const HomeList = ({
                     source={getIconByAccountType(
                       value.title === 'Donation Account'
                         ? value.title
+                        : value.iconType
+                        ? value.iconType
                         : value.accountType,
                     )}
                   />
-                  {value.accountType == 'secure' ? (
+                  {value.accountType == SECURE_ACCOUNT ? (
                     <TouchableOpacity
                       onPress={() => {
                         // alert('2FA');
@@ -196,7 +193,7 @@ const HomeList = ({
                         marginTop: hp('1%'),
                       }}
                     >
-                      {value.accountType === 'test' || switchOn ? (
+                      {value.accountType === TEST_ACCOUNT || switchOn ? (
                         <Image
                           style={styles.cardBitCoinImage}
                           source={value.bitcoinicon}
@@ -223,21 +220,23 @@ const HomeList = ({
                         }
                       >
                         {switchOn
-                          ? value.title === 'Donation Account'
+                          ? config.EJECTED_ACCOUNTS.includes(value.subType)
                             ? UsNumberFormat(value.amount)
-                            : value.accountType === 'test'
+                            : value.accountType === TEST_ACCOUNT
                             ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === 'regular'
+                            : value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)
-                          : value.title === 'Donation Account' && exchangeRates
+                          : config.EJECTED_ACCOUNTS.includes(value.subType) &&
+                            exchangeRates
                           ? (
                               (value.amount / 1e8) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2)
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? UsNumberFormat(balances.testBalance)
-                          : value.accountType === 'regular' && exchangeRates
+                          : value.accountType === REGULAR_ACCOUNT &&
+                            exchangeRates
                           ? (
                               (balances.regularBalance / 1e8) *
                               exchangeRates[CurrencyCode].last
@@ -252,7 +251,7 @@ const HomeList = ({
                       <Text style={styles.cardAmountUnitText}>
                         {switchOn
                           ? value.unit
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? value.unit
                           : CurrencyCode.toLocaleLowerCase()}
                       </Text>

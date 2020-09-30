@@ -12,15 +12,12 @@ import Fonts from './../../common/Fonts';
 import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { FAST_BITCOINS } from '../../common/constants/serviceTypes';
-
-interface transaction {
-  transactionType?: string;
-  accountType?: any;
-  date?: string;
-  amount?: string;
-  confirmations?: number;
-}
+import {
+  FAST_BITCOINS,
+  REGULAR_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import { TransactionDetails } from '../../bitcoin/utilities/Interface';
 
 const InfoBox = ({ text, isFromAccount }) => {
   return (
@@ -56,7 +53,6 @@ const TransactionsContent = ({
   isFromAccount,
   infoBoxInfoText = 'All your recent transactions across the accounts appear here',
 }) => {
-
   const LoadingView: React.FC = () => {
     return (
       <View style={styles.modalContentContainer}>
@@ -84,13 +80,10 @@ const TransactionsContent = ({
           })}
         </View>
         <View style={{ backgroundColor: Colors.white }}>
-          <InfoBox
-            text={infoBoxInfoText}
-            isFromAccount={isFromAccount}
-          />
+          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
         </View>
       </View>
-    )
+    );
   };
 
   const EmptyView: React.FC = () => {
@@ -98,10 +91,7 @@ const TransactionsContent = ({
       <View style={styles.modalContentContainer}>
         <View style={{ flex: 1 }}></View>
         <View style={{ backgroundColor: Colors.white }}>
-          <InfoBox
-            text={infoBoxInfoText}
-            isFromAccount={isFromAccount}
-          />
+          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
         </View>
       </View>
     );
@@ -128,7 +118,7 @@ const TransactionsContent = ({
                 <View style={styles.separatorView} />
               </View>
             )}
-            renderItem={({ item }: { item: transaction }) => (
+            renderItem={({ item }: { item: TransactionDetails }) => (
               <AppBottomSheetTouchableWrapper
                 onPress={
                   () => {
@@ -161,12 +151,12 @@ const TransactionsContent = ({
                       }
                     />
                   </View>
-                  <View
-                    style={{ justifyContent: 'center', marginLeft: 10 }}
-                  >
+                  <View style={{ justifyContent: 'center', marginLeft: 10 }}>
                     <Text style={styles.transactionModalTitleText}>
                       {item.accountType == FAST_BITCOINS
                         ? 'FastBitcoins.com'
+                        : item.accountType === SUB_PRIMARY_ACCOUNT
+                        ? item.primaryAccType
                         : item.accountType}{' '}
                     </Text>
                     <Text style={styles.transactionModalDateText}>
@@ -203,11 +193,11 @@ const TransactionsContent = ({
                       ? item.confirmations < 6
                         ? item.confirmations
                         : item.confirmations === '-' // for testnet faucet tx
-                          ? item.confirmations
-                          : '6+'
-                      : item.confirmations < 6
                         ? item.confirmations
-                        : '6+'}
+                        : '6+'
+                      : item.confirmations < 6
+                      ? item.confirmations
+                      : '6+'}
                   </Text>
                   <Ionicons
                     name="ios-arrow-forward"
@@ -223,10 +213,7 @@ const TransactionsContent = ({
       </View>
 
       {transactions.length <= 1 && (
-        <InfoBox
-          text={infoBoxInfoText}
-          isFromAccount={isFromAccount}
-        />
+        <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
       )}
     </View>
   );
