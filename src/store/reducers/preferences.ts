@@ -1,6 +1,6 @@
 import {
   CURRENCY_CODE,
-  CURRENCY_TOGGLE_VALUE,
+  CURRENCY_KIND_SET,
   FCM_TOKEN_VALUE,
   SECONDARY_DEVICE_ADDRESS_VALUE,
   RELEASE_CASES_VALUE,
@@ -10,17 +10,18 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
-  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN,
-  CARD_DATA
-
+  UPDATE_APPLICATION_STATUS,
+  UPDATE_LAST_SEEN,
+  CARD_DATA,
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import ip, { chain } from 'icepick';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 const initialState = ip.freeze({
   isInternetModalCome: false,
   currencyCode: null,
-  currencyToggleValue: null,
+  currencyKind: CurrencyKind.BITCOIN,
   fcmTokenValue: '',
   secondaryDeviceAddressValue: '',
   releaseCasesValue: null,
@@ -46,11 +47,13 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         currencyCode: payload.currencyCode,
       };
-    case CURRENCY_TOGGLE_VALUE:
+
+    case CURRENCY_KIND_SET:
       return {
         ...state,
-        currencyToggleValue: payload.currencyToggleValue,
+        currencyKind: payload,
       };
+
     case FCM_TOKEN_VALUE:
       return {
         ...state,
@@ -108,12 +111,11 @@ export default (state = initialState, { type, payload }) => {
     case UPDATE_LAST_SEEN:
       return Object.assign({}, state, { lastSeen: new Date() })
 
-      case CARD_DATA:
+    case CARD_DATA:
       return {
         ...state,
         cardData: payload.cardData,
       };
-
     default:
       return state
   }
