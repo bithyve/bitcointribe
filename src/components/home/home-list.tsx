@@ -19,6 +19,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { UsNumberFormat } from '../../common/utilities';
 import config from '../../bitcoin/HexaConfig';
@@ -125,10 +126,8 @@ const HomeList = ({
                   <Image
                     style={{ width: wp('10%'), height: wp('10%') }}
                     source={getIconByAccountType(
-                      value.title === 'Donation Account'
-                        ? value.title
-                        : value.iconType
-                        ? value.iconType
+                      value.subType === DONATION_ACCOUNT
+                        ? value.subType
                         : value.accountType,
                     )}
                   />
