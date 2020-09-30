@@ -65,7 +65,7 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
