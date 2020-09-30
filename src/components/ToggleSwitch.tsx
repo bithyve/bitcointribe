@@ -27,8 +27,8 @@ export default function ToggleSwitch(props) {
       style={{
         flexDirection: props.transform ? 'column' : 'row',
         backgroundColor: props.toggleColor ? props.toggleColor : '#1E82C2',
-        height: props.transform ? wp('17%') : wp('10%'),
-        width: props.transform ? wp('10%') : wp('17%'),
+        height: props.transform ? wp('17%') : props.changeSettingToggle ? wp('8%') : wp('10%'),
+        width: props.transform ? wp('10%') : props.changeSettingToggle ? wp('14%') : wp('17%'),
         borderRadius: wp('10%') / 2,
         alignItems: 'center',
         paddingLeft: props.transform ? 4 : 2,
@@ -39,8 +39,8 @@ export default function ToggleSwitch(props) {
         <View style={{ flexDirection: props.transform ? 'column' : 'row' }}>
           <View
             style={{
-              height: wp('8%'),
-              width: wp('8%'),
+              height: props.toggleSize ? props.toggleSize : wp('8%'),
+              width: props.toggleSize ? props.toggleSize : wp('8%'),
               justifyContent: 'center',
               alignItems: 'center',
             }}
@@ -72,9 +72,9 @@ export default function ToggleSwitch(props) {
               backgroundColor: props.toggleCircleColor
                 ? props.toggleCircleColor
                 : Colors.white,
-              height: wp('8%'),
-              width: wp('8%'),
-              borderRadius: wp('8%') / 2,
+              height: props.toggleSize ? props.toggleSize : wp('8%'),
+              width: props.toggleSize ? props.toggleSize : wp('8%'),
+              borderRadius: props.toggleSize ? props.toggleSize : wp('8%') / 2,
               marginLeft: props.toggle ? 'auto' : 0,
               justifyContent: 'center',
               alignItems: 'center',
@@ -104,9 +104,9 @@ export default function ToggleSwitch(props) {
               backgroundColor: props.toggleCircleColor
                 ? props.toggleCircleColor
                 : Colors.white,
-              height: wp('8%'),
-              width: wp('8%'),
-              borderRadius: wp('8%') / 2,
+              height: props.toggleSize ? props.toggleSize : wp('8%'),
+              width: props.toggleSize ? props.toggleSize : wp('8%'),
+              borderRadius: props.toggleSize ? props.toggleSize : wp('8%') / 2,
               alignItems: 'center',
               justifyContent: 'center',
               marginLeft: 2,
@@ -138,8 +138,8 @@ export default function ToggleSwitch(props) {
           </View>
           <View
             style={{
-              height: wp('8%'),
-              width: wp('8%'),
+              height: props.toggleSize ? props.toggleSize : wp('8%'),
+              width: props.toggleSize ? props.toggleSize : wp('8%'),
               justifyContent: 'center',
               alignItems: 'center',
               marginLeft: props.toggle ? 'auto' : props.transform ? 2 : 0,

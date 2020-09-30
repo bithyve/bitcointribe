@@ -88,6 +88,7 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
+import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
 // import accounts from '../../store/reducers/accounts';
 
 function isEmpty(obj) {
@@ -1566,9 +1567,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('87%')
-          : hp('89%'),]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('60%'),
+          ]}
           renderContent={() => {
             const { dervAccount, dervAccountType, accountNumber } = this.state
               .presentCarouselData
@@ -1582,6 +1586,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             if (dervAccountType !== DONATION_ACCOUNT) return;
             return (
               <DonationWebPageModalContents
+                onClickSetting={() => {
+                  (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                    1,
+                  );
+                }}
                 account={dervAccount}
                 accountNumber={accountNumber}
                 serviceType={this.state.serviceType}
@@ -1599,6 +1608,52 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
           )}
         />
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'SettingDonationWebPageBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+            ]}
+            renderContent={() => {
+              const { dervAccount, dervAccountType, accountNumber } = this.state
+              .presentCarouselData
+              ? this.state.presentCarouselData
+              : {
+                  dervAccount: null,
+                  dervAccountType: null,
+                  accountNumber: null,
+                };
+            if (!dervAccount) return;
+            if (dervAccountType !== DONATION_ACCOUNT) return;
+              return (
+                <SettingDonationWebPageContents
+                  onPressBack={() =>
+                    (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                      0,
+                    )
+                  }
+                  account={dervAccount}
+                  accountNumber={accountNumber}
+                  serviceType={this.state.serviceType}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <ModalHeader
+                onPressHeader={() => {
+                  (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                    0,
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
+
         {this.state.is_initiated ? (
           <BottomSheet
             enabledInnerScrolling={true}

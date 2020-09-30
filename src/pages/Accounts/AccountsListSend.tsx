@@ -42,7 +42,6 @@ const AccountsListSend = ({
           <Image
             style={styles.image}
             source={accounts.image}
-            resizeMode={'contain'}
           />
           <Text
             style={{
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     alignSelf: 'center',
-    resizeMode: 'center',
+    resizeMode: "contain",
   },
   accountName: {
     fontSize: RFValue(10),

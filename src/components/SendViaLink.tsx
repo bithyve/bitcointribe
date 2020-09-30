@@ -589,6 +589,7 @@ function isAppInstalledIOS(key) {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
+                      disabled={shareLink ? false : true}
                     >
                       <View style={styles.modalElementInfoView}>
                         <View

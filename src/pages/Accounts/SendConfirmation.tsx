@@ -520,6 +520,7 @@ class SendConfirmation extends Component<
                 this.props.clearTransfer(this.serviceType, 'stage1');
               }}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
+              disabled={isConfirmDisabled}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -1097,7 +1098,7 @@ class SendConfirmation extends Component<
                 this.props.accounts[this.serviceType].loading.transfer) ||
               (isConfirmDisabled &&
                 this.props.accounts[this.serviceType].loading.transfer) ? (
-                <ActivityIndicator size="small" />
+                <ActivityIndicator/>
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
               )}
@@ -1107,6 +1108,7 @@ class SendConfirmation extends Component<
                 ...styles.confirmButtonView,
                 width: wp('30%'),
               }}
+              disabled={isConfirmDisabled}
               onPress={() => {
                 this.props.clearTransfer(this.serviceType, 'stage1');
                 navigation.goBack();
