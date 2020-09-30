@@ -784,6 +784,7 @@ class SendToContact extends Component<
                 this.props.navigation.goBack();
               }}
               style={styles.backArrow}
+              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
             >
               <FontAwesome
                 name="long-arrow-left"

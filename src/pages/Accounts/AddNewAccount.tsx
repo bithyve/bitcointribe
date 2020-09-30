@@ -377,6 +377,7 @@ class AddNewAccount extends PureComponent<
               onPress={() => {
                 navigation.goBack();
               }}
+              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
               style={{
                 height: 30,
                 width: 30,

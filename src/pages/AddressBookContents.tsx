@@ -619,6 +619,7 @@ class AddressBookContents extends PureComponent<
             <View style={Styles.backIconRootContainer}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
                 style={Styles.backIconTouchContainer}
               >
                 <FontAwesome

@@ -92,6 +92,7 @@ export default function ExistingSavingMethods(props) {
             <TouchableOpacity
               onPress={() => props.navigation.goBack()}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
+              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
             >
               <FontAwesome
                 name="long-arrow-left"
