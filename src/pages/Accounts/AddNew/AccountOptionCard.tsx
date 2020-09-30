@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { Card } from 'react-native-elements';
 import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
 import CardStyles from '../../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
+import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
 
 export interface Props {
   style?: Record<string, any>;
