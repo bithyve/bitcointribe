@@ -62,9 +62,9 @@ import RecipientSendConfirmation from './RecipientSendConfirmation';
 import RadioButton from '../../components/RadioButton';
 import CustomPriorityContent from './CustomPriorityContent';
 import Toast from '../../components/Toast';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 interface SendConfirmationStateTypes {
-  switchOn: boolean;
   CurrencyCode: string;
   totalAmount: any;
   sliderValue: any;
@@ -95,7 +95,7 @@ interface SendConfirmationPropsTypes {
   alternateTransferST2: any;
   transferST2: any;
   currencyCode: any;
-  currencyToggleValue: any;
+  currencyKind: CurrencyKind;
   averageTxFees: any;
 }
 class SendConfirmation extends Component<
@@ -131,8 +131,8 @@ class SendConfirmation extends Component<
       }, 2);
     }
     this.viewRef = React.createRef();
+
     this.state = {
-      switchOn: true,
       CurrencyCode: 'USD',
       totalAmount: 0,
       sliderValue: 0,
@@ -462,30 +462,36 @@ class SendConfirmation extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = this.props.currencyToggleValue;
     let currencyCodeTmp = this.props.currencyCode;
+
     this.setState({
-      switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
   };
 
   convertBitCoinToCurrency = (value) => {
-    const { switchOn, exchangeRates, CurrencyCode } = this.state;
-    return this.serviceType == TEST_ACCOUNT
-      ? UsNumberFormat(value)
-      : switchOn
-      ? UsNumberFormat(value)
-      : exchangeRates
-      ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-      : null;
+    const { exchangeRates, CurrencyCode } = this.state;
+
+    if (
+      this.serviceType === TEST_ACCOUNT ||
+      this.props.currencyKind === CurrencyKind.BITCOIN
+    ) {
+      return UsNumberFormat(value);
+    } else if (exchangeRates !== undefined) {
+      return ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2);
+    } else {
+      return null;
+    }
   };
 
   getCorrectCurrencySymbol = () => {
-    const { switchOn, CurrencyCode } = this.state;
-    return this.serviceType == TEST_ACCOUNT
-      ? 't-sats'
-      : switchOn
+    const { CurrencyCode } = this.state;
+
+    if (this.serviceType == TEST_ACCOUNT) {
+      return 't-sats';
+    }
+
+    return this.props.currencyKind === CurrencyKind.BITCOIN
       ? 'sats'
       : CurrencyCode.toLocaleLowerCase();
   };
@@ -498,16 +504,16 @@ class SendConfirmation extends Component<
 
   render() {
     const {
-      switchOn,
       CurrencyCode,
       totalAmount,
       sliderValue,
       isConfirmDisabled,
       SelectedContactId,
       transfer,
-      loading,
     } = this.state;
-    const { navigation, exchangeRates } = this.props;
+    const { navigation, exchangeRates, currencyKind } = this.props;
+    const prefersBitcoin = currencyKind === CurrencyKind.BITCOIN
+
     return (
       <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -585,7 +591,7 @@ class SendConfirmation extends Component<
               <Text style={styles.availableToSpendText}>
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
-                  : switchOn
+                  : prefersBitcoin
                   ? UsNumberFormat(this.spendableBalance)
                   : exchangeRates
                   ? (
@@ -597,7 +603,7 @@ class SendConfirmation extends Component<
               <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
                   ? ' t-sats)'
-                  : switchOn
+                  : prefersBitcoin
                   ? ' sats)'
                   : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
@@ -691,7 +697,7 @@ class SendConfirmation extends Component<
                 <Text style={styles.amountText}>
                   {this.serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(totalAmount)
-                    : switchOn
+                    : prefersBitcoin
                     ? UsNumberFormat(totalAmount)
                     : exchangeRates
                     ? (
@@ -705,7 +711,7 @@ class SendConfirmation extends Component<
                   {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
                   {this.serviceType == TEST_ACCOUNT
                     ? ' t-sats'
-                    : switchOn
+                    : prefersBitcoin
                     ? ' sats'
                     : ' ' + CurrencyCode.toLocaleLowerCase()}
                 </Text>
@@ -1323,8 +1329,7 @@ const mapStateToProps = (state) => {
     accounts: idx(state, (_) => _.accounts) || [],
     WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP) || '',
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
-    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
+    currencyKind: idx(state, (_) => _.preferences.currencyKind),
   };
 };
 

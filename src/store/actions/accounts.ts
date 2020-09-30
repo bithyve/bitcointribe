@@ -301,6 +301,7 @@ export interface AddNewAccountCompletionAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_COMPLETED;
 };
 
+
 export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
   return { type: ADD_NEW_ACCOUNT_COMPLETED };
 };

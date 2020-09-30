@@ -17,7 +17,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from './ToggleSwitch';
+import CurrencyKindToggleSwitch from './CurrencyKindToggleSwitch';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import Toast from './Toast';
 import { updateDonationPreferences } from '../store/actions/accounts';
@@ -36,7 +36,7 @@ export default function SettingDonationWebPageContents(props) {
     if (
       isDonationTotalEnable !== props.account.configuration.displayBalance ||
       isDonationTransactionEnable !==
-        props.account.configuration.displayTransactions
+      props.account.configuration.displayTransactions
     )
       setSaveEnabled(true);
     else setSaveEnabled(false);
@@ -69,7 +69,7 @@ export default function SettingDonationWebPageContents(props) {
     isDonationTransactionEnable,
     props.account.configuration,
   ]);
-  
+
   return (
     <View style={styles.modalContentContainer}>
       <KeyboardAvoidingView
@@ -91,19 +91,19 @@ export default function SettingDonationWebPageContents(props) {
                 />
               </AppBottomSheetTouchableWrapper>
               <View>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Change settings'}
-              </Text>
-              <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp('1.5%'),
-                color: Colors.lightTextColor,
-              }}
-            >
-                Settings for the Donation web view
+                <Text style={styles.modalHeaderTitleText}>
+                  {'Change settings'}
+                </Text>
+                <Text
+                  style={{
+                    ...styles.modalInfoText,
+                    marginTop: wp('1.5%'),
+                    color: Colors.lightTextColor,
+                  }}
+                >
+                  Settings for the Donation web view
             </Text>
-            </View>
+              </View>
             </View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -167,12 +167,14 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={{...styles.modalTextBoxView, height: wp('20%')}}>
+            <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
-                style={{...styles.textBox,
+                style={{
+                  ...styles.textBox,
                   paddingRight: 20,
                   marginTop: 10,
-                  marginBottom: 10,}}
+                  marginBottom: 10,
+                }}
                 placeholder={'Enter a description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
@@ -206,18 +208,18 @@ export default function SettingDonationWebPageContents(props) {
                   Show the total funds received for the donation
                 </Text>
               </View>
-              <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+              <CurrencyKindToggleSwitch
+                changeSettingToggle={true}
+                thumbSize={wp('6%')}
                 isNotImage={true}
-                toggleColor={Colors.lightBlue}
-                toggleCircleColor={
+                trackColor={Colors.lightBlue}
+                thumbColor={
                   isDonationTotalEnable ? Colors.blue : Colors.white
                 }
                 onpress={() =>
                   setIsDonationTotalEnable((prevState) => !prevState)
                 }
-                toggle={isDonationTotalEnable}
+                isOn={isDonationTotalEnable}
               />
             </View>
             <View style={styles.rowContainer}>
@@ -237,35 +239,35 @@ export default function SettingDonationWebPageContents(props) {
                   Show / hide transactions on web view
                 </Text>
               </View>
-              <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+              <CurrencyKindToggleSwitch
+                changeSettingToggle={true}
+                thumbSize={wp('6%')}
                 isNotImage={true}
-                toggleColor={Colors.lightBlue}
-                toggleCircleColor={
+                trackColor={Colors.lightBlue}
+                thumbColor={
                   isDonationTransactionEnable ? Colors.blue : Colors.white
                 }
                 onpress={() =>
                   setIsDonationTransactionEnable((prevState) => !prevState)
                 }
-                toggle={isDonationTransactionEnable}
+                isOn={isDonationTransactionEnable}
               />
             </View>
 
             <View style={styles.rowContainer}>
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.lightBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text
+              <View
+                style={{
+                  ...styles.circleShapeView,
+                  backgroundColor: Colors.lightBlue,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
                   style={{
                     textAlign: 'center',
                     fontSize: RFValue(20),
-                  color: Colors.white,
+                    color: Colors.white,
                     lineHeight: RFValue(20), //... One for top and one for bottom alignment
                   }}
                 >
@@ -288,34 +290,34 @@ export default function SettingDonationWebPageContents(props) {
                   Show / hide transaction ID on the web view
                 </Text>
               </View>
-              <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+              <CurrencyKindToggleSwitch
+                changeSettingToggle={true}
+                thumbSize={wp('6%')}
                 isNotImage={true}
-                toggleColor={Colors.lightBlue}
-                toggleCircleColor={
-                    isTransactionDetailsEnable ? Colors.blue : Colors.white
+                trackColor={Colors.lightBlue}
+                thumbColor={
+                  isTransactionDetailsEnable ? Colors.blue : Colors.white
                 }
                 onpress={() =>
                   setIsTransactionDetails((prevState) => !prevState)
                 }
-                toggle={isTransactionDetailsEnable}
+                isOn={isTransactionDetailsEnable}
               />
             </View>
 
             <View style={styles.rowContainer}>
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.lightBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Image
-                style={{...styles.imageStyle, height: wp('7%'), width: wp('7%')}}
-                source={require('../assets/images/icons/icon_donation_white.png')}
-              />
+              <View
+                style={{
+                  ...styles.circleShapeView,
+                  backgroundColor: Colors.lightBlue,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Image
+                  style={{ ...styles.imageStyle, height: wp('7%'), width: wp('7%') }}
+                  source={require('../assets/images/icons/icon_donation_white.png')}
+                />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.titleTextStyle}>Pause Donation</Text>
@@ -329,23 +331,23 @@ export default function SettingDonationWebPageContents(props) {
                   Pause Donation
                 </Text>
               </View>
-              <ToggleSwitch
+              <CurrencyKindToggleSwitch
                 changeSettingToggle={true}
-                toggleSize={wp('6%')}
+                thumbSize={wp('6%')}
                 isNotImage={true}
-                toggleColor={Colors.lightBlue}
-                toggleCircleColor={
-                    isDonationPause ? Colors.blue : Colors.white
+                trackColor={Colors.lightBlue}
+                thumbColor={
+                  isDonationPause ? Colors.blue : Colors.white
                 }
                 onpress={() =>
                   setIsDonationPause((prevState) => !prevState)
                 }
-                toggle={isDonationPause}
+                isOn={isDonationPause}
               />
             </View>
 
           </View>
-          
+
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
