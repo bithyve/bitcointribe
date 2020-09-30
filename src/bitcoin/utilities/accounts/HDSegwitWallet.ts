@@ -281,6 +281,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 1,
     contactName?: string,
+    accountName?: string,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
@@ -309,8 +310,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
       default:
         if (!this.derivativeAccounts[accountType][accountNumber])
-          this.generateDerivativeXpub(accountType, accountNumber);
-
+          this.generateDerivativeXpub(accountType, accountNumber, accountName);
         break;
     }
 
@@ -1926,6 +1926,7 @@ export default class HDSegwitWallet extends Bitcoin {
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
+    accountName?: string,
   ) => {
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
@@ -1949,6 +1950,7 @@ export default class HDSegwitWallet extends Bitcoin {
         xpubId: crypto.createHash('sha256').update(xpub).digest('hex'),
         nextFreeAddressIndex: 0,
         nextFreeChangeAddressIndex: 0,
+        accountName,
       };
       this.derivativeAccounts[accountType].instance.using++;
 

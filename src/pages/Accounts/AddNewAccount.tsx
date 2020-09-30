@@ -164,13 +164,15 @@ class AddNewAccount extends PureComponent<
         instanceCount += derivativeAccounts[dervAccount].instance.using;
     }
 
-    const accountName = ` ${
+    const accountName = `${
       item.type === DONATION_ACCOUNT
         ? 'Donation Account'
         : item.type === REGULAR_ACCOUNT
         ? 'Checking Account'
         : 'Savings Account'
-    } ${instanceCount}`;
+    } ${
+      item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
+    }`;
     this.setState({
       selectedAccount: item,
       accountName,
@@ -490,6 +492,7 @@ class AddNewAccount extends PureComponent<
                   this.state.selectedAccount.type,
                   dervAccount,
                   accountNumber,
+                  this.state.accountName,
                 );
                 this.props.navigation.navigate('Accounts');
               }

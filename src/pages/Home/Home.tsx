@@ -34,6 +34,7 @@ import {
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AllAccountsContents from '../../components/AllAccountsContents';
 import SettingsContents from '../../components/SettingsContents';
@@ -683,21 +684,35 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           const account = derivativeAccounts[carouselAcc][index];
           idIndex++;
+
+          let title = '';
+          switch (carouselAcc) {
+            case DONATION_ACCOUNT:
+              title = account.subject ? account.subject : 'Donation Account';
+              break;
+
+            case SUB_PRIMARY_ACCOUNT:
+              if (serviceType === REGULAR_ACCOUNT)
+                title = account.accountName
+                  ? account.accountName
+                  : 'Checking Account';
+              else if (serviceType === SECURE_ACCOUNT)
+                title = account.accountName
+                  ? account.accountName
+                  : 'Savings Account';
+              break;
+          }
+
           const carouselInstance = {
             id: idIndex,
-            title:
-              carouselAcc === DONATION_ACCOUNT
-                ? 'Donation Account'
-                : serviceType === REGULAR_ACCOUNT
-                ? 'Checking Account'
-                : 'Savings Account',
+            title,
             unit: 'sats',
             amount: account.balances
               ? account.balances.balance + account.balances.unconfirmedBalance
               : 0,
             account:
               carouselAcc === DONATION_ACCOUNT
-                ? `Donate Bitcoin`
+                ? `Accept Bitcoin`
                 : serviceType === REGULAR_ACCOUNT
                 ? 'Fast and easy'
                 : 'Multi-factor security',

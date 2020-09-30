@@ -208,10 +208,11 @@ export const fetchDerivativeAccAddress = (
   serviceType,
   accountType,
   accountNumber?,
+  accountName?,
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_ADDRESS,
-    payload: { serviceType, accountType, accountNumber },
+    payload: { serviceType, accountType, accountNumber, accountName },
   };
 };
 
