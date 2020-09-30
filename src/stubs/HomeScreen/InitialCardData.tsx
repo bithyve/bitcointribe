@@ -7,5 +7,4 @@ const initialCardData: AccountPayload[] = [
   new CheckingAccountPayload(),
 ];
 
-
 export default initialCardData
