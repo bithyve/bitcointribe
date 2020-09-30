@@ -151,7 +151,7 @@ const getIconByAccountType = (type) => {
     return require('../../assets/images/icons/icon_secureaccount.png');
   } else if (type == 'test' || type === TEST_ACCOUNT) {
     return require('../../assets/images/icons/icon_test.png');
-  } else if (type === 'Donation Account') {
+  } else if (type === DONATION_ACCOUNT) {
     return require('../../assets/images/icons/icon_donation_hexa.png');
   } else {
     return require('../../assets/images/icons/icon_test.png');
@@ -718,7 +718,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 : 'Multi-factor security',
             accountType: serviceType,
             subType: carouselAcc,
-            iconType: serviceType === REGULAR_ACCOUNT ? 'regular' : 'secure',
           };
           additionalCardData.push(carouselInstance);
         }
