@@ -10,10 +10,12 @@ interface ConstructorProps {
   shortDescription: string;
   serviceAccountKind: ServiceAccountKind;
   accountNumber?: number;
+  displayOrder?: number | null;
   balance?: number;
   unit?: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName?: string | null;
+  customDescription?: string | null;
+  secondaryAccountUUIDs?: string[];
 }
 
 export default class ServiceAccountPayload implements ExternalServiceAccountPayload {
@@ -24,10 +26,12 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
   serviceAccountKind: ServiceAccountKind;
 
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit = BitcoinUnit.SATS;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
 
   constructor({
@@ -35,23 +39,31 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     shortDescription,
     serviceAccountKind,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps) {
     this.title = title;
     this.shortDescription = shortDescription;
     this.serviceAccountKind = serviceAccountKind;
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForServiceAccountKind(this.serviceAccountKind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 

@@ -8,10 +8,11 @@ import { ImportedWalletAccountPayload } from './AccountPayload';
 interface ConstructorProps {
   title?: string;
   accountNumber?: number;
+  displayOrder?: number | null;
   balance?: number;
   unit?: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName?: string | null;
+  customDescription?: string | null;
 }
 
 export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAccountPayload {
@@ -20,14 +21,16 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   shortDescription: string = "View a non-Hexa wallet as an account.";
   kind: AccountKind = AccountKind.WATCH_ONLY_IMPORTED_WALLET
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
@@ -35,10 +38,11 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   }: ConstructorProps = {}) {
     this.title = title || "Watch Only";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
   }
 
   get imageSource(): NodeRequire {
@@ -53,15 +57,17 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   shortDescription: string = "Fully import and manage a non-Hexa wallet.";
   kind: AccountKind = AccountKind.FULLY_IMPORTED_WALLET;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
 
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
@@ -69,10 +75,11 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   }: ConstructorProps = {}) {
     this.title = title || "Full Import";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
   }
 
 
