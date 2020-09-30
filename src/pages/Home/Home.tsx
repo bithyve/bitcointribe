@@ -1634,43 +1634,44 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     // donation transactions
-    const donationTxs = [];
-    let donationsBalance = 0;
+    const additionalTxs = [];
+    let additionalBalances = 0;
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
         accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const additionAcc of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[additionAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
+        for (
+          let index = 1;
+          index <= derivativeAccounts[additionAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[additionAcc][index];
 
-        if (donAcc.balances)
-          donationsBalance +=
-            donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
-        if (
-          donAcc.transactions &&
-          donAcc.transactions.transactionDetails.length
-        )
-          donationTxs.push(...donAcc.transactions.transactionDetails);
+          if (account.balances)
+            additionalBalances +=
+              account.balances.balance + account.balances.unconfirmedBalance;
+          if (
+            account.transactions &&
+            account.transactions.transactionDetails.length
+          )
+            additionalTxs.push(...account.transactions.transactionDetails);
+        }
       }
     }
 
     const accumulativeBalance =
-      regularBalance + secureBalance + donationsBalance;
+      regularBalance + secureBalance + additionalBalances;
 
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
-      ...donationTxs,
+      ...additionalTxs,
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
