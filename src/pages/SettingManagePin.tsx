@@ -14,11 +14,8 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ContactList from '../components/ContactList';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../components/ToggleSwitch';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,23 +53,10 @@ export default function SettingManagePin(props) {
     authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
   }, [authenticationFailed]);
 
-  const [switchOn, setSwitchOn] = useState(false);
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      {/* <View style={CommonStyle.headerContainer}>
-          <TouchableOpacity
-            style={CommonStyle.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.goBack();
-            }}
-          >
-            <View style={CommonStyle.headerLeftIconInnerContainer}>
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-            </View>
-          </TouchableOpacity>
-        </View> */}
+
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>

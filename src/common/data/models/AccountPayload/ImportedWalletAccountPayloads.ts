@@ -3,6 +3,7 @@ import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { ImportedWalletAccountPayload } from './Interfaces';
+import AccountVisibility from '../../enums/AccountVisibility';
 
 
 interface ConstructorProps {
@@ -13,6 +14,7 @@ interface ConstructorProps {
   unit?: BitcoinUnit;
   customDisplayName?: string | null;
   customDescription?: string | null;
+  visibility?: AccountVisibility;
   secondaryAccountUUIDs?: string[];
 }
 
@@ -27,6 +29,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
+  visibility: AccountVisibility;
   secondaryAccountUUIDs: string[];
 
   constructor({
@@ -37,6 +40,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Watch Only";
@@ -46,6 +50,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
@@ -70,6 +75,9 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
+
+  visibility: AccountVisibility;
+
   secondaryAccountUUIDs: string[];
 
   constructor({
@@ -80,6 +88,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Full Import";
@@ -89,6 +98,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Image, Text, StyleSheet, Linking } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -7,15 +7,28 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ToggleSwitch from './ToggleSwitch';
+import CurrencyKindToggleSwitch from './CurrencyKindToggleSwitch';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 import DeviceInfo from 'react-native-device-info';
+import useCurrencyKind from '../utils/hooks/state-selectors/UseCurrencyKind';
+import { useDispatch } from 'react-redux';
+import { currencyKindSet } from '../store/actions/preferences';
+import CurrencyKind from '../common/data/enums/CurrencyKind';
+import useCurrencyCode from '../utils/hooks/state-selectors/UseCurrencyCode';
+
 
 export default function SettingsContents(props) {
-  const [currencycode, setCurrencycode] = useState('');
-  const [switchOn, setSwitchOn] = useState(false);
+  const dispatch = useDispatch();
+  const currencyCode = useCurrencyCode();
+  const currencyKind: CurrencyKind = useCurrencyKind();
+
+  const prefersBitcoin = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
+
   const [PageData, setPageData] = useState([
     {
       title: 'Manage Passcode',
@@ -58,7 +71,7 @@ export default function SettingsContents(props) {
         {PageData.map((item) => {
           return (
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressManagePin(item.type, currencycode)}
+              onPress={() => props.onPressManagePin(item.type, currencyCode)}
               style={styles.selectedContactsView}
             >
               <Image
@@ -87,14 +100,16 @@ export default function SettingsContents(props) {
               </View>
               <View style={{ marginLeft: 'auto' }}>
                 {item.type == 'JumbleKeyboard' ? (
-                  <ToggleSwitch
+                  <CurrencyKindToggleSwitch
                     isNotImage={true}
-                    toggleColor={Colors.lightBlue}
-                    toggleCircleColor={Colors.blue}
+                    trackColor={Colors.lightBlue}
+                    thumbColor={Colors.blue}
                     onpress={() => {
-                      setSwitchOn(!switchOn);
+                      dispatch(currencyKindSet(
+                        prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                      ));
                     }}
-                    toggle={switchOn}
+                    isOn={prefersBitcoin}
                   />
                 ) : item.type != 'AboutApp' ? (
                   <Ionicons
@@ -138,7 +153,7 @@ export default function SettingsContents(props) {
         >
           <Text style={styles.addModalTitleText}>FAQs</Text>
         </AppBottomSheetTouchableWrapper>
-        
+
         <View
           style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }}
         />

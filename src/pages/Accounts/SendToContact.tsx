@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Component } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Image,
@@ -12,9 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
-  Alert,
   ActivityIndicator,
-  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -24,9 +22,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../../components/ToggleSwitch';
 import { nameToInitials } from '../../common/CommonFunctions';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   transferST1,
   addTransferDetails,
@@ -49,32 +45,21 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AccountSelectionModalContents from './AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import Currencies from '../../common/Currencies';
+import Currencies from '../../common/FiatCurrencies';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
-import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import config from '../../bitcoin/HexaConfig';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
-import { setCurrencyToggleValue } from '../../store/actions/preferences';
-
-const currencyCode = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
-];
+import { currencyKindSet } from '../../store/actions/preferences';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon';
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -87,8 +72,8 @@ interface SendToContactPropsTypes {
   clearTransfer: any;
   addTransferDetails: any;
   currencyCode: any;
-  currencyToggleValue: any;
-  setCurrencyToggleValue: any;
+  currencyKind: CurrencyKind;
+  currencyKindSet: (CurrencyKind) => void;
   averageTxFees: any;
   setAverageTxFee: any;
 }
@@ -106,7 +91,6 @@ interface SendToContactStateTypes {
   derivativeAccountDetails: { type: string; number: number };
   sweepSecure: any;
   removeItem: any;
-  switchOn: boolean;
   CurrencyCode: string;
   CurrencySymbol: string;
   bitcoinAmount: string;
@@ -121,14 +105,16 @@ interface SendToContactStateTypes {
   recipients: any[];
   spendableBalances: any;
   isSendMax: boolean;
+  prefersBitcoin: boolean;
 }
 
 class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
-> {
+  > {
   constructor(props) {
     super(props);
+
     this.state = {
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
@@ -146,7 +132,6 @@ class SendToContact extends Component<
       ),
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       removeItem: {},
-      switchOn: true,
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
@@ -167,6 +152,7 @@ class SendToContact extends Component<
         secureBalance: 0,
       },
       isSendMax: false,
+      prefersBitcoin: this.props.currencyKind === CurrencyKind.BITCOIN,
     };
   }
 
@@ -186,9 +172,9 @@ class SendToContact extends Component<
       if (bitcoinAmount) {
         const currency = this.state.exchangeRates
           ? (
-              (parseInt(bitcoinAmount) / 1e8) *
-              this.state.exchangeRates[this.state.CurrencyCode].last
-            ).toFixed(2)
+            (parseInt(bitcoinAmount) / 1e8) *
+            this.state.exchangeRates[this.state.CurrencyCode].last
+          ).toFixed(2)
           : 0;
 
         this.setState({
@@ -261,7 +247,7 @@ class SendToContact extends Component<
       prevState.currencyAmount !== this.state.currencyAmount ||
       prevState.spendableBalance !== this.state.spendableBalance ||
       prevProps.transfer[this.state.serviceType].transfer.details.length !==
-        this.props.transfer[this.state.serviceType].transfer.details.length
+      this.props.transfer[this.state.serviceType].transfer.details.length
     ) {
       this.amountCalculation();
     }
@@ -281,18 +267,18 @@ class SendToContact extends Component<
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
       : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -311,8 +297,8 @@ class SendToContact extends Component<
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
       : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        //      .unconfirmedBalance
-        0;
+      //      .unconfirmedBalance
+      0;
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
@@ -320,7 +306,7 @@ class SendToContact extends Component<
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -350,16 +336,12 @@ class SendToContact extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = this.props.currencyToggleValue;
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
     let currencyCodeTmp = this.props.currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
+
     this.setState({
-      switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
+
     for (let i = 0; i < Currencies.length; i++) {
       if (Currencies[i].code.includes(currencyCodeTmp)) {
         this.setState({ CurrencySymbol: Currencies[i].symbol });
@@ -383,7 +365,7 @@ class SendToContact extends Component<
             i
           ].selectedContact.hasOwnProperty('currencyAmount') &&
           selectedContact.id ==
-            transfer[serviceType].transfer.details[i].selectedContact.id
+          transfer[serviceType].transfer.details[i].selectedContact.id
         ) {
           removeTransferDetails(
             serviceType,
@@ -395,9 +377,10 @@ class SendToContact extends Component<
   };
 
   convertBitCoinToCurrency = (value) => {
-    const { switchOn, exchangeRates, CurrencyCode } = this.state;
+    const { exchangeRates, CurrencyCode, prefersBitcoin } = this.state;
+
     let temp = value;
-    if (switchOn) {
+    if (prefersBitcoin) {
       let result = exchangeRates
         ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
         : 0;
@@ -414,6 +397,11 @@ class SendToContact extends Component<
     }
   };
 
+
+  // TODO: I don't think averageTxFees should be a wallet-wide concern.
+  // I also don't think this component should be concerned about dong its
+  // own data fetching if it can't find what's SUPPOSED to be passed in
+  // as navigation props.
   storeAverageTxFees = async () => {
     const { service } = this.props;
     const { serviceType } = this.state;
@@ -421,9 +409,7 @@ class SendToContact extends Component<
     const instance =
       service[serviceType].service.hdWallet ||
       service[serviceType].service.secureHDWallet;
-    // const storedAverageTxFees = await AsyncStorage.getItem(
-    //   'storedAverageTxFees',
-    // );
+
     const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
       ? 'MAINNET'
       : 'TESTNET';
@@ -522,9 +508,8 @@ class SendToContact extends Component<
       averageTxFees,
       serviceType,
       spendableBalance,
-      switchOn,
     } = this.state;
-    const { transfer } = this.props;
+    const { transfer, currencyKind, currencyKindSet } = this.props;
 
     const recipientsList = [];
     let amountStacked = 0;
@@ -552,11 +537,9 @@ class SendToContact extends Component<
         return;
       }
       this.setState(
-        {
-          switchOn: !switchOn ? true : switchOn,
-          isSendMax: true,
-        },
+        { isSendMax: true },
         () => {
+          currencyKindSet(CurrencyKind.BITCOIN);
           this.convertBitCoinToCurrency(max.toString());
         },
       );
@@ -596,7 +579,7 @@ class SendToContact extends Component<
         if (config.EJECTED_ACCOUNTS.includes(selectedContact.id)) {
           if (
             instance.selectedContact.account_number ===
-              selectedContact.account_number &&
+            selectedContact.account_number &&
             instance.selectedContact.type === selectedContact.type
           ) {
             // skip (current donation instance), get added as currentRecipientInstance
@@ -637,9 +620,8 @@ class SendToContact extends Component<
           });
         } else {
           // recipient: trusted contact
-          const contactName = `${item.selectedContact.firstName} ${
-            item.selectedContact.lastName ? item.selectedContact.lastName : ''
-          }`.toLowerCase();
+          const contactName = `${item.selectedContact.firstName} ${item.selectedContact.lastName ? item.selectedContact.lastName : ''
+            }`.toLowerCase();
           recipients.push({
             id: contactName,
             address: null,
@@ -681,7 +663,7 @@ class SendToContact extends Component<
               transfer[serviceType].transfer.details[i].selectedContact
                 .account_number === selectedContact.account_number &&
               transfer[serviceType].transfer.details[i].selectedContact.type ===
-                selectedContact.type
+              selectedContact.type
             )
               removeTransferDetails(
                 serviceType,
@@ -711,18 +693,18 @@ class SendToContact extends Component<
     const {
       serviceType,
       spendableBalance,
-      switchOn,
+      prefersBitcoin,
       exchangeRates,
       CurrencyCode,
     } = this.state;
 
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(spendableBalance)
-      : switchOn
-      ? UsNumberFormat(spendableBalance)
-      : exchangeRates
-      ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-      : null;
+      : prefersBitcoin
+        ? UsNumberFormat(spendableBalance)
+        : exchangeRates
+          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          : null;
   };
 
   getIsMinimumAllowedStatus = () => {
@@ -742,7 +724,7 @@ class SendToContact extends Component<
       selectedContact,
       serviceType,
       removeItem,
-      switchOn,
+      prefersBitcoin,
       CurrencyCode,
       CurrencySymbol,
       bitcoinAmount,
@@ -795,13 +777,13 @@ class SendToContact extends Component<
             <Image
               source={
                 this.state.derivativeAccountDetails &&
-                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                  this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../assets/images/icons/icon_donation_hexa.png')
                   : serviceType == TEST_ACCOUNT
-                  ? require('../../assets/images/icons/icon_test.png')
-                  : serviceType == REGULAR_ACCOUNT
-                  ? require('../../assets/images/icons/icon_regular.png')
-                  : require('../../assets/images/icons/icon_secureaccount.png')
+                    ? require('../../assets/images/icons/icon_test.png')
+                    : serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -837,15 +819,15 @@ class SendToContact extends Component<
               }}
             >
               {this.state.derivativeAccountDetails &&
-              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType == 'TEST_ACCOUNT'
-                ? 'Test Account'
-                : serviceType == 'SECURE_ACCOUNT'
-                ? 'Savings Account'
-                : serviceType == 'REGULAR_ACCOUNT'
-                ? 'Checking Account'
-                : ''}
+                  ? 'Test Account'
+                  : serviceType == 'SECURE_ACCOUNT'
+                    ? 'Savings Account'
+                    : serviceType == 'REGULAR_ACCOUNT'
+                      ? 'Checking Account'
+                      : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -853,9 +835,9 @@ class SendToContact extends Component<
               <Text style={styles.textTsats}>
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
-                  : switchOn
-                  ? ' sats )'
-                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  : prefersBitcoin
+                    ? ' sats )'
+                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
             {isFromAddressBook && (
@@ -958,60 +940,136 @@ class SendToContact extends Component<
                             </Text>
                           ) : (
                             <Image
-                              source={require('../../assets/images/icons/icon_user.png')}
+                              source={
+                                item.selectedContact.account_name ===
+                                  'Checking Account'
+                                  ? require('../../assets/images/icons/icon_regular.png')
+                                  : item.selectedContact.account_name ===
+                                    'Savings Account'
+                                    ? require('../../assets/images/icons/icon_secureaccount.png')
+                                    : item.selectedContact.account_name ===
+                                      'Test Account'
+                                      ? require('../../assets/images/icons/icon_test_white.png')
+                                      : item.selectedContact.account_name ===
+                                        'Donation Account'
+                                        ? require('../../assets/images/icons/icon_donation_account.png')
+                                        : require('../../assets/images/icons/icon_user.png')
+                              }
                               style={styles.circleShapeView}
                             />
-                          )}
-                        </View>
-                      )}
-                      {/* {getImageIcon(item.selectedContact)} */}
-                      <TouchableOpacity
-                        style={styles.closeMarkStyle}
-                        onPress={() => {
-                          setTimeout(() => {
-                            this.setState({ removeItem: item });
-                          }, 2);
-                          (this.refs.RemoveBottomSheet as any).snapTo(1);
-                        }}
-                      >
-                        <AntDesign
-                          size={16}
-                          color={Colors.blue}
-                          name={'closecircle'}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <Text style={styles.name} numberOfLines={1}>
-                      {item.selectedContact.firstName === 'F&F request' &&
-                      item.selectedContact.contactsWalletName !== undefined &&
-                      item.selectedContact.contactsWalletName !== ''
-                        ? `${item.selectedContact.contactsWalletName}'s wallet`
-                        : item.selectedContact.name ||
+                          ) : item.selectedContact.image ? (
+                            <Image
+                              source={item.selectedContact.image}
+                              style={styles.circleShapeView}
+                            />
+                          ) : (
+                              <View
+                                style={{
+                                  ...styles.circleShapeView,
+                                  backgroundColor: Colors.shadowBlue,
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                {item.selectedContact &&
+                                  item.selectedContact.firstName ? (
+                                    <Text
+                                      style={{
+                                        textAlign: 'center',
+                                        fontSize: 13,
+                                        lineHeight: 13, //... One for top and one for bottom alignment
+                                      }}
+                                    >
+                                      {item && item.selectedContact
+                                        ? nameToInitials(
+                                          item.selectedContact.firstName ===
+                                            'F&F request' &&
+                                            item.selectedContact
+                                              .contactsWalletName !== undefined &&
+                                            item.selectedContact
+                                              .contactsWalletName !== ''
+                                            ? `${item.selectedContact.contactsWalletName}'s wallet`
+                                            : item.selectedContact.firstName &&
+                                              item.selectedContact.lastName
+                                              ? item.selectedContact.firstName +
+                                              ' ' +
+                                              item.selectedContact.lastName
+                                              : item.selectedContact.firstName &&
+                                                !item.selectedContact.lastName
+                                                ? item.selectedContact.firstName
+                                                : !item.selectedContact.firstName &&
+                                                  item.selectedContact.lastName
+                                                  ? item.selectedContact.lastName
+                                                  : '',
+                                        )
+                                        : ''}
+                                    </Text>
+                                  ) : item &&
+                                    item.selectedContact &&
+                                    item.selectedContact.id ? (
+                                      <Text
+                                        style={{
+                                          textAlign: 'center',
+                                          fontSize: 18,
+                                          lineHeight: 18, //... One for top and one for bottom alignment
+                                        }}
+                                      >
+                                        @
+                                      </Text>
+                                    ) : (
+                                      <Image
+                                        source={require('../../assets/images/icons/icon_user.png')}
+                                        style={styles.circleShapeView}
+                                      />
+                                    )}
+                              </View>
+                            )}
+                        {/* {getImageIcon(item.selectedContact)} */}
+                        <TouchableOpacity
+                          style={styles.closeMarkStyle}
+                          onPress={() => {
+                            setTimeout(() => {
+                              this.setState({ removeItem: item });
+                            }, 2);
+                            (this.refs.RemoveBottomSheet as any).snapTo(1);
+                          }}
+                        >
+                          <AntDesign
+                            size={16}
+                            color={Colors.blue}
+                            name={'closecircle'}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={styles.name} numberOfLines={1}>
+                        {item.selectedContact.firstName === 'F&F request' &&
+                          item.selectedContact.contactsWalletName !== undefined &&
+                          item.selectedContact.contactsWalletName !== ''
+                          ? `${item.selectedContact.contactsWalletName}'s wallet`
+                          : item.selectedContact.name ||
                           item.selectedContact.account_name ||
                           item.selectedContact.id}
-                    </Text>
-                    <Text style={styles.amountText}>
-                      {switchOn
-                        ? `${
-                            item.bitcoinAmount
-                              ? item.bitcoinAmount
-                              : bitcoinAmount
+                      </Text>
+                      <Text style={styles.amountText}>
+                        {prefersBitcoin
+                          ? `${item.bitcoinAmount
+                            ? item.bitcoinAmount
+                            : bitcoinAmount
                           }` +
                           `${serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
-                        : CurrencySymbol +
+                          : CurrencySymbol +
                           ' ' +
-                          `${
-                            item.currencyAmount
-                              ? item.currencyAmount
-                              : currencyAmount
+                          `${item.currencyAmount
+                            ? item.currencyAmount
+                            : currencyAmount
                           }`}
-                    </Text>
-                  </View>
-                );
-              })}
-              {/* renderMultipleContacts(item))} */}
-            </ScrollView>
-          ) : null}
+                      </Text>
+                    </View>
+                  );
+                })}
+                {/* renderMultipleContacts(item))} */}
+              </ScrollView>
+            ) : null}
         </View>
         <View style={styles.dividerView} />
         <KeyboardAvoidingView
@@ -1032,32 +1090,32 @@ class SendToContact extends Component<
                       width: wp('70%'),
                       height: wp('13%'),
                       alignItems: 'center',
-                      backgroundColor: !switchOn
+                      backgroundColor: !prefersBitcoin
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
                     onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
-                      {currencyCode.includes(CurrencyCode) ? (
+                      {materialIconCurrencyCodes.includes(CurrencyCode) ? (
                         <View style={styles.currencyImageView}>
-                          <MaterialCommunityIcons
-                            name={getCurrencyImageName(CurrencyCode)}
+                          <MaterialCurrencyCodeIcon
+                            currencyCode={CurrencyCode}
                             color={Colors.currencyGray}
                             size={wp('6%')}
                           />
                         </View>
                       ) : (
-                        <Image
-                          style={{
-                            ...styles.textBoxImage,
-                          }}
-                          source={getCurrencyImageByRegion(
-                            CurrencyCode,
-                            'gray',
-                          )}
-                        />
-                      )}
+                          <Image
+                            style={{
+                              ...styles.textBoxImage,
+                            }}
+                            source={getCurrencyImageByRegion(
+                              CurrencyCode,
+                              'gray',
+                            )}
+                          />
+                        )}
                       {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
@@ -1072,9 +1130,9 @@ class SendToContact extends Component<
                         height: wp('13%'),
                         width: wp('45%'),
                       }}
-                      editable={!switchOn}
+                      editable={!prefersBitcoin}
                       placeholder={
-                        switchOn
+                        prefersBitcoin
                           ? 'Converted amount in ' + CurrencyCode
                           : 'Enter amount in ' + CurrencyCode
                       }
@@ -1103,7 +1161,7 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {!switchOn && (
+                    {!prefersBitcoin && (
                       <Text
                         style={{
                           color: Colors.blue,
@@ -1139,7 +1197,7 @@ class SendToContact extends Component<
                       alignItems: 'center',
                       width: wp('70%'),
                       height: wp('13%'),
-                      backgroundColor: switchOn
+                      backgroundColor: prefersBitcoin
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
@@ -1161,15 +1219,15 @@ class SendToContact extends Component<
                         width: wp('45%'),
                       }}
                       placeholder={
-                        switchOn
+                        prefersBitcoin
                           ? serviceType == TEST_ACCOUNT
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
                           : serviceType == TEST_ACCOUNT
-                          ? 'Converted amount in t-sats'
-                          : 'Converted amount in sats'
+                            ? 'Converted amount in t-sats'
+                            : 'Converted amount in sats'
                       }
-                      editable={switchOn}
+                      editable={prefersBitcoin}
                       value={bitcoinAmount}
                       returnKeyLabel="Done"
                       returnKeyType="done"
@@ -1195,7 +1253,7 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {switchOn && (
+                    {prefersBitcoin && (
                       <Text
                         style={{
                           color: Colors.blue,
@@ -1212,17 +1270,15 @@ class SendToContact extends Component<
                   {/* {renderBitCoinInputText()} */}
                 </View>
                 <View style={styles.toggleSwitchView}>
-                  <ToggleSwitch
-                    currencyCodeValue={CurrencyCode}
-                    onpress={async () => {
-                      this.setState({ switchOn: !switchOn });
-                      let temp = !switchOn ? 'true' : '';
-                      this.props.setCurrencyToggleValue(temp);
-
-                      //await AsyncStorage.setItem('currencyToggleValue', temp);
+                  <CurrencyKindToggleSwitch
+                    fiatCurrencyCode={CurrencyCode}
+                    onpress={() => {
+                      this.props.currencyKindSet(
+                        this.state.prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                      );
                     }}
-                    toggle={switchOn}
-                    transform={true}
+                    isOn={this.state.prefersBitcoin}
+                    isVertical={true}
                   />
                 </View>
               </View>
@@ -1303,12 +1359,12 @@ class SendToContact extends Component<
                       ) : ( */}
                   {(!isConfirmDisabled &&
                     loading[serviceType].loading.transfer) ||
-                  (isConfirmDisabled &&
-                    loading[serviceType].loading.transfer) ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
-                  )}
+                    (isConfirmDisabled &&
+                      loading[serviceType].loading.transfer) ? (
+                      <ActivityIndicator size="small" />
+                    ) : (
+                      <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                    )}
                   {/* )} */}
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -1338,7 +1394,7 @@ class SendToContact extends Component<
                             if (
                               transfer[serviceType].transfer.details[i]
                                 .selectedContact.account_number ===
-                                selectedContact.account_number &&
+                              selectedContact.account_number &&
                               transfer[serviceType].transfer.details[i]
                                 .selectedContact.type === selectedContact.type
                             )
@@ -1440,19 +1496,12 @@ class SendToContact extends Component<
               title={'Sent Unsuccessful'}
               info={
                 'There seems to be a problem' +
-                '\n' +
-                transfer[serviceType].transfer.stage1.failed
+                  '\n' +
+                  transfer[serviceType].transfer.stage1.failed
                   ? transfer[serviceType].transfer.stage1.err ===
                     'Insufficient balance'
-                    ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
-                      //   `\n\nPlease reduce the transfer amount by ${(
-                      //     parseFloat(netAmount) +
-                      //     parseFloat(fee) -
-                      //     parseFloat(balance)
-                      //   ).toFixed(
-                      //     switchOn ? 0 : 2,
-                      //   )} in order to conduct this transaction`
-                      'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
+                    ?
+                    'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
                     : 'Something went wrong, please try again'
                   : 'Something went wrong, please try again'
               }
@@ -1541,8 +1590,7 @@ const mapStateToProps = (state) => {
     loading: idx(state, (_) => _.accounts),
     accounts: state.accounts || [],
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
-    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
+    currencyKind: idx(state, (_) => _.preferences.currencyKind),
   };
 };
 
@@ -1552,7 +1600,7 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
-    setCurrencyToggleValue,
+    currencyKindSet,
     setAverageTxFee,
   })(SendToContact),
 );

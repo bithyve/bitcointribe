@@ -3,6 +3,7 @@ import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { DonationReceivingAccountPayload } from './Interfaces';
+import AccountVisibility from '../../enums/AccountVisibility';
 
 interface ConstructorProps {
   title?: string;
@@ -14,6 +15,7 @@ interface ConstructorProps {
   unit?: BitcoinUnit;
   customDisplayName?: string | null;
   customDescription?: string | null;
+  visibility?: AccountVisibility;
   secondaryAccountUUIDs?: string[];
 }
 
@@ -32,6 +34,9 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
+
+  visibility: AccountVisibility;
+
   secondaryAccountUUIDs: string[];
 
   constructor({
@@ -44,6 +49,7 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps) {
     this.title = title || "Donation Account";
@@ -55,6 +61,7 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
