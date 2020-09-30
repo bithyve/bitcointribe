@@ -37,7 +37,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
 import { stat } from 'react-native-fs';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 
 // TODO: Remove this in favor of a generalized `AccountPayload` interface
 const ACCOUNT_VARS: {

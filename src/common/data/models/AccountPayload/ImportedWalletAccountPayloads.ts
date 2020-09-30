@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
-import { ImportedWalletAccountPayload } from './AccountPayload';
+import { ImportedWalletAccountPayload } from './Interfaces';
 
 
 interface ConstructorProps {
@@ -13,6 +13,7 @@ interface ConstructorProps {
   unit?: BitcoinUnit;
   customDisplayName?: string | null;
   customDescription?: string | null;
+  secondaryAccountUUIDs?: string[];
 }
 
 export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAccountPayload {
@@ -26,6 +27,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
@@ -35,6 +37,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Watch Only";
     this.accountNumber = accountNumber || 0;
@@ -43,10 +46,15 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 
@@ -62,7 +70,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
-
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
@@ -72,6 +80,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Full Import";
     this.accountNumber = accountNumber || 0;
@@ -80,10 +89,15 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }

@@ -92,7 +92,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
 import { AccountsState } from '../../store/reducers/accounts';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import WalletKind from '../../common/data/enums/WalletKind';
 import AccountKind from '../../common/data/enums/AccountKind';
 import { DonationAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
