@@ -27,8 +27,6 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
-  DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
 import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss';
@@ -46,7 +44,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications';
 import { storeFbtcData } from '../../store/actions/fbtc';
-import { setCurrencyCode, setCardData } from '../../store/actions/preferences';
+import { setCurrencyCode } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import Toast from '../../components/Toast';
@@ -65,7 +63,6 @@ import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
-import initialCardData from '../../stubs/HomeScreen/InitialCardData';
 import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
@@ -96,10 +93,7 @@ import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
 const releaseNotificationTopic = getReleaseTopic()
 import { AccountsState } from '../../store/reducers/accounts';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
-import WalletKind from '../../common/data/enums/WalletKind';
-import AccountKind from '../../common/data/enums/AccountKind';
-import AccountCardsList from './AccountCardsList';
-import DonationAccountPayload from '../../common/data/models/AccountPayload/DonationAccountPayload';
+import HomeAccountCardsList from './HomeAccountCardsList';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -150,7 +144,6 @@ export enum BottomSheetKind {
 }
 
 interface HomeStateTypes {
-  accountCardData: AccountPayload[];
   accountCardColumnData?: Array<[AccountPayload]>;
   notificationLoading: boolean;
   notificationData?: any[];
@@ -212,8 +205,6 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  setCardData: any;
-  cardDataProps: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -235,7 +226,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.openBottomSheetOnLaunchTimeout = null;
 
     this.state = {
-      accountCardData: [],
       notificationData: [],
       accountCardColumnData: [],
       CurrencyCode: 'USD',
@@ -532,16 +522,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   makeAccountCardColumnData = () => {
-    const accountCardData = this.state.accountCardData;
+    const activeAccounts: AccountPayload[] = this.props.accountsState.activeAccounts;
 
-    if (accountCardData.length <= 2) {
-      return [accountCardData];
+    if (activeAccounts.length <= 2) {
+      return [activeAccounts];
     }
 
     let columns = [];
     let currentColumn = [];
 
-    for (let account of accountCardData) {
+    for (let account of activeAccounts) {
       currentColumn.push(account);
 
       if (currentColumn.length == 2) {
@@ -557,17 +547,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.setState({ accountCardColumnData: columns });
   };
 
-
-  updateAccountCardData = () => {
-    this.setState({
-      accountCardData: [
-        ...initialCardData,
-        ...(this.props.accountsState?.addedAccounts || []),
-      ],
-    }, () => {
-      this.makeAccountCardColumnData();
-    });
-  };
 
   scheduleNotification = async () => {
     const channelId = new firebase.notifications.Android.Channel(
@@ -633,7 +612,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { s3Service, navigation } = this.props;
 
     this.closeBottomSheet();
-    this.updateAccountCardData();
+    this.makeAccountCardColumnData();
     this.getBalances();
 
     this.appStateListener = AppState.addEventListener(
@@ -773,7 +752,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
-      this.updateAccountCardData();
+      this.makeAccountCardColumnData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -1598,19 +1577,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleAccountCardSelection = (selectedAccount: AccountPayload) => {
-    // TODO: This should be inferrable from the structure of the `AccountPayload`.
-    const deprecatedServiceType = {
-      [AccountKind.TEST]: TEST_ACCOUNT,
-      [AccountKind.REGULAR]: REGULAR_ACCOUNT,
-      [AccountKind.SECURE]: SECURE_ACCOUNT,
-    }[selectedAccount.kind] || SECURE_ACCOUNT;
-
-    // TODO: We should be able to navigate with an id instead
-    const index = this.state.accountCardData.indexOf(selectedAccount);
-
-    this.props.navigation.navigate('Accounts', {
-      serviceType: deprecatedServiceType,
-      index,
+    this.props.navigation.navigate('AccountDetails', {
+      accountID: selectedAccount.uuid,
     });
   };
 
@@ -2036,7 +2004,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       exchangeRates,
       walletName,
       overallHealth,
-      cardDataProps,
     } = this.props;
 
     return (
@@ -2070,9 +2037,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         <View style={{ flex: 7 }}>
           <View style={styles.accountCardsContainer}>
-            <AccountCardsList
+            <HomeAccountCardsList
               columnData={accountCardColumnData}
-              fiatCurrencyCode={currencyCode}
               isBalanceLoading={isBalanceLoading}
               onAddNewSelected={this.navigateToAddNewAccountScreen}
               onCardSelected={this.handleAccountCardSelection}
@@ -2139,16 +2105,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications,
+    accountsState: state.accounts,
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
-    accountsState: state.accounts || {},
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     UNDER_CUSTODY: idx(
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
-    cardDataProps: idx(state, (_) => _.preferences.cardData),
-
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
@@ -2184,7 +2148,6 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    setCardData,
   })(Home),
 );
 

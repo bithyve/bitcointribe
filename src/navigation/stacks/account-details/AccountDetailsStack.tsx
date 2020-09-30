@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
-import AccountDetailsScreen from '../../../pages/Accounts/Index';
+import AccountDetailsContainerScreen from '../../../pages/Accounts/Details/AccountDetailsContainer';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import SendStack from '../send/SendStack';
@@ -9,10 +9,8 @@ import SendStack from '../send/SendStack';
 const AccountDetailsStack = createStackNavigator(
   {
     AccountDetailsRoot: {
-      screen: AccountDetailsScreen,
-      navigationOptions: {
-        header: null,
-      },
+      screen: AccountDetailsContainerScreen,
+      navigationOptions: AccountDetailsContainerScreen.navigationOptions,
     },
     Send: {
       screen: SendStack,

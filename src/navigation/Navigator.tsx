@@ -62,9 +62,8 @@ import HomeStack from './stacks/home/HomeStack';
 import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
 import SendStack from './stacks/send/SendStack';
 import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
-import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AccountDetails';
+import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
-
 
 const SetupNavigator = createStackNavigator(
   {
@@ -129,6 +128,7 @@ const AddNewAccountStack = createStackNavigator(
     initialRouteName: 'AccountSelectionList',
   },
 );
+
 
 const HomeNavigator = createStackNavigator(
   {
