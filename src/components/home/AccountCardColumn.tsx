@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import HomeAccountsListCard from './HomeAccountsListCard';
 
 export interface Props {
