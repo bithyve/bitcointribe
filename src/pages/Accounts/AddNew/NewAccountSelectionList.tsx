@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, SectionList } from 'react-native';
-import AccountPayload, { ExternalServiceAccountPayload } from '../../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload, { ExternalServiceAccountPayload } from '../../../common/data/models/AccountPayload/Interfaces';
 import NEW_ACCOUNT_CHOICES from './NewAccountChoices';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';

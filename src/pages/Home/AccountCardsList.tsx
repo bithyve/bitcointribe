@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { FlatList } from 'react-native';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import AccountCardColumn from '../../components/home/AccountCardColumn';
 import AddNewAccountCard from './AddNewAccountCard';
 

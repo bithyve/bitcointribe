@@ -106,7 +106,7 @@ import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
 import { AccountsState } from '../../store/reducers/accounts';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import WalletKind from '../../common/data/enums/WalletKind';
 import AccountKind from '../../common/data/enums/AccountKind';
 import { DonationAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
