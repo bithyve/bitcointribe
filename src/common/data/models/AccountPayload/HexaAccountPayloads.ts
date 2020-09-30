@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { iconForAccountKind, iconForServiceAccountKind } from '../../../../utils/accounts/IconUtils';
+import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { HexaAccountPayload } from './AccountPayload';
@@ -8,10 +8,12 @@ import { HexaAccountPayload } from './AccountPayload';
 interface ConstructorProps {
   title?: string;
   accountNumber?: number;
+  displayOrder?: number | null;
   balance?: number;
   unit?: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName?: string | null;
+  customDescription?: string | null;
+  secondaryAccountUUIDs?: string[];
 }
 
 
@@ -21,27 +23,38 @@ export class TestAccountPayload implements HexaAccountPayload {
   shortDescription: string = "Learn Bitcoin";
   kind: AccountKind = AccountKind.TEST;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit = BitcoinUnit.TSATS;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
+
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Test Account";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 
@@ -51,29 +64,39 @@ export class SavingsAccountPayload implements HexaAccountPayload {
   shortDescription: string = "Multi-factor security";
   kind: AccountKind = AccountKind.SECURE;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDescription?: string;
-  customDisplayName?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Savings Account";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 
@@ -83,29 +106,39 @@ export class CheckingAccountPayload implements HexaAccountPayload {
   shortDescription: string = "Fast and easy";
   kind: AccountKind = AccountKind.REGULAR;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDescription?: string;
-  customDisplayName?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Checking Account";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 
@@ -116,29 +149,39 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
   shortDescription: string = "Account with Trusted Contacts";
   kind: AccountKind = AccountKind.TRUSTED_CONTACTS;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Joint Account";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
 
@@ -149,28 +192,38 @@ export class DonationAccountPayload implements HexaAccountPayload {
   shortDescription: string = "Directly Accept Donations";
   kind: AccountKind = AccountKind.DONATION;
   accountNumber: number;
+  displayOrder: number | null;
   balance: number;
   unit: BitcoinUnit;
-  customDisplayName?: string;
-  customDescription?: string;
+  customDisplayName: string | null;
+  customDescription: string | null;
+  secondaryAccountUUIDs: string[];
 
   constructor({
     title,
     accountNumber,
+    displayOrder,
     balance,
     unit,
     customDisplayName,
     customDescription,
+    secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Donation Account";
     this.accountNumber = accountNumber || 0;
+    this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
     this.unit = unit || BitcoinUnit.SATS;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
+    this.customDisplayName = customDisplayName || null;
+    this.customDescription = customDescription || null;
+    this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
   get imageSource(): NodeRequire {
     return iconForAccountKind(this.kind);
+  }
+
+  get isPrimaryAccount(): boolean {
+    return this.secondaryAccountUUIDs.length === 0;
   }
 }
