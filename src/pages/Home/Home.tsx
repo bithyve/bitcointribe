@@ -112,8 +112,8 @@ import { AccountsState } from '../../store/reducers/accounts';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import WalletKind from '../../common/data/enums/WalletKind';
 import AccountKind from '../../common/data/enums/AccountKind';
-import { DonationAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
 import AccountCardsList from './AccountCardsList';
+import DonationAccountPayload from '../../common/data/models/AccountPayload/DonationAccountPayload';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -632,7 +632,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  makes = () => {
+  makeAccountCardColumnData = () => {
     const accountCardData = this.state.accountCardData;
 
     if (accountCardData.length <= 2) {
@@ -659,61 +659,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
 
-  getDonationAccountsCardDataForWallet = (
-    walletKind: WalletKind.SECURE_HD_WALLET | WalletKind.HD_WALLET
-  ): AccountPayload[] => {
-    const { accountsState } = this.props;
-    const accountKind = walletKind === WalletKind.SECURE_HD_WALLET ?
-      SECURE_ACCOUNT : REGULAR_ACCOUNT;
-
-    const accountData = accountsState[accountKind].service;
-    if (!accountData) { return []; }
-
-    const walletKindKey = walletKind === WalletKind.SECURE_HD_WALLET ?
-      'secureHDWallet' : 'hdWallet';
-
-    const donationAccountData = accountData[walletKindKey].derivativeAccounts[DONATION_ACCOUNT];
-    if (!donationAccountData) { return []; }
-
-    let cardData = [];
-
-    for (
-      let index = 1;
-      index <= donationAccountData.instance.using;
-      index++
-    ) {
-      const donationAccountElements: DonationDerivativeAccountElements = donationAccountData[index];
-
-      const donationCardInstance = new DonationAccountPayload({
-        balance: donationAccountElements.balances ?
-          donationAccountElements.balances.balance + donationAccountElements.balances.unconfirmedBalance
-          : 0,
-      });
-
-      cardData.push(donationCardInstance);
-    }
-
-    return cardData;
-  }
-
   updateAccountCardData = () => {
-    let donationAccountCardData = [];
-
-    for (const walletKind of [WalletKind.SECURE_HD_WALLET, WalletKind.HD_WALLET]) {
-      const donationAccountCardData = this.getDonationAccountsCardDataForWallet(walletKind);
-
-      donationAccountCardData.push(...donationAccountCardData);
-    }
-
     this.setState({
       accountCardData: [
         ...initialCardData,
-        ...donationAccountCardData,
-        ...this.props.accountsState.addedAccounts,
+        ...(this.props.accountsState?.addedAccounts || []),
       ],
     }, () => {
-      this.makes();
-    })
+      this.makeAccountCardColumnData();
+    });
   };
 
   scheduleNotification = async () => {
@@ -3213,6 +3167,5 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: -1 },
     paddingTop: 16,
     width: '100%',
-    // paddingLeft: 14,
   },
 });
