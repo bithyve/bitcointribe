@@ -17,7 +17,7 @@ interface ConstructorProps {
   secondaryAccountUUIDs?: string[];
 }
 
-export class DonationAccountPayload implements DonationReceivingAccountPayload {
+export default class DonationAccountPayload implements DonationReceivingAccountPayload {
   uuid: string = uuidv4();
   title: string;
   shortDescription: string = "Directly Accept Donations";
