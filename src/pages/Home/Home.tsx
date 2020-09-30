@@ -714,8 +714,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                ? 'Fast and easy'
-                : 'Multi-factor security',
+                ? 'User Checking Account'
+                : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
           };
