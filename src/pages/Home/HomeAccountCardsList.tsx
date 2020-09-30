@@ -6,22 +6,17 @@ import AddNewAccountCard from './AddNewAccountCard';
 
 export interface Props {
   columnData: Array<AccountPayload[]>;
-  prefersBTCUnits: boolean;
-  fiatCurrencyCode: string;
   isBalanceLoading: boolean;
   onCardSelected: (selectedAccount: AccountPayload) => void;
   onAddNewSelected: () => void;
 }
 
-const AccountCardsList: React.FC<Props> = ({
+const HomeAccountCardsList: React.FC<Props> = ({
   columnData,
-  prefersBTCUnits,
-  fiatCurrencyCode,
   isBalanceLoading,
   onCardSelected,
   onAddNewSelected,
 }: Props) => {
-
   const columnCount = useMemo(() => {
     return columnData.length;
   }, [columnData]);
@@ -55,8 +50,6 @@ const AccountCardsList: React.FC<Props> = ({
               (item as AccountPayload[]).length === 1 &&
               index === columnCount - 1
             }
-            prefersBTCUnits={prefersBTCUnits}
-            fiatCurrencyCode={fiatCurrencyCode}
             onAccountCardSelected={onCardSelected}
             onAddNewAccountPressed={onAddNewSelected}
           />
@@ -66,4 +59,4 @@ const AccountCardsList: React.FC<Props> = ({
   );
 };
 
-export default AccountCardsList;
+export default HomeAccountCardsList;

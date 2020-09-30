@@ -13,14 +13,15 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import useExchangeRates from '../../utils/hooks/state-selectors/UseExchangeRates';
 import { UsNumberFormat } from '../../common/utilities';
 import { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit';
-import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions';
-import MaterialCurrencyCodeIcon from '../MaterialCurrencyCodeIcon';
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 
 export interface Props {
   accountPayload: AccountPayload;
-  prefersBTCUnits: boolean;
-  fiatCurrencyCode: string;
   isBalanceLoading: boolean;
 }
 
@@ -67,18 +68,6 @@ export function headerImageSourceForAccount(accountPayload: AccountPayload): Nod
   }
 }
 
-const supportedIconCurrencyCodes = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
-];
-
 
 const BalanceCurrencyIcon = ({ isUsingBitcoinUnits, fiatCurrencyCode }) => {
   if (isUsingBitcoinUnits) {
@@ -86,9 +75,9 @@ const BalanceCurrencyIcon = ({ isUsingBitcoinUnits, fiatCurrencyCode }) => {
       style={styles.balanceCurrencyImage}
       source={require('../../assets/images/currencySymbols/icon_bitcoin_gray.png')}
     />;
-  } else if (supportedIconCurrencyCodes.includes(fiatCurrencyCode)) {
+  } else if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
     return <MaterialCurrencyCodeIcon
-      iconName={getCurrencyImageName(fiatCurrencyCode)}
+      currencyCode={fiatCurrencyCode}
       color={Colors.lightBlue}
       size={styles.balanceCurrencyImage.width}
     />;
@@ -177,16 +166,20 @@ const LoadingBalanceView: React.FC = () => {
 
 const BodySection: React.FC<BodyProps> = ({
   accountPayload,
-  prefersBTCUnits,
-  fiatCurrencyCode,
   isBalanceLoading,
 }: BodyProps) => {
+  const fiatCurrencyCode = useCurrencyCode();
+  const currencyKind = useCurrencyKind();
   const accountsState = useAccountsState();
   const exchangeRates = useExchangeRates();
 
+  const prefersBitcoin = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
   const isUsingBitcoinUnits = useMemo(() => {
-    return prefersBTCUnits || accountPayload.kind === AccountKind.TEST;
-  }, [prefersBTCUnits, accountPayload.kind])
+    return prefersBitcoin || accountPayload.kind === AccountKind.TEST;
+  }, [prefersBitcoin, accountPayload.kind])
 
   const formattedBalanceText = useMemo(() => {
     const balance = accountPayload.balance || 0;
@@ -257,8 +250,6 @@ const BodySection: React.FC<BodyProps> = ({
 
 const HomeAccountsListCard: React.FC<Props> = ({
   accountPayload,
-  prefersBTCUnits,
-  fiatCurrencyCode,
   isBalanceLoading,
 }: Props) => {
   return (
@@ -267,8 +258,6 @@ const HomeAccountsListCard: React.FC<Props> = ({
 
       <BodySection
         accountPayload={accountPayload}
-        prefersBTCUnits={prefersBTCUnits}
-        fiatCurrencyCode={fiatCurrencyCode}
         isBalanceLoading={isBalanceLoading}
       />
     </CardView>

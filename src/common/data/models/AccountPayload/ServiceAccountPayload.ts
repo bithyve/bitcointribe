@@ -4,6 +4,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import { ExternalServiceAccountPayload } from './Interfaces';
+import AccountVisibility from '../../enums/AccountVisibility';
 
 interface ConstructorProps {
   title: string;
@@ -15,6 +16,7 @@ interface ConstructorProps {
   unit?: BitcoinUnit;
   customDisplayName?: string | null;
   customDescription?: string | null;
+  visibility: AccountVisibility;
   secondaryAccountUUIDs?: string[];
 }
 
@@ -31,6 +33,9 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
   unit: BitcoinUnit = BitcoinUnit.SATS;
   customDisplayName: string | null;
   customDescription: string | null;
+
+  visibility: AccountVisibility;
+
   secondaryAccountUUIDs: string[];
 
 
@@ -44,6 +49,7 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps) {
     this.title = title;
@@ -55,6 +61,7 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
