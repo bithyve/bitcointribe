@@ -345,7 +345,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             accountType = account.subject
               ? account.subject
               : 'Donation Account';
-            accountInfo = 'Accept Bitcoin';
+            accountInfo = 'Accept bitcoin';
             backgroundImage = require('../../assets/images/carouselImages/donation_account_background.png');
             accountTypeImage = require('../../assets/images/icons/icon_donation_account.png');
           } else if (serviceType === REGULAR_ACCOUNT) {

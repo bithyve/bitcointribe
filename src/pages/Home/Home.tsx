@@ -712,7 +712,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               : 0,
             account:
               carouselAcc === DONATION_ACCOUNT
-                ? `Accept Bitcoin`
+                ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
                 ? 'Fast and easy'
                 : 'Multi-factor security',
