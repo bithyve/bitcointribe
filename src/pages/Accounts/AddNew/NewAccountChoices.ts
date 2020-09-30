@@ -1,7 +1,8 @@
 import ServiceAccountKind from "../../../common/data/enums/ServiceAccountKind";
-import { CheckingAccountPayload, DonationAccountPayload, SavingsAccountPayload, TestAccountPayload, TrustedContactsAccountPayload } from "../../../common/data/models/AccountPayload/HexaAccountPayloads";
+import { CheckingAccountPayload, SavingsAccountPayload, TestAccountPayload, TrustedContactsAccountPayload } from "../../../common/data/models/AccountPayload/HexaAccountPayloads";
 import { FullyImportedWalletAccountPayload, WatchOnlyImportedWalletAccountPayload } from "../../../common/data/models/AccountPayload/ImportedWalletAccountPayloads";
 import ServiceAccountPayload from "../../../common/data/models/AccountPayload/ServiceAccountPayload";
+import DonationAccountPayload from "../../../common/data/models/AccountPayload/DonationAccountPayload";
 
 // TODO: Make this a reusable hook that dynamically computes default properties
 const NEW_ACCOUNT_CHOICES = {
@@ -10,7 +11,10 @@ const NEW_ACCOUNT_CHOICES = {
     new SavingsAccountPayload(),
     new CheckingAccountPayload(),
     new TrustedContactsAccountPayload(),
-    new DonationAccountPayload(),
+    new DonationAccountPayload({
+      doneeName: 'Sample Donee',
+      causeName: 'Bitcoin Development Fund',
+    }),
   ],
 
   serviceAccounts: [
