@@ -12,9 +12,9 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
-  Alert,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from 'react-native';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
@@ -24,14 +24,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../../../components/ToggleSwitch';
 import {
   transferST1,
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
 } from '../../../store/actions/accounts';
-import { currencyKindSet } from '../../../store/actions/preferences';
 import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
 import { UsNumberFormat } from '../../../common/utilities';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -47,41 +45,26 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
+import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
+import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
+import { RecipientDescribing, ContactRecipientDescribing, AccountRecipientDescribing, makeContactRecipientDescription, makeSubAccountRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { connect } from 'react-redux';
+import idx from 'idx';
+import { withNavigationFocus } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import { config } from 'react-native-firebase';
+import { currencyKindSet } from '../../../store/actions/preferences';
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../../components/MaterialCurrencyCodeIcon';
+import { getCurrencyImageByRegion } from '../../../common/CommonFunctions';
+import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwitch';
+import BottomInfoBox from '../../../components/BottomInfoBox';
 import AccountSelectionModalContents from '../AccountSelectionModalContents';
 import SmallHeaderModal from '../../../components/SmallHeaderModal';
-import BottomInfoBox from '../../../components/BottomInfoBox';
 import FiatCurrencies from '../../../common/FiatCurrencies';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getCurrencyImageByRegion } from '../../../common/CommonFunctions/index';
-import { getCurrencyImageName } from '../../../common/CommonFunctions/index';
-import config from '../../../bitcoin/HexaConfig';
-import { connect } from 'react-redux';
-import { withNavigationFocus } from 'react-navigation';
-import idx from 'idx';
-import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
-import CurrencyKind from '../../../common/data/enums/CurrencyKind';
-import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
-import {
-  RecipientDescribing,
-  makeContactRecipientDescription,
-  makeSubAccountRecipientDescription,
-} from '../../../common/data/models/interfaces/RecipientDescribing';
 import Loader from '../../../components/loader';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
-
-const currencyCode = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
-];
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -427,11 +410,8 @@ class SendToContact extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
     let currencyCodeTmp = this.props.currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
+
     this.setState({
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
@@ -474,7 +454,8 @@ class SendToContact extends Component<
   };
 
   convertBitCoinToCurrency = (value) => {
-    const { prefersBitcoin, exchangeRates, CurrencyCode } = this.state;
+    const { exchangeRates, CurrencyCode, prefersBitcoin } = this.state;
+
     let temp = value;
     if (prefersBitcoin) {
       let result = exchangeRates
@@ -493,7 +474,13 @@ class SendToContact extends Component<
     }
   };
 
+
+  // TODO: I don't think averageTxFees should be a wallet-wide concern.
+  // I also don't think this component should be concerned about dong its
+  // own data fetching if it can't find what's SUPPOSED to be passed in
+  // as navigation props.
   setAverageTxFees = async () => {
+    const { accountsState } = this.props;
     const { serviceType } = this.state;
 
     const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
@@ -617,6 +604,7 @@ class SendToContact extends Component<
           isSendMax: true,
         },
         () => {
+          currencyKindSet(CurrencyKind.BITCOIN);
           this.convertBitCoinToCurrency(max.toString());
         },
       );
@@ -961,6 +949,14 @@ class SendToContact extends Component<
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.selectedContact.account_name != null) {
+                // 🔑 This seems to be the way the backend is defining the "account kind".
+                const accountKind = {
+                  'Checking Account': REGULAR_ACCOUNT,
+                  'Savings Account': SECURE_ACCOUNT,
+                  'Test Account': TEST_ACCOUNT,
+                  'Donation Account': DONATION_ACCOUNT,
+                }[item.selectedContact.account_name || 'Checking Account'];
+
                 recipient = makeSubAccountRecipientDescription(
                   newItem,
                   accountKind,
@@ -1025,10 +1021,10 @@ class SendToContact extends Component<
                     onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
-                      {currencyCode.includes(CurrencyCode) ? (
+                      {materialIconCurrencyCodes.includes(CurrencyCode) ? (
                         <View style={styles.currencyImageView}>
-                          <MaterialCommunityIcons
-                            name={getCurrencyImageName(CurrencyCode)}
+                          <MaterialCurrencyCodeIcon
+                            currencyCode={CurrencyCode}
                             color={Colors.currencyGray}
                             size={wp('6%')}
                           />
@@ -1199,8 +1195,8 @@ class SendToContact extends Component<
                 </View>
 
                 <View style={styles.toggleSwitchView}>
-                  <ToggleSwitch
-                    currencyCodeValue={CurrencyCode}
+                  <CurrencyKindToggleSwitch
+                    fiatCurrencyCode={CurrencyCode}
                     onpress={() => {
                       const newValue = prefersBitcoin
                         ? CurrencyKind.FIAT
@@ -1213,8 +1209,8 @@ class SendToContact extends Component<
                         },
                       );
                     }}
-                    toggle={prefersBitcoin}
-                    transform={true}
+                    isOn={prefersBitcoin}
+                    isVertical={true}
                   />
                 </View>
               </View>

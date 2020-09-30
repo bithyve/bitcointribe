@@ -10,13 +10,11 @@ import {
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS,
-  CARD_DATA,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import { stat } from 'fs';
 
 const initialState = ip.freeze({
   hasShownNoInternetWarning: false,
@@ -35,7 +33,6 @@ const initialState = ip.freeze({
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
-  cardData: null,
 });
 
 export default (state = initialState, { type, payload }) => {
@@ -110,11 +107,6 @@ export default (state = initialState, { type, payload }) => {
         applicationStatus: payload.status,
       };
 
-    case CARD_DATA:
-      return {
-        ...state,
-        cardData: payload.cardData,
-      };
     default:
       return state;
   }

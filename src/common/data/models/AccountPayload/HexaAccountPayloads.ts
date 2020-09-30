@@ -3,6 +3,7 @@ import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { HexaAccountPayload } from './Interfaces';
+import AccountVisibility from '../../enums/AccountVisibility';
 
 
 interface ConstructorProps {
@@ -14,6 +15,7 @@ interface ConstructorProps {
   customDisplayName?: string | null;
   customDescription?: string | null;
   secondaryAccountUUIDs?: string[];
+  visibility?: AccountVisibility;
 }
 
 export class TestAccountPayload implements HexaAccountPayload {
@@ -28,6 +30,7 @@ export class TestAccountPayload implements HexaAccountPayload {
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
+  visibility: AccountVisibility;
 
 
   constructor({
@@ -37,6 +40,7 @@ export class TestAccountPayload implements HexaAccountPayload {
     balance,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Test Account";
@@ -45,6 +49,7 @@ export class TestAccountPayload implements HexaAccountPayload {
     this.balance = balance || 0;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
@@ -69,6 +74,7 @@ export class SavingsAccountPayload implements HexaAccountPayload {
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
+  visibility: AccountVisibility;
 
   constructor({
     title,
@@ -78,6 +84,7 @@ export class SavingsAccountPayload implements HexaAccountPayload {
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Savings Account";
@@ -87,6 +94,7 @@ export class SavingsAccountPayload implements HexaAccountPayload {
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
@@ -111,6 +119,7 @@ export class CheckingAccountPayload implements HexaAccountPayload {
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
+  visibility: AccountVisibility;
 
   constructor({
     title,
@@ -120,6 +129,7 @@ export class CheckingAccountPayload implements HexaAccountPayload {
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Checking Account";
@@ -129,6 +139,7 @@ export class CheckingAccountPayload implements HexaAccountPayload {
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
@@ -154,6 +165,7 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
+  visibility: AccountVisibility;
 
   constructor({
     title,
@@ -163,6 +175,7 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
     unit,
     customDisplayName,
     customDescription,
+    visibility,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
     this.title = title || "Joint Account";
@@ -172,6 +185,7 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
     this.unit = unit || BitcoinUnit.SATS;
     this.customDisplayName = customDisplayName || null;
     this.customDescription = customDescription || null;
+    this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
   }
 
