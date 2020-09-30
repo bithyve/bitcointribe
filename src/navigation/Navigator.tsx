@@ -16,7 +16,6 @@ import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDoc
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
@@ -77,9 +76,10 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
-import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AccountDetails';
+import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 import { MoreOptionsStack } from './stacks/MoreOptions';
+import AccountDetailsContainer from '../pages/Accounts/Details/AccountDetailsContainer';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -151,6 +151,29 @@ const AddNewAccountStack = createStackNavigator(
   },
 );
 
+
+const AccountDetailsStack = createStackNavigator(
+  {
+    AccountDetailsRoot: {
+      screen: AccountDetailsContainer,
+      navigationOptions: AccountDetailsContainer.navigationOptions,
+      // navigationOptions: {
+      //   headerShown: false,
+      // },
+    },
+    // AccountSettings: {
+      // screen: AccountSettings,
+      // navigationOptions: AccountSettings.navigationOptions,
+    // },
+  },
+  {
+    mode: 'modal',
+    initialRouteName: 'AccountDetailsRoot',
+  },
+);
+
+
+
 const HomeNavigator = createStackNavigator(
   {
     Home: {
@@ -164,7 +187,10 @@ const HomeNavigator = createStackNavigator(
       },
     },
     Intermediate,
-    Accounts,
+    // Accounts,
+    AccountDetails: {
+      screen: AccountDetailsStack,
+    },
     ManageBackup,
     SecondaryDevice,
     TrustedContacts,

@@ -2,9 +2,12 @@ import { createAction } from 'redux-actions';
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import { AsyncStorage } from 'react-native'
 import { updateTrustedContactInfoLocally } from '../actions/trustedContacts'
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { Action } from 'redux';
 
+export const CARD_DATA = 'CARD_DATA';
 export const CURRENCY_CODE = 'CURRENCY_CODE';
-export const CURRENCY_TOGGLE_VALUE = 'CURRENCY_TOGGLE_VALUE';
+export const CURRENCY_KIND_SET = 'CURRENCY_KIND_SET';
 export const FCM_TOKEN_VALUE = 'FCM_TOKEN_VALUE';
 export const SECONDARY_DEVICE_ADDRESS_VALUE = 'SECONDARY_DEVICE_ADDRESS_VALUE';
 export const RELEASE_CASES_VALUE = 'RELEASE_CASES_VALUE';
@@ -19,7 +22,6 @@ export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS';
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED';
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS';
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
-export const CARD_DATA = 'CARD_DATA';
 
 
 export const setCurrencyCode = (data) => {
@@ -28,10 +30,16 @@ export const setCurrencyCode = (data) => {
     payload: { currencyCode: data },
   };
 };
-export const setCurrencyToggleValue = (data) => {
+
+export interface CurrencyKindSetAction extends Action {
+  type: typeof CURRENCY_KIND_SET;
+  payload: CurrencyKind,
+};
+
+export const currencyKindSet = (kind: CurrencyKind) => {
   return {
-    type: CURRENCY_TOGGLE_VALUE,
-    payload: { currencyToggleValue: data },
+    type: CURRENCY_KIND_SET,
+    payload: kind,
   };
 };
 
