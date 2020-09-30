@@ -49,7 +49,7 @@ export default function SendViaLink(props) {
     {
       title: `Telegram`,
       image: require('../assets/images/icons/telegram.png'),
-      url: 'https://telegram.me/share/url?url=',
+      url: 'https://t.me/share/url?url=',
       isAvailable: false,
     },
     {

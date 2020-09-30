@@ -81,8 +81,6 @@ const HomeList = ({
                 cornerRadius={10}
                 style={{
                   ...styles.card,
-                  opacity: 0.4,
-                  backgroundColor: Colors.borderColor,
                 }}
               >
                 <View
