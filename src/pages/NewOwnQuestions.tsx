@@ -256,6 +256,7 @@ export default function NewOwnQuestions(props) {
             <View style={CommonStyles.headerContainer}>
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
                 onPress={() => {
                   props.navigation.goBack();
                 }}

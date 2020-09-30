@@ -954,6 +954,7 @@ export default function SendToContact(props) {
               width: 30,
               justifyContent: 'center',
             }}
+            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>

@@ -519,6 +519,7 @@ class SendConfirmation extends Component<
                 navigation.goBack();
                 this.props.clearTransfer(this.serviceType, 'stage1');
               }}
+              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
               disabled={isConfirmDisabled}
             >

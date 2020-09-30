@@ -1076,6 +1076,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
+            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
             onPress={() => {
               this.props.navigation.navigate('Home');
             }}
