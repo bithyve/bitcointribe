@@ -509,6 +509,8 @@ export default class SecureHDWallet extends Bitcoin {
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
     accountNumber: number = 1,
+    contactName?: string,
+    accountName?: string,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
@@ -528,7 +530,7 @@ export default class SecureHDWallet extends Bitcoin {
 
       default:
         if (!this.derivativeAccounts[accountType][accountNumber])
-          this.generateDerivativeXpub(accountType, accountNumber);
+          this.generateDerivativeXpub(accountType, accountNumber, accountName);
 
         break;
     }
@@ -2169,6 +2171,7 @@ export default class SecureHDWallet extends Bitcoin {
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
+    accountName?: string,
   ) => {
     if (accountType === TRUSTED_CONTACTS)
       throw new Error(
@@ -2201,6 +2204,7 @@ export default class SecureHDWallet extends Bitcoin {
         xpriv,
         nextFreeAddressIndex: 0,
         nextFreeChangeAddressIndex: 0,
+        accountName,
       };
       this.derivativeAccounts[accountType].instance.using++;
 

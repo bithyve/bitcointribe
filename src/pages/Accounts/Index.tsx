@@ -342,17 +342,23 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
           let accountType, backgroundImage, accountTypeImage, accountInfo;
           if (carouselAcc === DONATION_ACCOUNT) {
-            accountType = 'Donation Account';
-            accountInfo = account.subject;
+            accountType = account.subject
+              ? account.subject
+              : 'Donation Account';
+            accountInfo = 'Accept bitcoin';
             backgroundImage = require('../../assets/images/carouselImages/donation_account_background.png');
             accountTypeImage = require('../../assets/images/icons/icon_donation_account.png');
           } else if (serviceType === REGULAR_ACCOUNT) {
-            accountType = 'Checking Account';
+            accountType = account.accountName
+              ? account.accountName
+              : 'Checking Account';
             accountInfo = 'Fast and easy';
             backgroundImage = require('../../assets/images/carouselImages/regular_account_background.png');
             accountTypeImage = require('../../assets/images/icons/icon_regular_account.png');
           } else if (serviceType === SECURE_ACCOUNT) {
-            accountType = 'Savings Account';
+            accountType = account.accountName
+              ? account.accountName
+              : 'Savings Account';
             accountInfo = 'Multi-factor security';
             backgroundImage = require('../../assets/images/carouselImages/savings_account_background.png');
             accountTypeImage = require('../../assets/images/icons/icon_secureaccount_white.png');
@@ -898,9 +904,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null
             ) : null}
-            {(item.accountType === 'Savings Account' ||
-              (item.accountType === 'Donation Account' &&
-                item.type === SECURE_ACCOUNT)) && (
+            {item.type === SECURE_ACCOUNT && (
               <TouchableOpacity
                 style={{
                   alignItems: 'center',

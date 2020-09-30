@@ -131,8 +131,7 @@ export const fetchDerivativeAccXpubWatcher = createWatcher(
 );
 
 function* fetchDerivativeAccAddressWorker({ payload }) {
-  const { serviceType, accountType, accountNumber } = payload;
-
+  const { serviceType, accountType, accountNumber, accountName } = payload;
   const service = yield select((state) => state.accounts[serviceType].service);
 
   const { derivativeAccounts } =
@@ -143,6 +142,8 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
     service.getDerivativeAccAddress,
     accountType,
     accountNumber,
+    null, // contanct name is null(non-TC)
+    accountName,
   );
   console.log({ res });
 

@@ -149,8 +149,34 @@ class AddNewAccount extends PureComponent<
   };
 
   onSelectContact = (item) => {
+    const dervAccount =
+      item.type === DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT;
+
+    let instanceCount = 1;
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      if (dervAccount === SUB_PRIMARY_ACCOUNT && serviceType !== item.type)
+        continue;
+      const derivativeAccounts = this.props.accounts[serviceType].service[
+        serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+      ].derivativeAccounts;
+
+      if (derivativeAccounts[dervAccount])
+        instanceCount += derivativeAccounts[dervAccount].instance.using;
+    }
+
+    const accountName = `${
+      item.type === DONATION_ACCOUNT
+        ? 'Donation Account'
+        : item.type === REGULAR_ACCOUNT
+        ? 'Checking Account'
+        : 'Savings Account'
+    } ${
+      item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
+    }`;
     this.setState({
       selectedAccount: item,
+      accountName,
+      isValid: false,
     });
   };
 
@@ -466,6 +492,7 @@ class AddNewAccount extends PureComponent<
                   this.state.selectedAccount.type,
                   dervAccount,
                   accountNumber,
+                  this.state.accountName,
                 );
                 this.props.navigation.navigate('Accounts');
               }
