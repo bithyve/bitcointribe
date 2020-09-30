@@ -1,14 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import { iconForServiceAccountKind } from '../../../../utils/accounts/IconUtils';
+import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
-import ServiceAccountKind from "../../enums/ServiceAccountKind";
-import { ExternalServiceAccountPayload } from './Interfaces';
+import { DonationReceivingAccountPayload } from './Interfaces';
 
 interface ConstructorProps {
-  title: string;
-  shortDescription: string;
-  serviceAccountKind: ServiceAccountKind;
+  title?: string;
+  doneeName: string;
+  causeName: string;
   accountNumber?: number;
   displayOrder?: number | null;
   balance?: number;
@@ -18,26 +17,27 @@ interface ConstructorProps {
   secondaryAccountUUIDs?: string[];
 }
 
-export default class ServiceAccountPayload implements ExternalServiceAccountPayload {
+export class DonationAccountPayload implements DonationReceivingAccountPayload {
   uuid: string = uuidv4();
   title: string;
-  shortDescription: string;
-  kind: AccountKind = AccountKind.SERVICE;
-  serviceAccountKind: ServiceAccountKind;
+  shortDescription: string = "Directly Accept Donations";
+  kind: AccountKind = AccountKind.DONATION;
+
+  doneeName: string;
+  causeName: string;
 
   accountNumber: number;
   displayOrder: number | null;
   balance: number;
-  unit: BitcoinUnit = BitcoinUnit.SATS;
+  unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
 
-
   constructor({
     title,
-    shortDescription,
-    serviceAccountKind,
+    doneeName,
+    causeName,
     accountNumber,
     displayOrder,
     balance,
@@ -46,9 +46,9 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     customDescription,
     secondaryAccountUUIDs,
   }: ConstructorProps) {
-    this.title = title;
-    this.shortDescription = shortDescription;
-    this.serviceAccountKind = serviceAccountKind;
+    this.title = title || "Donation Account";
+    this.doneeName = doneeName;
+    this.causeName = causeName;
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -59,11 +59,10 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
   }
 
   get imageSource(): NodeRequire {
-    return iconForServiceAccountKind(this.serviceAccountKind);
+    return iconForAccountKind(this.kind);
   }
 
   get isPrimaryAccount(): boolean {
     return this.secondaryAccountUUIDs.length === 0;
   }
 }
-

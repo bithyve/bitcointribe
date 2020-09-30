@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import AccountKind from '../../common/data/enums/AccountKind';
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
-import AccountPayload from '../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import ServiceAccountPayload from '../../common/data/models/AccountPayload/ServiceAccountPayload';
 import CardView from 'react-native-cardview';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';

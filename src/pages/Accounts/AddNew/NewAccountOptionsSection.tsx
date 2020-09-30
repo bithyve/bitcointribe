@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
 import Colors from '../../../common/Colors';
 import AccountOptionCard from './AccountOptionCard';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
