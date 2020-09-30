@@ -593,7 +593,7 @@ class SendToContact extends Component<
         instance.bitcoinAmount &&
         instance.selectedContact.id === selectedContact.id
       ) {
-        if (selectedContact.id === DONATION_ACCOUNT) {
+        if (config.EJECTED_ACCOUNTS.includes(selectedContact.id)) {
           if (
             instance.selectedContact.account_number ===
               selectedContact.account_number &&
@@ -625,7 +625,7 @@ class SendToContact extends Component<
         if (
           recipientId === REGULAR_ACCOUNT ||
           recipientId === SECURE_ACCOUNT ||
-          recipientId === DONATION_ACCOUNT
+          config.EJECTED_ACCOUNTS.includes(recipientId)
         ) {
           // recipient: account
           recipients.push({
@@ -676,7 +676,7 @@ class SendToContact extends Component<
           transfer[serviceType].transfer.details[i].selectedContact.id ==
           selectedContact.id
         ) {
-          if (selectedContact.id === DONATION_ACCOUNT) {
+          if (config.EJECTED_ACCOUNTS.includes(selectedContact.id)) {
             if (
               transfer[serviceType].transfer.details[i].selectedContact
                 .account_number === selectedContact.account_number &&
@@ -793,7 +793,8 @@ class SendToContact extends Component<
             </TouchableOpacity>
             <Image
               source={
-                this.state.derivativeAccountDetails
+                this.state.derivativeAccountDetails &&
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../assets/images/icons/icon_donation_account.png')
                   : serviceType == TEST_ACCOUNT
                   ? require('../../assets/images/icons/icon_test.png')
@@ -834,7 +835,8 @@ class SendToContact extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {this.state.derivativeAccountDetails
+              {this.state.derivativeAccountDetails &&
+              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType == 'TEST_ACCOUNT'
                 ? 'Test Account'
@@ -842,8 +844,6 @@ class SendToContact extends Component<
                 ? 'Savings Account'
                 : serviceType == 'REGULAR_ACCOUNT'
                 ? 'Checking Account'
-                : serviceType == 'S3_SERVICE'
-                ? 'S3 Service'
                 : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
@@ -1324,7 +1324,9 @@ class SendToContact extends Component<
                           transfer[serviceType].transfer.details[i]
                             .selectedContact.id == selectedContact.id
                         ) {
-                          if (selectedContact.id === DONATION_ACCOUNT) {
+                          if (
+                            config.EJECTED_ACCOUNTS.includes(selectedContact.id)
+                          ) {
                             if (
                               transfer[serviceType].transfer.details[i]
                                 .selectedContact.account_number ===

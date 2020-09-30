@@ -26,6 +26,7 @@ import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -213,6 +214,13 @@ export default class HDSegwitWallet extends Bitcoin {
         receivingAddress = donationAcc ? donationAcc.receivingAddress : '';
         break;
 
+      case SUB_PRIMARY_ACCOUNT:
+        const account = this.derivativeAccounts[SUB_PRIMARY_ACCOUNT][
+          accountNumber
+        ];
+        receivingAddress = account ? account.receivingAddress : '';
+        break;
+
       default:
         receivingAddress = this.receivingAddress;
     }
@@ -276,7 +284,12 @@ export default class HDSegwitWallet extends Bitcoin {
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
-      throw new Error(`${accountType} does not exists`);
+      if (config[accountType])
+        this.derivativeAccounts = {
+          ...this.derivativeAccounts,
+          [accountType]: config[accountType],
+        };
+      else throw new Error(`${accountType} does not exists`);
 
     switch (accountType) {
       case TRUSTED_CONTACTS:
@@ -460,6 +473,7 @@ export default class HDSegwitWallet extends Bitcoin {
         .nextFreeChangeAddressIndex - 1,
       accountType,
       contactName,
+      accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
     );
 
     const { balances, transactions, UTXOs } = res;
@@ -768,6 +782,10 @@ export default class HDSegwitWallet extends Bitcoin {
                           )
                           .join(' ')
                       : tx.accountType,
+                  primaryAccType:
+                    tx.accountType === SUB_PRIMARY_ACCOUNT
+                      ? 'Checking Account'
+                      : null,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed

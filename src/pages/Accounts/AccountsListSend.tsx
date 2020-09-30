@@ -15,6 +15,7 @@ import {
   SECURE_ACCOUNT,
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import config from '../../bitcoin/HexaConfig';
 
 const AccountsListSend = ({
   balances,
@@ -60,11 +61,12 @@ const AccountsListSend = ({
               ? '$' + UsNumberFormat(balances.regularBalance)
               : accounts.id === SECURE_ACCOUNT
               ? '$' + UsNumberFormat(balances.secureBalance)
-              : accounts.id === DONATION_ACCOUNT && balances.donationsBalance
+              : config.EJECTED_ACCOUNTS.includes(accounts.id) &&
+                balances.additionalBalances
               ? '$' +
                 UsNumberFormat(
-                  balances.donationsBalance[
-                    accounts.type + accounts.account_number
+                  balances.additionalBalances[
+                    accounts.type + accounts.id + accounts.account_number
                   ],
                 )
               : 0}
