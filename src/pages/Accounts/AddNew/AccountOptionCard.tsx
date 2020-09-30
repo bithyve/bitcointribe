@@ -5,7 +5,7 @@ import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CardStyles from '../../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
-import AccountPayload from '../../../common/data/models/AccountPayload/AccountPayload';
+import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
 
 export interface Props {
   style?: Record<string, any>;
