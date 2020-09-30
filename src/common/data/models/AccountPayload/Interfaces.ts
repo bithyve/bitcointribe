@@ -1,6 +1,7 @@
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
+import AccountVisibility from "../../enums/AccountVisibility";
 
 
 interface BaseAccountPayload {
@@ -44,8 +45,12 @@ interface BaseAccountPayload {
    */
   customDisplayName: string | null;
 
-  // A description set by the user
+  /**
+   * A description set by the user.
+   */
   customDescription: string | null;
+
+  visibility: AccountVisibility;
 
   imageSource: NodeRequire;
 }

@@ -153,10 +153,3 @@ export const updateApplicationStatus = (data) => {
     payload: { status: data },
   };
 };
-
-export const setCardData = (data) => {
-  return {
-    type: CARD_DATA,
-    payload: { cardData: data },
-  };
-};

@@ -14,7 +14,7 @@ import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
-import ToggleSwitch from '../../components/ToggleSwitch';
+import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch';
 import HomePageShield from '../../components/HomePageShield';
 const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR', 'EUR'];
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -160,14 +160,14 @@ const HomeHeader = ({
           </TouchableOpacity>
         </View>
         <View style={styles.headerToggleSwitchContainer}>
-          <ToggleSwitch
-            currencyCodeValue={CurrencyCode}
+          <CurrencyKindToggleSwitch
+            fiatCurrencyCode={CurrencyCode}
             onpress={() => {
               dispatch(currencyKindSet(
                 prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
               ));
             }}
-            toggle={prefersBitcoin}
+            isOn={prefersBitcoin}
           />
           <TouchableOpacity
             activeOpacity={10}

@@ -13,8 +13,6 @@ export interface Props {
   isBalanceLoading: boolean;
   cardData: AccountPayload[];
   appendsAddButton: boolean;
-  prefersBTCUnits: boolean;
-  fiatCurrencyCode: string;
   onAccountCardSelected: (AccountPayload) => void;
   onAddNewAccountPressed: () => void;
 }
@@ -23,8 +21,6 @@ const AccountCardColumn: React.FC<Props> = ({
   isBalanceLoading,
   cardData,
   appendsAddButton,
-  prefersBTCUnits,
-  fiatCurrencyCode,
   onAccountCardSelected,
   onAddNewAccountPressed,
 }: Props) => {
@@ -35,8 +31,6 @@ const AccountCardColumn: React.FC<Props> = ({
           <TouchableOpacity style={styles.cardContainer} onPress={() => onAccountCardSelected(accountPayload)}>
             <HomeAccountsListCard
               accountPayload={accountPayload}
-              prefersBTCUnits={prefersBTCUnits}
-              fiatCurrencyCode={fiatCurrencyCode}
               isBalanceLoading={isBalanceLoading}
             />
           </TouchableOpacity>
