@@ -1,4 +1,4 @@
-import AccountPayload from "../../common/data/models/AccountPayload/AccountPayload";
+import AccountPayload from "../../common/data/models/AccountPayload/Interfaces";
 import { CheckingAccountPayload, SavingsAccountPayload, TestAccountPayload } from "../../common/data/models/AccountPayload/HexaAccountPayloads";
 
 const initialCardData: AccountPayload[] = [
