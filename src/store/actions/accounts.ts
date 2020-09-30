@@ -1,7 +1,7 @@
 import { Action } from "redux";
 // types and action creators: dispatched by components and sagas
 
-import AccountPayload from "../../common/data/models/AccountPayload/AccountPayload";
+import AccountPayload from "../../common/data/models/AccountPayload/Interfaces";
 
 // export const FETCH_ADDR = 'FETCH_ADDR';
 export const FETCH_BALANCE = 'FETCH_BALANCE';
