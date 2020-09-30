@@ -79,7 +79,7 @@ const accountData = [
     id: DONATION_ACCOUNT,
     account_name: 'Donation Account',
     type: DONATION_ACCOUNT,
-    checked: false,
+    checked: true,
     image: require('../../assets/images/icons/icon_donation_hexa.png'), //icon_donation_white
   },
 ];
@@ -205,6 +205,16 @@ class AddNewAccount extends PureComponent<
     );
   };
 
+  openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
+
   renderAccountDetailModalContent = () => {
     return (
       <ScrollView style={{ height: '100%' }}>
@@ -227,7 +237,7 @@ class AddNewAccount extends PureComponent<
                   color: Colors.lightTextColor,
                 }}
               >
-                Some of these details can be displayed on the Donation web-view
+                Some of these details can be displayed on the Donation web view
               </Text>
             </View>
             <View style={styles.modalTextBoxView}>
@@ -277,6 +287,7 @@ class AddNewAccount extends PureComponent<
                 </Text>
                 <CheckBox
                   size={26}
+                  imageSize={20}
                   borderRadius={5}
                   color={Colors.lightBlue}
                   borderColor={Colors.borderColor}
@@ -293,6 +304,7 @@ class AddNewAccount extends PureComponent<
               <Text style={styles.modalInfoText}>
                 By clicking proceed you agree to our{' '}
                 <Text
+                  onPress={()=>{this.openLink('https://hexawallet.io/donor-terms-conditions/')}}
                   style={{
                     fontFamily: Fonts.FiraSansItalic,
                     color: Colors.blue,
@@ -422,13 +434,13 @@ class AddNewAccount extends PureComponent<
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             renderItem={(Items) => {
-              const checked =
-                Items.item.id === this.state.selectedAccount.id ? true : false;
+             // const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
               return (
                 <AccountsListSend
+                  fromAddNewAccount={true}
                   accounts={Items.item}
                   balances={0}
-                  checkedItem={checked}
+                  checkedItem={Items.item.checked}
                   onSelectContact={this.onSelectContact}
                 />
               );

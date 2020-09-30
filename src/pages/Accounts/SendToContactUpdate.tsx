@@ -795,7 +795,7 @@ class SendToContact extends Component<
               source={
                 this.state.derivativeAccountDetails &&
                 this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  ? require('../../assets/images/icons/icon_donation_hexa.png')
                   : serviceType == TEST_ACCOUNT
                   ? require('../../assets/images/icons/icon_test.png')
                   : serviceType == REGULAR_ACCOUNT
@@ -889,6 +889,9 @@ class SendToContact extends Component<
                               : item.selectedContact.account_name ===
                                 'Test Account'
                               ? require('../../assets/images/icons/icon_test_white.png')
+                              : item.selectedContact.account_name ===
+                              'Donation Account'
+                            ? require('../../assets/images/icons/icon_donation_account.png')
                               : require('../../assets/images/icons/icon_user.png')
                           }
                           style={styles.circleShapeView}

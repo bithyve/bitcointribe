@@ -270,19 +270,11 @@ export default function ExistingSavingMethods(props) {
                         >
                           Voucher Code {value.voucherCode}
                         </Text>
-                        <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(10),
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          {moment(value.orderData.date)
-                            .utc()
-                            .format('DD MMMM YYYY')}
-                        </Text>
+                        
                       </View>
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
                       <Text
                         style={{
                           color: Colors.textColorGrey,
@@ -295,6 +287,19 @@ export default function ExistingSavingMethods(props) {
                           ? 'Checking Account'
                           : 'Savings Account'}
                       </Text>
+                      <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          {moment(value.orderData.date)
+                            .utc()
+                            .format('DD MMMM YYYY')}
+                        </Text>
+                        </View>
                     </View>
                     <View
                       style={{

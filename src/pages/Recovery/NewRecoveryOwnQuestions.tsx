@@ -184,7 +184,7 @@ export default function NewRecoveryOwnQuestions(props) {
                 >
                   <TextInput
                     style={styles.modalInputBox}
-                    placeholder={'Enter Security Question'}
+                    placeholder={'Enter Security Answer'}
                     placeholderTextColor={Colors.borderColor}
                     value={answer}
                     autoCompleteType="off"
@@ -245,6 +245,7 @@ export default function NewRecoveryOwnQuestions(props) {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
         <View style={{ ...styles.bottomButtonView }}>
           {setButtonVisible()}
           <View style={styles.statusIndicatorView}>
@@ -266,7 +267,7 @@ export default function NewRecoveryOwnQuestions(props) {
             />
           </View>
         ) : null}
-      </KeyboardAvoidingView>
+      
     </View>
   );
 }

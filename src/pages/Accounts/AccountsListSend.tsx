@@ -22,6 +22,7 @@ const AccountsListSend = ({
   accounts,
   onSelectContact,
   checkedItem,
+  fromAddNewAccount
 }) => {
   // console.log("Items,", accounts);
   return (
@@ -41,7 +42,6 @@ const AccountsListSend = ({
           <Image
             style={styles.image}
             source={accounts.image}
-            resizeMode={'contain'}
           />
           <Text
             style={{
@@ -51,7 +51,7 @@ const AccountsListSend = ({
           >
             {accounts.account_name}
           </Text>
-          <Text
+          {!fromAddNewAccount ? <Text
             style={{
               ...styles.accountBalance,
               color: checkedItem ? Colors.white : Colors.borderColor,
@@ -70,7 +70,7 @@ const AccountsListSend = ({
                   ],
                 )
               : 0}
-          </Text>
+          </Text> : null}
           <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
             <TouchableOpacity
               onPress={() => onSelectContact(accounts)}
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     alignSelf: 'center',
-    resizeMode: 'center',
+    resizeMode: "contain",
   },
   accountName: {
     fontSize: RFValue(10),
