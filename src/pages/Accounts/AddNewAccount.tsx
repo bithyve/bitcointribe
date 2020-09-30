@@ -79,7 +79,7 @@ const accountData = [
     id: DONATION_ACCOUNT,
     account_name: 'Donation Account',
     type: DONATION_ACCOUNT,
-    checked: true,
+    checked: false,
     image: require('../../assets/images/icons/icon_donation_hexa.png'), //icon_donation_white
   },
 ];
@@ -217,8 +217,9 @@ class AddNewAccount extends PureComponent<
 
   renderAccountDetailModalContent = () => {
     return (
-      <ScrollView style={{ height: '100%' }}>
+      
         <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+          <ScrollView style={{ height: '100%' }}>
           <View style={{ height: '100%', marginHorizontal: wp('8%') }}>
             <View style={styles.successModalHeaderView}>
               <Text
@@ -256,9 +257,14 @@ class AddNewAccount extends PureComponent<
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={styles.modalTextBoxView}>
+            <View style={{...styles.modalTextBoxView, height: wp('20%'),}}>
               <TextInput
-                style={styles.textBox}
+                style={{...styles.textBox,
+                  paddingRight: 20,
+                  marginTop: 10,
+                  marginBottom: 10,}}
+                multiline={true}
+                numberOfLines={4}
                 placeholder={'Enter a description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
@@ -345,8 +351,8 @@ class AddNewAccount extends PureComponent<
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
+          </ScrollView>
         </View>
-      </ScrollView>
     );
   };
 
@@ -434,13 +440,13 @@ class AddNewAccount extends PureComponent<
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             renderItem={(Items) => {
-             // const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
+              const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
               return (
                 <AccountsListSend
                   fromAddNewAccount={true}
                   accounts={Items.item}
                   balances={0}
-                  checkedItem={Items.item.checked}
+                  checkedItem={checked}
                   onSelectContact={this.onSelectContact}
                 />
               );
