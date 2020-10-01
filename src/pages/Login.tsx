@@ -313,6 +313,8 @@ export default function Login(props) {
   const onLoginSuccess = async () => {
     let walletExists = await AsyncStorage.getItem("walletExists")
     if (walletExists) {
+      // get data from db , if exists trigger these
+      let { database } = await dispatch(fetchDatabase(key))
       if (loaderBottomSheet.current) {
         loaderBottomSheet.current.snapTo(0);
       }
@@ -322,9 +324,6 @@ export default function Login(props) {
         trustedContactRequest,
         userKey,
       });
-
-      // get data from db , if exists trigger these
-      let { database } = await dispatch(fetchDatabase(key))
       if (database) {
         dispatch(updateWalletImage());
         dispatch(calculateExchangeRate());

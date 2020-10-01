@@ -132,7 +132,7 @@ PODS:
   - react-native-mail (4.1.0):
     - React
   - react-native-netinfo (5.9.6):
-    - React
+    - React/Core
   - react-native-print (0.6.0):
     - React
   - react-native-randombytes (3.5.3):
@@ -207,7 +207,7 @@ PODS:
   - RNGestureHandler (1.3.0):
     - React
   - RNLocalize (1.4.1):
-    - React
+    - React/Core
   - RNOS (1.2.6):
     - React
   - RNReanimated (1.13.1):
@@ -506,7 +506,7 @@ SPEC CHECKSUMS:
   react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-in-app-utils: 96cdefc90ad74a79a95d19239a183995a6face0b
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 38a1e0b3e89b48e4b5833ed475d8df5f049f6f90
+  react-native-netinfo: 60fdd787790926ac643d4988a7b3a772bdb9396b
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
@@ -515,7 +515,7 @@ SPEC CHECKSUMS:
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
-  RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
+  RNLocalize: dedac618d8868828fd81ad5dda7598a1c4658a80
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
@@ -539,4 +539,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: f0bbb553ff1ab8d8aec9f7f1b27f494d65a52d93
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.8.4
