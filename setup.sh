@@ -22,5 +22,5 @@ test -f node_modules/react-native/React/Views/RCTWebViewManager.h && rm -f node_
 test -f node_modules/react-native/React/Views/RCTWebViewManager.m && rm -f node_modules/react-native/React/Views/RCTWebViewManager.m
 
 #patch cocoapods
-sudo cp ./rnPatchFiles/RNLocalize.podspec ./node_modules/react-native-localize/RNLocalize.podspec
-sudo cp ./rnPatchFiles/react-native-netinfo.podspec ./node_modules/@react-native-community/netinfo/react-native-netinfo.podspec
+cp ./rnPatchFiles/RNLocalize.podspec ./node_modules/react-native-localize/RNLocalize.podspec
+cp ./rnPatchFiles/react-native-netinfo.podspec ./node_modules/@react-native-community/netinfo/react-native-netinfo.podspec
