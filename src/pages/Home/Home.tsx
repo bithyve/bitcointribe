@@ -142,7 +142,6 @@ export enum BottomSheetState {
 }
 
 interface HomeStateTypes {
-  accountCardColumnData?: Array<[AccountShell]>;
   notificationLoading: boolean;
   notificationData?: any[];
   cardData?: any[];
@@ -176,7 +175,6 @@ interface HomeStateTypes {
   isCameraOpen: boolean;
   isLoading: boolean;
   isRequestModalOpened: boolean;
-  isBalanceLoading: boolean;
   addContactModalOpened: boolean;
 }
 
@@ -252,7 +250,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.state = {
       notificationData: [],
-      accountCardColumnData: [],
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: BottomTab.Transactions,
@@ -284,7 +281,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationLoading: true,
       isLoading: true,
       isRequestModalOpened: false,
-      isBalanceLoading: true,
       addContactModalOpened: false,
     };
   }
@@ -605,32 +601,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  makeAccountCardColumnData = () => {
-    const activeAccounts: AccountShell[] = this.props.accountsState.activeAccounts;
-
-    if (activeAccounts.length <= 2) {
-      return [activeAccounts];
-    }
-
-    let columns = [];
-    let currentColumn = [];
-
-    for (let account of activeAccounts) {
-      currentColumn.push(account);
-
-      if (currentColumn.length == 2) {
-        columns.push(currentColumn);
-        currentColumn = [];
-      }
-    }
-
-    if (currentColumn.length > 0) {
-      columns.push(currentColumn);
-    }
-
-    this.setState({ accountCardColumnData: columns });
-  };
-
 
   scheduleNotification = async () => {
     const channelId = new firebase.notifications.Android.Channel(
@@ -706,7 +676,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    this.makeAccountCardColumnData();
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
       'change',
@@ -874,7 +843,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
-      this.makeAccountCardColumnData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -1560,7 +1528,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         accumulativeBalance,
       },
       transactions: accumulativeTransactions,
-      isBalanceLoading: false,
     });
   };
 
@@ -1860,6 +1827,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     });
   };
 
+
   handleBottomSheetPositionChange = (
     bottomSheetRef: React.RefObject<RNBottomSheet>,
     newIndex: number,
@@ -2079,7 +2047,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      accountCardColumnData,
       CurrencyCode,
       transactions,
       balances,
@@ -2101,7 +2068,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       custodyRequest,
       isLoadContacts,
       isLoading,
-      isBalanceLoading,
       addContactModalOpened,
     } = this.state;
 
@@ -2141,16 +2107,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
-        <View style={{ flex: 7 }}>
-          <View style={styles.accountCardsContainer}>
-            <HomeAccountCardsList
-              columnData={accountCardColumnData}
-              isBalanceLoading={isBalanceLoading}
-              onAddNewSelected={this.navigateToAddNewAccountScreen}
-              onCardSelected={this.handleAccountCardSelection}
-            />
-          </View>
-        </View>
+        <HomeAccountCardsList
+          containerStyle={styles.accountCardsContainer}
+          onAddNewSelected={this.navigateToAddNewAccountScreen}
+          onCardSelected={this.handleAccountCardSelection}
+        />
 
         <BottomSheetBackground
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
@@ -2863,7 +2824,7 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create({
   accountCardsContainer: {
-    height: '100%',
+    flex: 7,
     backgroundColor: Colors.backgroundColor,
     marginTop: 30,
     borderTopLeftRadius: 25,

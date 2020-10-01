@@ -6,33 +6,35 @@ import {
 } from 'react-native';
 
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import HomeAccountsListCard from './HomeAccountsListCard';
 import AccountShell from '../../common/data/models/AccountShell';
 
 export type Props = {
-  isBalanceLoading: boolean;
   cardData: AccountShell[];
   appendsAddButton: boolean;
   onAccountCardSelected: (accountShell: AccountShell) => void;
   onAddNewAccountPressed: () => void;
-}
+  onCardLongPressed: (accountShell: AccountShell) => void;
+};
 
 const AccountCardColumn: React.FC<Props> = ({
-  isBalanceLoading,
   cardData,
   appendsAddButton,
   onAccountCardSelected,
   onAddNewAccountPressed,
+  onCardLongPressed,
 }: Props) => {
   return (
     <View style={styles.rootContainer}>
       {cardData.map((accountShell) => {
         return (
-          <TouchableOpacity style={styles.cardContainer} onPress={() => onAccountCardSelected(accountShell)}>
+          <TouchableOpacity
+            style={styles.cardContainer}
+            onPress={() => onAccountCardSelected(accountShell)}
+            onLongPress={() => onCardLongPressed(accountShell)}
+          >
             <HomeAccountsListCard
               accountShell={accountShell}
-              isBalanceLoading={isBalanceLoading}
             />
           </TouchableOpacity>
         );
