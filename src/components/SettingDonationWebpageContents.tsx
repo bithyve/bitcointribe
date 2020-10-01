@@ -45,8 +45,8 @@ export default function SettingDonationWebPageContents(props) {
     isDonationTransactionEnable,
     props.account.configuration,
   ]);
-  const [doneeName, setDoneeName] = useState('');
-  const [description, setDescription] = useState('');
+  const [doneeName, setDoneeName] = useState(props.account.donee ? props.account.donee : '');
+  const [description, setDescription] = useState(props.account.description ? props.account.description : '');
   const [cause, setCause] = useState('');
   const [isDonationPause, setIsDonationPause] = useState(false);
   const dispatch = useDispatch();
@@ -167,13 +167,18 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={styles.modalTextBoxView}>
+            <View style={{...styles.modalTextBoxView, height: wp('20%')}}>
               <TextInput
-                style={styles.textBox}
+                style={{...styles.textBox,
+                  paddingRight: 20,
+                  marginTop: 10,
+                  marginBottom: 10,}}
                 placeholder={'Enter a description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
+                multiline={true}
+                numberOfLines={4}
                 value={description}
                 onChangeText={(text) => {
                   setDescription(text);
@@ -221,7 +226,7 @@ export default function SettingDonationWebPageContents(props) {
                 source={require('../assets/images/icons/icon_donation_transactions.png')}
               />
               <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Donation Transactions</Text>
+                <Text style={styles.titleTextStyle}>Show Transactions</Text>
                 <Text
                   style={{
                     ...styles.modalInfoText,
@@ -229,7 +234,7 @@ export default function SettingDonationWebPageContents(props) {
                     color: Colors.lightTextColor,
                   }}
                 >
-                  Show the transactions set to the donation account
+                  Show / hide transactions on web view
                 </Text>
               </View>
               <ToggleSwitch
@@ -248,12 +253,31 @@ export default function SettingDonationWebPageContents(props) {
             </View>
 
             <View style={styles.rowContainer}>
-              <Image
+            <View
+              style={{
+                ...styles.circleShapeView,
+                backgroundColor: Colors.lightBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: RFValue(20),
+                  color: Colors.white,
+                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                  }}
+                >
+                  @
+                </Text>
+              </View>
+              {/* <Image
                 style={styles.imageStyle}
                 source={require('../assets/images/icons/icon_donation_transactions.png')}
-              />
+              /> */}
               <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Hide Transaction</Text>
+                <Text style={styles.titleTextStyle}>Hide Transaction ID</Text>
                 <Text
                   style={{
                     ...styles.modalInfoText,
@@ -261,7 +285,7 @@ export default function SettingDonationWebPageContents(props) {
                     color: Colors.lightTextColor,
                   }}
                 >
-                  Hide Transaction details
+                  Show / hide transaction ID on the web view
                 </Text>
               </View>
               <ToggleSwitch
@@ -280,10 +304,19 @@ export default function SettingDonationWebPageContents(props) {
             </View>
 
             <View style={styles.rowContainer}>
+            <View
+              style={{
+                ...styles.circleShapeView,
+                backgroundColor: Colors.lightBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Image
-                style={styles.imageStyle}
-                source={require('../assets/images/icons/icon_donation_transactions.png')}
+                style={{...styles.imageStyle, height: wp('7%'), width: wp('7%')}}
+                source={require('../assets/images/icons/icon_donation_white.png')}
               />
+              </View>
               <View style={styles.textContainer}>
                 <Text style={styles.titleTextStyle}>Pause Donation</Text>
                 <Text
@@ -320,6 +353,15 @@ export default function SettingDonationWebPageContents(props) {
 }
 
 const styles = StyleSheet.create({
+  circleShapeView: {
+    width: wp('8%'),
+    height: wp('8%'),
+    borderRadius: wp('8%') / 2,
+    borderColor: Colors.lightBlue,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white
