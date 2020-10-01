@@ -193,10 +193,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       'INR',
       'EUR',
     ];
-
+    
     this.state = {
       carouselData: [
         {
+          id: 1,
           accountType: 'Test Account',
           accountInfo: 'Learn Bitcoin',
           backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
@@ -204,6 +205,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           type: TEST_ACCOUNT,
         },
         {
+          id: 2,
           accountType: 'Checking Account',
           accountInfo: 'Fast and easy',
           backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
@@ -211,6 +213,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           type: REGULAR_ACCOUNT,
         },
         {
+          id: 3,
           accountType: 'Savings Account',
           accountInfo: 'Multi-factor security',
           backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
@@ -245,22 +248,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       spendableBalance: 0,
       FBTCAccount: {},
     };
+
   }
 
   componentDidMount = () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
+    this.updateCarouselData();
     // this.setState({ spendableBalance: this.props.navigation.state.params
     //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
-    this.getServiceType(
-      serviceType,
-      serviceType === SECURE_ACCOUNT
-        ? 2
-        : serviceType === REGULAR_ACCOUNT
-        ? 1
-        : 0,
-    );
+    
     this.getBalance();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
@@ -272,7 +270,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         : service.hdWallet;
     this.setAverageTransactionFees();
     this.checkFastBitcoin();
-    this.updateCarouselData();
+    
     // if (this.wallet.transactions.transactionDetails.length) {
     //   this.wallet.transactions.transactionDetails.sort(function (left, right) {
     //     return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -299,9 +297,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   updateCarouselData = () => {
+    let { serviceType } = this.state;
     let { accounts } = this.props;
     const defaultCarouselData = [
       {
+        id: 1,
         accountType: 'Test Account',
         accountInfo: 'Learn Bitcoin',
         backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
@@ -309,6 +309,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: TEST_ACCOUNT,
       },
       {
+        id: 2,
         accountType: 'Checking Account',
         accountInfo: 'Fast and easy',
         backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
@@ -316,6 +317,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: REGULAR_ACCOUNT,
       },
       {
+        id: 3,
         accountType: 'Savings Account',
         accountInfo: 'Multi-factor security',
         backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
@@ -323,7 +325,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: SECURE_ACCOUNT,
       },
     ];
-
+    let idIndex = defaultCarouselData[defaultCarouselData.length - 1].id;
     const additionalCarouselData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
@@ -340,7 +342,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           index++
         ) {
           const account = derivativeAccounts[carouselAcc][index];
-
+          idIndex++;
           let accountType, backgroundImage, accountTypeImage, accountInfo;
           if (carouselAcc === DONATION_ACCOUNT) {
             accountType = account.subject
@@ -366,6 +368,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           }
 
           const carouselInstance = {
+            id: idIndex,
             accountType,
             accountInfo,
             derivativeAccountDetails: {
@@ -383,9 +386,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         }
       }
     }
-    this.setState({
-      carouselData: [...defaultCarouselData, ...additionalCarouselData],
-    });
+    let carouselData1 = [...defaultCarouselData, ...additionalCarouselData];
+  this.setState({ carouselData: carouselData1, }, () => {                              
+    //callback
+   // console.log("carouselData", this.state.carouselData);
+  });
+    this.getServiceType(
+      serviceType,
+      carouselData1.length - 1
+    );
   };
 
   getBalance = () => {
@@ -626,22 +635,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
-
-    if (!index) {
-      if (this.carousel.current) {
-        if (serviceType == TEST_ACCOUNT) {
-          if (this.carousel.current as any)
-            (this.carousel.current as any).snapToItem(0, true, false);
-        } else if (serviceType == REGULAR_ACCOUNT) {
-          if (this.carousel.current as any)
-            (this.carousel.current as any).snapToItem(1, true, false);
-        } else if (serviceType == SECURE_ACCOUNT) {
-          if (this.carousel.current as any)
-            (this.carousel.current as any).snapToItem(2, true, false);
-        }
-      }
-      this.setState({ serviceType: serviceType });
-    } else {
+    //console.log("presentCarouselData getServiceType", this.state.presentCarouselData, index, this.state.carouselData);
+   
       if (this.carousel.current as any)
         (this.carousel.current as any).snapToItem(index, true, false);
       this.setState({
@@ -649,8 +644,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         presentCarouselData: this.state.carouselData[index],
         presentCarouselIndex: index,
       });
-    }
-
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
@@ -1063,6 +1056,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       CurrencyCode,
       transactions,
       spendableBalance,
+      presentCarouselData,
+      carouselData
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
     const averageTxFees = this.getAverageTxFees();
@@ -1152,7 +1147,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
                 <Carousel
                   ref={this.carousel}
-                  data={this.state.carouselData}
+                  data={carouselData}
                   firstItem={carouselInitIndex}
                   initialNumToRender={carouselInitIndex}
                   renderItem={this.RenderItem}
@@ -1160,7 +1155,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   itemWidth={this.sliderWidth * 0.95}
                   onSnapToItem={(index) => {
                     this.getServiceType(
-                      this.state.carouselData[index].type,
+                      carouselData[index].type,
                       index,
                     );
                   }}
@@ -1975,6 +1970,7 @@ const mapStateToProps = (state) => {
     accounts: idx(state, (_) => _.accounts) || [],
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    cardData: idx(state, (_) => _.preferences.cardData),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     isTestHelperDoneValue: idx(
       state,

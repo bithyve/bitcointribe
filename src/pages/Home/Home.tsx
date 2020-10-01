@@ -65,6 +65,7 @@ import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
+  setCardData
 } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -242,6 +243,8 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   updateLastSeen: any;
+  setCardData: any;
+  cardDataProps: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -643,6 +646,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setAccountCardData = (newCardData) => {
+    //console.log("newCardData", newCardData);
     let newArrayFinal = [];
     let tempArray = [];
     for (let a = 0; a < newCardData.length; a++) {
@@ -660,13 +664,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         cardData: newArrayFinal,
       });
     }
+   
   };
 
   updateAccountCardData = () => {
     let { accounts } = this.props;
     const defaultCardData = initialCardData;
     let idIndex = initialCardData[initialCardData.length - 1].id;
-
+    const allCards = [];
     const additionalCardData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
@@ -718,12 +723,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
+            bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
           };
           additionalCardData.push(carouselInstance);
         }
       }
     }
 
+    allCards.push(...defaultCardData, ... additionalCardData);
+    this.props.setCardData(allCards);
     this.setAccountCardData([
       ...defaultCardData,
       ...additionalCardData,
@@ -2356,6 +2364,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       UNDER_CUSTODY,
       downloadMShare,
       overallHealth,
+      cardDataProps
     } = this.props;
     return (
       <ImageBackground
@@ -2410,6 +2419,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   getIconByAccountType={getIconByAccountType}
                   switchOn={switchOn}
                   accounts={accounts}
+                  addNewDisable={cardDataProps.length == 4 ? true : false}
                   CurrencyCode={currencyCode}
                   balances={balances}
                   exchangeRates={exchangeRates}
@@ -3230,6 +3240,8 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
+    cardDataProps: idx(state, (_) => _.preferences.cardData),
+
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
@@ -3269,6 +3281,7 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
+    setCardData
   })(Home),
 );
 

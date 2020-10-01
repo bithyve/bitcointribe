@@ -67,6 +67,7 @@ const HomeList = ({
   CurrencyCode,
   balances,
   exchangeRates,
+  addNewDisable
 }) => {
   return (
     <View style={{ flexDirection: 'column' }}>
@@ -74,14 +75,16 @@ const HomeList = ({
         if (value.accountType === 'add') {
           return (
             <TouchableOpacity
-              disabled={false}
-              onPress={() => navigation.navigate('AddNewAccount')}
+              disabled={addNewDisable}
+              onPress={() => navigation.navigate('AddNewDonationAccount')}
             >
               <CardView
                 cornerRadius={10}
-                style={{
+                style={addNewDisable ? {
                   ...styles.card,
-                }}
+                   backgroundColor: Colors.borderColor
+                } : {
+                  ...styles.card}}
               >
                 <View
                   style={{
@@ -112,12 +115,7 @@ const HomeList = ({
               onPress={() => {
                 navigation.navigate('Accounts', {
                   serviceType: value.accountType,
-                  index:
-                    value.accountType === TEST_ACCOUNT
-                      ? 0
-                      : value.accountType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
+                  index: value.id - 1,
                 });
               }}
             >

@@ -83,6 +83,7 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
+import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -155,6 +156,7 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestAccepted,
     ReceivingAddress,
     AddNewAccount,
+    AddNewDonationAccount,
     Send: {
       screen: Send,
       navigationOptions: {
