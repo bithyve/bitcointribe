@@ -111,6 +111,7 @@ import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
+import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -1041,9 +1042,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if (prevState.isLoading && !this.state.isLoading) {
-      if (this.transactionTabBarBottomSheetRef.current) {
         this.transactionTabBarBottomSheetRef.current?.snapTo(1);
-      }
     }
   };
 
@@ -2459,6 +2458,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.transactionTabBarBottomSheetRef,
@@ -2504,6 +2504,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.addTabBarBottomSheetRef,
@@ -2557,6 +2558,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.qrTabBarBottomSheetRef,
@@ -2597,6 +2599,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.moreTabBarBottomSheetRef,
