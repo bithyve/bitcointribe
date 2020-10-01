@@ -1,4 +1,4 @@
-export default {
+const Colors = {
   borderColor: "#E3E3E3",
   black: "#2F2F2F",
   shadowBlue: "#DDECF5",
@@ -21,3 +21,5 @@ export default {
   currencyGray: '#d0d0d0',
   greyTextColor: '#656565'
 };
+
+export default Colors;
