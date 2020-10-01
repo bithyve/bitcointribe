@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Navigator from './src/navigation/Navigator';
 import { Provider } from 'react-redux';
