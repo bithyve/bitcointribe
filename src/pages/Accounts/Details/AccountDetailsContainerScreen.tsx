@@ -23,8 +23,6 @@ import BottomSheetBackground from '../../../components/bottom-sheets/BottomSheet
 import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellMergeCompletionEffect';
 import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet';
 import AccountShell from '../../../common/data/models/AccountShell';
-import { BottomSheetModalConfigs } from '@gorhom/bottom-sheet/lib/typescript/types';
-
 
 export type Props = {
   navigation: any;

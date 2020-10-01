@@ -9,7 +9,6 @@ import {
   Linking,
   Alert,
   Image,
-  BackHandler,
 } from 'react-native';
 import { Easing } from 'react-native-reanimated';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -139,7 +138,6 @@ export enum BottomSheetKind {
 }
 
 interface HomeStateTypes {
-  accountCardColumnData?: Array<[AccountShell]>;
   notificationLoading: boolean;
   notificationData?: any[];
   CurrencyCode: string;
@@ -162,7 +160,6 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
-  isBalanceLoading: boolean;
 }
 
 interface HomePropsTypes {
@@ -222,7 +219,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.state = {
       notificationData: [],
-      accountCardColumnData: [],
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: null,
@@ -242,7 +238,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
-      isBalanceLoading: true,
     };
   }
 
@@ -516,32 +511,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  makeAccountCardColumnData = () => {
-    const activeAccounts: AccountShell[] = this.props.accountsState.activeAccounts;
-
-    if (activeAccounts.length <= 2) {
-      return [activeAccounts];
-    }
-
-    let columns = [];
-    let currentColumn = [];
-
-    for (let account of activeAccounts) {
-      currentColumn.push(account);
-
-      if (currentColumn.length == 2) {
-        columns.push(currentColumn);
-        currentColumn = [];
-      }
-    }
-
-    if (currentColumn.length > 0) {
-      columns.push(currentColumn);
-    }
-
-    this.setState({ accountCardColumnData: columns });
-  };
-
 
   scheduleNotification = async () => {
     const channelId = new firebase.notifications.Android.Channel(
@@ -604,10 +573,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { s3Service, navigation } = this.props;
+    const { navigation } = this.props;
 
     this.closeBottomSheet();
-    this.makeAccountCardColumnData();
     this.getBalances();
 
     this.appStateListener = AppState.addEventListener(
@@ -747,7 +715,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
-      this.makeAccountCardColumnData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -1326,7 +1293,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         secureBalance,
         accumulativeBalance,
       },
-      isBalanceLoading: false,
     });
   };
 
@@ -1971,12 +1937,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      accountCardColumnData,
       balances,
       selectedBottomTab,
       notificationData,
       currencyCode,
-      isBalanceLoading,
     } = this.state;
 
     const {
@@ -2015,16 +1979,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
-        <View style={{ flex: 7 }}>
-          <View style={styles.accountCardsContainer}>
-            <HomeAccountCardsList
-              columnData={accountCardColumnData}
-              isBalanceLoading={isBalanceLoading}
-              onAddNewSelected={this.navigateToAddNewAccountScreen}
-              onCardSelected={this.handleAccountCardSelection}
-            />
-          </View>
-        </View>
+        <HomeAccountCardsList
+          containerStyle={styles.accountCardsContainer}
+          onAddNewSelected={this.navigateToAddNewAccountScreen}
+          onCardSelected={this.handleAccountCardSelection}
+        />
 
         <View
           style={styles.floatingFriendsAndFamilyButtonContainer}
@@ -2133,11 +2092,10 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create({
   accountCardsContainer: {
+    flex: 7,
     marginTop: 30,
     paddingLeft: 20,
     paddingTop: 16,
-    width: '100%',
-    height: '100%',
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
