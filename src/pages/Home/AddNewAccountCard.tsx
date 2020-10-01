@@ -10,7 +10,7 @@ export interface Props {
 }
 
 const AddNewAccountCard: React.FC<Props> = ({
-  onPress
+  onPress,
 }: Props) => {
   return (
     <TouchableOpacity onPress={onPress}>

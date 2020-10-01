@@ -59,8 +59,8 @@ class App extends Component {
 
   render() {
     return (
-      <BottomSheetModalProvider>
-        <Provider store={store} uriPrefix={prefix}>
+      <Provider store={store} uriPrefix={prefix}>
+        <BottomSheetModalProvider>
           <Navigator
             onNavigationStateChange={async (prevState, currentState) => {
               const currentScreen = this.getActiveRouteName(currentState);
@@ -121,8 +121,8 @@ class App extends Component {
               />
             )}
           />
-        </Provider>
-      </BottomSheetModalProvider>
+        </BottomSheetModalProvider>
+      </Provider>
     );
   }
 }

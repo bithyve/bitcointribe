@@ -17,13 +17,9 @@ import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/Use
 
 export type Props = {
   accountShell: AccountShell;
-  isBalanceLoading: boolean;
 };
 
-type HeaderProps = {
-  accountShell: AccountShell;
-};
-
+type HeaderProps = Props;
 type BodyProps = Props;
 
 
@@ -59,32 +55,8 @@ const HeaderSection: React.FC<HeaderProps> = ({
   );
 };
 
-// TODO: Figure out when this actually gets rendered and what it's supposed
-// to look like.
-const LoadingBalanceView: React.FC = () => {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginTop: heightPercentageToDP('1%'),
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: Colors.backgroundColor,
-          width: widthPercentageToDP('30%'),
-          height: widthPercentageToDP('5%'),
-          borderRadius: 8,
-        }}
-      />
-    </View>
-  );
-};
-
 const BodySection: React.FC<BodyProps> = ({
   accountShell,
-  isBalanceLoading,
 }: BodyProps) => {
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountsState = useAccountsState();
@@ -106,15 +78,11 @@ const BodySection: React.FC<BodyProps> = ({
         {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
       </Text>
 
-      {isBalanceLoading && (
-        <LoadingBalanceView />
-      ) || (
-        <AccountBalanceDisplay
-          accountShell={accountShell}
-          containerStyle={styles.balanceRow}
-          amountTextStyle={balanceTextStyle}
-        />
-      )}
+      <AccountBalanceDisplay
+        accountShell={accountShell}
+        containerStyle={styles.balanceRow}
+        amountTextStyle={balanceTextStyle}
+      />
     </View>
   );
 };
@@ -122,16 +90,11 @@ const BodySection: React.FC<BodyProps> = ({
 
 const HomeAccountsListCard: React.FC<Props> = ({
   accountShell,
-  isBalanceLoading,
 }: Props) => {
   return (
     <CardView cornerRadius={10} style={styles.rootContainer}>
       <HeaderSection accountShell={accountShell} />
-
-      <BodySection
-        accountShell={accountShell}
-        isBalanceLoading={isBalanceLoading}
-      />
+      <BodySection accountShell={accountShell} />
     </CardView>
   );
 };
