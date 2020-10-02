@@ -54,7 +54,6 @@ import {
 import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
-  setCurrencyToggleValue,
   setCardData,
 } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
@@ -137,7 +136,6 @@ interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
   cardData?: any[];
-  switchOn: boolean;
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab | null;
@@ -192,8 +190,6 @@ interface HomePropsTypes {
   storeFbtcData: any;
   setCurrencyCode: any;
   currencyCode: any;
-  setCurrencyToggleValue: any;
-  currencyToggleValue: any;
   updatePreference: any;
   fcmTokenValue: any;
   setFCMToken: any;
@@ -225,7 +221,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.state = {
       notificationData: [],
       cardData: [],
-      switchOn: false,
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: null,
@@ -279,11 +274,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.openBottomSheetOnLaunch(BottomSheetKind.NOTIFICATIONS_LIST);
   };
 
-  onSwitchToggle = (switchOn) => {
-    this.setState({
-      switchOn,
-    });
-  };
 
   processQRData = async (qrData) => {
     const { accounts, addTransferDetails, navigation } = this.props;
@@ -1094,7 +1084,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setCurrencyCodeFromAsync = async () => {
-    const { currencyCode, currencyToggleValue } = this.props;
+    const { currencyCode } = this.props;
     let currencyCodeTmp = currencyCode;
     if (!currencyCodeTmp) {
       currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
@@ -1109,15 +1099,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         currencyCode: currencyCodeTmp,
       });
     }
-    let currencyToggleValueTmp = currencyToggleValue;
-    if (!currencyToggleValueTmp) {
-      currencyToggleValueTmp = await AsyncStorage.getItem(
-        'currencyToggleValue',
-      );
-    }
-    this.setState({
-      switchOn: currencyToggleValueTmp ? true : false,
-    });
   };
 
   bootStrapNotifications = async () => {
@@ -1821,11 +1802,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setCurrencyToggleValue = (temp) => {
-    this.props.setCurrencyToggleValue(temp);
-  };
-
-
   getBottomSheetSnapPoints(): any[] {
     switch (this.state.currentBottomSheetKind) {
       case BottomSheetKind.TAB_BAR_ADD_MENU:
@@ -2026,7 +2002,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     const {
       cardData,
-      switchOn,
+      CurrencyCode,
       balances,
       selectedBottomTab,
       notificationData,
@@ -2063,15 +2039,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onPressNotifications={this.onPressNotifications}
             notificationData={notificationData}
             walletName={walletName}
-            switchOn={switchOn}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
             balances={balances}
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
             navigation={this.props.navigation}
             overallHealth={overallHealth}
-            onSwitchToggle={this.onSwitchToggle}
-            setCurrencyToggleValue={this.setCurrencyToggleValue}
           />
         </View>
 
@@ -2087,7 +2060,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             data={cardData}
             extraData={{
               balances,
-              switchOn,
               walletName,
               currencyCode,
               accounts,
@@ -2100,10 +2072,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 Items={Items}
                 navigation={navigation}
                 getIconByAccountType={getIconByAccountType}
-                switchOn={switchOn}
                 accounts={accounts}
                 addNewDisable={cardDataProps.length == 4 ? true : false}
-                CurrencyCode={currencyCode}
                 balances={balances}
                 exchangeRates={exchangeRates}
               />
@@ -2186,7 +2156,6 @@ const mapStateToProps = (state) => {
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
-    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
     secondaryDeviceAddressValue: idx(
       state,
@@ -2213,7 +2182,6 @@ export default withNavigationFocus(
     notificationsUpdated,
     storeFbtcData,
     setCurrencyCode,
-    setCurrencyToggleValue,
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
