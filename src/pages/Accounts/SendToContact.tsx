@@ -32,6 +32,7 @@ import {
   clearTransfer,
   setAverageTxFee,
 } from '../../store/actions/accounts';
+import { currencyKindSet } from '../../store/actions/preferences';
 import { syncTrustedChannels } from '../../store/actions/trustedContacts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -52,7 +53,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AccountSelectionModalContents from './AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import Currencies from '../../common/Currencies';
+import FiatCurrencies from '../../common/FiatCurrencies';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
@@ -60,8 +61,8 @@ import config from '../../bitcoin/HexaConfig';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
-import { setCurrencyToggleValue } from '../../store/actions/preferences';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 const currencyCode = [
   'BRL',
@@ -83,12 +84,12 @@ interface SendToContactPropsTypes {
   clearTransfer: any;
   addTransferDetails: any;
   currencyCode: any;
-  currencyToggleValue: any;
-  setCurrencyToggleValue: any;
   averageTxFees: any;
   setAverageTxFee: any;
   trustedContactsService: TrustedContactsService;
   syncTrustedChannels: any;
+  currencyKind: CurrencyKind;
+  currencyKindSet: (kind: CurrencyKind) => void;
 }
 
 interface SendToContactStateTypes {
@@ -104,7 +105,6 @@ interface SendToContactStateTypes {
   derivativeAccountDetails: { type: string; number: number };
   sweepSecure: any;
   removeItem: any;
-  switchOn: boolean;
   CurrencyCode: string;
   CurrencySymbol: string;
   bitcoinAmount: string;
@@ -119,6 +119,7 @@ interface SendToContactStateTypes {
   recipients: any[];
   spendableBalances: any;
   isSendMax: boolean;
+  prefersBitcoin: boolean;
 }
 
 class SendToContact extends Component<
@@ -144,7 +145,6 @@ class SendToContact extends Component<
       ),
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       removeItem: {},
-      switchOn: true,
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
@@ -165,6 +165,7 @@ class SendToContact extends Component<
         secureBalance: 0,
       },
       isSendMax: false,
+      prefersBitcoin: this.props.currencyKind === CurrencyKind.BITCOIN,
     };
   }
 
@@ -221,7 +222,6 @@ class SendToContact extends Component<
     }
 
     this.updateSpendableBalance();
-
     this.amountCalculation();
   };
 
@@ -406,19 +406,17 @@ class SendToContact extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = this.props.currencyToggleValue;
     // await AsyncStorage.getItem(
     //   'currencyToggleValue',
     // );
     let currencyCodeTmp = this.props.currencyCode;
     //await AsyncStorage.getItem('currencyCode');
     this.setState({
-      switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
-    for (let i = 0; i < Currencies.length; i++) {
-      if (Currencies[i].code.includes(currencyCodeTmp)) {
-        this.setState({ CurrencySymbol: Currencies[i].symbol });
+    for (let i = 0; i < FiatCurrencies.length; i++) {
+      if (FiatCurrencies[i].code.includes(currencyCodeTmp)) {
+        this.setState({ CurrencySymbol: FiatCurrencies[i].symbol });
       }
     }
   };
@@ -451,9 +449,9 @@ class SendToContact extends Component<
   };
 
   convertBitCoinToCurrency = (value) => {
-    const { switchOn, exchangeRates, CurrencyCode } = this.state;
+    const { prefersBitcoin, exchangeRates, CurrencyCode } = this.state;
     let temp = value;
-    if (switchOn) {
+    if (prefersBitcoin) {
       let result = exchangeRates
         ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
         : 0;
@@ -471,12 +469,12 @@ class SendToContact extends Component<
   };
 
   storeAverageTxFees = async () => {
-    const { service } = this.props;
+    const { accountsState } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
     const instance =
-      service[serviceType].service.hdWallet ||
-      service[serviceType].service.secureHDWallet;
+      accountsState[serviceType].service.hdWallet ||
+      accountsState[serviceType].service.secureHDWallet;
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
@@ -578,7 +576,7 @@ class SendToContact extends Component<
       averageTxFees,
       serviceType,
       spendableBalance,
-      switchOn,
+      prefersBitcoin,
     } = this.state;
     const { accountsState } = this.props;
 
@@ -609,7 +607,7 @@ class SendToContact extends Component<
       }
       this.setState(
         {
-          switchOn: !switchOn ? true : switchOn,
+          prefersBitcoin: !prefersBitcoin ? true : prefersBitcoin,
           isSendMax: true,
         },
         () => {
@@ -628,7 +626,7 @@ class SendToContact extends Component<
       serviceType,
       averageTxFees,
     } = this.state;
-    const { accountsState, service, transferST1 } = this.props;
+    const { accountsState, transferST1 } = this.props;
 
     const recipients = [];
     const currentRecipientInstance = {
@@ -664,8 +662,8 @@ class SendToContact extends Component<
     });
     recipientsList.push(currentRecipientInstance);
     const instance =
-      service[serviceType].service.hdWallet ||
-      service[serviceType].service.secureHDWallet;
+      accountsState[serviceType].service.hdWallet ||
+      accountsState[serviceType].service.secureHDWallet;
 
     recipientsList.map((item) => {
       const recipientId = item.selectedContact.id;
@@ -770,14 +768,14 @@ class SendToContact extends Component<
     const {
       serviceType,
       spendableBalance,
-      switchOn,
+      prefersBitcoin,
       exchangeRates,
       CurrencyCode,
     } = this.state;
 
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(spendableBalance)
-      : switchOn
+      : prefersBitcoin
         ? UsNumberFormat(spendableBalance)
         : exchangeRates
           ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
@@ -800,7 +798,7 @@ class SendToContact extends Component<
       selectedContact,
       serviceType,
       removeItem,
-      switchOn,
+      prefersBitcoin,
       CurrencyCode,
       CurrencySymbol,
       bitcoinAmount,
@@ -901,7 +899,7 @@ class SendToContact extends Component<
               <Text style={styles.textTsats}>
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
-                  : switchOn
+                  : prefersBitcoin
                     ? ' sats )'
                     : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
@@ -1038,7 +1036,7 @@ class SendToContact extends Component<
                           item.selectedContact.id}
                       </Text>
                       <Text style={styles.amountText}>
-                        {switchOn
+                        {prefersBitcoin
                           ? `${
                           item.bitcoinAmount
                             ? item.bitcoinAmount
@@ -1078,7 +1076,7 @@ class SendToContact extends Component<
                       width: wp('70%'),
                       height: wp('13%'),
                       alignItems: 'center',
-                      backgroundColor: !switchOn
+                      backgroundColor: !prefersBitcoin
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
@@ -1118,9 +1116,9 @@ class SendToContact extends Component<
                         height: wp('13%'),
                         width: wp('45%'),
                       }}
-                      editable={!switchOn}
+                      editable={!prefersBitcoin}
                       placeholder={
-                        switchOn
+                        prefersBitcoin
                           ? 'Converted amount in ' + CurrencyCode
                           : 'Enter amount in ' + CurrencyCode
                       }
@@ -1149,7 +1147,7 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {!switchOn && (
+                    {!prefersBitcoin && (
                       <Text
                         style={{
                           color: Colors.blue,
@@ -1185,7 +1183,7 @@ class SendToContact extends Component<
                       alignItems: 'center',
                       width: wp('70%'),
                       height: wp('13%'),
-                      backgroundColor: switchOn
+                      backgroundColor: prefersBitcoin
                         ? Colors.white
                         : Colors.backgroundColor,
                     }}
@@ -1207,7 +1205,7 @@ class SendToContact extends Component<
                         width: wp('45%'),
                       }}
                       placeholder={
-                        switchOn
+                        prefersBitcoin
                           ? serviceType == TEST_ACCOUNT
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
@@ -1215,7 +1213,7 @@ class SendToContact extends Component<
                             ? 'Converted amount in t-sats'
                             : 'Converted amount in sats'
                       }
-                      editable={switchOn}
+                      editable={prefersBitcoin}
                       value={bitcoinAmount}
                       returnKeyLabel="Done"
                       returnKeyType="done"
@@ -1241,7 +1239,7 @@ class SendToContact extends Component<
                         }
                       }}
                     />
-                    {switchOn && (
+                    {prefersBitcoin && (
                       <Text
                         style={{
                           color: Colors.blue,
@@ -1255,23 +1253,27 @@ class SendToContact extends Component<
                       </Text>
                     )}
                   </TouchableOpacity>
-                  {/* {renderBitCoinInputText()} */}
                 </View>
+
                 <View style={styles.toggleSwitchView}>
                   <ToggleSwitch
                     currencyCodeValue={CurrencyCode}
-                    onpress={async () => {
-                      this.setState({ switchOn: !switchOn });
-                      let temp = !switchOn ? 'true' : '';
-                      this.props.setCurrencyToggleValue(temp);
+                    onpress={() => {
+                      const newValue = prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN;
 
-                      //await AsyncStorage.setItem('currencyToggleValue', temp);
+                      this.setState(
+                        { prefersBitcoin: newValue == CurrencyKind.BITCOIN },
+                        () => {
+                          this.props.currencyKindSet(newValue);
+                        }
+                      )
                     }}
-                    toggle={switchOn}
+                    toggle={prefersBitcoin}
                     transform={true}
                   />
                 </View>
               </View>
+
               {serviceType == TEST_ACCOUNT ? (
                 <View style={styles.bottomInfoView}>
                   <BottomInfoBox
@@ -1558,7 +1560,7 @@ const mapStateToProps = (state) => {
     accountsState: state.accounts || [],
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
-    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+    currencyKind: idx(state, (_) => _.preferences.currencyKind),
     averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
   };
 };
@@ -1569,7 +1571,7 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
-    setCurrencyToggleValue,
+    currencyKindSet,
     setAverageTxFee,
     syncTrustedChannels,
   })(SendToContact),

@@ -1,6 +1,6 @@
 import {
   CURRENCY_CODE,
-  CURRENCY_TOGGLE_VALUE,
+  CURRENCY_KIND_SET,
   FCM_TOKEN_VALUE,
   SECONDARY_DEVICE_ADDRESS_VALUE,
   RELEASE_CASES_VALUE,
@@ -15,11 +15,12 @@ import {
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 const initialState = ip.freeze({
   hasShownNoInternetWarning: false,
   currencyCode: null,
-  currencyToggleValue: null,
+  currencyKind: CurrencyKind.BITCOIN,
   fcmTokenValue: '',
   secondaryDeviceAddressValue: '',
   releaseCasesValue: null,
@@ -45,11 +46,13 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         currencyCode: payload.currencyCode,
       };
-    case CURRENCY_TOGGLE_VALUE:
+
+    case CURRENCY_KIND_SET:
       return {
         ...state,
-        currencyToggleValue: payload.currencyToggleValue,
+        currencyKind: payload,
       };
+
     case FCM_TOKEN_VALUE:
       return {
         ...state,
@@ -108,7 +111,6 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         cardData: payload.cardData,
       };
-
     default:
       return state;
   }
