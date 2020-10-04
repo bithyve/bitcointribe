@@ -26,7 +26,7 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-//import TransactionDetails from '../pages/Accounts/TransactionDetails';
+import TransactionDetailsScreen from '../pages/Accounts/Transactions/TransactionDetailsScreenContainer';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
@@ -84,7 +84,9 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
 import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
-import AccountDetailsContainer from '../pages/Accounts/Details/AccountDetailsContainer';
+import AccountDetails from '../pages/Accounts/Details/AccountDetailsContainer';
+import TransactionsListScreen from '../pages/Accounts/Transactions/TransactionsListScreenContainer';
+import AccountSettingsMainScreen from '../pages/Accounts/AccountSettings/AccountSettingsMainScreen';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -131,7 +133,6 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
   'Confirmation',
-  'TransactionDetails',
   'Intermediate',
 ];
 
@@ -160,16 +161,32 @@ const AddNewAccountStack = createStackNavigator(
 const AccountDetailsStack = createStackNavigator(
   {
     AccountDetailsRoot: {
-      screen: AccountDetailsContainer,
-      navigationOptions: AccountDetailsContainer.navigationOptions,
+      screen: AccountDetails,
+      navigationOptions: AccountDetails.navigationOptions,
       // navigationOptions: {
       //   headerShown: false,
       // },
     },
-    // AccountSettings: {
-      // screen: AccountSettings,
+    TransactionsList: {
+      screen: TransactionsListScreen,
+      navigationOptions: {
+        title: "All Transactions",
+      },
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsScreen,
+      // navigationOptions: TransactionDetails.navigationOptions,
+      navigationOptions: {
+        title: "Transaction Details",
+      },
+    },
+    AccountSettingsMain: {
+      screen: AccountSettingsMainScreen,
       // navigationOptions: AccountSettings.navigationOptions,
-    // },
+      navigationOptions: {
+        title: "Account Settings",
+      },
+    },
   },
   {
     mode: 'modal',

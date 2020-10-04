@@ -71,8 +71,8 @@ const AccountOptionCard: React.FC<Props> = ({
         <Card.Image style={styles.image} source={accountPayload.imageSource} />
 
         <View style={styles.descriptionTextContainer}>
-          <Card.Title style={titleTextStyle} numberOfLines={1}>{accountPayload.title}</Card.Title>
-          <Card.Title style={subtitleTextStyle}>{accountPayload.shortDescription}</Card.Title>
+          <Card.Title style={titleTextStyle} numberOfLines={1}>{accountPayload.defaultTitle}</Card.Title>
+          <Card.Title style={subtitleTextStyle}>{accountPayload.defaultDescription}</Card.Title>
         </View>
 
         <View style={selectionIndicatorContainerStyle}>

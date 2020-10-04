@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
@@ -7,7 +7,7 @@ import AccountVisibility from '../../enums/AccountVisibility';
 
 
 interface ConstructorProps {
-  title?: string;
+  defaultTitle?: string;
   accountNumber?: number;
   displayOrder?: number | null;
   balance?: number;
@@ -16,12 +16,13 @@ interface ConstructorProps {
   customDescription?: string | null;
   visibility?: AccountVisibility;
   secondaryAccountUUIDs?: string[];
+  transactionIDs?: string[];
 }
 
 export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "View a non-Hexa wallet as an account.";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "View a non-Hexa wallet as an account.";
   kind: AccountKind = AccountKind.WATCH_ONLY_IMPORTED_WALLET
   accountNumber: number;
   displayOrder: number | null;
@@ -31,9 +32,11 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   customDescription: string | null;
   visibility: AccountVisibility;
   secondaryAccountUUIDs: string[];
+  transactionIDs: string[];
+
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -42,8 +45,9 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     customDescription,
     visibility,
     secondaryAccountUUIDs,
+    transactionIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Watch Only";
+    this.defaultTitle = defaultTitle || "Watch Only";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -52,6 +56,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {
@@ -65,9 +70,9 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
 
 
 export class FullyImportedWalletAccountPayload implements ImportedWalletAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Fully import and manage a non-Hexa wallet.";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
   kind: AccountKind = AccountKind.FULLY_IMPORTED_WALLET;
   accountNumber: number;
   displayOrder: number | null;
@@ -75,13 +80,13 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   unit: BitcoinUnit;
   customDisplayName: string | null;
   customDescription: string | null;
-
   visibility: AccountVisibility;
-
   secondaryAccountUUIDs: string[];
+  transactionIDs: string[];
+
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -90,8 +95,9 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     customDescription,
     visibility,
     secondaryAccountUUIDs,
+    transactionIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Full Import";
+    this.defaultTitle = defaultTitle || "Full Import";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -100,6 +106,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
 
