@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native';
 import useActiveAccountPayload from '../../utils/hooks/state-selectors/UseActiveAccountPayload';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
@@ -7,6 +8,13 @@ import ScreenHeaderStyles from '../../common/Styles/ScreenHeaders';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch';
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { currencyKindSet } from '../../store/actions/preferences';
 
 
 export type Props = {
@@ -18,10 +26,18 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   accountID,
   onBackPressed,
 }: Props) => {
+  const dispatch = useDispatch();
   const accountPayload: AccountPayload | undefined = useActiveAccountPayload(accountID);
 
+  const currencyCode = useCurrencyCode();
+  const currencyKind = useCurrencyKind();
+
+  const prefersBitcoin = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
   const title = useMemo(() => {
-    return accountPayload?.customDisplayName || accountPayload?.title || 'Account Details';
+    return accountPayload?.customDisplayName || accountPayload?.defaultTitle || 'Account Details';
   }, [accountID]);
 
 
@@ -38,7 +54,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
 
         <View style={styles.mainContentContainer}>
           <TouchableOpacity
-            style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}
+            style={{ height: '100%', justifyContent: 'center', alignItems: 'center', flex: 0 }}
             hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             onPress={onBackPressed}
           >
@@ -53,36 +69,38 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
             {title}
           </Text>
 
-          <CurrencyKindToggleSwitch
-            currencyCodeValue={CurrencyCode}
-            activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
-            inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-            activeOffImage={
-              this.currencyCode.includes(CurrencyCode)
-                ? this.setCurrencyCodeToImage(
-                  getCurrencyImageName(CurrencyCode),
-                  'light',
-                )
-                : getCurrencyImageByRegion(CurrencyCode, 'light')
-            }
-            inactiveOffImage={
-              this.currencyCode.includes(CurrencyCode)
-                ? this.setCurrencyCodeToImage(
-                  getCurrencyImageName(CurrencyCode),
-                  'dark',
-                )
-                : getCurrencyImageByRegion(CurrencyCode, 'dark')
-            }
-            toggleColor={Colors.lightBlue}
-            toggleCircleColor={Colors.blue}
-            onpress={() => {
-              this.props.currencyKindSet(
-                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-              );
-            }}
-            toggle={prefersBitcoin}
-          />
-
+          <View style={styles.currencyKindToggleContainer}>
+            <CurrencyKindToggleSwitch
+              activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
+              inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
+              activeOffImage={
+                materialIconCurrencyCodes.includes(currencyCode) ?
+                  <MaterialCurrencyCodeIcon
+                    currencyCode={currencyCode}
+                    color={Colors.white}
+                    size={14}
+                  />
+                  : getCurrencyImageByRegion(currencyCode, 'light')
+              }
+              inactiveOffImage={
+                materialIconCurrencyCodes.includes(currencyCode) ?
+                  <MaterialCurrencyCodeIcon
+                    currencyCode={currencyCode}
+                    color={Colors.blue}
+                    size={14}
+                  />
+                  : getCurrencyImageByRegion(currencyCode, 'dark')
+              }
+              trackColor={Colors.lightBlue}
+              thumbColor={Colors.blue}
+              onpress={() => {
+                dispatch(currencyKindSet(
+                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                ));
+              }}
+              isOn={prefersBitcoin}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -97,10 +115,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-
   titleText: {
-    ...HeadingStyles.screenHeadingLarge,
+    ...ScreenHeaderStyles.smallHeaderTitleText,
     flex: 1,
+
+  },
+
+  currencyKindToggleContainer: {
+    flex: 0,
   },
 });
 

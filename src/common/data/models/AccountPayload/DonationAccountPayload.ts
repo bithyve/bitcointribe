@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
@@ -6,7 +6,7 @@ import { DonationReceivingAccountPayload } from './Interfaces';
 import AccountVisibility from '../../enums/AccountVisibility';
 
 interface ConstructorProps {
-  title?: string;
+  defaultTitle?: string;
   doneeName: string;
   causeName: string;
   accountNumber?: number;
@@ -17,12 +17,13 @@ interface ConstructorProps {
   customDescription?: string | null;
   visibility?: AccountVisibility;
   secondaryAccountUUIDs?: string[];
+  transactionIDs?: string[];
 }
 
 export default class DonationAccountPayload implements DonationReceivingAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Directly Accept Donations";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Directly Accept Donations";
   kind: AccountKind = AccountKind.DONATION;
 
   doneeName: string;
@@ -38,9 +39,11 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
   visibility: AccountVisibility;
 
   secondaryAccountUUIDs: string[];
+  transactionIDs: string[];
+
 
   constructor({
-    title,
+    defaultTitle,
     doneeName,
     causeName,
     accountNumber,
@@ -51,8 +54,9 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
     customDescription,
     visibility,
     secondaryAccountUUIDs,
+    transactionIDs,
   }: ConstructorProps) {
-    this.title = title || "Donation Account";
+    this.defaultTitle = defaultTitle || "Donation Account";
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.accountNumber = accountNumber || 0;
@@ -63,6 +67,7 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {

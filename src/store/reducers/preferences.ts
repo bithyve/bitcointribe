@@ -20,7 +20,7 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 const initialState = ip.freeze({
   isInternetModalCome: false,
-  currencyCode: null,
+  currencyCode: 'USD',
   currencyKind: CurrencyKind.BITCOIN,
   fcmTokenValue: '',
   secondaryDeviceAddressValue: '',

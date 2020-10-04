@@ -250,7 +250,7 @@ export default function HealthCheck(props) {
             onPress={() => {
             }}
           >
-          <Image source={require("../../assets/images/icons/icon_settings1.png")} style={styles.image} />
+          <Image source={require("../../assets/images/icons/icon_settings_blue.png")} style={styles.image} />
           </TouchableOpacity>
         </View>
         <ScrollView>

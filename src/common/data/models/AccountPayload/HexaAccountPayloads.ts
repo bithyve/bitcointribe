@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { iconForAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
@@ -7,7 +7,7 @@ import AccountVisibility from '../../enums/AccountVisibility';
 
 
 interface ConstructorProps {
-  title?: string;
+  defaultTitle?: string;
   accountNumber?: number;
   displayOrder?: number | null;
   balance?: number;
@@ -16,12 +16,13 @@ interface ConstructorProps {
   customDescription?: string | null;
   secondaryAccountUUIDs?: string[];
   visibility?: AccountVisibility;
+  transactionIDs?: string[];
 }
 
 export class TestAccountPayload implements HexaAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Learn Bitcoin";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Learn Bitcoin";
   kind: AccountKind = AccountKind.TEST;
   accountNumber: number;
   displayOrder: number | null;
@@ -30,11 +31,14 @@ export class TestAccountPayload implements HexaAccountPayload {
   customDisplayName: string | null;
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
+
   visibility: AccountVisibility;
+
+  transactionIDs: string[];
 
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -42,8 +46,9 @@ export class TestAccountPayload implements HexaAccountPayload {
     customDescription,
     visibility,
     secondaryAccountUUIDs,
+    transactionIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Test Account";
+    this.defaultTitle = defaultTitle || "Test Account";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -51,6 +56,7 @@ export class TestAccountPayload implements HexaAccountPayload {
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {
@@ -63,9 +69,9 @@ export class TestAccountPayload implements HexaAccountPayload {
 }
 
 export class SavingsAccountPayload implements HexaAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Multi-factor security";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Multi-factor security";
   kind: AccountKind = AccountKind.SECURE;
   accountNumber: number;
   displayOrder: number | null;
@@ -75,9 +81,10 @@ export class SavingsAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+  transactionIDs: string[];
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -85,9 +92,10 @@ export class SavingsAccountPayload implements HexaAccountPayload {
     customDisplayName,
     customDescription,
     visibility,
+    transactionIDs,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Savings Account";
+    this.defaultTitle = defaultTitle || "Savings Account";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -96,6 +104,7 @@ export class SavingsAccountPayload implements HexaAccountPayload {
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {
@@ -108,9 +117,9 @@ export class SavingsAccountPayload implements HexaAccountPayload {
 }
 
 export class CheckingAccountPayload implements HexaAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Fast and easy";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Fast and easy";
   kind: AccountKind = AccountKind.REGULAR;
   accountNumber: number;
   displayOrder: number | null;
@@ -120,9 +129,10 @@ export class CheckingAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+  transactionIDs: string[];
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -130,9 +140,10 @@ export class CheckingAccountPayload implements HexaAccountPayload {
     customDisplayName,
     customDescription,
     visibility,
+    transactionIDs,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Checking Account";
+    this.defaultTitle = defaultTitle || "Checking Account";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -141,6 +152,7 @@ export class CheckingAccountPayload implements HexaAccountPayload {
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {
@@ -154,9 +166,9 @@ export class CheckingAccountPayload implements HexaAccountPayload {
 
 
 export class TrustedContactsAccountPayload implements HexaAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string = "Account with Trusted Contacts";
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string = "Account with Trusted Contacts";
   kind: AccountKind = AccountKind.TRUSTED_CONTACTS;
   accountNumber: number;
   displayOrder: number | null;
@@ -166,9 +178,10 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+  transactionIDs: string[];
 
   constructor({
-    title,
+    defaultTitle,
     accountNumber,
     displayOrder,
     balance,
@@ -176,9 +189,10 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
     customDisplayName,
     customDescription,
     visibility,
+    transactionIDs,
     secondaryAccountUUIDs,
   }: ConstructorProps = {}) {
-    this.title = title || "Joint Account";
+    this.defaultTitle = defaultTitle || "Joint Account";
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
     this.balance = balance || 0;
@@ -187,6 +201,7 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {
