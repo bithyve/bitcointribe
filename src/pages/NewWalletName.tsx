@@ -193,10 +193,10 @@ const styles = StyleSheet.create({
   },
   buttonView: {
     height: wp('13%'),
-    width: wp('30%'),
+    width: wp('35%'),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: Colors.blue,
   },
   buttonText: {

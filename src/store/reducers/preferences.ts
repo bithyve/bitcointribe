@@ -12,7 +12,9 @@ import {
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS, 
   UPDATE_LAST_SEEN,
-  CLOUD_BACKUP_DATA_STATUS
+  CLOUD_BACKUP_DATA_STATUS,
+  CARD_DATA
+
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import ip, { chain } from 'icepick';
@@ -34,7 +36,8 @@ const initialState = ip.freeze({
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
-  cloudBackupStatus: false
+  cloudBackupStatus: false,
+  cardData: null
 })
 
 export default (state = initialState, { type, payload }) => {
@@ -112,6 +115,12 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         cloudBackupStatus: payload.status,
+      };
+      
+      case CARD_DATA:
+      return {
+        ...state,
+        cardData: payload.cardData,
       };
 
     default:

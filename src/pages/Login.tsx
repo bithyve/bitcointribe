@@ -19,7 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { credsAuth } from '../store/actions/setupAndAuth';
+import { credsAuth, validatePin } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
@@ -34,6 +34,7 @@ import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
+import { fetchDatabase, fetchFromDB } from '../store/actions/storage';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Satoshis or Sats');
@@ -307,45 +308,35 @@ export default function Login(props) {
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector(state => state.preferences.isMigrated)
   const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
+  let key = useSelector((state) => state.storage.key)
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      // migrate async keys
-      if (!isMigrated) {
-        dispatch(initMigration())
+  const onLoginSuccess = async () => {
+    let walletExists = await AsyncStorage.getItem("walletExists")
+    if (walletExists) {
+      // get data from db , if exists trigger these
+      let { database } = await dispatch(fetchDatabase(key))
+      if (loaderBottomSheet.current) {
+        loaderBottomSheet.current.snapTo(0);
       }
-      AsyncStorage.getItem('walletExists').then((exists) => {
-        if (exists) {
-          if (loaderBottomSheet.current) {
-            loaderBottomSheet.current.snapTo(0);
-          }
-          props.navigation.navigate('Home', {
-            custodyRequest,
-            recoveryRequest,
-            trustedContactRequest,
-            userKey,
-          });
-
-          if (dbFetched) {
-            dispatch(updateWalletImage());
-            dispatch(calculateExchangeRate());
-            setTimeout(() => {
-              if (loaderBottomSheet.current) {
-                loaderBottomSheet.current.snapTo(0);
-              }
-              props.navigation.navigate('Home', {
-                custodyRequest,
-                recoveryRequest,
-                trustedContactRequest,
-                userKey,
-              });
-            }, 2500);
-            dispatch(startupSync());
-          }
-        } else { props.navigation.replace('RestoreAndRecoverWallet') };
+      props.navigation.navigate('Home', {
+        custodyRequest,
+        recoveryRequest,
+        trustedContactRequest,
+        userKey,
       });
+      if (database) {
+        dispatch(updateWalletImage());
+        dispatch(calculateExchangeRate());
+        dispatch(startupSync());
+      }
+    } else {
+      props.navigation.replace('RestoreAndRecoverWallet')
     }
-  }, [isAuthenticated, dbFetched]);
+    if (!isMigrated) {
+      dispatch(initMigration())
+    }
+
+  }
 
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -424,17 +415,13 @@ export default function Login(props) {
     );
   }, []);
 
-  const proceedButton = () => {
-    loaderBottomSheet.current.snapTo(1);
-    setTimeout(() => {
-      setMessage('Hexa Test Account');
-      setSubTextMessage1('Test Account comes preloaded with test-sats');
-      setSubTextMessage2('Best place to start if you are new to Bitcoin');
-    }, 3000);
-    setTimeout(() => {
-      setElevation(0);
-    }, 2);
-    dispatch(credsAuth(passcode));
+  const proceedButton = async (passcode) => {
+    let res = await dispatch(validatePin(passcode))
+    if (res.key) {
+      onLoginSuccess()
+    } else {
+      return
+    }
   };
 
   return (
@@ -589,6 +576,7 @@ export default function Login(props) {
                     setElevation(0);
                   }, 2);
                   loaderBottomSheet.current.snapTo(1);
+                  proceedButton(passcode)
                   setTimeout(() => {
                     setMessage('Hexa Test Account');
                     setSubTextMessage1(
@@ -597,7 +585,6 @@ export default function Login(props) {
                     setSubTextMessage2(
                       'Best place to start if you are new to Bitcoin',
                     );
-                    dispatch(credsAuth(passcode));
                   }, 3000);
                 }}
                 style={{

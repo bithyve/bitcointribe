@@ -7,7 +7,10 @@ import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import config from '../../HexaConfig';
 import { Transactions } from '../Interface';
-import { TRUSTED_CONTACTS } from '../../../common/constants/serviceTypes';
+import {
+  SUB_PRIMARY_ACCOUNT,
+  TRUSTED_CONTACTS,
+} from '../../../common/constants/serviceTypes';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
 const { TESTNET, MAINNET } = API_URLS;
@@ -101,6 +104,7 @@ export default class Bitcoin {
     lastUsedChangeAddressIndex: number,
     accountType: string,
     contactName?: string,
+    primaryAccType?: string,
   ): Promise<{
     UTXOs: Array<{
       txId: string;
@@ -212,6 +216,7 @@ export default class Bitcoin {
                 transactionType: 'Sent',
                 amount: tx.sentAmount,
                 accountType: tx.accountType,
+                primaryAccType,
                 recipientAddresses: tx.recipientAddresses,
                 blockTime: tx.Status.block_time, // only available when tx is confirmed
               };
@@ -227,6 +232,7 @@ export default class Bitcoin {
                 transactionType: 'Received',
                 amount: tx.receivedAmount,
                 accountType: tx.accountType,
+                primaryAccType,
                 senderAddresses: tx.senderAddresses,
                 blockTime: tx.Status.block_time, // only available when tx is confirmed
               };
@@ -258,6 +264,7 @@ export default class Bitcoin {
                         )
                         .join(' ')
                     : tx.accountType,
+                primaryAccType,
                 recipientAddresses: tx.recipientAddresses,
                 senderAddresses: tx.senderAddresses,
                 blockTime: tx.Status.block_time, // only available when tx is confirmed

@@ -268,6 +268,7 @@ export default function NewOwnQuestions(props) {
             <View style={CommonStyles.headerContainer}>
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
                 onPress={() => {
                   props.navigation.goBack();
                 }}
@@ -588,7 +589,7 @@ const styles = StyleSheet.create({
     width: wp('35%'),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },

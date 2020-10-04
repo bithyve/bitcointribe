@@ -1011,6 +1011,7 @@ class ContactDetailsNew extends PureComponent<
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 style={styles.backArrowView}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
               >
                 <FontAwesome
                   name="long-arrow-left"

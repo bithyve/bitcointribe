@@ -927,6 +927,8 @@ export default class SecureAccount {
   public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
+    contactName?: string,
+    accountName?: string,
   ): Promise<
     | {
         status: number;
@@ -947,6 +949,8 @@ export default class SecureAccount {
         data: await this.secureHDWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
+          contactName,
+          accountName,
         ),
       };
     } catch (err) {

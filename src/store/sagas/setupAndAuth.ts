@@ -132,6 +132,7 @@ function* credentialsAuthWorker({ payload }) {
     yield put(credsAuthenticated(true));
     // t.stop()
     yield put(keyFetched(key));
+    // TODO -- this need to be done on 
     yield put(fetchFromDB());
   }
 }
