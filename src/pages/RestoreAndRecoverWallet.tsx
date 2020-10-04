@@ -71,7 +71,9 @@ const RestoreAndRecoverWallet = props => {
           <TouchableOpacity
             onPress={async () => {
               if (await AsyncStorage.getItem('recoveryExists'))
-                props.navigation.navigate('RestoreSelectedContactsList');
+              props.navigation.navigate('RestoreWithICloud');
+
+                //props.navigation.navigate('RestoreSelectedContactsList');
               else props.navigation.navigate('WalletNameRecovery');
             }}
             style={{

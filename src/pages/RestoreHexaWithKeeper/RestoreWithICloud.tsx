@@ -38,14 +38,36 @@ import ICloudBackupNotFound from './ICloudBackupNotFound';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { requestTimedout } from '../../store/utils/utilities';
 import RestoreWallet from './RestoreWallet';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import { CloudData } from '../../common/CommonFunctions';
+import {
+  CheckCloudDataBackup,
+  CloudDataBackup,
+} from '../../common/CommonFunctions/CloudBackup';
+import { setCloudBackupStatus } from '../../store/actions/preferences';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import SSS from '../../bitcoin/utilities/sss/SSS';
+import { decrypt, decrypt1 } from '../../common/encryption';
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
   listData: any[];
+  walletsArray: any[];
+  cloudBackup: boolean;
+  hideShow: boolean;
+  selectedBackup: any;
 }
 
 interface RestoreWithICloudPropsTypes {
   navigation: any;
+  walletName: string;
+  regularAccount: RegularAccount;
+  s3Service: any;
+  cloudBackupStatus: any;
+  database: any;
+  setCloudBackupStatus: any;
+  security: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -85,16 +107,60 @@ class RestoreWithICloud extends Component<
           id: 3,
         },
       ],
+      walletsArray: [],
+      cloudBackup: false,
+      hideShow: false,
+      selectedBackup: {
+        data: '',
+        dateTime: '',
+        walletId: '',
+        walletName: '',
+      },
     };
   }
   // image: require('../../assets/images/icons/icon_contact.png'),
   // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.cloudData();
+  };
+
+  cloudData = async () => {
+    CheckCloudDataBackup((result) => this.getData(result));
+  };
+
+  getData = (result) => {
+    console.log('FILE DATA', result);
+    var arr = [];
+    var newArray = [];
+    try {
+      arr = JSON.parse(result);
+    } catch (error) {
+      console.log('ERROR', error);
+    }
+    if (arr && arr.length) {
+      for (var i = 0; i < arr.length; i++) {
+        newArray.push(arr[i]);
+      }
+    }
+    console.log('ARR', newArray);
+    this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
+    (this.refs.RestoreFromICloud as any).snapTo(1);
+  };
+
+  restoreWallet = () => {
+    const { selectedBackup } = this.state;
+    let key = SSS.strechKey(this.props.security.answer);
+    const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
+    console.log("decryptedCloudDataJson",decryptedCloudDataJson);
+  }
 
   render() {
-    const { listData, selectedIds } = this.state;
+    const { listData, hideShow, cloudBackup, walletsArray, selectedBackup } = this.state;
     const { navigation } = this.props;
+    let name;
+            if (Platform.OS == 'ios') name = 'iCloud';
+            else name = 'GDrive';
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -123,116 +189,117 @@ class RestoreWithICloud extends Component<
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          {listData.map((item, index) => {
-            return (
-              <TouchableOpacity
-                style={{
-                  ...styles.cardsView,
-                  borderBottomWidth: index == 2 ? 0 : 4,
-                }}
-              >
-                {item.type == 'contact' && item.image ? (
-                  <View
-                    style={{
-                      borderRadius: wp('15%') / 2,
-                      borderColor: Colors.white,
-                      borderWidth: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      shadowOffset: {
-                        width: 2,
-                        height: 2,
-                      },
-                      shadowOpacity: 0.8,
-                      shadowColor: Colors.textColorGrey,
-                      shadowRadius: 5,
-                      elevation: 10,
-                      marginRight: 15,
-                      marginLeft: 5,
-                    }}
-                  >
-                    <Image
-                      source={item.image}
+          {cloudBackup &&
+            listData.map((item, index) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    ...styles.cardsView,
+                    borderBottomWidth: index == 2 ? 0 : 4,
+                  }}
+                >
+                  {item.type == 'contact' && item.image ? (
+                    <View
                       style={{
-                        width: wp('15%'),
-                        height: wp('15%'),
                         borderRadius: wp('15%') / 2,
-                      }}
-                    />
-                  </View>
-                ) : (
-                  <ImageBackground
-                    source={require('../../assets/images/icons/Ellipse.png')}
-                    style={{ ...styles.cardsImageView, marginRight: 10 }}
-                  >
-                    <Image
-                      source={
-                        item.type == 'contact'
-                          ? require('../../assets/images/icons/icon_contact.png')
-                          : item.type == 'device'
-                          ? require('../../assets/images/icons/icon_secondarydevice.png')
-                          : require('../../assets/images/icons/icon_contact.png')
-                      }
-                      style={styles.cardImage}
-                    />
-                  </ImageBackground>
-                )}
-                <View style={{}}>
-                  <Text
-                    style={{
-                      ...styles.cardsInfoText,
-                      fontSize: RFValue(18),
-                    }}
-                  >
-                    {item.title}
-                  </Text>
-                  <Text style={styles.cardsInfoText}>{item.info}</Text>
-                  <Text style={styles.cardsInfoText}>
-                    Last backup {item.time} ago
-                  </Text>
-                </View>
-                {item.status == 'received' ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    <View
-                      style={{
-                        ...styles.statusTextView,
-                        backgroundColor: Colors.lightGreen,
-                      }}
-                    >
-                      <Text style={styles.statusText}>Key Received</Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.lightGreen,
-                        width: wp('5%'),
-                        height: wp('5%'),
-                        borderRadius: wp('5%') / 2,
-                        justifyContent: 'center',
+                        borderColor: Colors.white,
+                        borderWidth: 1,
                         alignItems: 'center',
+                        justifyContent: 'center',
+                        shadowOffset: {
+                          width: 2,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.8,
+                        shadowColor: Colors.textColorGrey,
+                        shadowRadius: 5,
+                        elevation: 10,
+                        marginRight: 15,
                         marginLeft: 5,
                       }}
                     >
-                      <AntDesign
-                        name={'check'}
-                        size={RFValue(10)}
-                        color={Colors.darkGreen}
+                      <Image
+                        source={item.image}
+                        style={{
+                          width: wp('15%'),
+                          height: wp('15%'),
+                          borderRadius: wp('15%') / 2,
+                        }}
                       />
                     </View>
+                  ) : (
+                    <ImageBackground
+                      source={require('../../assets/images/icons/Ellipse.png')}
+                      style={{ ...styles.cardsImageView, marginRight: 10 }}
+                    >
+                      <Image
+                        source={
+                          item.type == 'contact'
+                            ? require('../../assets/images/icons/icon_contact.png')
+                            : item.type == 'device'
+                            ? require('../../assets/images/icons/icon_secondarydevice.png')
+                            : require('../../assets/images/icons/icon_contact.png')
+                        }
+                        style={styles.cardImage}
+                      />
+                    </ImageBackground>
+                  )}
+                  <View style={{}}>
+                    <Text
+                      style={{
+                        ...styles.cardsInfoText,
+                        fontSize: RFValue(18),
+                      }}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text style={styles.cardsInfoText}>{item.info}</Text>
+                    <Text style={styles.cardsInfoText}>
+                      Last backup {item.time} ago
+                    </Text>
                   </View>
-                ) : (
-                  <View style={styles.statusTextView}>
-                    <Text style={styles.statusText}>Waiting for Key</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
+                  {item.status == 'received' ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      <View
+                        style={{
+                          ...styles.statusTextView,
+                          backgroundColor: Colors.lightGreen,
+                        }}
+                      >
+                        <Text style={styles.statusText}>Key Received</Text>
+                      </View>
+                      <View
+                        style={{
+                          backgroundColor: Colors.lightGreen,
+                          width: wp('5%'),
+                          height: wp('5%'),
+                          borderRadius: wp('5%') / 2,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginLeft: 5,
+                        }}
+                      >
+                        <AntDesign
+                          name={'check'}
+                          size={RFValue(10)}
+                          color={Colors.darkGreen}
+                        />
+                      </View>
+                    </View>
+                  ) : (
+                    <View style={styles.statusTextView}>
+                      <Text style={styles.statusText}>Waiting for Key</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
         </ScrollView>
         <View
           style={{
@@ -276,6 +343,52 @@ class RestoreWithICloud extends Component<
             <Text style={styles.buttonText}>Scan Key</Text>
           </TouchableOpacity>
         </View>
+        {hideShow ? (
+          <View style={styles.dropDownView}>
+            {walletsArray.map((value) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={10}
+                  onPress={() => {
+                    this.setState({ hideShow: false });
+                    this.setState({selectedBackup: value})
+                  }}
+                  style={styles.dropDownElement}
+                >
+                 {value.data && 
+                    <View style={styles.greyBox}>
+                      <View style={styles.greyBoxImage}>
+                        <MaterialCommunityIcons
+                          name={'restore'}
+                          size={RFValue(25)}
+                          color={Colors.blue}
+                        />
+                      </View>
+                      <View style={{ marginLeft: 10}}>
+                        <Text style={styles.greyBoxText}>{"Restoring Wallet from"}</Text>
+                        <Text
+                          style={{
+                            ...styles.greyBoxText,
+                            fontSize: RFValue(20),
+                          }}
+                        >
+                          {value.walletName}
+                        </Text>
+                        <Text
+                          style={{
+                            ...styles.greyBoxText,
+                            fontSize: RFValue(10),
+                          }}
+                        >
+                          {'Last backup : ' + timeFormatter(moment(new Date()), value.dateTime)}
+                        </Text>
+                      </View>
+                    </View> }
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : null}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'RestoreFromICloud'}
@@ -287,26 +400,36 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => {
             let name;
-            if(Platform.OS == 'ios') name = 'iCloud';
+            if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
-            return (<RestoreFromICloud
-              title={'Restore from ' + name}
-              subText={'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'}
-              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'}
-              cardInfo={'Restoring Wallet from'}
-              cardTitle={'Hexa Wallet Backup'}
-              cardSubInfo={name + ' backup'}
-              proceedButtonText={'Restore'}
-              backButtonText={'Back'}
-              modalRef={this.refs.RestoreFromICloud}
-              onPressProceed={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0);
-              }}
-              onPressBack={() => {
-                (this.refs.RestoreFromICloud as any).snapTo(0);
-              }}
-            />
-          )}}
+            return (
+              <RestoreFromICloud
+                title={'Restore from ' + name}
+                subText={
+                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+                }
+                info={
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                }
+                cardInfo={'Restoring Wallet from'}
+                cardTitle={selectedBackup.walletName}
+                cardSubInfo={name + ' backup'}
+                proceedButtonText={'Restore'}
+                backButtonText={'Back'}
+                modalRef={this.refs.RestoreFromICloud}
+                onPressProceed={() => {
+                  //(this.refs.RestoreFromICloud as any).snapTo(0);
+                  this.restoreWallet();
+                }}
+                onPressBack={() => {
+                  (this.refs.RestoreFromICloud as any).snapTo(0);
+                }}
+                onPressCard={()=>{
+                  this.setState({hideShow: !hideShow});
+                }}
+              />
+            );
+          }}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
@@ -404,6 +527,11 @@ const mapStateToProps = (state) => {
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     s3Service: idx(state, (_) => _.sss.service),
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    cloudBackupStatus:
+      idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+    database: idx(state, (_) => _.storage.database) || {},
+    security: idx(state, (_) => _.storage.database.WALLET_SETUP.security),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
   };
@@ -412,6 +540,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
+    setCloudBackupStatus,
   })(RestoreWithICloud),
 );
 
@@ -424,6 +553,31 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     marginLeft: 20,
     marginRight: 20,
+  },
+  dropDownView: {
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 999,
+    backgroundColor: Colors.white,
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+marginTop: wp('2%'),
+marginBottom: wp('2%'),
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems:'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    overflow: 'hidden',
+  },
+  dropDownElement: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: wp('3%'),
+    paddingRight: wp('3%'),
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 1,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -499,5 +653,36 @@ const styles = StyleSheet.create({
     fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
+  },
+  greyBox: {
+    width: wp('90%'),
+    borderRadius: 10,
+    backgroundColor: Colors.backgroundColor1,
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  greyBoxImage: {
+    width: wp('15%'),
+    height: wp('15%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp('15%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 1,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.8,
+    shadowColor: Colors.textColorGrey,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  greyBoxText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11),
   },
 });

@@ -25,5 +25,3 @@ export default {
   babyGray: '#BCB6B6',
   greyTextColor: '#656565'
 };
-
-export default Colors;

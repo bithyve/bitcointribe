@@ -309,7 +309,7 @@ export default function Login(props) {
   const isMigrated = useSelector(state => state.preferences.isMigrated)
   const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
   let key = useSelector((state) => state.storage.key)
-
+console.log("KEY", key);
   const onLoginSuccess = async () => {
     let walletExists = await AsyncStorage.getItem("walletExists")
     if (walletExists) {

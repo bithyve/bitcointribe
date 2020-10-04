@@ -8,7 +8,7 @@
   export const S3_LOADING = 'S3_LOADING';
   export const PREPARE_MSHARES = 'PREPARE_MSHARES';
   export const UPDATE_HEALTH = 'UPDATE_HEALTH';
-  
+  export const GET_HEALTH_OBJECT = 'GET_HEALTH_OBJECT';
 
   export const initHealthCheck = () => {
     return { type: INIT_HEALTH_CHECK };
@@ -42,3 +42,7 @@
   export const prepareMShares = () => {
     return { type: PREPARE_MSHARES };
   };
+
+  export const getHealth = () => {
+    return { type: GET_HEALTH_OBJECT };
+  }

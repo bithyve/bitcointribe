@@ -5,6 +5,7 @@ const GoogleDrive = NativeModules.GoogleDrive;
 const iCloud = NativeModules.iCloud;
 let dataObject;
 let callBack;
+let recoveryCallback;
 // check storage permission
 export const checkPermission = async () => {
   try {
@@ -18,6 +19,20 @@ export const checkPermission = async () => {
   }
   return null;
 };
+
+export const CheckCloudDataBackup = (recoveryCallback1) =>{
+  recoveryCallback = recoveryCallback1;
+  if (Platform.OS == 'ios') {
+    // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
+    iCloud.downloadBackup().then((backedJson) => {
+      console.log('BackedUp JSON: ', backedJson);
+      recoveryCallback(backedJson);
+    });
+  } else {
+    let checkDataIsBackedup = true;
+    GoogleDriveLogin(checkDataIsBackedup);
+  }
+}
 
 export const CloudDataBackup = (data, callback) => {
   dataObject = data;
@@ -37,11 +52,11 @@ export const CloudDataBackup = (data, callback) => {
   }
 };
 
-export const GoogleDriveLogin = () => {
+export const GoogleDriveLogin = (checkDataIsBackedup?) => {
   GoogleDrive.setup()
     .then(() => {
       GoogleDrive.login((err, data) => {
-        handleLogin(err, data);
+        handleLogin(err, data, checkDataIsBackedup);
       });
     })
     .catch((err) => {
@@ -49,7 +64,7 @@ export const GoogleDriveLogin = () => {
     });
 };
 
-export const handleLogin = async (e, data) => {
+export const handleLogin = async (e, data, checkDataIsBackedup?) => {
   const result = e || data;
   console.log('GOOGLE ReSULT', data);
   // console.log('Error', e);
@@ -58,11 +73,11 @@ export const handleLogin = async (e, data) => {
       throw new Error('Storage Permission Denied');
     }
     //this.createFile();
-    checkFileIsAvailable();
+    checkFileIsAvailable(checkDataIsBackedup);
   }
 };
 
-export const checkFileIsAvailable = async () => {
+export const checkFileIsAvailable = async (checkDataIsBackedup?) => {
   /**
    * TODO: Check if file exist if not then create new file having name HexaWalletBackup.json
    * If file exist then call readFile
@@ -76,13 +91,18 @@ export const checkFileIsAvailable = async () => {
     // console.log('err, data', data, err);
     const result = err || data;
     // console.log('checkFileIsAvailable', result);
-    if (result && result.eventName == 'listEmpty') {
-      createFile();
-    } else if (result.eventName == 'failure') {
-      console.log('FAILURE');
-    } else {
-      readFile(result);
+    if(!checkDataIsBackedup){
+      if (result && result.eventName == 'listEmpty') {
+        createFile();
+      } else if (result.eventName == 'failure') {
+        console.log('FAILURE');
+      } else {
+        readFile(result);
+      }
+    } else{
+      readFile(result, checkDataIsBackedup);
     }
+    
   });
 };
 
@@ -141,14 +161,19 @@ export const UpdateFile = (metaData) => {
   }
 };
 
-export const readFile = (result) => {
+export const readFile = (result, checkDataIsBackedup?) => {
   const metaData = {
     id: result.id,
   };
   try {
     GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
       const result1 = err || data1.data;
-      updateData(result1, result);
+      if(checkDataIsBackedup){
+        recoveryCallback(result1);
+      }else{
+        updateData(result1, result);
+      }
+      
     });
   } catch (error) {
     //console.log('error', error);

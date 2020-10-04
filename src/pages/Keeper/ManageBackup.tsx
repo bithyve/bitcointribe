@@ -178,12 +178,10 @@ class ManageBackup extends Component<
   modifyLevelStatus = () =>{
     let { levelData } = this.state;
     let { levelHealth } = this.props;
-    for (let i = 0; i < levelData.length; i++) {
-      const element = levelData[i];
-      if(levelHealth[i].levelInfo[1].status == 'accessible'){
-        levelData[i].keeper2.keeper2Done = true;
-      }
-      if(levelHealth[i].levelInfo[0].status == 'accessible'){
+    console.log("LevelHealth", levelHealth);
+    for (let i = 0; i < levelHealth.length; i++) {
+      console.log("LevelHealth i", levelHealth[i]);
+      if(levelHealth[i].status == 'accessible'){
         levelData[i].keeper2.keeper2Done = true;
       }
     }
@@ -211,9 +209,6 @@ class ManageBackup extends Component<
     const { walletName, regularAccount } = this.props;
     let encryptedCloudDataJson;
     let shares;
-    // var ICloudBackup = NativeModules.ICloudBackup;
-    // ICloudBackup.initBackup();
-    // console.log('CalendarManager', ICloudBackup)
     encryptedCloudDataJson = await CloudData(this.props.database);
     console.log('encryptedDatabase', encryptedCloudDataJson);
     let data = {

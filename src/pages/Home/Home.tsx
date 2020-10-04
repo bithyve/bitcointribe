@@ -88,7 +88,7 @@ import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import TransactionsContent from '../../components/home/transaction-content';
 import HomeList from '../../components/home/home-list';
-import HomeHeader from '../../components/home/home-header';
+import HomeHeader from '../../components/home/home-header_update';
 import idx from 'idx';
 import CustomBottomTabs, {
   BottomTab,
@@ -891,8 +891,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cloudData = async () => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares = JSON.stringify(s3Service.LevelHealth.metaShares);
-    console.log('s3Service.LevelHealth.metaShares', s3Service);
+    let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
+    //console.log('s3Service.LevelHealth.metaShares', s3Service);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -911,14 +911,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       regularAccount: regularAccount,
       keeperData: JSON.stringify(keeperData)
     }
-    // CloudDataBackup(data, this.setCloudBackupStatus);
+    CloudDataBackup(data, this.setCloudBackupStatus);
     console.log('call for google drive upload', this.props.cloudBackupStatus);
-    this.updateHealthForCloud(s3Service.LevelHealth.metaShares);
+    
   };
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
     console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
+    if(this.props.cloudBackupStatus.status){
+      console.log("this.props.s3Service", this.props.s3Service, this.props.s3Service.levelhealth)
+      this.updateHealthForCloud(this.props.s3Service.levelhealth.metaShares);
+    }
   }
 
   getNewTransactionNotifications = async () => {
@@ -2250,23 +2254,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   updateHealthForCloud = (shares) =>{
     let levelHealth = this.props.levelHealth;
+    console.log("LEVEL health", levelHealth)
     // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth[0].levelStatus == 'notSetup'){
+    if(this.props.cloudBackupStatus && levelHealth.length){
       let shareId = [];
       for (let i = 0; i < shares.length; i++) {
         this.props.s3Service.prepareShareUploadables(i,'cloud');
         const element = shares[i];
         shareId.push(element.shareId);
       }
-      if(levelHealth[0].levelInfo[0].type == 'cloud'){
-        levelHealth[0].levelInfo[0].lastUpdated = moment(new Date()).valueOf();
-        levelHealth[0].levelInfo[0].created = moment(new Date()).valueOf();
-        levelHealth[0].levelInfo[0].status = 'accessible';
-        levelHealth[0].levelInfo[0].shareId = JSON.stringify(shareId);
-        levelHealth[0].levelInfo[0].reshareVersion = 1;
-        levelHealth[0].levelInfo[0].guardian = 'cloud';
+      if(levelHealth[0].shareType == 'cloud'){
+        levelHealth[0].lastUpdated = moment(new Date()).valueOf();
+        levelHealth[0].status = 'accessible';
+        levelHealth[0].shareId = JSON.stringify(shareId);
+        levelHealth[0].reshareVersion = 1;
+        //levelHealth[0].guardian = 'cloud';
       }
-      if(levelHealth[0].levelInfo[1].type == 'securityQuestion' && levelHealth[0].levelInfo[1].created){
+      if(levelHealth[0].shareType == 'securityQuestion'){
         levelHealth[0].levelStatus = 'good';
       }
       updateHealth(levelHealth);

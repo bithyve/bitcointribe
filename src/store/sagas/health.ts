@@ -5,6 +5,8 @@ import {
   requestTimedout,
 } from '../utils/utilities';
 import {
+  healthInitialize,
+  healthInitialized,
   INIT_HEALTH_SETUP,
   UPDATE_HEALTH,
 } from '../actions/health';
@@ -28,31 +30,34 @@ import {
 } from '../actions/health';
 import { insertDBWorker } from './storage';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
+import {generateRandomString} from '../../common/CommonFunctions/index';
 
 function* initHealthData() {
   // Call HEALTH_CHECK_INITIALIZE action
-  let randomId = 'dsfdsf' //Create Here
-  let randomIdForCloud = 'dsfdsf' //Create Here
+  yield put(healthInitialize());
+  let randomIdForSecurityQ = generateRandomString(8); 
+  let randomIdForCloud = generateRandomString(8); 
   // Update Reducer
   let healthArray = [
     {
         "shareType": "cloud",
         "updatedAt": 0,
         "status": "notAccessible",
-        "shareId": "string1",
+        "shareId": randomIdForCloud,
         "reshareVersion": 0
     },
     {
         "shareType": "securityQuestion",
         "updatedAt": 0,
         "status": "accessible",
-        "shareId": "string1",
+        "shareId": randomIdForSecurityQ,
         "reshareVersion": 0 
     }
   ];
   // Call API sharesHealthCheckInit2()
   yield put(updateHealth(healthArray));
   // Call HEALTH_CHECK_INITIALIZED action
+  yield put(healthInitialized());
 }
 
 export const initHealthDataWatcher = createWatcher(
@@ -61,59 +66,21 @@ export const initHealthDataWatcher = createWatcher(
 );
 
 function* updateHealthToRelay() {
-  let healthArray = [];
-  for (let i = 0; i < 3; i++) {
-    let subObj1 = {
-      keeperType: null,
-      type: 'cloud',
-      lastUpdated: null,
-      created: null,
-      status: 'notAccessible',
-      shareId: null,
-      reshareVersion: 0
-    };
-    let subObj2 = {
-      keeperType: 'otherKeeper',
-      type: null,
-      lastUpdated: null,
-      created: null,
-      status: 'notAccessible',
-      shareId: null,
-      reshareVersion: 0
-    };
-    let obj = {
-      level: 1,
-      levelStatus: 'notSetup',
-      levelInfo: [ subObj1, subObj2 ],
-    };
-    
-    if(i == 0){
-      obj.level = 1;
-      obj.levelInfo = [ subObj1,
-        {
-          keeperType: null,
-          type: 'securityQuestion',
-          lastUpdated: moment(new Date()).valueOf(),
-          created: moment(new Date()).valueOf(),
-          status: 'accessible',
-          shareId: null,
-          reshareVersion: 1
-        },
-      ];
-    }
-    if(i == 1){
-      obj.level = 2;
-      obj.levelInfo = [ {...subObj1, keeperType: 'primaryKeeper',
-        type: 'device', }, 
-        subObj2
-      ];
-    }
-    if(i == 2){
-      obj.level = 3;
-      obj.levelInfo = [ subObj2, subObj2 ];
-    }
-    healthArray.push(obj);
-  }
+  let healthArray = [
+  {
+    "shareType": "cloud",
+    "updatedAt": 0,
+    "status": "notAccessible",
+    "shareId": "randomIdForCloud",
+    "reshareVersion": 0
+},
+{
+    "shareType": "securityQuestion",
+    "updatedAt": 0,
+    "status": "accessible",
+    "shareId": "randomIdForSecurityQ",
+    "reshareVersion": 0 
+}];
   yield put(updateHealth(healthArray));
 }
 

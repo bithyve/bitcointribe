@@ -2,6 +2,7 @@ import {
   HEALTH_CHECK_INITIALIZED,
   HEALTH_CHECK_INITIALIZE,
   HEALTH_UPDATE,
+  GET_HEALTH_OBJECT,
 } from '../actions/health';
 
 const initialState: {
@@ -48,6 +49,12 @@ export default (state = initialState, action) => {
         };
     
     case HEALTH_UPDATE: 
+        return {
+        ...state,
+        levelHealth: action.payload.health,
+      };
+
+      case GET_HEALTH_OBJECT: 
         return {
         ...state,
         levelHealth: action.payload.health,

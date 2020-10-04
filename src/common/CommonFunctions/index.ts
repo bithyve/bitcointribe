@@ -52,11 +52,19 @@ export const APP_LIST = {
   "Messenger": {pkgName: "com.facebook.orca", urlScheme: "fb-messenger", urlParams: "user-thread/{user-id}"}, // fa: facebook
 }
 
+export const generateRandomString = (length: number): string => {
+  let randomString: string = '';
+  const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  for (let itr = 0; itr < length; itr++) {
+    randomString += possibleChars.charAt(
+      Math.floor(Math.random() * possibleChars.length),
+    );
+  }
+  return randomString;
+};
+
 export const CloudData = async (database) => {
   let encryptedCloudDataJson;
-    // var ICloudBackup = NativeModules.ICloudBackup;
-    // ICloudBackup.initBackup();
-    // console.log('CalendarManager', ICloudBackup)
     let walletImage = {
       SERVICES: {},
       DECENTRALIZED_BACKUP: {},
@@ -77,7 +85,6 @@ export const CloudData = async (database) => {
       };
       encryptedCloudDataJson = await encrypt(CloudDataJson, key);
       // console.log('encryptedDatabase', encryptedCloudDataJson);
-      const decryptedCloudDataJson = decrypt(encryptedCloudDataJson, key);
       return encryptedCloudDataJson;
 }
 }
