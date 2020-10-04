@@ -18,6 +18,7 @@ import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../Material
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
 
 
 export interface Props {
@@ -69,30 +70,24 @@ export function headerImageSourceForAccount(accountPayload: AccountPayload): Nod
 }
 
 
-const BalanceCurrencyIcon = ({ isUsingBitcoinUnits, fiatCurrencyCode }) => {
-  if (isUsingBitcoinUnits) {
-    return <Image
-      style={styles.balanceCurrencyImage}
-      source={require('../../assets/images/currencySymbols/icon_bitcoin_gray.png')}
-    />;
-  } else if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
-    return <MaterialCurrencyCodeIcon
-      currencyCode={fiatCurrencyCode}
-      color={Colors.lightBlue}
-      size={styles.balanceCurrencyImage.width}
-    />;
-  } else {
-    return <Image
-      style={styles.balanceCurrencyImage}
-      source={
-        getCurrencyImageByRegion(
-          fiatCurrencyCode,
-          'light_blue',
-        )
-      }
-    />;
-  }
-};
+// const BalanceCurrencyIcon = ({ isUsingBitcoinUnits, fiatCurrencyCode }) => {
+//   if (isUsingBitcoinUnits) {
+//     return <Image
+//     />;
+//   } else if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
+//     return <MaterialCurrencyCodeIcon
+//       currencyCode={fiatCurrencyCode}
+//       color={Colors.lightBlue}
+//   } else {
+//     return <Image
+//         getCurrencyImageByRegion(
+//           fiatCurrencyCode,
+//           'light_blue',
+//         )
+//       }
+//     />;
+//   }
+// };
 
 const HeaderSection: React.FC<HeaderProps> = ({
   accountPayload,
@@ -168,81 +163,34 @@ const BodySection: React.FC<BodyProps> = ({
   accountPayload,
   isBalanceLoading,
 }: BodyProps) => {
-  const fiatCurrencyCode = useCurrencyCode();
-  const currencyKind = useCurrencyKind();
   const accountsState = useAccountsState();
-  const exchangeRates = useExchangeRates();
-
-  const prefersBitcoin = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
-
-  const isUsingBitcoinUnits = useMemo(() => {
-    return prefersBitcoin || accountPayload.kind === AccountKind.TEST;
-  }, [prefersBitcoin, accountPayload.kind])
-
-  const formattedBalanceText = useMemo(() => {
-    const balance = accountPayload.balance || 0;
-
-    if (isUsingBitcoinUnits) {
-      return UsNumberFormat(balance);
-    } else if (exchangeRates !== null) {
-      return (
-        (balance / 1e8) * exchangeRates[fiatCurrencyCode].last
-      ).toFixed(2);
-    } else {
-      return `${balance}`;
-    }
-  }, [isUsingBitcoinUnits, accountPayload, exchangeRates]);
-
-  const formattedUnitText = useMemo(() => {
-    if (isUsingBitcoinUnits) {
-      return displayNameForBitcoinUnit(accountPayload.unit);
-    } else {
-      return fiatCurrencyCode.toLocaleLowerCase();
-    }
-  }, [isUsingBitcoinUnits, accountPayload]);
 
   const balanceTextStyle = useMemo(() => {
     const color = accountsState.accountsSynched ? Colors.black : Colors.textColorGrey;
 
-    return {
-      ...styles.balanceAmountText,
-      color,
-    };
+    return { color };
   }, [accountsState.accountsSynced]);
 
 
   return (
     <View style={styles.bodyContainer}>
       <Text style={styles.titleText} numberOfLines={2}>
-        {accountPayload.customDisplayName ?? accountPayload.title}
+        {accountPayload.customDisplayName ?? accountPayload.defaultTitle}
       </Text>
 
       <Text style={styles.subtitleText} numberOfLines={3}>
-        {accountPayload.customDescription ?? accountPayload.shortDescription}
+        {accountPayload.customDescription ?? accountPayload.defaultDescription}
       </Text>
 
       {isBalanceLoading && (
         <LoadingBalanceView />
       ) || (
-          <View style={styles.balanceRow}>
-            <View style={styles.currencyIconContainer}>
-              <BalanceCurrencyIcon
-                isUsingBitcoinUnits={isUsingBitcoinUnits}
-                fiatCurrencyCode={fiatCurrencyCode}
-              />
-            </View>
-
-            <Text style={balanceTextStyle}>
-              {formattedBalanceText}
-            </Text>
-
-            <Text style={styles.balanceUnitText}>
-              {formattedUnitText}
-            </Text>
-          </View>
-        )}
+        <AccountBalanceDisplay
+          accountPayload={accountPayload}
+          containerStyle={styles.balanceRow}
+          amountTextStyle={balanceTextStyle}
+        />
+      )}
     </View>
   );
 };
@@ -266,7 +214,6 @@ const HomeAccountsListCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   rootContainer: {
-    // margin: 0,
     width: widthPercentageToDP('42.6%'),
     height: heightPercentageToDP('20.1%'),
     borderColor: Colors.borderColor,
@@ -323,32 +270,7 @@ const styles = StyleSheet.create({
   },
 
   balanceRow: {
-    flexDirection: 'row',
     marginTop: 10,
-  },
-
-  currencyIconContainer: {
-    marginRight: 5,
-  },
-
-  balanceCurrencyImage: {
-    width: 14,
-    height: 14,
-    resizeMode: 'contain',
-  },
-
-  balanceAmountText: {
-    fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
-    marginRight: 5,
-    lineHeight: RFValue(17),
-  },
-
-  balanceUnitText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    lineHeight: RFValue(17),
   },
 });
 

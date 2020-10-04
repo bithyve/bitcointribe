@@ -62,7 +62,7 @@ const AccountBalanceDisplay: React.FC<Props> = ({
       />;
     } else if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
       return <MaterialCurrencyCodeIcon
-        iconName={fiatCurrencyCode}
+        currencyCode={fiatCurrencyCode}
         color={color}
         size={styles.currencyImage.width}
         style={style}
