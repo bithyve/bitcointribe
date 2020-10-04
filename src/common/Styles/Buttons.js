@@ -14,6 +14,8 @@ const actionButton = {
 
 
 const ButtonStyles = StyleSheet.create({
+  actionButton,
+
   primaryActionButton: {
     ...actionButton,
     backgroundColor: Colors.blue,

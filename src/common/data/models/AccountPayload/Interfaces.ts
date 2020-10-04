@@ -15,12 +15,12 @@ interface BaseAccountPayload {
   /**
    * Default displayable title of the account.
    */
-  title: string;
+  defaultTitle: string;
 
   /**
    * Default displayable short description of the account.
    */
-  shortDescription: string;
+  defaultDescription: string;
 
   accountNumber: number;
 
@@ -53,6 +53,8 @@ interface BaseAccountPayload {
   visibility: AccountVisibility;
 
   imageSource: NodeRequire;
+
+  transactionIDs: string[];
 }
 
 
