@@ -65,7 +65,7 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import moment from 'moment';
 import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
-import TransactionDetails from './TransactionDetails';
+import TransactionDetailsBottomSheetContent from '../../components/home/TransactionDetailsBottomSheetContent';
 import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -1091,7 +1091,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
             >
               <CurrencyKindToggleSwitch
-                currencyCodeValue={CurrencyCode}
+                fiatCurrencyCode={CurrencyCode}
                 activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
                 inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
                 activeOffImage={
@@ -1110,14 +1110,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     )
                     : getCurrencyImageByRegion(CurrencyCode, 'dark')
                 }
-                toggleColor={Colors.lightBlue}
-                toggleCircleColor={Colors.blue}
+                trackColor={Colors.lightBlue}
+                thumbColor={Colors.blue}
                 onpress={() => {
                   this.props.currencyKindSet(
                     prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
                   );
                 }}
-                toggle={prefersBitcoin}
+                isOn={prefersBitcoin}
               />
             </View>
           </TouchableOpacity>
@@ -1501,7 +1501,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   >
                     <View style={styles.sendButtonImageView}>
                       <Image
-                        source={require('../../assets/images/icons/icon_recieve.png')}
+                        source={require('../../assets/images/icons/icon_receive.png')}
                         style={styles.bottomCardSendReceiveImage}
                       />
                     </View>
@@ -1843,7 +1843,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 : hp('88%'),
             ]}
             renderContent={() => (
-              <TransactionDetails
+              <TransactionDetailsBottomSheetContent
                 item={transactionItem}
                 serviceType={serviceType}
                 onPressKnowMore={() => {

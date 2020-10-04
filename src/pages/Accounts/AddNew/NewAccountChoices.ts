@@ -19,18 +19,18 @@ const NEW_ACCOUNT_CHOICES = {
 
   serviceAccounts: [
     new ServiceAccountPayload({
-      title: "Swan Bitcoin",
-      shortDescription: "Stack Sats with Swan.",
+      defaultTitle: "Swan Bitcoin",
+      defaultDescription: "Stack Sats with Swan.",
       serviceAccountKind: ServiceAccountKind.SWAN,
     }),
     new ServiceAccountPayload({
-      title: "FastBitcoins.com",
-      shortDescription: "Use FastBitcoin Vouchers.",
+      defaultTitle: "FastBitcoins.com",
+      defaultDescription: "Use FastBitcoin Vouchers.",
       serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
     }),
     new ServiceAccountPayload({
-      title: "Whirlpool Account",
-      shortDescription: "Powered by Samurai.",
+      defaultTitle: "Whirlpool Account",
+      defaultDescription: "Powered by Samurai.",
       serviceAccountKind: ServiceAccountKind.WHIRLPOOL,
     }),
   ],

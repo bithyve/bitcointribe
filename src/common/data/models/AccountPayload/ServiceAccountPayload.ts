@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { iconForServiceAccountKind } from '../../../../utils/accounts/IconUtils';
 import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
@@ -7,8 +7,8 @@ import { ExternalServiceAccountPayload } from './Interfaces';
 import AccountVisibility from '../../enums/AccountVisibility';
 
 interface ConstructorProps {
-  title: string;
-  shortDescription: string;
+  defaultTitle: string;
+  defaultDescription: string;
   serviceAccountKind: ServiceAccountKind;
   accountNumber?: number;
   displayOrder?: number | null;
@@ -16,14 +16,15 @@ interface ConstructorProps {
   unit?: BitcoinUnit;
   customDisplayName?: string | null;
   customDescription?: string | null;
-  visibility: AccountVisibility;
+  visibility?: AccountVisibility;
   secondaryAccountUUIDs?: string[];
+  transactionIDs?: string[];
 }
 
 export default class ServiceAccountPayload implements ExternalServiceAccountPayload {
-  uuid: string = uuidv4();
-  title: string;
-  shortDescription: string;
+  uuid: string = uuidV4();
+  defaultTitle: string;
+  defaultDescription: string;
   kind: AccountKind = AccountKind.SERVICE;
   serviceAccountKind: ServiceAccountKind;
 
@@ -33,15 +34,14 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
   unit: BitcoinUnit = BitcoinUnit.SATS;
   customDisplayName: string | null;
   customDescription: string | null;
-
   visibility: AccountVisibility;
-
   secondaryAccountUUIDs: string[];
+  transactionIDs: string[];
 
 
   constructor({
-    title,
-    shortDescription,
+    defaultTitle,
+    defaultDescription,
     serviceAccountKind,
     accountNumber,
     displayOrder,
@@ -51,9 +51,10 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     customDescription,
     visibility,
     secondaryAccountUUIDs,
+    transactionIDs,
   }: ConstructorProps) {
-    this.title = title;
-    this.shortDescription = shortDescription;
+    this.defaultTitle = defaultTitle;
+    this.defaultDescription = defaultDescription;
     this.serviceAccountKind = serviceAccountKind;
     this.accountNumber = accountNumber || 0;
     this.displayOrder = displayOrder || null;
@@ -63,6 +64,7 @@ export default class ServiceAccountPayload implements ExternalServiceAccountPayl
     this.customDescription = customDescription || null;
     this.visibility = visibility || AccountVisibility.DEFAULT;
     this.secondaryAccountUUIDs = secondaryAccountUUIDs || [];
+    this.transactionIDs = transactionIDs || [];
   }
 
   get imageSource(): NodeRequire {

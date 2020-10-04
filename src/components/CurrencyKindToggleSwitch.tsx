@@ -42,7 +42,7 @@ const CurrencyCodeIcon = ({
     <MaterialCurrencyCodeIcon
       currencyCode={currencyCode}
       color={color}
-      size={wp(3.8)}
+      size={12}
     />
   );
 };

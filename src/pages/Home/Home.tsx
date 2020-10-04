@@ -61,7 +61,7 @@ import { setCurrencyCode } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import TransactionDetails from '../Accounts/TransactionDetails';
+import TransactionDetailsBottomSheetContent from '../../components/home/TransactionDetailsBottomSheetContent';
 import Toast from '../../components/Toast';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../../components/NotificationListContent';
@@ -2739,7 +2739,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 : hp('82%'),
             ]}
             renderContent={() => (
-              <TransactionDetails
+              <TransactionDetailsBottomSheetContent
                 item={selectedTransactionItem}
                 onPressKnowMore={() => {
                   this.transactionDetailsBottomSheetRef.current?.snapTo(1);
