@@ -76,7 +76,6 @@ export default function Receive(props) {
   const [
     SecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
-  //let [isLoading, setIsLoading] = useState(true);
   const [ReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );

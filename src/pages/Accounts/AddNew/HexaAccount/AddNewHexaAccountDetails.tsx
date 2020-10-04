@@ -24,7 +24,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
     return navigation.getParam('currentPayload');
   }, [navigation.state.params]);
 
-  const [accountName, setAccountName] = useState(currentPayload.title);
+  const [accountName, setAccountName] = useState(currentPayload.defaultTitle);
   const [accountDescription, setAccountDescription] = useState('');
 
   const canProceed = useMemo(() => {
@@ -120,7 +120,7 @@ AddNewHexaAccountDetails.navigationOptions = ({ navigation, navigationOptions })
   return {
     header: ({ scene, previous, navigation }) => {
       const currentPayload: AccountPayload = params.currentPayload;
-      const title = `Enter details for the new ${currentPayload.title}`;
+      const title = `Enter details for the new ${currentPayload.defaultTitle}`;
 
       return <NavigationHeader
         title={title}
