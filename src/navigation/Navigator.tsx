@@ -163,9 +163,6 @@ const AccountDetailsStack = createStackNavigator(
     AccountDetailsRoot: {
       screen: AccountDetails,
       navigationOptions: AccountDetails.navigationOptions,
-      // navigationOptions: {
-      //   headerShown: false,
-      // },
     },
     TransactionsList: {
       screen: TransactionsListScreen,
@@ -175,14 +172,12 @@ const AccountDetailsStack = createStackNavigator(
     },
     TransactionDetails: {
       screen: TransactionDetailsScreen,
-      // navigationOptions: TransactionDetails.navigationOptions,
       navigationOptions: {
         title: "Transaction Details",
       },
     },
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      // navigationOptions: AccountSettings.navigationOptions,
       navigationOptions: {
         title: "Account Settings",
       },
@@ -209,7 +204,6 @@ const HomeNavigator = createStackNavigator(
       },
     },
     Intermediate,
-    // Accounts,
     AccountDetails: {
       screen: AccountDetailsStack,
     },
