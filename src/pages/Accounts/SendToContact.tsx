@@ -1240,44 +1240,44 @@ class SendToContact extends Component<
                   />
                 </View>
               ) : null}
-              <View
-                style={{
-                  ...InputStyleNote,
-                  marginBottom: wp('1.5%'),
-                  marginTop: wp('1.5%'),
-                  flexDirection: 'row',
-                  height: wp('13%'),
-                }}
-              >
-                <TextInput
+              {this.state.donationId ? (
+                <View
                   style={{
-                    ...styles.textBox,
-                    paddingLeft: 15,
-                    flex: 1,
+                    ...InputStyleNote,
+                    marginBottom: wp('1.5%'),
+                    marginTop: wp('1.5%'),
+                    flexDirection: 'row',
                     height: wp('13%'),
                   }}
-                  returnKeyLabel="Done"
-                  returnKeyType="done"
-                  onSubmitEditing={Keyboard.dismiss}
-                  keyboardType={
-                    Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                  }
-                  placeholder={
-                    this.state.donationId
-                      ? 'Send a short note to the donee'
-                      : 'Add a note to self (Optional)'
-                  }
-                  value={note}
-                  onChangeText={(text) => this.setState({ note: text })}
-                  placeholderTextColor={Colors.borderColor}
-                  onFocus={() => {
-                    this.setState({ InputStyleNote: styles.inputBoxFocused });
-                  }}
-                  onBlur={() => {
-                    this.setState({ InputStyleNote: styles.textBoxView });
-                  }}
-                />
-              </View>
+                >
+                  <TextInput
+                    style={{
+                      ...styles.textBox,
+                      paddingLeft: 15,
+                      flex: 1,
+                      height: wp('13%'),
+                    }}
+                    returnKeyLabel="Done"
+                    returnKeyType="done"
+                    onSubmitEditing={Keyboard.dismiss}
+                    keyboardType={
+                      Platform.OS == 'ios'
+                        ? 'ascii-capable'
+                        : 'visible-password'
+                    }
+                    placeholder={'Send a short note to the donee'}
+                    value={note}
+                    onChangeText={(text) => this.setState({ note: text })}
+                    placeholderTextColor={Colors.borderColor}
+                    onFocus={() => {
+                      this.setState({ InputStyleNote: styles.inputBoxFocused });
+                    }}
+                    onBlur={() => {
+                      this.setState({ InputStyleNote: styles.textBoxView });
+                    }}
+                  />
+                </View>
+              ) : null}
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
