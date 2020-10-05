@@ -24,52 +24,76 @@ import { updateDonationPreferences } from '../store/actions/accounts';
 import { useDispatch } from 'react-redux';
 
 export default function SettingDonationWebPageContents(props) {
-  const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
+  const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(
+    props.account.configuration.displayBalance,
+  );
   const [
     isDonationTransactionEnable,
     setIsDonationTransactionEnable,
   ] = useState(props.account.configuration.displayTransactions);
-  const [saveEnabled, setSaveEnabled] = useState(false);
-  const [isTransactionDetailsEnable, setIsTransactionDetails] = useState(false);
+  const [hideTxDetails, setHideTxDetails] = useState(
+    !props.account.configuration.displayTxDetails,
+  );
 
-  useEffect(() => {
+  const [doneeName, setDoneeName] = useState('');
+  const [description, setDescription] = useState('');
+  const [cause, setCause] = useState('');
+  const [isDonationPause, setIsDonationPause] = useState(
+    props.account.disableAccount ? props.account.disableAccount : false,
+  );
+  const dispatch = useDispatch();
+
+  const updatePreferences = () => {
+    let preferences;
+
+    if (isDonationPause !== props.account.disableAccount) {
+      preferences = preferences
+        ? { ...preferences, disableAccount: isDonationPause }
+        : { disableAccount: isDonationPause };
+    }
+
     if (
       isDonationTotalEnable !== props.account.configuration.displayBalance ||
       isDonationTransactionEnable !==
-        props.account.configuration.displayTransactions
-    )
-      setSaveEnabled(true);
-    else setSaveEnabled(false);
-  }, [
-    isDonationTotalEnable,
-    isDonationTransactionEnable,
-    props.account.configuration,
-  ]);
-  const [doneeName, setDoneeName] = useState(props.account.donee ? props.account.donee : '');
-  const [description, setDescription] = useState(props.account.description ? props.account.description : '');
-  const [cause, setCause] = useState('');
-  const [isDonationPause, setIsDonationPause] = useState(false);
-  const dispatch = useDispatch();
+        props.account.configuration.displayTransactions ||
+      !hideTxDetails !== props.account.configuration.displayTxDetails
+    ) {
+      const configuration = {
+        displayBalance: isDonationTotalEnable,
+        displayTransactions: isDonationTransactionEnable,
+        displayTxDetails: !hideTxDetails,
+      };
 
-  const updatePreferences = useCallback(() => {
-    const configuration = {
-      displayBalance: isDonationTotalEnable,
-      displayTransactions: isDonationTransactionEnable,
-    };
+      preferences = preferences
+        ? { ...preferences, configuration }
+        : { configuration };
+    }
 
-    const preferences = { configuration };
+    if (
+      (doneeName && doneeName !== props.account.donee) ||
+      (description && description !== props.account.description) ||
+      (cause && cause !== props.account.subject)
+    ) {
+      const accountDetails = {
+        donee: doneeName ? doneeName : props.account.donee,
+        subject: cause ? cause : props.account.subject,
+        description: description ? description : props.account.description,
+      };
+      preferences = preferences
+        ? { ...preferences, accountDetails }
+        : { accountDetails };
+    }
+
     const { serviceType, accountNumber } = props;
-    console.log({ serviceType, accountNumber });
-    Toast('Your preferences would be updated shortly');
-    dispatch(
-      updateDonationPreferences(serviceType, accountNumber, preferences),
-    );
-  }, [
-    isDonationTotalEnable,
-    isDonationTransactionEnable,
-    props.account.configuration,
-  ]);
-  
+
+    if (preferences) {
+      Toast('Your preferences would be updated shortly');
+      dispatch(
+        updateDonationPreferences(serviceType, accountNumber, preferences),
+      );
+    }
+  };
+
   return (
     <View style={styles.modalContentContainer}>
       <KeyboardAvoidingView
@@ -91,19 +115,19 @@ export default function SettingDonationWebPageContents(props) {
                 />
               </AppBottomSheetTouchableWrapper>
               <View>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Change settings'}
-              </Text>
-              <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp('1.5%'),
-                color: Colors.lightTextColor,
-              }}
-            >
-                Settings for the Donation web view
-            </Text>
-            </View>
+                <Text style={styles.modalHeaderTitleText}>
+                  {'Change settings'}
+                </Text>
+                <Text
+                  style={{
+                    ...styles.modalInfoText,
+                    marginTop: wp('1.5%'),
+                    color: Colors.lightTextColor,
+                  }}
+                >
+                  Settings for the Donation web view
+                </Text>
+              </View>
             </View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -137,7 +161,7 @@ export default function SettingDonationWebPageContents(props) {
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter cause'}
+                placeholder={props.account.subject}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -154,7 +178,7 @@ export default function SettingDonationWebPageContents(props) {
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter donee name'}
+                placeholder={props.account.donee}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -167,13 +191,15 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={{...styles.modalTextBoxView, height: wp('20%')}}>
+            <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
-                style={{...styles.textBox,
+                style={{
+                  ...styles.textBox,
                   paddingRight: 20,
                   marginTop: 10,
-                  marginBottom: 10,}}
-                placeholder={'Enter a description'}
+                  marginBottom: 10,
+                }}
+                placeholder={props.account.description}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -207,8 +233,8 @@ export default function SettingDonationWebPageContents(props) {
                 </Text>
               </View>
               <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+                changeSettingToggle={true}
+                toggleSize={wp('6%')}
                 isNotImage={true}
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={
@@ -238,8 +264,8 @@ export default function SettingDonationWebPageContents(props) {
                 </Text>
               </View>
               <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+                changeSettingToggle={true}
+                toggleSize={wp('6%')}
                 isNotImage={true}
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={
@@ -253,19 +279,19 @@ export default function SettingDonationWebPageContents(props) {
             </View>
 
             <View style={styles.rowContainer}>
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.lightBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text
+              <View
+                style={{
+                  ...styles.circleShapeView,
+                  backgroundColor: Colors.lightBlue,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
                   style={{
                     textAlign: 'center',
                     fontSize: RFValue(20),
-                  color: Colors.white,
+                    color: Colors.white,
                     lineHeight: RFValue(20), //... One for top and one for bottom alignment
                   }}
                 >
@@ -289,33 +315,33 @@ export default function SettingDonationWebPageContents(props) {
                 </Text>
               </View>
               <ToggleSwitch
-              changeSettingToggle={true}
-              toggleSize={wp('6%')}
+                changeSettingToggle={true}
+                toggleSize={wp('6%')}
                 isNotImage={true}
                 toggleColor={Colors.lightBlue}
-                toggleCircleColor={
-                    isTransactionDetailsEnable ? Colors.blue : Colors.white
-                }
-                onpress={() =>
-                  setIsTransactionDetails((prevState) => !prevState)
-                }
-                toggle={isTransactionDetailsEnable}
+                toggleCircleColor={hideTxDetails ? Colors.blue : Colors.white}
+                onpress={() => setHideTxDetails((prevState) => !prevState)}
+                toggle={hideTxDetails}
               />
             </View>
 
             <View style={styles.rowContainer}>
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.lightBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Image
-                style={{...styles.imageStyle, height: wp('7%'), width: wp('7%')}}
-                source={require('../assets/images/icons/icon_donation_white.png')}
-              />
+              <View
+                style={{
+                  ...styles.circleShapeView,
+                  backgroundColor: Colors.lightBlue,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Image
+                  style={{
+                    ...styles.imageStyle,
+                    height: wp('7%'),
+                    width: wp('7%'),
+                  }}
+                  source={require('../assets/images/icons/icon_donation_white.png')}
+                />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.titleTextStyle}>Pause Donation</Text>
@@ -334,18 +360,12 @@ export default function SettingDonationWebPageContents(props) {
                 toggleSize={wp('6%')}
                 isNotImage={true}
                 toggleColor={Colors.lightBlue}
-                toggleCircleColor={
-                    isDonationPause ? Colors.blue : Colors.white
-                }
-                onpress={() =>
-                  setIsDonationPause((prevState) => !prevState)
-                }
+                toggleCircleColor={isDonationPause ? Colors.blue : Colors.white}
+                onpress={() => setIsDonationPause((prevState) => !prevState)}
                 toggle={isDonationPause}
               />
             </View>
-
           </View>
-          
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -364,7 +384,7 @@ const styles = StyleSheet.create({
   },
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.white
+    backgroundColor: Colors.white,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -425,7 +445,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: wp('8%'),
     height: wp('8%'),
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
   textContainer: {
     flex: 1,

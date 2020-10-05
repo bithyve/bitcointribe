@@ -65,7 +65,7 @@ import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
-  setCardData
+  setCardData,
 } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -396,13 +396,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               // checking for donationId to send note
               if (options && options.message) {
-                try {
-                  // encoded message
-                  const rawMessage = JSON.parse(options.message);
-                  donationId = rawMessage.donationId;
-                } catch (err) {
-                  // normal message
-                }
+                const rawMessage = options.message;
+                donationId = rawMessage.split(':').pop().trim();
               }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
@@ -665,13 +660,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         cardData: newArrayFinal,
       });
     }
-   
   };
 
   updateAccountCardData = () => {
     let { accounts } = this.props;
     const defaultCardData = initialCardData;
-    let idIndex = initialCardData[initialCardData.length - 1].id;
+    let idIndex = initialCardData.length;
     const allCards = [];
     const additionalCardData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
@@ -731,7 +725,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    allCards.push(...defaultCardData, ... additionalCardData);
+    allCards.push(...defaultCardData, ...additionalCardData);
     this.props.setCardData(allCards);
     this.setAccountCardData([
       ...defaultCardData,
@@ -1042,7 +1036,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if (prevState.isLoading && !this.state.isLoading) {
-        this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+      this.transactionTabBarBottomSheetRef.current?.snapTo(1);
     }
   };
 
@@ -2363,7 +2357,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       UNDER_CUSTODY,
       downloadMShare,
       overallHealth,
-      cardDataProps
+      cardDataProps,
     } = this.props;
     return (
       <ImageBackground
@@ -3284,7 +3278,7 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
-    setCardData
+    setCardData,
   })(Home),
 );
 
