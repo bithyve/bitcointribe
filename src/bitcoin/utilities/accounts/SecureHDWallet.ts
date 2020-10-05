@@ -1303,7 +1303,9 @@ export default class SecureHDWallet extends Bitcoin {
       ].configuration = configuration;
 
     if (disableAccount !== undefined)
-      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration;
+      this.derivativeAccounts[DONATION_ACCOUNT][
+        accountNumber
+      ].disableAccount = disableAccount;
 
     if (accountDetails) {
       this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].donee =
