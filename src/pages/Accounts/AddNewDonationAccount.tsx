@@ -261,7 +261,7 @@ class AddNewAccount extends PureComponent<
               </TouchableOpacity>
               <View style={{ marginLeft: wp('2.5%'), marginRight: wp('2%') }}>
                 <Text style={styles.modalHeaderTitleText}>
-                  Enter details for Donation Account
+                  Donation Details
                 </Text>
                 <Text
                   style={{
@@ -270,8 +270,7 @@ class AddNewAccount extends PureComponent<
                     fontSize: RFValue(12),
                   }}
                 >
-                  Some of these details can be displayed on the Donation web
-                  view
+                  These will be used on the Donation web view
                 </Text>
               </View>
             </View>

@@ -67,7 +67,7 @@ const HomeList = ({
   CurrencyCode,
   balances,
   exchangeRates,
-  addNewDisable
+  addNewDisable,
 }) => {
   return (
     <View style={{ flexDirection: 'column' }}>
@@ -80,11 +80,16 @@ const HomeList = ({
             >
               <CardView
                 cornerRadius={10}
-                style={addNewDisable ? {
-                  ...styles.card,
-                   backgroundColor: Colors.borderColor
-                } : {
-                  ...styles.card}}
+                style={
+                  addNewDisable
+                    ? {
+                        ...styles.card,
+                        backgroundColor: Colors.borderColor,
+                      }
+                    : {
+                        ...styles.card,
+                      }
+                }
               >
                 <View
                   style={{
@@ -103,7 +108,7 @@ const HomeList = ({
                       fontSize: RFValue(11),
                     }}
                   >
-                    Add to my wallet
+                    Add Donation Account
                   </Text>
                 </View>
               </CardView>

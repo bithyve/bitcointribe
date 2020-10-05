@@ -35,15 +35,9 @@ export default function SettingDonationWebPageContents(props) {
     !props.account.configuration.displayTxDetails,
   );
 
-  const [doneeName, setDoneeName] = useState(
-    props.account.donee ? props.account.donee : '',
-  );
-  const [description, setDescription] = useState(
-    props.account.description ? props.account.description : '',
-  );
-  const [cause, setCause] = useState(
-    props.account.subject ? props.account.subject : '',
-  );
+  const [doneeName, setDoneeName] = useState('');
+  const [description, setDescription] = useState('');
+  const [cause, setCause] = useState('');
   const [isDonationPause, setIsDonationPause] = useState(
     props.account.disableAccount ? props.account.disableAccount : false,
   );
@@ -76,14 +70,14 @@ export default function SettingDonationWebPageContents(props) {
     }
 
     if (
-      doneeName !== props.account.donee ||
-      description !== props.account.description ||
-      cause !== props.account.subject
+      (doneeName && doneeName !== props.account.donee) ||
+      (description && description !== props.account.description) ||
+      (cause && cause !== props.account.subject)
     ) {
       const accountDetails = {
-        donee: doneeName,
-        subject: cause,
-        description,
+        donee: doneeName ? doneeName : props.account.donee,
+        subject: cause ? cause : props.account.subject,
+        description: description ? description : props.account.description,
       };
       preferences = preferences
         ? { ...preferences, accountDetails }
@@ -167,7 +161,7 @@ export default function SettingDonationWebPageContents(props) {
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter cause'}
+                placeholder={props.account.subject}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -184,7 +178,7 @@ export default function SettingDonationWebPageContents(props) {
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter donee name'}
+                placeholder={props.account.donee}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -205,7 +199,7 @@ export default function SettingDonationWebPageContents(props) {
                   marginTop: 10,
                   marginBottom: 10,
                 }}
-                placeholder={'Enter a description'}
+                placeholder={props.account.description}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
