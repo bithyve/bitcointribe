@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
 import useAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
@@ -12,6 +12,9 @@ import TransactionsList from '../../../components/account-details/AccountDetails
 import sampleTransactions from './SampleTransactions';
 import { TransactionDescribing } from '../../../common/data/models/Transactions/Interfaces';
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter';
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
+import KnowMoreBottomSheet, { KnowMoreBottomSheetHandle } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet';
+import { Easing } from 'react-native-reanimated';
 
 
 export type Props = {
@@ -53,6 +56,8 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
   // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
   const accountTransactions = sampleTransactions;
 
+  // const { top: topSafeArea, bottom: bottomSafeArea } = useSafeArea();
+  const { present, dismiss } = useBottomSheetModal();
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
     navigation.navigate('TransactionDetails', {
@@ -72,14 +77,25 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
     });
   }
 
+  const showKnowMoreSheet = useCallback(() => {
+    present(
+      <KnowMoreBottomSheet accountKind={accountPayload.kind} onClose={dismiss}/>,
+      {
+        initialSnapIndex: 1,
+        snapPoints: [0, '95%'],
+        animationDuration: 500,
+        animationEasing: Easing.out(Easing.exp),
+        handleComponent: KnowMoreBottomSheetHandle,
+      },
+    );
+  }, [present]);
 
   return (
     <ScrollView style={styles.rootContainer}>
-
       <View style={{ paddingVertical: 20 }}>
         <AccountDetailsCard
           accountPayload={accountPayload}
-          onKnowMorePressed={() => { }}
+          onKnowMorePressed={showKnowMoreSheet}
           onSettingsPressed={navigateToAccountSettings}
         />
       </View>
@@ -144,9 +160,9 @@ const styles = StyleSheet.create({
   },
 });
 
-AccountDetailsScreenContainer.navigationOptions = ({ _navigation, _navigationOptions }) => {
+AccountDetailsScreenContainer.navigationOptions = ({  }) => {
   return {
-    header: ({ _scene, _previous, navigation }) => {
+    header: ({ navigation }) => {
       const { accountID } = navigation.state.params;
 
       return <NavHeader
