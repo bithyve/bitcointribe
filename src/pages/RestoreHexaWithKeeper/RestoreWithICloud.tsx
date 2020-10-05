@@ -206,7 +206,8 @@ class RestoreWithICloud extends Component<
 
   getData = (result) => {
     console.log('FILE DATA', result);
-    var arr = [];
+    if(result){
+      var arr = [];
     var newArray = [];
     try {
       arr = JSON.parse(result);
@@ -221,6 +222,9 @@ class RestoreWithICloud extends Component<
     console.log('ARR', newArray);
     this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
     (this.refs.RestoreFromICloud as any).snapTo(1);
+  }else{
+    (this.refs.BackupNotFound as any).snapTo(1);
+  }
   };
 
   restoreWallet = () => {

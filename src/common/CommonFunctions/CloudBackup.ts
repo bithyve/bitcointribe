@@ -26,7 +26,10 @@ export const CheckCloudDataBackup = (recoveryCallback1) =>{
     // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
     iCloud.downloadBackup().then((backedJson) => {
       console.log('BackedUp JSON: ', backedJson);
+      if(backedJson)
       recoveryCallback(backedJson);
+      else
+      recoveryCallback(null);
     });
   } else {
     let checkDataIsBackedup = true;
