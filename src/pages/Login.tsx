@@ -44,6 +44,7 @@ export default function Login(props) {
   let [subTextMessage2, setSubTextMessage2] = useState(
     'Hexa uses sats to make using bitcoin easier',
   );
+  let [messageIndex, setMessageIndex] = useState(0)
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -60,53 +61,6 @@ export default function Login(props) {
     (state) => state.preferences.releaseCasesValue,
   );
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
-  // const releases =[
-  //       {
-  //           "build": "40",
-  //           "version": "0.8",
-  //           "releaseNotes": {
-  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
-  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //           },
-  //           "reminderLimit": 2
-  //       },
-  //       {
-  //         "build": "39",
-  //         "version": "0.8",
-  //         "releaseNotes": {
-  //             "ios": "dfsdg",
-  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //         },
-  //         "reminderLimit": -1
-  //     },
-  //     {
-  //       "build": "38",
-  //       "version": "0.8",
-  //       "releaseNotes": {
-  //           "ios": "64356354",
-  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //       },
-  //       "reminderLimit": -1
-  //   },
-  //   {
-  //     "build": "37",
-  //     "version": "0.8",
-  //     "releaseNotes": {
-  //         "ios": "dfgdgdg",
-  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //     },
-  //     "reminderLimit": -1
-  // },
-  //       {
-  //           "build": "35",
-  //           "version": "3.40",
-  //           "releaseNotes": {
-  //               "ios": "ios notes for release 319",
-  //               "android": "android notes for release 319"
-  //           },
-  //           "reminderLimit": -1
-  //       }
-  //   ];
   const onPressNumber = useCallback(
     (text) => {
       let tmpPasscode = passcode;
@@ -129,6 +83,46 @@ export default function Login(props) {
       setIsDisabledProceed(false);
     }
   }, [passcode]);
+
+
+
+  const LoaderMessages = [{
+    message: 'Hexa Test Account',
+    subTextMessage_1: 'Test Account comes preloaded with test-sats',
+    subTextMessage_2: 'Best place to start if you are new to Bitcoin',
+    index: 0
+  },
+  {
+    message: 'Satoshis or Sats',
+    subTextMessage_1: '1 bitcoin = 100 million satoshis or sats',
+    subTextMessage_2: 'Hexa uses sats to make using bitcoin easier',
+    index: 1
+  },
+  {
+    message: 'Introducing Donation Accounts',
+    subTextMessage_1: 'Start receiving donations directly in your Hexa Wallet',
+    subTextMessage_2: 'from anywhere in the world',
+    index: 2
+  },
+  {
+    message: 'Hexa Savings Account',
+    subTextMessage_1: 'Don’t forget to set up your 2FA code on an authenticator app',
+    subTextMessage_2: '',
+    index: 3
+  },
+  {
+    message: 'Friends & Family',
+    subTextMessage_1: 'Add contacts to Hexa and send sats w/o asking for address every time',
+    subTextMessage_2: '',
+    index: 4
+  },
+  {
+    message: 'Non-custodial buys',
+    subTextMessage_1: 'Get sats directly in your wallet with FastBitcoins vouchers',
+    subTextMessage_2: '(*select locations)',
+    index: 5
+  }
+  ]
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -338,15 +332,25 @@ export default function Login(props) {
 
   }
 
+
+  const startMessages = () => {
+    setInterval(() => {
+      let index = Math.floor(Math.random() * LoaderMessages.length);
+      if (index !== messageIndex) {
+        setMessageIndex(index)
+      }
+    }, 4000)
+  }
+
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
-        headerText={message}
-        messageText={subTextMessage1}
-        messageText2={subTextMessage2}
+        headerText={LoaderMessages[messageIndex].message}
+        messageText={LoaderMessages[messageIndex].subTextMessage_1}
+        messageText2={LoaderMessages[messageIndex].subTextMessage_2}
       />
     );
-  }, [message, subTextMessage1, subTextMessage2]);
+  }, [messageIndex]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -576,15 +580,7 @@ export default function Login(props) {
                   }, 2);
                   loaderBottomSheet.current.snapTo(1);
                   proceedButton(passcode)
-                  setTimeout(() => {
-                    setMessage('Hexa Test Account');
-                    setSubTextMessage1(
-                      'Test Account comes preloaded with test-sats',
-                    );
-                    setSubTextMessage2(
-                      'Best place to start if you are new to Bitcoin',
-                    );
-                  }, 3000);
+                  startMessages()
                 }}
                 style={{
                   ...styles.proceedButtonView,
