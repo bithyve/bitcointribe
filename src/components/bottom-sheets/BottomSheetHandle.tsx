@@ -1,12 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import Colors from '../../common/Colors';
-import DeviceInfo from 'react-native-device-info';
 
-const BottomSheetHandle: React.FC = () => {
+export const HANDLE_CONTAINER_HEIGHT = 12;
+
+export type Props = {
+  containerStyle?: Record<string, unknown>;
+  handleIndicatorStyle?: Record<string, unknown>;
+};
+
+const BottomSheetHandle: React.FC<Props> = ({
+  containerStyle,
+  handleIndicatorStyle,
+}: Props) => {
   return (
-    <View style={styles.rootContainer}>
-      <View style={styles.handleIndicator}></View>
+    <View style={{ ...styles.rootContainer, ...containerStyle }}>
+      <View style={{ ...styles.handleIndicator, ...handleIndicatorStyle }}></View>
     </View>
   );
 };

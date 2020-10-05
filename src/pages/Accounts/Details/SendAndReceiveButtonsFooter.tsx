@@ -51,7 +51,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ({
   return (
     <View style={styles.rootContainer}>
       <FooterButton
-        style={{marginLeft: 10}}
+        style={{marginRight: 8}}
         onPress={onSendPressed}
         title="Send"
         subtitle="Tran Fee: 0.032 (sats)"

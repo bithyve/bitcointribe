@@ -15,7 +15,7 @@ export default function DonationAccountHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
         style={styles.viewStyle}
         activeOpacity={10}
@@ -191,9 +191,9 @@ const styles = StyleSheet.create({
     marginRight: wp('10%'),
     marginBottom: wp('15%'),
   },
-  viewStyle: { 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  viewStyle: {
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   separatorViewDotted: {
     borderStyle: 'dotted',
