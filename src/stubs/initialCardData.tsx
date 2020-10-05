@@ -15,7 +15,7 @@ export const initialCardData = [
     bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
   },
   {
-    id: 2,
+    id: 3,
     title: 'Savings Account',
     unit: 'sats',
     amount: 0,
@@ -24,7 +24,7 @@ export const initialCardData = [
     bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
   },
   {
-    id: 3,
+    id: 2,
     title: 'Checking Account',
     unit: 'sats',
     amount: 0,

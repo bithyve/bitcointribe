@@ -519,7 +519,7 @@ class SendConfirmation extends Component<
                 navigation.goBack();
                 this.props.clearTransfer(this.serviceType, 'stage1');
               }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
               disabled={isConfirmDisabled}
             >
@@ -1099,7 +1099,7 @@ class SendConfirmation extends Component<
                 this.props.accounts[this.serviceType].loading.transfer) ||
               (isConfirmDisabled &&
                 this.props.accounts[this.serviceType].loading.transfer) ? (
-                <ActivityIndicator/>
+                <ActivityIndicator />
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
               )}
@@ -1171,12 +1171,13 @@ class SendConfirmation extends Component<
 
                 navigation.navigate('Accounts', {
                   serviceType: this.serviceType,
-                  index:
-                    this.serviceType === TEST_ACCOUNT
-                      ? 0
-                      : this.serviceType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
+                  index: this.state.derivativeAccountDetails
+                    ? 3
+                    : this.serviceType === TEST_ACCOUNT
+                    ? 0
+                    : this.serviceType === REGULAR_ACCOUNT
+                    ? 1
+                    : 2,
                   spendableBalance: this.spendableBalance - totalAmount,
                 });
               }}

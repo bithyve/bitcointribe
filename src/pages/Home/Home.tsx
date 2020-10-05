@@ -665,7 +665,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   updateAccountCardData = () => {
     let { accounts } = this.props;
     const defaultCardData = initialCardData;
-    let idIndex = initialCardData[initialCardData.length - 1].id;
+    let idIndex = initialCardData.length;
     const allCards = [];
     const additionalCardData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {

@@ -193,7 +193,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       'INR',
       'EUR',
     ];
-    
+
     this.state = {
       carouselData: [
         {
@@ -248,7 +248,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       spendableBalance: 0,
       FBTCAccount: {},
     };
-
   }
 
   componentDidMount = () => {
@@ -258,7 +257,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // this.setState({ spendableBalance: this.props.navigation.state.params
     //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
-    
     this.getBalance();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
@@ -270,7 +268,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         : service.hdWallet;
     this.setAverageTransactionFees();
     this.checkFastBitcoin();
-    
+
     // if (this.wallet.transactions.transactionDetails.length) {
     //   this.wallet.transactions.transactionDetails.sort(function (left, right) {
     //     return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -296,7 +294,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  updateCarouselData = () => {
+  updateCarouselData = (dontSlide?) => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
     const defaultCarouselData = [
@@ -387,14 +385,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       }
     }
     let carouselData1 = [...defaultCarouselData, ...additionalCarouselData];
-  this.setState({ carouselData: carouselData1, }, () => {                              
-    //callback
-   // console.log("carouselData", this.state.carouselData);
-  });
-    this.getServiceType(
-      serviceType,
-      carouselData1.length - 1
-    );
+    this.setState({ carouselData: carouselData1 }, () => {
+      if (dontSlide) {
+        // workaround to halt inconsistent carousel swipings
+      } else this.getServiceType(serviceType, this.state.carouselInitIndex);
+    });
   };
 
   getBalance = () => {
@@ -629,21 +624,24 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         }
       }
 
-      if (donationAccUpdated) this.updateCarouselData();
+      if (donationAccUpdated) {
+        const dontSlide = true;
+        this.updateCarouselData(dontSlide);
+      }
     }
   };
 
   getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
     //console.log("presentCarouselData getServiceType", this.state.presentCarouselData, index, this.state.carouselData);
-   
-      if (this.carousel.current as any)
-        (this.carousel.current as any).snapToItem(index, true, false);
-      this.setState({
-        serviceType: serviceType,
-        presentCarouselData: this.state.carouselData[index],
-        presentCarouselIndex: index,
-      });
+
+    if (this.carousel.current as any)
+      (this.carousel.current as any).snapToItem(index, true, false);
+    this.setState({
+      serviceType: serviceType,
+      presentCarouselData: this.state.carouselData[index],
+      presentCarouselIndex: index,
+    });
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
@@ -1057,7 +1055,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactions,
       spendableBalance,
       presentCarouselData,
-      carouselData
+      carouselData,
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
     const averageTxFees = this.getAverageTxFees();
@@ -1071,7 +1069,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             onPress={() => {
               this.props.navigation.navigate('Home');
             }}
@@ -1154,10 +1152,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   sliderWidth={this.sliderWidth}
                   itemWidth={this.sliderWidth * 0.95}
                   onSnapToItem={(index) => {
-                    this.getServiceType(
-                      carouselData[index].type,
-                      index,
-                    );
+                    this.getServiceType(carouselData[index].type, index);
                   }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
@@ -1616,15 +1611,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             ]}
             renderContent={() => {
               const { dervAccount, dervAccountType, accountNumber } = this.state
-              .presentCarouselData
-              ? this.state.presentCarouselData
-              : {
-                  dervAccount: null,
-                  dervAccountType: null,
-                  accountNumber: null,
-                };
-            if (!dervAccount) return;
-            if (dervAccountType !== DONATION_ACCOUNT) return;
+                .presentCarouselData
+                ? this.state.presentCarouselData
+                : {
+                    dervAccount: null,
+                    dervAccountType: null,
+                    accountNumber: null,
+                  };
+              if (!dervAccount) return;
+              if (dervAccountType !== DONATION_ACCOUNT) return;
               return (
                 <SettingDonationWebPageContents
                   onPressBack={() =>
