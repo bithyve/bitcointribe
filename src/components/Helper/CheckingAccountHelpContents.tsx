@@ -31,7 +31,7 @@ export default function CheckingAccountHelpContents(props) {
   };
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
         style={{ justifyContent: 'center', alignItems: 'center' }}
         activeOpacity={10}

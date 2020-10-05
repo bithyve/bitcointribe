@@ -36,7 +36,7 @@
   },
   "projectDirectory": "iOS",
   "dependencies": {
-    "@gorhom/bottom-sheet": "^1.2.2",
+    "@gorhom/bottom-sheet": "^1.4.1",
     "@react-native-community/netinfo": "^5.0.0",
     "@tradle/react-native-http": "^2.0.0",
     "@welldone-software/why-did-you-render": "^5.0.0-alpha.2",
