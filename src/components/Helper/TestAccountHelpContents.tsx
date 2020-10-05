@@ -22,7 +22,7 @@ export default function TestAccountHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
         style={{ justifyContent: 'center', alignItems: 'center' }}
         activeOpacity={10}
