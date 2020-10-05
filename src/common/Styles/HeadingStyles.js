@@ -19,6 +19,18 @@ const HeadingStyles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,
   },
+
+  listItemTitle: {
+    color: Colors.blue,
+    fontSize: RFValue(14),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+
+  listItemSubtitle: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+  },
 });
 
 export default HeadingStyles;
