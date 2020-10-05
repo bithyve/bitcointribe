@@ -31,7 +31,7 @@ export default function SavingsAccountHelpContents(props) {
   };
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
         style={{ justifyContent: 'center', alignItems: 'center' }}
         activeOpacity={10}
@@ -182,7 +182,7 @@ export default function SavingsAccountHelpContents(props) {
         <View
           style={{
             height: hp('80%'),
-            marginTop: hp('2%'), 
+            marginTop: hp('2%'),
             justifyContent: 'space-between'
           }}
         >
