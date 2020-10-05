@@ -16,7 +16,7 @@ import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDoc
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/index';
+import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
@@ -28,7 +28,7 @@ import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 //import TransactionDetails from '../pages/Accounts/TransactionDetails';
-import Send from '../pages/Accounts/SendUpdate';
+import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
@@ -72,7 +72,7 @@ import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
-import SendToContact from '../pages/Accounts/SendToContactUpdate';
+import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
@@ -83,6 +83,7 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
+import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -155,6 +156,7 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestAccepted,
     ReceivingAddress,
     AddNewAccount,
+    AddNewDonationAccount,
     Send: {
       screen: Send,
       navigationOptions: {

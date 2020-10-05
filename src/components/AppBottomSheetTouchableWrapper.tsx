@@ -3,7 +3,7 @@ import { TouchableOpacity as TouchableOpacityGestureHandler } from "react-native
 import React, { ReactNode } from "react";
 
 export const AppBottomSheetTouchableWrapper = (
-    props: { children: ReactNode } & Pick<TouchableOpacityProps,'onPress' | 'style' | 'activeOpacity' | 'disabled'>,
+    props: { children: ReactNode } & Pick<TouchableOpacityProps,'onPress' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop'>,
   ) =>
     Platform.select({
       android: <TouchableOpacityGestureHandler {...props} />,

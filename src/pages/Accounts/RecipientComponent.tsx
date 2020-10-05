@@ -27,16 +27,24 @@ import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientComponent(props) {
   const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue) || 'USD';
+  const currencyToggleValue =
+    useSelector((state) => state.preferences.currencyToggleValue) || 'USD';
 
   const getCorrectAmountCurrency = () => {
     const switchOn = currencyToggleValue ? true : false;
-    if(!switchOn) {
-      return props.item.currencyAmount && (props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase());
+    if (!switchOn) {
+      return (
+        props.item.currencyAmount &&
+        props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()
+      );
     } else {
-      return props.item.bitcoinAmount && props.item.bitcoinAmount + (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats');
+      return (
+        props.item.bitcoinAmount &&
+        props.item.bitcoinAmount +
+          (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
+      );
     }
-  }
+  };
 
   return (
     <TouchableOpacity
@@ -85,11 +93,16 @@ function RecipientComponent(props) {
                   }}
                 >
                   {nameToInitials(
-                    props.item.selectedContact.firstName &&
-                      props.item.selectedContact.lastName
+                    props.item.selectedContact.firstName === 'F&F request' &&
+                      props.item.selectedContact.contactsWalletName !==
+                        undefined &&
+                      props.item.selectedContact.contactsWalletName !== ''
+                      ? `${props.item.selectedContact.contactsWalletName}'s wallet`
+                      : props.item.selectedContact.firstName &&
+                        props.item.selectedContact.lastName
                       ? props.item.selectedContact.firstName +
-                          ' ' +
-                          props.item.selectedContact.lastName
+                        ' ' +
+                        props.item.selectedContact.lastName
                       : props.item.selectedContact.firstName &&
                         !props.item.selectedContact.lastName
                       ? props.item.selectedContact.firstName
@@ -99,15 +112,17 @@ function RecipientComponent(props) {
                       : '',
                   )}
                 </Text>
+              ) : props.item && props.item.selectedContact.id ? (
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: RFValue(30),
+                    lineHeight: RFValue(30), //... One for top and one for bottom alignment
+                  }}
+                >
+                  @
+                </Text>
               ) : (
-                props.item && props.item.selectedContact.id ? 
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: RFValue(30),
-                  lineHeight: RFValue(30), //... One for top and one for bottom alignment
-                }}
-              >@</Text> :
                 <Image
                   source={require('../../assets/images/icons/icon_user.png')}
                   style={styles.circleShapeView}
@@ -129,9 +144,13 @@ function RecipientComponent(props) {
             Sending to:
           </Text>
           <Text style={styles.contactNameText} numberOfLines={1}>
-            {props.item.selectedContact.name ||
-              props.item.selectedContact.account_name ||
-              props.item.selectedContact.id}
+            {props.item.selectedContact.firstName === 'F&F request' &&
+            props.item.selectedContact.contactsWalletName !== undefined &&
+            props.item.selectedContact.contactsWalletName !== ''
+              ? `${props.item.selectedContact.contactsWalletName}'s wallet`
+              : props.item.selectedContact.name ||
+                props.item.selectedContact.account_name ||
+                props.item.selectedContact.id}
           </Text>
           {props.item.hasOwnProperty('bitcoinAmount') ||
           props.item.hasOwnProperty('currencyAmount') ? (

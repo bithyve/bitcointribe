@@ -218,6 +218,7 @@ export default function TwoFAToken(props) {
           onPress={() => {
             props.navigation.goBack();
           }}
+          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

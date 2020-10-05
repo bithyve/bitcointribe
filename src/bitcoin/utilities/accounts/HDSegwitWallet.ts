@@ -26,6 +26,7 @@ import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -213,6 +214,13 @@ export default class HDSegwitWallet extends Bitcoin {
         receivingAddress = donationAcc ? donationAcc.receivingAddress : '';
         break;
 
+      case SUB_PRIMARY_ACCOUNT:
+        const account = this.derivativeAccounts[SUB_PRIMARY_ACCOUNT][
+          accountNumber
+        ];
+        receivingAddress = account ? account.receivingAddress : '';
+        break;
+
       default:
         receivingAddress = this.receivingAddress;
     }
@@ -273,10 +281,16 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 1,
     contactName?: string,
+    accountName?: string,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
-      throw new Error(`${accountType} does not exists`);
+      if (config[accountType])
+        this.derivativeAccounts = {
+          ...this.derivativeAccounts,
+          [accountType]: config[accountType],
+        };
+      else throw new Error(`${accountType} does not exists`);
 
     switch (accountType) {
       case TRUSTED_CONTACTS:
@@ -296,8 +310,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
       default:
         if (!this.derivativeAccounts[accountType][accountNumber])
-          this.generateDerivativeXpub(accountType, accountNumber);
-
+          this.generateDerivativeXpub(accountType, accountNumber, accountName);
         break;
     }
 
@@ -460,6 +473,7 @@ export default class HDSegwitWallet extends Bitcoin {
         .nextFreeChangeAddressIndex - 1,
       accountType,
       contactName,
+      accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
     );
 
     const { balances, transactions, UTXOs } = res;
@@ -690,8 +704,8 @@ export default class HDSegwitWallet extends Bitcoin {
                 });
 
                 if (status.confirmed) balances.balance += value;
-                // else if (changeAddresses && changeAddresses.includes(Address))
-                //   balances.balance += value;
+                else if (internalAddresses.includes(Address))
+                  balances.balance += value;
                 else balances.unconfirmedBalance += value;
               }
             }
@@ -768,6 +782,10 @@ export default class HDSegwitWallet extends Bitcoin {
                           )
                           .join(' ')
                       : tx.accountType,
+                  primaryAccType:
+                    tx.accountType === SUB_PRIMARY_ACCOUNT
+                      ? 'Checking Account'
+                      : null,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -993,6 +1011,7 @@ export default class HDSegwitWallet extends Bitcoin {
     configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
+      displayTxDetails: boolean;
     },
     disableAccount: boolean = false,
   ): Promise<{ setupSuccessful: Boolean }> => {
@@ -1066,6 +1085,7 @@ export default class HDSegwitWallet extends Bitcoin {
       configuration?: {
         displayBalance: boolean;
         displayTransactions: boolean;
+        displayTxDetails: boolean;
       };
       accountDetails?: {
         donee: string;
@@ -1107,7 +1127,9 @@ export default class HDSegwitWallet extends Bitcoin {
       ].configuration = configuration;
 
     if (disableAccount !== undefined)
-      this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].configuration;
+      this.derivativeAccounts[DONATION_ACCOUNT][
+        accountNumber
+      ].disableAccount = disableAccount;
 
     if (accountDetails) {
       this.derivativeAccounts[DONATION_ACCOUNT][accountNumber].donee =
@@ -1908,6 +1930,7 @@ export default class HDSegwitWallet extends Bitcoin {
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
+    accountName?: string,
   ) => {
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
@@ -1931,6 +1954,7 @@ export default class HDSegwitWallet extends Bitcoin {
         xpubId: crypto.createHash('sha256').update(xpub).digest('hex'),
         nextFreeAddressIndex: 0,
         nextFreeChangeAddressIndex: 0,
+        accountName,
       };
       this.derivativeAccounts[accountType].instance.using++;
 
