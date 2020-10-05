@@ -2,11 +2,11 @@ import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
 import AccountDetailsContainerScreen from '../../../pages/Accounts/Details/AccountDetailsContainer';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import SendStack from '../send/SendStack';
 import TransactionsListScreen from '../../../pages/Accounts/Transactions/TransactionsListScreenContainer';
 import TransactionDetailsScreen from '../../../pages/Accounts/Transactions/TransactionDetailsScreenContainer';
 import AccountSettingsMainScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen';
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 
 
 const AccountDetailsStack = createStackNavigator(
@@ -43,14 +43,13 @@ const AccountDetailsStack = createStackNavigator(
     },
   },
   {
-    // TODO: Refactor to present screens here modally post https://github.com/bithyve/hexa/issues/1915
-    // mode: 'modal',
+    mode: 'modal',
     initialRouteName: 'AccountDetailsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop(); }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },
       };
     },
