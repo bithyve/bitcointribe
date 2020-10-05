@@ -852,93 +852,15 @@ class SendToContact extends Component<
         </View>
         <View style={{ width: wp('85%'), alignSelf: 'center' }}>
           {transfer[serviceType].transfer.details &&
-          transfer[serviceType].transfer.details.length > 0 ? (
-            <ScrollView horizontal={true}>
-              {transfer[serviceType].transfer.details.map((item) => {
-                //console.log('ITEM in list', item);
-                return (
-                  <View style={styles.view1}>
-                    <View style={{ flexDirection: 'row' }}>
-                      {item.selectedContact &&
-                      item.selectedContact.account_name ? (
-                        <Image
-                          source={
-                            item.selectedContact.account_name ===
-                            'Checking Account'
-                              ? require('../../assets/images/icons/icon_regular.png')
-                              : item.selectedContact.account_name ===
-                                'Savings Account'
-                              ? require('../../assets/images/icons/icon_secureaccount.png')
-                              : item.selectedContact.account_name ===
-                                'Test Account'
-                              ? require('../../assets/images/icons/icon_test_white.png')
-                              : item.selectedContact.account_name ===
-                                'Donation Account'
-                              ? require('../../assets/images/icons/icon_donation_account.png')
-                              : require('../../assets/images/icons/icon_user.png')
-                          }
-                          style={styles.circleShapeView}
-                        />
-                      ) : item.selectedContact.image ? (
-                        <Image
-                          source={item.selectedContact.image}
-                          style={styles.circleShapeView}
-                        />
-                      ) : (
-                        <View
-                          style={{
-                            ...styles.circleShapeView,
-                            backgroundColor: Colors.shadowBlue,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          {item.selectedContact &&
-                          item.selectedContact.firstName ? (
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: 13,
-                                lineHeight: 13, //... One for top and one for bottom alignment
-                              }}
-                            >
-                              {item && item.selectedContact
-                                ? nameToInitials(
-                                    item.selectedContact.firstName ===
-                                      'F&F request' &&
-                                      item.selectedContact
-                                        .contactsWalletName !== undefined &&
-                                      item.selectedContact
-                                        .contactsWalletName !== ''
-                                      ? `${item.selectedContact.contactsWalletName}'s wallet`
-                                      : item.selectedContact.firstName &&
-                                        item.selectedContact.lastName
-                                      ? item.selectedContact.firstName +
-                                        ' ' +
-                                        item.selectedContact.lastName
-                                      : item.selectedContact.firstName &&
-                                        !item.selectedContact.lastName
-                                      ? item.selectedContact.firstName
-                                      : !item.selectedContact.firstName &&
-                                        item.selectedContact.lastName
-                                      ? item.selectedContact.lastName
-                                      : '',
-                                  )
-                                : ''}
-                            </Text>
-                          ) : item &&
-                            item.selectedContact &&
-                            item.selectedContact.id ? (
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: 18,
-                                lineHeight: 18, //... One for top and one for bottom alignment
-                              }}
-                            >
-                              @
-                            </Text>
-                          ) : (
+            transfer[serviceType].transfer.details.length > 0 ? (
+              <ScrollView horizontal={true}>
+                {transfer[serviceType].transfer.details.map((item) => {
+                  //console.log('ITEM in list', item);
+                  return (
+                    <View style={styles.view1}>
+                      <View style={{ flexDirection: 'row' }}>
+                        {item.selectedContact &&
+                          item.selectedContact.account_name ? (
                             <Image
                               source={
                                 item.selectedContact.account_name ===
