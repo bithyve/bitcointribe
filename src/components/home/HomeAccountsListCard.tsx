@@ -10,14 +10,6 @@ import useAccountsState from '../../utils/hooks/state-selectors/UseAccountsState
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import useExchangeRates from '../../utils/hooks/state-selectors/UseExchangeRates';
-import { UsNumberFormat } from '../../common/utilities';
-import { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
 
 
@@ -68,26 +60,6 @@ export function headerImageSourceForAccount(accountPayload: AccountPayload): Nod
       return require('../../assets/images/icons/icon_wallet.png');
   }
 }
-
-
-// const BalanceCurrencyIcon = ({ isUsingBitcoinUnits, fiatCurrencyCode }) => {
-//   if (isUsingBitcoinUnits) {
-//     return <Image
-//     />;
-//   } else if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
-//     return <MaterialCurrencyCodeIcon
-//       currencyCode={fiatCurrencyCode}
-//       color={Colors.lightBlue}
-//   } else {
-//     return <Image
-//         getCurrencyImageByRegion(
-//           fiatCurrencyCode,
-//           'light_blue',
-//         )
-//       }
-//     />;
-//   }
-// };
 
 const HeaderSection: React.FC<HeaderProps> = ({
   accountPayload,

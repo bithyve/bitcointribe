@@ -35,13 +35,5 @@ const AccountDetailsTransactionsList: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  rootContainer: {
-  },
-
-  separatorView: {
-
-  },
-});
 
 export default AccountDetailsTransactionsList;
