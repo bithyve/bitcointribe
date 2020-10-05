@@ -31,7 +31,9 @@ export default function SettingDonationWebPageContents(props) {
     isDonationTransactionEnable,
     setIsDonationTransactionEnable,
   ] = useState(props.account.configuration.displayTransactions);
-  const [isTransactionDetailsEnable, setIsTransactionDetails] = useState(false);
+  const [hideTxDetails, setHideTxDetails] = useState(
+    !props.account.configuration.displayTxDetails,
+  );
 
   const [doneeName, setDoneeName] = useState(
     props.account.donee ? props.account.donee : '',
@@ -59,11 +61,13 @@ export default function SettingDonationWebPageContents(props) {
     if (
       isDonationTotalEnable !== props.account.configuration.displayBalance ||
       isDonationTransactionEnable !==
-        props.account.configuration.displayTransactions
+        props.account.configuration.displayTransactions ||
+      !hideTxDetails !== props.account.configuration.displayTxDetails
     ) {
       const configuration = {
         displayBalance: isDonationTotalEnable,
         displayTransactions: isDonationTransactionEnable,
+        displayTxDetails: !hideTxDetails,
       };
 
       preferences = preferences
@@ -321,13 +325,9 @@ export default function SettingDonationWebPageContents(props) {
                 toggleSize={wp('6%')}
                 isNotImage={true}
                 toggleColor={Colors.lightBlue}
-                toggleCircleColor={
-                  isTransactionDetailsEnable ? Colors.blue : Colors.white
-                }
-                onpress={() =>
-                  setIsTransactionDetails((prevState) => !prevState)
-                }
-                toggle={isTransactionDetailsEnable}
+                toggleCircleColor={hideTxDetails ? Colors.blue : Colors.white}
+                onpress={() => setHideTxDetails((prevState) => !prevState)}
+                toggle={hideTxDetails}
               />
             </View>
 
