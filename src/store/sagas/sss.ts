@@ -45,7 +45,7 @@ import {
   SHARE_PERSONAL_COPY,
   personalCopyShared,
   pdfHealthCheckFailed,
-  personalCopyGenerated,
+  personalCopyGenerated, RECOVER_WALLET_USING_ICLOUD
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -1609,6 +1609,63 @@ export const recoverWalletWatcher = createWatcher(
   recoverWalletWorker,
   RECOVER_WALLET,
 );
+
+
+function* recoverWalletFromIcloudWorker({ payload }) {
+  yield put(switchS3Loader('restoreWallet'));
+  console.log("PAYLOAD", payload);
+  const {SERVICES, WALLET_SETUP, DECENTRALIZED_BACKUP, ASYNC_DATA } = payload.icloudData.walletImage;
+  console.log("SERVICES, WALLET_SETUP, DECENTRALIZED_BACKUP, ASYNC_DATA", SERVICES, WALLET_SETUP, DECENTRALIZED_BACKUP, ASYNC_DATA);
+
+  try {
+      if (ASYNC_DATA) {
+        for (const key of Object.keys(ASYNC_DATA)) {
+          console.log('restoring to async: ', key);
+          yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+  
+          if (key === 'TrustedContactsInfo' && ASYNC_DATA[key]) {
+            const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
+            yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+          }
+        }
+      }
+      
+      const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      //console.log("payload afshjkfhdfjhf", payload);
+      // update hashes
+      const hashesWI = {};
+      Object.keys(payload).forEach((key) => {
+        hashesWI[key] = hash(payload[key]);
+      });
+      yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+      yield call(insertDBWorker, { payload });
+      yield delay(2000);
+      const s3Service = JSON.parse(SERVICES.S3_SERVICE);
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
+      const current = Date.now();
+      AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
+      const securityQuestionHistory = {
+        confirmed: current,
+      };
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(securityQuestionHistory),
+      );
+
+    } catch (err) {
+    console.log({ err: err.message });
+    yield put(walletRecoveryFailed(true));
+    // Alert.alert('Wallet recovery failed!', err.message);
+  }
+  yield put(walletImageChecked(true));
+  yield put(switchS3Loader('restoreWallet'));
+}
+
+export const recoverWalletFromIcloudWatcher = createWatcher(
+  recoverWalletFromIcloudWorker,
+  RECOVER_WALLET_USING_ICLOUD,
+);
+
 
 const sha256 = crypto.createHash('sha256');
 const hash = (element) => {

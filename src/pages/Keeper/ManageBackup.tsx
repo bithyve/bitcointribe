@@ -51,6 +51,7 @@ interface ManageBackupStateTypes {
   selectedId: any;
   isLevel2: boolean;
   securityAtLevel: any;
+  encryptedCloudDataJson: any;
 }
 
 interface ManageBackupPropsTypes {
@@ -205,26 +206,43 @@ class ManageBackup extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  GoogleDriveLogin = async () => {
-    const { walletName, regularAccount } = this.props;
+  cloudData = async () => {
+    const { walletName, regularAccount, } = this.props;
     let encryptedCloudDataJson;
-    let shares;
+    let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
+    //console.log('s3Service.LevelHealth.metaShares', s3Service);
     encryptedCloudDataJson = await CloudData(this.props.database);
-    console.log('encryptedDatabase', encryptedCloudDataJson);
+    this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
+    let keeperData = [
+      {
+        shareId:'',
+        KeeperType: 'cloud',
+        updated:'',
+        reshareVersion: 0
+      },
+    ]
     let data = {
-        shares: shares,
-        encryptedCloudDataJson: encryptedCloudDataJson,
-        walletName: walletName,
-        regularAccount: regularAccount,
-      };
-      CloudDataBackup(data, this.setCloudBackupStatus);
-      console.log('call for google drive upload', this.props.cloudBackupStatus);
+      levelStatus: 1,
+      shares: shares,
+      encryptedCloudDataJson : encryptedCloudDataJson,
+      walletName: walletName,
+      regularAccount: regularAccount,
+      keeperData: JSON.stringify(keeperData)
+    }
+    CloudDataBackup(data, this.setCloudBackupStatus);
+    //console.log('call for google drive upload', this.props.cloudBackupStatus);
+    
   };
 
   setCloudBackupStatus = () => {
-    this.props.setCloudBackupStatus({ status: true });
-    console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
-  };
+    this.props.setCloudBackupStatus({status: true});
+    //console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
+    // if(this.props.cloudBackupStatus.status){
+    //   console.log("this.props.s3Service", this.props.s3Service, this.props.s3Service.levelhealth)
+    //   this.updateHealthForCloud(this.props.s3Service.levelhealth.metaShares);
+    // }
+  }
+
 
   componentDidUpdate = (prevProps, prevState) => {
     // console.log('this.props.overallHealth', this.props.overallHealth);
@@ -455,7 +473,7 @@ class ManageBackup extends Component<
                               style={styles.appBackupButton}
                               onPress={() => {
                                 if (!this.props.cloudBackupStatus) {
-                                  this.GoogleDriveLogin();
+                                  this.cloudData();
                                 }
                               }}
                             >
@@ -469,7 +487,7 @@ class ManageBackup extends Component<
                                   fontSize: RFValue(11),
                                 }}
                               >
-                                Add Backup
+                               {this.props.cloudBackupStatus && this.props.cloudBackupStatus.status ? "Data Backed up"  : "Add Backup" }
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity

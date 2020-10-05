@@ -20,6 +20,7 @@ export const DOWNLOAD_DYNAMIC_NONPMDD = 'DOWNLOAD_DYNAMIC_NONPMDD';
 export const RESTORE_DYNAMIC_NONPMDD = 'RESTORE_DYNAMIC_NONPMDD';
 export const RECOVER_MNEMONIC = 'RECOVER_MNEMONIC';
 export const RECOVER_WALLET = 'RECOVER_WALLET';
+export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
 export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 export const CHECK_PDF_HEALTH = 'CHECK_PDF_HEALTH';
@@ -129,6 +130,10 @@ export const recoverMmnemonic = (metaShares, securityAns) => {
 
 export const recoverWallet = () => {
   return { type: RECOVER_WALLET };
+};
+
+export const recoverWalletUsingIcloud = (icloudData) => {
+  return { type: RECOVER_WALLET_USING_ICLOUD, payload: { icloudData } };
 };
 
 export const resetRequestedShareUpload = () => {

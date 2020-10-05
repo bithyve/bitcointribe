@@ -86,6 +86,7 @@ import {
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
   sharePersonalCopyWatcher,
+  recoverWalletFromIcloudWatcher
 } from './sagas/sss';
 
 import {
@@ -198,6 +199,7 @@ const rootSaga = function* () {
     shareHistoryUpdateWatcher,
     updateWalletImageWatcher,
     fetchWalletImageWatcher,
+    recoverWalletFromIcloudWatcher,
 
     //fBTC
     accountSyncWatcher,

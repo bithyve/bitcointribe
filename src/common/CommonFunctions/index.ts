@@ -1,4 +1,4 @@
-import { NativeModules } from "react-native";
+import { AsyncStorage, NativeModules } from "react-native";
 import SSS from "../../bitcoin/utilities/sss/SSS";
 import { decrypt, encrypt } from "../encryption";
 
@@ -63,13 +63,35 @@ export const generateRandomString = (length: number): string => {
   return randomString;
 };
 
+const asyncDataToBackup = async () => {
+  const [
+    [, TrustedContactsInfo],
+    [, personalCopyDetails],
+    [, FBTCAccount],
+  ] = await AsyncStorage.multiGet([
+    'TrustedContactsInfo',
+    'personalCopyDetails',
+    'FBTCAccount',
+  ]);
+  const ASYNC_DATA = {};
+  if (TrustedContactsInfo)
+    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+  if (personalCopyDetails)
+    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+
+  return ASYNC_DATA;
+};
+
 export const CloudData = async (database) => {
   let encryptedCloudDataJson;
     let walletImage = {
       SERVICES: {},
       DECENTRALIZED_BACKUP: {},
+      ASYNC_DATA: {},
       WALLET_SETUP: {},
     };
+   // console.log("DATABASE", database);
     let CloudDataJson = {};
     if (!isEmpty(database)) {
       if (database.SERVICES)
@@ -78,6 +100,7 @@ export const CloudData = async (database) => {
         walletImage.DECENTRALIZED_BACKUP = database.DECENTRALIZED_BACKUP;
       if (database.WALLET_SETUP)
         walletImage.WALLET_SETUP = database.WALLET_SETUP;
+      walletImage.ASYNC_DATA = await asyncDataToBackup();
       let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
       CloudDataJson = {
         walletImage,

@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
+  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -49,6 +50,18 @@ import { setCloudBackupStatus } from '../../store/actions/preferences';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import { decrypt, decrypt1 } from '../../common/encryption';
+import LoaderModal from '../../components/LoaderModal';
+import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import {
+  recoverWalletUsingIcloud,
+  checkMSharesHealth,
+} from '../../store/actions/sss';
+import axios from 'axios';
+import {
+  calculateExchangeRate,
+  startupSync,
+} from '../../store/actions/accounts';
+import { initializeHealthSetup } from '../../store/actions/health';
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -57,6 +70,7 @@ interface RestoreWithICloudStateTypes {
   cloudBackup: boolean;
   hideShow: boolean;
   selectedBackup: any;
+  exchangeRates: any;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -68,6 +82,14 @@ interface RestoreWithICloudPropsTypes {
   database: any;
   setCloudBackupStatus: any;
   security: any;
+  recoverWalletUsingIcloud: any;
+  accounts: any;
+  walletImageChecked: any;
+  SERVICES: any;
+  checkMSharesHealth: any;
+  calculateExchangeRate: any;
+  startupSync: any;
+  initializeHealthSetup: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -116,17 +138,70 @@ class RestoreWithICloud extends Component<
         walletId: '',
         walletName: '',
       },
+      exchangeRates: '',
     };
   }
   // image: require('../../assets/images/icons/icon_contact.png'),
   // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     this.cloudData();
+    const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+    if (storedExchangeRates) {
+      const exchangeRates = JSON.parse(storedExchangeRates);
+      if (Date.now() - exchangeRates.lastFetched < 1800000) {
+        this.setState({ exchangeRates });
+        return;
+      } // maintaining a half an hour difference b/w fetches
+    }
+    const res = await axios.get('https://blockchain.info/ticker');
+    if (res.status == 200) {
+      const exchangeRates = res.data;
+      exchangeRates.lastFetched = Date.now();
+      this.setState({ exchangeRates });
+      await AsyncStorage.setItem(
+        'exchangeRates',
+        JSON.stringify(exchangeRates),
+      );
+    } else {
+      console.log('Failed to retrieve exchange rates', res);
+    }
   };
 
   cloudData = async () => {
     CheckCloudDataBackup((result) => this.getData(result));
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const {
+      walletImageChecked,
+      SERVICES,
+      calculateExchangeRate,
+      startupSync,
+      checkMSharesHealth,
+      initializeHealthSetup
+    } = this.props;
+    if (
+      prevProps.walletImageChecked != walletImageChecked
+    ) {
+      await AsyncStorage.setItem('walletExists', 'true');
+      await AsyncStorage.setItem('walletRecovered', 'true');
+      calculateExchangeRate();
+      initializeHealthSetup();
+      //checkMSharesHealth();
+      setTimeout(() => {
+        startupSync(); // delaying as checkMSharesHealth is also a DB inserting saga
+      }, 2000);
+    }
+
+    if (prevProps.accounts !== this.props.accounts) {
+      if (this.props.accounts.accountsSynched) {
+        (this.refs.loaderBottomSheet as any).snapTo(0);
+        this.props.navigation.navigate('Home', {
+          exchangeRates: this.state.exchangeRates,
+        });
+      }
+    }
   };
 
   getData = (result) => {
@@ -150,17 +225,26 @@ class RestoreWithICloud extends Component<
 
   restoreWallet = () => {
     const { selectedBackup } = this.state;
+    const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
-    console.log("decryptedCloudDataJson",decryptedCloudDataJson);
-  }
+    console.log('decryptedCloudDataJson', decryptedCloudDataJson);
+    (this.refs.loaderBottomSheet as any).snapTo(1);
+    recoverWalletUsingIcloud(decryptedCloudDataJson);
+  };
 
   render() {
-    const { listData, hideShow, cloudBackup, walletsArray, selectedBackup } = this.state;
+    const {
+      listData,
+      hideShow,
+      cloudBackup,
+      walletsArray,
+      selectedBackup,
+    } = this.state;
     const { navigation } = this.props;
     let name;
-            if (Platform.OS == 'ios') name = 'iCloud';
-            else name = 'GDrive';
+    if (Platform.OS == 'ios') name = 'iCloud';
+    else name = 'GDrive';
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -351,11 +435,11 @@ class RestoreWithICloud extends Component<
                   activeOpacity={10}
                   onPress={() => {
                     this.setState({ hideShow: false });
-                    this.setState({selectedBackup: value})
+                    this.setState({ selectedBackup: value });
                   }}
                   style={styles.dropDownElement}
                 >
-                 {value.data && 
+                  {value.data && (
                     <View style={styles.greyBox}>
                       <View style={styles.greyBoxImage}>
                         <MaterialCommunityIcons
@@ -364,8 +448,10 @@ class RestoreWithICloud extends Component<
                           color={Colors.blue}
                         />
                       </View>
-                      <View style={{ marginLeft: 10}}>
-                        <Text style={styles.greyBoxText}>{"Restoring Wallet from"}</Text>
+                      <View style={{ marginLeft: 10 }}>
+                        <Text style={styles.greyBoxText}>
+                          {'Restoring Wallet from'}
+                        </Text>
                         <Text
                           style={{
                             ...styles.greyBoxText,
@@ -380,10 +466,12 @@ class RestoreWithICloud extends Component<
                             fontSize: RFValue(10),
                           }}
                         >
-                          {'Last backup : ' + timeFormatter(moment(new Date()), value.dateTime)}
+                          {'Last backup : ' +
+                            timeFormatter(moment(new Date()), moment(value.dateTime).valueOf())}
                         </Text>
                       </View>
-                    </View> }
+                    </View>
+                  )}
                 </TouchableOpacity>
               );
             })}
@@ -424,8 +512,8 @@ class RestoreWithICloud extends Component<
                 onPressBack={() => {
                   (this.refs.RestoreFromICloud as any).snapTo(0);
                 }}
-                onPressCard={()=>{
-                  this.setState({hideShow: !hideShow});
+                onPressCard={() => {
+                  this.setState({ hideShow: !hideShow });
                 }}
               />
             );
@@ -516,6 +604,38 @@ class RestoreWithICloud extends Component<
             />
           )}
         />
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={'loaderBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('100%')
+              : hp('100%'),
+          ]}
+          renderContent={() => (
+            <LoaderModal
+              headerText={'Creating your wallet'}
+              messageText={
+                'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+              }
+            />
+          )}
+          renderHeader={() => (
+            <View
+              style={{
+                marginTop: 'auto',
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                height: hp('75%'),
+                zIndex: 9999,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            />
+          )}
+        />
       </View>
     );
   }
@@ -534,6 +654,8 @@ const mapStateToProps = (state) => {
     security: idx(state, (_) => _.storage.database.WALLET_SETUP.security),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
+    walletImageChecked: idx(state, (_) => _.sss.walletImageChecked),
+    SERVICES: idx(state, (_) => _.storage.database.SERVICES),
   };
 };
 
@@ -541,6 +663,11 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
     setCloudBackupStatus,
+    recoverWalletUsingIcloud,
+    calculateExchangeRate,
+    checkMSharesHealth,
+    startupSync,
+    initializeHealthSetup,
   })(RestoreWithICloud),
 );
 
@@ -561,11 +688,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
-marginTop: wp('2%'),
-marginBottom: wp('2%'),
+    marginTop: wp('2%'),
+    marginBottom: wp('2%'),
     alignSelf: 'center',
     justifyContent: 'center',
-    alignItems:'center',
+    alignItems: 'center',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
