@@ -18,7 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 export default function DonationAccountHelpContents(props) {
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
         style={{ justifyContent: 'center', alignItems: 'center' }}
         activeOpacity={10}
@@ -46,10 +46,10 @@ export default function DonationAccountHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            A Donation Account lets you collect donation for a cause or a charity. 
-            All the funds collected will show in this account 
-            It provides you with the tools you need to start collecting donations from 
-            across the world in a permission less way without incurring any middleman cost. 
+            A Donation Account lets you collect donation for a cause or a charity.
+            All the funds collected will show in this account
+            It provides you with the tools you need to start collecting donations from
+            across the world in a permission less way without incurring any middleman cost.
             Simply copy the link anywhere and start collecting donations
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -64,8 +64,8 @@ export default function DonationAccountHelpContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            It provides you with the tools you need to start collecting donations from across the world 
-            in a permission less way without incurring any middleman cost. Simply copy the link anywhere 
+            It provides you with the tools you need to start collecting donations from across the world
+            in a permission less way without incurring any middleman cost. Simply copy the link anywhere
             and start collecting donations
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
