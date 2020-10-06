@@ -122,7 +122,9 @@ const TransactionsContent = ({
               <AppBottomSheetTouchableWrapper
                 onPress={
                   () => {
-                    transactionDetailsBottomSheetRef.current?.snapTo(1);
+                    transactionDetailsBottomSheetRef.current
+                      ? transactionDetailsBottomSheetRef.current.snapTo(1)
+                      : transactionDetailsBottomSheetRef.snapTo(1);
                     setTimeout(() => {
                       setTransactionItem(item);
                       setTabBarZIndex(0);

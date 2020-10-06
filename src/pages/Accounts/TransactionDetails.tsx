@@ -38,23 +38,22 @@ export default function TransactionDetails(props) {
     return null;
   }
   const serviceType = props.serviceType ? props.serviceType : null;
-  const [description, setDescription] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      const descriptionHistory = JSON.parse(
-        await AsyncStorage.getItem('descriptionHistory'),
-      );
-      if (descriptionHistory) {
-        const descrip = descriptionHistory[txDetails.txid];
-        if (descrip) {
-          setDescription(descrip);
-        } else {
-          setDescription('');
-        }
-      }
-    })();
-  }, [txDetails]);
+  // useEffect(() => { // retiring in app notes
+  //   (async () => {
+  //     const descriptionHistory = JSON.parse(
+  //       await AsyncStorage.getItem('descriptionHistory'),
+  //     );
+  //     if (descriptionHistory) {
+  //       const descrip = descriptionHistory[txDetails.txid];
+  //       if (descrip) {
+  //         setDescription(descrip);
+  //       } else {
+  //         setDescription('');
+  //       }
+  //     }
+  //   })();
+  // }, [txDetails]);
 
   const getImageByAccountType = (accountType, primaryAccType?) => {
     if (accountType == 'FAST_BITCOINS') {
@@ -341,29 +340,6 @@ export default function TransactionDetails(props) {
             {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
           </Text>
         </View>
-        {description ? (
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Note
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {description}
-            </Text>
-          </View>
-        ) : null}
         {txDetails.message ? (
           <View style={styles.infoCardView}>
             <Text

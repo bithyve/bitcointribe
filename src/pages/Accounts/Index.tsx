@@ -1674,7 +1674,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (index) => {}
                     //this.setState({ tabBarIndex: index })
                   }
-                  TransactionDetailsBottomSheet={
+                  transactionDetailsBottomSheetRef={
                     this.refs.TransactionDetailsBottomSheet as any
                   }
                 />

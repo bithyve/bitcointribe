@@ -195,18 +195,18 @@ class SendConfirmation extends Component<
     }
   };
 
-  updateDescription = async (txid, description) => {
-    let descriptionHistory = {};
-    let storedHistory = await AsyncStorage.getItem('descriptionHistory');
+  // updateDescription = async (txid, description) => {
+  //   let descriptionHistory = {};
+  //   let storedHistory = await AsyncStorage.getItem('descriptionHistory');
 
-    if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
-    descriptionHistory[txid] = description;
+  //   if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
+  //   descriptionHistory[txid] = description;
 
-    await AsyncStorage.setItem(
-      'descriptionHistory',
-      JSON.stringify(descriptionHistory),
-    );
-  };
+  //   await AsyncStorage.setItem(
+  //     'descriptionHistory',
+  //     JSON.stringify(descriptionHistory),
+  //   );
+  // };
 
   sendNotifications = () => {
     let { WALLET_SETUP, trustedContactsService } = this.props;
@@ -267,9 +267,9 @@ class SendConfirmation extends Component<
       }
 
       this.sendNotifications();
-      if (transfer.details[0].note) {
-        this.updateDescription(transfer.txid, transfer.details[0].note);
-      }
+      // if (transfer.details[0].note) { // retired in app notes
+      //   this.updateDescription(transfer.txid, transfer.details[0].note);
+      // }
       this.storeTrustedContactsHistory(transfer.details);
       if (this.state.derivativeAccountDetails) {
         if (this.state.derivativeAccountDetails.type === DONATION_ACCOUNT)

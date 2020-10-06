@@ -34,10 +34,10 @@ export default function SettingDonationWebPageContents(props) {
   const [hideTxDetails, setHideTxDetails] = useState(
     !props.account.configuration.displayTxDetails,
   );
-
-  const [doneeName, setDoneeName] = useState('');
-  const [description, setDescription] = useState('');
-  const [cause, setCause] = useState('');
+  const [disableSave, setDisableSave] = useState(true);
+  const [doneeName, setDoneeName] = useState(props.account.donee);
+  const [description, setDescription] = useState(props.account.description);
+  const [cause, setCause] = useState(props.account.subject);
   const [isDonationPause, setIsDonationPause] = useState(
     props.account.disableAccount ? props.account.disableAccount : false,
   );
@@ -91,8 +91,34 @@ export default function SettingDonationWebPageContents(props) {
       dispatch(
         updateDonationPreferences(serviceType, accountNumber, preferences),
       );
+      setDisableSave(true);
     }
   };
+
+  useEffect(() => {
+    if (
+      (doneeName && doneeName !== props.account.donee) ||
+      (description && description !== props.account.description) ||
+      (cause && cause !== props.account.subject) ||
+      isDonationTotalEnable !== props.account.configuration.displayBalance ||
+      isDonationTransactionEnable !==
+        props.account.configuration.displayTransactions ||
+      !hideTxDetails !== props.account.configuration.displayTxDetails ||
+      isDonationPause !== props.account.disableAccount
+    ) {
+      setDisableSave(false);
+    } else {
+      setDisableSave(true);
+    }
+  }, [
+    doneeName,
+    description,
+    cause,
+    isDonationPause,
+    hideTxDetails,
+    isDonationTotalEnable,
+    isDonationTransactionEnable,
+  ]);
 
   return (
     <View style={styles.modalContentContainer}>
@@ -130,6 +156,7 @@ export default function SettingDonationWebPageContents(props) {
               </View>
             </View>
             <AppBottomSheetTouchableWrapper
+              disabled={disableSave}
               onPress={() => {
                 updatePreferences();
                 props.onPressBack();
@@ -139,7 +166,9 @@ export default function SettingDonationWebPageContents(props) {
                 width: wp('18%'),
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: disableSave
+                  ? Colors.shadowBlue
+                  : Colors.lightBlue,
                 justifyContent: 'center',
                 borderRadius: 8,
                 alignSelf: 'center',
@@ -153,15 +182,16 @@ export default function SettingDonationWebPageContents(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Done
+                Save
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
           <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+            <Text style={styles.titleTextStyle}>Donation name</Text>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={props.account.subject}
+                placeholder={'Donation name'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -174,11 +204,11 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-
+            <Text style={styles.titleTextStyle}>Donee name</Text>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={props.account.donee}
+                placeholder={'Donee name'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -191,6 +221,7 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
+            <Text style={styles.titleTextStyle}>Description</Text>
             <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
                 style={{
@@ -199,7 +230,7 @@ export default function SettingDonationWebPageContents(props) {
                   marginTop: 10,
                   marginBottom: 10,
                 }}
-                placeholder={props.account.description}
+                placeholder={'Description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
