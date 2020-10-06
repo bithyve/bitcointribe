@@ -15,6 +15,11 @@ const ListStyles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: 3,
+  },
+
+  listItemContentContainer: {
+    paddingVertical: 10,
   },
 });
 
