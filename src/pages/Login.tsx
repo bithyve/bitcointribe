@@ -333,24 +333,45 @@ export default function Login(props) {
   }
 
 
-  const startMessages = () => {
-    setInterval(() => {
-      let index = Math.floor(Math.random() * LoaderMessages.length);
-      if (index !== messageIndex) {
-        setMessageIndex(index)
-      }
-    }, 4000)
+  const startMessages = (passcode) => {
+    setTimeout(() => {
+      setMessage(LoaderMessages[0].message)
+      setSubTextMessage1(LoaderMessages[0].subTextMessage_1)
+      setSubTextMessage2(LoaderMessages[0].subTextMessage_2)
+      setTimeout(() => {
+        setMessage(LoaderMessages[1].message)
+        setSubTextMessage1(LoaderMessages[1].subTextMessage_1)
+        setSubTextMessage2(LoaderMessages[1].subTextMessage_2)
+        setTimeout(() => {
+          setMessage(LoaderMessages[2].message)
+          setSubTextMessage1(LoaderMessages[2].subTextMessage_1)
+          setSubTextMessage2(LoaderMessages[2].subTextMessage_2)
+          setTimeout(() => {
+            setMessage(LoaderMessages[3].message)
+            setSubTextMessage1(LoaderMessages[3].subTextMessage_1)
+            setSubTextMessage2(LoaderMessages[3].subTextMessage_2)
+            setTimeout(() => {
+              setMessage(LoaderMessages[4].message)
+              setSubTextMessage1(LoaderMessages[4].subTextMessage_1)
+              setSubTextMessage2(LoaderMessages[4].subTextMessage_2)
+              setTimeout(() => {
+                setMessage(LoaderMessages[5].message)
+                setSubTextMessage1(LoaderMessages[5].subTextMessage_1)
+                setSubTextMessage2(LoaderMessages[5].subTextMessage_2)
+                proceedButton(passcode)
+              }, 2000)
+            }, 2000)
+          }, 2000)
+        }, 2000)
+      }, 2000)
+    }, 2000)
   }
 
-  const renderLoaderModalContent = useCallback(() => {
-    return (
-      <LoaderModal
-        headerText={LoaderMessages[messageIndex].message}
-        messageText={LoaderMessages[messageIndex].subTextMessage_1}
-        messageText2={LoaderMessages[messageIndex].subTextMessage_2}
-      />
-    );
-  }, [messageIndex]);
+  // const renderLoaderModalContent = useCallback(() => {
+  //   return (
+
+  //   );
+  // }, [message, subTextMessage1, subTextMessage2]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -579,8 +600,7 @@ export default function Login(props) {
                     setElevation(0);
                   }, 2);
                   loaderBottomSheet.current.snapTo(1);
-                  proceedButton(passcode)
-                  startMessages()
+                  startMessages(passcode)
                 }}
                 style={{
                   ...styles.proceedButtonView,
@@ -736,7 +756,11 @@ export default function Login(props) {
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
           snapPoints={[-50, hp('100%')]}
-          renderContent={renderLoaderModalContent}
+          renderContent={() => <LoaderModal
+            headerText={message}
+            messageText={subTextMessage1}
+            messageText2={subTextMessage2}
+          />}
           renderHeader={renderLoaderModalHeader}
         />
       </View>
