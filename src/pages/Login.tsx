@@ -36,14 +36,53 @@ import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
 const LOADER_MESSAGE_TIME = 4000;
+const loaderMessages = [
+  {
+    heading: 'Non-custodial buys',
+    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
+    subText: '(*select locations)'
+  },
+  {
+    heading: 'Friends & Family',
+    text: 'Add contacts to Hexa and send sats w/o asking for address every time',
+    subText: ''
+  },
+  {
+    heading: 'Hexa Savings Account',
+    text: 'Don’t forget to set up your 2FA code on an authenticator app',
+    subText: ''
+  },
+  {
+    heading: 'Introducing Donation Accounts',
+    text: 'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
+    subText: ''
+  },
+  {
+    heading: 'Satoshis or Sats',
+    text: '1 bitcoin = 100 million satoshis or sats',
+    subText: 'Hexa uses sats to make using bitcoin easier'
+  },
+  {
+    heading: 'Hexa Test Account',
+    text: 'Test Account comes preloaded with test-sats',
+    subText: 'Best place to start if you are new to Bitcoin'
+  }
+];
+
+const getRandomMessage = () =>  {
+  const randomIndex = Math.floor((Math.random() * 6))
+  return loaderMessages[randomIndex]
+}
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Satoshis or Sats');
+  const initialMessage = getRandomMessage()
+  console.log({initialMessage})
+  let [message, setMessage] = useState(initialMessage.heading);
   let [subTextMessage1, setSubTextMessage1] = useState(
-    '1 bitcoin = 100 million satoshis or sats',
+    initialMessage.text
   );
   let [subTextMessage2, setSubTextMessage2] = useState(
-    'Hexa uses sats to make using bitcoin easier',
+    initialMessage.subText
   );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
@@ -345,47 +384,13 @@ export default function Login(props) {
 
   const handleLoaderMessages = (passcode) => {
     dispatch(credsAuth(passcode));
-    setTimeout(() => {
-      setMessage('Hexa Test Account');
-      setSubTextMessage1('Test Account comes preloaded with test-sats');
-      setSubTextMessage2('Best place to start if you are new to Bitcoin');
-      setTimeout(() => {
-        setMessage('Non-custodial buys');
-        setSubTextMessage1(
-          'Get sats directly in your wallet with FastBitcoins vouchers',
-        );
-        setSubTextMessage2('(*select locations)');
-        setTimeout(() => {
-          setMessage('Introducing Donation Accounts');
-          setSubTextMessage1(
-            'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
-          );
-          setSubTextMessage2('');
-          setTimeout(() => {
-            setMessage('Hexa Savings Account');
-            setSubTextMessage1(
-              'Don’t forget to set up your 2FA code on an authenticator app',
-            );
-            setSubTextMessage2('');
-            setTimeout(() => {
-              setMessage('Friends & Family');
-              setSubTextMessage1(
-                'Add contacts to Hexa and send sats w/o asking for address every time',
-              );
-              setSubTextMessage2('');
-              setTimeout(() => {
-                setMessage('Non-custodial buys');
-                setSubTextMessage1(
-                  'Get sats directly in your wallet with FastBitcoins vouchers',
-                );
-                setSubTextMessage2('(*select locations)');
-              }, LOADER_MESSAGE_TIME);
-            }, LOADER_MESSAGE_TIME);
-          }, LOADER_MESSAGE_TIME);
-        }, LOADER_MESSAGE_TIME);
-      }, LOADER_MESSAGE_TIME);
-    }, LOADER_MESSAGE_TIME);
-  };
+
+    setTimeout(()=>{
+      const message = getRandomMessage()
+      setMessage(message.heading);
+      setSubTextMessage1(message.text);
+      setSubTextMessage2(message.subText);
+    }, LOADER_MESSAGE_TIME)
 
   const renderLoaderModalContent = useCallback(() => {
     return (
