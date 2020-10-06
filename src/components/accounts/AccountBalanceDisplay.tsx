@@ -1,18 +1,16 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import AccountKind from '../../common/data/enums/AccountKind';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
-import { UsNumberFormat } from '../../common/utilities';
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 
 export type Props = {
   accountPayload: AccountPayload;
@@ -40,20 +38,8 @@ const AccountBalanceDisplay: React.FC<Props> = ({
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
-  const isUsingBitcoinUnits: boolean = useMemo(() => {
-    return prefersBitcoin || accountPayload.kind === AccountKind.TEST;
-  }, [prefersBitcoin, accountPayload.kind])
-
   const formattedBalanceText = useFormattedAmountText(balance);
-
-  const formattedUnitText = useMemo(() => {
-    if (isUsingBitcoinUnits) {
-      return displayNameForBitcoinUnit(accountPayload.unit);
-    } else {
-      return fiatCurrencyCode.toLocaleLowerCase();
-    }
-  }, [isUsingBitcoinUnits, accountPayload.unit]);
-
+  const formattedUnitText = useFormattedUnitText(accountPayload);
 
   const BalanceCurrencyIcon = () => {
     if (currencyImageSource) {
