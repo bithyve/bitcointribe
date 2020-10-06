@@ -40,50 +40,47 @@ const loaderMessages = [
   {
     heading: 'Non-custodial buys',
     text: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subText: '(*select locations)'
+    subText: '(*select locations)',
   },
   {
     heading: 'Friends & Family',
-    text: 'Add contacts to Hexa and send sats w/o asking for address every time',
-    subText: ''
+    text:
+      'Add contacts to Hexa and send sats w/o asking for address every time',
+    subText: '',
   },
   {
     heading: 'Hexa Savings Account',
     text: 'Don’t forget to set up your 2FA code on an authenticator app',
-    subText: ''
+    subText: '',
   },
   {
     heading: 'Introducing Donation Accounts',
-    text: 'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
-    subText: ''
+    text:
+      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
+    subText: '',
   },
   {
     heading: 'Satoshis or Sats',
     text: '1 bitcoin = 100 million satoshis or sats',
-    subText: 'Hexa uses sats to make using bitcoin easier'
+    subText: 'Hexa uses sats to make using bitcoin easier',
   },
   {
     heading: 'Hexa Test Account',
     text: 'Test Account comes preloaded with test-sats',
-    subText: 'Best place to start if you are new to Bitcoin'
-  }
+    subText: 'Best place to start if you are new to Bitcoin',
+  },
 ];
 
-const getRandomMessage = () =>  {
-  const randomIndex = Math.floor((Math.random() * 6))
-  return loaderMessages[randomIndex]
-}
+const getRandomMessage = () => {
+  const randomIndex = Math.floor(Math.random() * 6);
+  return loaderMessages[randomIndex];
+};
 
 export default function Login(props) {
-  const initialMessage = getRandomMessage()
-  console.log({initialMessage})
+  const initialMessage = getRandomMessage();
   let [message, setMessage] = useState(initialMessage.heading);
-  let [subTextMessage1, setSubTextMessage1] = useState(
-    initialMessage.text
-  );
-  let [subTextMessage2, setSubTextMessage2] = useState(
-    initialMessage.subText
-  );
+  let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
+  let [subTextMessage2, setSubTextMessage2] = useState(initialMessage.subText);
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -385,525 +382,532 @@ export default function Login(props) {
   const handleLoaderMessages = (passcode) => {
     dispatch(credsAuth(passcode));
 
-    setTimeout(()=>{
-      const message = getRandomMessage()
+    setTimeout(() => {
+      const message = getRandomMessage();
       setMessage(message.heading);
       setSubTextMessage1(message.text);
       setSubTextMessage2(message.subText);
-    }, LOADER_MESSAGE_TIME)
+    }, LOADER_MESSAGE_TIME);
 
-  const renderLoaderModalContent = useCallback(() => {
-    return (
-      <LoaderModal
-        headerText={message}
-        messageText={subTextMessage1}
-        messageText2={subTextMessage2}
-      />
-    );
-  }, [message, subTextMessage1, subTextMessage2]);
-
-  const renderLoaderModalHeader = () => {
-    return (
-      <View
-        style={{
-          marginTop: 'auto',
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('75%'),
-          zIndex: 9999,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      />
-    );
-  };
-
-  const checkPasscode = () => {
-    if (checkAuth) {
-      setTimeout(() => {
-        loaderBottomSheet.current.snapTo(0);
-      }, 2);
-
+    const renderLoaderModalContent = useCallback(() => {
       return (
-        <View style={{ marginLeft: 'auto' }}>
-          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
-        </View>
+        <LoaderModal
+          headerText={message}
+          messageText={subTextMessage1}
+          messageText2={subTextMessage2}
+        />
       );
-    }
-  };
+    }, [message, subTextMessage1, subTextMessage2]);
 
-  useEffect(() => {
-    if (authenticationFailed) {
-      setCheckAuth(true);
-      checkPasscode();
-      setPasscode('');
-    } else {
-      setCheckAuth(false);
-    }
-  }, [authenticationFailed]);
+    const renderLoaderModalHeader = () => {
+      return (
+        <View
+          style={{
+            marginTop: 'auto',
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            height: hp('75%'),
+            zIndex: 9999,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        />
+      );
+    };
 
-  const renderErrorModalContent = useCallback(() => {
+    const checkPasscode = () => {
+      if (checkAuth) {
+        setTimeout(() => {
+          loaderBottomSheet.current.snapTo(0);
+        }, 2);
+
+        return (
+          <View style={{ marginLeft: 'auto' }}>
+            <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+          </View>
+        );
+      }
+    };
+
+    useEffect(() => {
+      if (authenticationFailed) {
+        setCheckAuth(true);
+        checkPasscode();
+        setPasscode('');
+      } else {
+        setCheckAuth(false);
+      }
+    }, [authenticationFailed]);
+
+    const renderErrorModalContent = useCallback(() => {
+      return (
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={JailBrokenTitle}
+          info={JailBrokenInfo}
+          proceedButtonText={'Ok'}
+          onPressProceed={() => {
+            ErrorBottomSheet.current.snapTo(0);
+          }}
+          isBottomImage={true}
+          bottomImage={require('../assets/images/icons/errorImage.png')}
+        />
+      );
+    }, [JailBrokenTitle]);
+
+    const renderErrorModalHeader = useCallback(() => {
+      return (
+        <ModalHeader
+          onPressHeader={() => {
+            ErrorBottomSheet.current.snapTo(0);
+          }}
+        />
+      );
+    }, []);
+
     return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={JailBrokenTitle}
-        info={JailBrokenInfo}
-        proceedButtonText={'Ok'}
-        onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../assets/images/icons/errorImage.png')}
-      />
-    );
-  }, [JailBrokenTitle]);
-
-  const renderErrorModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ErrorBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  return (
-    <View style={{ flex: 1 }}>
-      <StatusBar />
       <View style={{ flex: 1 }}>
-        <View style={{}}>
-          <Text style={styles.headerTitleText}>Welcome back!</Text>
-          <View>
-            <Text style={styles.headerInfoText}>
-              Please enter your{' '}
-              <Text style={styles.boldItalicText}>passcode</Text>
-            </Text>
-            <View style={{ alignSelf: 'baseline' }}>
-              <View style={styles.passcodeTextInputView}>
-                <View
-                  style={[
-                    passcode.length == 0 && passcodeFlag == true
-                      ? styles.textBoxActive
-                      : styles.textBoxStyles,
-                  ]}
-                >
-                  <Text
+        <StatusBar />
+        <View style={{ flex: 1 }}>
+          <View style={{}}>
+            <Text style={styles.headerTitleText}>Welcome back!</Text>
+            <View>
+              <Text style={styles.headerInfoText}>
+                Please enter your{' '}
+                <Text style={styles.boldItalicText}>passcode</Text>
+              </Text>
+              <View style={{ alignSelf: 'baseline' }}>
+                <View style={styles.passcodeTextInputView}>
+                  <View
                     style={[
                       passcode.length == 0 && passcodeFlag == true
-                        ? styles.textFocused
-                        : styles.textStyles,
+                        ? styles.textBoxActive
+                        : styles.textBoxStyles,
                     ]}
                   >
-                    {passcode.length >= 1 ? (
-                      <Text
-                        style={{
-                          fontSize: RFValue(10),
-                          textAlignVertical: 'center',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <FontAwesome
-                          size={10}
-                          name={'circle'}
-                          color={Colors.black}
-                        />
-                      </Text>
-                    ) : passcode.length == 0 && passcodeFlag == true ? (
-                      <Text style={styles.passcodeTextInputText}>{'|'}</Text>
-                    ) : (
-                      ''
-                    )}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    passcode.length == 1
-                      ? styles.textBoxActive
-                      : styles.textBoxStyles,
-                  ]}
-                >
-                  <Text
+                    <Text
+                      style={[
+                        passcode.length == 0 && passcodeFlag == true
+                          ? styles.textFocused
+                          : styles.textStyles,
+                      ]}
+                    >
+                      {passcode.length >= 1 ? (
+                        <Text
+                          style={{
+                            fontSize: RFValue(10),
+                            textAlignVertical: 'center',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <FontAwesome
+                            size={10}
+                            name={'circle'}
+                            color={Colors.black}
+                          />
+                        </Text>
+                      ) : passcode.length == 0 && passcodeFlag == true ? (
+                        <Text style={styles.passcodeTextInputText}>{'|'}</Text>
+                      ) : (
+                        ''
+                      )}
+                    </Text>
+                  </View>
+                  <View
                     style={[
                       passcode.length == 1
-                        ? styles.textFocused
-                        : styles.textStyles,
+                        ? styles.textBoxActive
+                        : styles.textBoxStyles,
                     ]}
                   >
-                    {passcode.length >= 2 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
-                        <FontAwesome
-                          size={10}
-                          name={'circle'}
-                          color={Colors.black}
-                        />
-                      </Text>
-                    ) : passcode.length == 1 ? (
-                      <Text style={styles.passcodeTextInputText}>{'|'}</Text>
-                    ) : (
-                      ''
-                    )}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    passcode.length == 2
-                      ? styles.textBoxActive
-                      : styles.textBoxStyles,
-                  ]}
-                >
-                  <Text
+                    <Text
+                      style={[
+                        passcode.length == 1
+                          ? styles.textFocused
+                          : styles.textStyles,
+                      ]}
+                    >
+                      {passcode.length >= 2 ? (
+                        <Text style={{ fontSize: RFValue(10) }}>
+                          <FontAwesome
+                            size={10}
+                            name={'circle'}
+                            color={Colors.black}
+                          />
+                        </Text>
+                      ) : passcode.length == 1 ? (
+                        <Text style={styles.passcodeTextInputText}>{'|'}</Text>
+                      ) : (
+                        ''
+                      )}
+                    </Text>
+                  </View>
+                  <View
                     style={[
                       passcode.length == 2
-                        ? styles.textFocused
-                        : styles.textStyles,
+                        ? styles.textBoxActive
+                        : styles.textBoxStyles,
                     ]}
                   >
-                    {passcode.length >= 3 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
-                        <FontAwesome
-                          size={10}
-                          name={'circle'}
-                          color={Colors.black}
-                        />
-                      </Text>
-                    ) : passcode.length == 2 ? (
-                      <Text style={styles.passcodeTextInputText}>{'|'}</Text>
-                    ) : (
-                      ''
-                    )}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    passcode.length == 3
-                      ? styles.textBoxActive
-                      : styles.textBoxStyles,
-                  ]}
-                >
-                  <Text
+                    <Text
+                      style={[
+                        passcode.length == 2
+                          ? styles.textFocused
+                          : styles.textStyles,
+                      ]}
+                    >
+                      {passcode.length >= 3 ? (
+                        <Text style={{ fontSize: RFValue(10) }}>
+                          <FontAwesome
+                            size={10}
+                            name={'circle'}
+                            color={Colors.black}
+                          />
+                        </Text>
+                      ) : passcode.length == 2 ? (
+                        <Text style={styles.passcodeTextInputText}>{'|'}</Text>
+                      ) : (
+                        ''
+                      )}
+                    </Text>
+                  </View>
+                  <View
                     style={[
                       passcode.length == 3
-                        ? styles.textFocused
-                        : styles.textStyles,
+                        ? styles.textBoxActive
+                        : styles.textBoxStyles,
                     ]}
                   >
-                    {passcode.length >= 4 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
-                        <FontAwesome
-                          size={10}
-                          name={'circle'}
-                          color={Colors.black}
-                        />
-                      </Text>
-                    ) : passcode.length == 3 ? (
-                      <Text style={styles.passcodeTextInputText}>{'|'}</Text>
-                    ) : (
-                      ''
-                    )}
-                  </Text>
+                    <Text
+                      style={[
+                        passcode.length == 3
+                          ? styles.textFocused
+                          : styles.textStyles,
+                      ]}
+                    >
+                      {passcode.length >= 4 ? (
+                        <Text style={{ fontSize: RFValue(10) }}>
+                          <FontAwesome
+                            size={10}
+                            name={'circle'}
+                            color={Colors.black}
+                          />
+                        </Text>
+                      ) : passcode.length == 3 ? (
+                        <Text style={styles.passcodeTextInputText}>{'|'}</Text>
+                      ) : (
+                        ''
+                      )}
+                    </Text>
+                  </View>
                 </View>
+                {checkPasscode()}
               </View>
-              {checkPasscode()}
             </View>
+
+            {passcode.length == 4 ? (
+              <View>
+                <TouchableOpacity
+                  disabled={isDisabledProceed}
+                  onPress={() => {
+                    setCheckAuth(false);
+                    setTimeout(() => {
+                      setIsDisabledProceed(true);
+                      setElevation(0);
+                    }, 2);
+                    loaderBottomSheet.current.snapTo(1);
+                    handleLoaderMessages(passcode);
+                  }}
+                  style={{
+                    ...styles.proceedButtonView,
+                    elevation: Elevation,
+                    backgroundColor: isDisabledProceed
+                      ? Colors.lightBlue
+                      : Colors.blue,
+                  }}
+                >
+                  <Text style={styles.proceedButtonText}>Proceed</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
 
-          {passcode.length == 4 ? (
-            <View>
+          <View style={{ marginTop: 'auto' }}>
+            <View style={styles.keyPadRow}>
               <TouchableOpacity
-                disabled={isDisabledProceed}
-                onPress={() => {
-                  setCheckAuth(false);
-                  setTimeout(() => {
-                    setIsDisabledProceed(true);
-                    setElevation(0);
-                  }, 2);
-                  loaderBottomSheet.current.snapTo(1);
-                  handleLoaderMessages(passcode);
-                }}
-                style={{
-                  ...styles.proceedButtonView,
-                  elevation: Elevation,
-                  backgroundColor: isDisabledProceed
-                    ? Colors.lightBlue
-                    : Colors.blue,
-                }}
+                onPress={() => onPressNumber('1')}
+                style={styles.keyPadElementTouchable}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('1')}
+                >
+                  1
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber('2')}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('2')}
+                >
+                  2
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber('3')}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('3')}
+                >
+                  3
+                </Text>
               </TouchableOpacity>
             </View>
-          ) : null}
-        </View>
-
-        <View style={{ marginTop: 'auto' }}>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber('1')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('1')}
-              >
-                1
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('2')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('2')}
-              >
-                2
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('3')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('3')}
-              >
-                3
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber('4')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+            <View style={styles.keyPadRow}>
+              <TouchableOpacity
                 onPress={() => onPressNumber('4')}
+                style={styles.keyPadElementTouchable}
               >
-                4
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('5')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('4')}
+                >
+                  4
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber('5')}
+                style={styles.keyPadElementTouchable}
               >
-                5
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('6')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('5')}
+                >
+                  5
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber('6')}
+                style={styles.keyPadElementTouchable}
               >
-                6
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber('7')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('7')}
-              >
-                7
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('8')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('8')}
-              >
-                8
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('9')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber('9')}
-              >
-                9
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <View style={styles.keyPadElementTouchable}>
-              <Text style={{ flex: 1, padding: 15 }}></Text>
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('6')}
+                >
+                  6
+                </Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => onPressNumber('0')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+            <View style={styles.keyPadRow}>
+              <TouchableOpacity
+                onPress={() => onPressNumber('7')}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('7')}
+                >
+                  7
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber('8')}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('8')}
+                >
+                  8
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber('9')}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('9')}
+                >
+                  9
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.keyPadRow}>
+              <View style={styles.keyPadElementTouchable}>
+                <Text style={{ flex: 1, padding: 15 }}></Text>
+              </View>
+              <TouchableOpacity
                 onPress={() => onPressNumber('0')}
+                style={styles.keyPadElementTouchable}
               >
-                0
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber('x')}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('0')}
+                >
+                  0
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber('x')}
+                style={styles.keyPadElementTouchable}
               >
-                <Ionicons name="ios-backspace" size={30} color={Colors.blue} />
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber('x')}
+                >
+                  <Ionicons
+                    name="ios-backspace"
+                    size={30}
+                    color={Colors.blue}
+                  />
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          <BottomSheet
+            onCloseEnd={() => {}}
+            enabledGestureInteraction={false}
+            enabledInnerScrolling={true}
+            ref={loaderBottomSheet}
+            snapPoints={[-50, hp('100%')]}
+            renderContent={renderLoaderModalContent}
+            renderHeader={renderLoaderModalHeader}
+          />
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
-          enabledGestureInteraction={false}
+          onCloseEnd={() => {
+            setElevation(10);
+          }}
+          onOpenEnd={() => {
+            setElevation(0);
+          }}
           enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[-50, hp('100%')]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('25%')
+              : hp('30%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
         />
       </View>
-      <BottomSheet
-        onCloseEnd={() => {
-          setElevation(10);
-        }}
-        onOpenEnd={() => {
-          setElevation(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('25%') : hp('30%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
-    </View>
-  );
-}
+    );
+  };
 
-const styles = StyleSheet.create({
-  textBoxStyles: {
-    borderWidth: 0.5,
-    height: wp('13%'),
-    width: wp('13%'),
-    borderRadius: 7,
-    marginLeft: 20,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-  },
-  textBoxActive: {
-    height: wp('13%'),
-    width: wp('13%'),
-    borderRadius: 7,
-    marginLeft: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 1,
-    shadowOffset: { width: 0, height: 3 },
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-  },
-  textStyles: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textFocused: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  keyPadRow: {
-    flexDirection: 'row',
-    height: hp('8%'),
-  },
-  keyPadElementTouchable: {
-    flex: 1,
-    height: hp('8%'),
-    fontSize: RFValue(18),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyPadElementText: {
-    color: Colors.blue,
-    fontSize: RFValue(25),
-    fontFamily: Fonts.FiraSansRegular,
-    fontStyle: 'normal',
-  },
-  proceedButtonView: {
-    marginLeft: 20,
-    marginTop: hp('6%'),
-    height: wp('13%'),
-    width: wp('30%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-  },
-  proceedButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-  },
-  errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue(11),
-    fontStyle: 'italic',
-  },
-  headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(25),
-    marginLeft: 20,
-    marginTop: hp('10%'),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  headerInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12),
-    marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  passcodeTextInputText: {
-    color: Colors.blue,
-    fontWeight: 'bold',
-    fontSize: RFValue(13),
-  },
-  passcodeTextInputView: {
-    flexDirection: 'row',
-    marginTop: hp('4.5%'),
-    marginBottom: hp('1.5%'),
-    width: 'auto',
-  },
-});
+  const styles = StyleSheet.create({
+    textBoxStyles: {
+      borderWidth: 0.5,
+      height: wp('13%'),
+      width: wp('13%'),
+      borderRadius: 7,
+      marginLeft: 20,
+      borderColor: Colors.borderColor,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.white,
+    },
+    textBoxActive: {
+      height: wp('13%'),
+      width: wp('13%'),
+      borderRadius: 7,
+      marginLeft: 20,
+      elevation: 10,
+      shadowColor: Colors.borderColor,
+      shadowOpacity: 1,
+      shadowOffset: { width: 0, height: 3 },
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.white,
+    },
+    textStyles: {
+      color: Colors.black,
+      fontSize: RFValue(13),
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    textFocused: {
+      color: Colors.black,
+      fontSize: RFValue(13),
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    keyPadRow: {
+      flexDirection: 'row',
+      height: hp('8%'),
+    },
+    keyPadElementTouchable: {
+      flex: 1,
+      height: hp('8%'),
+      fontSize: RFValue(18),
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    keyPadElementText: {
+      color: Colors.blue,
+      fontSize: RFValue(25),
+      fontFamily: Fonts.FiraSansRegular,
+      fontStyle: 'normal',
+    },
+    proceedButtonView: {
+      marginLeft: 20,
+      marginTop: hp('6%'),
+      height: wp('13%'),
+      width: wp('30%'),
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 8,
+      shadowColor: Colors.shadowBlue,
+      shadowOpacity: 1,
+      shadowOffset: { width: 15, height: 15 },
+    },
+    proceedButtonText: {
+      color: Colors.white,
+      fontSize: RFValue(13),
+      fontFamily: Fonts.FiraSansMedium,
+    },
+    boldItalicText: {
+      fontFamily: Fonts.FiraSansMediumItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+    errorText: {
+      fontFamily: Fonts.FiraSansMediumItalic,
+      color: Colors.red,
+      fontSize: RFValue(11),
+      fontStyle: 'italic',
+    },
+    headerTitleText: {
+      color: Colors.blue,
+      fontSize: RFValue(25),
+      marginLeft: 20,
+      marginTop: hp('10%'),
+      fontFamily: Fonts.FiraSansRegular,
+    },
+    headerInfoText: {
+      color: Colors.textColorGrey,
+      fontSize: RFValue(12),
+      marginLeft: 20,
+      fontFamily: Fonts.FiraSansRegular,
+    },
+    passcodeTextInputText: {
+      color: Colors.blue,
+      fontWeight: 'bold',
+      fontSize: RFValue(13),
+    },
+    passcodeTextInputView: {
+      flexDirection: 'row',
+      marginTop: hp('4.5%'),
+      marginBottom: hp('1.5%'),
+      width: 'auto',
+    },
+  });
+}
