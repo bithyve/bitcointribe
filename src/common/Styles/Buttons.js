@@ -10,6 +10,8 @@ const actionButton = {
   minWidth: 144,
   justifyContent: 'center',
   alignItems: 'center',
+  paddingHorizontal: 20,
+  paddingVertical: 16
 };
 
 
@@ -19,9 +21,9 @@ const ButtonStyles = StyleSheet.create({
   primaryActionButton: {
     ...actionButton,
     backgroundColor: Colors.blue,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowColor: Colors.blue,
+    shadowOpacity: 0.16,
+    shadowOffset: { width: 10, height: 10 },
     elevation: 5,
   },
 

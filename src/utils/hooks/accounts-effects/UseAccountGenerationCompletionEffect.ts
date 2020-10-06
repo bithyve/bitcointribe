@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { newAccountAddCompleted } from "../../store/actions/accounts";
+import { newAccountAddCompleted } from "../../../store/actions/accounts";
 
 
 export default function useAccountGenerationCompletionEffect(onComplete: () => void) {
