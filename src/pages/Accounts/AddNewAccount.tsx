@@ -138,6 +138,7 @@ class AddNewAccount extends PureComponent<
     const configuration = {
       displayBalance: true,
       displayTransactions: true,
+      displayTxDetails: true,
     };
     this.props.setupDonationAccount(
       serviceType,
@@ -217,9 +218,8 @@ class AddNewAccount extends PureComponent<
 
   renderAccountDetailModalContent = () => {
     return (
-      
-        <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-          <ScrollView style={{ height: '100%' }}>
+      <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+        <ScrollView style={{ height: '100%' }}>
           <View style={{ height: '100%', marginHorizontal: wp('8%') }}>
             <View style={styles.successModalHeaderView}>
               <Text
@@ -257,12 +257,14 @@ class AddNewAccount extends PureComponent<
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={{...styles.modalTextBoxView, height: wp('20%'),}}>
+            <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
-                style={{...styles.textBox,
+                style={{
+                  ...styles.textBox,
                   paddingRight: 20,
                   marginTop: 10,
-                  marginBottom: 10,}}
+                  marginBottom: 10,
+                }}
                 multiline={true}
                 numberOfLines={4}
                 placeholder={'Enter a description'}
@@ -310,7 +312,11 @@ class AddNewAccount extends PureComponent<
               <Text style={styles.modalInfoText}>
                 By clicking proceed you agree to our{' '}
                 <Text
-                  onPress={()=>{this.openLink('https://hexawallet.io/donor-terms-conditions/')}}
+                  onPress={() => {
+                    this.openLink(
+                      'https://hexawallet.io/donor-terms-conditions/',
+                    );
+                  }}
                   style={{
                     fontFamily: Fonts.FiraSansItalic,
                     color: Colors.blue,
@@ -351,8 +357,8 @@ class AddNewAccount extends PureComponent<
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
-          </ScrollView>
-        </View>
+        </ScrollView>
+      </View>
     );
   };
 
@@ -377,7 +383,7 @@ class AddNewAccount extends PureComponent<
               onPress={() => {
                 navigation.goBack();
               }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{
                 height: 30,
                 width: 30,
@@ -441,7 +447,8 @@ class AddNewAccount extends PureComponent<
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             renderItem={(Items) => {
-              const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
+              const checked =
+                Items.item.id === this.state.selectedAccount.id ? true : false;
               return (
                 <AccountsListSend
                   fromAddNewAccount={true}

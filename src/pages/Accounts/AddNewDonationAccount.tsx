@@ -120,7 +120,10 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
-      this.props.navigation.navigate('Accounts', {serviceType, index: this.props.cardData.length - 1,});
+      this.props.navigation.navigate('Accounts', {
+        serviceType,
+        index: this.props.cardData.length - 1,
+      });
     }
 
     this.onSelectContact(this.item);
@@ -148,6 +151,7 @@ class AddNewAccount extends PureComponent<
     const configuration = {
       displayBalance: true,
       displayTransactions: true,
+      displayTxDetails: true,
     };
     this.props.setupDonationAccount(
       serviceType,
@@ -156,7 +160,6 @@ class AddNewAccount extends PureComponent<
       modelDescription,
       configuration,
     );
-
   };
 
   onSelectContact = (item) => {
@@ -237,43 +240,41 @@ class AddNewAccount extends PureComponent<
 
         <View style={{ ...styles.modalContentContainer, height: '100%' }}>
           <ScrollView style={{ height: '100%' }}>
-            
-              <View style={styles.modalHeaderTitleView}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.goBack();
-                    }}
-                    hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-                    style={{
-                      height: 30,
-                      width: 30,
-                      justifyContent: 'center',
-                      marginLeft: wp('1%')
-                    }}
-                  >
-                    <FontAwesome
-                      name="long-arrow-left"
-                      color={Colors.blue}
-                      size={17}
-                    />
-                  </TouchableOpacity>
-                  <View style={{ marginLeft: wp('2.5%'), marginRight: wp('2%') }}>
-                    <Text style={styles.modalHeaderTitleText}>
-                      Enter details for Donation Account
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
-                        fontSize: RFValue(12),
-                      }}
-                    >
-                      Some of these details can be displayed on the Donation web
-                      view
-                    </Text>
-                  </View>
+            <View style={styles.modalHeaderTitleView}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
+                style={{
+                  height: 30,
+                  width: 30,
+                  justifyContent: 'center',
+                  marginLeft: wp('1%'),
+                }}
+              >
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>
+              <View style={{ marginLeft: wp('2.5%'), marginRight: wp('2%') }}>
+                <Text style={styles.modalHeaderTitleText}>
+                  Donation Details
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                  }}
+                >
+                  These will be used on the Donation web view
+                </Text>
               </View>
-              <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
+            </View>
+            <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
               <View style={styles.modalTextBoxView}>
                 <TextInput
                   style={styles.textBox}

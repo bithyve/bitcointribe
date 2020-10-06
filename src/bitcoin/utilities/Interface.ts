@@ -155,6 +155,7 @@ export interface DonationDerivativeAccountElements
   configuration: {
     displayBalance: boolean;
     displayTransactions: boolean;
+    displayTxDetails: boolean;
   };
   disableAccount: boolean;
 }

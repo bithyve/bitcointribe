@@ -405,13 +405,19 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           break;
 
         case 'paymentURI':
-          let address, options;
+          let address, options, donationId;
           try {
             const res = service[serviceType].service.decodePaymentURI(
               recipientAddress.trim(),
             );
             address = res.address;
             options = res.options;
+
+            // checking for donationId to send note
+            if (options && options.message) {
+              const rawMessage = options.message;
+              donationId = rawMessage.split(':').pop().trim();
+            }
           } catch (err) {
             Alert.alert('Unable to decode payment URI');
             return;
@@ -434,6 +440,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             bitcoinAmount: options.amount
               ? `${Math.round(options.amount * 1e8)}`
               : '',
+            donationId,
           });
           break;
       }
@@ -475,13 +482,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
               // checking for donationId to send note
               if (options && options.message) {
-                try {
-                  // encoded message
-                  const rawMessage = JSON.parse(options.message);
-                  donationId = rawMessage.donationId;
-                } catch (err) {
-                  // normal message
-                }
+                const rawMessage = options.message;
+                donationId = rawMessage.split(':').pop().trim();
               }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
@@ -769,7 +771,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         this.props.navigation.goBack();
                       }}
                       style={styles.backButton}
-                      hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                      hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
                     >
                       <FontAwesome
                         name="long-arrow-left"
