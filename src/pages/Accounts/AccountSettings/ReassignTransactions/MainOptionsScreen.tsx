@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { Avatar, ListItem } from 'react-native-elements';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
-import useActiveAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
-import ListStyles from '../../../common/Styles/Lists';
+import ListStyles from '../../../../common/Styles/Lists';
 
 export type Props = {
   navigation: any;
@@ -21,13 +19,13 @@ const listItems: OptionsListItem[] = [
     title: 'Transactions',
     subtitle: `Reassign any of your incoming and outgoing transactions`,
     screenName: 'ReassignAllTransactionsSelectTransactions',
-    imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
+    imageSource: require('../../../../assets/images/icons/icon_transactions_circle.png'),
   },
   {
     title: 'Sources',
     subtitle: 'Reassign the entire transaction set of a source',
     screenName: 'ReassignAllTransactionsSelectSources',
-    imageSource: require('../../../assets/images/icons/icon_sources.png'),
+    imageSource: require('../../../../assets/images/icons/icon_sources.png'),
   },
 ];
 
@@ -40,8 +38,6 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
   const accountID = useMemo(() => {
     return navigation.getParam('accountID');
   }, [navigation]);
-
-  const accountPayload: AccountPayload | undefined = useActiveAccountPayload(accountID);
 
   function handleListItemPressed(listItem: OptionsListItem) {
     navigation.navigate(listItem.screenName, {

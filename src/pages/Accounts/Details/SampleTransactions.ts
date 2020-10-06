@@ -27,7 +27,7 @@ const sampleTransactions: TransactionInfo[] = [
     transactionKind: TransactionKind.SEND,
     fee: 2,
     timestamp: Date.now(),
-    amount: 0.081,
+    amount: 3081,
     message: 'Buy Coffee',
     xPubAccountID: 'R-1',
     xPubAccountKind: AccountKind.REGULAR,
