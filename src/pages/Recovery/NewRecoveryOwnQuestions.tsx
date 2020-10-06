@@ -63,7 +63,8 @@ export default function NewRecoveryOwnQuestions(props) {
     (async () => {
       if (insertedIntoDB) {
         await AsyncStorage.setItem('recoveryExists', 'true');
-        props.navigation.navigate('RestoreSelectedContactsList');
+        props.navigation.navigate('RestoreWithICloud');
+        // props.navigation.navigate('RestoreSelectedContactsList');
       }
     })();
   }, [insertedIntoDB]);

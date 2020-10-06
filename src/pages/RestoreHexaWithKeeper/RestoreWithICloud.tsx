@@ -62,6 +62,7 @@ import {
   startupSync,
 } from '../../store/actions/accounts';
 import { initializeHealthSetup } from '../../store/actions/health';
+import ErrorModalContents from '../../components/ErrorModalContents';
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -233,8 +234,12 @@ class RestoreWithICloud extends Component<
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     console.log('decryptedCloudDataJson', decryptedCloudDataJson);
+    if(decryptedCloudDataJson){
     (this.refs.loaderBottomSheet as any).snapTo(1);
     recoverWalletUsingIcloud(decryptedCloudDataJson);
+   } else{
+    (this.refs.ErrorBottomSheet as any).snapTo(1);
+   }
   };
 
   render() {
@@ -640,6 +645,36 @@ class RestoreWithICloud extends Component<
             />
           )}
         />
+
+<BottomSheet
+        enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
+        ref={'ErrorBottomSheet'}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={()=>(
+          <ErrorModalContents
+            modalRef={this.refs.ErrorBottomSheet}
+            title={"Error receiving Recovery Key"}
+            info={'There was an error while receiving your Recovery Key, please try again'}
+            proceedButtonText={'Try again'}
+            onPressProceed={() => {
+              (this.refs.ErrorBottomSheet as any).snapTo(0);
+            }}
+            isBottomImage={true}
+            bottomImage={require('../../assets/images/icons/errorImage.png')}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+          // onPressHeader={() => {
+          //   (this.refs.ErrorBottomSheet as any).snapTo(0);
+          // }}
+          />
+        )}
+      />
       </View>
     );
   }
