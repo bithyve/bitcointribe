@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects';
-import { createWatcher, serviceGenerator } from '../utils/utilities';
+import { createWatcher, serviceGenerator2 } from '../utils/utilities';
 import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as Cipher from '../../common/encryption';
@@ -33,7 +33,7 @@ function* initSetupWorker({ payload }) {
     secureAcc,
     s3Service,
     trustedContacts,
-  } = yield call(serviceGenerator, security.answer);
+  } = yield call(serviceGenerator2, security.answer);
 
   const initialDatabase: Database = {
     WALLET_SETUP: { walletName, security },

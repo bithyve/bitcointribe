@@ -11,21 +11,19 @@ const initialState: {
   };
   levelHealth: {
     levelInfo: {
-      keeperType: string;
-      type: string;
-      lastUpdated: string;
-      created: string;
+      shareType: string;
+      updatedAt: string;
       status: string;
       shareId: string;
-      reshareVersion: number;
-      guardian: string;
+      reshareVersion?: number;
+      guardian?: string;
     };
   }[];
 } = {
   loading: {
     levelHealthCheck: false,
   },
-  levelHealth: null,
+  levelHealth: [],
 };
 
 export default (state = initialState, action) => {

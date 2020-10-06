@@ -32,39 +32,6 @@ import { insertDBWorker } from './storage';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
 import {generateRandomString} from '../../common/CommonFunctions/index';
 
-function* initHealthData() {
-  // Call HEALTH_CHECK_INITIALIZE action
-  yield put(healthInitialize());
-  let randomIdForSecurityQ = generateRandomString(8); 
-  let randomIdForCloud = generateRandomString(8); 
-  // Update Reducer
-  let healthArray = [
-    {
-        "shareType": "cloud",
-        "updatedAt": 0,
-        "status": "notAccessible",
-        "shareId": randomIdForCloud,
-        "reshareVersion": 0
-    },
-    {
-        "shareType": "securityQuestion",
-        "updatedAt": 0,
-        "status": "accessible",
-        "shareId": randomIdForSecurityQ,
-        "reshareVersion": 0 
-    }
-  ];
-  // Call API sharesHealthCheckInit2()
-  yield put(updateHealth(healthArray));
-  // Call HEALTH_CHECK_INITIALIZED action
-  yield put(healthInitialized());
-}
-
-export const initHealthDataWatcher = createWatcher(
-  initHealthData,
-  INIT_HEALTH_SETUP,
-);
-
 function* updateHealthToRelay() {
   let healthArray = [
   {
@@ -90,17 +57,20 @@ export const updateHealthToRelayWatcher = createWatcher(
 );
 
 
-function* initHCWorker() {
+function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
   const initialized = s3Service.levelhealth.healthCheckInitialized;
   if (initialized) return;
 
   yield put(switchS3Loader('initHC'));
-  if (!s3Service.levelhealth.metaShares.length) {
-    s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
-  }
+  // Call this at level 2
+  // if (!s3Service.levelhealth.metaShares.length) {
+  //   s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
+  // }
   const res = yield call(s3Service.initializeHealth);
+  console.log('res initializeHealth', res)
   if (res.status === 200) {
+    yield put(updateHealth(res.data.levelInfo));
     yield put(healthCheckInitialized());
 
     // walletID globalization (in-app)
@@ -123,7 +93,7 @@ function* initHCWorker() {
   }
 }
 
-export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
+export const initHealthWatcher = createWatcher(initHealthWorker, INIT_HEALTH_SETUP);
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
