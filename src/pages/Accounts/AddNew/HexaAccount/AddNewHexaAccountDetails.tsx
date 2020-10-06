@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import AccountPayload from '../../../../common/data/models/AccountPayload/AccountPayload';
 import NavigationHeader from '../NavigationHeader';
 import FormStyles from '../../../../common/Styles/Forms';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccount } from '../../../../store/actions/accounts';
-import useAccountGenerationCompletionEffect from '../../../../utils/hooks/UseAccountGenerationCompletionEffect';
+import useAccountGenerationCompletionEffect from '../../../../utils/hooks/accounts-effects/UseAccountGenerationCompletionEffect';
 import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
+import AccountPayload from '../../../../common/data/models/AccountPayload/Interfaces';
 
 export interface Props {
   navigation: any;
