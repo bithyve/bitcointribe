@@ -177,24 +177,28 @@ class AddNewAccount extends PureComponent<
         instanceCount += derivativeAccounts[dervAccount].instance.using;
     }
 
-    const accountName = `${
-      item.type === DONATION_ACCOUNT
-        ? 'Donation Account'
-        : item.type === REGULAR_ACCOUNT
-        ? 'Checking Account'
-        : 'Savings Account'
-    } ${
-      item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
-    }`;
+    // const accountName = `${
+    //   item.type === DONATION_ACCOUNT
+    //     ? this.state.accountName//'Donation Account'
+    //     : item.type === REGULAR_ACCOUNT
+    //     ? 'Checking Account'
+    //     : 'Savings Account'
+    // } ${
+    //   item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
+    // }`;
     this.setState({
       selectedAccount: item,
-      accountName,
+      //accountName,
       isValid: false,
     });
   };
 
   handleOnTextChange = (name, text) => {
-    if (name === 'modelTitle') {
+    if (name === 'donationAccountName') {
+      this.setState({
+        accountName: text,
+      });
+    } else if (name === 'modelTitle') {
       this.setState({
         modelTitle: text,
       });
@@ -275,6 +279,24 @@ class AddNewAccount extends PureComponent<
               </View>
             </View>
             <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
+
+            <View style={styles.modalTextBoxView}>
+                <TextInput
+                  style={styles.textBox}
+                  placeholder={'Enter donation account name'}
+                  keyboardType={
+                    Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                  }
+                  value={this.state.accountName}
+                  onChangeText={(text) => {
+                    this.handleOnTextChange('donationAccountName', text);
+                  }}
+                  placeholderTextColor={Colors.borderColor}
+                  returnKeyType="done"
+                  returnKeyLabel="Done"
+                />
+              </View>
+
               <View style={styles.modalTextBoxView}>
                 <TextInput
                   style={styles.textBox}
