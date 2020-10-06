@@ -20,31 +20,31 @@ const listItems: SettingsListItem[] = [
   {
     title: 'Name & Description',
     subtitle: `Customize display properties`,
-    screenName: 'AccountSettingsNameAndDescription',
+    screenName: 'AccountSettingsDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_checking_blue.png'),
   },
   {
     title: 'Reassign Transactions',
     subtitle: 'Map from this account to another',
-    screenName: 'AccountSettingsNameAndDescription',
+    screenName: 'AccountSettingsDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
   },
   {
     title: 'Account Visibility',
     subtitle: `Configure for different privacy-sensitive contexts`,
-    screenName: 'AccountSettingsNameAndDescription',
+    screenName: 'AccountSettingsDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
   },
   {
     title: 'Merge Account',
     subtitle: `Move all transactions to another Hexa account`,
-    screenName: 'AccountSettingsNameAndDescription',
+    screenName: 'AccountSettingsDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
   },
   {
     title: 'Archive Account',
     subtitle: 'Move this account out of sight and out of mind',
-    screenName: 'AccountSettingsNameAndDescription',
+    screenName: 'AccountSettingsDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_archive.png'),
   },
 ];

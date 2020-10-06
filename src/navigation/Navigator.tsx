@@ -82,6 +82,7 @@ import { MoreOptionsStack } from './stacks/MoreOptions';
 import AccountDetailsContainer from '../pages/Accounts/Details/AccountDetailsContainer';
 import TransactionsListScreen from '../pages/Accounts/Transactions/TransactionsListScreenContainer';
 import AccountSettingsMainScreen from '../pages/Accounts/AccountSettings/AccountSettingsMainScreen';
+import AccountSettingsDisplayPropertiesScreen from '../pages/Accounts/AccountSettings/AccountSettingsDisplayPropertiesScreen';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -175,6 +176,12 @@ const AccountDetailsStack = createStackNavigator(
       screen: AccountSettingsMainScreen,
       navigationOptions: {
         title: "Account Settings",
+      },
+    },
+    AccountSettingsDisplayProperties: {
+      screen: AccountSettingsDisplayPropertiesScreen,
+      navigationOptions: {
+        title: "Name & Description",
       },
     },
   },
