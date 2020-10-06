@@ -2,12 +2,12 @@ import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
 import AccountDetailsContainerScreen from '../../../pages/Accounts/Details/AccountDetailsContainer';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import SendStack from '../send/SendStack';
 import TransactionsListScreen from '../../../pages/Accounts/Transactions/TransactionsListScreenContainer';
 import TransactionDetailsScreen from '../../../pages/Accounts/Transactions/TransactionDetailsScreenContainer';
 import AccountSettingsMainScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-
+import AccountSettingsDisplayPropertiesScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsDisplayPropertiesScreen';
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -39,6 +39,12 @@ const AccountDetailsStack = createStackNavigator(
       // navigationOptions: AccountSettings.navigationOptions,
       navigationOptions: {
         title: "Account Settings",
+      },
+    },
+    AccountSettingsDisplayProperties: {
+      screen: AccountSettingsDisplayPropertiesScreen,
+      navigationOptions: {
+        title: "Name & Description",
       },
     },
   },
