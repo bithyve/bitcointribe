@@ -35,16 +35,54 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
+const LOADER_MESSAGE_TIME = 4000;
+const loaderMessages = [
+  {
+    heading: 'Non-custodial buys',
+    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
+    subText: '(*select locations)'
+  },
+  {
+    heading: 'Friends & Family',
+    text: 'Add contacts to Hexa and send sats w/o asking for address every time',
+    subText: ''
+  },
+  {
+    heading: 'Hexa Savings Account',
+    text: 'Don’t forget to set up your 2FA code on an authenticator app',
+    subText: ''
+  },
+  {
+    heading: 'Introducing Donation Accounts',
+    text: 'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
+    subText: ''
+  },
+  {
+    heading: 'Satoshis or Sats',
+    text: '1 bitcoin = 100 million satoshis or sats',
+    subText: 'Hexa uses sats to make using bitcoin easier'
+  },
+  {
+    heading: 'Hexa Test Account',
+    text: 'Test Account comes preloaded with test-sats',
+    subText: 'Best place to start if you are new to Bitcoin'
+  }
+];
 
-const LOADER_MESSAGE_TIME = 4000
+const getRandomMessage = () =>  {
+  const randomIndex = Math.floor((Math.random() * 6))
+  return loaderMessages[randomIndex]
+}
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Satoshis or Sats');
+  const initialMessage = getRandomMessage()
+  console.log({initialMessage})
+  let [message, setMessage] = useState(initialMessage.heading);
   let [subTextMessage1, setSubTextMessage1] = useState(
-    '1 bitcoin = 100 million satoshis or sats',
+    initialMessage.text
   );
   let [subTextMessage2, setSubTextMessage2] = useState(
-    'Hexa uses sats to make using bitcoin easier',
+    initialMessage.subText
   );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
@@ -204,8 +242,9 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
-
-  useEffect(() => { AsyncStorage.removeItem("lastSeen") }, [])
+  useEffect(() => {
+    AsyncStorage.removeItem('lastSeen');
+  }, []);
 
   const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
@@ -308,14 +347,16 @@ export default function Login(props) {
     'trustedContactRequest',
   );
   const userKey = props.navigation.getParam('userKey');
-  const isMigrated = useSelector(state => state.preferences.isMigrated)
-  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
+  const isMigrated = useSelector((state) => state.preferences.isMigrated);
+  const accountsSynched = useSelector(
+    (state) => state.accounts.accountsSynched,
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
       // migrate async keys
       if (!isMigrated) {
-        dispatch(initMigration())
+        dispatch(initMigration());
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
@@ -334,69 +375,22 @@ export default function Login(props) {
             dispatch(calculateExchangeRate());
             dispatch(startupSync());
           }
-        } else { props.navigation.replace('RestoreAndRecoverWallet') };
+        } else {
+          props.navigation.replace('RestoreAndRecoverWallet');
+        }
       });
     }
   }, [isAuthenticated, dbFetched]);
 
-
   const handleLoaderMessages = (passcode) => {
-    setTimeout(() => {
-      setMessage('Hexa Test Account');
-      setSubTextMessage1(
-        'Test Account comes preloaded with test-sats',
-      );
-      setSubTextMessage2(
-        'Best place to start if you are new to Bitcoin',
-      );
-      setTimeout(() => {
-        setMessage('Satoshis or Sats');
-        setSubTextMessage1(
-          '1 bitcoin = 100 million satoshis or sats',
-        );
-        setSubTextMessage2(
-          '',
-        );
-        setTimeout(() => {
-          setMessage('Introducing Donation Accounts');
-          setSubTextMessage1(
-            'Start receiving donations directly in your Hexa Wallet',
-          );
-          setSubTextMessage2(
-            'from anywhere in the world',
-          );
-          setTimeout(() => {
-            setMessage('Hexa Savings Account');
-            setSubTextMessage1(
-              'Don’t forget to set up your 2FA code on an authenticator app',
-            );
-            setSubTextMessage2(
-              'from anywhere in the world',
-            );
-            dispatch(credsAuth(passcode))
-            setTimeout(() => {
-              setMessage('Friends & Family');
-              setSubTextMessage1(
-                'Add contacts to Hexa and send sats w/o asking for address every time',
-              );
-              setSubTextMessage2(
-                '',
-              );
-              setTimeout(() => {
-                setMessage('Non-custodial buys');
-                setSubTextMessage1(
-                  'Get sats directly in your wallet with FastBitcoins vouchers',
-                );
-                setSubTextMessage2(
-                  '(*select locations)',
-                );
-              }, LOADER_MESSAGE_TIME)
-            }, LOADER_MESSAGE_TIME)
-          }, LOADER_MESSAGE_TIME)
-        }, LOADER_MESSAGE_TIME)
-      }, LOADER_MESSAGE_TIME)
-    }, LOADER_MESSAGE_TIME);
-  }
+    dispatch(credsAuth(passcode));
+
+    setTimeout(()=>{
+      const message = getRandomMessage()
+      setMessage(message.heading);
+      setSubTextMessage1(message.text);
+      setSubTextMessage2(message.subText);
+    }, LOADER_MESSAGE_TIME)
 
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -519,8 +513,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -548,8 +542,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -577,8 +571,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -606,8 +600,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -626,7 +620,7 @@ export default function Login(props) {
                     setElevation(0);
                   }, 2);
                   loaderBottomSheet.current.snapTo(1);
-                  handleLoaderMessages(passcode)
+                  handleLoaderMessages(passcode);
                 }}
                 style={{
                   ...styles.proceedButtonView,
@@ -777,7 +771,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
@@ -802,7 +796,7 @@ export default function Login(props) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       />
-    </View >
+    </View>
   );
 }
 

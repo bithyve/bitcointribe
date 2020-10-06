@@ -187,11 +187,11 @@ export default function SettingDonationWebPageContents(props) {
             </AppBottomSheetTouchableWrapper>
           </View>
           <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-            <Text style={styles.titleTextStyle}>Donation name</Text>
+            <Text style={styles.titleTextStyle}>Name for the donation</Text>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Donation name'}
+                placeholder={'Name for the donation'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -204,11 +204,11 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <Text style={styles.titleTextStyle}>Donee name</Text>
+            <Text style={styles.titleTextStyle}>Organised by</Text>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Donee name'}
+                placeholder={'Organised by'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -221,7 +221,7 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <Text style={styles.titleTextStyle}>Description</Text>
+            <Text style={styles.titleTextStyle}>Donation cause or description</Text>
             <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
                 style={{
@@ -230,7 +230,7 @@ export default function SettingDonationWebPageContents(props) {
                   marginTop: 10,
                   marginBottom: 10,
                 }}
-                placeholder={'Description'}
+                placeholder={'Donation cause or description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
