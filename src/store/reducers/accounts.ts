@@ -25,6 +25,9 @@ import {
   NEW_ACCOUNT_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
   ADD_NEW_ACCOUNT_COMPLETED,
+  ACCOUNT_SETTINGS_UPDATED,
+  ACCOUNT_SETTINGS_UPDATE_FAILED,
+  ACCOUNT_SETTINGS_UPDATE_COMPLETED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -35,8 +38,6 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
-import { stat } from 'react-native-fs';
 import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import { TestAccountPayload, SavingsAccountPayload, CheckingAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
 
@@ -104,8 +105,8 @@ const ACCOUNT_VARS: {
 };
 
 export type AccountsState = {
-  servicesEnriched: Boolean;
-  accountsSynched: Boolean;
+  servicesEnriched: boolean;
+  accountsSynched: boolean;
   exchangeRates?: any;
   activeAccounts: AccountPayload[];
   archivedAccounts: AccountPayload[];
@@ -124,9 +125,13 @@ export type AccountsState = {
     secure?: any;
   };
 
-  isGeneratingNewAccount: Boolean;
-  hasNewAccountGenerationSucceeded: Boolean;
-  hasNewAccountGenerationFailed: Boolean;
+  isGeneratingNewAccount: boolean;
+  hasNewAccountGenerationSucceeded: boolean;
+  hasNewAccountGenerationFailed: boolean;
+
+  isUpdatingAccountSettings: boolean;
+  hasAccountSettingsUpdateSucceeded: boolean;
+  hasAccountSettingsUpdateFailed: boolean;
 }
 
 const initialState: AccountsState = {
@@ -136,15 +141,20 @@ const initialState: AccountsState = {
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
-  isGeneratingNewAccount: false,
-  hasNewAccountGenerationSucceeded: false,
-  hasNewAccountGenerationFailed: false,
   activeAccounts: [
     new TestAccountPayload(),
     new SavingsAccountPayload(),
     new CheckingAccountPayload(),
   ],
   archivedAccounts: [],
+
+  isGeneratingNewAccount: false,
+  hasNewAccountGenerationSucceeded: false,
+  hasNewAccountGenerationFailed: false,
+
+  isUpdatingAccountSettings: false,
+  hasAccountSettingsUpdateSucceeded: false,
+  hasAccountSettingsUpdateFailed: false,
 };
 
 export default (state: AccountsState = initialState, action): AccountsState => {
@@ -546,6 +556,31 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         isGeneratingNewAccount: false,
         hasNewAccountGenerationSucceeded: false,
         hasNewAccountGenerationFailed: false,
+      };
+
+    case ACCOUNT_SETTINGS_UPDATED:
+      // TODO: Implement Logic for updating the list of account payloads
+      return {
+        ...state,
+        isUpdatingAccountSettings: false,
+        hasAccountSettingsUpdateSucceeded: true,
+        hasAccountSettingsUpdateFailed: false,
+      };
+
+    case ACCOUNT_SETTINGS_UPDATE_FAILED:
+      return {
+        ...state,
+        isUpdatingAccountSettings: false,
+        hasAccountSettingsUpdateSucceeded: false,
+        hasAccountSettingsUpdateFailed: true,
+      };
+
+    case ACCOUNT_SETTINGS_UPDATE_COMPLETED:
+      return {
+        ...state,
+        isUpdatingAccountSettings: false,
+        hasAccountSettingsUpdateSucceeded: false,
+        hasAccountSettingsUpdateFailed: false,
       };
 
     default:

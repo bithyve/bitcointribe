@@ -34,6 +34,8 @@ export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
 export const ADD_NEW_ACCOUNT_COMPLETED = 'ADD_NEW_ACCOUNT_COMPLETED';
+export const UPDATE_ACCOUNT_SETTINGS = 'UPDATE_ACCOUNT_SETTINGS';
+export const ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'ACCOUNT_SETTINGS_UPDATE_COMPLETED';
 
 
 export const fetchBalance = (
@@ -297,15 +299,30 @@ export const addNewAccount = (payload: AccountPayload): AddNewAccountAction => {
     payload,
   }
 }
-
-
 export interface AddNewAccountCompletionAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_COMPLETED;
 };
 
-
 export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
   return { type: ADD_NEW_ACCOUNT_COMPLETED };
+};
+
+export interface UpdateAccountSettingsAction extends Action {
+  type: typeof UPDATE_ACCOUNT_SETTINGS;
+  payload: AccountPayload;
+};
+
+export const updateAccountSettings = (payload: AccountPayload): UpdateAccountSettingsAction => {
+  return { type: UPDATE_ACCOUNT_SETTINGS, payload };
+};
+
+export interface UpdateAccountSettingsCompletionAction extends Action {
+  type: typeof ACCOUNT_SETTINGS_UPDATE_COMPLETED;
+};
+
+
+export const accountSettingsUpdateCompleted = (): UpdateAccountSettingsCompletionAction => {
+  return { type: ACCOUNT_SETTINGS_UPDATE_COMPLETED };
 };
 
 
@@ -330,6 +347,8 @@ export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
 export const NEW_ACCOUNT_ADDED = 'NEW_ACCOUNT_ADDED';
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
+export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
+export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -417,4 +436,21 @@ export const newAccountAddFailed = (
 
 export const newAccountAdded = ({ account }: { account: AccountPayload }) => {
   return { type: NEW_ACCOUNT_ADDED, payload: account };
+};
+
+
+
+export const accountSettingsUpdateFailed = (
+  {
+    account,
+    error
+  }: {
+    account: AccountPayload,
+    error: Error
+  }) => {
+  return { type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: { account, error } };
+}
+
+export const accountSettingsUpdated = ({ account }: { account: AccountPayload }) => {
+  return { type: ACCOUNT_SETTINGS_UPDATED, payload: account };
 };
