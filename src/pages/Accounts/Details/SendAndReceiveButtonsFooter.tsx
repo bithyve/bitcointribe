@@ -8,7 +8,7 @@ type FooterButtonProps = {
   style?: Record<string, unknown>;
   title: string;
   subtitle: string;
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
   onPress: () => void;
 }
 

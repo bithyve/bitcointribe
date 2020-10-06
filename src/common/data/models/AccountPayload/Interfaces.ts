@@ -52,7 +52,7 @@ interface BaseAccountPayload {
 
   visibility: AccountVisibility;
 
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
 
   transactionIDs: string[];
 }

@@ -65,6 +65,7 @@ import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectio
 import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
 
+
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -128,7 +129,6 @@ const AddNewAccountStack = createStackNavigator(
     initialRouteName: 'AccountSelectionList',
   },
 );
-
 
 const HomeNavigator = createStackNavigator(
   {
