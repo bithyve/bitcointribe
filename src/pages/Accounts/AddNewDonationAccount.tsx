@@ -48,7 +48,7 @@ interface AddNewAccountStateTypes {
   accountName: string;
   isValid: boolean;
   modelDescription: string;
-  modelTitle: string;
+  doneeName: string;
   modelButtonIsValid: boolean;
   is2FAEnable: boolean;
 }
@@ -96,7 +96,7 @@ class AddNewAccount extends PureComponent<
       selectedAccount: '',
       accountName: '',
       isValid: true,
-      modelTitle: '',
+      doneeName: '',
       modelDescription: '',
       modelButtonIsValid: true,
       is2FAEnable: false,
@@ -131,7 +131,7 @@ class AddNewAccount extends PureComponent<
 
   initiateDonationAccount = () => {
     const {
-      modelTitle,
+      doneeName,
       accountName,
       is2FAEnable,
       modelDescription,
@@ -141,7 +141,7 @@ class AddNewAccount extends PureComponent<
       serviceType = SECURE_ACCOUNT;
     }
 
-    let donee = modelTitle;
+    let donee = doneeName;
     if (!donee) {
       // defaulting to wallet name
       donee = this.props.walletName;
@@ -198,9 +198,9 @@ class AddNewAccount extends PureComponent<
       this.setState({
         accountName: text,
       });
-    } else if (name === 'modelTitle') {
+    } else if (name === 'doneeName') {
       this.setState({
-        modelTitle: text,
+        doneeName: text,
       });
     } else if (name === 'modelDescription') {
       this.setState({
@@ -279,8 +279,7 @@ class AddNewAccount extends PureComponent<
               </View>
             </View>
             <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
-
-            <View style={styles.modalTextBoxView}>
+              <View style={styles.modalTextBoxView}>
                 <TextInput
                   style={styles.textBox}
                   placeholder={'Enter donation account name'}
@@ -304,9 +303,9 @@ class AddNewAccount extends PureComponent<
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
-                  value={this.state.modelTitle}
+                  value={this.state.doneeName}
                   onChangeText={(text) => {
-                    this.handleOnTextChange('modelTitle', text);
+                    this.handleOnTextChange('doneeName', text);
                   }}
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"

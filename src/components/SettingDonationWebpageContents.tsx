@@ -34,7 +34,7 @@ export default function SettingDonationWebPageContents(props) {
   const [hideTxDetails, setHideTxDetails] = useState(
     !props.account.configuration.displayTxDetails,
   );
-  const [isSave, setIsSave] = useState(true);
+  const [disableSave, setDisableSave] = useState(true);
   const [doneeName, setDoneeName] = useState(props.account.donee);
   const [description, setDescription] = useState(props.account.description);
   const [cause, setCause] = useState(props.account.subject);
@@ -91,6 +91,7 @@ export default function SettingDonationWebPageContents(props) {
       dispatch(
         updateDonationPreferences(serviceType, accountNumber, preferences),
       );
+      setDisableSave(true);
     }
   };
 
@@ -105,7 +106,9 @@ export default function SettingDonationWebPageContents(props) {
       !hideTxDetails !== props.account.configuration.displayTxDetails ||
       isDonationPause !== props.account.disableAccount
     ) {
-      setIsSave(false);
+      setDisableSave(false);
+    } else {
+      setDisableSave(true);
     }
   }, [
     doneeName,
@@ -153,10 +156,9 @@ export default function SettingDonationWebPageContents(props) {
               </View>
             </View>
             <AppBottomSheetTouchableWrapper
-              disabled={isSave}
+              disabled={disableSave}
               onPress={() => {
                 updatePreferences();
-                setIsSave(true);
                 props.onPressBack();
               }}
               style={{
@@ -164,7 +166,9 @@ export default function SettingDonationWebPageContents(props) {
                 width: wp('18%'),
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: isSave ? Colors.shadowBlue : Colors.lightBlue,
+                backgroundColor: disableSave
+                  ? Colors.shadowBlue
+                  : Colors.lightBlue,
                 justifyContent: 'center',
                 borderRadius: 8,
                 alignSelf: 'center',
@@ -183,11 +187,11 @@ export default function SettingDonationWebPageContents(props) {
             </AppBottomSheetTouchableWrapper>
           </View>
           <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-          <Text style={styles.titleTextStyle}>Donation name</Text>
+            <Text style={styles.titleTextStyle}>Donation name</Text>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={"Donation name"}
+                placeholder={'Donation name'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -204,7 +208,7 @@ export default function SettingDonationWebPageContents(props) {
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={"Donee name"}
+                placeholder={'Donee name'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -226,7 +230,7 @@ export default function SettingDonationWebPageContents(props) {
                   marginTop: 10,
                   marginBottom: 10,
                 }}
-                placeholder={"Description"}
+                placeholder={'Description'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
