@@ -145,6 +145,7 @@ class ManageBackup extends Component<
         },
       ],
       isLevel2: false,
+      encryptedCloudDataJson: []
     };
   }
 
@@ -179,7 +180,7 @@ class ManageBackup extends Component<
   modifyLevelStatus = () =>{
     let { levelData } = this.state;
     let { levelHealth } = this.props;
-    console.log("LevelHealth", levelHealth);
+    console.log("LevelHealth redux", levelHealth);
     for (let i = 0; i < levelHealth.length; i++) {
       console.log("LevelHealth i", levelHealth[i]);
       if(levelHealth[i].status == 'accessible'){

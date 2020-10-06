@@ -116,7 +116,7 @@ export default function NewOwnQuestions(props) {
           answer,
         };
         dispatch(initializeSetup(walletName, security));
-        if (security.answer) dispatch(initializeHealthSetup());
+        // if (security.answer) dispatch(initializeHealthSetup());
         const current = Date.now();
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',

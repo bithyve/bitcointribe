@@ -13,6 +13,7 @@ import {
 } from '../Interface';
 
 import { BH_AXIOS } from '../../../services/api';
+import { generateRandomString } from '../../../common/CommonFunctions';
 const { HEXA_ID } = config;
 export default class LevelHealth {
   public static cipherSpec: {
@@ -649,43 +650,62 @@ export default class LevelHealth {
     };
   };
 
-  public initializeHealth = async (health: any[]): Promise<{
+  public initializeHealth = async (): Promise<{
     success: boolean;
+    levelInfo: any[];
   }> => {
+    console.log('level haealth');
     if (this.healthCheckInitialized)
       throw new Error('Health Check is already initialized.');
 
-    if (!this.metaShares.length)
-      throw new Error('Can not initialize health check; missing MetaShares');
-
-    const shareIDs = this.metaShares
-      .slice(0, 3)
-      .map((metaShare) => metaShare.shareId);
-
+    // Check on starting of level 2
+    // if (!this.metaShares.length)
+    //   throw new Error('Can not initialize health check; missing MetaShares');
+    let randomIdForSecurityQ = generateRandomString(8); 
+    let randomIdForCloud = generateRandomString(8); 
+    let levelInfo = [
+      {
+        shareType: 'cloud',
+        updatedAt: 0,
+        status: "notAccessible",
+        shareId: randomIdForCloud,
+        reshareVersion: 0,
+      },
+      {
+        shareType: 'securityQuestion',
+        updatedAt: 0,
+        status: "notAccessible",
+        shareId: randomIdForSecurityQ,
+        reshareVersion: 0,
+      }
+    ];
+   
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('sharesHealthCheckInit', {
+      res = await BH_AXIOS.post('sharesHealthCheckInit2', {
         HEXA_ID,
         walletID: this.walletId,
-        health,
+        levelInfo,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
+    console.log('sharesHealthCheckInit2 res', res);
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
 
-      for (let index = 0; index < shareIDs.length; index++) {
-        this.healthCheckStatus[index] = {
-          shareId: shareIDs[index],
-          updatedAt: 0,
-          reshareVersion: 0,
-        };
-      }
+      // for (let index = 0; index < shareIDs.length; index++) {
+      //   this.healthCheckStatus[index] = {
+      //     shareId: shareIDs[index],
+      //     updatedAt: 0,
+      //     reshareVersion: 0,
+      //   };
+      // }
     }
     return {
       success: res.data.initSuccessful,
+      levelInfo: levelInfo
     };
   };
 

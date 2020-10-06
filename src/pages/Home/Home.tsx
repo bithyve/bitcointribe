@@ -49,6 +49,9 @@ import {
   uploadRequestedShare,
 } from '../../store/actions/sss';
 import {
+  initializeHealthSetup,
+} from '../../store/actions/health';
+import {
   updateHealth
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
@@ -231,7 +234,7 @@ interface HomePropsTypes {
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
   s3Service: any;
-  initHealthCheck: any;
+  initializeHealthSetup: any;
   overallHealth: any;
   levelHealth: any[];
   fetchDerivativeAccBalTx: any;
@@ -861,10 +864,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // health check
 
-    const { s3Service, initHealthCheck } = this.props;
+    const { s3Service, initializeHealthSetup } = this.props;
     const { healthCheckInitialized } = s3Service.levelhealth;
     if (!healthCheckInitialized) {
-      initHealthCheck();
+      initializeHealthSetup();
     }
 
     // call this once deeplink is detected aswell
@@ -3364,7 +3367,7 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    initHealthCheck,
+    initializeHealthSetup,
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
