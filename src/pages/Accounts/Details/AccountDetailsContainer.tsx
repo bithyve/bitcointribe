@@ -67,13 +67,13 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
 
   function navigateToTransactionsList() {
     navigation.navigate('TransactionsList', {
-      accountID: accountPayload.uuid,
+      accountID,
     });
   }
 
   function navigateToAccountSettings() {
-    navigation.navigate('AccountSettingsMain', {
-      accountID: accountPayload.uuid,
+    navigation.navigate('AccountSettingsRoot', {
+      accountID,
     });
   }
 

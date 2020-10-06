@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
-import useActiveAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import FormStyles from '../../../common/Styles/Forms';
@@ -11,6 +10,7 @@ import ButtonStyles from '../../../common/Styles/Buttons';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { updateAccountSettings } from '../../../store/actions/accounts';
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/accounts-effects/UseAccountSettingsUpdatedEffect';
+import useAccountPayloadFromNavigation from '../../../utils/hooks/state-selectors/UseAccountPayloadFromNavigation';
 
 export type Props = {
   navigation: any;
@@ -19,11 +19,7 @@ export type Props = {
 const AccountSettingsDisplayPropertiesScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const accountID = useMemo(() => {
-    return navigation.getParam('accountID');
-  }, [navigation]);
-
-  const accountPayload: AccountPayload | undefined = useActiveAccountPayload(accountID);
+  const accountPayload: AccountPayload | undefined = useAccountPayloadFromNavigation(navigation);
   const dispatch = useDispatch();
   const nameInputRef = useRef<Input>(null);
 

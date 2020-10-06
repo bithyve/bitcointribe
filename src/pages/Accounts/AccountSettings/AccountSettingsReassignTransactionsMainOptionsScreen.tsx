@@ -1,68 +1,55 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { Avatar, ListItem } from 'react-native-elements';
+import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import useActiveAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
 import ListStyles from '../../../common/Styles/Lists';
 
 export type Props = {
   navigation: any;
 };
 
-export type SettingsListItem = {
+export type OptionsListItem = {
   title: string;
   subtitle: string;
   screenName: string;
   imageSource: NodeRequire;
 };
 
-const listItems: SettingsListItem[] = [
+const listItems: OptionsListItem[] = [
   {
-    title: 'Name & Description',
-    subtitle: `Customize display properties`,
-    screenName: 'EditDisplayProperties',
-    imageSource: require('../../../assets/images/icons/icon_checking_blue.png'),
-  },
-  {
-    title: 'Reassign Transactions',
-    subtitle: 'Map from this account to another',
-    screenName: 'ReassignTransactionsMainOptions',
+    title: 'Transactions',
+    subtitle: `Reassign any of your incoming and outgoing transactions`,
+    screenName: 'ReassignAllTransactionsSelectTransactions',
     imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
   },
   {
-    title: 'Account Visibility',
-    subtitle: `Configure for different privacy-sensitive contexts`,
-    screenName: '',
-    imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
-  },
-  {
-    title: 'Merge Account',
-    subtitle: `Move all transactions to another Hexa account`,
-    screenName: '',
-    imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
-  },
-  {
-    title: 'Archive Account',
-    subtitle: 'Move this account out of sight and out of mind',
-    screenName: '',
-    imageSource: require('../../../assets/images/icons/icon_archive.png'),
+    title: 'Sources',
+    subtitle: 'Reassign the entire transaction set of a source',
+    screenName: 'ReassignAllTransactionsSelectSources',
+    imageSource: require('../../../assets/images/icons/icon_sources.png'),
   },
 ];
 
-const listItemKeyExtractor = (item: SettingsListItem) => item.title;
+const listItemKeyExtractor = (item: OptionsListItem) => item.title;
 
-const AccountSettingsMainScreen: React.FC<Props> = ({
+
+const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const accountID = useMemo(() => {
     return navigation.getParam('accountID');
   }, [navigation]);
 
-  function handleListItemPressed(listItem: SettingsListItem) {
+  const accountPayload: AccountPayload | undefined = useActiveAccountPayload(accountID);
+
+  function handleListItemPressed(listItem: OptionsListItem) {
     navigation.navigate(listItem.screenName, {
       accountID,
     });
   }
 
-  const renderItem = ({ item: listItem }: { item: SettingsListItem }) => {
+  const renderItem = ({ item: listItem }: { item: OptionsListItem }) => {
     return (
       <ListItem
         bottomDivider
@@ -109,4 +96,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AccountSettingsMainScreen;
+export default AccountSettingsReassignTransactionsMainOptionsScreen;
