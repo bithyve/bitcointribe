@@ -333,32 +333,33 @@ export default function Login(props) {
   }
 
 
-  const startMessages = (passcode) => {
-    setTimeout(() => {
+  // try moving these to a reducer
+  const startMessages = async () => {
+    await setTimeout(async () => {
       setMessage(LoaderMessages[0].message)
       setSubTextMessage1(LoaderMessages[0].subTextMessage_1)
       setSubTextMessage2(LoaderMessages[0].subTextMessage_2)
-      setTimeout(() => {
+      await setTimeout(async () => {
         setMessage(LoaderMessages[1].message)
         setSubTextMessage1(LoaderMessages[1].subTextMessage_1)
         setSubTextMessage2(LoaderMessages[1].subTextMessage_2)
-        setTimeout(() => {
+        await setTimeout(async () => {
           setMessage(LoaderMessages[2].message)
           setSubTextMessage1(LoaderMessages[2].subTextMessage_1)
           setSubTextMessage2(LoaderMessages[2].subTextMessage_2)
-          setTimeout(() => {
+          await setTimeout(async () => {
             setMessage(LoaderMessages[3].message)
             setSubTextMessage1(LoaderMessages[3].subTextMessage_1)
             setSubTextMessage2(LoaderMessages[3].subTextMessage_2)
-            setTimeout(() => {
+            await setTimeout(async () => {
               setMessage(LoaderMessages[4].message)
               setSubTextMessage1(LoaderMessages[4].subTextMessage_1)
               setSubTextMessage2(LoaderMessages[4].subTextMessage_2)
-              setTimeout(() => {
+              await setTimeout(async () => {
                 setMessage(LoaderMessages[5].message)
                 setSubTextMessage1(LoaderMessages[5].subTextMessage_1)
                 setSubTextMessage2(LoaderMessages[5].subTextMessage_2)
-                proceedButton(passcode)
+                // proceedButton(passcode)
               }, 2000)
             }, 2000)
           }, 2000)
@@ -600,7 +601,8 @@ export default function Login(props) {
                     setElevation(0);
                   }, 2);
                   loaderBottomSheet.current.snapTo(1);
-                  startMessages(passcode)
+                  proceedButton(passcode)
+                  startMessages()
                 }}
                 style={{
                   ...styles.proceedButtonView,
