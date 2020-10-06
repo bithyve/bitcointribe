@@ -2,6 +2,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import AccountVisibility from "../../enums/AccountVisibility";
+import { ImageSourcePropType } from "react-native";
 
 
 interface BaseAccountPayload {
