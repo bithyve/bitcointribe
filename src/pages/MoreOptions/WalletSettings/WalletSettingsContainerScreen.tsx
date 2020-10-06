@@ -15,7 +15,7 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
   screenName?: string;
 }
 
