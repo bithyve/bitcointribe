@@ -106,10 +106,22 @@ const HomeList = ({
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue(11),
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      alignItems: 'center'
                     }}
                   >
-                    Add Donation Account
+                    {addNewDisable
+                    ? 'Add more accounts': "Add Donation Account"}
                   </Text>
+                  {addNewDisable
+                    ? <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(11),
+                      alignSelf: 'center',
+                    }}
+                  >(coming soon)</Text> : null}
                 </View>
               </CardView>
             </TouchableOpacity>
