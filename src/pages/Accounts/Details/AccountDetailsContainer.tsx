@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
 import useAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
