@@ -8,7 +8,7 @@ import { Button } from 'react-native-elements';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import AccountKind from '../../../common/data/enums/AccountKind';
-import useAccountGenerationCompletionEffect from '../../../utils/hooks/UseAccountGenerationCompletionEffect';
+import useAccountGenerationCompletionEffect from '../../../utils/hooks/accounts-effects/UseAccountGenerationCompletionEffect';
 import { addNewAccount } from '../../../store/actions/accounts';
 import { useDispatch } from "react-redux";
 import { goHomeAction } from '../../../navigation/actions/NavigationActions';

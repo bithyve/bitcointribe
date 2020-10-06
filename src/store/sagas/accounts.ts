@@ -46,6 +46,9 @@ import {
   ADD_NEW_ACCOUNT,
   newAccountAdded,
   newAccountAddFailed,
+  UPDATE_ACCOUNT_SETTINGS,
+  accountSettingsUpdated,
+  accountSettingsUpdateFailed,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -1191,4 +1194,19 @@ function* addNewAccount({ payload: account }: { payload: AccountPayload }) {
 export const addNewAccountWatcher = createWatcher(
   addNewAccount,
   ADD_NEW_ACCOUNT,
+);
+
+
+function* updateAccountSettings({ payload: account }: { payload: AccountPayload }) {
+  try {
+    // TODO: Implement backend logic here for saving an account's properties
+    yield put(accountSettingsUpdated({ account }));
+  } catch (error) {
+    yield put(accountSettingsUpdateFailed({ account, error }));
+  }
+}
+
+export const updateAccountSettingsWatcher = createWatcher(
+  updateAccountSettings,
+  UPDATE_ACCOUNT_SETTINGS,
 );
