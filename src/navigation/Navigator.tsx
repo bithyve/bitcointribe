@@ -26,7 +26,6 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-import TransactionDetailsScreen from '../pages/Accounts/Transactions/TransactionDetailsScreenContainer';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
@@ -78,11 +77,9 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
 import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
+import { AccountDetailsStack } from './stacks/AccountNavigationStacks';
 import { MoreOptionsStack } from './stacks/MoreOptions';
-import AccountDetailsContainer from '../pages/Accounts/Details/AccountDetailsContainer';
-import TransactionsListScreen from '../pages/Accounts/Transactions/TransactionsListScreenContainer';
-import AccountSettingsMainScreen from '../pages/Accounts/AccountSettings/AccountSettingsMainScreen';
-import AccountSettingsDisplayPropertiesScreen from '../pages/Accounts/AccountSettings/AccountSettingsDisplayPropertiesScreen';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -152,46 +149,6 @@ const AddNewAccountStack = createStackNavigator(
     initialRouteName: 'AccountSelectionList',
   },
 );
-
-
-const AccountDetailsStack = createStackNavigator(
-  {
-    AccountDetailsRoot: {
-      screen: AccountDetailsContainer,
-      navigationOptions: AccountDetailsContainer.navigationOptions,
-    },
-    TransactionsList: {
-      screen: TransactionsListScreen,
-      navigationOptions: {
-        title: "All Transactions",
-      },
-    },
-    TransactionDetails: {
-      screen: TransactionDetailsScreen,
-      navigationOptions: {
-        title: "Transaction Details",
-      },
-    },
-    AccountSettingsMain: {
-      screen: AccountSettingsMainScreen,
-      navigationOptions: {
-        title: "Account Settings",
-      },
-    },
-    AccountSettingsDisplayProperties: {
-      screen: AccountSettingsDisplayPropertiesScreen,
-      navigationOptions: {
-        title: "Name & Description",
-      },
-    },
-  },
-  {
-    mode: 'modal',
-    initialRouteName: 'AccountDetailsRoot',
-  },
-);
-
-
 
 const HomeNavigator = createStackNavigator(
   {
