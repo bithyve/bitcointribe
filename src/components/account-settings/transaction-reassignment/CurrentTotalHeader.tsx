@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
 
 
   countDescriptionSection: {
-    // flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },

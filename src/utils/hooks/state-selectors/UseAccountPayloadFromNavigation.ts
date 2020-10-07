@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
 import useActiveAccountPayload from './UseActiveAccountPayload';
 
