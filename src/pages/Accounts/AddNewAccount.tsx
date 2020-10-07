@@ -314,7 +314,7 @@ class AddNewAccount extends PureComponent<
                 <Text
                   onPress={() => {
                     this.openLink(
-                      'https://hexawallet.io/donor-terms-conditions/',
+                      'https://hexawallet.io/donee-terms-conditions/',
                     );
                   }}
                   style={{
