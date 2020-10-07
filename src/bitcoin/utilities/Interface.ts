@@ -33,10 +33,12 @@ export interface TransactionDetails {
   transactionType: string;
   amount: number;
   accountType: string;
+  primaryAccType?: string;
   contactName?: string;
   recipientAddresses?: string[];
   senderAddresses?: string[];
   blockTime?: number;
+  message?: string;
 }
 
 export interface Transactions {
@@ -91,8 +93,10 @@ export interface DerivativeAccountElements {
   xpub: string;
   xpubId: string;
   xpriv: string;
+  accountName?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
+  nextFreeChangeAddressIndex?: number;
   receivingAddress?: string;
   confirmedUTXOs?: {
     txId: string;
@@ -151,7 +155,9 @@ export interface DonationDerivativeAccountElements
   configuration: {
     displayBalance: boolean;
     displayTransactions: boolean;
+    displayTxDetails: boolean;
   };
+  disableAccount: boolean;
 }
 
 // Base Dervative Account

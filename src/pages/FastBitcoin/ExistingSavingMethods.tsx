@@ -92,6 +92,7 @@ export default function ExistingSavingMethods(props) {
             <TouchableOpacity
               onPress={() => props.navigation.goBack()}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
+              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -270,19 +271,11 @@ export default function ExistingSavingMethods(props) {
                         >
                           Voucher Code {value.voucherCode}
                         </Text>
-                        <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(10),
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          {moment(value.orderData.date)
-                            .utc()
-                            .format('DD MMMM YYYY')}
-                        </Text>
+                        
                       </View>
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
                       <Text
                         style={{
                           color: Colors.textColorGrey,
@@ -295,6 +288,19 @@ export default function ExistingSavingMethods(props) {
                           ? 'Checking Account'
                           : 'Savings Account'}
                       </Text>
+                      <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          {moment(value.orderData.date)
+                            .utc()
+                            .format('DD MMMM YYYY')}
+                        </Text>
+                        </View>
                     </View>
                     <View
                       style={{

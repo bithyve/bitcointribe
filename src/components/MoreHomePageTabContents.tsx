@@ -54,7 +54,7 @@ export default function MoreHomePageTabContents(props) {
   };
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+    <View style={styles.modalContentContainer}>
       <View>
         <FlatList
           data={addData}
@@ -135,7 +135,7 @@ export default function MoreHomePageTabContents(props) {
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   separatorView: {

@@ -539,7 +539,9 @@ export default class SecureAccount {
     configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
+      displayTxDetails: boolean;
     },
+    disableAccount?: boolean,
   ): Promise<
     | {
         status: number;
@@ -564,6 +566,7 @@ export default class SecureAccount {
           subject,
           description,
           configuration,
+          disableAccount,
         ),
       };
     } catch (err) {
@@ -577,9 +580,18 @@ export default class SecureAccount {
 
   public updateDonationPreferences = async (
     accountNumber: number,
-    configuration: {
-      displayBalance: boolean;
-      displayTransactions: boolean;
+    preferences: {
+      disableAccount?: boolean;
+      configuration?: {
+        displayBalance: boolean;
+        displayTransactions: boolean;
+        displayTxDetails: boolean;
+      };
+      accountDetails?: {
+        donee: string;
+        subject: string;
+        description: string;
+      };
     },
   ): Promise<
     | {
@@ -602,7 +614,7 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.updateDonationPreferences(
           accountNumber,
-          configuration,
+          preferences,
         ),
       };
     } catch (err) {
@@ -917,6 +929,8 @@ export default class SecureAccount {
   public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
+    contactName?: string,
+    accountName?: string,
   ): Promise<
     | {
         status: number;
@@ -937,6 +951,8 @@ export default class SecureAccount {
         data: await this.secureHDWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
+          contactName,
+          accountName,
         ),
       };
     } catch (err) {

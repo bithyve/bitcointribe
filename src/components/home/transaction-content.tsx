@@ -12,27 +12,48 @@ import Fonts from './../../common/Fonts';
 import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { FAST_BITCOINS } from '../../common/constants/serviceTypes';
+import {
+  FAST_BITCOINS,
+  REGULAR_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import { TransactionDetails } from '../../bitcoin/utilities/Interface';
 
-interface transaction {
-  transactionType?: string;
-  accountType?: any;
-  date?: string;
-  amount?: string;
-  confirmations?: number;
-}
+const InfoBox = ({ text, isFromAccount }) => {
+  return (
+    <View
+      style={{
+        ...styles.infoBoxContainer,
+        marginBottom: isFromAccount ? hp('3%') : hp('15%') + 22,
+      }}
+    >
+      <Text style={styles.viewTransactionText}>
+        View your transactions here.
+      </Text>
+
+      <Text
+        style={{
+          color: Colors.textColorGrey,
+          fontSize: RFValue(12),
+          fontFamily: Fonts.FiraSansRegular,
+        }}
+      >
+        {text}
+      </Text>
+    </View>
+  );
+};
 
 const TransactionsContent = ({
   transactions,
-  TransactionDetailsBottomSheet,
-  AtCloseEnd,
+  transactionDetailsBottomSheetRef,
   setTransactionItem,
   setTabBarZIndex,
   transactionLoading,
   isFromAccount,
-  infoBoxInfoText,
+  infoBoxInfoText = 'All your recent transactions across the accounts appear here',
 }) => {
-  if (transactionLoading) {
+  const LoadingView: React.FC = () => {
     return (
       <View style={styles.modalContentContainer}>
         <View
@@ -59,192 +80,145 @@ const TransactionsContent = ({
           })}
         </View>
         <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              ...styles.viewTransaction,
-              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
-            }}
-          >
-            <Text style={styles.viewTransactionText}>
-              View your transactions here
-            </Text>
-            <Text style={styles.textNote}>
-              {infoBoxInfoText
-                ? infoBoxInfoText
-                : 'All your recent transactions across the accounts appear here'}
-            </Text>
-          </View>
+          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
         </View>
       </View>
     );
-  } else {
-    if (transactions.length > 0) {
-      return (
-        <View style={styles.modalContentContainer}>
-          <View style={{ flex: 1 }}>
-            <View
-              style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
-            >
-              <FlatList
-                data={transactions}
-                ItemSeparatorComponent={() => (
-                  <View style={{ backgroundColor: Colors.white }}>
-                    <View style={styles.separatorView} />
-                  </View>
-                )}
-                renderItem={({ item }: { item: transaction }) => (
-                  <AppBottomSheetTouchableWrapper
-                    onPress={
-                      () => {
-                        (TransactionDetailsBottomSheet as any).snapTo(1);
-                        setTimeout(() => {
-                          setTransactionItem(item);
-                          setTabBarZIndex(0);
-                        }, 10);
+  };
+
+  const EmptyView: React.FC = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <View style={{ flex: 1 }}></View>
+        <View style={{ backgroundColor: Colors.white }}>
+          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
+        </View>
+      </View>
+    );
+  };
+
+  if (transactionLoading) {
+    return <LoadingView />;
+  }
+
+  if (transactions.length === 0) {
+    return <EmptyView />;
+  }
+
+  return (
+    <View style={styles.modalContentContainer}>
+      <View style={{ flex: 1 }}>
+        <View
+          style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
+        >
+          <FlatList
+            data={transactions}
+            ItemSeparatorComponent={() => (
+              <View style={{ backgroundColor: Colors.white }}>
+                <View style={styles.separatorView} />
+              </View>
+            )}
+            renderItem={({ item }: { item: TransactionDetails }) => (
+              <AppBottomSheetTouchableWrapper
+                onPress={
+                  () => {
+                    transactionDetailsBottomSheetRef.current
+                      ? transactionDetailsBottomSheetRef.current.snapTo(1)
+                      : transactionDetailsBottomSheetRef.snapTo(1);
+                    setTimeout(() => {
+                      setTransactionItem(item);
+                      setTabBarZIndex(0);
+                    }, 10);
+                  }
+                  //props.navigation.navigate('TransactionDetails', { item })
+                }
+                style={{
+                  ...styles.transactionModalElementView,
+                  backgroundColor: Colors.white,
+                }}
+              >
+                <View style={styles.modalElementInfoView}>
+                  <View style={{ justifyContent: 'center' }}>
+                    <FontAwesome
+                      name={
+                        item.transactionType == 'Received'
+                          ? 'long-arrow-down'
+                          : 'long-arrow-up'
                       }
-                      //props.navigation.navigate('TransactionDetails', { item })
-                    }
-                    style={{
-                      ...styles.transactionModalElementView,
-                      backgroundColor: Colors.white,
-                    }}
-                  >
-                    <View style={styles.modalElementInfoView}>
-                      <View style={{ justifyContent: 'center' }}>
-                        <FontAwesome
-                          name={
-                            item.transactionType == 'Received'
-                              ? 'long-arrow-down'
-                              : 'long-arrow-up'
-                          }
-                          size={15}
-                          color={
-                            item.transactionType == 'Received'
-                              ? Colors.green
-                              : Colors.red
-                          }
-                        />
-                      </View>
-                      <View
-                        style={{ justifyContent: 'center', marginLeft: 10 }}
-                      >
-                        <Text style={styles.transactionModalTitleText}>
-                          {item.accountType == FAST_BITCOINS
-                            ? 'FastBitcoins.com'
-                            : item.accountType}{' '}
-                        </Text>
-                        <Text style={styles.transactionModalDateText}>
-                          {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.transactionModalAmountView}>
-                      {item.accountType == FAST_BITCOINS && (
-                        <View style={styles.view5}>
-                          <Image
-                            source={require('../../assets/images/icons/fastbitcoin_dark.png')}
-                            style={{
-                              width: wp('5%'),
-                              height: wp('5%'),
-                              resizeMode: 'contain',
-                            }}
-                          />
-                        </View>
-                      )}
-                      <Text
+                      size={15}
+                      color={
+                        item.transactionType == 'Received'
+                          ? Colors.green
+                          : Colors.red
+                      }
+                    />
+                  </View>
+                  <View style={{ justifyContent: 'center', marginLeft: 10 }}>
+                    <Text style={styles.transactionModalTitleText}>
+                      {item.accountType == FAST_BITCOINS
+                        ? 'FastBitcoins.com'
+                        : item.accountType === SUB_PRIMARY_ACCOUNT
+                        ? item.primaryAccType
+                        : item.accountType}{' '}
+                    </Text>
+                    <Text style={styles.transactionModalDateText}>
+                      {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.transactionModalAmountView}>
+                  {item.accountType == FAST_BITCOINS && (
+                    <View style={styles.view5}>
+                      <Image
+                        source={require('../../assets/images/icons/fastbitcoin_dark.png')}
                         style={{
-                          ...styles.transactionModalAmountText,
-                          color:
-                            item.transactionType == 'Received'
-                              ? Colors.green
-                              : Colors.red,
+                          width: wp('5%'),
+                          height: wp('5%'),
+                          resizeMode: 'contain',
                         }}
-                      >
-                        {UsNumberFormat(item.amount)}
-                      </Text>
-                      <Text style={styles.transactionModalAmountUnitText}>
-                        {item.accountType === 'Test Account'
-                          ? item.confirmations < 6
-                            ? item.confirmations
-                            : item.confirmations === '-' // for testnet faucet tx
-                            ? item.confirmations
-                            : '6+'
-                          : item.confirmations < 6
-                          ? item.confirmations
-                          : '6+'}
-                      </Text>
-                      <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={12}
-                        style={{ marginLeft: 20, alignSelf: 'center' }}
                       />
                     </View>
-                  </AppBottomSheetTouchableWrapper>
-                )}
-              />
-            </View>
-          </View>
-          {transactions.length <= 1 && (
-            <View
-              style={{
-                marginBottom: isFromAccount
-                  ? hp('3%')
-                  : AtCloseEnd
-                  ? hp('12%') + 15
-                  : hp('30%') + 15,
-                ...styles.viewTransaction,
-              }}
-            >
-              <Text style={styles.viewTransactionText}>
-                View your transactions here
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {infoBoxInfoText
-                  ? infoBoxInfoText
-                  : 'All your recent transactions across the accounts appear here'}
-              </Text>
-            </View>
-          )}
+                  )}
+                  <Text
+                    style={{
+                      ...styles.transactionModalAmountText,
+                      color:
+                        item.transactionType == 'Received'
+                          ? Colors.green
+                          : Colors.red,
+                    }}
+                  >
+                    {UsNumberFormat(item.amount)}
+                  </Text>
+                  <Text style={styles.transactionModalAmountUnitText}>
+                    {item.accountType === 'Test Account'
+                      ? item.confirmations < 6
+                        ? item.confirmations
+                        : item.confirmations === '-' // for testnet faucet tx
+                        ? item.confirmations
+                        : '6+'
+                      : item.confirmations < 6
+                      ? item.confirmations
+                      : '6+'}
+                  </Text>
+                  <Ionicons
+                    name="ios-arrow-forward"
+                    color={Colors.textColorGrey}
+                    size={12}
+                    style={{ marginLeft: 20, alignSelf: 'center' }}
+                  />
+                </View>
+              </AppBottomSheetTouchableWrapper>
+            )}
+          />
         </View>
-      );
-    } else {
-      return (
-        <View style={styles.modalContentContainer}>
-          <View style={{ flex: 1 }}></View>
-          <View style={{ backgroundColor: Colors.white }}>
-            <View
-              style={{
-                ...styles.viewTransaction,
-                marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
-              }}
-            >
-              <Text style={styles.viewTransactionText}>
-                View your transactions here
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {infoBoxInfoText
-                  ? infoBoxInfoText
-                  : 'All your recent transactions across the accounts appear here'}
-              </Text>
-            </View>
-          </View>
-        </View>
-      );
-    }
-  }
+      </View>
+
+      {transactions.length <= 1 && (
+        <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
+      )}
+    </View>
+  );
 };
 
 export default memo(TransactionsContent);
@@ -300,7 +274,7 @@ const styles = StyleSheet.create({
     height: wp('8%'),
     backgroundColor: Colors.white,
   },
-  viewTransaction: {
+  infoBoxContainer: {
     margin: 15,
     backgroundColor: Colors.backgroundColor,
     padding: 10,

@@ -40,6 +40,7 @@ import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import {
   fetchBalance,
@@ -87,6 +88,7 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
+import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
 // import accounts from '../../store/reducers/accounts';
 
 function isEmpty(obj) {
@@ -195,6 +197,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.state = {
       carouselData: [
         {
+          id: 1,
           accountType: 'Test Account',
           accountInfo: 'Learn Bitcoin',
           backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
@@ -202,6 +205,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           type: TEST_ACCOUNT,
         },
         {
+          id: 2,
           accountType: 'Checking Account',
           accountInfo: 'Fast and easy',
           backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
@@ -209,6 +213,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           type: REGULAR_ACCOUNT,
         },
         {
+          id: 3,
           accountType: 'Savings Account',
           accountInfo: 'Multi-factor security',
           backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
@@ -248,17 +253,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   componentDidMount = () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
+    this.updateCarouselData();
     // this.setState({ spendableBalance: this.props.navigation.state.params
     //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
-    this.getServiceType(
-      serviceType,
-      serviceType === SECURE_ACCOUNT
-        ? 2
-        : serviceType === REGULAR_ACCOUNT
-        ? 1
-        : 0,
-    );
     this.getBalance();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
@@ -270,7 +268,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         : service.hdWallet;
     this.setAverageTransactionFees();
     this.checkFastBitcoin();
-    this.updateCarouselData();
+
     // if (this.wallet.transactions.transactionDetails.length) {
     //   this.wallet.transactions.transactionDetails.sort(function (left, right) {
     //     return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -296,10 +294,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  updateCarouselData = () => {
+  updateCarouselData = (dontSlide?) => {
+    let { serviceType } = this.state;
     let { accounts } = this.props;
     const defaultCarouselData = [
       {
+        id: 1,
         accountType: 'Test Account',
         accountInfo: 'Learn Bitcoin',
         backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
@@ -307,6 +307,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: TEST_ACCOUNT,
       },
       {
+        id: 2,
         accountType: 'Checking Account',
         accountInfo: 'Fast and easy',
         backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
@@ -314,6 +315,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: REGULAR_ACCOUNT,
       },
       {
+        id: 3,
         accountType: 'Savings Account',
         accountInfo: 'Multi-factor security',
         backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
@@ -321,7 +323,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         type: SECURE_ACCOUNT,
       },
     ];
-
+    let idIndex = defaultCarouselData[defaultCarouselData.length - 1].id;
     const additionalCarouselData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
@@ -329,33 +331,64 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[carouselAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
-        const donationInstance = {
-          accountType: 'Donation Account',
-          derivativeAccountDetails: {
-            type: DONATION_ACCOUNT,
-            number: index,
-          },
-          accountInfo: donAcc.subject,
-          backgroundImage: require('../../assets/images/carouselImages/donation_account_background.png'),
-          accountTypeImage: require('../../assets/images/icons/icon_donation_account.png'),
-          type: serviceType,
-          donationAcc: donAcc,
-          accountNumber: index,
-        };
-        additionalCarouselData.push(donationInstance);
+        for (
+          let index = 1;
+          index <= derivativeAccounts[carouselAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[carouselAcc][index];
+          idIndex++;
+          let accountType, backgroundImage, accountTypeImage, accountInfo;
+          if (carouselAcc === DONATION_ACCOUNT) {
+            accountType = account.subject
+              ? account.subject
+              : 'Donation Account';
+            accountInfo = 'Accept bitcoin';
+            backgroundImage = require('../../assets/images/carouselImages/donation_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_donation_account.png');
+          } else if (serviceType === REGULAR_ACCOUNT) {
+            accountType = account.accountName
+              ? account.accountName
+              : 'Checking Account';
+            accountInfo = 'User Checking Account';
+            backgroundImage = require('../../assets/images/carouselImages/regular_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_regular_account.png');
+          } else if (serviceType === SECURE_ACCOUNT) {
+            accountType = account.accountName
+              ? account.accountName
+              : 'Savings Account';
+            accountInfo = 'User Savings Account';
+            backgroundImage = require('../../assets/images/carouselImages/savings_account_background.png');
+            accountTypeImage = require('../../assets/images/icons/icon_secureaccount_white.png');
+          }
+
+          const carouselInstance = {
+            id: idIndex,
+            accountType,
+            accountInfo,
+            derivativeAccountDetails: {
+              type: carouselAcc,
+              number: index,
+            },
+            backgroundImage,
+            accountTypeImage,
+            type: serviceType,
+            dervAccount: account,
+            dervAccountType: carouselAcc,
+            accountNumber: index,
+          };
+          additionalCarouselData.push(carouselInstance);
+        }
       }
     }
-    this.setState({
-      carouselData: [...defaultCarouselData, ...additionalCarouselData],
+    let carouselData1 = [...defaultCarouselData, ...additionalCarouselData];
+    this.setState({ carouselData: carouselData1 }, () => {
+      if (dontSlide) {
+        // workaround to halt inconsistent carousel swipings
+      } else this.getServiceType(serviceType, this.state.carouselInitIndex);
     });
   };
 
@@ -373,14 +406,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       let currentTransactions;
 
       const { presentCarouselData } = this.state;
-      if (
-        presentCarouselData &&
-        presentCarouselData.accountType === 'Donation Account'
-      ) {
-        const donationAccount: DonationDerivativeAccountElements =
-          presentCarouselData.donationAcc;
+      if (presentCarouselData && presentCarouselData.dervAccountType) {
+        const account = presentCarouselData.dervAccount;
 
-        const { balances, transactions } = donationAccount;
+        const { balances, transactions } = account;
         currentBalance = balances
           ? balances.balance + balances.unconfirmedBalance
           : 0;
@@ -461,6 +490,34 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         spendableBalance: spendableBalance,
         transactions: currentTransactions,
         transactionLoading: false,
+      });
+    }
+  };
+
+  refreshAccountBalance = () => {
+    const { presentCarouselData, serviceType } = this.state;
+    if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
+      const { derivativeAccountDetails } = presentCarouselData;
+      console.log({ derivativeAccountDetails });
+      if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+        this.props.syncViaXpubAgent(
+          serviceType,
+          derivativeAccountDetails.type,
+          derivativeAccountDetails.number,
+        );
+      else
+        this.props.fetchDerivativeAccBalTx(
+          serviceType,
+          derivativeAccountDetails.type,
+          derivativeAccountDetails.number,
+        );
+    } else {
+      this.props.fetchBalanceTx(serviceType, {
+        loader: true,
+        syncTrustedDerivative:
+          serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+            ? true
+            : false,
       });
     }
   };
@@ -567,43 +624,24 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         }
       }
 
-      if (donationAccUpdated) this.updateCarouselData();
+      if (donationAccUpdated) {
+        const dontSlide = true;
+        this.updateCarouselData(dontSlide);
+      }
     }
   };
 
   getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
+    //console.log("presentCarouselData getServiceType", this.state.presentCarouselData, index, this.state.carouselData);
 
-    if (!index) {
-      if (this.carousel.current) {
-        if (serviceType == TEST_ACCOUNT) {
-          if (this.carousel.current as any)
-            //setTimeout(() => {
-            (this.carousel.current as any).snapToItem(0, true, false);
-          //}, 1100);
-        } else if (serviceType == REGULAR_ACCOUNT) {
-          if (this.carousel.current as any)
-            // setTimeout(() => {
-            (this.carousel.current as any).snapToItem(1, true, false);
-          //}, 1100);
-        } else if (serviceType == SECURE_ACCOUNT) {
-          if (this.carousel.current as any)
-            // setTimeout(() => {
-            (this.carousel.current as any).snapToItem(2, true, false);
-          // }, 1100);
-        }
-      }
-      this.setState({ serviceType: serviceType });
-    } else {
-      if (this.carousel.current as any)
-        (this.carousel.current as any).snapToItem(index, true, false);
-      this.setState({
-        serviceType: serviceType,
-        presentCarouselData: this.state.carouselData[index],
-        presentCarouselIndex: index,
-      });
-    }
-
+    if (this.carousel.current as any)
+      (this.carousel.current as any).snapToItem(index, true, false);
+    this.setState({
+      serviceType: serviceType,
+      presentCarouselData: this.state.carouselData[index],
+      presentCarouselIndex: index,
+    });
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
@@ -852,9 +890,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null
             ) : null}
-            {(item.accountType === 'Savings Account' ||
-              (item.accountType === 'Donation Account' &&
-                item.type === SECURE_ACCOUNT)) && (
+            {item.type === SECURE_ACCOUNT && (
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -1018,6 +1054,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       CurrencyCode,
       transactions,
       spendableBalance,
+      presentCarouselData,
+      carouselData,
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
     const averageTxFees = this.getAverageTxFees();
@@ -1031,6 +1069,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             onPress={() => {
               this.props.navigation.navigate('Home');
             }}
@@ -1099,53 +1138,21 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     accounts[serviceType].loading.balanceTx ||
                     accounts[serviceType].loading.derivativeBalanceTx
                   }
-                  onRefresh={() => {
-                    console.log({
-                      state: this.state,
-                      presentCarouselData: this.state.presentCarouselData,
-                    });
-                    const { presentCarouselData } = this.state;
-                    if (
-                      presentCarouselData &&
-                      presentCarouselData.accountType === 'Donation Account'
-                    ) {
-                      const { derivativeAccountDetails } = presentCarouselData;
-                      console.log({ derivativeAccountDetails });
-                      if (derivativeAccountDetails) {
-                        this.props.syncViaXpubAgent(
-                          serviceType,
-                          derivativeAccountDetails.type,
-                          derivativeAccountDetails.number,
-                        );
-                      }
-                    } else {
-                      this.props.fetchBalanceTx(serviceType, {
-                        loader: true,
-                        syncTrustedDerivative:
-                          serviceType === REGULAR_ACCOUNT ||
-                          serviceType === SECURE_ACCOUNT
-                            ? true
-                            : false,
-                      });
-                    }
-                  }}
+                  onRefresh={this.refreshAccountBalance}
                 />
               }
             >
               <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
                 <Carousel
                   ref={this.carousel}
-                  data={this.state.carouselData}
+                  data={carouselData}
                   firstItem={carouselInitIndex}
                   initialNumToRender={carouselInitIndex}
                   renderItem={this.RenderItem}
                   sliderWidth={this.sliderWidth}
                   itemWidth={this.sliderWidth * 0.95}
                   onSnapToItem={(index) => {
-                    this.getServiceType(
-                      this.state.carouselData[index].type,
-                      index,
-                    );
+                    this.getServiceType(carouselData[index].type, index);
                   }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
@@ -1283,6 +1290,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 <Text style={styles.transactionModalTitleText}>
                                   {item.accountType == FAST_BITCOINS
                                     ? 'FastBitcoins.com'
+                                    : item.accountType === SUB_PRIMARY_ACCOUNT
+                                    ? item.primaryAccType
                                     : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>
@@ -1324,6 +1333,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 <Text style={styles.transactionModalTitleText}>
                                   {item.accountType == FAST_BITCOINS
                                     ? 'FastBitcoins.com'
+                                    : item.accountType === SUB_PRIMARY_ACCOUNT
+                                    ? item.primaryAccType
                                     : item.accountType}{' '}
                                 </Text>
                                 <Text style={styles.transactionModalDateText}>
@@ -1509,8 +1520,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 ></View>
               </View>
               {this.state.presentCarouselData &&
-              this.state.presentCarouselData.accountType ===
-                'Donation Account' ? (
+              this.state.presentCarouselData.dervAccountType ===
+                DONATION_ACCOUNT ? (
                 <View
                   style={{
                     flex: 1,
@@ -1527,7 +1538,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       }
                     }}
                   >
-                    <Text style={styles.buttonText}>Donation Webpage</Text>
+                    <Text style={styles.buttonText}>Donation web view</Text>
                   </AppBottomSheetTouchableWrapper>
                 </View>
               ) : null}
@@ -1547,16 +1558,31 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'DonationWebPageBottomSheet'}
-          snapPoints={[-50, hp('75%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('60%'),
+          ]}
           renderContent={() => {
-            const { donationAcc, accountNumber } = this.state
+            const { dervAccount, dervAccountType, accountNumber } = this.state
               .presentCarouselData
               ? this.state.presentCarouselData
-              : { donationAcc: null, accountNumber: null };
-            if (!donationAcc) return;
+              : {
+                  dervAccount: null,
+                  dervAccountType: null,
+                  accountNumber: null,
+                };
+            if (!dervAccount) return;
+            if (dervAccountType !== DONATION_ACCOUNT) return;
             return (
               <DonationWebPageModalContents
-                account={donationAcc}
+                onClickSetting={() => {
+                  (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                    1,
+                  );
+                }}
+                account={dervAccount}
                 accountNumber={accountNumber}
                 serviceType={this.state.serviceType}
                 close={() =>
@@ -1573,6 +1599,52 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
           )}
         />
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'SettingDonationWebPageBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+            ]}
+            renderContent={() => {
+              const { dervAccount, dervAccountType, accountNumber } = this.state
+                .presentCarouselData
+                ? this.state.presentCarouselData
+                : {
+                    dervAccount: null,
+                    dervAccountType: null,
+                    accountNumber: null,
+                  };
+              if (!dervAccount) return;
+              if (dervAccountType !== DONATION_ACCOUNT) return;
+              return (
+                <SettingDonationWebPageContents
+                  onPressBack={() =>
+                    (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                      0,
+                    )
+                  }
+                  account={dervAccount}
+                  accountNumber={accountNumber}
+                  serviceType={this.state.serviceType}
+                />
+              );
+            }}
+            renderHeader={() => (
+              <ModalHeader
+                onPressHeader={() => {
+                  (this.refs.SettingDonationWebPageBottomSheet as any).snapTo(
+                    0,
+                  );
+                }}
+              />
+            )}
+          />
+        ) : null}
+
         {this.state.is_initiated ? (
           <BottomSheet
             enabledInnerScrolling={true}
@@ -1594,7 +1666,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   isFromAccount={true}
                   transactionLoading={transactionLoading}
                   transactions={transactions}
-                  AtCloseEnd={false}
                   setTransactionItem={
                     (item) => {}
                     //this.setState({ selectedTransactionItem: item })
@@ -1603,7 +1674,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (index) => {}
                     //this.setState({ tabBarIndex: index })
                   }
-                  TransactionDetailsBottomSheet={
+                  transactionDetailsBottomSheetRef={
                     this.refs.TransactionDetailsBottomSheet as any
                   }
                 />
@@ -1894,6 +1965,7 @@ const mapStateToProps = (state) => {
     accounts: idx(state, (_) => _.accounts) || [],
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    cardData: idx(state, (_) => _.preferences.cardData),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     isTestHelperDoneValue: idx(
       state,

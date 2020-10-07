@@ -109,7 +109,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PDFGenerator (3.1.0)
-  - Protobuf (3.12.0)
+  - Protobuf (3.13.0)
   - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
@@ -132,7 +132,7 @@ PODS:
   - react-native-mail (4.1.0):
     - React
   - react-native-netinfo (5.9.6):
-    - React
+    - React/Core
   - react-native-print (0.6.0):
     - React
   - react-native-randombytes (3.5.3):
@@ -207,10 +207,10 @@ PODS:
   - RNGestureHandler (1.3.0):
     - React
   - RNLocalize (1.4.1):
-    - React
+    - React/Core
   - RNOS (1.2.6):
     - React
-  - RNReanimated (1.4.0):
+  - RNReanimated (1.13.0):
     - React
   - RNScreens (1.0.0-alpha.23):
     - React
@@ -468,7 +468,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
+  Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
   EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
@@ -483,7 +483,7 @@ SPEC CHECKSUMS:
   EXSecureStore: bf94958c936b2b9e3813509d2e7e6b8a263d40df
   EXSQLite: ddc1e6727bd7d36e649f07590fe3ae5511c1f039
   EXWebBrowser: 18924c3d2a3a1aa95d413672f058beff589c80f4
-  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
+  Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
   Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
   FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
   FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
@@ -498,7 +498,7 @@ SPEC CHECKSUMS:
   jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  Protobuf: 2793fcd0622a00b546c60e7cbbcc493e043e9bb9
+  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
@@ -506,7 +506,7 @@ SPEC CHECKSUMS:
   react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 38a1e0b3e89b48e4b5833ed475d8df5f049f6f90
+  react-native-netinfo: 60fdd787790926ac643d4988a7b3a772bdb9396b
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
@@ -515,9 +515,9 @@ SPEC CHECKSUMS:
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
-  RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
+  RNLocalize: dedac618d8868828fd81ad5dda7598a1c4658a80
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
-  RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
+  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f

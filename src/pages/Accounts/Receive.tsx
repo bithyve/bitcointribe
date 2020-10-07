@@ -14,10 +14,6 @@ import {
   SafeAreaView,
   StatusBar,
   AsyncStorage,
-  ImageBackground,
-  FlatList,
-  CheckBox,
-  ActivityIndicator,
   Alert,
   InteractionManager,
 } from 'react-native';
@@ -45,17 +41,15 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   updateEphemeralChannel,
   updateTrustedContactInfoLocally,
 } from '../../store/actions/trustedContacts';
 import {
   EphemeralDataElements,
-  TrustedContactDerivativeAccount,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -64,14 +58,28 @@ import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import Loader from '../../components/loader';
 import TwoFASetupWarningModal from './TwoFASetupWarningModal';
+import idx from 'idx';
+import {
+  setReceiveHelper,
+  setSavingWarning,
+} from '../../store/actions/preferences';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
 
 export default function Receive(props) {
+  const [isOTPType, setIsOTPType] = useState(false);
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [OTP, setOTP] = useState('');
+  const [renderTimer, setRenderTimer] = useState(false);
+
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
-  // let [isLoading, setIsLoading] = useState(true);
-
+  //let [isLoading, setIsLoading] = useState(true);
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
@@ -81,8 +89,6 @@ export default function Receive(props) {
   ] = useState(React.createRef());
   const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [amount, setAmount] = useState('');
-  const [showContacts, setShowContacts] = useState(false);
-  const [LoadContacts, setLoadContacts] = useState(false);
   const [selectedContact, setSelectedContact] = useState(Object);
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
@@ -101,6 +107,14 @@ export default function Receive(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+
+  const derivativeAccountDetails =
+    props.navigation.state.params.derivativeAccountDetails;
+
+  const carouselIndex = props.navigation.state.params.carouselIndex
+    ? props.navigation.state.params.carouselIndex
+    : null;
+
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
@@ -114,6 +128,19 @@ export default function Receive(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
+  const fcmTokenValue = useSelector((state) =>
+    idx(state, (_) => _.preferences.fcmTokenValue),
+  );
+  const isReceiveHelperDoneValue = useSelector((state) =>
+    idx(state, (_) => _.preferences.isReceiveHelperDoneValue),
+  );
+  const savingWarning = useSelector((state) =>
+    idx(state, (_) => _.preferences.savingWarning),
+  );
+
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -124,13 +151,17 @@ export default function Receive(props) {
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
 
   useEffect(() => {
     if (!AsTrustedContact) {
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
+
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -170,7 +201,7 @@ export default function Receive(props) {
   useEffect(() => {
     if (!AsTrustedContact) return;
     if (!selectedContact || !selectedContact.firstName) {
-      console.log('Err: Contact missing');
+      //console.log('Err: Contact missing');
       return;
     }
     if (updateEphemeralChannelLoader) {
@@ -187,15 +218,16 @@ export default function Receive(props) {
 
     if (trustedContact) {
       if (!trustedContact.ephemeralChannel) {
-        console.log(
-          'Err: Ephemeral Channel does not exists for contact: ',
-          contactName,
-        );
+        // console.log(
+        //   'Err: Ephemeral Channel does not exists for contact: ',
+        //   contactName,
+        // );
         return;
       }
 
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
       const requester = WALLET_SETUP.walletName;
       const appVersion = DeviceInfo.getVersion();
 
@@ -205,7 +237,7 @@ export default function Receive(props) {
           selectedContact.phoneNumbers.length
         ) {
           const phoneNumber = selectedContact.phoneNumbers[0].number;
-          console.log({ phoneNumber });
+          // console.log({ phoneNumber });
           let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
           number = number.slice(number.length - 10); // last 10 digits only
           const numHintType = 'num';
@@ -223,7 +255,7 @@ export default function Receive(props) {
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
-          console.log({ numberDL });
+          // console.log({ numberDL });
           setReceiveLink(numberDL);
         } else if (selectedContact.emails && selectedContact.emails.length) {
           const email = selectedContact.emails[0].email;
@@ -244,13 +276,28 @@ export default function Receive(props) {
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
-          console.log({ emailDL });
+          //console.log({ emailDL });
           setReceiveLink(emailDL);
+        } else if (otp) {
+          const otpHintType = 'otp';
+          const otpHint = 'xxx';
+          const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+            .encryptedPub;
+          const otpDL =
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
+            `/${requester}` +
+            `/${otpEncPubKey}` +
+            `/${otpHintType}` +
+            `/${otpHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
+            `/v${appVersion}`;
+
+          console.log({ otpDL });
+          setReceiveLink(otpDL);
+          setOTP(otp);
+          setIsOTPType(true);
         } else {
-          Alert.alert(
-            'Invalid Contact',
-            'Cannot add a contact without phone-num/email as a trusted entity',
-          );
+          Alert.alert('Invalid Contact', 'Something went wrong.');
           return;
         }
         updateTrustedContactsInfo(selectedContact); // Contact initialized to become TC
@@ -268,6 +315,8 @@ export default function Receive(props) {
           info = number;
         } else if (selectedContact.emails && selectedContact.emails.length) {
           info = selectedContact.emails[0].email;
+        } else if (otp) {
+          info = otp;
         }
 
         setReceiveQR(
@@ -292,26 +341,20 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector(
-      (state) => state.trustedContacts.trustedContacts,
-    );
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
-
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
           }`
             .toLowerCase()
             .trim();
-
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
           }`
             .toLowerCase()
             .trim();
-
           return presentContactName == selectedContactName;
         }) == -1
       ) {
@@ -355,12 +398,12 @@ export default function Receive(props) {
         contactName,
         info: info.trim(),
       };
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
-      const { receivingAddress } =
-        serviceType === SECURE_ACCOUNT
-          ? service.secureHDWallet
-          : service.hdWallet;
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+      const receivingAddress = service.getReceivingAddress(
+        derivativeAccountDetails ? derivativeAccountDetails.type : null,
+        derivativeAccountDetails ? derivativeAccountDetails.number : null,
+      );
 
       let paymentURI;
       if (amount) {
@@ -368,12 +411,11 @@ export default function Receive(props) {
           amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
-
       let accountNumber =
         regularAccount.hdWallet.trustedContactToDA[contactName];
       if (!accountNumber) {
         // initialize a trusted derivative account against the following account
-        const res = await regularAccount.getDerivativeAccXpub(
+        const res = regularAccount.getDerivativeAccXpub(
           TRUSTED_CONTACTS,
           null,
           contactName,
@@ -402,7 +444,8 @@ export default function Receive(props) {
       if (!trustedContact) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
-          const FCM = await AsyncStorage.getItem('fcmToken');
+          const FCM = fcmTokenValue;
+          //await AsyncStorage.getItem('fcmToken');
 
           const data: EphemeralDataElements = {
             walletID,
@@ -417,6 +460,8 @@ export default function Receive(props) {
                 paymentURI,
               },
             },
+            trustedAddress: trustedReceivingAddress,
+            trustedTestAddress: testAccount.hdWallet.receivingAddress,
           };
           dispatch(updateEphemeralChannel(contactInfo, data));
         })();
@@ -428,7 +473,6 @@ export default function Receive(props) {
           config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
-
         dispatch(
           updateEphemeralChannel(
             contactInfo,
@@ -472,17 +516,42 @@ export default function Receive(props) {
     service,
   ]);
 
-  const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone1 = await AsyncStorage.getItem(
-      'isReceiveHelperDone',
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        renderTimer={renderTimer}
+        onPressOk={(index) => {
+          setTimeout(() => {
+            setRenderTimer(false);
+          }, 2);
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        onPressBack={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+        OTP={OTP}
+      />
     );
-    // console.log(
-    //   'isReceiveHelperDone1',
-    //   isReceiveHelperDone,
-    //   isReceiveHelperDone1,
-    // );
+  }, [OTP, renderTimer]);
+
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const checkNShowHelperModal = async () => {
+    let isReceiveHelperDone1 = isReceiveHelperDoneValue;
+    if (!isReceiveHelperDone1) {
+      await AsyncStorage.getItem('isReceiveHelperDone');
+    }
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      dispatch(setReceiveHelper(true));
+      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
@@ -499,227 +568,92 @@ export default function Receive(props) {
 
   useEffect(() => {
     checkNShowHelperModal();
-    (async () => {
-      if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
-          // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-          if (SecureReceiveWarningBottomSheet.current)
-            (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
-          await AsyncStorage.setItem('savingsWarning', 'true');
-        }
+    //(async () => {
+    if (serviceType === SECURE_ACCOUNT) {
+      if (!savingWarning) {
+        //await AsyncStorage.getItem('savingsWarning')
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        if (SecureReceiveWarningBottomSheet.current)
+          (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
+        dispatch(setSavingWarning(true));
+        //await AsyncStorage.setItem('savingsWarning', 'true');
       }
-    })();
+    }
+    //})();
   }, []);
 
-  const renderAddContactAddressBookHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    );
+  const onPressOkOf2FASetupWarning = () => {
+    if (SecureReceiveWarningBottomSheet.current)
+      (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
   };
 
-  const renderAddContactAddressBookContents = () => {
-    return (
-      <AddContactAddressBook
-        isLoadContacts={isLoadContacts}
-        modalTitle="Select a Contact"
-        modalRef={AddContactAddressBookBookBottomSheet}
-        proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={(selectedContacts) => {
-          setTimeout(() => {
-            setSelectedContact(selectedContacts[0]);
-          }, 2);
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-        onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact);
-        }}
-        onPressBack={() => {
-          setTimeout(() => {
-            setAsTrustedContact(!AsTrustedContact);
-            setSelectedContact({});
-          }, 2);
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
+  const onPressTouchableWrapper = () => {
+    if (ReceiveHelperBottomSheet.current)
+      (ReceiveHelperBottomSheet as any).current.snapTo(0);
   };
 
-  const renderSendViaLinkContents = useCallback(() => {
-    return (
-      <SendViaLink
-        isFromReceive={true}
-        headerText={'Share'}
-        subHeaderText={
-          !isEmpty(selectedContact)
-            ? 'Send to your contact'
-            : 'Send bitcoin address'
-        }
-        contactText={'Adding to Friends and Family:'}
-        amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
-        contact={!isEmpty(selectedContact) ? selectedContact : null}
-        info={
-          'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
-        }
-        infoText={
-          receiveLink.includes('https://hexawallet.io')
-            ? `Click here to accept contact request from ${
-                WALLET_SETUP.walletName
-              } Hexa wallet - link will expire in ${
-                config.TC_REQUEST_EXPIRY / (60000 * 60)
-              } hours`
-            : null
-        }
-        amount={amount === '' ? null : amount}
-        link={receiveLink}
-        serviceType={serviceType}
-        onPressBack={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
-        onPressDone={() => {
-          (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [selectedContact, receiveLink, amount, serviceType]);
-
-  const renderSendViaLinkHeader = useCallback(() => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (SendViaLinkBottomSheet.current)
-      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    );
-  }, []);
-
-  const renderSendViaQRContents = useCallback(() => {
-    //console.log(amount);
-    return (
-      <SendViaQR
-        isFromReceive={true}
-        headerText={'QR'}
-        subHeaderText={'Scan QR for contact request'}
-        contactText={'Adding to Friends and Family:'}
-        contact={!isEmpty(selectedContact) ? selectedContact : null}
-        amount={amount === '' ? null : amount}
-        QR={receiveQR}
-        serviceType={serviceType}
-        amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
-        contactEmail={''}
-        onPressBack={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
-        onPressDone={() => {
-          (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [selectedContact, receiveQR, amount, serviceType]);
-
-  const renderSendViaQRHeader = useCallback(() => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (SendViaQRBottomSheet.current)
-      //     (SendViaQRBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    );
-  }, []);
-
-  const renderReceiveHelperContents = useCallback(() => {
-    return (
-      // <TestAccountHelperModalContents
-      //   topButtonText={'Receiving Bitcoins'}
-      //   image={require('../../assets/images/icons/receive.png')}
-      //   helperInfo={
-      //     'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
-      //   }
-      //   continueButtonText={'Ok, got it'}
-      //   onPressContinue={() => {
-      //     if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-      //       if (ReceiveHelperBottomSheet.current)
-      //         (ReceiveHelperBottomSheet as any).current.snapTo(0);
-      //       props.navigation.navigate('ReceivingAddress', {
-      //         serviceType,
-      //         getServiceType,
-      //       });
-      //     }
-      //   }}
-      // />
-      <ReceiveHelpContents
-        titleClicked={() => {
-          if (ReceiveHelperBottomSheet.current)
-            (ReceiveHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [serviceType]);
-
-  const renderReceiveHelperHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          //console.log('isReceiveHelperDone', isReceiveHelperDone);
-          if (isReceiveHelperDone) {
-            if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(1);
-            setTimeout(() => {
-              setIsReceiveHelperDone(false);
-            }, 10);
-          } else {
-            if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(0);
-          }
-        }}
-      />
-    );
+  const onPressBack = () => {
+    if (getServiceType) {
+      getServiceType(serviceType, carouselIndex);
+    }
+    props.navigation.goBack();
   };
 
-  const renderSecureReceiveWarningContents = useCallback(() => {
-    return (
-      <TwoFASetupWarningModal
-        onPressOk={() => {
-          if (SecureReceiveWarningBottomSheet.current)
-            (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-        }}
-        onPressManageBackup={() => props.navigation.replace('ManageBackup')}
-      />
-    );
-  }, [serviceType]);
+  const onPressKnowMore = () => {
+    dispatch(setReceiveHelper(true));
+    //AsyncStorage.setItem('isReceiveHelperDone', 'true');
+    if (ReceiveHelperBottomSheet.current)
+      (ReceiveHelperBottomSheet as any).current.snapTo(1);
+  };
 
-  const renderSecureReceiveWarningHeader = useCallback(() => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.borderColor}
-        backgroundColor={Colors.white}
-        // onPressHeader={() => {
-        //   if (SecureReceiveWarningBottomSheet.current)
-        //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-        // }}
-      />
-    );
-  }, []);
+  const onPressShare = () => {
+    if (AsTrustedContact) {
+      createTrustedContact();
+    }
+    if (SendViaLinkBottomSheet.current)
+      (SendViaLinkBottomSheet as any).current.snapTo(1);
+  };
+
+  const onPressQr = () => {
+    if (AsTrustedContact) {
+      createTrustedContact();
+    }
+    if (SendViaQRBottomSheet.current)
+      (SendViaQRBottomSheet as any).current.snapTo(1);
+  };
+
+  const onPressReceiveHelperHeader = () => {
+    if (isReceiveHelperDone) {
+      if (ReceiveHelperBottomSheet.current)
+        (ReceiveHelperBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        setIsReceiveHelperDone(false);
+      }, 10);
+    } else {
+      if (ReceiveHelperBottomSheet.current)
+        (ReceiveHelperBottomSheet as any).current.snapTo(0);
+    }
+  };
+
+  const onPressContinue = (selectedContacts) => {
+    setTimeout(() => {
+      setSelectedContact(selectedContacts[0]);
+    }, 2);
+    (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+  };
+
+  const setPhoneNumber = () => {
+    let phoneNumber = selectedContact.phoneNumbers[0].number;
+    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+    number = number.slice(number.length - 10); // last 10 digits only
+    return number;
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (ReceiveHelperBottomSheet.current)
-            (ReceiveHelperBottomSheet as any).current.snapTo(0);
-        }}
-      >
+      <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
@@ -731,12 +665,7 @@ export default function Receive(props) {
                 style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
               >
                 <TouchableOpacity
-                  onPress={() => {
-                    if (getServiceType) {
-                      getServiceType(serviceType);
-                    }
-                    props.navigation.goBack();
-                  }}
+                  onPress={() => onPressBack()}
                   style={{ height: 30, width: 30, justifyContent: 'center' }}
                 >
                   <FontAwesome
@@ -747,7 +676,10 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    serviceType == TEST_ACCOUNT
+                    derivativeAccountDetails &&
+                    derivativeAccountDetails.type === DONATION_ACCOUNT
+                      ? require('../../assets/images/icons/icon_donation_hexa.png')
+                      : serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
                       ? require('../../assets/images/icons/icon_regular.png')
@@ -764,7 +696,10 @@ export default function Receive(props) {
                       fontSize: RFValue(12),
                     }}
                   >
-                    {serviceType == TEST_ACCOUNT
+                    {derivativeAccountDetails &&
+                    derivativeAccountDetails.type === DONATION_ACCOUNT
+                      ? 'Donation Account'
+                      : serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
                       ? 'Checking Account'
@@ -773,16 +708,8 @@ export default function Receive(props) {
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
-                    onPress={() => {
-                      AsyncStorage.setItem('isReceiveHelperDone', 'true');
-                      if (ReceiveHelperBottomSheet.current)
-                        (ReceiveHelperBottomSheet as any).current.snapTo(1);
-                    }}
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      marginLeft: 'auto',
-                    }}
+                    onPress={() => onPressKnowMore()}
+                    style={styles.knowMoreTouchable}
                   >
                     Know more
                   </Text>
@@ -791,15 +718,7 @@ export default function Receive(props) {
             </View>
             <ScrollView>
               <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginBottom: 10,
-                    marginTop: hp('1%'),
-                  }}
-                >
+                <Text style={styles.requestedAmountText}>
                   Requested amount:
                 </Text>
                 <View style={styles.textBoxView}>
@@ -823,42 +742,13 @@ export default function Receive(props) {
 
                 <TouchableOpacity
                   activeOpacity={10}
-                  onPress={() => {
-                    setAsTrustedContact(!AsTrustedContact);
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    borderRadius: 8,
-                    backgroundColor: Colors.backgroundColor1,
-                    alignItems: 'center',
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    marginTop: 15,
-                    height: wp('13%'),
-                  }}
+                  onPress={() => setAsTrustedContact(!AsTrustedContact)}
+                  style={styles.senderAsContactTouchable}
                 >
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
+                  <Text style={styles.senderAsContactText}>
                     Add sender as Contact
                   </Text>
-                  <View
-                    style={{
-                      width: wp('7%'),
-                      height: wp('7%'),
-                      borderRadius: 7,
-                      backgroundColor: Colors.white,
-                      borderColor: Colors.borderColor,
-                      borderWidth: 1,
-                      marginLeft: 'auto',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <View style={styles.senderAsContactCheckView}>
                     {AsTrustedContact && (
                       <Entypo
                         name="check"
@@ -868,60 +758,22 @@ export default function Receive(props) {
                     )}
                   </View>
                 </TouchableOpacity>
-                {!isEmpty(selectedContact) && (
+                {!isEmpty(selectedContact) && AsTrustedContact && (
                   <View style={styles.contactProfileView}>
                     <View
                       style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          flex: 1,
-                          backgroundColor: Colors.backgroundColor1,
-                          height: 90,
-                          borderRadius: 10,
-                        }}
-                      >
+                      <View style={styles.selectedContactView}>
                         {selectedContact && selectedContact.imageAvailable ? (
-                          <View
-                            style={{
-                              marginLeft: 15,
-                              marginRight: 15,
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              shadowOpacity: 1,
-                              shadowOffset: { width: 2, height: 2 },
-                            }}
-                          >
+                          <View style={styles.selectedContactImageView}>
                             <Image
                               source={selectedContact && selectedContact.image}
                               style={{ ...styles.contactProfileImage }}
                             />
                           </View>
                         ) : (
-                          <View
-                            style={{
-                              marginLeft: 15,
-                              marginRight: 15,
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              backgroundColor: Colors.backgroundColor,
-                              width: 70,
-                              height: 70,
-                              borderRadius: 70 / 2,
-                              shadowColor: Colors.shadowBlue,
-                              shadowOpacity: 1,
-                              shadowOffset: { width: 2, height: 2 },
-                            }}
-                          >
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: RFValue(20),
-                                lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                              }}
-                            >
+                          <View style={styles.selectedContactInitialsView}>
+                            <Text style={styles.selectedContactInitialsText}>
                               {nameToInitials(
                                 selectedContact &&
                                   selectedContact.firstName &&
@@ -943,16 +795,7 @@ export default function Receive(props) {
                           </View>
                         )}
                         <View>
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(11),
-                              marginLeft: 5,
-                              paddingTop: 5,
-                              paddingBottom: 3,
-                            }}
-                          >
+                          <Text style={styles.addingAsContactText}>
                             Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
@@ -975,30 +818,14 @@ export default function Receive(props) {
                           {selectedContact &&
                           selectedContact.phoneNumbers &&
                           selectedContact.phoneNumbers.length ? (
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(10),
-                                marginLeft: 5,
-                                paddingTop: 3,
-                              }}
-                            >
-                              {selectedContact.phoneNumbers[0].digits}
+                            <Text style={styles.selectedContactPhoneNumber}>
+                              {setPhoneNumber()}
+                              {/* {selectedContact.phoneNumbers[0].digits} */}
                             </Text>
                           ) : selectedContact &&
                             selectedContact.emails &&
                             selectedContact.emails.length ? (
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(10),
-                                marginLeft: 5,
-                                paddingTop: 3,
-                                paddingBottom: 5,
-                              }}
-                            >
+                            <Text style={styles.selectedContactEmail}>
                               {selectedContact &&
                                 selectedContact.emails[0].email}
                             </Text>
@@ -1010,42 +837,16 @@ export default function Receive(props) {
                 )}
               </View>
             </ScrollView>
-            <View
-              style={{
-                marginTop: 'auto',
-                marginBottom: hp('3%'),
-                paddingTop: 10,
-              }}
-            >
+            <View style={styles.bottomButtonOuterView}>
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
                   title={'Bitcoin Receiving Address'}
                   infoText={'Generate bitcoin address and send via link or QR'}
                 />
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: Colors.blue,
-                  height: 60,
-                  borderRadius: 10,
-                  marginLeft: 25,
-                  marginRight: 25,
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 15, height: 15 },
-                }}
-              >
+              <View style={styles.bottomButtonInnerView}>
                 <AppBottomSheetTouchableWrapper
-                  onPress={() => {
-                    if (AsTrustedContact) {
-                      createTrustedContact();
-                    }
-                    if (SendViaLinkBottomSheet.current)
-                      (SendViaLinkBottomSheet as any).current.snapTo(1);
-                  }}
+                  onPress={() => onPressShare()}
                   style={styles.buttonInnerView}
                 >
                   <Image
@@ -1063,13 +864,7 @@ export default function Receive(props) {
                 />
                 <AppBottomSheetTouchableWrapper
                   style={styles.buttonInnerView}
-                  onPress={() => {
-                    if (AsTrustedContact) {
-                      createTrustedContact();
-                    }
-                    if (SendViaQRBottomSheet.current)
-                      (SendViaQRBottomSheet as any).current.snapTo(1);
-                  }}
+                  onPress={() => onPressQr()}
                 >
                   <Image
                     source={require('../../assets/images/icons/qr-code.png')}
@@ -1086,67 +881,213 @@ export default function Receive(props) {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}
-        snapPoints={[
-          -50,
-          hp('89%'),
-          // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
-        ]}
-        renderContent={renderReceiveHelperContents}
-        renderHeader={renderReceiveHelperHeader}
+        snapPoints={[-50, hp('89%')]}
+        renderContent={() => (
+          <ReceiveHelpContents
+            titleClicked={() => {
+              if (ReceiveHelperBottomSheet.current)
+                (ReceiveHelperBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.blue}
+            backgroundColor={Colors.blue}
+            onPressHeader={() => onPressReceiveHelperHeader()}
+          />
+        )}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
-        renderContent={renderAddContactAddressBookContents}
-        renderHeader={renderAddContactAddressBookHeader}
+        renderContent={() => (
+          <AddContactAddressBook
+            isLoadContacts={isLoadContacts}
+            modalTitle="Select a Contact"
+            modalRef={AddContactAddressBookBookBottomSheet}
+            proceedButtonText={'Confirm & Proceed'}
+            onPressContinue={(selectedContacts) =>
+              onPressContinue(selectedContacts)
+            }
+            onSelectContact={(selectedContact) =>
+              setSelectedContact(selectedContact)
+            }
+            onPressBack={() => {
+              setTimeout(() => {
+                setAsTrustedContact(!AsTrustedContact);
+                setSelectedContact({});
+              }, 2);
+              (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+            }}
+            onSkipContinue={() => {
+              let { skippedContactsCount } = trustedContacts.tc;
+              let data;
+              if (!skippedContactsCount) {
+                skippedContactsCount = 1;
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                };
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                };
+              }
+
+              onPressContinue([data]);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+            backgroundColor={Colors.white}
+            //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+          />
+        )}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
         ]}
-        renderContent={renderSendViaLinkContents}
-        renderHeader={renderSendViaLinkHeader}
+        renderContent={() => (
+          <SendViaLink
+            isFromReceive={true}
+            headerText={'Share'}
+            subHeaderText={
+              !isEmpty(selectedContact)
+                ? 'Send to your contact'
+                : 'Send bitcoin address'
+            }
+            contactText={'Adding to Friends and Family:'}
+            amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
+            contact={!isEmpty(selectedContact) ? selectedContact : null}
+            info={
+              'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
+            }
+            infoText={
+              receiveLink.includes('https://hexawallet.io')
+                ? `Click here to accept contact request from ${
+                    WALLET_SETUP.walletName
+                  } Hexa wallet - link will expire in ${
+                    config.TC_REQUEST_EXPIRY / (60000 * 60)
+                  } hours`
+                : null
+            }
+            amount={amount === '' ? null : amount}
+            link={receiveLink}
+            serviceType={serviceType}
+            onPressBack={() => {
+              if (SendViaLinkBottomSheet.current)
+                (SendViaLinkBottomSheet as any).current.snapTo(0);
+            }}
+            onPressDone={() => {
+              if (isOTPType) {
+                setTimeout(() => {
+                  setRenderTimer(true);
+                }, 2);
+                shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+              }
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+          // onPressHeader={() => {
+          //   if (SendViaLinkBottomSheet.current)
+          //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+          // }}
+          />
+        )}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('56%'),
         ]}
-        renderContent={renderSendViaQRContents}
-        renderHeader={renderSendViaQRHeader}
+        renderContent={() => (
+          <SendViaQR
+            isFromReceive={true}
+            headerText={'QR'}
+            subHeaderText={'Scan QR for contact request'}
+            contactText={'Adding to Friends and Family:'}
+            contact={!isEmpty(selectedContact) ? selectedContact : null}
+            amount={amount === '' ? null : amount}
+            QR={receiveQR}
+            serviceType={serviceType}
+            amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
+            contactEmail={''}
+            onPressBack={() => {
+              if (SendViaQRBottomSheet.current)
+                (SendViaQRBottomSheet as any).current.snapTo(0);
+            }}
+            onPressDone={() => (SendViaQRBottomSheet as any).current.snapTo(0)}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+          // onPressHeader={() => {
+          //   if (SendViaQRBottomSheet.current)
+          //     (SendViaQRBottomSheet as any).current.snapTo(0);
+          // }}
+          />
+        )}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SecureReceiveWarningBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={renderSecureReceiveWarningContents}
-        renderHeader={renderSecureReceiveWarningHeader}
+        renderContent={() => (
+          <TwoFASetupWarningModal
+            onPressOk={() => onPressOkOf2FASetupWarning()}
+            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.borderColor}
+            backgroundColor={Colors.white}
+            // onPressHeader={() => {
+            //   if (SecureReceiveWarningBottomSheet.current)
+            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+            // }}
+          />
+        )}
+      />
+
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={shareOtpWithTrustedContactBottomSheet}
+        snapPoints={[-30, hp('65%')]}
+        renderContent={renderShareOtpWithTrustedContactContent}
+        renderHeader={renderShareOtpWithTrustedContactHeader}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -1156,34 +1097,6 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
-  },
-  boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    fontStyle: 'italic',
-    color: Colors.blue,
-  },
-  modalHeaderContainer: {
-    backgroundColor: Colors.white,
-    marginTop: 'auto',
-    flex: 1,
-    height: Platform.OS == 'ios' ? 45 : 40,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
-    zIndex: 9999,
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -1250,11 +1163,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
-  contactIconImage: {
-    width: 20,
-    height: 20,
-    resizeMode: 'cover',
-  },
   buttonInnerView: {
     flexDirection: 'row',
     height: 40,
@@ -1274,31 +1182,118 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-  TwoFAWarningButtonView: {
+  knowMoreTouchable: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    marginLeft: 'auto',
+  },
+  requestedAmountText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansRegular,
+    marginBottom: 10,
+    marginTop: hp('1%'),
+  },
+  senderAsContactTouchable: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundColor1,
+    alignItems: 'center',
     paddingLeft: 20,
     paddingRight: 20,
-    flexDirection: 'row',
-    marginTop: hp('1%'),
-    marginBottom: hp('2%'),
-    marginLeft: hp('2%'),
-  },
-  TwoFAWarningButton: {
-    width: wp('40%'),
+    marginTop: 15,
     height: wp('13%'),
-    justifyContent: 'center',
+  },
+  senderAsContactText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  senderAsContactCheckView: {
+    width: wp('7%'),
+    height: wp('7%'),
+    borderRadius: 7,
+    backgroundColor: Colors.white,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    marginLeft: 'auto',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedContactView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: Colors.backgroundColor1,
+    height: 90,
     borderRadius: 10,
-    backgroundColor: Colors.blue,
-    elevation: 10,
+  },
+  selectedContactImageView: {
+    marginLeft: 15,
+    marginRight: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOpacity: 1,
+    shadowOffset: { width: 2, height: 2 },
+  },
+  selectedContactInitialsView: {
+    marginLeft: 15,
+    marginRight: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.backgroundColor,
+    width: 70,
+    height: 70,
+    borderRadius: 70 / 2,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    marginRight: 5,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: { width: 2, height: 2 },
   },
-  TwoFAWarningButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
+  selectedContactInitialsText: {
+    textAlign: 'center',
+    fontSize: RFValue(20),
+    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+  },
+  addingAsContactText: {
+    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11),
+    marginLeft: 5,
+    paddingTop: 5,
+    paddingBottom: 3,
+  },
+  selectedContactPhoneNumber: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(10),
+    marginLeft: 5,
+    paddingTop: 3,
+  },
+  selectedContactEmail: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(10),
+    marginLeft: 5,
+    paddingTop: 3,
+    paddingBottom: 5,
+  },
+  bottomButtonOuterView: {
+    marginTop: 'auto',
+    marginBottom: hp('3%'),
+    paddingTop: 10,
+  },
+  bottomButtonInnerView: {
+    flexDirection: 'row',
+    backgroundColor: Colors.blue,
+    height: 60,
+    borderRadius: 10,
+    marginLeft: 25,
+    marginRight: 25,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
   TwoFAWarningView: {
     height: '100%',

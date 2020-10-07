@@ -133,6 +133,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
               props.navigation.goBack();
               // props.navigation.navigate('RestoreSelectedContactsList');
             }}
+            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome

@@ -110,10 +110,6 @@ function* servicesEnricherWorker({ payload }) {
     if (appVersion === "0.9") {
       appVersion = "0.9.0"
     }
-
-
-
-
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,

@@ -204,6 +204,7 @@ export default class BaseAccount {
     accountType: string,
     accountNumber?: number,
     contactName?: string,
+    accountName?: string,
   ): Promise<
     | {
         status: number;
@@ -225,6 +226,7 @@ export default class BaseAccount {
           accountType,
           accountNumber,
           contactName ? contactName.toLowerCase().trim() : null,
+          accountName,
         ),
       };
     } catch (err) {
@@ -367,7 +369,9 @@ export default class BaseAccount {
     configuration: {
       displayBalance: boolean;
       displayTransactions: boolean;
+      displayTxDetails: boolean;
     },
+    disableAccount?: boolean,
   ): Promise<
     | {
         status: number;
@@ -392,6 +396,7 @@ export default class BaseAccount {
           subject,
           description,
           configuration,
+          disableAccount,
         ),
       };
     } catch (err) {
@@ -405,9 +410,18 @@ export default class BaseAccount {
 
   public updateDonationPreferences = async (
     accountNumber: number,
-    configuration: {
-      displayBalance: boolean;
-      displayTransactions: boolean;
+    preferences: {
+      disableAccount?: boolean;
+      configuration?: {
+        displayBalance: boolean;
+        displayTransactions: boolean;
+        displayTxDetails: boolean;
+      };
+      accountDetails?: {
+        donee: string;
+        subject: string;
+        description: string;
+      };
     },
   ): Promise<
     | {
@@ -430,7 +444,7 @@ export default class BaseAccount {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.updateDonationPreferences(
           accountNumber,
-          configuration,
+          preferences,
         ),
       };
     } catch (err) {

@@ -176,6 +176,7 @@ export default function SettingGetNewPin(props) {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity
                 onPress={() => props.navigation.goBack()}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
                 style={{ height: 30, width: 30, justifyContent: 'center' }}
               >
                 <FontAwesome
