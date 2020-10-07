@@ -4,6 +4,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { ImportedWalletAccountPayload } from './Interfaces';
 import AccountVisibility from '../../enums/AccountVisibility';
+import TransactionGroup from '../../enums/TransactionGroup';
 
 
 interface ConstructorProps {
@@ -33,7 +34,7 @@ export class WatchOnlyImportedWalletAccountPayload implements ImportedWalletAcco
   visibility: AccountVisibility;
   secondaryAccountUUIDs: string[];
   transactionIDs: string[];
-
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     defaultTitle,
@@ -83,7 +84,7 @@ export class FullyImportedWalletAccountPayload implements ImportedWalletAccountP
   visibility: AccountVisibility;
   secondaryAccountUUIDs: string[];
   transactionIDs: string[];
-
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     defaultTitle,
