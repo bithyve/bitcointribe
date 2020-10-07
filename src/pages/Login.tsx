@@ -380,14 +380,11 @@ export default function Login(props) {
   }, [isAuthenticated, dbFetched]);
 
   const handleLoaderMessages = (passcode) => {
-    dispatch(credsAuth(passcode));
-
-    setTimeout(() => {
-      const message = getRandomMessage();
-      setMessage(message.heading);
-      setSubTextMessage1(message.text);
-      setSubTextMessage2(message.subText);
-    }, LOADER_MESSAGE_TIME);
+    const message = getRandomMessage();
+    setMessage(message.heading);
+    setSubTextMessage1(message.text);
+    setSubTextMessage2(message.subText);
+    dispatch(credsAuth(passcode))
   };
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -510,8 +507,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -539,8 +536,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -568,8 +565,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -597,8 +594,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -616,7 +613,7 @@ export default function Login(props) {
                     setIsDisabledProceed(true);
                     setElevation(0);
                   }, 2);
-                  loaderBottomSheet.current.snapTo(1);
+                  setTimeout(() => loaderBottomSheet.current.snapTo(1), 2)
                   handleLoaderMessages(passcode);
                 }}
                 style={{
@@ -768,7 +765,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
@@ -793,7 +790,7 @@ export default function Login(props) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       />
-    </View>
+    </View >
   );
 }
 
