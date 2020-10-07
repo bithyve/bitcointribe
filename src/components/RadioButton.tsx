@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
@@ -12,48 +11,43 @@ export type Props = {
   size?: number;
   color? : string;
   borderColor? : string;
+  ignoresTouch?: boolean;
   onpress?: () => void;
 };
 
 const RadioButton: React.FC<Props> = ({
-  isChecked,
-  size,
-  color,
-  borderColor,
-  onpress,
-}) => {
-  const containerSize = useMemo(() => {
-    return size || 20;
-  }, [size]);
-
+  isChecked = false,
+  size = 20,
+  color = Colors.primaryAccentLighter1,
+  borderColor = Colors.borderColor,
+  ignoresTouch = false,
+  onpress = () => {},
+}: Props) => {
   const containerStyle = useMemo(() => {
     return {
-      borderColor: borderColor || 'none',
-      borderWidth: 1,
-      borderRadius: containerSize / 2,
-      height: containerSize,
-      width: containerSize,
-      justifyContent: 'center',
-      alignItems: 'center',
+      ...styles.rootContainer,
+      borderColor,
+      borderRadius: size / 2,
+      height: size,
+      width: size,
     };
-  }, [borderColor, containerSize]);
+  }, [borderColor, size]);
 
   const innerCircleStyle = useMemo(() => {
     return {
-      backgroundColor: color || Colors.blue,
-      borderRadius: containerSize / 2,
-      height: containerSize - 5,
-      width: containerSize - 5,
+      backgroundColor: color,
+      borderRadius: size / 2,
+      height: size - 5,
+      width: size - 5,
     };
-  }, [color, containerSize]);
+  }, [color, size]);
 
   return (
     <TouchableOpacity
       style={containerStyle}
       activeOpacity={1}
-      onPress={() => {
-        if (onpress) { onpress(); }
-      }}
+      disabled={ignoresTouch}
+      onPress={onpress}
     >
       {isChecked &&
         <View style={innerCircleStyle} />
@@ -61,5 +55,13 @@ const RadioButton: React.FC<Props> = ({
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default RadioButton;
