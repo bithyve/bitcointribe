@@ -66,7 +66,6 @@ import {
 
 import {
   initHCWatcher,
-  generateMetaSharesWatcher,
   uploadEncMetaShareWatcher,
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
@@ -116,7 +115,8 @@ import {
 import {
   initHealthWatcher,
   checkSharesHealthWatcher,
-  updateSharesHealthWatcher
+  updateSharesHealthWatcher,
+  generateMetaSharesWatcher,
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -181,7 +181,6 @@ const rootSaga = function* () {
 
     // sss watchers
     initHCWatcher,
-    generateMetaSharesWatcher,
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
     generatePersonalCopyWatcher,
@@ -227,7 +226,8 @@ const rootSaga = function* () {
     // Health 
     initHealthWatcher,
     checkSharesHealthWatcher,
-    updateSharesHealthWatcher
+    updateSharesHealthWatcher,
+    generateMetaSharesWatcher,
   ];
 
   yield all(

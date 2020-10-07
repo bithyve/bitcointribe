@@ -61,7 +61,7 @@ export interface MetaShare {
     reshareVersion: number;
     guardian?: string;
   };
-  encryptedStaticNonPMDD: string;
+  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {

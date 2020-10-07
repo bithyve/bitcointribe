@@ -1047,6 +1047,52 @@ export default class LevelHealth {
     return { metaShares: this.metaShares };
   };
 
+  public createMetaSharesKeeper = (
+    tag: string,
+    version?: string,
+  ): {
+    metaShares: MetaShare[];
+  } => {
+    if (!this.encryptedSecrets.length) {
+      throw new Error('Can not create MetaShares; missing encryptedSecrets');
+    }
+
+    const timestamp = new Date().toLocaleString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    let index = 0;
+    let metaShare: MetaShare;
+    for (const encryptedSecret of this.encryptedSecrets) {
+        metaShare = {
+          encryptedSecret,
+          shareId: LevelHealth.getShareId(encryptedSecret),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+          },
+        };
+      this.metaShares.push(metaShare);
+      index++;
+    }
+    if (this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
+      this.metaShares = [];
+      throw new Error('Something went wrong while generating metaShares');
+    }
+
+    return { metaShares: this.metaShares };
+  };
+
+
   public reshareMetaShare = (index: number) => {
     this.metaShares[index].meta.reshareVersion =
       this.metaShares[index].meta.reshareVersion + 1;

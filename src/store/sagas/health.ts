@@ -1,12 +1,9 @@
 import { call, put, select, delay } from 'redux-saga/effects';
 import {
   createWatcher,
-  serviceGenerator,
   requestTimedout,
 } from '../utils/utilities';
 import {
-  healthInitialize,
-  healthInitialized,
   INIT_HEALTH_SETUP,
   UPDATE_HEALTH,
   CHECK_SHARES_HEALTH,
@@ -14,14 +11,6 @@ import {
   updateMSharesLoader
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import {
-  SECURE_ACCOUNT,
-  REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes';
-import DeviceInfo from 'react-native-device-info';
-import moment from 'moment';
 import {
   updateHealth,
 } from '../actions/health';
@@ -30,12 +19,38 @@ import {
   switchS3LoadingStatus,
   initLoader,
   healthCheckInitialized,
-  PREPARE_MSHARES,
+  GENERATE_META_SHARE,
 } from '../actions/health';
 import { insertDBWorker } from './storage';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
 import {generateRandomString} from '../../common/CommonFunctions/index';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import DeviceInfo from 'react-native-device-info';
+
+function* updateHealthToRelay() {
+  let healthArray = [
+  {
+    "shareType": "cloud",
+    "updatedAt": 0,
+    "status": "notAccessible",
+    "shareId": "randomIdForCloud",
+    "reshareVersion": 0
+},
+{
+    "shareType": "securityQuestion",
+    "updatedAt": 0,
+    "status": "accessible",
+    "shareId": "randomIdForSecurityQ",
+    "reshareVersion": 0 
+}];
+  yield put(updateHealth(healthArray));
+}
+
+export const updateHealthToRelayWatcher = createWatcher(
+  updateHealthToRelay,
+  UPDATE_HEALTH,
+);
+
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
@@ -76,46 +91,33 @@ function* initHealthWorker() {
 
 export const initHealthWatcher = createWatcher(initHealthWorker, INIT_HEALTH_SETUP);
 
-function* generateMetaSharesWorker() {
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+function* generateMetaSharesWorker({ payload }) {
+  let s3Service: S3Service = yield select((state) => state.sss.service);
   const { walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
-  const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
-
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
-  if (!secondaryMnemonic || !twoFASecret) {
-    throw new Error('secure assets missing; staticNonPMDD');
-  }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
-
-  const secureAssets = {
-    secondaryMnemonic,
-    twoFASecret,
-    secondaryXpub: secondary,
-    bhXpub: bh,
-  };
-
   const appVersion = DeviceInfo.getVersion();
-
-  if (s3Service.levelhealth.metaShares.length) return;
+  const { level } = payload;
+  const { answer } = yield select(
+    (state) => state.storage.database.WALLET_SETUP.security,
+  );
   const res = yield call(
-    s3Service.createMetaShares,
-    secureAssets,
+    s3Service.generateLevel1Shares,
+    answer,
     walletName,
-    appVersion,
+    appVersion
   );
   if (res.status === 200) {
-    return s3Service;
-    // const { SERVICES } = yield select(state => state.storage.database);
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   S3_SERVICE: JSON.stringify(s3Service)
-    // };
-    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    let s3Service: S3Service = yield select((state) => state.sss.service);
+    //console.log("S#SERVICE", s3Service);
+    //console.log("shares", res.data);
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service)
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    //yield put(sharesGenerated({ shares: res.data.encryptedSecrets }));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
@@ -124,7 +126,7 @@ function* generateMetaSharesWorker() {
 
 export const generateMetaSharesWatcher = createWatcher(
   generateMetaSharesWorker,
-  PREPARE_MSHARES,
+  GENERATE_META_SHARE,
 );
 
 function* checkSharesHealthWorker() {

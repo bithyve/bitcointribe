@@ -6,7 +6,8 @@ import {
   ERROR_SENDING,
   S3_LOADING_STATUS,
   INIT_LOADING_STATUS,
-  UPDATE_MSHARE_LOADING_STATUS
+  UPDATE_MSHARE_LOADING_STATUS,
+  MSHARES
 } from '../actions/health';
 
 const initialState: {
@@ -27,6 +28,7 @@ const initialState: {
       guardian?: string;
     };
   }[];
+  shares: any;
 } = {
   loading: {
     levelHealthCheck: false,
@@ -36,6 +38,7 @@ const initialState: {
   },
   levelHealth: [],
   errorSending: false,
+  shares: null
 };
 
 export default (state = initialState, action) => {
@@ -104,6 +107,11 @@ export default (state = initialState, action) => {
         };
 
         
+      case MSHARES: 
+        return {
+        ...state,
+        shares: action.payload.shares,
+      };
   }
   return state;
 };

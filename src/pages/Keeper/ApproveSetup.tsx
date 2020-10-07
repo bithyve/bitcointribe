@@ -11,8 +11,11 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 import CountDown from '../../components/CountDown';
+import Config from '../../bitcoin/HexaConfig';
 
 export default function ApproveSetup(props) {
+  const KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY;
+
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View style={{ height: '100%' }}>
@@ -91,7 +94,7 @@ export default function ApproveSetup(props) {
         />
         <CountDown
           size={15}
-          until={600}
+          until={KP_REQUEST_EXPIRY}
           // onFinish={() => props.onPressContinue()}
           digitStyle={{
             backgroundColor: '#FFF',
@@ -105,8 +108,8 @@ export default function ApproveSetup(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
           separatorStyle={{ color: Colors.blue }}
-          timeToShow={['M', 'S']}
-          timeLabels={{ m: null, s: null }}
+          timeToShow={['H', 'M', 'S']}
+          timeLabels={{ h: null, m: null, s: null }}
           showSeparator
         />
         </View>

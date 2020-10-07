@@ -191,7 +191,7 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={()=>{
-          if(!props.navigation.state.params.isLevel2){
+          if(!props.navigation.state.params.isPrimaryKeeper){
               (ApproveSetupBottomSheet as any).current.snapTo(1);  
             }
             else{

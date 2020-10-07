@@ -105,6 +105,9 @@ class HexaConfig {
     10,
   );
   public TC_REQUEST_EXPIRY = parseInt(Config.BIT_TC_REQUEST_EXPIRY.trim(), 10);
+  
+  public KP_REQUEST_EXPIRY = parseInt(Config.KP_REQUEST_EXPIRY.trim(), 10);
+
 
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {

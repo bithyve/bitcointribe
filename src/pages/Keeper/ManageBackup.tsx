@@ -46,6 +46,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
 import { checkMSharesHealth } from '../../store/actions/health';
+import { generateMetaShare } from '../../store/actions/health';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -53,6 +54,7 @@ interface ManageBackupStateTypes {
   isLevel2: boolean;
   securityAtLevel: any;
   encryptedCloudDataJson: any;
+  isPrimaryKeeper: any;
 }
 
 interface ManageBackupPropsTypes {
@@ -65,6 +67,7 @@ interface ManageBackupPropsTypes {
   overallHealth: any;
   levelHealth: any[];
   healthLoading: any;
+  generateMetaShare: any;
 }
 
 class ManageBackup extends Component<
@@ -114,7 +117,7 @@ class ManageBackup extends Component<
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           keeper1: {
-            name: 'iPad Pro',
+            name: 'Keeper Device',
             keeper1Done: true,
             type: 'device',
           },
@@ -147,6 +150,7 @@ class ManageBackup extends Component<
         },
       ],
       isLevel2: false,
+      isPrimaryKeeper: false,
       encryptedCloudDataJson: []
     };
   }
@@ -265,12 +269,26 @@ class ManageBackup extends Component<
     // }
   };
 
+  generateShares = () =>{
+    const { isLevel2, isPrimaryKeeper } = this.state;
+    const {generateMetaShare} = this.props;
+    generateMetaShare(2);
+    this.props.navigation.navigate('KeeperDeviceHistory', {
+      selectedTime: this.getTime(new Date()),
+      selectedStatus: 'Ugly',
+      selectedTitle: "Keeper Device",
+      isLevel2: isLevel2,
+      isPrimaryKeeper: isPrimaryKeeper
+    });
+  }
+
   render() {
     const {
       levelData,
       selectedId,
       isLevel2,
       securityAtLevel,
+      isPrimaryKeeper
     } = this.state;
     const { navigation, overallHealth, levelHealth, healthLoading } = this.props;
     // console.log('selectedId', selectedId)
@@ -581,9 +599,11 @@ class ManageBackup extends Component<
                                     .SetupPrimaryKeeperBottomSheet as any).snapTo(
                                     1,
                                   );
+                                  this.setState({isPrimaryKeeper: true});
                                 } else {
                                   (this.refs
                                     .keeperTypeBottomSheet as any).snapTo(1);
+                                    this.setState({isPrimaryKeeper: false});
                                 }
                               }}
                             >
@@ -651,6 +671,8 @@ class ManageBackup extends Component<
                                   (this.refs
                                     .keeperTypeBottomSheet as any).snapTo(1);
                                 }, 2);
+                                this.setState({isPrimaryKeeper: false});
+
                               }}
                             >
                               {value.keeper2.keeper2Done &&
@@ -720,6 +742,7 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
+                    isPrimaryKeeper: isPrimaryKeeper
                   });
                 }
                 if (type === 'device') {
@@ -728,6 +751,7 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
+                    isPrimaryKeeper: isPrimaryKeeper
                   });
                 }
                 if (type === 'pdf') {
@@ -736,6 +760,7 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
+                    isPrimaryKeeper: isPrimaryKeeper
                   });
                 }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -776,12 +801,12 @@ class ManageBackup extends Component<
               proceedButtonText={'Proceed'}
               backButtonText={'Back'}
               onPressBack={() => {
-                navigation.navigate('KeeperFeatures');
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
               }}
               onPressContinue={() => {
-                navigation.navigate('KeeperFeatures');
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+                this.generateShares();
+                // navigation.navigate('KeeperFeatures');
+                // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
               }}
             />
           )}
@@ -819,6 +844,7 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
     setCloudBackupStatus,
+    generateMetaShare
   })(ManageBackup),
 );
 

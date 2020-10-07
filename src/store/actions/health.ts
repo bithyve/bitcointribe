@@ -14,6 +14,8 @@
   export const ERROR_SENDING = 'ERROR_SENDING';
   export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH';
   export const UPDATE_MSHARE_LOADING_STATUS = 'UPDATE_MSHARE_LOADING_STATUS';
+  export const GENERATE_META_SHARE = 'GENERATE_META_SHARE';
+export const MSHARES = "MSHARES";
 
   export const initHealthCheck = () => {
     return { type: INIT_HEALTH_CHECK };
@@ -76,3 +78,10 @@
     // console.log("Called s3 Loading", new Date())
     return { type: UPDATE_MSHARE_LOADING_STATUS, payload: { beingLoaded } };
   };
+  export const generateMetaShare = (level) => {
+    return { type: GENERATE_META_SHARE, payload: {level} };
+  }
+
+  export const sharesGenerated = (shares) => {
+    return { type: MSHARES, payload: {shares} };
+  }
