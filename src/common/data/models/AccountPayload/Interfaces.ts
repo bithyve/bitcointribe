@@ -2,6 +2,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import AccountVisibility from "../../enums/AccountVisibility";
+import TransactionGroup from "../../enums/TransactionGroup";
 
 
 interface BaseAccountPayload {
@@ -55,6 +56,7 @@ interface BaseAccountPayload {
   imageSource: NodeRequire;
 
   transactionIDs: string[];
+  transactionGroup: TransactionGroup;
 }
 
 

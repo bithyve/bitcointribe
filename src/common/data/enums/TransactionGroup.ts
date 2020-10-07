@@ -2,7 +2,7 @@
  * Determines whether or not an account is a compatible destination
  * for re-mapping another account's transactions.
  */
-enum AccountGroup {
+enum TransactionGroup {
   SINGLE_SIG_PUBLIC,
   SINGLE_SIG_PRIVATE,
   MULTI_SIG_PUBLIC,
@@ -10,4 +10,4 @@ enum AccountGroup {
   TESTNET,
 }
 
-export default AccountGroup
+export default TransactionGroup

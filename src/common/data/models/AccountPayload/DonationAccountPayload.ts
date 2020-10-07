@@ -4,6 +4,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { DonationReceivingAccountPayload } from './Interfaces';
 import AccountVisibility from '../../enums/AccountVisibility';
+import TransactionGroup from '../../enums/TransactionGroup';
 
 interface ConstructorProps {
   defaultTitle?: string;
@@ -39,8 +40,9 @@ export default class DonationAccountPayload implements DonationReceivingAccountP
   visibility: AccountVisibility;
 
   secondaryAccountUUIDs: string[];
-  transactionIDs: string[];
 
+  transactionIDs: string[];
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     defaultTitle,
