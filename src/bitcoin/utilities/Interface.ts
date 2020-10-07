@@ -306,27 +306,30 @@ export interface EncryptedImage {
   ASYNC_DATA?: string;
 }
 
-export interface PrimaryUser {
-  uuid: string;
-  privateKey: string;
-  publicKey: string;
-  encKey: string;
-  otp?: string;
-  symmetricKey?: string;
-  secondaryKey?: string;
-  contactsPubKey?: string;
-  contactsWalletName?: string;
-  walletID?: string;
-  FCMs?: string[];
-  ephemeralChannel?: {
-    address: string;
-    initiatedAt?: number;
-    data?: EphemeralDataElements[];
-  };
-  trustedChannel?: {
-    address: string;
-    data?: TrustedData[];
-  };
-  trustedAddress?: string;
-  trustedTestAddress?: string;
+export interface Keepers {
+  [shareId: string]: {
+    uuid: string;
+    shareType: string;
+    privateKey: string;
+    publicKey: string;
+    encKey: string;
+    otp?: string;
+    symmetricKey?: string;
+    secondaryKey?: string;
+    contactsPubKey?: string;
+    contactsWalletName?: string;
+    walletID?: string;
+    FCMs?: string[];
+    ephemeralChannel?: {
+      address: string;
+      initiatedAt?: number;
+      data?: EphemeralDataElements[];
+    };
+    trustedChannel?: {
+      address: string;
+      data?: TrustedData[];
+    };
+    trustedAddress?: string;
+    trustedTestAddress?: string;
+  }
 }

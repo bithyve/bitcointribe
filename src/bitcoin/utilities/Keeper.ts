@@ -1,5 +1,5 @@
 import {
-  PrimaryUser,
+  Keepers,
   EphemeralDataElements,
   TrustedDataElements,
   EphemeralData,
@@ -17,7 +17,7 @@ const { HEXA_ID } = config;
 
 export default class Keeper {
 
-  public user: PrimaryUser;
+  public keepers: Keepers = {};
 
   public static cipherSpec: {
     algorithm: string;
@@ -72,38 +72,39 @@ export default class Keeper {
     return { data };
   };
 
-  public initializeKeeper = (
-    uuid: string,
-    privateKey: string,
-    publicKey: string,
-    encKey: string,
-    ephemeralAddress: string
-  ): boolean => {
+  // public initializeKeeper = (
+  //   uuid: string,
+  //   privateKey: string,
+  //   publicKey: string,
+  //   encKey: string,
+  //   ephemeralAddress: string
+  // ): boolean => {
 
-    // const keyPair = ec.genKeyPair();
-    // const publicKey = keyPair.getPublic('hex');
-    // const privateKey = keyPair.getPrivate('hex');
+  //   // const keyPair = ec.genKeyPair();
+  //   // const publicKey = keyPair.getPublic('hex');
+  //   // const privateKey = keyPair.getPrivate('hex');
 
-    // const ephemeralAddress = crypto
-    //   .createHash('sha256')
-    //   .update(publicKey)
-    //   .digest('hex');
+  //   // const ephemeralAddress = crypto
+  //   //   .createHash('sha256')
+  //   //   .update(publicKey)
+  //   //   .digest('hex');
 
-    this.user = {
-      uuid: uuid,
-      privateKey,
-      publicKey,
-      encKey,
-      ephemeralChannel: { address: ephemeralAddress },
-    };
+  //   this.keepers[shareId] = {
+  //     uuid: uuid,
+  //     privateKey,
+  //     publicKey,
+  //     encKey,
+  //     ephemeralChannel: { address: ephemeralAddress },
+  //   };
 
-    return true;
-  };
+  //   return true;
+  // };
 
   public updateEphemeralChannelData = (
+    shareId: string,
     data: EphemeralDataElements,
   ): { updatedEphemeralDataElements: EphemeralDataElements } => {
-    let ephemeralData = this.user.ephemeralChannel.data;
+    let ephemeralData = this.keepers[shareId].ephemeralChannel.data;
     let updatedEphemeralDataElements: EphemeralDataElements;
     if (ephemeralData) {
       let updated = false;
@@ -125,16 +126,16 @@ export default class Keeper {
         updatedEphemeralDataElements = data;
         // update counterparty's walletId and FCM
         data.walletID
-          ? (this.user.walletID = data.walletID)
+          ? (this.keepers[shareId].walletID = data.walletID)
           : null;
 
         if (data.FCM)
-          this.user.FCMs
-            ? this.user.FCMs.push(data.FCM)
-            : (this.user.FCMs = [data.FCM]);
+          this.keepers[shareId].FCMs
+            ? this.keepers[shareId].FCMs.push(data.FCM)
+            : (this.keepers[shareId].FCMs = [data.FCM]);
 
-        this.user.trustedAddress = data.trustedAddress;
-        this.user.trustedTestAddress =
+        this.keepers[shareId].trustedAddress = data.trustedAddress;
+        this.keepers[shareId].trustedTestAddress =
           data.trustedTestAddress;
       }
     } else {
@@ -142,11 +143,17 @@ export default class Keeper {
       updatedEphemeralDataElements = data;
     }
 
-    this.user.ephemeralChannel.data = ephemeralData;
+    this.keepers[shareId].ephemeralChannel.data = ephemeralData;
     return { updatedEphemeralDataElements };
   };
 
   public updateEphemeralChannel = async (
+    shareId: string,
+    uuid: string,
+    shareType: string,
+    privateKey: string,
+    publicKey: string,
+    ephemeralAddress: string,
     dataElements: EphemeralDataElements,
     encKey: string,
     fetch?: Boolean,
@@ -165,20 +172,28 @@ export default class Keeper {
   > => {
     try {
 
-      const { publicKey, ephemeralChannel } = this.user;
+      this.keepers[shareId] = {
+        uuid,
+        shareType,
+        privateKey,
+        publicKey,
+        encKey,
+        ephemeralChannel: { address: ephemeralAddress },
+      };
+
       dataElements.publicKey = publicKey;
 
       if (dataElements.DHInfo)
-        dataElements.DHInfo.address = ephemeralChannel.address;
+        dataElements.DHInfo.address = this.keepers[shareId].ephemeralChannel.address;
 
-      const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(dataElements);
+      const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(shareId, dataElements);
 
       let res: AxiosResponse;
       if (!encKey) {
         // supporting versions prior to 1.1.0
         res = await BH_AXIOS.post('updateEphemeralChannel', {
           HEXA_ID,
-          address: ephemeralChannel.address,
+          address: this.keepers[shareId].ephemeralChannel.address,
           data: dataElements,
           fetch,
           legacy: true,
@@ -214,7 +229,7 @@ export default class Keeper {
           res = await BH_AXIOS.post('updateShareAndEC', {
             // EC update params
             HEXA_ID,
-            address: ephemeralChannel.address,
+            address: this.keepers[shareId].ephemeralChannel.address,
             data: encryptedDataPacket,
             fetch,
             // upload share params
@@ -225,7 +240,7 @@ export default class Keeper {
         } else {
           res = await BH_AXIOS.post('updateEphemeralChannel', {
             HEXA_ID,
-            address: ephemeralChannel.address,
+            address: this.keepers[shareId].ephemeralChannel.address,
             data: encryptedDataPacket,
             fetch,
           });
@@ -236,18 +251,18 @@ export default class Keeper {
       console.log({ updated, initiatedAt, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (initiatedAt)
-        this.user.ephemeralChannel.initiatedAt = initiatedAt;
+        this.keepers[shareId].ephemeralChannel.initiatedAt = initiatedAt;
 
       if (data && Object.keys(data).length) {
         if (!encKey) {
-          this.updateEphemeralChannelData(data);
+          this.updateEphemeralChannelData(shareId, data);
         }
 
         return {
           updated,
           publicKey,
           data: encKey
-            ? this.processEphemeralChannelData(data, encKey).data
+            ? this.processEphemeralChannelData(shareId, data, encKey).data
             : data,
         };
       }
@@ -261,6 +276,7 @@ export default class Keeper {
   };
 
   public processEphemeralChannelData = (
+    shareId: string,
     encryptedData: EncryptedEphemeralData,
     key: string,
   ): EphemeralData => {
@@ -273,7 +289,7 @@ export default class Keeper {
       publicKey: encryptedData.publicKey,
       data,
     };
-    this.updateEphemeralChannelData(decryptedEphemeralData.data);
+    this.updateEphemeralChannelData(shareId, decryptedEphemeralData.data);
     return decryptedEphemeralData;
   };
 }
