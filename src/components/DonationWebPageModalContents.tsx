@@ -119,7 +119,7 @@ export default function DonationWebPageModalContents(props) {
                   : 'donate-test'
               }/?donationid=${
                 props.account.id
-              }" width="400" height="600"></iframe>`}
+              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>
         </View>
