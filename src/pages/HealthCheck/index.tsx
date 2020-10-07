@@ -23,7 +23,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
+import { checkMSharesHealth, initializeHealthSetup } from '../../store/actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import BackupStyles from './Styles';
@@ -154,7 +154,7 @@ export default function HealthCheck(props) {
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     //WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-    if (!s3Service.levelhealth.healthCheckInitialized) dispatch(initHealthCheck());
+    if (!s3Service.levelhealth.healthCheckInitialized) dispatch(initializeHealthSetup());
   }, []);
 
   const { overallHealth } = useSelector(state => state.sss);

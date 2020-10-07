@@ -35,9 +35,11 @@ import _ from 'underscore';
 import { nameToInitials } from '../../common/CommonFunctions';
 import {
   uploadEncMShare,
-  checkMSharesHealth,
   ErrorSending,
 } from '../../store/actions/sss';
+import {
+  checkMSharesHealth,
+} from '../../store/actions/health';
 import { useDispatch } from 'react-redux';
 import SendShareModal from './SendShareModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';

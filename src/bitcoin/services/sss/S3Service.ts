@@ -298,7 +298,11 @@ export default class S3Service {
   };
 
   public static updateHealth = async (
-    metaShares: MetaShare[],
+    shares: [{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }],
   ): Promise<
     | {
         status: number;
@@ -322,10 +326,11 @@ export default class S3Service {
         data?: undefined;
       }
   > => {
+    console.log('updateMSharesHealth s3 shares', shares)
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await LevelHealth.updateHealth(metaShares),
+        data: await LevelHealth.updateHealth(shares),
       };
     } catch (err) {
       return { status: 506, err: err.message, message: ErrMap[506] };
@@ -591,15 +596,7 @@ export default class S3Service {
   public checkHealth = async (): Promise<
     | {
         status: number;
-        data: {
-          shareGuardianMapping: {
-            [index: number]: {
-              shareId: string;
-              updatedAt: number;
-              guardian: string;
-            };
-          };
-        };
+        data?: {};
         err?: undefined;
         message?: undefined;
       }
@@ -611,9 +608,10 @@ export default class S3Service {
       }
   > => {
     try {
+      console.log('this.levelhealth.checkHealth2()');
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.levelhealth.checkHealth(),
+        data: await this.levelhealth.checkHealth2(),
       };
     } catch (err) {
       return { status: 514, err: err.message, message: ErrMap[514] };

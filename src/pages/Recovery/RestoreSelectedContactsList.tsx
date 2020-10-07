@@ -39,8 +39,10 @@ import {
   recoverWallet,
   walletRecoveryFailed,
   ErrorReceiving,
-  checkMSharesHealth,
 } from '../../store/actions/sss';
+import {
+  checkMSharesHealth,
+} from '../../store/actions/health';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 

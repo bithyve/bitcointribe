@@ -31,7 +31,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import SecurityQuestion from './SecurityQuestion';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
-import { checkMSharesHealth } from '../../store/actions/sss';
+import { checkMSharesHealth } from '../../store/actions/health';
 
 const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([

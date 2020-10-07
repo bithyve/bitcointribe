@@ -3,12 +3,20 @@ import {
   HEALTH_CHECK_INITIALIZE,
   HEALTH_UPDATE,
   GET_HEALTH_OBJECT,
+  ERROR_SENDING,
+  S3_LOADING_STATUS,
+  INIT_LOADING_STATUS,
+  UPDATE_MSHARE_LOADING_STATUS
 } from '../actions/health';
 
 const initialState: {
   loading: {
     levelHealthCheck: Boolean;
+    checkMSharesHealth: Boolean;
+    initLoader: Boolean;
+    updateMSharesHealth: Boolean;
   };
+  errorSending: Boolean;
   levelHealth: {
     levelInfo: {
       shareType: string;
@@ -22,8 +30,12 @@ const initialState: {
 } = {
   loading: {
     levelHealthCheck: false,
+    checkMSharesHealth: false,
+    initLoader: false,
+    updateMSharesHealth: false
   },
   levelHealth: [],
+  errorSending: false,
 };
 
 export default (state = initialState, action) => {
@@ -57,6 +69,41 @@ export default (state = initialState, action) => {
         ...state,
         levelHealth: action.payload.health,
       };
+
+      case ERROR_SENDING:
+        return {
+          ...state,
+          errorSending: action.payload.isFailed,
+        };
+      
+      case S3_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            checkMSharesHealth: action.payload.beingLoaded,
+          },
+        };
+      
+      case INIT_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            initLoader: action.payload.beingLoaded,
+          },
+        };
+
+      case UPDATE_MSHARE_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            updateMSharesHealth: action.payload.beingLoaded,
+          },
+        };
+
+        
   }
   return state;
 };

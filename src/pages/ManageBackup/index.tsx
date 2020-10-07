@@ -25,7 +25,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
+import { initializeHealthSetup, checkMSharesHealth } from '../../store/actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import Icons from '../../common/Icons';
@@ -1374,7 +1374,7 @@ export default function ManageBackup(props) {
         })();
       } else {
         // console.log({ healthCheckInitialized });
-        dispatch(initHealthCheck());
+        dispatch(initializeHealthSetup());
       }
     }
   }, [s3Service]);

@@ -25,9 +25,11 @@ import LoaderModal from '../components/LoaderModal';
 import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
 import {
   updateMSharesHealth,
-  checkMSharesHealth,
   updateWalletImage,
 } from '../store/actions/sss';
+import {
+  checkMSharesHealth,
+} from '../store/actions/health';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';

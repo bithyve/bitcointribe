@@ -19,7 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch } from 'react-redux';
-import { checkMSharesHealth } from '../../store/actions/sss';
+import { checkMSharesHealth } from '../../store/actions/health';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';

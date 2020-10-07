@@ -54,8 +54,10 @@ import LoaderModal from '../../components/LoaderModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import {
   recoverWalletUsingIcloud,
-  checkMSharesHealth,
 } from '../../store/actions/sss';
+import {
+  checkMSharesHealth,
+} from '../../store/actions/health';
 import axios from 'axios';
 import {
   calculateExchangeRate,

@@ -114,7 +114,9 @@ import {
 } from './sagas/trustedContacts';
 
 import {
-  initHealthWatcher
+  initHealthWatcher,
+  checkSharesHealthWatcher,
+  updateSharesHealthWatcher
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -223,7 +225,9 @@ const rootSaga = function* () {
     trustedChannelsSyncWatcher,
 
     // Health 
-    initHealthWatcher
+    initHealthWatcher,
+    checkSharesHealthWatcher,
+    updateSharesHealthWatcher
   ];
 
   yield all(

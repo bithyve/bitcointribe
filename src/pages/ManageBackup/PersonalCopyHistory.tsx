@@ -21,13 +21,15 @@ import { getIconByStatus, verifyPersonalCopyAccess } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
-  checkMSharesHealth,
   personalCopyShared,
   generatePersonalCopy,
   personalCopyGenerated,
   pdfHealthChecked,
   pdfHealthCheckFailed,
 } from '../../store/actions/sss';
+import {
+  checkMSharesHealth,
+} from '../../store/actions/health';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';

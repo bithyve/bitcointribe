@@ -45,14 +45,11 @@ import NoInternetModalContents from '../../components/NoInternetModalContents';
 import NetInfo from '@react-native-community/netinfo';
 import {
   downloadMShare,
-  initHealthCheck,
   uploadRequestedShare,
 } from '../../store/actions/sss';
 import {
   initializeHealthSetup,
-} from '../../store/actions/health';
-import {
-  updateHealth
+  updateMSharesHealth
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
@@ -262,7 +259,7 @@ interface HomePropsTypes {
   cloudBackupStatus: any;
   regularAccount: RegularAccount;
   database: any;
-  updateHealth: any;
+  updateMSharesHealth: any;
   setCardData: any;
   cardDataProps: any;
 }
@@ -909,16 +906,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       keeperData: JSON.stringify(keeperData)
     }
     CloudDataBackup(data, this.setCloudBackupStatus);
-    console.log('call for google drive upload', this.props.cloudBackupStatus);
-    
+    // console.log('call for google drive upload', this.props.cloudBackupStatus);
   };
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
-    console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
     if(this.props.cloudBackupStatus.status){
-      console.log("this.props.s3Service", this.props.s3Service, this.props.s3Service.levelhealth)
-      this.updateHealthForCloud(this.props.s3Service.levelhealth.metaShares);
+      this.updateHealthForCloud();
     }
   }
 
@@ -1967,7 +1961,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       fetchTrustedChannel,
       walletName,
       trustedContacts,
-      updateHealth
+      updateMSharesHealth
     } = this.props;
 
     if (!isRecovery) {
@@ -2249,28 +2243,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateHealthForCloud = (shares) =>{
+  updateHealthForCloud = () =>{
     let levelHealth = this.props.levelHealth;
-    console.log("LEVEL health", levelHealth)
+    console.log('levelHealth', levelHealth)
     // health update for 1st upload to cloud 
     if(this.props.cloudBackupStatus && levelHealth.length){
-      let shareId = [];
-      for (let i = 0; i < shares.length; i++) {
-        this.props.s3Service.prepareShareUploadables(i,'cloud');
-        const element = shares[i];
-        shareId.push(element.shareId);
-      }
       if(levelHealth[0].shareType == 'cloud'){
-        levelHealth[0].lastUpdated = moment(new Date()).valueOf();
+        levelHealth[0].updatedAt = moment(new Date()).valueOf();
         levelHealth[0].status = 'accessible';
-        levelHealth[0].shareId = JSON.stringify(shareId);
         levelHealth[0].reshareVersion = 1;
-        //levelHealth[0].guardian = 'cloud';
+        levelHealth[0].guardian = 'cloud';
+        console.log('levelHealth updateHealthForCloud', levelHealth[0])
       }
-      if(levelHealth[0].shareType == 'securityQuestion'){
-        levelHealth[0].levelStatus = 'good';
-      }
-      updateHealth(levelHealth);
+      let shareArray = [
+        {
+          walletId: this.props.s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[0].shareId,
+          reshareVersion: levelHealth[0].reshareVersion
+        }
+      ];
+      console.log('updateMSharesHealth shareArray', shareArray);
+      updateMSharesHealth(shareArray);
     }
   }
 
@@ -3381,7 +3374,7 @@ export default withNavigationFocus(
     updateAddressBookLocally,
     updateLastSeen,
     setCloudBackupStatus,
-    updateHealth,
+    updateMSharesHealth,
     setCardData
   })(Home),
 );

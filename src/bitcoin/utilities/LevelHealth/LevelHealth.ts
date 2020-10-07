@@ -14,6 +14,7 @@ import {
 
 import { BH_AXIOS } from '../../../services/api';
 import { generateRandomString } from '../../../common/CommonFunctions';
+import moment from 'moment';
 const { HEXA_ID } = config;
 export default class LevelHealth {
   public static cipherSpec: {
@@ -358,44 +359,32 @@ export default class LevelHealth {
   };
 
   public static updateHealth = async (
-    metaShares: MetaShare[],
+    shares: [{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }],
   ): Promise<{
     updationInfo: Array<{
       walletId: string;
       shareId: string;
       updated: boolean;
       updatedAt?: number;
-      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
-      err?: string;
     }>;
   }> => {
-    if (metaShares.length === 0) {
-      throw new Error('No metaShare supplied');
-    }
-
-    const toUpdate: Array<{
-      walletId: string;
-      shareId: string;
-      reshareVersion: number;
-    }> = [];
-    for (const metaShare of metaShares) {
-      toUpdate.push({
-        walletId: metaShare.meta.walletId,
-        shareId: metaShare.shareId,
-        reshareVersion: metaShare.meta.reshareVersion,
-      });
-    }
 
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('updateSharesHealth', {
+      res = await BH_AXIOS.post('updateSharesHealth2', {
         HEXA_ID,
-        toUpdate,
+        toUpdate: shares,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
+
+    console.log('res updateHealth', res)
 
     const { updationInfo } = res.data;
     return { updationInfo };
@@ -654,7 +643,6 @@ export default class LevelHealth {
     success: boolean;
     levelInfo: any[];
   }> => {
-    console.log('level haealth');
     if (this.healthCheckInitialized)
       throw new Error('Health Check is already initialized.');
 
@@ -673,8 +661,8 @@ export default class LevelHealth {
       },
       {
         shareType: 'securityQuestion',
-        updatedAt: 0,
-        status: "notAccessible",
+        updatedAt: moment(new Date()).valueOf(),
+        status: "accessible",
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
       }
@@ -691,7 +679,6 @@ export default class LevelHealth {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
-    console.log('sharesHealthCheckInit2 res', res);
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
 
@@ -720,17 +707,19 @@ export default class LevelHealth {
       throw new Error('Can not initialize health check; missing MetaShares');
 
     const metaShares = this.metaShares.slice(0, 3);
-
+    console.log('walletID', this.walletId);
+    console.log('HEXA_ID', HEXA_ID);
     try {
-      res = await BH_AXIOS.post('checkSharesHealth', {
+      res = await BH_AXIOS.post('checkSharesHealth2', {
         HEXA_ID,
         walletID: this.walletId,
-        shareIDs: this.shareIDs,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
+
+    console.log('res response', res);
 
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
@@ -753,6 +742,31 @@ export default class LevelHealth {
 
     return {
       shareGuardianMapping,
+    };
+  };
+
+  public checkHealth2 = async (): Promise<{
+    data: {};
+  }> => {
+    let response = {};
+    let res: AxiosResponse;
+    const metaShares = this.metaShares.slice(0, 3);
+    console.log('walletID', this.walletId);
+    console.log('HEXA_ID', HEXA_ID);
+    try {
+      res = await BH_AXIOS.post('checkSharesHealth2', {
+        HEXA_ID,
+        walletID: this.walletId,
+      });
+      response = res;
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      response = err;
+    }
+    console.log('res response', res);
+    return {
+      data: response,
     };
   };
 

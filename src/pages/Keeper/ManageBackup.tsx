@@ -45,6 +45,7 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
+import { checkMSharesHealth } from '../../store/actions/health';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -63,6 +64,7 @@ interface ManageBackupPropsTypes {
   database: any;
   overallHealth: any;
   levelHealth: any[];
+  healthLoading: any;
 }
 
 class ManageBackup extends Component<
@@ -174,6 +176,7 @@ class ManageBackup extends Component<
   };
 
   componentDidMount = () => {
+    console.log('healthLoading', this.props.healthLoading)
     this.setSelectedCards();
   };
 
@@ -246,6 +249,9 @@ class ManageBackup extends Component<
 
 
   componentDidUpdate = (prevProps, prevState) => {
+    if(prevProps.healthLoading != this.props.healthLoading){
+      console.log('healthLoading', this.props.healthLoading);
+    }
     // console.log('this.props.overallHealth', this.props.overallHealth);
     // if (prevProps.overallHealth != this.props.overallHealth)
     //   this.setState({ health: this.props.overallHealth });
@@ -266,7 +272,7 @@ class ManageBackup extends Component<
       isLevel2,
       securityAtLevel,
     } = this.state;
-    const { navigation, overallHealth, levelHealth } = this.props;
+    const { navigation, overallHealth, levelHealth, healthLoading } = this.props;
     // console.log('selectedId', selectedId)
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -295,7 +301,17 @@ class ManageBackup extends Component<
             />
           </TouchableOpacity>
         </View>
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView 
+        refreshControl={
+          <RefreshControl
+            refreshing={healthLoading}
+            onRefresh={() => {
+              console.log('RefreshControl')
+              checkMSharesHealth();
+            }}
+          />
+        }
+        style={{ flex: 1 }}>
           <View style={styles.topHealthView}>
             <ImageBackground
               source={require('../../assets/images/icons/keeper_sheild.png')}
@@ -795,6 +811,7 @@ const mapStateToProps = (state) => {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
+    healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
   };
 };
 
