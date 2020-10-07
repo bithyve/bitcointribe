@@ -65,7 +65,7 @@ function* initHealthWorker() {
   const res = yield call(s3Service.initializeHealth);
   if (res.status === 200) {
     // Update Initial Health to reducer
-    yield put(updateHealth(res.data.levelInfo));
+    yield put(updateHealth(res.data.levelInfo, 0));
     // Update status
     yield put(healthCheckInitialized());
 
@@ -146,17 +146,17 @@ function* checkSharesHealthWorker() {
   if (res.status === 200) {
     if(res.data.data.data.currentLevel == 0 || res.data.data.data.currentLevel == 1 ){
       if(res.data.data.data.levels[0]){
-        yield put(updateHealth(res.data.data.data.levels[0].levelInfo));
+        yield put(updateHealth(res.data.data.data.levels[0].levelInfo, res.data.data.data.currentLevel));
       }
     }
     else if(res.data.data.data.currentLevel == 2 ){
       if(res.data.data.data.levels[1]) {
-        yield put(updateHealth(res.data.data.data.levels[1].levelInfo));
+        yield put(updateHealth(res.data.data.data.levels[1].levelInfo, res.data.data.data.currentLevel));
       }
     }
     else{
       if(res.data.data.data.levels[2]){
-        yield put(updateHealth(res.data.data.data.levels[2].levelInfo));
+        yield put(updateHealth(res.data.data.data.levels[2].levelInfo, res.data.data.data.currentLevel));
       } 
     }
   } else {
@@ -174,8 +174,8 @@ export const checkSharesHealthWatcher = createWatcher(
 
 
 function* updateSharesHealthWorker({ payload }) {
-  console.log('updateMSharesHealth payload', payload.shares)
-  // set a timelapse for auto update and enable instantaneous manual update
+  console.log('updateMSharesHealth payload', payload)
+  // // set a timelapse for auto update and enable instantaneous manual update
   yield put(updateMSharesLoader(true));
 
   const trustedContactsService: TrustedContactsService = yield select(

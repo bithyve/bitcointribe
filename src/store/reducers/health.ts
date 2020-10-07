@@ -18,6 +18,7 @@ const initialState: {
     updateMSharesHealth: Boolean;
   };
   errorSending: Boolean;
+  currentLevel: Number;
   levelHealth: {
     levelInfo: {
       shareType: string;
@@ -36,6 +37,7 @@ const initialState: {
     initLoader: false,
     updateMSharesHealth: false
   },
+  currentLevel: 0,
   levelHealth: [],
   errorSending: false,
   shares: null
@@ -65,6 +67,7 @@ export default (state = initialState, action) => {
         return {
         ...state,
         levelHealth: action.payload.health,
+        currentLevel: action.payload.currentLevel
       };
 
       case GET_HEALTH_OBJECT: 

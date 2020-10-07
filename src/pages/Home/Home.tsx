@@ -2263,7 +2263,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       ];
       console.log('updateMSharesHealth shareArray', shareArray);
-      updateMSharesHealth(shareArray);
+      this.props.updateMSharesHealth(shareArray);
     }
   }
 

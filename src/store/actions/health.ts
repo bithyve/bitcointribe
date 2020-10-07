@@ -25,8 +25,8 @@ export const MSHARES = "MSHARES";
     return { type: INIT_HEALTH_SETUP };
   };
   
-  export const updateHealth = (health) => {
-    return { type: HEALTH_UPDATE, payload: { health } };
+  export const updateHealth = (health, currentLevel) => {
+    return { type: HEALTH_UPDATE, payload: { health, currentLevel } };
   }
 
   export const healthInitialize = () => {

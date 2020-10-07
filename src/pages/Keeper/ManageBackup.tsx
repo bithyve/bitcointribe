@@ -65,9 +65,18 @@ interface ManageBackupPropsTypes {
   regularAccount: RegularAccount;
   database: any;
   overallHealth: any;
-  levelHealth: any[];
+  levelHealth: {
+    shareType: string;
+    updatedAt: string;
+    status: string;
+    shareId: string;
+    reshareVersion?: number;
+    guardian?: string;
+  }[];
+  currentLevel: any;
   healthLoading: any;
   generateMetaShare: any;
+  checkMSharesHealth: any;
 }
 
 class ManageBackup extends Component<
@@ -93,7 +102,7 @@ class ManageBackup extends Component<
       levelData: [
         {
           type: 'icloud',
-          status: 'good',
+          status: 'notSetup',
           level: 1,
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
@@ -155,6 +164,87 @@ class ManageBackup extends Component<
     };
   }
 
+  modifyLevelStatus = () =>{
+    let levelData = this.state.levelData;
+    if(this.props.levelHealth.length == 2){
+      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper1.name = 'Cloud';
+        levelData[0].keeper1.keeper1Done = true;
+        levelData[0].keeper1.type = "cloud";
+      }
+      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper2.name = 'Security Question';
+        levelData[0].keeper2.keeper2Done = true;
+        levelData[0].keeper2.type = "securityQuestion";
+      }
+      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
+    }
+    if(this.props.levelHealth.length == 4){
+      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper1.name = 'Cloud';
+        levelData[0].keeper1.keeper1Done = true;
+        levelData[0].keeper1.type = "cloud";
+      }
+      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper2.name = 'Security Question';
+        levelData[0].keeper2.keeper2Done = true;
+        levelData[0].keeper2.type = "securityQuestion";
+      }
+      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
+      
+      if(this.props.levelHealth[2].status == "accessible"){
+        levelData[1].keeper1.name = this.props.levelHealth[2].guardian;
+        levelData[1].keeper1.keeper1Done = true;
+        levelData[1].keeper1.type = this.props.levelHealth[2].shareType;
+      }
+      if(this.props.levelHealth[3].status == "accessible"){
+        levelData[1].keeper2.name = this.props.levelHealth[2].guardian;
+        levelData[1].keeper2.keeper2Done = true;
+        levelData[1].keeper2.type = this.props.levelHealth[2].shareType;
+      }
+      if(this.props.levelHealth[2].status == "accessible" && this.props.levelHealth[3].status == "accessible") levelData[1].status = 'good';
+      console.log('levelData updated', levelData)
+    }
+    if(this.props.levelHealth.length == 6){
+      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper1.name = 'Cloud';
+        levelData[0].keeper1.keeper1Done = true;
+        levelData[0].keeper1.type = "cloud";
+      }
+      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+        levelData[0].keeper2.name = 'Security Question';
+        levelData[0].keeper2.keeper2Done = true;
+        levelData[0].keeper2.type = "securityQuestion";
+      }
+      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
+
+      if(this.props.levelHealth[2].status == "accessible"){
+        levelData[1].keeper1.name = this.props.levelHealth[2].guardian;
+        levelData[1].keeper1.keeper1Done = true;
+        levelData[1].keeper1.type = this.props.levelHealth[2].shareType;
+      }
+      if(this.props.levelHealth[3].status == "accessible"){
+        levelData[1].keeper2.name = this.props.levelHealth[3].guardian;
+        levelData[1].keeper2.keeper2Done = true;
+        levelData[1].keeper2.type = this.props.levelHealth[3].shareType;
+      }
+      if(this.props.levelHealth[1].status == "accessible" && this.props.levelHealth[3].status == "accessible") levelData[1].status = 'good';
+
+      if(this.props.levelHealth[4].status == "accessible"){
+        levelData[2].keeper1.name = this.props.levelHealth[4].guardian;
+        levelData[2].keeper1.keeper1Done = true;
+        levelData[2].keeper1.type = this.props.levelHealth[4].shareType;
+      }
+      if(this.props.levelHealth[5].status == "accessible"){
+        levelData[2].keeper2.name = this.props.levelHealth[5].guardian;
+        levelData[2].keeper2.keeper2Done = true;
+        levelData[2].keeper2.type = this.props.levelHealth[5].shareType;
+      }
+      if(this.props.levelHealth[4].status == "accessible" && this.props.levelHealth[5].status == "accessible") levelData[2].status = 'good';
+    }
+    this.setState({levelData: levelData});
+  }
+
   setSelectedCards = () => {
     const { levelData } = this.state;
     for (let a = 0; a < levelData.length; a++) {
@@ -176,26 +266,17 @@ class ManageBackup extends Component<
             (value) => value.status == 'bad' || value.status == 'notSetup',
           ) - 1
         ].id;
+    let value = 1
+    if(this.state.levelData[0].status == 'notSetup') value = 1;
+    else if(level) value = level + 1;
+    else if(level == 3) value = 3;
+    this.setState({ selectedId: value });
     this.setState({ securityAtLevel: level });
   };
 
   componentDidMount = () => {
-    console.log('healthLoading', this.props.healthLoading)
     this.setSelectedCards();
   };
-
-  modifyLevelStatus = () =>{
-    let { levelData } = this.state;
-    let { levelHealth } = this.props;
-    console.log("LevelHealth redux", levelHealth);
-    for (let i = 0; i < levelHealth.length; i++) {
-      console.log("LevelHealth i", levelHealth[i]);
-      if(levelHealth[i].status == 'accessible'){
-        levelData[i].keeper2.keeper2Done = true;
-      }
-    }
-    this.setState({levelData: levelData});
-  }
 
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
@@ -244,29 +325,9 @@ class ManageBackup extends Component<
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
-    //console.log('setCloudBackupStatus', this.props.cloudBackupStatus);
-    // if(this.props.cloudBackupStatus.status){
-    //   console.log("this.props.s3Service", this.props.s3Service, this.props.s3Service.levelhealth)
-    //   this.updateHealthForCloud(this.props.s3Service.levelhealth.metaShares);
-    // }
   }
 
-
   componentDidUpdate = (prevProps, prevState) => {
-    if(prevProps.healthLoading != this.props.healthLoading){
-      console.log('healthLoading', this.props.healthLoading);
-    }
-    // console.log('this.props.overallHealth', this.props.overallHealth);
-    // if (prevProps.overallHealth != this.props.overallHealth)
-    //   this.setState({ health: this.props.overallHealth });
-    // else {
-    //   (async () => {
-    //     const storedHealth = await AsyncStorage.getItem('overallHealth');
-    //     if (storedHealth) {
-    //       this.setState({ health: JSON.parse(storedHealth) });
-    //     }
-    //   })();
-    // }
   };
 
   generateShares = (level) =>{
@@ -290,8 +351,7 @@ class ManageBackup extends Component<
       securityAtLevel,
       isPrimaryKeeper
     } = this.state;
-    const { navigation, overallHealth, levelHealth, healthLoading } = this.props;
-    // console.log('selectedId', selectedId)
+    const { navigation, overallHealth, levelHealth, healthLoading, checkMSharesHealth, currentLevel } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -836,6 +896,7 @@ const mapStateToProps = (state) => {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
+    currentLevel: idx(state, (_) => _.health.currentLevel),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
   };
 };
@@ -844,7 +905,8 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
     setCloudBackupStatus,
-    generateMetaShare
+    generateMetaShare,
+    checkMSharesHealth,
   })(ManageBackup),
 );
 
