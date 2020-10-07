@@ -346,7 +346,7 @@ class AddNewAccount extends PureComponent<
                   }}
                 >
                   <Text style={styles.modalInfoText}>
-                  Enable two-factor authentication
+                    Enable two-factor authentication
                   </Text>
                   <CheckBox
                     size={26}
@@ -369,7 +369,7 @@ class AddNewAccount extends PureComponent<
                   <Text
                     onPress={() => {
                       this.openLink(
-                        'https://hexawallet.io/donor-terms-conditions/',
+                        'https://hexawallet.io/donee-terms-conditions/',
                       );
                     }}
                     style={{
