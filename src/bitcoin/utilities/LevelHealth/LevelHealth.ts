@@ -1050,6 +1050,7 @@ export default class LevelHealth {
   public createMetaSharesKeeper = (
     tag: string,
     version?: string,
+    level? : number
   ): {
     metaShares: MetaShare[];
   } => {
@@ -1084,7 +1085,13 @@ export default class LevelHealth {
       this.metaShares.push(metaShare);
       index++;
     }
-    if (this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
+    
+    if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
+      this.metaShares = [];
+      throw new Error('Something went wrong while generating metaShares');
+    }
+    
+    if (level == 3 && this.metaShares.length !== config.SSS_LEVEL2_TOTAL) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
     }

@@ -269,10 +269,10 @@ class ManageBackup extends Component<
     // }
   };
 
-  generateShares = () =>{
+  generateShares = (level) =>{
     const { isLevel2, isPrimaryKeeper } = this.state;
     const {generateMetaShare} = this.props;
-    generateMetaShare(2);
+    generateMetaShare(level);
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
       selectedStatus: 'Ugly',
@@ -804,7 +804,7 @@ class ManageBackup extends Component<
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
               }}
               onPressContinue={() => {
-                this.generateShares();
+                this.generateShares(2);
                 // navigation.navigate('KeeperFeatures');
                 // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
               }}

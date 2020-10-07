@@ -101,16 +101,24 @@ function* generateMetaSharesWorker({ payload }) {
   const { answer } = yield select(
     (state) => state.storage.database.WALLET_SETUP.security,
   );
+  let serviceCall;
+  if(level == 2 ){
+    serviceCall = s3Service.generateLevel1Shares;
+  } else if(level == 3 ){
+    serviceCall = s3Service.generateLevel2Shares;
+  }
+
   const res = yield call(
-    s3Service.generateLevel1Shares,
+    serviceCall,
     answer,
     walletName,
-    appVersion
+    appVersion, 
+    level
   );
   if (res.status === 200) {
     let s3Service: S3Service = yield select((state) => state.sss.service);
     //console.log("S#SERVICE", s3Service);
-    //console.log("shares", res.data);
+    console.log("shares", res);
     const { SERVICES } = yield select(state => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
