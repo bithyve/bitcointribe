@@ -4,7 +4,7 @@ import AccountKind from "../../enums/AccountKind";
 import BitcoinUnit from '../../enums/BitcoinUnit';
 import { HexaAccountPayload } from './Interfaces';
 import AccountVisibility from '../../enums/AccountVisibility';
-
+import TransactionGroup from '../../enums/TransactionGroup';
 
 interface ConstructorProps {
   defaultTitle?: string;
@@ -35,6 +35,7 @@ export class TestAccountPayload implements HexaAccountPayload {
   visibility: AccountVisibility;
 
   transactionIDs: string[];
+  transactionGroup: TransactionGroup = TransactionGroup.TESTNET;
 
 
   constructor({
@@ -81,7 +82,10 @@ export class SavingsAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+
   transactionIDs: string[];
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
+
 
   constructor({
     defaultTitle,
@@ -129,7 +133,10 @@ export class CheckingAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+
   transactionIDs: string[];
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
+
 
   constructor({
     defaultTitle,
@@ -178,7 +185,10 @@ export class TrustedContactsAccountPayload implements HexaAccountPayload {
   customDescription: string | null;
   secondaryAccountUUIDs: string[];
   visibility: AccountVisibility;
+
   transactionIDs: string[];
+  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
+
 
   constructor({
     defaultTitle,

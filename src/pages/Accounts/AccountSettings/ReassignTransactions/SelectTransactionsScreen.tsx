@@ -7,6 +7,7 @@ import { Button } from 'react-native-elements';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
+import TransactionReassignmentKind from '../../../../common/data/enums/TransactionReassignmentKind';
 
 export type Props = {
   navigation: any;
@@ -46,7 +47,11 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
   }
 
   function handleProceedButtonPress() {
-    // TODO: Navigate to destination selection
+    navigation.navigate('ReassignTransactionsSelectDestination', {
+      accountID: accountPayload.uuid,
+      reassignmentKind: TransactionReassignmentKind.UNDESIGNATED_XPUBS,
+      selectedTransactions,
+    });
   }
 
   return (

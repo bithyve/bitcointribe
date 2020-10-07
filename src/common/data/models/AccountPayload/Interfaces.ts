@@ -3,6 +3,7 @@ import BitcoinUnit from '../../enums/BitcoinUnit';
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import AccountVisibility from "../../enums/AccountVisibility";
 import { ImageSourcePropType } from "react-native";
+import TransactionGroup from "../../enums/TransactionGroup";
 
 
 interface BaseAccountPayload {
@@ -56,6 +57,7 @@ interface BaseAccountPayload {
   imageSource: ImageSourcePropType;
 
   transactionIDs: string[];
+  transactionGroup: TransactionGroup;
 }
 
 
