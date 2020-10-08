@@ -14,6 +14,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.DONATION;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Directly Accept Donations";
@@ -34,6 +35,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   constructor({
     accountShellID,
     defaultTitle = "Donation Account",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     doneeName,
@@ -44,6 +46,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.doneeName = doneeName;
