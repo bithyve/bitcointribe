@@ -147,7 +147,7 @@ class AddNewAccount extends PureComponent<
       donee = this.props.walletName;
     }
 
-    const subject = accountName;
+    const subject = accountName ? accountName : 'Donation Account';
     const configuration = {
       displayBalance: true,
       displayTransactions: true,
