@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { FlatList } from 'react-native';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import AccountShell from '../../common/data/models/AccountShell';
 import AccountCardColumn from '../../components/home/AccountCardColumn';
 import AddNewAccountCard from './AddNewAccountCard';
 
 export interface Props {
-  columnData: Array<AccountPayload[]>;
+  columnData: Array<AccountShell[]>;
   isBalanceLoading: boolean;
-  onCardSelected: (selectedAccount: AccountPayload) => void;
+  onCardSelected: (selectedAccount: AccountShell) => void;
   onAddNewSelected: () => void;
 }
 
@@ -36,7 +36,7 @@ const HomeAccountCardsList: React.FC<Props> = ({
       showsHorizontalScrollIndicator={false}
       data={[...columnData, 'Flag for Add Button']}
       keyExtractor={(_, index) => String(index)}
-      renderItem={({ item, index }: { item: AccountPayload[] | string, index: number }) => {
+      renderItem={({ item, index }: { item: AccountShell[] | string, index: number }) => {
         if (typeof item === 'string') {
           // "Manually" append an Add button ONLY if we're at the end and we know
           // it won't be stacked as the last item of a column.
@@ -45,9 +45,9 @@ const HomeAccountCardsList: React.FC<Props> = ({
         } else {
           return <AccountCardColumn
             isBalanceLoading={isBalanceLoading}
-            cardData={item as AccountPayload[]}
+            cardData={item as AccountShell[]}
             appendsAddButton={
-              (item as AccountPayload[]).length === 1 &&
+              (item as AccountShell[]).length === 1 &&
               index === columnCount - 1
             }
             onAccountCardSelected={onCardSelected}

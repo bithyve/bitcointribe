@@ -24,7 +24,7 @@ const listItems: OptionsListItem[] = [
   {
     title: 'Sources',
     subtitle: 'Reassign the entire transaction set of a source',
-    screenName: 'ReassignAllTransactionsSelectSources',
+    screenName: 'ReassignSourcesSelectSourcesScreen',
     imageSource: require('../../../../assets/images/icons/icon_sources.png'),
   },
 ];

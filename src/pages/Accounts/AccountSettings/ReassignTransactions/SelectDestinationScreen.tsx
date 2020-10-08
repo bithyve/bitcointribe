@@ -4,11 +4,12 @@ import { Button } from 'react-native-elements';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../../../../common/Colors';
 import Fonts from '../../../../common/Fonts';
-import AccountPayload from '../../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import DestinationAccountsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountsList';
-import useAccountPayloadFromNavigation from '../../../../utils/hooks/state-selectors/UseAccountPayloadFromNavigation';
-import useAccountPayloadsInGroup from '../../../../utils/hooks/state-selectors/UseAccountPayloadsInGroup';
+import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
+import useAccountShellsInGroup from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellsInGroup';
+import useSubAccountsInGroup from '../../../../utils/hooks/state-selectors/accounts/UseSubAccountsInGroup';
 
 export type Props = {
   navigation: any;
@@ -25,16 +26,16 @@ const HeaderSection: React.FC = () => {
 const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const currentAccountPayload = useAccountPayloadFromNavigation(navigation);
-  const selectableAccounts = useAccountPayloadsInGroup(currentAccountPayload.transactionGroup);
-  const [selectedAccountID, setSelectedAccountID] = useState<string>(null);
+  const currentAccountShell = useAccountShellFromNavigation(navigation);
+  const selectableSubAccounts = useSubAccountsInGroup(currentAccountShell.transactionGroup);
+  const [selectedSubAccountID, setSelectedSubAccountID] = useState<string>(null);
 
   const canProceed = useMemo(() => {
-    return selectedAccountID != null;
-  }, [selectedAccountID]);
+    return selectedSubAccountID != null;
+  }, [selectedSubAccountID]);
 
-  function handleAccountSelection(accountPayload: AccountPayload) {
-    setSelectedAccountID(accountPayload.uuid);
+  function handleAccountSelection(subAccountInfo: SubAccountDescribing) {
+    setSelectedSubAccountID(subAccountInfo.id);
   }
 
   function handleProceedButtonPress() {
@@ -47,8 +48,8 @@ const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
 
       <View>
         <DestinationAccountsList
-          selectableAccounts={selectableAccounts}
-          selectedAccountID={selectedAccountID}
+          selectableSubAccounts={selectableSubAccounts}
+          selectedSubAccountID={selectedSubAccountID}
           onAccountSelected={handleAccountSelection}
         />
       </View>

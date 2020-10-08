@@ -84,7 +84,6 @@ import {
 } from '../../store/actions/accounts';
 import {
   trustedChannelActions,
-  DonationDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
@@ -102,8 +101,8 @@ import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBac
 import BottomSheetHeader from './BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 import { AccountsState } from '../../store/reducers/accounts';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import HomeAccountCardsList from './HomeAccountCardsList';
+import AccountShell from '../../common/data/models/AccountShell';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -143,7 +142,7 @@ export enum BottomSheetState {
 }
 
 interface HomeStateTypes {
-  accountCardColumnData?: Array<[AccountPayload]>;
+  accountCardColumnData?: Array<[AccountShell]>;
   notificationLoading: boolean;
   notificationData?: any[];
   cardData?: any[];
@@ -611,7 +610,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   makeAccountCardColumnData = () => {
-    const activeAccounts: AccountPayload[] = this.props.accountsState.activeAccounts;
+    const activeAccounts: AccountShell[] = this.props.accountsState.activeAccounts;
 
     if (activeAccounts.length <= 2) {
       return [activeAccounts];
@@ -672,12 +671,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       })
       .then(() => { })
       .catch(
-        (err) => { }, //console.log('err', err)
+        () => { }, //console.log('err', err)
       );
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {
+      .then(() => {
         //console.log('logging notifications', notifications);
       });
   };
@@ -763,9 +762,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
-    const { notificationListNew } = this.props;
     let newTransactions = [];
-    const { accountsState, fetchDerivativeAccBalTx } = this.props;
+    const { accountsState } = this.props;
     const regularAccount = accountsState[REGULAR_ACCOUNT].service.hdWallet;
     const secureAccount = accountsState[SECURE_ACCOUNT].service.secureHDWallet;
 
@@ -862,11 +860,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
       })
       .then(() => { })
-      .catch((err) => { });
+      .catch(() => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => { });
+      .then(() => { });
   };
 
   componentDidUpdate = (prevProps: HomePropsTypes, prevState: HomeStateTypes) => {
@@ -1218,9 +1216,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getAssociatedContact = async () => {
     // TODO -- need to check this
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
     // setAssociatedContact(AssociatedContact);
     this.setSecondaryDeviceAddresses();
   };
@@ -1256,7 +1251,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.storeFCMToken();
           this.scheduleNotification();
         })
-        .catch((error) => {
+        .catch(() => {
           // User has rejected permissions
           //console.log(
           // 'PERMISSION REQUEST :: notification permission rejected',
@@ -1328,7 +1323,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.notificationOpenedListener = firebase
       .notifications()
       .onNotificationOpened(async (notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
         this.props.fetchNotifications();
         this.onNotificationOpen(notificationOpen.notification);
       });
@@ -1340,7 +1334,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .notifications()
       .getInitialNotification();
     if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
 
       this.props.fetchNotifications();
       this.onNotificationOpen(notificationOpen.notification);
@@ -1348,14 +1341,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage((message) => {
+    firebase.messaging().onMessage(() => {
       //process data message
     });
   };
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
-    const { notificationListNew } = this.props;
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1607,7 +1599,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // }
   };
 
-  onPressSettingsElements = async (type, currencycode) => {
+  onPressSettingsElements = async (type) => {
     const { navigation, currencyCode } = this.props;
     if (type == 'ManagePin') {
       return navigation.navigate('SettingManagePin', {
@@ -1625,7 +1617,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  managePinSuccessProceed = (pin) => {
+  managePinSuccessProceed = () => {
     this.setState(
       {
         tabBarIndex: 999,
@@ -1637,7 +1629,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
-    const { notificationListNew } = this.props;
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1688,7 +1679,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.processDLRequest(key, false);
   };
 
-  onTrustedContactReject = (key) => {
+  onTrustedContactReject = () => {
     setTimeout(() => {
       this.setState({
         tabBarIndex: 999,
@@ -1787,7 +1778,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       uploadRequestedShare,
       navigation,
       approveTrustedContact,
-      fetchEphemeralChannel,
       fetchTrustedChannel,
       walletName,
       trustedContacts,
@@ -1837,13 +1827,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
           }
 
-          let existingContact, existingContactName;
+          let existingContactName;
           Object.keys(trustedContacts.tc.trustedContacts).forEach(
             (contactName) => {
               const contact = trustedContacts.tc.trustedContacts[contactName];
               if (contact.contactsPubKey === publicKey) {
                 existingContactName = contactName;
-                existingContact = contact;
               }
             },
           );
@@ -1949,9 +1938,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleAccountCardSelection = (selectedAccount: AccountPayload) => {
+  handleAccountCardSelection = (selectedAccount: AccountShell) => {
     this.props.navigation.navigate('AccountDetails', {
-      accountID: selectedAccount.uuid,
+      accountID: selectedAccount.id,
     });
   };
 
@@ -2006,7 +1995,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
-    const { notificationListNew } = this.props;
     //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -2098,8 +2086,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (item.title === 'Hexa Community (Telegram)') {
       let url = 'https://t.me/HexaWallet';
       Linking.openURL(url)
-        .then((data) => { })
-        .catch((e) => {
+        .then(() => { })
+        .catch(() => {
           alert('Make sure Telegram installed on your device');
         });
       return;
@@ -2107,7 +2095,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
-    const { notificationListNew } = this.props;
     // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -2222,7 +2209,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       buttonText,
       selectedContact,
       notificationData,
-      fbBTCAccount,
       loading,
       transactionsLoading,
       currencyCode,
@@ -2231,14 +2217,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       custodyRequest,
       isLoadContacts,
       isLoading,
-      isRequestModalOpened,
       isBalanceLoading,
       addContactModalOpened,
     } = this.state;
 
     const {
       navigation,
-      notificationList,
       exchangeRates,
       walletName,
       UNDER_CUSTODY,

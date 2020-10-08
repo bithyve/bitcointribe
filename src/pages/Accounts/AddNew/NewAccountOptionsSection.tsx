@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
 import AccountOptionCard from './AccountOptionCard';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import CardStyles from '../../../common/Styles/Cards.js';
 
 export interface Props {
-  choices: AccountPayload[];
-  selectedChoice?: AccountPayload;
-  onOptionSelected: (AccountPayload) => void;
+  choices: SubAccountDescribing[];
+  selectedChoice?: SubAccountDescribing;
+  onOptionSelected: (SubAccountDescribing) => void;
 }
 
-const keyExtractor = (item: AccountPayload) => item.uuid;
+const keyExtractor = (item: SubAccountDescribing) => item.id;
 
 
 const NewAccountOptionsSection: React.FC<Props> = ({
@@ -38,7 +38,7 @@ const NewAccountOptionsSection: React.FC<Props> = ({
                 >
                   <AccountOptionCard
                     style={{ flex: 1 }}
-                    accountPayload={accountChoicePayload}
+                    subAccountInfo={accountChoicePayload}
                     isSelected={accountChoicePayload == selectedChoice}
                   />
                 </TouchableOpacity>

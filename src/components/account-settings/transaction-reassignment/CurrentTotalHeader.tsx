@@ -1,20 +1,21 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import { TransactionDescribing } from '../../../common/data/models/Transactions/Interfaces';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText';
 import { RFValue } from 'react-native-responsive-fontsize';
+import AccountShell from '../../../common/data/models/AccountShell';
 
 export type Props = {
-  accountPayload: AccountPayload;
+  accountShell: AccountShell;
   selectedTransactions: TransactionDescribing[];
 };
 
 const CurrentTotalHeader: React.FC<Props> = ({
-  accountPayload,
+  accountShell,
   selectedTransactions,
 }: Props) => {
   const totalAmount = useMemo(() => {
@@ -22,7 +23,7 @@ const CurrentTotalHeader: React.FC<Props> = ({
   }, [selectedTransactions]);
 
   const formattedAmountText = useFormattedAmountText(totalAmount);
-  const formattedUnitText = useFormattedUnitText(accountPayload);
+  const formattedUnitText = useFormattedUnitText(accountShell);
 
   const countDescriptionText = useMemo(() => {
     const count = selectedTransactions.length;
