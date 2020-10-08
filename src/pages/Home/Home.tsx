@@ -56,19 +56,17 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import TransactionsContent from '../../components/home/transaction-content';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
-import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
 } from '../../store/actions/accounts';
-import { trustedChannelActions, DonationDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents';
@@ -92,8 +90,8 @@ import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
 const releaseNotificationTopic = getReleaseTopic()
 import { AccountsState } from '../../store/reducers/accounts';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import HomeAccountCardsList from './HomeAccountCardsList';
+import AccountShell from '../../common/data/models/AccountShell';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -144,7 +142,7 @@ export enum BottomSheetKind {
 }
 
 interface HomeStateTypes {
-  accountCardColumnData?: Array<[AccountPayload]>;
+  accountCardColumnData?: Array<[AccountShell]>;
   notificationLoading: boolean;
   notificationData?: any[];
   CurrencyCode: string;
@@ -522,7 +520,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   makeAccountCardColumnData = () => {
-    const activeAccounts: AccountPayload[] = this.props.accountsState.activeAccounts;
+    const activeAccounts: AccountShell[] = this.props.accountsState.activeAccounts;
 
     if (activeAccounts.length <= 2) {
       return [activeAccounts];
@@ -1017,7 +1015,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener('didFocus', () => {
       this.setCurrencyCodeFromAsync();
-      this.getAssociatedContact();
       this.checkFastBitcoin();
       this.props.fetchNotifications();
       this.setState({
@@ -1025,7 +1022,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     });
 
-    this.getAssociatedContact();
     this.setCurrencyCodeFromAsync();
     this.checkFastBitcoin();
   };
@@ -1244,10 +1240,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    let regularTransactions = accountsState[REGULAR_ACCOUNT].service
-      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
-      : [];
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
@@ -1276,10 +1268,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         .unconfirmedBalance
       : 0;
 
-    const secureTransactions = accountsState[SECURE_ACCOUNT].service
-      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
-      : [];
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
@@ -1576,9 +1564,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleAccountCardSelection = (selectedAccount: AccountPayload) => {
+  handleAccountCardSelection = (selectedAccount: AccountShell) => {
     this.props.navigation.navigate('AccountDetails', {
-      accountID: selectedAccount.uuid,
+      accountID: selectedAccount.id,
     });
   };
 
