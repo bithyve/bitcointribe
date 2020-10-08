@@ -1,10 +1,9 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
-import { TransactionDescribing } from '../../../common/data/models/Transactions/Interfaces';
 import RadioButton from '../../RadioButton';
-import ListStyles from '../../../common/Styles/Lists';
 import TransactionListItemContent from '../../account-details/TransactionListItemContent';
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
 
 export type Props = {
   selectableTransactions: TransactionDescribing[];

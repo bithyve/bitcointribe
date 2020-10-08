@@ -5,18 +5,18 @@ import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CardStyles from '../../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 
 export interface Props {
   style?: Record<string, any>;
   isSelected: boolean;
-  accountPayload: AccountPayload;
+  subAccountInfo: SubAccountDescribing;
 }
 
 const AccountOptionCard: React.FC<Props> = ({
   style,
   isSelected,
-  accountPayload,
+  subAccountInfo,
 }: Props) => {
 
   const selectionIndicatorContainerStyle = useMemo(() => {
@@ -68,11 +68,11 @@ const AccountOptionCard: React.FC<Props> = ({
         containerStyle={cardContainerStyle}
         wrapperStyle={styles.cardContentWrapper}
       >
-        <Card.Image style={styles.image} source={accountPayload.imageSource} />
+        <Card.Image style={styles.image} source={subAccountInfo.imageSource} />
 
         <View style={styles.descriptionTextContainer}>
-          <Card.Title style={titleTextStyle} numberOfLines={1}>{accountPayload.defaultTitle}</Card.Title>
-          <Card.Title style={subtitleTextStyle}>{accountPayload.defaultDescription}</Card.Title>
+          <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
+          <Card.Title style={subtitleTextStyle}>{subAccountInfo.defaultDescription}</Card.Title>
         </View>
 
         <View style={selectionIndicatorContainerStyle}>

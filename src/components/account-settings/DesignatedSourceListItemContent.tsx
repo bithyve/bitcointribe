@@ -9,29 +9,21 @@ export type Props = {
   subAccountInfo: SubAccountDescribing;
 };
 
-export function imageSourceForAccountKind(accountKind: SubAccountKind): NodeRequire {
-  switch (accountKind) {
-    case SubAccountKind.REGULAR:
-      return require('../../assets/images/icons/icon_checking_circled.png');
-    default:
-      // TODO: Get image assets for other possible account kinds
-      return require('../../assets/images/icons/icon_checking_circled.png');
-  }
-}
-
-const AccountSourceListItemContent: React.FC<Props> = ({
+const DesignatedSourceListItemContent: React.FC<Props> = ({
   subAccountInfo,
 }: Props) => {
 
-  const accountKindImageSource = useMemo(() => {
-    return imageSourceForAccountKind(subAccountInfo.kind);
+  const avatarImageSource = useMemo(() => {
+    // TODO: Figure out how each designated-source sub-account will have an avatar
+    // that corresponds to it.
+    return require('../../assets/images/icons/icon_bitcoin_dark.png');
   }, [subAccountInfo.kind]);
 
   return (
     <>
       <Image
         style={styles.accountKindImage}
-        source={accountKindImageSource}
+        source={avatarImageSource}
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -66,4 +58,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default AccountSourceListItemContent;
+export default DesignatedSourceListItemContent;

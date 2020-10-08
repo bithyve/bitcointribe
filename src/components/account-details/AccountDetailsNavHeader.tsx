@@ -1,20 +1,18 @@
 import React, { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native';
-import useActiveAccountPayload from '../../utils/hooks/state-selectors/UseActiveAccountPayload';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
 import Colors from '../../common/Colors';
 import ScreenHeaderStyles from '../../common/Styles/ScreenHeaders';
-import HeadingStyles from '../../common/Styles/HeadingStyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch';
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
+import useAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountShell';
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 
 export type Props = {
@@ -27,7 +25,8 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   onBackPressed,
 }: Props) => {
   const dispatch = useDispatch();
-  const accountPayload: AccountPayload | undefined = useActiveAccountPayload(accountID);
+  const accountShell = useAccountShell(accountID);
+  const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
   const currencyCode = useCurrencyCode();
   const currencyKind = useCurrencyKind();
@@ -37,9 +36,8 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   }, [currencyKind]);
 
   const title = useMemo(() => {
-    return accountPayload?.customDisplayName || accountPayload?.defaultTitle || 'Account Details';
+    return primarySubAccountInfo?.customDisplayName || primarySubAccountInfo?.defaultTitle || 'Account Details';
   }, [accountID]);
-
 
   return (
     <View>

@@ -1,14 +1,13 @@
 import { useMemo } from "react";
-import AccountKind from "../../../common/data/enums/AccountKind";
 import { displayNameForBitcoinUnit } from "../../../common/data/enums/BitcoinUnit";
 import CurrencyKind from "../../../common/data/enums/CurrencyKind";
-import AccountPayload from "../../../common/data/models/AccountPayload/Interfaces";
 import useCurrencyCode from "../state-selectors/UseCurrencyCode";
 import useCurrencyKind from "../state-selectors/UseCurrencyKind";
+import AccountShell from "../../../common/data/models/AccountShell";
 
 
 export default function useFormattedUnitText(
-  accountPayload: AccountPayload,
+  accountShell: AccountShell,
 ): string {
   const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();
@@ -17,13 +16,8 @@ export default function useFormattedUnitText(
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
-  const isUsingBitcoinUnits: boolean = useMemo(() => {
-    return prefersBitcoin || accountPayload.kind === AccountKind.TEST;
-  }, [prefersBitcoin, accountPayload])
-
-
-  if (isUsingBitcoinUnits) {
-    return displayNameForBitcoinUnit(accountPayload.unit);
+  if (prefersBitcoin) {
+    return displayNameForBitcoinUnit(accountShell.unit);
   } else {
     return fiatCurrencyCode.toLocaleLowerCase();
   }

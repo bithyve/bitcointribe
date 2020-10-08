@@ -1,4 +1,4 @@
-import AccountKind from "../../common/data/enums/AccountKind";
+import SubAccountKind from "../../common/data/enums/SubAccountKind";
 import ServiceAccountKind from "../../common/data/enums/ServiceAccountKind";
 
 // TODO: Deprecate this in favor of calling `getIconByAccountKind` with a
@@ -20,21 +20,21 @@ export function getIconByAccountType(type: string): NodeRequire {
 };
 
 
-export function iconForAccountKind(kind: AccountKind): NodeRequire {
+export function iconForAccountKind(kind: SubAccountKind): NodeRequire {
   switch (kind) {
-    case AccountKind.TEST:
+    case SubAccountKind.TEST:
       return require('../../assets/images/icons/icon_test.png');
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return require('../../assets/images/icons/icon_checking.png');
-    case AccountKind.SECURE:
+    case SubAccountKind.SECURE:
       return require('../../assets/images/icons/icon_savings.png');
-    case AccountKind.TRUSTED_CONTACTS:
+    case SubAccountKind.TRUSTED_CONTACTS:
       return require('../../assets/images/icons/icon_wallet.png');
-    case AccountKind.DONATION:
+    case SubAccountKind.DONATION:
       return require('../../assets/images/icons/icon_donation_hexa.png');
-    case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
+    case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
       return require('../../assets/images/icons/icon_import_watch_only_wallet.png');
-    case AccountKind.FULLY_IMPORTED_WALLET:
+    case SubAccountKind.FULLY_IMPORTED_WALLET:
       return require('../../assets/images/icons/icon_wallet.png');
     default:
       return require('../../assets/images/icons/icon_wallet.png');

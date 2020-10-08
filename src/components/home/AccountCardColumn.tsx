@@ -6,14 +6,15 @@ import {
 } from 'react-native';
 
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import HomeAccountsListCard from './HomeAccountsListCard';
+import AccountShell from '../../common/data/models/AccountShell';
 
-export interface Props {
+export type Props = {
   isBalanceLoading: boolean;
-  cardData: AccountPayload[];
+  cardData: AccountShell[];
   appendsAddButton: boolean;
-  onAccountCardSelected: (AccountPayload) => void;
+  onAccountCardSelected: (accountShell: AccountShell) => void;
   onAddNewAccountPressed: () => void;
 }
 
@@ -26,11 +27,11 @@ const AccountCardColumn: React.FC<Props> = ({
 }: Props) => {
   return (
     <View style={styles.rootContainer}>
-      {cardData.map((accountPayload) => {
+      {cardData.map((accountShell) => {
         return (
-          <TouchableOpacity style={styles.cardContainer} onPress={() => onAccountCardSelected(accountPayload)}>
+          <TouchableOpacity style={styles.cardContainer} onPress={() => onAccountCardSelected(accountShell)}>
             <HomeAccountsListCard
-              accountPayload={accountPayload}
+              accountShell={accountShell}
               isBalanceLoading={isBalanceLoading}
             />
           </TouchableOpacity>

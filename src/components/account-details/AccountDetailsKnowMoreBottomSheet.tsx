@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import AccountKind from '../../common/data/enums/AccountKind';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import TestAccountHelpContents from '../Helper/TestAccountHelpContents';
 import Colors from '../../common/Colors';
 import SavingsAccountHelpContents from '../Helper/SavingsAccountHelpContents';
@@ -9,7 +9,7 @@ import DonationAccountHelpContents from '../Helper/DonationAccountHelpContents';
 import BottomSheetHandle from '../bottom-sheets/BottomSheetHandle';
 
 export type Props = {
-  accountKind: AccountKind;
+  accountKind: SubAccountKind;
   onClose: () => void;
 };
 
@@ -23,13 +23,13 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
 }: Props) => {
   const BottomSheetContent = () => {
     switch (accountKind) {
-      case AccountKind.TEST:
+      case SubAccountKind.TEST:
         return <TestAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case AccountKind.SECURE:
+      case SubAccountKind.SECURE:
         return <SavingsAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case AccountKind.REGULAR:
+      case SubAccountKind.REGULAR:
         return <CheckingAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case AccountKind.DONATION:
+      case SubAccountKind.DONATION:
         return <DonationAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer} />;
       default:
         return null;

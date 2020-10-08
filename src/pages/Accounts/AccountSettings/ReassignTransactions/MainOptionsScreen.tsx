@@ -24,7 +24,7 @@ const listItems: OptionsListItem[] = [
   {
     title: 'Sources',
     subtitle: 'Reassign the entire transaction set of a source',
-    screenName: 'ReassignAllTransactionsSelectSources',
+    screenName: 'ReassignSourcesSelectSources',
     imageSource: require('../../../../assets/images/icons/icon_sources.png'),
   },
 ];
@@ -56,9 +56,9 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
           size={"small"}
         />
 
-        <ListItem.Content style={styles.listItemContentContainer}>
+        <ListItem.Content style={ListStyles.listItemContentContainer}>
           <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
-          <ListItem.Subtitle style={styles.subtitleText}>{listItem.subtitle}</ListItem.Subtitle>
+          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
         </ListItem.Content>
 
         <ListItem.Chevron />
@@ -80,15 +80,6 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
 const styles = StyleSheet.create({
   rootContainer: {
     paddingHorizontal: 10,
-  },
-
-  listItemContentContainer: {
-    paddingVertical: 10,
-  },
-
-  subtitleText: {
-    ...ListStyles.listItemSubtitle,
-    marginTop: 3,
   },
 });
 

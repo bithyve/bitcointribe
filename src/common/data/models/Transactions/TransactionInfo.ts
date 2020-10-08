@@ -1,15 +1,14 @@
 import { v4 as uuidV4 } from 'uuid';
-import AccountKind from "../../enums/AccountKind";
+import SubAccountKind from "../../enums/SubAccountKind";
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import TransactionConfirmationStatus from "../../enums/TransactionConfirmationStatus";
 import TransactionKind from "../../enums/TransactionKind";
-import { TransactionDescribing } from './Interfaces';
+import { InboundTransactionDescribing, OutboundTransactionDescribing } from './Interfaces';
 
 
-type ConstructorProps = {
+type BaseConstructorProps = {
   confirmations: number,
   confirmationStatus: TransactionConfirmationStatus,
-  transactionKind: TransactionKind,
   fee: number,
   timestamp: number,
   amount: number,
@@ -19,57 +18,114 @@ type ConstructorProps = {
   blockTime?: number | null,
   message?: string | null,
   xPubAccountID: string,
-  xPubAccountKind: AccountKind,
+  xPubAccountKind: SubAccountKind,
   xPubServiceKind?: ServiceAccountKind,
 };
 
+type InboundConstructorProps = BaseConstructorProps & {
+    sourceAddress: string;
+    sourceXPubAccountID?: string | null;
+}
 
-export default class TransactionInfo implements TransactionDescribing {
+type OutboundConstructorProps = BaseConstructorProps & {
+    destinationAddress: string;
+}
+
+export class InboundTransactionInfo implements InboundTransactionDescribing {
   txID: string = uuidV4();
   confirmations: number;
   confirmationStatus: TransactionConfirmationStatus;
-  transactionKind: TransactionKind;
+  transactionKind: TransactionKind = TransactionKind.RECEIVE;
   fee: number;
   timestamp: number;
   amount: number;
   contactName: string;
-  recipientAddresses: string[];
-  senderAddresses: string[];
   blockTime: number;
   message: string;
+
   xPubAccountID: string;
-  xPubAccountKind: AccountKind;
+  xPubAccountKind: SubAccountKind;
   xPubServiceKind?: ServiceAccountKind;
+
+  sourceAddress: string;
+  sourceXPubAccountID: string | null;
+
 
   constructor({
     confirmations,
     confirmationStatus,
-    transactionKind,
     fee,
-    timestamp,
+    timestamp = Date.now(),
     amount,
-    contactName,
-    recipientAddresses,
-    senderAddresses,
-    blockTime,
-    message,
+    contactName = null,
+    blockTime = null,
+    message = null,
     xPubAccountID,
     xPubAccountKind,
     xPubServiceKind,
-  }: ConstructorProps) {
+    sourceAddress,
+    sourceXPubAccountID = null,
+  }: InboundConstructorProps) {
     this.confirmations = confirmations;
     this.confirmationStatus = confirmationStatus;
-    this.transactionKind = transactionKind;
     this.fee = fee;
-    this.timestamp = timestamp || Date.now();
+    this.timestamp = timestamp;
     this.amount = amount;
-    this.contactName = contactName || null;
-    this.recipientAddresses = recipientAddresses || [];
-    this.senderAddresses = senderAddresses || [];
-    this.blockTime = blockTime || null;
-    this.message = message || null;
+    this.contactName = contactName;
+    this.blockTime = blockTime;
+    this.message = message;
     this.xPubAccountID = xPubAccountID;
     this.xPubAccountKind = xPubAccountKind;
     this.xPubServiceKind = xPubServiceKind;
+    this.sourceXPubAccountID = sourceXPubAccountID;
+    this.sourceAddress = sourceAddress;
+  }
+}
+
+export class OutboundTransactionInfo implements OutboundTransactionDescribing {
+  txID: string = uuidV4();
+  confirmations: number;
+  confirmationStatus: TransactionConfirmationStatus;
+  transactionKind: TransactionKind = TransactionKind.RECEIVE;
+  fee: number;
+  timestamp: number;
+  amount: number;
+  contactName: string;
+  blockTime: number;
+  message: string;
+
+  xPubAccountID: string;
+  xPubAccountKind: SubAccountKind;
+  xPubServiceKind?: ServiceAccountKind;
+
+  destinationAddress: string;
+
+
+  constructor({
+    confirmations,
+    confirmationStatus,
+    fee,
+    timestamp = Date.now(),
+    amount,
+    contactName = null,
+    blockTime = null,
+    message = null,
+    xPubAccountID,
+    xPubAccountKind,
+    xPubServiceKind,
+    destinationAddress,
+  }: OutboundConstructorProps) {
+    this.confirmations = confirmations;
+    this.confirmationStatus = confirmationStatus;
+    this.fee = fee;
+    this.timestamp = timestamp;
+    this.amount = amount;
+    this.contactName = contactName;
+    this.blockTime = blockTime;
+    this.message = message;
+    this.xPubAccountID = xPubAccountID;
+    this.xPubAccountKind = xPubAccountKind;
+    this.xPubServiceKind = xPubServiceKind;
+    this.destinationAddress = destinationAddress;
   }
 }

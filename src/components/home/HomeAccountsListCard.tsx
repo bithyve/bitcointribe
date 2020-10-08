@@ -1,34 +1,33 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import AccountKind from '../../common/data/enums/AccountKind';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
-import ServiceAccountPayload from '../../common/data/models/AccountPayload/ServiceAccountPayload';
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import CardView from 'react-native-cardview';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
-import useAccountsState from '../../utils/hooks/state-selectors/UseAccountsState';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
+import AccountShell from '../../common/data/models/AccountShell';
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 
-export interface Props {
-  accountPayload: AccountPayload;
+export type Props = {
+  accountShell: AccountShell;
   isBalanceLoading: boolean;
-}
+};
 
-interface HeaderProps {
-  accountPayload: AccountPayload;
-}
+type HeaderProps = {
+  accountShell: AccountShell;
+};
 
-interface BodyProps extends Props { }
+type BodyProps = Props;
 
 
-export function headerImageSourceForServiceAccount(accountPayload: ServiceAccountPayload): NodeRequire {
-  const { serviceAccountKind } = accountPayload;
-
-  switch (serviceAccountKind) {
+export function headerImageSourceForServiceKind(kind: ServiceAccountKind): NodeRequire {
+  switch (kind) {
     case ServiceAccountKind.SWAN:
       return require('../../assets/images/icons/icon_swan.png');
     case ServiceAccountKind.FAST_BITCOINS:
@@ -38,23 +37,21 @@ export function headerImageSourceForServiceAccount(accountPayload: ServiceAccoun
   }
 }
 
-export function headerImageSourceForAccount(accountPayload: AccountPayload): NodeRequire {
-  const { kind } = accountPayload;
-
+export function headerImageSourceForSubAccountKind(kind: SubAccountKind): NodeRequire {
   switch (kind) {
-    case AccountKind.TEST:
+    case SubAccountKind.TEST:
       return require('../../assets/images/icons/icon_test.png');
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return require('../../assets/images/icons/icon_regular.png');
-    case AccountKind.SECURE:
+    case SubAccountKind.SECURE:
       return require('../../assets/images/icons/icon_secureaccount.png');
-    case AccountKind.TRUSTED_CONTACTS:
+    case SubAccountKind.TRUSTED_CONTACTS:
       return require('../../assets/images/icons/icon_wallet.png');
-    case AccountKind.DONATION:
+    case SubAccountKind.DONATION:
       return require('../../assets/images/icons/icon_donation_hexa.png');
-    case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
+    case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
       return require('../../assets/images/icons/icon_import_watch_only_wallet.png');
-    case AccountKind.FULLY_IMPORTED_WALLET:
+    case SubAccountKind.FULLY_IMPORTED_WALLET:
       return require('../../assets/images/icons/icon_wallet.png');
     default:
       return require('../../assets/images/icons/icon_wallet.png');
@@ -62,28 +59,23 @@ export function headerImageSourceForAccount(accountPayload: AccountPayload): Nod
 }
 
 const HeaderSection: React.FC<HeaderProps> = ({
-  accountPayload,
+  accountShell,
 }: HeaderProps) => {
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
 
   const cardBadgeSource: NodeRequire = useMemo(() => {
-    if (accountPayload.kind === AccountKind.SERVICE) {
-      return headerImageSourceForServiceAccount(accountPayload as ServiceAccountPayload);
+    if (primarySubAccount.kind === SubAccountKind.SERVICE) {
+      return headerImageSourceForServiceKind((primarySubAccount as ExternalServiceSubAccountInfo).serviceAccountKind);
     } else {
-      return headerImageSourceForAccount(accountPayload);
+      return headerImageSourceForSubAccountKind(primarySubAccount.kind);
     }
-  }, [accountPayload]);
+  }, [accountShell]);
 
 
-  const serviceBadgeIcons: NodeRequire[] = useMemo(() => {
-    if (accountPayload.kind === AccountKind.REGULAR) {
-      // TODO: How do we detect if an account has an underlying service integration? (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1601337510034800)
-      return [
-        // require('../../assets/images/icons/icon_fastbitcoins_light_blue.png');
-      ];
-    } else {
-      return [];
-    }
-  }, [accountPayload])
+  const secondarySubAccountBadgeIcons: NodeRequire[] = useMemo(() => {
+    // TODO: Figure out the right logic for generating secondary sub-account badge images.
+    return [];
+  }, [accountShell])
 
 
   return (
@@ -94,11 +86,11 @@ const HeaderSection: React.FC<HeaderProps> = ({
       />
 
       <View style={styles.headerBadgeContainer}>
-        {accountPayload.kind === AccountKind.SECURE && (
+        {primarySubAccount.kind === SubAccountKind.SECURE && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
 
-        {serviceBadgeIcons.map(iconSource => {
+        {secondarySubAccountBadgeIcons.map(iconSource => {
           return (
             <Image style={styles.headerBadgeIcon} source={iconSource} />
           );
@@ -132,9 +124,10 @@ const LoadingBalanceView: React.FC = () => {
 };
 
 const BodySection: React.FC<BodyProps> = ({
-  accountPayload,
+  accountShell,
   isBalanceLoading,
 }: BodyProps) => {
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountsState = useAccountsState();
 
   const balanceTextStyle = useMemo(() => {
@@ -147,18 +140,18 @@ const BodySection: React.FC<BodyProps> = ({
   return (
     <View style={styles.bodyContainer}>
       <Text style={styles.titleText} numberOfLines={2}>
-        {accountPayload.customDisplayName ?? accountPayload.defaultTitle}
+        {primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle}
       </Text>
 
       <Text style={styles.subtitleText} numberOfLines={3}>
-        {accountPayload.customDescription ?? accountPayload.defaultDescription}
+        {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
       </Text>
 
       {isBalanceLoading && (
         <LoadingBalanceView />
       ) || (
         <AccountBalanceDisplay
-          accountPayload={accountPayload}
+          accountShell={accountShell}
           containerStyle={styles.balanceRow}
           amountTextStyle={balanceTextStyle}
         />
@@ -169,15 +162,15 @@ const BodySection: React.FC<BodyProps> = ({
 
 
 const HomeAccountsListCard: React.FC<Props> = ({
-  accountPayload,
+  accountShell,
   isBalanceLoading,
 }: Props) => {
   return (
     <CardView cornerRadius={10} style={styles.rootContainer}>
-      <HeaderSection accountPayload={accountPayload} />
+      <HeaderSection accountShell={accountShell} />
 
       <BodySection
-        accountPayload={accountPayload}
+        accountShell={accountShell}
         isBalanceLoading={isBalanceLoading}
       />
     </CardView>

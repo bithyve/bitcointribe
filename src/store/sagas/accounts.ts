@@ -68,7 +68,10 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
+import AccountShell from '../../common/data/models/AccountShell';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -1136,19 +1139,25 @@ export const updateDonationPreferencesWatcher = createWatcher(
 );
 
 
-function* addNewAccount({ payload: account }: { payload: AccountPayload }) {
+function* addNewAccount({ payload: subAccountInfo }: { payload: SubAccountDescribing }) {
   // TODO: Devise some way to reference and call a new account creation service here.
-  // const newAccountService = "";
+
+  const bitcoinUnit = subAccountInfo.kind == SubAccountKind.TEST ? BitcoinUnit.TSATS : BitcoinUnit.SATS;
+
+  const newAccountShell = new AccountShell({
+    unit: bitcoinUnit,
+    primarySubAccount: subAccountInfo,
+  });
 
   try {
-    // TODO: Yield a result by calling the account creation service with the `AccountPayload`.
+    // TODO: Yield a result by calling the account creation service with the `AccountShell`.
     // const res = yield call(
     //   newAccountService.generateNewAccount,
     //   ...payload,
     // );
-    yield put(newAccountAdded({ account }));
+    yield put(newAccountAdded({ accountShell: newAccountShell }));
   } catch (error) {
-    yield put(newAccountAddFailed({ account, error }));
+    yield put(newAccountAddFailed({ accountShell: newAccountShell, error }));
   }
 }
 
@@ -1158,7 +1167,7 @@ export const addNewAccountWatcher = createWatcher(
 );
 
 
-function* updateAccountSettings({ payload: account }: { payload: AccountPayload }) {
+function* updateAccountSettings({ payload: account }: { payload: SubAccountDescribing }) {
   try {
     // TODO: Implement backend logic here for saving an account's properties
     yield put(accountSettingsUpdated({ account }));

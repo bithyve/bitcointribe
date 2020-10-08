@@ -1,10 +1,11 @@
+import { BottomSheetHandleProps } from '@gorhom/bottom-sheet';
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import Colors from '../../common/Colors';
 
 export const HANDLE_CONTAINER_HEIGHT = 12;
 
-export type Props = {
+export type Props = BottomSheetHandleProps & {
   containerStyle?: Record<string, unknown>;
   handleIndicatorStyle?: Record<string, unknown>;
 };

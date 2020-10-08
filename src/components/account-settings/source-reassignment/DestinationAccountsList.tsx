@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import AccountShell from '../../../common/data/models/AccountShell';
@@ -7,27 +7,27 @@ import RadioButton from '../../RadioButton';
 import AccountSourceListItemContent from '../AccountSourceListItemContent';
 
 export type Props = {
-  selectableAccountShells: AccountShell[];
-  selectedAccountShellID: string | null;
-  onAccountSelected: (accountShell: AccountShell) => void;
+  selectableDestinations: AccountShell[];
+  selectedDestinationID: string | null;
+  onDestinationSelected: (accountShell: AccountShell) => void;
 };
 
 const listItemKeyExtractor = (item: AccountShell) => item.id;
 
 const DestinationAccountList: React.FC<Props> = ({
-  selectableAccountShells: selectableSubAccounts,
-  selectedAccountShellID: selectedSubAccountID,
-  onAccountSelected,
+  selectableDestinations,
+  selectedDestinationID,
+  onDestinationSelected,
 }: Props) => {
 
   const isChecked = useCallback((accountShell: AccountShell) => {
-    return accountShell.id === selectedSubAccountID;
-  }, [selectedSubAccountID]);
+    return accountShell.id === selectedDestinationID;
+  }, [selectedDestinationID]);
 
   const renderItem = ({ item: accountShell }: { item: AccountShell }) => {
     return (
       <ListItem
-        onPress={() => { onAccountSelected(accountShell) }}
+        onPress={() => { onDestinationSelected(accountShell) }}
       >
         <RadioButton
           isChecked={isChecked(accountShell)}
@@ -43,8 +43,8 @@ const DestinationAccountList: React.FC<Props> = ({
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{ paddingHorizontal: 14 }}
-      extraData={selectedSubAccountID}
-      data={selectableSubAccounts}
+      extraData={selectedDestinationID}
+      data={selectableDestinations}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />

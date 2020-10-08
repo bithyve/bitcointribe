@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from "react-navigation-stack";
-import TransactionReassignmentKind from '../../common/data/enums/TransactionReassignmentKind';
+import XPubSourceKind from '../../common/data/enums/XPubSourceKind';
 import AccountSettingsDisplayPropertiesScreen from "../../pages/Accounts/AccountSettings/DisplayPropertiesScreen";
 import AccountSettingsMainScreen from "../../pages/Accounts/AccountSettings/MainScreen";
 import ReassignTransactionsMainOptionsScreen from "../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
@@ -10,6 +10,7 @@ import AccountDetailsContainerScreen from "../../pages/Accounts/Details/AccountD
 import TransactionDetailsContainerScreen from "../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
 import TransactionsListContainerScreen from "../../pages/Accounts/Transactions/TransactionsListScreenContainer";
 import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationScreen';
+import ReassignSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSourcesScreen';
 
 export const AccountSettingsStack = createStackNavigator(
   {
@@ -37,11 +38,17 @@ export const AccountSettingsStack = createStackNavigator(
         title: "Reassign Transactions",
       },
     },
+    ReassignSourcesSelectSources: {
+      screen: ReassignSourcesSelectSourcesScreen,
+      navigationOptions: {
+        title: "Reassign Sources",
+      },
+    },
     ReassignTransactionsSelectDestination: {
       screen: ReassignTransactionsSelectDestinationScreen,
       navigationOptions: ({ navigation }) => {
         const reassignmentKind = navigation.getParam('reassignmentKind');
-        const nameText = reassignmentKind === TransactionReassignmentKind.SOURCES ? 'Sources' : 'Transactions';
+        const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions';
 
         return {
           title: `Reassign ${nameText}`,
