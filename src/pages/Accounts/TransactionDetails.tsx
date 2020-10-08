@@ -28,6 +28,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
@@ -37,25 +38,24 @@ export default function TransactionDetails(props) {
     return null;
   }
   const serviceType = props.serviceType ? props.serviceType : null;
-  const [description, setDescription] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      const descriptionHistory = JSON.parse(
-        await AsyncStorage.getItem('descriptionHistory'),
-      );
-      if (descriptionHistory) {
-        const descrip = descriptionHistory[txDetails.txid];
-        if (descrip) {
-          setDescription(descrip);
-        } else {
-          setDescription('');
-        }
-      }
-    })();
-  }, [txDetails]);
+  // useEffect(() => { // retiring in app notes
+  //   (async () => {
+  //     const descriptionHistory = JSON.parse(
+  //       await AsyncStorage.getItem('descriptionHistory'),
+  //     );
+  //     if (descriptionHistory) {
+  //       const descrip = descriptionHistory[txDetails.txid];
+  //       if (descrip) {
+  //         setDescription(descrip);
+  //       } else {
+  //         setDescription('');
+  //       }
+  //     }
+  //   })();
+  // }, [txDetails]);
 
-  const getImageByAccountType = (accountType) => {
+  const getImageByAccountType = (accountType, primaryAccType?) => {
     if (accountType == 'FAST_BITCOINS') {
       return (
         <View
@@ -83,13 +83,21 @@ export default function TransactionDetails(props) {
     } else if (
       accountType == 'Savings Account' ||
       accountType == 'Test Account' ||
-      accountType == 'Checking Account'
+      accountType == 'Checking Account' ||
+      accountType == 'Donation Account' ||
+      accountType === SUB_PRIMARY_ACCOUNT
     ) {
       return (
         <View>
           <Image
             source={
-              accountType == 'Savings Account'
+              accountType === SUB_PRIMARY_ACCOUNT
+                ? primaryAccType === 'Savings Account'
+                  ? require('../../assets/images/icons/icon_secureaccount.png')
+                  : require('../../assets/images/icons/icon_regular.png')
+                : accountType == 'Donation Account'
+                ? require('../../assets/images/icons/icon_donation_account.png')
+                : accountType == 'Savings Account'
                 ? require('../../assets/images/icons/icon_secureaccount.png')
                 : accountType == 'Test Account'
                 ? require('../../assets/images/icons/icon_test.png')
@@ -154,7 +162,7 @@ export default function TransactionDetails(props) {
           paddingBottom: hp('2%'),
         }}
       >
-        {getImageByAccountType(txDetails.accountType)}
+        {getImageByAccountType(txDetails.accountType, txDetails.primaryAccType)}
         <View
           style={{
             flex: 1,
@@ -171,7 +179,9 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(14),
               }}
             >
-              {txDetails.accountType}
+              {txDetails.accountType === SUB_PRIMARY_ACCOUNT
+                ? txDetails.primaryAccType
+                : txDetails.accountType}
             </Text>
             <Text
               style={{
@@ -330,29 +340,6 @@ export default function TransactionDetails(props) {
             {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
           </Text>
         </View>
-        {description ? (
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Note
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {description}
-            </Text>
-          </View>
-        ) : null}
         {txDetails.message ? (
           <View style={styles.infoCardView}>
             <Text

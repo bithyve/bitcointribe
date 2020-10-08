@@ -15,256 +15,115 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ToggleSwitch from './ToggleSwitch';
 import Toast from '../components/Toast';
-import { updateDonationPreferences } from '../store/actions/accounts';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import config from '../bitcoin/HexaConfig';
-import preferences from '../store/reducers/preferences';
+import CopyThisText from './CopyThisText';
+import { ScrollView } from 'react-native-gesture-handler';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function DonationWebPageModalContents(props) {
-  const [saveEnabled, setSaveEnabled] = useState(false);
-  const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
-  const [
-    isDonationTransactionEnable,
-    setIsDonationTransactionEnable,
-  ] = useState(props.account.configuration.displayTransactions);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    setIsDonationTotalEnable(props.account.configuration.displayBalance);
-    setIsDonationTransactionEnable(
-      props.account.configuration.displayTransactions,
-    );
-  }, [props.account]);
-
-  function writeToClipboard(link) {
-    Clipboard.setString(link);
-    Toast('Copied Successfully');
-  }
-
-  useEffect(() => {
-    if (
-      isDonationTotalEnable !== props.account.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        props.account.configuration.displayTransactions
-    )
-      setSaveEnabled(true);
-    else setSaveEnabled(false);
-  }, [
-    isDonationTotalEnable,
-    isDonationTransactionEnable,
-    props.account.configuration,
-  ]);
-
-  const updatePreferences = useCallback(() => {
-    const configuration = {
-      displayBalance: isDonationTotalEnable,
-      displayTransactions: isDonationTransactionEnable,
-    };
-
-    const preferences = { configuration };
-    const { serviceType, accountNumber } = props;
-    console.log({ serviceType, accountNumber });
-    Toast('Your preferences would be updated shortly');
-    dispatch(
-      updateDonationPreferences(serviceType, accountNumber, preferences),
-    );
-  }, [
-    isDonationTotalEnable,
-    isDonationTransactionEnable,
-    props.account.configuration,
-  ]);
-
   return (
     <View style={styles.modalContentContainer}>
-      <View style={{ height: '100%', marginHorizontal: wp('8%') }}>
-        <View style={styles.successModalHeaderView}>
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(18),
-              fontFamily: Fonts.FiraSansMedium,
-            }}
+      <ScrollView style={styles.modalContainer}>
+        <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
+          <View
+            style={{ ...styles.successModalHeaderView, flexDirection: 'row' }}
           >
-            Donation Webpage
-          </Text>
-          <Text
-            style={{
-              ...styles.modalInfoText,
-              marginTop: wp('1.5%'),
-              color: Colors.lightTextColor,
-            }}
-          >
-            Settings for the Donation web view
-          </Text>
-        </View>
-        <View style={{ ...styles.rowContainer, marginTop: 10 }}>
-          <Image
-            style={styles.imageStyle}
-            resizeMode="center"
-            source={require('../assets/images/icons/icon_donation_total.png')}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.titleTextStyle}>Donation Total</Text>
-            <Text
+            <View>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(18),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Donation web view
+              </Text>
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginTop: wp('1.5%'),
+                  color: Colors.lightTextColor,
+                }}
+              >
+                Use one of the options below to publish
+              </Text>
+            </View>
+            <AppBottomSheetTouchableWrapper
               style={{
-                ...styles.modalInfoText,
-                marginTop: wp('1.2%'),
-                color: Colors.lightTextColor,
+                marginLeft: 'auto',
+                marginRight: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                props.onClickSetting();
               }}
             >
-              Show the total funds received for the donation
+              <Image
+                source={require('../assets/images/icons/settings.png')}
+                style={styles.image}
+              />
+            </AppBottomSheetTouchableWrapper>
+          </View>
+          <View style={styles.infoTextContainer}>
+            <Text style={styles.titleTextStyle}>Donation Link</Text>
+            <Text style={styles.modalInfoText}>
+              When someone wants to donate, they can simply click on this link
+              which will serve up the donation page
             </Text>
           </View>
-          <ToggleSwitch
-            isNotImage={true}
-            toggleColor={Colors.lightBlue}
-            toggleCircleColor={
-              isDonationTotalEnable ? Colors.blue : Colors.white
-            }
-            onpress={() => setIsDonationTotalEnable((prevState) => !prevState)}
-            toggle={isDonationTotalEnable}
-          />
-        </View>
-        <View style={styles.rowContainer}>
-          <Image
-            style={styles.imageStyle}
-            resizeMode="center"
-            source={require('../assets/images/icons/icon_donation_transactions.png')}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.titleTextStyle}>Donation Transactions</Text>
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp('1.2%'),
-                color: Colors.lightTextColor,
-              }}
-            >
-              Show the transactions set to the donation account
-            </Text>
-          </View>
-          <ToggleSwitch
-            isNotImage={true}
-            toggleColor={Colors.lightBlue}
-            toggleCircleColor={
-              isDonationTransactionEnable ? Colors.blue : Colors.white
-            }
-            onpress={() =>
-              setIsDonationTransactionEnable((prevState) => !prevState)
-            }
-            toggle={isDonationTransactionEnable}
-          />
-        </View>
-        <View style={styles.infoTextContainer}>
-          <Text style={styles.titleTextStyle}>Donation Link</Text>
-          <Text style={styles.modalInfoText}>
-            When someone wants to donate, they can simply click on this link
-            which will serve up the donation page
-          </Text>
-        </View>
-        <View style={styles.deeplinkContainerStyle}>
-          <Text
+          <View
             style={{
-              color: Colors.lightBlue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
+              marginTop: -20,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: 40,
+              marginRight: 40,
             }}
-            numberOfLines={1}
           >
-            {`https://hexawallet.io/${
-              config.APP_STAGE === 'app'
-                ? 'donate'
-                : config.APP_STAGE === 'sta'
-                ? 'donate-stage'
-                : 'donate-test'
-            }/?donationid=` + props.account.id}
-          </Text>
-          <TouchableOpacity
-            style={styles.copylinkContainerStyle}
-            onPress={() =>
-              writeToClipboard(
+            <CopyThisText
+              text={
                 `https://hexawallet.io/${
                   config.APP_STAGE === 'app'
                     ? 'donate'
                     : config.APP_STAGE === 'sta'
                     ? 'donate-stage'
                     : 'donate-test'
-                }/?donationid=` + props.account.id,
-              )
-            }
-          >
-            <Image
-              source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: wp('10%'), height: wp('10%') }}
-              resizeMode="center"
+                }/?donationid=` + props.account.id
+              }
             />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.infoTextContainer}>
-          <Text style={styles.titleTextStyle}>Embed Code</Text>
-          <Text style={styles.modalInfoText}>
-            If you have a website, simply copy this code on your site to start
-            receiving donations
-          </Text>
-        </View>
-        <View style={styles.deeplinkContainerStyle}>
-          <Text
+          </View>
+          <View style={styles.infoTextContainer}>
+            <Text style={styles.titleTextStyle}>Embed Code</Text>
+            <Text style={styles.modalInfoText}>
+              If you have a website, simply copy this code on your site to start
+              receiving donations
+            </Text>
+          </View>
+          <View
             style={{
-              color: Colors.lightBlue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
+              marginTop: -20,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: 40,
+              marginRight: 40,
             }}
-            numberOfLines={1}
           >
-            {`<iframe src="https://hexawallet.io/${
-              config.APP_STAGE === 'app'
-                ? 'donate'
-                : config.APP_STAGE === 'sta'
-                ? 'donate-stage'
-                : 'donate-test'
-            }/?donationid=${
-              props.account.id
-            }" width="400" height="600"></iframe>`}
-          </Text>
-          <TouchableOpacity
-            style={styles.copylinkContainerStyle}
-            onPress={() =>
-              writeToClipboard(
-                `<iframe src="https://hexawallet.io/${
-                  config.APP_STAGE === 'app'
-                    ? 'donate'
-                    : config.APP_STAGE === 'sta'
-                    ? 'donate-stage'
-                    : 'donate-test'
-                }/?donationid=${
-                  props.account.id
-                }" width="400" height="600"></iframe>`,
-              )
-            }
-          >
-            <Image
-              source={require('../assets/images/icons/icon_copy.png')}
-              style={{ width: wp('10%'), height: wp('10%') }}
-              resizeMode="center"
+            <CopyThisText
+              text={`<iframe src="https://hexawallet.io/${
+                config.APP_STAGE === 'app'
+                  ? 'donate'
+                  : config.APP_STAGE === 'sta'
+                  ? 'donate-stage'
+                  : 'donate-test'
+              }/?donationid=${
+                props.account.id
+              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
-          </TouchableOpacity>
+          </View>
         </View>
-        <View style={{ marginTop: 30 }}>
-          <AppBottomSheetTouchableWrapper
-            style={{ ...styles.buttonStyle, opacity: !saveEnabled ? 0.5 : 1 }}
-            disabled={!saveEnabled}
-            onPress={() => {
-              updatePreferences();
-              props.close();
-            }}
-          >
-            <Text style={styles.buttonText}>Save</Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -273,17 +132,22 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
   },
+  modalContainer: {
+    height: '100%',
+    backgroundColor: Colors.white,
+    width: '100%',
+  },
   successModalHeaderView: {
     marginTop: wp('6%'),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
   },
   titleTextStyle: {
     color: Colors.blue,
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
   rowContainer: {
@@ -292,11 +156,6 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.borderColor,
     borderBottomWidth: 1,
     alignItems: 'center',
-  },
-  imageStyle: {
-    width: wp('12%'),
-    height: wp('12%'),
-    resizeMode: 'center',
   },
   textContainer: {
     flex: 1,
@@ -344,5 +203,10 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
     position: 'absolute',
     right: 0,
+  },
+  image: {
+    width: wp('5%'),
+    height: wp('5%'),
+    resizeMode: 'contain',
   },
 });

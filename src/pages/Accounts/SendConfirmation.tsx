@@ -28,6 +28,7 @@ import {
   clearTransfer,
   fetchBalanceTx,
   syncViaXpubAgent,
+  fetchDerivativeAccBalTx,
   alternateTransferST2,
 } from '../../store/actions/accounts';
 import { UsNumberFormat, timeConvertNear30 } from '../../common/utilities';
@@ -42,6 +43,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RelayServices from '../../bitcoin/services/RelayService';
 import {
@@ -88,6 +90,7 @@ interface SendConfirmationPropsTypes {
   exchangeRates: any;
   fetchBalanceTx: any;
   syncViaXpubAgent: any;
+  fetchDerivativeAccBalTx: any;
   clearTransfer: any;
   alternateTransferST2: any;
   transferST2: any;
@@ -192,18 +195,18 @@ class SendConfirmation extends Component<
     }
   };
 
-  updateDescription = async (txid, description) => {
-    let descriptionHistory = {};
-    let storedHistory = await AsyncStorage.getItem('descriptionHistory');
+  // updateDescription = async (txid, description) => {
+  //   let descriptionHistory = {};
+  //   let storedHistory = await AsyncStorage.getItem('descriptionHistory');
 
-    if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
-    descriptionHistory[txid] = description;
+  //   if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
+  //   descriptionHistory[txid] = description;
 
-    await AsyncStorage.setItem(
-      'descriptionHistory',
-      JSON.stringify(descriptionHistory),
-    );
-  };
+  //   await AsyncStorage.setItem(
+  //     'descriptionHistory',
+  //     JSON.stringify(descriptionHistory),
+  //   );
+  // };
 
   sendNotifications = () => {
     let { WALLET_SETUP, trustedContactsService } = this.props;
@@ -264,16 +267,23 @@ class SendConfirmation extends Component<
       }
 
       this.sendNotifications();
-      if (transfer.details[0].note) {
-        this.updateDescription(transfer.txid, transfer.details[0].note);
-      }
+      // if (transfer.details[0].note) { // retired in app notes
+      //   this.updateDescription(transfer.txid, transfer.details[0].note);
+      // }
       this.storeTrustedContactsHistory(transfer.details);
       if (this.state.derivativeAccountDetails) {
-        this.props.syncViaXpubAgent(
-          this.serviceType,
-          this.state.derivativeAccountDetails.type,
-          this.state.derivativeAccountDetails.number,
-        );
+        if (this.state.derivativeAccountDetails.type === DONATION_ACCOUNT)
+          this.props.syncViaXpubAgent(
+            this.serviceType,
+            this.state.derivativeAccountDetails.type,
+            this.state.derivativeAccountDetails.number,
+          );
+        else
+          this.props.fetchDerivativeAccBalTx(
+            this.serviceType,
+            this.state.derivativeAccountDetails.type,
+            this.state.derivativeAccountDetails.number,
+          );
       } else {
         this.props.fetchBalanceTx(this.serviceType, {
           loader: true,
@@ -509,7 +519,9 @@ class SendConfirmation extends Component<
                 navigation.goBack();
                 this.props.clearTransfer(this.serviceType, 'stage1');
               }}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
+              disabled={isConfirmDisabled}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -519,7 +531,8 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
             <Image
               source={
-                this.state.derivativeAccountDetails
+                this.state.derivativeAccountDetails &&
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../assets/images/icons/icon_donation_account.png')
                   : this.serviceType == TEST_ACCOUNT
                   ? require('../../assets/images/icons/icon_test.png')
@@ -1086,7 +1099,7 @@ class SendConfirmation extends Component<
                 this.props.accounts[this.serviceType].loading.transfer) ||
               (isConfirmDisabled &&
                 this.props.accounts[this.serviceType].loading.transfer) ? (
-                <ActivityIndicator size="small" />
+                <ActivityIndicator />
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
               )}
@@ -1096,6 +1109,7 @@ class SendConfirmation extends Component<
                 ...styles.confirmButtonView,
                 width: wp('30%'),
               }}
+              disabled={isConfirmDisabled}
               onPress={() => {
                 this.props.clearTransfer(this.serviceType, 'stage1');
                 navigation.goBack();
@@ -1157,12 +1171,13 @@ class SendConfirmation extends Component<
 
                 navigation.navigate('Accounts', {
                   serviceType: this.serviceType,
-                  index:
-                    this.serviceType === TEST_ACCOUNT
-                      ? 0
-                      : this.serviceType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
+                  index: this.state.derivativeAccountDetails
+                    ? 3
+                    : this.serviceType === TEST_ACCOUNT
+                    ? 0
+                    : this.serviceType === REGULAR_ACCOUNT
+                    ? 1
+                    : 2,
                   spendableBalance: this.spendableBalance - totalAmount,
                 });
               }}
@@ -1318,6 +1333,7 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchBalanceTx,
     syncViaXpubAgent,
+    fetchDerivativeAccBalTx,
     clearTransfer,
     alternateTransferST2,
     transferST2,

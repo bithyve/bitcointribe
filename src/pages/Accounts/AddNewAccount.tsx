@@ -28,13 +28,17 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-  DONATION_ACCOUNT
+  DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
-import { setupDonationAccount, } from '../../store/actions/accounts';
+import {
+  setupDonationAccount,
+  fetchDerivativeAccAddress,
+} from '../../store/actions/accounts';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
@@ -54,22 +58,23 @@ interface AddNewAccountPropsTypes {
   walletName: string;
   accounts: any;
   setupDonationAccount: any;
+  fetchDerivativeAccAddress: any;
 }
 const accountData = [
-  // {
-  //   id: REGULAR_ACCOUNT,
-  //   account_name: 'Checking Account',
-  //   type: REGULAR_ACCOUNT,
-  //   checked: false,
-  //   image: require('../../assets/images/icons/icon_regular_account.png'),
-  // },
-  // {
-  //   id: SECURE_ACCOUNT,
-  //   account_name: 'Savings Account',
-  //   type: SECURE_ACCOUNT,
-  //   checked: false,
-  //   image: require('../../assets/images/icons/icon_secureaccount_white.png'),
-  // },
+  {
+    id: REGULAR_ACCOUNT,
+    account_name: 'Checking Account',
+    type: REGULAR_ACCOUNT,
+    checked: false,
+    image: require('../../assets/images/icons/icon_regular_account.png'),
+  },
+  {
+    id: SECURE_ACCOUNT,
+    account_name: 'Savings Account',
+    type: SECURE_ACCOUNT,
+    checked: false,
+    image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+  },
   {
     id: DONATION_ACCOUNT,
     account_name: 'Donation Account',
@@ -123,13 +128,44 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
     const configuration = {
       displayBalance: true,
       displayTransactions: true,
-    }
-    this.props.setupDonationAccount(serviceType, donee, subject, modelDescription, configuration)
-  }
+      displayTxDetails: true,
+    };
+    this.props.setupDonationAccount(
+      serviceType,
+      donee,
+      subject,
+      modelDescription,
+      configuration,
+    );
+  };
 
   onSelectContact = (item) => {
+    const dervAccount =
+      item.type === DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT;
+
+    let instanceCount = 1;
+    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+      if (dervAccount === SUB_PRIMARY_ACCOUNT && serviceType !== item.type)
+        continue;
+      const derivativeAccounts = this.props.accounts[serviceType].service[
+        serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+      ].derivativeAccounts;
+
+      if (derivativeAccounts[dervAccount])
+        instanceCount += derivativeAccounts[dervAccount].instance.using;
+    }
+
+    const accountName = `${item.type === DONATION_ACCOUNT
+        ? 'Donation Account'
+        : item.type === REGULAR_ACCOUNT
+          ? 'Checking Account'
+          : 'Savings Account'
+      } ${item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
+      }`;
     this.setState({
       selectedAccount: item,
+      accountName,
+      isValid: false,
     });
   }
 
@@ -156,10 +192,20 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
     );
   };
 
+  openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
+
   renderAccountDetailModalContent = () => {
     return (
-      <ScrollView style={{ height: '100%' }}>
-        <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+      <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+        <ScrollView style={{ height: '100%' }}>
           <View style={{ height: '100%', marginHorizontal: wp('8%') }}>
             <View style={styles.successModalHeaderView}>
               <Text
@@ -178,13 +224,13 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                   color: Colors.lightTextColor,
                 }}
               >
-                Some of these details can be displayed on the Donation web-view
+                Some of these details can be displayed on the Donation web view
               </Text>
             </View>
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter donee name'}
+                placeholder={'Organised by'}
                 keyboardType={
                   Platform.OS == 'ios'
                     ? 'ascii-capable'
@@ -199,9 +245,16 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
                 returnKeyLabel="Done"
               />
             </View>
-            <View style={styles.modalTextBoxView}>
+            <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
-                style={styles.textBox}
+                style={{
+                  ...styles.textBox,
+                  paddingRight: 20,
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+                multiline={true}
+                numberOfLines={4}
                 placeholder={'Enter a description'}
                 keyboardType={
                   Platform.OS == 'ios'
@@ -218,10 +271,21 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
               />
             </View>
             <View style={styles.greyBoxView}>
-              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20 }}>
-                <Text style={styles.modalInfoText}>Enable 2 Factor Aunthentication</Text>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginHorizontal: 20,
+                }}
+              >
+                <Text style={styles.modalInfoText}>
+                  Enable two-factor authentication
+                </Text>
                 <CheckBox
                   size={26}
+                  imageSize={20}
                   borderRadius={5}
                   color={Colors.lightBlue}
                   borderColor={Colors.borderColor}
@@ -236,11 +300,18 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
             <View style={{ marginVertical: 10, marginLeft: 10 }}>
               <Text style={styles.modalInfoText}>
                 By clicking proceed you agree to our{' '}
-                <Text style={{
-                  fontFamily: Fonts.FiraSansItalic,
-                  color: Colors.blue,
-                  fontSize: RFValue(11),
-                }}>
+                <Text
+                  onPress={() => {
+                    this.openLink(
+                      'https://hexawallet.io/donee-terms-conditions/',
+                    );
+                  }}
+                  style={{
+                    fontFamily: Fonts.FiraSansItalic,
+                    color: Colors.blue,
+                    fontSize: RFValue(11),
+                  }}
+                >
                   Terms and Conditions
             </Text>
               </Text>
@@ -265,10 +336,10 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    )
-  }
+        </ScrollView>
+      </View>
+    );
+  };
 
   render() {
     const { navigation } = this.props;
@@ -291,6 +362,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
               onPress={() => {
                 navigation.goBack();
               }}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{
                 height: 30,
                 width: 30,
@@ -357,6 +429,7 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
               const checked = Items.item.id === this.state.selectedAccount.id ? true : false;
               return (
                 <AccountsListSend
+                  fromAddNewAccount={true}
                   accounts={Items.item}
                   balances={0}
                   checkedItem={checked}
@@ -403,7 +476,29 @@ class AddNewAccount extends PureComponent<AddNewAccountPropsTypes, AddNewAccount
             }}
             disabled={this.state.isValid}
             onPress={() => {
-              (this.AccountDetailBottomSheet as any).current.snapTo(1);
+              if (this.state.selectedAccount.id === DONATION_ACCOUNT)
+                (this.AccountDetailBottomSheet as any).current.snapTo(1);
+              else {
+                let accountNumber = 1;
+                const dervAccount = SUB_PRIMARY_ACCOUNT;
+                const serviceType = this.state.selectedAccount.type;
+                const derivativeAccounts = this.props.accounts[serviceType]
+                  .service[
+                  serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
+                ].derivativeAccounts;
+
+                if (derivativeAccounts[dervAccount])
+                  accountNumber =
+                    derivativeAccounts[dervAccount].instance.using + 1;
+
+                this.props.fetchDerivativeAccAddress(
+                  this.state.selectedAccount.type,
+                  dervAccount,
+                  accountNumber,
+                  this.state.accountName,
+                );
+                this.props.navigation.navigate('Accounts');
+              }
             }}
           >
             <Text style={styles.buttonText}>Proceed</Text>
@@ -514,5 +609,6 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     setupDonationAccount,
+    fetchDerivativeAccAddress,
   })(AddNewAccount),
 );

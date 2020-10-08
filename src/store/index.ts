@@ -15,11 +15,12 @@ import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from 'redux-persist';
 import preferencesReducer from './reducers/preferences';
+import loaders from './reducers/loaders'
 
 const config = {
   key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ['setupAndAuth']
+  blacklist: ['setupAndAuth', 'loaders']
 };
 
 import {
@@ -239,6 +240,7 @@ const rootReducer = combineReducers({
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
+  loaders
 });
 
 const sagaMiddleware = createSagaMiddleware();

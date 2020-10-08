@@ -172,10 +172,11 @@ export const fetchDerivativeAccAddress = (
   serviceType,
   accountType,
   accountNumber?,
+  accountName?,
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_ADDRESS,
-    payload: { serviceType, accountType, accountNumber },
+    payload: { serviceType, accountType, accountNumber, accountName },
   };
 };
 
@@ -205,6 +206,7 @@ export const setupDonationAccount = (
   configuration: {
     displayBalance: boolean;
     displayTransactions: boolean;
+    displayTxDetails: boolean;
   },
   disableAccount?: boolean,
 ) => {
@@ -229,6 +231,7 @@ export const updateDonationPreferences = (
     configuration?: {
       displayBalance: boolean;
       displayTransactions: boolean;
+      displayTxDetails: boolean;
     };
     accountDetails?: {
       donee: string;

@@ -19,9 +19,10 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { UsNumberFormat } from '../../common/utilities';
-
+import config from '../../bitcoin/HexaConfig';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
@@ -66,6 +67,7 @@ const HomeList = ({
   CurrencyCode,
   balances,
   exchangeRates,
+  addNewDisable,
 }) => {
   return (
     <View style={{ flexDirection: 'column' }}>
@@ -73,16 +75,21 @@ const HomeList = ({
         if (value.accountType === 'add') {
           return (
             <TouchableOpacity
-              disabled={false}
-              onPress={() => navigation.navigate('AddNewAccount')}
+              disabled={addNewDisable}
+              onPress={() => navigation.navigate('AddNewDonationAccount')}
             >
               <CardView
                 cornerRadius={10}
-                style={{
-                  ...styles.card,
-                  opacity: 0.4,
-                  backgroundColor: Colors.borderColor,
-                }}
+                style={
+                  addNewDisable
+                    ? {
+                        ...styles.card,
+                        backgroundColor: Colors.borderColor,
+                      }
+                    : {
+                        ...styles.card,
+                      }
+                }
               >
                 <View
                   style={{
@@ -99,10 +106,22 @@ const HomeList = ({
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue(11),
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      alignItems: 'center'
                     }}
                   >
-                    Add to my wallet
+                    {addNewDisable
+                    ? 'Add more accounts': "Add Donation Account"}
                   </Text>
+                  {addNewDisable
+                    ? <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(11),
+                      alignSelf: 'center',
+                    }}
+                  >(coming soon)</Text> : null}
                 </View>
               </CardView>
             </TouchableOpacity>
@@ -112,18 +131,8 @@ const HomeList = ({
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('Accounts', {
-                  serviceType:
-                    value.accountType === 'test'
-                      ? TEST_ACCOUNT
-                      : value.accountType === 'regular'
-                      ? REGULAR_ACCOUNT
-                      : SECURE_ACCOUNT,
-                  index:
-                    value.accountType === 'test'
-                      ? 0
-                      : value.accountType === 'regular'
-                      ? 1
-                      : 2,
+                  serviceType: value.accountType,
+                  index: value.id - 1,
                 });
               }}
             >
@@ -132,12 +141,12 @@ const HomeList = ({
                   <Image
                     style={{ width: wp('10%'), height: wp('10%') }}
                     source={getIconByAccountType(
-                      value.title === 'Donation Account'
-                        ? value.title
+                      value.subType === DONATION_ACCOUNT
+                        ? value.subType
                         : value.accountType,
                     )}
                   />
-                  {value.accountType == 'secure' ? (
+                  {value.accountType == SECURE_ACCOUNT ? (
                     <TouchableOpacity
                       onPress={() => {
                         // alert('2FA');
@@ -196,7 +205,7 @@ const HomeList = ({
                         marginTop: hp('1%'),
                       }}
                     >
-                      {value.accountType === 'test' || switchOn ? (
+                      {value.accountType === TEST_ACCOUNT || switchOn ? (
                         <Image
                           style={styles.cardBitCoinImage}
                           source={value.bitcoinicon}
@@ -223,21 +232,23 @@ const HomeList = ({
                         }
                       >
                         {switchOn
-                          ? value.title === 'Donation Account'
+                          ? config.EJECTED_ACCOUNTS.includes(value.subType)
                             ? UsNumberFormat(value.amount)
-                            : value.accountType === 'test'
+                            : value.accountType === TEST_ACCOUNT
                             ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === 'regular'
+                            : value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)
-                          : value.title === 'Donation Account' && exchangeRates
+                          : config.EJECTED_ACCOUNTS.includes(value.subType) &&
+                            exchangeRates
                           ? (
                               (value.amount / 1e8) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2)
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? UsNumberFormat(balances.testBalance)
-                          : value.accountType === 'regular' && exchangeRates
+                          : value.accountType === REGULAR_ACCOUNT &&
+                            exchangeRates
                           ? (
                               (balances.regularBalance / 1e8) *
                               exchangeRates[CurrencyCode].last
@@ -252,7 +263,7 @@ const HomeList = ({
                       <Text style={styles.cardAmountUnitText}>
                         {switchOn
                           ? value.unit
-                          : value.accountType === 'test'
+                          : value.accountType === TEST_ACCOUNT
                           ? value.unit
                           : CurrencyCode.toLocaleLowerCase()}
                       </Text>

@@ -68,3 +68,4 @@ ios/Podfile.lock
 
 # VSCode
 .vscode/.react
+.vscode/settings.json

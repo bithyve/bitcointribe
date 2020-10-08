@@ -17,20 +17,19 @@ const BottomSheetHeader = ({ title, onPress }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: 6,
+    paddingHorizontal: 16,
   },
 
   titleText: {
-    paddingBottom: 6,
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
 });
 

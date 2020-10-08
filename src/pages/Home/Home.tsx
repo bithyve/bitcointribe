@@ -34,6 +34,7 @@ import {
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
   DONATION_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AllAccountsContents from '../../components/AllAccountsContents';
 import SettingsContents from '../../components/SettingsContents';
@@ -64,6 +65,7 @@ import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
+  setCardData,
 } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -109,6 +111,7 @@ import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from './BottomSheetHeader';
+import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -144,13 +147,13 @@ export const isCompatible = async (method: string, version: string) => {
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
     return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'regular') {
+  } else if (type == 'regular' || type === REGULAR_ACCOUNT) {
     return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'secure') {
+  } else if (type == 'secure' || type === SECURE_ACCOUNT) {
     return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type == 'test') {
+  } else if (type == 'test' || type === TEST_ACCOUNT) {
     return require('../../assets/images/icons/icon_test.png');
-  } else if (type === 'Donation Account') {
+  } else if (type === DONATION_ACCOUNT) {
     return require('../../assets/images/icons/icon_donation_hexa.png');
   } else {
     return require('../../assets/images/icons/icon_test.png');
@@ -241,6 +244,8 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   updateLastSeen: any;
+  setCardData: any;
+  cardDataProps: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -391,13 +396,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               // checking for donationId to send note
               if (options && options.message) {
-                try {
-                  // encoded message
-                  const rawMessage = JSON.parse(options.message);
-                  donationId = rawMessage.donationId;
-                } catch (err) {
-                  // normal message
-                }
+                const rawMessage = options.message;
+                donationId = rawMessage.split(':').pop().trim();
               }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
@@ -642,6 +642,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setAccountCardData = (newCardData) => {
+    //console.log("newCardData", newCardData);
     let newArrayFinal = [];
     let tempArray = [];
     for (let a = 0; a < newCardData.length; a++) {
@@ -664,8 +665,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   updateAccountCardData = () => {
     let { accounts } = this.props;
     const defaultCardData = initialCardData;
-    let idIndex = initialCardData[initialCardData.length - 1].id;
-
+    let idIndex = initialCardData.length;
+    const allCards = [];
     const additionalCardData = [];
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
@@ -673,31 +674,59 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[carouselAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
-        idIndex++;
-        const donationCardInstance = {
-          id: idIndex,
-          title: 'Donation Account',
-          unit: 'sats',
-          amount: donAcc.balances
-            ? donAcc.balances.balance + donAcc.balances.unconfirmedBalance
-            : 0,
-          account: `Donate Bitcoin`,
-          accountType: serviceType,
-          bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
-        };
-        additionalCardData.push(donationCardInstance);
+        for (
+          let index = 1;
+          index <= derivativeAccounts[carouselAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[carouselAcc][index];
+          idIndex++;
+
+          let title = '';
+          switch (carouselAcc) {
+            case DONATION_ACCOUNT:
+              title = account.subject ? account.subject : 'Donation Account';
+              break;
+
+            case SUB_PRIMARY_ACCOUNT:
+              if (serviceType === REGULAR_ACCOUNT)
+                title = account.accountName
+                  ? account.accountName
+                  : 'Checking Account';
+              else if (serviceType === SECURE_ACCOUNT)
+                title = account.accountName
+                  ? account.accountName
+                  : 'Savings Account';
+              break;
+          }
+
+          const carouselInstance = {
+            id: idIndex,
+            title,
+            unit: 'sats',
+            amount: account.balances
+              ? account.balances.balance + account.balances.unconfirmedBalance
+              : 0,
+            account:
+              carouselAcc === DONATION_ACCOUNT
+                ? `Accept bitcoin`
+                : serviceType === REGULAR_ACCOUNT
+                ? 'User Checking Account'
+                : 'User Savings Account',
+            accountType: serviceType,
+            subType: carouselAcc,
+            bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
+          };
+          additionalCardData.push(carouselInstance);
+        }
       }
     }
 
+    allCards.push(...defaultCardData, ...additionalCardData);
+    this.props.setCardData(allCards);
     this.setAccountCardData([
       ...defaultCardData,
       ...additionalCardData,
@@ -1007,9 +1036,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if (prevState.isLoading && !this.state.isLoading) {
-      if (this.transactionTabBarBottomSheetRef.current) {
-        this.transactionTabBarBottomSheetRef.current?.snapTo(1);
-      }
+      this.transactionTabBarBottomSheetRef.current?.snapTo(1);
     }
   };
 
@@ -1607,43 +1634,44 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     // donation transactions
-    const donationTxs = [];
-    let donationsBalance = 0;
+    const additionalTxs = [];
+    let additionalBalances = 0;
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
         accounts[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
-      if (!derivativeAccounts[DONATION_ACCOUNT]) continue;
+      for (const additionAcc of config.EJECTED_ACCOUNTS) {
+        if (!derivativeAccounts[additionAcc]) continue;
 
-      for (
-        let index = 1;
-        index <= derivativeAccounts[DONATION_ACCOUNT].instance.using;
-        index++
-      ) {
-        const donAcc: DonationDerivativeAccountElements =
-          derivativeAccounts[DONATION_ACCOUNT][index];
+        for (
+          let index = 1;
+          index <= derivativeAccounts[additionAcc].instance.using;
+          index++
+        ) {
+          const account = derivativeAccounts[additionAcc][index];
 
-        if (donAcc.balances)
-          donationsBalance +=
-            donAcc.balances.balance + donAcc.balances.unconfirmedBalance;
-        if (
-          donAcc.transactions &&
-          donAcc.transactions.transactionDetails.length
-        )
-          donationTxs.push(...donAcc.transactions.transactionDetails);
+          if (account.balances)
+            additionalBalances +=
+              account.balances.balance + account.balances.unconfirmedBalance;
+          if (
+            account.transactions &&
+            account.transactions.transactionDetails.length
+          )
+            additionalTxs.push(...account.transactions.transactionDetails);
+        }
       }
     }
 
     const accumulativeBalance =
-      regularBalance + secureBalance + donationsBalance;
+      regularBalance + secureBalance + additionalBalances;
 
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
-      ...donationTxs,
+      ...additionalTxs,
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
@@ -2327,6 +2355,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       UNDER_CUSTODY,
       downloadMShare,
       overallHealth,
+      cardDataProps,
     } = this.props;
     return (
       <ImageBackground
@@ -2381,6 +2410,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   getIconByAccountType={getIconByAccountType}
                   switchOn={switchOn}
                   accounts={accounts}
+                  addNewDisable={cardDataProps.length == 4 ? true : false}
                   CurrencyCode={currencyCode}
                   balances={balances}
                   exchangeRates={exchangeRates}
@@ -2420,6 +2450,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.transactionTabBarBottomSheetRef,
@@ -2465,6 +2496,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.addTabBarBottomSheetRef,
@@ -2518,6 +2550,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('82%')
                 : hp('82%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.qrTabBarBottomSheetRef,
@@ -2558,6 +2591,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ? hp('65%')
                 : hp('64%'),
             ]}
+            handleComponent={BottomSheetHandle}
             onChange={(newPositionIndex: number) => {
               this.handleBottomSheetPositionChange(
                 this.moreTabBarBottomSheetRef,
@@ -3201,6 +3235,8 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
+    cardDataProps: idx(state, (_) => _.preferences.cardData),
+
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
@@ -3240,6 +3276,7 @@ export default withNavigationFocus(
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
     updateLastSeen,
+    setCardData,
   })(Home),
 );
 

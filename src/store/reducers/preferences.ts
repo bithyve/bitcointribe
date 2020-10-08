@@ -10,7 +10,8 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
-  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN
+  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN,
+  CARD_DATA
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
@@ -32,7 +33,8 @@ const initialState = ip.freeze({
   isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,
-  lastSeen: null
+  lastSeen: null,
+  cardData: null
 })
 
 export default (state = initialState, { type, payload }) => {
@@ -105,6 +107,12 @@ export default (state = initialState, { type, payload }) => {
 
     case UPDATE_LAST_SEEN:
       return Object.assign({}, state, { lastSeen: new Date() })
+
+      case CARD_DATA:
+      return {
+        ...state,
+        cardData: payload.cardData,
+      };
 
     default:
       return state
