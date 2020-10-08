@@ -46,7 +46,7 @@ export default function DonationWebPageModalContents(props) {
                   color: Colors.lightTextColor,
                 }}
               >
-                Use one of the option below to publish
+                Use one of the options below to publish
               </Text>
             </View>
             <AppBottomSheetTouchableWrapper

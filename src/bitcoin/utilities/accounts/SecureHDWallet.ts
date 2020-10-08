@@ -1197,6 +1197,7 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: this.getWalletId().walletId,
         details: {
           donee,
+          subject,
           description,
           xpubs: [xpub, this.xpubs.secondary, this.xpubs.bh],
           xpubId,
