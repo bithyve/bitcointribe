@@ -2,40 +2,40 @@ import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import RadioButton from '../../RadioButton';
 import AccountSourceListItemContent from '../AccountSourceListItemContent';
 
 export type Props = {
-  selectableAccounts: AccountPayload[];
-  selectedAccountID: string | null;
-  onAccountSelected: (AccountPayload) => void;
+  selectableSubAccounts: SubAccountDescribing[];
+  selectedSubAccountID: string | null;
+  onAccountSelected: (subAccountInfo: SubAccountDescribing) => void;
 };
 
 
-const listItemKeyExtractor = (item: AccountPayload) => item.uuid;
+const listItemKeyExtractor = (item: SubAccountDescribing) => item.id;
 
 const DestinationAccountList: React.FC<Props> = ({
-  selectableAccounts,
-  selectedAccountID,
+  selectableSubAccounts,
+  selectedSubAccountID,
   onAccountSelected,
 }: Props) => {
 
-  const isChecked = useCallback((accountPayload: AccountPayload) => {
-    return accountPayload.uuid === selectedAccountID;
-  }, [selectedAccountID]);
+  const isChecked = useCallback((subAccountInfo: SubAccountDescribing) => {
+    return subAccountInfo.id === selectedSubAccountID;
+  }, [selectedSubAccountID]);
 
-  const renderItem = ({ item: accountPayload }: { item: AccountPayload }) => {
+  const renderItem = ({ item: subAccountInfo }: { item: SubAccountDescribing }) => {
     return (
       <ListItem
-        onPress={() => { onAccountSelected(accountPayload) }}
+        onPress={() => { onAccountSelected(subAccountInfo) }}
       >
         <RadioButton
-          isChecked={isChecked(accountPayload)}
+          isChecked={isChecked(subAccountInfo)}
           ignoresTouch
         />
 
-        <AccountSourceListItemContent accountPayload={accountPayload} />
+        <AccountSourceListItemContent subAccountInfo={subAccountInfo} />
       </ListItem>
     );
   };
@@ -44,8 +44,8 @@ const DestinationAccountList: React.FC<Props> = ({
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{ paddingHorizontal: 14 }}
-      extraData={selectedAccountID}
-      data={selectableAccounts}
+      extraData={selectedSubAccountID}
+      data={selectableSubAccounts}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />

@@ -1,4 +1,4 @@
-enum AccountKind {
+enum SubAccountKind {
   TEST,
 
   /**
@@ -28,4 +28,4 @@ enum AccountKind {
   FULLY_IMPORTED_WALLET,
 };
 
-export default AccountKind;
+export default SubAccountKind;

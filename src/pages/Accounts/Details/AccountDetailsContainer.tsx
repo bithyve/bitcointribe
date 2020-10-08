@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
-import useAccountPayload from '../../../utils/hooks/state-selectors/UseActiveAccountPayload';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -10,11 +9,13 @@ import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import TransactionsList from '../../../components/account-details/AccountDetailsTransactionsList';
 import sampleTransactions from './SampleTransactions';
-import { TransactionDescribing } from '../../../common/data/models/Transactions/Interfaces';
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import KnowMoreBottomSheet, { KnowMoreBottomSheetHandle } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet';
 import { Easing } from 'react-native-reanimated';
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
+import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 
 export type Props = {
@@ -49,8 +50,8 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
   const accountID = useMemo(() => {
     return navigation.getParam('accountID');
   }, [navigation]);
-
-  const accountPayload: AccountPayload | undefined = useAccountPayload(accountID);
+  const accountShell = useAccountShellFromNavigation(navigation);
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
 
   // TODO: Implement a hook that fetches transactions for an account and use it here.
   // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
@@ -79,7 +80,7 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
 
   const showKnowMoreSheet = useCallback(() => {
     present(
-      <KnowMoreBottomSheet accountKind={accountPayload.kind} onClose={dismiss}/>,
+      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismiss}/>,
       {
         initialSnapIndex: 1,
         snapPoints: [0, '95%'],
@@ -94,7 +95,7 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
     <ScrollView style={styles.rootContainer}>
       <View style={{ paddingVertical: 20 }}>
         <AccountDetailsCard
-          accountPayload={accountPayload}
+          accountShell={accountShell}
           onKnowMorePressed={showKnowMoreSheet}
           onSettingsPressed={navigateToAccountSettings}
         />
@@ -122,7 +123,7 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
           onSendPressed={() => {
             navigation.navigate('Send', {
               accountID,
-              spendableBalance: accountPayload.balance,
+              spendableBalance: accountShell.balance,
             });
           }}
           onReceivePressed={() => {

@@ -1,17 +1,17 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Image } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
-import AccountKind from '../../common/data/enums/AccountKind';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import ListStyles from '../../common/Styles/Lists';
 
 export type Props = {
-  accountPayload: AccountPayload;
+  subAccountInfo: SubAccountDescribing;
 };
 
-export function imageSourceForAccountKind(accountKind: AccountKind): NodeRequire {
+export function imageSourceForAccountKind(accountKind: SubAccountKind): NodeRequire {
   switch (accountKind) {
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return require('../../assets/images/icons/icon_checking_circled.png');
     default:
       // TODO: Get image assets for other possible account kinds
@@ -20,12 +20,12 @@ export function imageSourceForAccountKind(accountKind: AccountKind): NodeRequire
 }
 
 const AccountSourceListItemContent: React.FC<Props> = ({
-  accountPayload,
+  subAccountInfo,
 }: Props) => {
 
   const accountKindImageSource = useMemo(() => {
-    return imageSourceForAccountKind(accountPayload.kind);
-  }, [accountPayload.kind]);
+    return imageSourceForAccountKind(subAccountInfo.kind);
+  }, [subAccountInfo.kind]);
 
   return (
     <>
@@ -39,14 +39,14 @@ const AccountSourceListItemContent: React.FC<Props> = ({
           style={ListStyles.listItemTitle}
           numberOfLines={1}
         >
-          {accountPayload.customDisplayName || accountPayload.defaultTitle}
+          {subAccountInfo.customDisplayName || subAccountInfo.defaultTitle}
         </ListItem.Title>
 
         <ListItem.Subtitle
           style={ListStyles.listItemSubtitle}
           numberOfLines={2}
         >
-          {accountPayload.customDescription || accountPayload.defaultDescription}
+          {subAccountInfo.customDescription || subAccountInfo.defaultDescription}
         </ListItem.Subtitle>
       </ListItem.Content>
     </>

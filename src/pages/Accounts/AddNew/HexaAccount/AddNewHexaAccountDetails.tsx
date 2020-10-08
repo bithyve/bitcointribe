@@ -6,9 +6,9 @@ import ButtonStyles from '../../../../common/Styles/Buttons';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccount } from '../../../../store/actions/accounts';
-import useAccountGenerationCompletionEffect from '../../../../utils/hooks/accounts-effects/UseAccountGenerationCompletionEffect';
+import useAccountGenerationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountGenerationCompletionEffect';
 import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
-import AccountPayload from '../../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 
 export interface Props {
   navigation: any;
@@ -20,11 +20,11 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
   const dispatch = useDispatch();
   const nameInputRef = useRef<Input>(null);
 
-  const currentPayload: AccountPayload = useMemo(() => {
-    return navigation.getParam('currentPayload');
+  const currentSubAccountInfo: SubAccountDescribing = useMemo(() => {
+    return navigation.getParam('currentSubAccountInfo');
   }, [navigation.state.params]);
 
-  const [accountName, setAccountName] = useState(currentPayload.defaultTitle);
+  const [accountName, setAccountName] = useState(currentSubAccountInfo.defaultTitle);
   const [accountDescription, setAccountDescription] = useState('');
 
   const canProceed = useMemo(() => {
@@ -45,10 +45,10 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
   });
 
   function handleProceedButtonPress() {
-    currentPayload.customDisplayName = accountName;
-    currentPayload.customDescription = accountDescription;
+    currentSubAccountInfo.customDisplayName = accountName;
+    currentSubAccountInfo.customDescription = accountDescription;
 
-    dispatch(addNewAccount(currentPayload));
+    dispatch(addNewAccount(currentSubAccountInfo));
   }
 
   return (
@@ -119,8 +119,8 @@ AddNewHexaAccountDetails.navigationOptions = ({ navigation, navigationOptions })
 
   return {
     header: ({ scene, previous, navigation }) => {
-      const currentPayload: AccountPayload = params.currentPayload;
-      const title = `Enter details for the new ${currentPayload.defaultTitle}`;
+      const currentSubAccountInfo: SubAccountDescribing = params.currentSubAccountInfo;
+      const title = `Enter details for the new ${currentSubAccountInfo.defaultTitle}`;
 
       return <NavigationHeader
         title={title}

@@ -4,16 +4,17 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
+import AccountShell from '../../common/data/models/AccountShell';
 
 export type Props = {
-  accountPayload: AccountPayload;
+  accountShell: AccountShell;
   containerStyle?: Record<string, unknown>;
   currencyImageSource?: NodeRequire;
   currencyImageStyle?: Record<string, unknown>;
@@ -23,14 +24,14 @@ export type Props = {
 
 
 const AccountBalanceDisplay: React.FC<Props> = ({
-  accountPayload,
+  accountShell,
   containerStyle,
   currencyImageSource,
   currencyImageStyle,
   amountTextStyle,
   unitTextStyle,
 }: Props) => {
-  const balance = accountPayload.balance || 0;
+  const balance = accountShell.balance || 0;
   const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();
 
@@ -39,7 +40,7 @@ const AccountBalanceDisplay: React.FC<Props> = ({
   }, [currencyKind]);
 
   const formattedBalanceText = useFormattedAmountText(balance);
-  const formattedUnitText = useFormattedUnitText(accountPayload);
+  const formattedUnitText = useFormattedUnitText(accountShell);
 
   const BalanceCurrencyIcon = () => {
     if (currencyImageSource) {
