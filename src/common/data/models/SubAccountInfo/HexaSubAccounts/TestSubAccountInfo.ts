@@ -12,6 +12,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.TEST;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Learn Bitcoin";
@@ -24,6 +25,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   constructor({
     accountShellID,
     defaultTitle = "Test Account",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -31,6 +33,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;

@@ -11,6 +11,11 @@ interface SubAccountDescribing {
   isPrimarySubAccount: boolean;
 
   /**
+   * Balance in Satoshis.
+   */
+  balance: number;
+
+  /**
    * Default displayable title.
    */
   defaultTitle: string;
@@ -56,6 +61,7 @@ export type SubAccountDescribingConstructorProps = {
   isPrimarySubAccount?: boolean;
   customDisplayName?: string | null;
   customDescription?: string | null;
+  balance?: number;
   imageSource?: NodeRequire;
   secondaryAccountUUIDs?: string[];
   transactionGroup?: TransactionGroup;

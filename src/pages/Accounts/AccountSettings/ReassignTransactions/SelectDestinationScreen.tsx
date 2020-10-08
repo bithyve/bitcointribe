@@ -9,7 +9,7 @@ import ButtonStyles from '../../../../common/Styles/Buttons';
 import DestinationAccountsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountsList';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import useAccountShellsInGroup from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellsInGroup';
-import useSubAccountsInGroup from '../../../../utils/hooks/state-selectors/accounts/UseSubAccountsInGroup';
+import AccountShell from '../../../../common/data/models/AccountShell';
 
 export type Props = {
   navigation: any;
@@ -27,15 +27,15 @@ const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const currentAccountShell = useAccountShellFromNavigation(navigation);
-  const selectableSubAccounts = useSubAccountsInGroup(currentAccountShell.transactionGroup);
-  const [selectedSubAccountID, setSelectedSubAccountID] = useState<string>(null);
+  const selectableAccountShells = useAccountShellsInGroup(currentAccountShell.transactionGroup);
+  const [selectedAccountShellID, setSelectedAccountShellID] = useState<string>(null);
 
   const canProceed = useMemo(() => {
-    return selectedSubAccountID != null;
-  }, [selectedSubAccountID]);
+    return selectedAccountShellID != null;
+  }, [selectedAccountShellID]);
 
-  function handleAccountSelection(subAccountInfo: SubAccountDescribing) {
-    setSelectedSubAccountID(subAccountInfo.id);
+  function handleAccountSelection(accountShell: AccountShell) {
+    setSelectedAccountShellID(accountShell.id);
   }
 
   function handleProceedButtonPress() {
@@ -48,8 +48,8 @@ const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
 
       <View>
         <DestinationAccountsList
-          selectableSubAccounts={selectableSubAccounts}
-          selectedSubAccountID={selectedSubAccountID}
+          selectableAccountShells={selectableAccountShells}
+          selectedAccountShellID={selectedAccountShellID}
           onAccountSelected={handleAccountSelection}
         />
       </View>
