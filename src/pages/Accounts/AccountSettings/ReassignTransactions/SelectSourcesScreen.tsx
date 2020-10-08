@@ -5,9 +5,30 @@ import ButtonStyles from '../../../../common/Styles/Buttons';
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
 import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import useReassignableSourcesForAccount from '../../../../utils/hooks/account-utils/UseReassignableSourcesForAccount';
-import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
-import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
+import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader';
+import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
+import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList';
+
+// TODO: Remove these after testing UI.
+const sampleSources: SubAccountDescribing[] = [
+  new CheckingSubAccountInfo({
+    isPrimarySubAccount: true,
+    balance: 23583,
+  }),
+  new CheckingSubAccountInfo({
+    isPrimarySubAccount: true,
+    balance: 99121,
+  }),
+  new CheckingSubAccountInfo({
+    isPrimarySubAccount: true,
+    balance: 11,
+  }),
+  new CheckingSubAccountInfo({
+    isPrimarySubAccount: true,
+    balance: 82308,
+  }),
+];
+
 
 export type Props = {
   navigation: any;
@@ -18,7 +39,8 @@ const SelectSourcesScreen: React.FC<Props> = ({
 }: Props) => {
   const accountShell = useAccountShellFromNavigation(navigation);
   const [selectedSourceIDs, setSelectedSourceIDs] = useState<Set<string>>(new Set());
-  const selectableSources = useReassignableSourcesForAccount(accountShell);
+  // const selectableSources = useReassignableSourcesForAccountShell(accountShell);
+  const selectableSources = sampleSources;
 
   const canProceed = useMemo(() => {
     return selectedSourceIDs.size > 0;
@@ -29,12 +51,11 @@ const SelectSourcesScreen: React.FC<Props> = ({
   }, [selectedSourceIDs]);
 
 
-
   function handleSourceSelection(source: SubAccountDescribing) {
-    if (selectedSourceIDs.has(accountShell.id)) {
-      selectedSourceIDs.delete(accountShell.id);
+    if (selectedSourceIDs.has(source.id)) {
+      selectedSourceIDs.delete(source.id);
     } else {
-      selectedSourceIDs.add(accountShell.id);
+      selectedSourceIDs.add(source.id);
     }
 
     setSelectedSourceIDs(new Set(selectedSourceIDs));
@@ -53,10 +74,10 @@ const SelectSourcesScreen: React.FC<Props> = ({
       <CurrentTotalHeader accountShell={accountShell} selectedSources={selectedSources} />
 
       <View>
-        <TransactionsList
-          selectableTransactions={selectableTransactions}
-          selectedTransactionIDs={selectedTransactionIDs}
-          onTransactionSelected={handleTransactionSelection}
+        <SubAccountSourcesList
+          selectableSources={selectableSources}
+          selectedSourceIDs={selectedSourceIDs}
+          onSourceSelected={handleSourceSelection}
         />
       </View>
 

@@ -11,6 +11,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.WATCH_ONLY_IMPORTED_WALLET;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "View a non-Hexa wallet as an account.";
@@ -23,6 +24,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   constructor({
     accountShellID,
     defaultTitle = "Watch-Only",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -30,6 +32,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;

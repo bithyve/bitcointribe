@@ -11,6 +11,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
@@ -23,6 +24,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   constructor({
     accountShellID,
     defaultTitle = "Full Import",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -30,6 +32,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;

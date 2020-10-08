@@ -11,6 +11,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.SECURE;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Multi-factor security";
@@ -23,6 +24,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   constructor({
     accountShellID,
     defaultTitle = "Savings Account",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -30,6 +32,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;

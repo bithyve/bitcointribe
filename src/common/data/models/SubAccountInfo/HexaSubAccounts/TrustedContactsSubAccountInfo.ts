@@ -11,6 +11,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   accountShellID: string;
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Account with Trusted Contacts";
@@ -23,6 +24,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   constructor({
     accountShellID,
     defaultTitle = "Joint Account",
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -31,6 +33,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;
