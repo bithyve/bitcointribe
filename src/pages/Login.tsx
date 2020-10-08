@@ -381,10 +381,12 @@ export default function Login(props) {
 
   const handleLoaderMessages = (passcode) => {
     const message = getRandomMessage();
-    setMessage(message.heading);
-    setSubTextMessage1(message.text);
-    setSubTextMessage2(message.subText);
-    dispatch(credsAuth(passcode));
+    // setMessage(message.heading);
+    // setSubTextMessage1(message.text);
+    // setSubTextMessage2(message.subText);
+    setTimeout(()=> {
+      dispatch(credsAuth(passcode));
+    }, 22000)
   };
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -392,6 +394,7 @@ export default function Login(props) {
         headerText={message}
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
+        showGif={true}
       />
     );
   }, [message, subTextMessage1, subTextMessage2]);
