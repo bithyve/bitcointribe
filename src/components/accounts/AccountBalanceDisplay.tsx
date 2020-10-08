@@ -11,9 +11,10 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 import { Satoshis } from '../../common/data/enums/UnitAliases';
+import AccountShell from '../../common/data/models/AccountShell';
 
 export type Props = {
-  balance: Satoshis;
+  accountShell: AccountShell;
   color?: string;
   iconSpacing?: number;
   containerStyle?: Record<string, unknown>;
@@ -25,7 +26,7 @@ export type Props = {
 
 
 const AccountBalanceDisplay: React.FC<Props> = ({
-  balance,
+  accountShell,
   iconSpacing = 0,
   color = Colors.currencyGray,
   containerStyle = {},
@@ -34,6 +35,7 @@ const AccountBalanceDisplay: React.FC<Props> = ({
   amountTextStyle = {},
   unitTextStyle = {},
 }: Props) => {
+  const balance: Satoshis = accountShell.balance || 0;
   const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();
 
@@ -42,7 +44,7 @@ const AccountBalanceDisplay: React.FC<Props> = ({
   }, [currencyKind]);
 
   const formattedBalanceText = useFormattedAmountText(balance);
-  const formattedUnitText = useFormattedUnitText(balance);
+  const formattedUnitText = useFormattedUnitText(accountShell.unit);
 
   const BalanceCurrencyIcon = () => {
     const style = {

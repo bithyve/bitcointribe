@@ -1,7 +1,8 @@
 import { Action } from "redux";
+import AccountShell from "../../common/data/models/AccountShell";
 // types and action creators: dispatched by components and sagas
 
-import AccountPayload from "../../common/data/models/AccountPayload/Interfaces";
+import SubAccountDescribing from "../../common/data/models/SubAccountInfo/Interfaces";
 
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
@@ -272,10 +273,10 @@ export const updateDonationPreferences = (
 
 export interface AddNewAccountAction extends Action {
   type: typeof ADD_NEW_ACCOUNT;
-  payload: AccountPayload;
+  payload: SubAccountDescribing;
 };
 
-export const addNewAccount = (payload: AccountPayload): AddNewAccountAction => {
+export const addNewAccount = (payload: SubAccountDescribing): AddNewAccountAction => {
   return {
     type: ADD_NEW_ACCOUNT,
     payload,
@@ -291,10 +292,10 @@ export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
 
 export interface UpdateAccountSettingsAction extends Action {
   type: typeof UPDATE_ACCOUNT_SETTINGS;
-  payload: AccountPayload;
+  payload: SubAccountDescribing;
 };
 
-export const updateAccountSettings = (payload: AccountPayload): UpdateAccountSettingsAction => {
+export const updateAccountSettings = (payload: SubAccountDescribing): UpdateAccountSettingsAction => {
   return { type: UPDATE_ACCOUNT_SETTINGS, payload };
 };
 
@@ -394,19 +395,17 @@ export const settedDonationAccount = (serviceType, successful) => {
   return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
 };
 
-export const newAccountAddFailed = (
-  {
-    account,
-    error
-}: {
-  account: AccountPayload,
-  error: Error
+export const newAccountAddFailed = ({ accountShell, error }: {
+  accountShell: AccountShell,
+  error: Error,
 }) => {
-  return { type: NEW_ACCOUNT_ADD_FAILED, payload: { account, error } };
-}
+  return { type: NEW_ACCOUNT_ADD_FAILED, payload: { accountShell, error } };
+};
 
-export const newAccountAdded = ({ account }: { account: AccountPayload }) => {
-  return { type: NEW_ACCOUNT_ADDED, payload: account };
+export const newAccountAdded = ({ accountShell }: {
+  accountShell: AccountShell,
+}) => {
+  return { type: NEW_ACCOUNT_ADDED, payload: accountShell };
 };
 
 
@@ -416,12 +415,12 @@ export const accountSettingsUpdateFailed = (
     account,
     error
   }: {
-    account: AccountPayload,
+    account: SubAccountDescribing,
     error: Error
   }) => {
   return { type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: { account, error } };
 }
 
-export const accountSettingsUpdated = ({ account }: { account: AccountPayload }) => {
+export const accountSettingsUpdated = ({ account }: { account: SubAccountDescribing }) => {
   return { type: ACCOUNT_SETTINGS_UPDATED, payload: account };
 };
