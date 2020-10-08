@@ -381,10 +381,12 @@ export default function Login(props) {
 
   const handleLoaderMessages = (passcode) => {
     const message = getRandomMessage();
-    setMessage(message.heading);
-    setSubTextMessage1(message.text);
-    setSubTextMessage2(message.subText);
-    dispatch(credsAuth(passcode));
+    // setMessage(message.heading);
+    // setSubTextMessage1(message.text);
+    // setSubTextMessage2(message.subText);
+    setTimeout(()=> {
+      dispatch(credsAuth(passcode));
+    }, 22000)
   };
   const renderLoaderModalContent = useCallback(() => {
     return (
