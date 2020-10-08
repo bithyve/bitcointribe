@@ -6,7 +6,6 @@ import SubAccountDescribing from "./SubAccountInfo/Interfaces";
 
 type ConstructorProps = {
   displayOrder?: number | null;
-  balance?: number;
   unit: BitcoinUnit;
   visibility?: AccountVisibility;
   primarySubAccount: SubAccountDescribing;
@@ -28,11 +27,6 @@ export default class AccountShell {
   displayOrder: number | null;
 
   /**
-   * Balance in Satoshis.
-   */
-  balance: number;
-
-  /**
    * The unit to be used for displaying the account's balance to the user.
    */
   unit: BitcoinUnit;
@@ -44,7 +38,6 @@ export default class AccountShell {
 
   constructor({
     displayOrder = null,
-    balance = 0,
     unit = BitcoinUnit.BTC,
     visibility = AccountVisibility.DEFAULT,
     primarySubAccount,
@@ -58,7 +51,6 @@ export default class AccountShell {
     this.secondarySubAccounts = secondarySubAccounts;
 
     this.displayOrder = displayOrder;
-    this.balance = balance;
     this.unit = unit;
     this.visibility = visibility;
   }
@@ -72,6 +64,15 @@ export default class AccountShell {
       this.primarySubAccount,
       ...this.secondarySubAccounts,
     ];
+  }
+
+  /**
+   * Total balance of all sub-accounts in Satoshis.
+  */
+  get totalBalance(): number {
+    return this
+      .subAccounts
+      .reduce((accumulated, current) => accumulated + current.balance, 0);
   }
 
   setPrimarySubAccount(subAccount: SubAccountDescribing) {
