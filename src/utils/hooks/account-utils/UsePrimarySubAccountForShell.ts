@@ -4,10 +4,8 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 
 export default function usePrimarySubAccountForShell(
   accountShell: AccountShell,
-): SubAccountDescribing | undefined {
+): SubAccountDescribing {
   return useMemo(() => {
-    return accountShell
-      .subAccounts
-      .find(subAccount => subAccount.isPrimarySubAccount);
-  }, [accountShell.subAccounts]);
+    return accountShell.primarySubAccount;
+  }, [accountShell.primarySubAccount]);
 }

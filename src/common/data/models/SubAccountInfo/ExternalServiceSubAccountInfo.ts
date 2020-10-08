@@ -17,6 +17,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
   serviceAccountKind: ServiceAccountKind;
   isPrimarySubAccount: boolean;
+  balance: number;
 
   defaultTitle: string;
   defaultDescription: string = "Account with Trusted Contacts";
@@ -31,6 +32,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
+    balance = 0,
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -41,6 +43,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.defaultTitle = defaultTitle;
     this.defaultDescription = defaultDescription;
     this.serviceAccountKind = serviceAccountKind;
+    this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;
