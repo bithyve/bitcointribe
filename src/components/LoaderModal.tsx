@@ -25,7 +25,7 @@ export default function LoaderModal(props) {
                         <Text style={{ marginRight: wp('20%'), color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: wp('3%') }}>{props.messageText2 ? props.messageText2 : ''}</Text>
                     </View>
                     : <View style={{ marginLeft: wp('4%'), marginRight: wp('4%'), marginTop: wp('5%') }}>
-                        <Image source={require('../assets/images/loaderMessages.gif')} style={{ width: wp('83%'), height: wp('30%'), marginRight: 'auto', resizeMode: "stretch", }} />
+                        <Image source={require('../assets/images/loaderMessages.gif')} style={{ width: wp('83%'), height: wp('28%'), marginRight: 'auto', resizeMode: "stretch", }} />
                     </View>
             }
         </View>
