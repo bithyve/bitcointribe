@@ -394,6 +394,7 @@ export default function Login(props) {
         headerText={message}
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
+        showGif={true}
       />
     );
   }, [message, subTextMessage1, subTextMessage2]);
