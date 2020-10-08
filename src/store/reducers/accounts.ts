@@ -38,10 +38,13 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
-import { TestAccountPayload, SavingsAccountPayload, CheckingAccountPayload } from '../../common/data/models/AccountPayload/HexaAccountPayloads';
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
+import AccountShell from '../../common/data/models/AccountShell';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
 
-// TODO: Remove this in favor of a generalized `AccountPayload` interface
+// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: String;
@@ -107,9 +110,13 @@ const ACCOUNT_VARS: {
 export type AccountsState = {
   servicesEnriched: boolean;
   accountsSynched: boolean;
+
+  // TODO: Consider separating this into another reducer -- I'm not
+  // sure it's really a concern of the "Accounts state".
   exchangeRates?: any;
-  activeAccounts: AccountPayload[];
-  archivedAccounts: AccountPayload[];
+
+  activeAccounts: AccountShell[];
+  archivedAccounts: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
   // up account data from `activeAccounts` using a UUID.
@@ -138,13 +145,30 @@ const initialState: AccountsState = {
   servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
+
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
+
   activeAccounts: [
-    new TestAccountPayload(),
-    new SavingsAccountPayload(),
-    new CheckingAccountPayload(),
+    new AccountShell({
+      primarySubAccount: new TestSubAccountInfo({
+        isPrimarySubAccount: true,
+      }),
+      unit: BitcoinUnit.TSATS,
+    }),
+    new AccountShell({
+      primarySubAccount: new CheckingSubAccountInfo({
+        isPrimarySubAccount: true,
+      }),
+      unit: BitcoinUnit.SATS,
+    }),
+    new AccountShell({
+      primarySubAccount: new SavingsSubAccountInfo({
+        isPrimarySubAccount: true,
+      }),
+      unit: BitcoinUnit.SATS,
+    }),
   ],
   archivedAccounts: [],
 

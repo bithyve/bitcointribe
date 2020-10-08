@@ -1,19 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, SectionList } from 'react-native';
-import AccountPayload, { ExternalServiceAccountPayload } from '../../../common/data/models/AccountPayload/Interfaces';
-import NEW_ACCOUNT_CHOICES from './NewAccountChoices';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import { Button } from 'react-native-elements';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
-import AccountKind from '../../../common/data/enums/AccountKind';
-import useAccountGenerationCompletionEffect from '../../../utils/hooks/accounts-effects/UseAccountGenerationCompletionEffect';
+import SubAccountKind from '../../../common/data/enums/SubAccountKind';
+import useAccountGenerationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountGenerationCompletionEffect';
 import { addNewAccount } from '../../../store/actions/accounts';
 import { useDispatch } from "react-redux";
 import { goHomeAction } from '../../../navigation/actions/NavigationActions';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
-import ServiceAccountPayload from '../../../common/data/models/AccountPayload/ServiceAccountPayload';
+import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
+import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices';
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -56,7 +56,8 @@ const NewAccountSelectionList: React.FC<Props> = ({
   });
 
   const dispatch = useDispatch();
-  const [selectedChoice, setSelectedChoice] = useState<AccountPayload>(null);
+  const newAccountChoices = useNewAccountChoices();
+  const [selectedChoice, setSelectedChoice] = useState<SubAccountDescribing>(null);
 
   const canProceed = useMemo(() => {
     return selectedChoice !== null;
@@ -78,8 +79,9 @@ const NewAccountSelectionList: React.FC<Props> = ({
   };
 
   function handleProceedButtonPress() {
-    if (selectedChoice instanceof ServiceAccountPayload) {
-      // TODO: Present options for choosing b/w a standalone Service account or adding it to a Hexa account.
+    if (selectedChoice instanceof ExternalServiceSubAccountInfo) {
+      // TODO: Present options for choosing b/w a standalone Service account or
+      // adding it to a Hexa account (e.g. Checking or Savings account).
       switch (selectedChoice.serviceAccountKind) {
         case ServiceAccountKind.FAST_BITCOINS:
           dispatch(addNewAccount(selectedChoice));
@@ -90,31 +92,31 @@ const NewAccountSelectionList: React.FC<Props> = ({
     }
 
     switch (selectedChoice.kind) {
-      case AccountKind.TEST:
-      case AccountKind.REGULAR:
-      case AccountKind.SECURE:
-      case AccountKind.DONATION:
+      case SubAccountKind.TEST:
+      case SubAccountKind.REGULAR:
+      case SubAccountKind.SECURE:
+      case SubAccountKind.DONATION:
         navigation.navigate('AddNewHexaAccountDetails', {
-          currentPayload: selectedChoice,
+          currentSubAccountInfo: selectedChoice,
         });
         break;
-      case AccountKind.TRUSTED_CONTACTS:
+      case SubAccountKind.TRUSTED_CONTACTS:
         dispatch(addNewAccount(selectedChoice));
         break;
       // case AccountKind.SERVICE:
-        // if ((selectedChoice as ServiceAccountPayload).serviceAccountKind === ServiceAccountKind.FAST_BITCOINS) {
+        // if ((selectedChoice as ExternalServiceSubAccountInfo).serviceAccountKind === ServiceAccountKind.FAST_BITCOINS) {
           // dispatch(addNewAccount({ payload: selectedChoice }));
           // break;
         // }
-      case AccountKind.FULLY_IMPORTED_WALLET:
-      case AccountKind.WATCH_ONLY_IMPORTED_WALLET:
+      case SubAccountKind.FULLY_IMPORTED_WALLET:
+      case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         break;
       default:
         break;
     }
   }
 
-  function handleChoiceSelection(choice: AccountPayload) {
+  function handleChoiceSelection(choice: SubAccountDescribing) {
     setSelectedChoice(choice);
   }
 
@@ -127,12 +129,12 @@ const NewAccountSelectionList: React.FC<Props> = ({
         sections={[
           {
             kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
-            data: [NEW_ACCOUNT_CHOICES.hexaAccounts],
+            data: [newAccountChoices.hexaAccounts],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
                   <NewAccountOptionsSection
-                    choices={NEW_ACCOUNT_CHOICES.hexaAccounts}
+                    choices={newAccountChoices.hexaAccounts}
                     selectedChoice={selectedChoice}
                     onOptionSelected={handleChoiceSelection}
                   />
@@ -142,12 +144,12 @@ const NewAccountSelectionList: React.FC<Props> = ({
           },
           {
             kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
-            data: [NEW_ACCOUNT_CHOICES.serviceAccounts],
+            data: [newAccountChoices.serviceAccounts],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
                   <NewAccountOptionsSection
-                    choices={NEW_ACCOUNT_CHOICES.serviceAccounts}
+                    choices={newAccountChoices.serviceAccounts}
                     selectedChoice={selectedChoice}
                     onOptionSelected={handleChoiceSelection}
                   />
@@ -157,12 +159,12 @@ const NewAccountSelectionList: React.FC<Props> = ({
           },
           {
             kind: SectionKind.IMPORT_WALLET,
-            data: [NEW_ACCOUNT_CHOICES.importedWalletAccounts],
+            data: [newAccountChoices.importedWalletAccounts],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
                   <NewAccountOptionsSection
-                    choices={NEW_ACCOUNT_CHOICES.importedWalletAccounts}
+                    choices={newAccountChoices.importedWalletAccounts}
                     selectedChoice={selectedChoice}
                     onOptionSelected={handleChoiceSelection}
                   />

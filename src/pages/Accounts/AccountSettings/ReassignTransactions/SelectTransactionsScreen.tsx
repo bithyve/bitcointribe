@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TransactionDescribing } from '../../../../common/data/models/Transactions/Interfaces';
-import useAccountPayloadFromNavigation from '../../../../utils/hooks/state-selectors/UseAccountPayloadFromNavigation';
+import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import sampleTransactions from '../../Details/SampleTransactions';
 import { Button } from 'react-native-elements';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
-import TransactionReassignmentKind from '../../../../common/data/enums/TransactionReassignmentKind';
+import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
 
 export type Props = {
   navigation: any;
@@ -16,7 +16,7 @@ export type Props = {
 const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const accountPayload = useAccountPayloadFromNavigation(navigation);
+  const accountShell = useAccountShellFromNavigation(navigation);
   const [selectedTransactionIDs, setSelectedTransactionIDs] = useState<Set<string>>(new Set());
   const [selectableTransactions, setSelectableTransactions] = useState<TransactionDescribing[]>([]);
 
@@ -30,10 +30,10 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
 
 
   useEffect(() => {
-    // TODO: Devise some way to load selectable "non-designated" transactions for the
-    // current account.
+    // TODO: Devise some way to load selectable "anonymous" transactions for the
+    // current account shell.
     setSelectableTransactions(sampleTransactions);
-  }, [accountPayload]);
+  }, [accountShell]);
 
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
@@ -48,15 +48,15 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
 
   function handleProceedButtonPress() {
     navigation.navigate('ReassignTransactionsSelectDestination', {
-      accountID: accountPayload.uuid,
-      reassignmentKind: TransactionReassignmentKind.UNDESIGNATED_XPUBS,
+      accountID: accountShell.id,
+      reassignmentKind: XPubSourceKind.ANONYMOUS,
       selectedTransactions,
     });
   }
 
   return (
     <View style={styles.rootContainer}>
-      <CurrentTotalHeader accountPayload={accountPayload} selectedTransactions={selectedTransactions} />
+      <CurrentTotalHeader accountShell={accountShell} selectedTransactions={selectedTransactions} />
 
       <View>
         <TransactionsList
