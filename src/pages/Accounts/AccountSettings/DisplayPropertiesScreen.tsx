@@ -1,16 +1,18 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Input, Button } from 'react-native-elements';
-import { useDispatch } from 'react-redux'
-import AccountPayload from '../../../common/data/models/AccountPayload/Interfaces';
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import FormStyles from '../../../common/Styles/Forms';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { updateAccountSettings } from '../../../store/actions/accounts';
-import useAccountSettingsUpdatedEffect from '../../../utils/hooks/accounts-effects/UseAccountSettingsUpdatedEffect';
-import useAccountPayloadFromNavigation from '../../../utils/hooks/state-selectors/UseAccountPayloadFromNavigation';
+import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect';
+import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
+import { useDispatch } from 'react-redux';
+import AccountShell from '../../../common/data/models/AccountShell';
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 export type Props = {
   navigation: any;
@@ -19,19 +21,20 @@ export type Props = {
 const AccountSettingsDisplayPropertiesScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const accountPayload: AccountPayload | undefined = useAccountPayloadFromNavigation(navigation);
+  const accountShell = useAccountShellFromNavigation(navigation);
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const dispatch = useDispatch();
   const nameInputRef = useRef<Input>(null);
 
   const [accountName, setAccountName] = useState(
-    accountPayload?.customDisplayName ||
-    accountPayload?.defaultTitle ||
+    primarySubAccount?.customDisplayName ||
+    primarySubAccount?.defaultTitle ||
     ''
   );
 
   const [accountDescription, setAccountDescription] = useState(
-    accountPayload?.customDescription ||
-    accountPayload?.defaultDescription ||
+    primarySubAccount?.customDescription ||
+    primarySubAccount?.defaultDescription ||
     ''
   );
 
@@ -53,10 +56,10 @@ const AccountSettingsDisplayPropertiesScreen: React.FC<Props> = ({
   });
 
   function handleSaveButtonPress() {
-    accountPayload.customDisplayName = accountName;
-    accountPayload.customDescription = accountDescription;
+    primarySubAccount.customDisplayName = accountName;
+    primarySubAccount.customDescription = accountDescription;
 
-    dispatch(updateAccountSettings(accountPayload));
+    dispatch(updateAccountSettings(primarySubAccount));
   }
 
   return (

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
-import AccountKind from '../../common/data/enums/AccountKind';
-import AccountPayload from '../../common/data/models/AccountPayload/Interfaces';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import ButtonStyles from '../../common/Styles/Buttons';
@@ -9,54 +8,55 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
 import { Button } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import AccountShell from '../../common/data/models/AccountShell';
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 export type Props = {
-  accountPayload: AccountPayload;
+  accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
 };
 
 
-function badgeImageForAccountKind(accountKind: AccountKind): NodeRequire {
+function badgeImageForAccountKind(accountKind: SubAccountKind): NodeRequire {
   switch (accountKind) {
-    case AccountKind.TEST:
+    case SubAccountKind.TEST:
       return require('../../assets/images/icons/icon_test_white.png');
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return require('../../assets/images/icons/icon_regular_account.png');
-    case AccountKind.SECURE:
+    case SubAccountKind.SECURE:
       return require('../../assets/images/icons/icon_secureaccount_white.png');
-    case AccountKind.DONATION:
+    case SubAccountKind.DONATION:
       return require('../../assets/images/icons/icon_donation_account.png');
     default:
       return require('../../assets/images/icons/accounts.png');
   }
 }
 
-function backgroundImageForAccountKind(accountKind: AccountKind): NodeRequire {
+function backgroundImageForAccountKind(accountKind: SubAccountKind): NodeRequire {
   switch (accountKind) {
-    case AccountKind.TEST:
+    case SubAccountKind.TEST:
       return require('../../assets/images/carouselImages/test_account_background.png');
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return require('../../assets/images/carouselImages/regular_account_background.png');
-    case AccountKind.SECURE:
+    case SubAccountKind.SECURE:
       return require('../../assets/images/carouselImages/savings_account_background.png');
-    case AccountKind.DONATION:
+    case SubAccountKind.DONATION:
       return require('../../assets/images/carouselImages/donation_account_background.png');
     default:
       return require('../../assets/images/carouselImages/savings_account_background.png');
   }
 }
 
-function shadowColorForAccountKind(accountKind: AccountKind): string {
+function shadowColorForAccountKind(accountKind: SubAccountKind): string {
   switch (accountKind) {
-    case AccountKind.TEST:
+    case SubAccountKind.TEST:
       return Colors.blue;
-    case AccountKind.REGULAR:
+    case SubAccountKind.REGULAR:
       return Colors.yellow;
-    case AccountKind.SECURE:
+    case SubAccountKind.SECURE:
       return Colors.green;
-    case AccountKind.DONATION:
+    case SubAccountKind.DONATION:
       return Colors.borderColor;
     default:
       return Colors.borderColor;
@@ -65,17 +65,18 @@ function shadowColorForAccountKind(accountKind: AccountKind): string {
 
 
 const AccountDetailsCard: React.FC<Props> = ({
-  accountPayload,
+  accountShell,
   onKnowMorePressed,
   onSettingsPressed,
 }: Props) => {
+  const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
   const rootContainerStyle = useMemo(() => {
     return {
       ...styles.rootContainer,
-      shadowColor: shadowColorForAccountKind(accountPayload.kind),
+      shadowColor: shadowColorForAccountKind(primarySubAccountInfo?.kind),
     };
-  }, [accountPayload.kind]);
+  }, [primarySubAccountInfo]);
 
 
   const AccountKindDetailsSection: React.FC = () => {
@@ -84,7 +85,7 @@ const AccountDetailsCard: React.FC<Props> = ({
 
         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
           <Image
-            source={badgeImageForAccountKind(accountPayload.kind)}
+            source={badgeImageForAccountKind(primarySubAccountInfo?.kind)}
             style={styles.accountKindBadgeImage}
           />
 
@@ -101,7 +102,7 @@ const AccountDetailsCard: React.FC<Props> = ({
               color: Colors.white,
             }}
           >
-            {accountPayload.defaultTitle}
+            {primarySubAccountInfo.defaultTitle}
           </Text>
 
           <Text
@@ -112,7 +113,7 @@ const AccountDetailsCard: React.FC<Props> = ({
               marginTop: 2,
             }}
           >
-            {accountPayload.defaultDescription}
+            {primarySubAccountInfo.defaultDescription}
           </Text>
         </View>
       </View>
@@ -123,7 +124,7 @@ const AccountDetailsCard: React.FC<Props> = ({
     return (
       <View style={styles.footerSection}>
         <AccountBalanceDisplay
-          accountPayload={accountPayload}
+          accountShell={accountShell}
           amountTextStyle={styles.balanceAmountText}
           unitTextStyle={styles.balanceUnitText}
           currencyImageStyle={styles.balanceCurrencyIcon}
@@ -173,7 +174,7 @@ const AccountDetailsCard: React.FC<Props> = ({
   return (
     <View style={rootContainerStyle}>
       <ImageBackground
-        source={backgroundImageForAccountKind(accountPayload.kind)}
+        source={backgroundImageForAccountKind(primarySubAccountInfo?.kind)}
         style={{
           ...StyleSheet.absoluteFillObject,
         }}
