@@ -48,7 +48,7 @@ interface AddNewAccountStateTypes {
   accountName: string;
   isValid: boolean;
   modelDescription: string;
-  modelTitle: string;
+  doneeName: string;
   modelButtonIsValid: boolean;
   is2FAEnable: boolean;
 }
@@ -96,7 +96,7 @@ class AddNewAccount extends PureComponent<
       selectedAccount: '',
       accountName: '',
       isValid: true,
-      modelTitle: '',
+      doneeName: '',
       modelDescription: '',
       modelButtonIsValid: true,
       is2FAEnable: false,
@@ -131,7 +131,7 @@ class AddNewAccount extends PureComponent<
 
   initiateDonationAccount = () => {
     const {
-      modelTitle,
+      doneeName,
       accountName,
       is2FAEnable,
       modelDescription,
@@ -141,7 +141,7 @@ class AddNewAccount extends PureComponent<
       serviceType = SECURE_ACCOUNT;
     }
 
-    let donee = modelTitle;
+    let donee = doneeName;
     if (!donee) {
       // defaulting to wallet name
       donee = this.props.walletName;
@@ -177,26 +177,30 @@ class AddNewAccount extends PureComponent<
         instanceCount += derivativeAccounts[dervAccount].instance.using;
     }
 
-    const accountName = `${
-      item.type === DONATION_ACCOUNT
-        ? 'Donation Account'
-        : item.type === REGULAR_ACCOUNT
-        ? 'Checking Account'
-        : 'Savings Account'
-    } ${
-      item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
-    }`;
+    // const accountName = `${
+    //   item.type === DONATION_ACCOUNT
+    //     ? this.state.accountName//'Donation Account'
+    //     : item.type === REGULAR_ACCOUNT
+    //     ? 'Checking Account'
+    //     : 'Savings Account'
+    // } ${
+    //   item.type === DONATION_ACCOUNT && instanceCount === 1 ? '' : instanceCount
+    // }`;
     this.setState({
       selectedAccount: item,
-      accountName,
+      //accountName,
       isValid: false,
     });
   };
 
   handleOnTextChange = (name, text) => {
-    if (name === 'modelTitle') {
+    if (name === 'donationAccountName') {
       this.setState({
-        modelTitle: text,
+        accountName: text,
+      });
+    } else if (name === 'doneeName') {
+      this.setState({
+        doneeName: text,
       });
     } else if (name === 'modelDescription') {
       this.setState({
@@ -261,7 +265,7 @@ class AddNewAccount extends PureComponent<
               </TouchableOpacity>
               <View style={{ marginLeft: wp('2.5%'), marginRight: wp('2%') }}>
                 <Text style={styles.modalHeaderTitleText}>
-                  Donation Details
+                  Donation details
                 </Text>
                 <Text
                   style={{
@@ -278,13 +282,30 @@ class AddNewAccount extends PureComponent<
               <View style={styles.modalTextBoxView}>
                 <TextInput
                   style={styles.textBox}
-                  placeholder={'Enter donee name'}
+                  placeholder={'Enter donation name'}
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
-                  value={this.state.modelTitle}
+                  value={this.state.accountName}
                   onChangeText={(text) => {
-                    this.handleOnTextChange('modelTitle', text);
+                    this.handleOnTextChange('donationAccountName', text);
+                  }}
+                  placeholderTextColor={Colors.borderColor}
+                  returnKeyType="done"
+                  returnKeyLabel="Done"
+                />
+              </View>
+
+              <View style={styles.modalTextBoxView}>
+                <TextInput
+                  style={styles.textBox}
+                  placeholder={'Organised by'}
+                  keyboardType={
+                    Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                  }
+                  value={this.state.doneeName}
+                  onChangeText={(text) => {
+                    this.handleOnTextChange('doneeName', text);
                   }}
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"
@@ -301,7 +322,7 @@ class AddNewAccount extends PureComponent<
                   }}
                   multiline={true}
                   numberOfLines={4}
-                  placeholder={'Enter a description'}
+                  placeholder={'Donation cause or description'}
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
@@ -325,7 +346,7 @@ class AddNewAccount extends PureComponent<
                   }}
                 >
                   <Text style={styles.modalInfoText}>
-                    Enable 2 Factor Aunthentication
+                    Enable two-factor authentication
                   </Text>
                   <CheckBox
                     size={26}
@@ -348,7 +369,7 @@ class AddNewAccount extends PureComponent<
                   <Text
                     onPress={() => {
                       this.openLink(
-                        'https://hexawallet.io/donor-terms-conditions/',
+                        'https://hexawallet.io/donee-terms-conditions/',
                       );
                     }}
                     style={{

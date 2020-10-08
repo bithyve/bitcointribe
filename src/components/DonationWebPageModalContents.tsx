@@ -19,75 +19,52 @@ import Toast from '../components/Toast';
 import config from '../bitcoin/HexaConfig';
 import CopyThisText from './CopyThisText';
 import { ScrollView } from 'react-native-gesture-handler';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function DonationWebPageModalContents(props) {
-  const [saveEnabled, setSaveEnabled] = useState(false);
-  const [isDonationTotalEnable, setIsDonationTotalEnable] = useState(false);
-  const [
-    isDonationTransactionEnable,
-    setIsDonationTransactionEnable,
-  ] = useState(props.account.configuration.displayTransactions);
-  useEffect(() => {
-    setIsDonationTotalEnable(props.account.configuration.displayBalance);
-    setIsDonationTransactionEnable(
-      props.account.configuration.displayTransactions,
-    );
-  }, [props.account]);
-
-  function writeToClipboard(link) {
-    Clipboard.setString(link);
-    Toast('Copied Successfully');
-  }
-
-  useEffect(() => {
-    if (
-      isDonationTotalEnable !== props.account.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        props.account.configuration.displayTransactions
-    )
-      setSaveEnabled(true);
-    else setSaveEnabled(false);
-  }, [
-    isDonationTotalEnable,
-    isDonationTransactionEnable,
-    props.account.configuration,
-  ]);
-
   return (
     <View style={styles.modalContentContainer}>
       <ScrollView style={styles.modalContainer}>
         <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
-          <View style={{...styles.successModalHeaderView, flexDirection: 'row', }}>
-          <View>
-            <Text
+          <View
+            style={{ ...styles.successModalHeaderView, flexDirection: 'row' }}
+          >
+            <View>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(18),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Donation web view
+              </Text>
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginTop: wp('1.5%'),
+                  color: Colors.lightTextColor,
+                }}
+              >
+                Use one of the option below to publish
+              </Text>
+            </View>
+            <AppBottomSheetTouchableWrapper
               style={{
-                color: Colors.blue,
-                fontSize: RFValue(18),
-                fontFamily: Fonts.FiraSansRegular,
+                marginLeft: 'auto',
+                marginRight: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            >
-              Donation web view
-            </Text>
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp('1.5%'),
-                color: Colors.lightTextColor,
+              onPress={() => {
+                props.onClickSetting();
               }}
-            >
-              Use one of the option below to publish
-            </Text>
-            
-          </View>
-          <TouchableOpacity
-              style={{ marginLeft: 'auto', marginRight: 10, alignItems: 'center', justifyContent: 'center' }}
-              onPress={() => {props.onClickSetting();}}
             >
               <Image
                 source={require('../assets/images/icons/settings.png')}
                 style={styles.image}
               />
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           </View>
           <View style={styles.infoTextContainer}>
             <Text style={styles.titleTextStyle}>Donation Link</Text>
@@ -142,10 +119,9 @@ export default function DonationWebPageModalContents(props) {
                   : 'donate-test'
               }/?donationid=${
                 props.account.id
-              }" width="400" height="600"></iframe>`}
+              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>
-          
         </View>
       </ScrollView>
     </View>
@@ -229,9 +205,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   image: {
-    width: wp("5%"),
-    height: wp("5%"),
-    resizeMode: "contain",
-    
+    width: wp('5%'),
+    height: wp('5%'),
+    resizeMode: 'contain',
   },
 });

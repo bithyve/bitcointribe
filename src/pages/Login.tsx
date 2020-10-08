@@ -19,7 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { credsAuth, validatePin } from '../store/actions/setupAndAuth';
+import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
@@ -36,17 +36,53 @@ import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
-import { fetchDatabase, fetchFromDB } from '../store/actions/storage';
+
+const LOADER_MESSAGE_TIME = 4000;
+const loaderMessages = [
+  {
+    heading: 'Non-custodial buys',
+    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
+    subText: '(*select locations)',
+  },
+  {
+    heading: 'Friends & Family',
+    text:
+      'Add contacts to Hexa and send sats w/o asking for address every time',
+    subText: '',
+  },
+  {
+    heading: 'Hexa Savings Account',
+    text: 'Don’t forget to set up your 2FA code on an authenticator app',
+    subText: '',
+  },
+  {
+    heading: 'Introducing Donation Accounts',
+    text:
+      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
+    subText: '',
+  },
+  {
+    heading: 'Satoshis or Sats',
+    text: '1 bitcoin = 100 million satoshis or sats',
+    subText: 'Hexa uses sats to make using bitcoin easier',
+  },
+  {
+    heading: 'Hexa Test Account',
+    text: 'Test Account comes preloaded with test-sats',
+    subText: 'Best place to start if you are new to Bitcoin',
+  },
+];
+
+const getRandomMessage = () => {
+  const randomIndex = Math.floor(Math.random() * 6);
+  return loaderMessages[randomIndex];
+};
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Satoshis or Sats');
-  let [subTextMessage1, setSubTextMessage1] = useState(
-    '1 bitcoin = 100 million satoshis or sats',
-  );
-  let [subTextMessage2, setSubTextMessage2] = useState(
-    'Hexa uses sats to make using bitcoin easier',
-  );
-  let [messageIndex, setMessageIndex] = useState(0)
+  const initialMessage = getRandomMessage();
+  let [message, setMessage] = useState(initialMessage.heading);
+  let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
+  let [subTextMessage2, setSubTextMessage2] = useState(initialMessage.subText);
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -63,6 +99,53 @@ export default function Login(props) {
     (state) => state.preferences.releaseCasesValue,
   );
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
+  // const releases =[
+  //       {
+  //           "build": "40",
+  //           "version": "0.8",
+  //           "releaseNotes": {
+  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
+  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //           },
+  //           "reminderLimit": 2
+  //       },
+  //       {
+  //         "build": "39",
+  //         "version": "0.8",
+  //         "releaseNotes": {
+  //             "ios": "dfsdg",
+  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //         },
+  //         "reminderLimit": -1
+  //     },
+  //     {
+  //       "build": "38",
+  //       "version": "0.8",
+  //       "releaseNotes": {
+  //           "ios": "64356354",
+  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //       },
+  //       "reminderLimit": -1
+  //   },
+  //   {
+  //     "build": "37",
+  //     "version": "0.8",
+  //     "releaseNotes": {
+  //         "ios": "dfgdgdg",
+  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //     },
+  //     "reminderLimit": -1
+  // },
+  //       {
+  //           "build": "35",
+  //           "version": "3.40",
+  //           "releaseNotes": {
+  //               "ios": "ios notes for release 319",
+  //               "android": "android notes for release 319"
+  //           },
+  //           "reminderLimit": -1
+  //       }
+  //   ];
   const onPressNumber = useCallback(
     (text) => {
       let tmpPasscode = passcode;
@@ -85,46 +168,6 @@ export default function Login(props) {
       setIsDisabledProceed(false);
     }
   }, [passcode]);
-
-
-
-  const LoaderMessages = [{
-    message: 'Hexa Test Account',
-    subTextMessage_1: 'Test Account comes preloaded with test-sats',
-    subTextMessage_2: 'Best place to start if you are new to Bitcoin',
-    index: 0
-  },
-  {
-    message: 'Satoshis or Sats',
-    subTextMessage_1: '1 bitcoin = 100 million satoshis or sats',
-    subTextMessage_2: 'Hexa uses sats to make using bitcoin easier',
-    index: 1
-  },
-  {
-    message: 'Introducing Donation Accounts',
-    subTextMessage_1: 'Start receiving donations directly in your Hexa Wallet',
-    subTextMessage_2: 'from anywhere in the world',
-    index: 2
-  },
-  {
-    message: 'Hexa Savings Account',
-    subTextMessage_1: 'Don’t forget to set up your 2FA code on an authenticator app',
-    subTextMessage_2: '',
-    index: 3
-  },
-  {
-    message: 'Friends & Family',
-    subTextMessage_1: 'Add contacts to Hexa and send sats w/o asking for address every time',
-    subTextMessage_2: '',
-    index: 4
-  },
-  {
-    message: 'Non-custodial buys',
-    subTextMessage_1: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subTextMessage_2: '(*select locations)',
-    index: 5
-  }
-  ]
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -198,8 +241,9 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
-
-  useEffect(() => { AsyncStorage.removeItem("lastSeen") }, [])
+  useEffect(() => {
+    AsyncStorage.removeItem('lastSeen');
+  }, []);
 
   const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
@@ -302,57 +346,57 @@ export default function Login(props) {
     'trustedContactRequest',
   );
   const userKey = props.navigation.getParam('userKey');
-  const isMigrated = useSelector(state => state.preferences.isMigrated)
-  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
-  let key = useSelector((state) => state.storage.key)
-console.log("KEY", key);
-  const onLoginSuccess = async () => {
-    let walletExists = await AsyncStorage.getItem("walletExists")
-    if (walletExists) {
-      // get data from db , if exists trigger these
-      let { database } = await dispatch(fetchDatabase(key))
-      if (loaderBottomSheet.current) {
-        loaderBottomSheet.current.snapTo(0);
+  const isMigrated = useSelector((state) => state.preferences.isMigrated);
+  const accountsSynched = useSelector(
+    (state) => state.accounts.accountsSynched,
+  );
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // migrate async keys
+      if (!isMigrated) {
+        dispatch(initMigration());
       }
-      props.navigation.navigate('Home', {
-        custodyRequest,
-        recoveryRequest,
-        trustedContactRequest,
-        userKey,
+      AsyncStorage.getItem('walletExists').then((exists) => {
+        if (exists) {
+          if (loaderBottomSheet.current) {
+            loaderBottomSheet.current.snapTo(0);
+          }
+          props.navigation.navigate('Home', {
+            custodyRequest,
+            recoveryRequest,
+            trustedContactRequest,
+            userKey,
+          });
+
+          if (dbFetched) {
+            dispatch(updateWalletImage());
+            dispatch(calculateExchangeRate());
+            dispatch(startupSync());
+          }
+        } else {
+          props.navigation.replace('RestoreAndRecoverWallet');
+        }
       });
-      if (database) {
-        dispatch(updateWalletImage());
-        dispatch(calculateExchangeRate());
-        dispatch(startupSync());
-      }
-    } else {
-      props.navigation.replace('RestoreAndRecoverWallet')
     }
-    if (!isMigrated) {
-      dispatch(initMigration())
-    }
+  }, [isAuthenticated, dbFetched]);
 
-  }
-
-
-  const startMessages = () => {
-    setInterval(() => {
-      let index = Math.floor(Math.random() * LoaderMessages.length);
-      if (index !== messageIndex) {
-        setMessageIndex(index)
-      }
-    }, 4000)
-  }
-
+  const handleLoaderMessages = (passcode) => {
+    const message = getRandomMessage();
+    setMessage(message.heading);
+    setSubTextMessage1(message.text);
+    setSubTextMessage2(message.subText);
+    dispatch(credsAuth(passcode));
+  };
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
-        headerText={LoaderMessages[messageIndex].message}
-        messageText={LoaderMessages[messageIndex].subTextMessage_1}
-        messageText2={LoaderMessages[messageIndex].subTextMessage_2}
+        headerText={message}
+        messageText={subTextMessage1}
+        messageText2={subTextMessage2}
       />
     );
-  }, [messageIndex]);
+  }, [message, subTextMessage1, subTextMessage2]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -420,15 +464,6 @@ console.log("KEY", key);
     );
   }, []);
 
-  const proceedButton = async (passcode) => {
-    let res = await dispatch(validatePin(passcode))
-    if (res.key) {
-      onLoginSuccess()
-    } else {
-      return
-    }
-  };
-
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
@@ -474,8 +509,8 @@ console.log("KEY", key);
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -503,8 +538,8 @@ console.log("KEY", key);
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -532,8 +567,8 @@ console.log("KEY", key);
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -561,8 +596,8 @@ console.log("KEY", key);
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -580,9 +615,8 @@ console.log("KEY", key);
                     setIsDisabledProceed(true);
                     setElevation(0);
                   }, 2);
-                  loaderBottomSheet.current.snapTo(1);
-                  proceedButton(passcode)
-                  startMessages()
+                  setTimeout(() => loaderBottomSheet.current?.snapTo(1), 2);
+                  handleLoaderMessages(passcode);
                 }}
                 style={{
                   ...styles.proceedButtonView,
@@ -733,7 +767,7 @@ console.log("KEY", key);
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

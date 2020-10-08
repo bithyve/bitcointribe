@@ -14,13 +14,15 @@ import QrScanner from '../../components/QrScanner';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
-import { restoreShareFromQR, UnableRecoverShareFromQR } from '../../store/actions/sss';
+import {
+  restoreShareFromQR,
+  UnableRecoverShareFromQR,
+} from '../../store/actions/sss';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
-
 
 export default function RestoreByCloudQrCodeContents(props) {
   const [qrData, setQrData] = useState('');
@@ -33,20 +35,20 @@ export default function RestoreByCloudQrCodeContents(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [processButtonText, setProcessButtonText] = useState('Okay');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const unableRecoverShareFromQR = useSelector(state => state.sss.unableRecoverShareFromQR);
-  console.log("unableRecoverShareFromQR", unableRecoverShareFromQR);
+  const unableRecoverShareFromQR = useSelector(
+    (state) => state.sss.unableRecoverShareFromQR,
+  );
+  console.log('unableRecoverShareFromQR', unableRecoverShareFromQR);
 
-  const getQrCodeData = qrData => {
+  const getQrCodeData = (qrData) => {
     let tempArray = qrDataArray;
     let shareCode = qrData.substring(0, 2);
     if (shareCode !== 'e0' && shareCode !== 'c0') {
       console.log('shareCode', shareCode);
       setTimeout(() => {
         setErrorMessageHeader('Invalid QR');
-        setErrorMessage(
-          'Please try again',
-        );
-      setProcessButtonText('Try again');
+        setErrorMessage('Please try again');
+        setProcessButtonText('Try again');
       }, 2);
       errorBottomSheetRef.current.snapTo(1);
       console.log('shareCode1', shareCode);
@@ -70,10 +72,8 @@ export default function RestoreByCloudQrCodeContents(props) {
       if (qrDataArray[i] == qrData) {
         setTimeout(() => {
           setErrorMessageHeader('Scan QR code');
-          setErrorMessage(
-            'Please scan ' + temp1 + ' QR code'
-          );
-          setProcessButtonText('Okay')
+          setErrorMessage('Please scan ' + temp1 + ' QR code');
+          setProcessButtonText('Okay');
         }, 2);
         errorBottomSheetRef.current.snapTo(1);
         return;
@@ -82,13 +82,11 @@ export default function RestoreByCloudQrCodeContents(props) {
         console.log('in if', startNumber1, startNumberCounter);
         setTimeout(() => {
           setErrorMessageHeader('Scan QR code');
-          setErrorMessage(
-            'Please scan ' + temp1 + ' QR code'
-          );
-          setProcessButtonText('Okay')
+          setErrorMessage('Please scan ' + temp1 + ' QR code');
+          setProcessButtonText('Okay');
         }, 2);
         errorBottomSheetRef.current.snapTo(1);
-       // Alert.alert('Please scan ' + temp1 + ' QR code');
+        // Alert.alert('Please scan ' + temp1 + ' QR code');
         return;
       }
     }
@@ -105,14 +103,14 @@ export default function RestoreByCloudQrCodeContents(props) {
           : counter == 9
           ? 8
           : counter + 'th';
-          // setTimeout(() => {
-          //   setErrorMessageHeader('Scan QR code');
-          //   setErrorMessage(
-          //     temp + ' QR code scanned, please scan the next one'
-          //   );
-          //   setProcessButtonText('Okay')
-          // }, 2);
-          // (ErrorBottomSheet as any).current.snapTo(1);
+      // setTimeout(() => {
+      //   setErrorMessageHeader('Scan QR code');
+      //   setErrorMessage(
+      //     temp + ' QR code scanned, please scan the next one'
+      //   );
+      //   setProcessButtonText('Okay')
+      // }, 2);
+      // (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert(temp + ' QR code scanned, please scan the next one');
       Toast(temp + ' QR code scanned, please scan the next one');
       counter++;
@@ -144,7 +142,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader,processButtonText]);
+  }, [errorMessage, errorMessageHeader, processButtonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -156,12 +154,10 @@ export default function RestoreByCloudQrCodeContents(props) {
     );
   }, []);
 
-  if(unableRecoverShareFromQR){
+  if (unableRecoverShareFromQR) {
     setTimeout(() => {
       setErrorMessageHeader('Error receiving Recovery Key');
-      setErrorMessage(
-        'Invalid QR or error while receiving, please try again',
-      );
+      setErrorMessage('Invalid QR or error while receiving, please try again');
       setProcessButtonText('Try again');
     }, 2);
     errorBottomSheetRef.current.snapTo(1);
@@ -170,141 +166,146 @@ export default function RestoreByCloudQrCodeContents(props) {
 
   return (
     <View style={styles.modalContainer}>
-    <ScrollView>
-      <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', flex: 1 }}>
-          {/* <AppBottomSheetTouchableWrapper
+      <ScrollView>
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper> */}
-          <View>
-            <Text style={styles.modalHeaderTitleText}>
-              Enter Recovery Key
-            </Text>
-            <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have stored
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
-            <KnowMoreButton
-              onpress={() => {
-                alert(qrData);
-              }}
-              containerStyle={{}}
-              textStyle={{}}
-            />
-            <Image
-              source={require('../../assets/images/icons/icon_error_red.png')}
-              style={{
-                width: wp('5%'),
-                height: wp('5%'),
-                resizeMode: 'contain',
-              }}
-            />
+            <View>
+              <Text style={styles.modalHeaderTitleText}>
+                Enter Recovery Key
+              </Text>
+              <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+                {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have
+                stored
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+              <KnowMoreButton
+                onpress={() => {
+                  alert(qrData);
+                }}
+                containerStyle={{}}
+                textStyle={{}}
+              />
+              <Image
+                source={require('../../assets/images/icons/icon_error_red.png')}
+                style={{
+                  width: wp('5%'),
+                  height: wp('5%'),
+                  resizeMode: 'contain',
+                }}
+              />
+            </View>
           </View>
         </View>
-      </View>
-      <View style={{ marginLeft: 30 }}>
-        <Text
-          style={{
-            color: Colors.blue,
-            fontSize: RFValue(13, 812),
-            fontFamily: Fonts.FiraSansMedium,
-          }}
-        >
-          Step {counter == 9 ? 8 : counter} of 8
-        </Text>
-        <Text
-          numberOfLines={2}
-          style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue(11, 812),
-            fontFamily: Fonts.FiraSansMedium,
-          }}
-        >
-          {props.pageInfo}Please scan the{' '}
-          {counter == 1
-            ? counter + 'st'
-            : counter == 2
-            ? counter + 'nd'
-            : counter == 3
-            ? counter + 'rd'
-            : counter == 9
-            ? 8
-            : counter + 'th'}{' '}
-          QR code on the{'\n'}PDF you have
-        </Text>
-      </View>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          // backgroundColor: 'red',
-        }}
-      >
-        <QrCodeModalContents
-          flag={true}
-          onQrScan={qrData => getQrCodeData(qrData)}
-          onPressQrScanner={() => {
-            props.navigation.navigate('QrScanner', {
-              scanedCode: getQrCodeData,
-            });
-          }}
-        />
-        {/* <QrScanner onScanQRCode={ async ( data ) => { setQrData( data ) } } /> */}
-      </View>
-      <View
-        style={{ marginBottom: hp('3%'), marginTop: hp('1%'), marginRight: 20 }}
-      >
-        <View style={styles.statusIndicatorView}>
-          {qrDataArray.length == 0 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 1 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 2 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 3 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 4 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 5 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 6 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
-          {qrDataArray.length == 7 || qrDataArray.length == 8 ? (
-            <View style={styles.statusIndicatorActiveView} />
-          ) : (
-            <View style={styles.statusIndicatorInactiveView} />
-          )}
+        <View style={{ marginLeft: 30 }}>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(13, 812),
+              fontFamily: Fonts.FiraSansMedium,
+            }}
+          >
+            Step {counter == 9 ? 8 : counter} of 8
+          </Text>
+          <Text
+            numberOfLines={2}
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue(11, 812),
+              fontFamily: Fonts.FiraSansMedium,
+            }}
+          >
+            {props.pageInfo}Please scan the{' '}
+            {counter == 1
+              ? counter + 'st'
+              : counter == 2
+              ? counter + 'nd'
+              : counter == 3
+              ? counter + 'rd'
+              : counter == 9
+              ? 8
+              : counter + 'th'}{' '}
+            QR code on the{'\n'}PDF you have
+          </Text>
         </View>
-      </View>
-
-    </ScrollView>
-    <BottomSheet
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            // backgroundColor: 'red',
+          }}
+        >
+          <QrCodeModalContents
+            onClose={() => {}}
+            flag={true}
+            onQrScan={(qrData) => getQrCodeData(qrData)}
+            onPressQrScanner={() => {
+              props.navigation.navigate('QrScanner', {
+                scanedCode: getQrCodeData,
+              });
+            }}
+          />
+          {/* <QrScanner onScanQRCode={ async ( data ) => { setQrData( data ) } } /> */}
+        </View>
+        <View
+          style={{
+            marginBottom: hp('3%'),
+            marginTop: hp('1%'),
+            marginRight: 20,
+          }}
+        >
+          <View style={styles.statusIndicatorView}>
+            {qrDataArray.length == 0 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 1 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 2 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 3 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 4 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 5 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 6 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+            {qrDataArray.length == 7 || qrDataArray.length == 8 ? (
+              <View style={styles.statusIndicatorActiveView} />
+            ) : (
+              <View style={styles.statusIndicatorInactiveView} />
+            )}
+          </View>
+        </View>
+      </ScrollView>
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={errorBottomSheetRef}
         snapPoints={[

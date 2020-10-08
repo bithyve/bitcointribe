@@ -244,7 +244,7 @@ class AddNewAccount extends PureComponent<
             <View style={styles.modalTextBoxView}>
               <TextInput
                 style={styles.textBox}
-                placeholder={'Enter donee name'}
+                placeholder={'Organised by'}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -291,7 +291,7 @@ class AddNewAccount extends PureComponent<
                 }}
               >
                 <Text style={styles.modalInfoText}>
-                  Enable 2 Factor Aunthentication
+                  Enable two-factor authentication
                 </Text>
                 <CheckBox
                   size={26}
@@ -314,7 +314,7 @@ class AddNewAccount extends PureComponent<
                 <Text
                   onPress={() => {
                     this.openLink(
-                      'https://hexawallet.io/donor-terms-conditions/',
+                      'https://hexawallet.io/donee-terms-conditions/',
                     );
                   }}
                   style={{
