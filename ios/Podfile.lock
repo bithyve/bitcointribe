@@ -12,29 +12,29 @@ PODS:
     - React-Core (= 0.63.2)
     - React-jsi (= 0.63.2)
     - ReactCommon/turbomodule/core (= 0.63.2)
-  - Firebase/Core (6.32.2):
+  - Firebase/Core (6.34.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 6.8.2)
-  - Firebase/CoreOnly (6.32.2):
-    - FirebaseCore (= 6.10.2)
-  - Firebase/Messaging (6.32.2):
+    - FirebaseAnalytics (= 6.9.0)
+  - Firebase/CoreOnly (6.34.0):
+    - FirebaseCore (= 6.10.4)
+  - Firebase/Messaging (6.34.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 4.6.2)
-  - FirebaseAnalytics (6.8.2):
+    - FirebaseMessaging (~> 4.7.1)
+  - FirebaseAnalytics (6.9.0):
     - FirebaseCore (~> 6.10)
-    - FirebaseInstallations (~> 1.6)
-    - GoogleAppMeasurement (= 6.8.2)
+    - FirebaseInstallations (~> 1.7)
+    - GoogleAppMeasurement (= 6.9.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/MethodSwizzler (~> 6.7)
     - GoogleUtilities/Network (~> 6.7)
     - "GoogleUtilities/NSData+zlib (~> 6.7)"
     - nanopb (~> 1.30906.0)
-  - FirebaseCore (6.10.2):
+  - FirebaseCore (6.10.4):
     - FirebaseCoreDiagnostics (~> 1.6)
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/Logger (~> 6.7)
-  - FirebaseCoreDiagnostics (1.6.0):
-    - GoogleDataTransport (~> 7.2)
+  - FirebaseCoreDiagnostics (1.7.0):
+    - GoogleDataTransport (~> 7.4)
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/Logger (~> 6.7)
     - nanopb (~> 1.30906.0)
@@ -43,14 +43,14 @@ PODS:
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/UserDefaults (~> 6.7)
     - PromisesObjC (~> 1.2)
-  - FirebaseInstanceID (4.6.0):
+  - FirebaseInstanceID (4.8.0):
     - FirebaseCore (~> 6.10)
     - FirebaseInstallations (~> 1.6)
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/UserDefaults (~> 6.7)
-  - FirebaseMessaging (4.6.2):
+  - FirebaseMessaging (4.7.1):
     - FirebaseCore (~> 6.10)
-    - FirebaseInstanceID (~> 4.6)
+    - FirebaseInstanceID (~> 4.7)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/Reachability (~> 6.7)
@@ -66,13 +66,13 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - GoogleAppMeasurement (6.8.2):
+  - GoogleAppMeasurement (6.9.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/MethodSwizzler (~> 6.7)
     - GoogleUtilities/Network (~> 6.7)
     - "GoogleUtilities/NSData+zlib (~> 6.7)"
     - nanopb (~> 1.30906.0)
-  - GoogleDataTransport (7.3.0):
+  - GoogleDataTransport (7.5.1):
     - nanopb (~> 1.30906.0)
   - GoogleUtilities/AppDelegateSwizzler (6.7.2):
     - GoogleUtilities/Environment
@@ -101,7 +101,7 @@ PODS:
   - nanopb/decode (1.30906.0)
   - nanopb/encode (1.30906.0)
   - PDFGenerator (3.1.0)
-  - PromisesObjC (1.2.10)
+  - PromisesObjC (1.2.11)
   - Protobuf (3.13.0)
   - QRCoder (1.1.0)
   - RCTRequired (0.63.2)
@@ -600,22 +600,22 @@ SPEC CHECKSUMS:
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
   FBLazyVector: 3ef4a7f62e7db01092f9d517d2ebc0d0677c4a37
   FBReactNativeSpec: dc7fa9088f0f2a998503a352b0554d69a4391c5a
-  Firebase: 47176280bfba198e531f909cfb1612dad216cb96
-  FirebaseAnalytics: 3c2fee6a922023ccfda7af87e4e641bad1fc11ba
-  FirebaseCore: 1d697bb944bf2af5fc248f1a66e165c9dd88bf97
-  FirebaseCoreDiagnostics: 7415bfb3883b3500c5a95c42b6ba66baae78f600
+  Firebase: c23a36d9e4cdf7877dfcba8dd0c58add66358999
+  FirebaseAnalytics: 3bb096873ee0d7fa4b6c70f5e9166b6da413cc7f
+  FirebaseCore: d3a978a3cfa3240bf7e4ba7d137fdf5b22b628ec
+  FirebaseCoreDiagnostics: 770ac5958e1372ce67959ae4b4f31d8e127c3ac1
   FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
-  FirebaseInstanceID: 84f5f5762f1bee94ca2254f693bbf5aec6666504
-  FirebaseMessaging: 82d75b3770a78bbce470769a6980429608b4c407
+  FirebaseInstanceID: bd3ffc24367f901a43c063b36c640b345a4a5dd1
+  FirebaseMessaging: 5eca4ef173de76253352511aafef774caa1cba2a
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  GoogleAppMeasurement: 1a66f478c68ecd6c16ee63ee60c7c3a648e6b337
-  GoogleDataTransport: e85fb700c9b027079ce182c3d08e12e0f9618bb4
+  GoogleAppMeasurement: a6a3a066369828db64eda428cb2856dc1cdc7c4e
+  GoogleDataTransport: f56af7caa4ed338dc8e138a5d7c5973e66440833
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   jail-monkey: 80c9e34da2cd54023e5ad08bf7051ec75bd43d5b
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
+  PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
@@ -668,4 +668,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 3d0ed1ca2bad17b5e1548a9566c818ccbe698557
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
