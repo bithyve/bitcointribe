@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Image } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
+import { ListItem, Icon, Avatar } from 'react-native-elements';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import ListStyles from '../../common/Styles/Lists';
@@ -19,7 +19,7 @@ export function imageSourceForAccountKind(accountKind: SubAccountKind): NodeRequ
   }
 }
 
-const AccountSourceListItemContent: React.FC<Props> = ({
+const DestinationAccountListItemContent: React.FC<Props> = ({
   subAccountInfo,
 }: Props) => {
 
@@ -29,9 +29,14 @@ const AccountSourceListItemContent: React.FC<Props> = ({
 
   return (
     <>
-      <Image
-        style={styles.accountKindImage}
+      <Avatar
+        rounded
         source={accountKindImageSource}
+        containerStyle={styles.accountKindImage}
+        size="medium"
+        imageProps={{
+          resizeMode: 'cover',
+        }}
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -55,8 +60,6 @@ const AccountSourceListItemContent: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   accountKindImage: {
-    width: 48,
-    height: 48,
     marginRight: 14,
   },
 
@@ -66,4 +69,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default AccountSourceListItemContent;
+export default DestinationAccountListItemContent;

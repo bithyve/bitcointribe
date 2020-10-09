@@ -2,14 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { useDispatch } from "react-redux";
 import Colors from '../../../../common/Colors';
 import Fonts from '../../../../common/Fonts';
-import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import DestinationAccountsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountsList';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import useAccountShellsInGroup from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellsInGroup';
 import AccountShell from '../../../../common/data/models/AccountShell';
+import { reassignTransactions } from '../../../../store/actions/accounts';
+import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions';
+import useCompatibleDestinationAccounts from '../../../../utils/hooks/state-selectors/accounts/UseCompatibleDestinationAccounts';
 
 export type Props = {
   navigation: any;
@@ -23,12 +25,18 @@ const HeaderSection: React.FC = () => {
   );
 }
 
-const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
+const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
+  const dispatch = useDispatch();
+
   const currentAccountShell = useAccountShellFromNavigation(navigation);
-  const selectableAccountShells = useAccountShellsInGroup(currentAccountShell.transactionGroup);
+  const selectableAccountShells = useCompatibleDestinationAccounts(currentAccountShell);
   const [selectedAccountShellID, setSelectedAccountShellID] = useState<string>(null);
+
+  const selectedTransactionIDs = useMemo(() => {
+    return navigation.getParam('selectedTransactionIDs', []);
+  }, [navigation]);
 
   const canProceed = useMemo(() => {
     return selectedAccountShellID != null;
@@ -39,7 +47,15 @@ const ReassignTransactionsSelectDestinationScreen: React.FC<Props> = ({
   }
 
   function handleProceedButtonPress() {
-    // TODO: Show alert on success with a link to view the destination account details.
+    dispatch(reassignTransactions({
+      transactionIDs: selectedTransactionIDs,
+      sourceID: currentAccountShell.id,
+      destinationID: selectedAccountShellID,
+    }));
+
+    navigation.dispatch(resetStackToAccountDetails({
+      accountID: currentAccountShell.id
+    }));
   }
 
   return (
@@ -93,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReassignTransactionsSelectDestinationScreen;
+export default ReassignTransactionsSelectDestinationAccountScreen;

@@ -24,7 +24,7 @@ const listItems: OptionsListItem[] = [
   {
     title: 'Sources',
     subtitle: 'Reassign the entire transaction set of a source',
-    screenName: 'ReassignSourcesSelectSources',
+    screenName: 'ReassignSubAccountSourcesSelectSources',
     imageSource: require('../../../../assets/images/icons/icon_sources.png'),
   },
 ];
@@ -53,7 +53,10 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
       >
         <Avatar
           source={listItem.imageSource}
-          size={"small"}
+          size="small"
+          imageProps={{
+            resizeMode: 'contain',
+          }}
         />
 
         <ListItem.Content style={ListStyles.listItemContentContainer}>
