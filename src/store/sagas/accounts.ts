@@ -37,7 +37,7 @@ import {
   ADD_NEW_ACCOUNT,
   newAccountAdded,
   newAccountAddFailed,
-  UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_SUB_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
   ReassignTransactionsActionPayload,
@@ -1114,7 +1114,7 @@ function* updateAccountSettings({ payload: account }: { payload: SubAccountDescr
 
 export const updateAccountSettingsWatcher = createWatcher(
   updateAccountSettings,
-  UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_SUB_ACCOUNT_SETTINGS,
 );
 
 
