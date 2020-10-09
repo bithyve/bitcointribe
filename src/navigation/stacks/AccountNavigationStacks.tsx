@@ -6,11 +6,11 @@ import AccountSettingsDisplayPropertiesScreen from "../../pages/Accounts/Account
 import AccountSettingsMainScreen from "../../pages/Accounts/AccountSettings/MainScreen";
 import ReassignTransactionsMainOptionsScreen from "../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
 import ReassignAllTransactionsSelectTransactionsScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
-import AccountDetailsContainerScreen from "../../pages/Accounts/Details/AccountDetailsContainer";
+import AccountDetailsContainerScreen from "../../pages/Accounts/Details/AccountDetailsContainerScreen";
 import TransactionDetailsContainerScreen from "../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
 import TransactionsListContainerScreen from "../../pages/Accounts/Transactions/TransactionsListScreenContainer";
-import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationScreen';
-import ReassignSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSourcesScreen';
+import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
+import ReassignSubAccountSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
 
 export const AccountSettingsStack = createStackNavigator(
   {
@@ -38,8 +38,8 @@ export const AccountSettingsStack = createStackNavigator(
         title: "Reassign Transactions",
       },
     },
-    ReassignSourcesSelectSources: {
-      screen: ReassignSourcesSelectSourcesScreen,
+    ReassignSubAccountSourcesSelectSources: {
+      screen: ReassignSubAccountSourcesSelectSourcesScreen,
       navigationOptions: {
         title: "Reassign Sources",
       },

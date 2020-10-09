@@ -1,8 +1,6 @@
-import { call, put, select, delay, all } from 'redux-saga/effects';
+import { call, put, select, all } from 'redux-saga/effects';
 import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
-  // FETCH_ADDR,
-  addressFetched,
   FETCH_BALANCE,
   FETCH_TRANSACTIONS,
   transactionsFetched,
@@ -12,10 +10,8 @@ import {
   executedST1,
   executedST2,
   GET_TESTCOINS,
-  fetchBalance,
   TRANSFER_ST3,
   executedST3,
-  fetchTransactions,
   ACCUMULATIVE_BAL_AND_TX,
   failedST1,
   failedST2,
@@ -33,12 +29,10 @@ import {
   alternateTransferST2Executed,
   RESET_TWO_FA,
   twoFAResetted,
-  RUN_TEST,
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
   SYNC_DERIVATIVE_ACCOUNTS,
-  syncDerivativeAccounts,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
@@ -50,15 +44,18 @@ import {
   UPDATE_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
+  ReassignTransactionsActionPayload,
+  REASSIGN_TRANSACTIONS,
+  transactionReassignmentSucceeded,
+  transactionReassignmentFailed,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -848,10 +845,6 @@ function* accumulativeTxAndBalWorker() {
   const accounts = yield select((state) => state.accounts);
   console.log({ accounts });
 
-  const testBalance = accounts[TEST_ACCOUNT].service
-    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
     accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
@@ -1179,4 +1172,36 @@ function* updateAccountSettings({ payload: account }: { payload: SubAccountDescr
 export const updateAccountSettingsWatcher = createWatcher(
   updateAccountSettings,
   UPDATE_ACCOUNT_SETTINGS,
+);
+
+
+
+function* reassignTransactions({
+  payload: {
+    transactionIDs,
+    sourceID,
+    destinationID,
+  }
+}: { payload: ReassignTransactionsActionPayload }) {
+  try {
+    // TODO: Implement backend logic here for processing transaction re-assignment
+
+    yield put(transactionReassignmentSucceeded({
+      transactionIDs,
+      sourceID,
+      destinationID,
+    }));
+  } catch (error) {
+    yield put(transactionReassignmentFailed({
+      transactionIDs,
+      sourceID,
+      destinationID,
+      error,
+    }));
+  }
+}
+
+export const reassignTransactionsWatcher = createWatcher(
+  reassignTransactions,
+  REASSIGN_TRANSACTIONS,
 );

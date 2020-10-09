@@ -37,7 +37,8 @@ export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
 export const ADD_NEW_ACCOUNT_COMPLETED = 'ADD_NEW_ACCOUNT_COMPLETED';
 export const UPDATE_ACCOUNT_SETTINGS = 'UPDATE_ACCOUNT_SETTINGS';
 export const ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'ACCOUNT_SETTINGS_UPDATE_COMPLETED';
-
+export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
+export const TRANSACTION_REASSIGNMENT_COMPLETED = 'TRANSACTION_REASSIGNMENT_COMPLETED';
 
 export const fetchBalance = (
   serviceType,
@@ -321,9 +322,31 @@ export interface UpdateAccountSettingsCompletionAction extends Action {
   type: typeof ACCOUNT_SETTINGS_UPDATE_COMPLETED;
 };
 
-
 export const accountSettingsUpdateCompleted = (): UpdateAccountSettingsCompletionAction => {
   return { type: ACCOUNT_SETTINGS_UPDATE_COMPLETED };
+};
+
+export type ReassignTransactionsActionPayload = {
+  transactionIDs: string[];
+  sourceID: string;
+  destinationID: string;
+};
+
+export interface ReassignTransactionsAction extends Action {
+  type: typeof REASSIGN_TRANSACTIONS;
+  payload: ReassignTransactionsActionPayload;
+};
+
+export const reassignTransactions = (payload: ReassignTransactionsActionPayload): ReassignTransactionsAction => {
+  return { type: REASSIGN_TRANSACTIONS, payload };
+};
+
+export interface TransactionReassignmentCompletionAction extends Action {
+  type: typeof TRANSACTION_REASSIGNMENT_COMPLETED;
+};
+
+export const transactionReassignmentCompleted = (): TransactionReassignmentCompletionAction => {
+  return { type: TRANSACTION_REASSIGNMENT_COMPLETED };
 };
 
 
@@ -350,6 +373,8 @@ export const NEW_ACCOUNT_ADDED = 'NEW_ACCOUNT_ADDED';
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
+export const TRANSACTION_REASSIGNMENT_SUCCEEDED = 'TRANSACTION_REASSIGNMENT_SUCCEEDED';
+export const TRANSACTION_REASSIGNMENT_FAILED = 'TRANSACTION_REASSIGNMENT_FAILED';
 
 export const testcoinsReceived = (serviceType, service) => {
   // console.log("Called testcoinsReceived", new Date())
@@ -438,7 +463,6 @@ export const newAccountAdded = ({ accountShell }: {
 };
 
 
-
 export const accountSettingsUpdateFailed = (
   {
     account,
@@ -452,4 +476,23 @@ export const accountSettingsUpdateFailed = (
 
 export const accountSettingsUpdated = ({ account }: { account: SubAccountDescribing }) => {
   return { type: ACCOUNT_SETTINGS_UPDATED, payload: account };
+};
+
+
+export const transactionReassignmentFailed = (
+  payload: ReassignTransactionsActionPayload & { error: Error }
+) => {
+  return {
+    type: TRANSACTION_REASSIGNMENT_FAILED,
+    payload,
+  };
+};
+
+// export const transactionReassignmentSucceeded = ({
+export const transactionReassignmentSucceeded = (payload: ReassignTransactionsActionPayload) => {
+  // transactionIDs,
+  // sourceID,
+  // destinationID,
+// }: ReassignTransactionsActionPayload) => {
+  return { type: TRANSACTION_REASSIGNMENT_SUCCEEDED, payload };
 };
