@@ -1,4 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
+import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
 import { ImportedWalletSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
@@ -12,6 +13,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   kind: SubAccountKind = SubAccountKind.WATCH_ONLY_IMPORTED_WALLET;
   isPrimarySubAccount: boolean;
   balance: number;
+  visibility: AccountVisibility;
 
   defaultTitle: string;
   defaultDescription: string = "View a non-Hexa wallet as an account.";
@@ -19,7 +21,6 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   customDescription: string | null;
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_import_watch_only_wallet.png');
-
 
   transactionIDs: string[];
   transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
@@ -30,6 +31,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
     balance = 0,
     customDisplayName = null,
     customDescription = null,
+    visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
     isPrimarySubAccount = false,
   }: ConstructorProps) {
@@ -38,6 +40,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.visibility = visibility;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
 

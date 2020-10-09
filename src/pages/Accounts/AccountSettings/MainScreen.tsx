@@ -30,7 +30,7 @@ const listItems: SettingsListItem[] = [
   {
     title: 'Account Visibility',
     subtitle: `Configure for different privacy-sensitive contexts`,
-    screenName: '',
+    screenName: 'EditVisibility',
     imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
   },
   {

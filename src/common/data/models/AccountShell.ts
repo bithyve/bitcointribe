@@ -7,7 +7,6 @@ import SubAccountDescribing from "./SubAccountInfo/Interfaces";
 type ConstructorProps = {
   displayOrder?: number | null;
   unit: BitcoinUnit;
-  visibility?: AccountVisibility;
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts?: SubAccountDescribing[];
 };
@@ -31,15 +30,12 @@ export default class AccountShell {
    */
   unit: BitcoinUnit;
 
-  visibility: AccountVisibility;
-
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: SubAccountDescribing[];
 
   constructor({
     displayOrder = null,
     unit = BitcoinUnit.BTC,
-    visibility = AccountVisibility.DEFAULT,
     primarySubAccount,
     secondarySubAccounts = [],
   }: ConstructorProps) {
@@ -52,7 +48,6 @@ export default class AccountShell {
 
     this.displayOrder = displayOrder;
     this.unit = unit;
-    this.visibility = visibility;
   }
 
   get transactionGroup(): TransactionGroup {
@@ -73,6 +68,10 @@ export default class AccountShell {
     return this
       .subAccounts
       .reduce((accumulated, current) => accumulated + current.balance, 0);
+  }
+
+  get visiblity(): AccountVisibility {
+    return this.primarySubAccount.visibility;
   }
 
   setPrimarySubAccount(subAccount: SubAccountDescribing) {
