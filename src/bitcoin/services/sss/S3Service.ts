@@ -10,6 +10,8 @@ import {
 } from '../../utilities/Interface';
 import SSS from '../../utilities/sss/SSS';
 import LevelHealth from '../../utilities/LevelHealth/LevelHealth';
+import HDSegwitWallet from '../../utilities/accounts/HDSegwitWallet';
+import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
 
 export default class S3Service {
   public static fromJSON = (json: string) => {
@@ -418,6 +420,8 @@ export default class S3Service {
   };
 
   public levelhealth: LevelHealth;
+  public hdWallet: HDSegwitWallet;
+  public secureWallet: SecureHDWallet;
   constructor(
     mnemonic: string,
     stateVars?: {
@@ -431,6 +435,8 @@ export default class S3Service {
     },
   ) {
     this.levelhealth = new LevelHealth(mnemonic, stateVars);
+    this.hdWallet = new HDSegwitWallet();
+    this.secureWallet = new SecureHDWallet(mnemonic);
   }
 
   public generateShares = (

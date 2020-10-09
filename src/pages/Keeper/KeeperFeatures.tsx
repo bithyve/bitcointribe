@@ -32,6 +32,7 @@ import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import RadioButton from '../../components/RadioButton';
+import { createAndUploadOnEFChannel } from '../../store/actions/health';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
@@ -40,6 +41,7 @@ interface KeeperFeaturesStateTypes {
 
 interface KeeperFeaturesPropsTypes {
   navigation: any;
+  createAndUploadOnEFChannel: any;
 }
 
 class KeeperFeatures extends Component<
@@ -79,7 +81,13 @@ class KeeperFeatures extends Component<
     };
   }
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    if(this.props.navigation.state.params.qrScannedData){
+      console.log('this.props.navigation.state.params.qrScannedData', this.props.navigation.state.params.qrScannedData)
+    }
+  };
+
+
 
   getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
@@ -100,6 +108,21 @@ class KeeperFeatures extends Component<
     }
     this.setState({ selectedIds: selectedId });
   };
+
+  setUpKeeper = () =>{
+    if(this.props.navigation.state.params.qrScannedData){
+      let featuresList = [];
+      let isPrimaryKeeper = this.props.navigation.state.params.isPrimaryKeeper;
+      for (let i = 0; i < this.state.levelData.length; i++) {
+        const element = this.state.levelData[i];
+        if(this.state.selectedIds.findIndex(value => value == element.id) > -1){
+          featuresList.push(element);
+        } 
+      }
+      this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper);
+    }
+    this.props.navigation.replace('ManageBackupKeeper')
+  }
 
   render() {
     const { levelData, selectedIds } = this.state;
@@ -277,7 +300,7 @@ class KeeperFeatures extends Component<
         <View style={styles.bottomButtonView}>
           <TouchableOpacity
             onPress={() => {
-              navigation.replace('ManageBackupKeeper')
+              this.setUpKeeper();
             }}
             style={{
               ...styles.successModalButtonView,
@@ -327,6 +350,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
+    createAndUploadOnEFChannel,
   })(KeeperFeatures),
 );
 

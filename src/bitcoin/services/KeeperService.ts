@@ -1,5 +1,5 @@
 import {
-  EphemeralDataElements,
+  EphemeralDataElementsForKeeper,
   ShareUploadables
 } from '../utilities/Interface';
 import config from '../HexaConfig';
@@ -8,6 +8,10 @@ import Keeper from '../utilities/Keeper';
 export default class KeeperService {
 
   public keeper: Keeper;
+
+  constructor() {
+    this.keeper = new Keeper();
+  }
 
   // public initializeKeeper = (
   //   uuid: string,
@@ -52,15 +56,14 @@ export default class KeeperService {
 
   public updateEphemeralChannel = async (
     shareId: string,
-    uuid: string,
     shareType: string,
-    privateKey: string,
     publicKey: string,
     ephemeralAddress: string,
-    dataElements: EphemeralDataElements,
+    dataElements: EphemeralDataElementsForKeeper,
     encKey: string,
     fetch?: Boolean,
     shareUploadables?: ShareUploadables,
+    privateKey?: string,
   ): Promise<
     | {
       status: number;
@@ -68,7 +71,7 @@ export default class KeeperService {
       | {
         updated: any;
         publicKey: string;
-        data: EphemeralDataElements;
+        data: EphemeralDataElementsForKeeper;
       }
       | {
         updated: any;
@@ -91,15 +94,14 @@ export default class KeeperService {
         status: config.STATUS.SUCCESS,
         data: await this.keeper.updateEphemeralChannel(
           shareId,
-          uuid,
           shareType,
-          privateKey,
           publicKey,
           ephemeralAddress,
           dataElements,
           encKey,
           fetch,
           shareUploadables,
+          privateKey,
         ),
       };
     } catch (err) {

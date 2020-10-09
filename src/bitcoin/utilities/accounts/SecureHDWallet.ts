@@ -294,6 +294,18 @@ export default class SecureHDWallet extends Bitcoin {
     return { secondaryXpub: this.xpubs.secondary };
   };
 
+  public getSecureXpubs = (): {
+    primary: string;
+    secondary: string;
+    bh: string;
+  } => {
+    return {
+      primary: this.xpubs.primary,
+      secondary: this.xpubs.secondary,
+      bh: this.xpubs.bh
+    }
+  };
+
   public getAccountId = (): { accountId: string } => {
     const mutliSig = this.createSecureMultiSig(0);
     const { address } = mutliSig; // getting the first receiving address
@@ -2221,5 +2233,9 @@ export default class SecureHDWallet extends Bitcoin {
       ).address;
       return xpub;
     }
+  };
+
+  public getSecondaryMnemonic = () => {
+    return this.secondaryMnemonic;
   };
 }

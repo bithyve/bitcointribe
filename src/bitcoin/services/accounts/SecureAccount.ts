@@ -1020,4 +1020,12 @@ export default class SecureAccount {
       };
     }
   };
+
+  public getXpubsForAccount = () => {
+    return this.secureHDWallet.getSecureXpubs()
+  };
+
+  public getSecondaryMnemonics = () => {
+    return this.secureHDWallet.getSecondaryMnemonic()
+  };
 }

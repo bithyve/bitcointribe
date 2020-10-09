@@ -45,11 +45,10 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
-import { checkMSharesHealth } from '../../store/actions/health';
-import { generateMetaShare } from '../../store/actions/health';
+import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel } from '../../store/actions/health';
 
 interface ManageBackupStateTypes {
-  levelData: any;
+  levelData: any[];
   selectedId: any;
   isLevel2: boolean;
   securityAtLevel: any;
@@ -77,6 +76,7 @@ interface ManageBackupPropsTypes {
   healthLoading: any;
   generateMetaShare: any;
   checkMSharesHealth: any;
+  createAndUploadOnEFChannel: any;
 }
 
 class ManageBackup extends Component<
@@ -164,7 +164,7 @@ class ManageBackup extends Component<
     };
   }
 
-  modifyLevelStatus = () =>{
+  modifyLevelStatus = () => {
     let levelData = this.state.levelData;
     if(this.props.levelHealth.length == 2){
       if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
@@ -331,15 +331,16 @@ class ManageBackup extends Component<
   };
 
   generateShares = (level) =>{
-    const { isLevel2, isPrimaryKeeper } = this.state;
+    const { isLevel2, isPrimaryKeeper, levelData } = this.state;
     const {generateMetaShare} = this.props;
     generateMetaShare(level);
+    let PKStatus = levelData.findIndex(value=>value.keeper1.keeper1Done == true) > -1 ? 'accessed' : 'notAccessed'
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
-      selectedStatus: 'Ugly',
-      selectedTitle: "Keeper Device",
-      isLevel2: isLevel2,
-      isPrimaryKeeper: isPrimaryKeeper
+      selectedStatus: PKStatus,
+      selectedTitle: "Primary Keeper",
+      isPrimaryKeeper: true,
+      isSetUp: true
     });
   }
 
@@ -582,7 +583,7 @@ class ManageBackup extends Component<
                                   fontSize: RFValue(11),
                                 }}
                               >
-                               {this.props.cloudBackupStatus && this.props.cloudBackupStatus.status ? "Data Backed up"  : "Add Backup" }
+                               {this.props.cloudBackupStatus && this.props.cloudBackupStatus.status ? "Data Backed-Up"  : "Add Backup" }
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -907,6 +908,7 @@ export default withNavigationFocus(
     setCloudBackupStatus,
     generateMetaShare,
     checkMSharesHealth,
+    createAndUploadOnEFChannel,
   })(ManageBackup),
 );
 

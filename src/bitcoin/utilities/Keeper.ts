@@ -1,10 +1,11 @@
 import {
   Keepers,
-  EphemeralDataElements,
+  EphemeralDataElementsForKeeper,
   TrustedDataElements,
   EphemeralData,
   EncryptedEphemeralData,
   ShareUploadables,
+  EphemeralDataForKeeper
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -102,10 +103,10 @@ export default class Keeper {
 
   public updateEphemeralChannelData = (
     shareId: string,
-    data: EphemeralDataElements,
-  ): { updatedEphemeralDataElements: EphemeralDataElements } => {
+    data: EphemeralDataElementsForKeeper,
+  ): { updatedEphemeralDataElements: EphemeralDataElementsForKeeper } => {
     let ephemeralData = this.keepers[shareId].ephemeralChannel.data;
-    let updatedEphemeralDataElements: EphemeralDataElements;
+    let updatedEphemeralDataElements: EphemeralDataElementsForKeeper;
     if (ephemeralData) {
       let updated = false;
       for (let index = 0; index < ephemeralData.length; index++) {
@@ -129,14 +130,6 @@ export default class Keeper {
           ? (this.keepers[shareId].walletID = data.walletID)
           : null;
 
-        if (data.FCM)
-          this.keepers[shareId].FCMs
-            ? this.keepers[shareId].FCMs.push(data.FCM)
-            : (this.keepers[shareId].FCMs = [data.FCM]);
-
-        this.keepers[shareId].trustedAddress = data.trustedAddress;
-        this.keepers[shareId].trustedTestAddress =
-          data.trustedTestAddress;
       }
     } else {
       ephemeralData = [data];
@@ -149,20 +142,19 @@ export default class Keeper {
 
   public updateEphemeralChannel = async (
     shareId: string,
-    uuid: string,
     shareType: string,
-    privateKey: string,
     publicKey: string,
     ephemeralAddress: string,
-    dataElements: EphemeralDataElements,
+    dataElements: EphemeralDataElementsForKeeper,
     encKey: string,
     fetch?: Boolean,
     shareUploadables?: ShareUploadables,
+    privateKey?: string,
   ): Promise<
     | {
       updated: any;
       publicKey: string;
-      data: EphemeralDataElements;
+      data: EphemeralDataElementsForKeeper;
     }
     | {
       updated: any;
@@ -173,7 +165,6 @@ export default class Keeper {
     try {
 
       this.keepers[shareId] = {
-        uuid,
         shareType,
         privateKey,
         publicKey,
@@ -182,9 +173,6 @@ export default class Keeper {
       };
 
       dataElements.publicKey = publicKey;
-
-      if (dataElements.DHInfo)
-        dataElements.DHInfo.address = this.keepers[shareId].ephemeralChannel.address;
 
       const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(shareId, dataElements);
 
@@ -201,14 +189,14 @@ export default class Keeper {
       } else {
         //Ignore this as its added to support older versions of app.
         let encryptedDataPacket: EncryptedEphemeralData;
-        if (dataElements.DHInfo) {
-          encryptedDataPacket = {
-            publicKey,
-            encryptedData: null,
-            DHInfo: dataElements.DHInfo,
-          };
-        } else {
-          const ephemeralData: EphemeralData = {
+        // if (dataElements.DHInfo) {
+        //   encryptedDataPacket = {
+        //     publicKey,
+        //     encryptedData: null,
+        //     DHInfo: dataElements.DHInfo,
+        //   };
+        // } else {
+          const ephemeralData: EphemeralDataForKeeper = {
             publicKey,
             data: updatedEphemeralDataElements,
           };
@@ -223,7 +211,7 @@ export default class Keeper {
             encryptedData,
             walletID: updatedEphemeralDataElements.walletID,
           };
-        }
+        // }
 
         if (shareUploadables && Object.keys(shareUploadables).length) {
           res = await BH_AXIOS.post('updateShareAndEC', {

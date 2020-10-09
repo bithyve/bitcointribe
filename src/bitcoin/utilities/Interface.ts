@@ -308,7 +308,6 @@ export interface EncryptedImage {
 
 export interface Keepers {
   [shareId: string]: {
-    uuid: string;
     shareType: string;
     privateKey: string;
     publicKey: string;
@@ -332,4 +331,21 @@ export interface Keepers {
     trustedAddress?: string;
     trustedTestAddress?: string;
   }
+}
+
+// TRUSTED CONTACTS
+export interface EphemeralDataElementsForKeeper {
+  publicKey?: string;
+  walletID?: string;
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
+  xPub? : any;
+  securityQuestion?: any;
+}
+
+export interface EphemeralDataForKeeper {
+  publicKey: string;
+  data: EphemeralDataElementsForKeeper;
 }

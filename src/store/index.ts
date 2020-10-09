@@ -117,6 +117,7 @@ import {
   checkSharesHealthWatcher,
   updateSharesHealthWatcher,
   generateMetaSharesWatcher,
+  createAndUploadOnEFChannelWatcher
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -228,6 +229,7 @@ const rootSaga = function* () {
     checkSharesHealthWatcher,
     updateSharesHealthWatcher,
     generateMetaSharesWatcher,
+    createAndUploadOnEFChannelWatcher
   ];
 
   yield all(

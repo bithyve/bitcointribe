@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { getIconByStatus } from './utils';
+import { getIconByStatus, getIconByStatusForKeeper } from './utils';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -43,7 +43,7 @@ const KeeperDeviceHistory = (props) => {
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
-  const [isLevel2, setIsLevel2] = useState(props.navigation.state.params.isLevel2 ? props.navigation.state.params.isLevel2 : false)
+  const [qrScannedData, setQrScannedData] = useState('');
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
@@ -84,11 +84,7 @@ const KeeperDeviceHistory = (props) => {
     //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     // },
   ]);
- 
-  useEffect(() => {
-    console.log("props.navigation.state.params.isLevel2", props.navigation.state.params.isLevel2)
-      setIsLevel2(props.navigation.state.params.isLevel2)
-  }, [props.navigation.state.params.isLevel2]);
+
 
   const sortedHistory = (history) => {
     const currentHistory = history.filter((element) => {
@@ -123,6 +119,9 @@ const KeeperDeviceHistory = (props) => {
 
   useEffect(() => {
     (async () => {
+      if(props.navigation.state.params.isSetUp){
+        (QrBottomSheet as any).current.snapTo(1);
+      }
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
@@ -174,12 +173,12 @@ const KeeperDeviceHistory = (props) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
           try {
-            qrData = JSON.parse(qrData);
+            setQrScannedData(qrData);
           } catch (err) {
             console.log({ err });
-            
           }
-       setTimeout(() => {
+
+          setTimeout(() => {
             setQrBottomSheetsFlag(false);
             (QrBottomSheet.current as any).snapTo(0);
           }, 2);
@@ -195,7 +194,9 @@ const KeeperDeviceHistory = (props) => {
               (ApproveSetupBottomSheet as any).current.snapTo(1);  
             }
             else{
-              props.navigation.navigate('KeeperFeatures');
+              let qrScannedData = '{"uuid":"fdd217d6-82e6-435b-985c-b4a9e0163276","publicKey":"01d1d90092100c738f087550d263a75967f121fa598bb300cedbd7406c76bdff","ephemeralAddress":"e04d236f3681a22c7f7bd84f13ece1d64acb5e6fe8fd089d82a912043daa1f2e","walletName":"Sam"}'
+
+              props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper});
             }
           (QrBottomSheet as any).current.snapTo(0);
         }}
@@ -314,11 +315,7 @@ const KeeperDeviceHistory = (props) => {
                 marginLeft: 'auto',
                 alignSelf: 'center',
               }}
-              source={
-                getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
-              }
+              source={getIconByStatusForKeeper(props.navigation.state.params.selectedStatus)}
             />
           </View>
         </View>

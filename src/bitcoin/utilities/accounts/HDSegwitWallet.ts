@@ -1889,7 +1889,7 @@ export default class HDSegwitWallet extends Bitcoin {
     throw new Error('Could not find private key for: ' + address);
   };
 
-  private getXpub = () => {
+  public getXpub = () => {
     if (this.xpub) {
       return this.xpub;
     }

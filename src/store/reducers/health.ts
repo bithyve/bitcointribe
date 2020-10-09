@@ -7,7 +7,8 @@ import {
   S3_LOADING_STATUS,
   INIT_LOADING_STATUS,
   UPDATE_MSHARE_LOADING_STATUS,
-  MSHARES
+  MSHARES,
+  UPDATE_EFCHANNEL_LOADING_STATUS
 } from '../actions/health';
 
 const initialState: {
@@ -16,6 +17,7 @@ const initialState: {
     checkMSharesHealth: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
+    updateEFChannelStatus: Boolean
   };
   errorSending: Boolean;
   currentLevel: Number;
@@ -35,7 +37,8 @@ const initialState: {
     levelHealthCheck: false,
     checkMSharesHealth: false,
     initLoader: false,
-    updateMSharesHealth: false
+    updateMSharesHealth: false,
+    updateEFChannelStatus: false
   },
   currentLevel: 0,
   levelHealth: [],
@@ -115,6 +118,17 @@ export default (state = initialState, action) => {
         ...state,
         shares: action.payload.shares,
       };
+
+      case UPDATE_EFCHANNEL_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            updateEFChannelStatus: action.payload.beingLoaded,
+          },
+        };
+
+      
   }
   return state;
 };
