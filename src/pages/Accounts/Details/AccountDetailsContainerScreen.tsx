@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -16,6 +15,11 @@ import { Easing } from 'react-native-reanimated';
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect';
+import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet';
+import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle';
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
+import BottomSheetBackground from '../../../components/bottom-sheets/BottomSheetBackground';
 
 
 export type Props = {
@@ -43,13 +47,19 @@ const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> = ({
   );
 };
 
+const ConfirmationMessageBottomSheetBackground = () => {
+  return (
+    <BottomSheetBackground isVisible />
+  );
+}
 
-const AccountDetailsScreenContainer: React.FC<Props> = ({
+const AccountDetailsContainerScreen: React.FC<Props> = ({
   navigation,
 }) => {
   const accountID = useMemo(() => {
     return navigation.getParam('accountID');
   }, [navigation]);
+
   const accountShell = useAccountShellFromNavigation(navigation);
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
 
@@ -80,7 +90,7 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
 
   const showKnowMoreSheet = useCallback(() => {
     present(
-      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismiss}/>,
+      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismiss} />,
       {
         initialSnapIndex: 1,
         snapPoints: [0, '95%'],
@@ -90,6 +100,38 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
       },
     );
   }, [present]);
+
+  const showReassignmentConfirmationBottomSheet = useCallback((destinationID) => {
+    present(
+      <TransactionReassignmentSuccessBottomSheet
+        destinationAccountID={destinationID}
+        onViewAccountDetailsPressed={() => {
+          dismiss();
+          navigation.dispatch(resetStackToAccountDetails({
+            accountID: destinationID,
+          }));
+        }}
+      />,
+      {
+        initialSnapIndex: 1,
+        snapPoints: [0, '40%'],
+        animationDuration: 500,
+        animationEasing: Easing.out(Easing.exp),
+        overlayComponent: ConfirmationMessageBottomSheetBackground,
+        handleComponent: BottomSheetHandle,
+      },
+    );
+  }, [present, dismiss]);
+
+  useTransactionReassignmentCompletedEffect({
+    onSuccess: showReassignmentConfirmationBottomSheet,
+    onError: () => {
+      Alert.alert(
+        "Transaction Reassignment Error",
+        "An error occurred while attempting to reassign transactions",
+      );
+    }
+  });
 
   return (
     <ScrollView style={styles.rootContainer}>
@@ -123,7 +165,7 @@ const AccountDetailsScreenContainer: React.FC<Props> = ({
           onSendPressed={() => {
             navigation.navigate('Send', {
               accountID,
-              spendableBalance: accountShell.balance,
+              spendableBalance: accountShell.totalBalance,
             });
           }}
           onReceivePressed={() => {
@@ -161,7 +203,7 @@ const styles = StyleSheet.create({
   },
 });
 
-AccountDetailsScreenContainer.navigationOptions = ({  }) => {
+AccountDetailsContainerScreen.navigationOptions = ({ }) => {
   return {
     header: ({ navigation }) => {
       const { accountID } = navigation.state.params;
@@ -174,4 +216,4 @@ AccountDetailsScreenContainer.navigationOptions = ({  }) => {
   };
 };
 
-export default AccountDetailsScreenContainer;
+export default AccountDetailsContainerScreen;

@@ -28,6 +28,10 @@ import {
   ACCOUNT_SETTINGS_UPDATED,
   ACCOUNT_SETTINGS_UPDATE_FAILED,
   ACCOUNT_SETTINGS_UPDATE_COMPLETED,
+  REASSIGN_TRANSACTIONS,
+  TRANSACTION_REASSIGNMENT_SUCCEEDED,
+  TRANSACTION_REASSIGNMENT_FAILED,
+  TRANSACTION_REASSIGNMENT_COMPLETED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -139,6 +143,11 @@ export type AccountsState = {
   isUpdatingAccountSettings: boolean;
   hasAccountSettingsUpdateSucceeded: boolean;
   hasAccountSettingsUpdateFailed: boolean;
+
+  isTransactionReassignmentInProgress: boolean;
+  hasTransactionReassignmentSucceeded: boolean;
+  hasTransactionReassignmentFailed: boolean;
+  transactionReassignmentDestinationID: string | null;
 }
 
 const initialState: AccountsState = {
@@ -179,6 +188,11 @@ const initialState: AccountsState = {
   isUpdatingAccountSettings: false,
   hasAccountSettingsUpdateSucceeded: false,
   hasAccountSettingsUpdateFailed: false,
+
+  isTransactionReassignmentInProgress: false,
+  hasTransactionReassignmentSucceeded: false,
+  hasTransactionReassignmentFailed: false,
+  transactionReassignmentDestinationID: null,
 };
 
 export default (state: AccountsState = initialState, action): AccountsState => {
@@ -605,6 +619,43 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         isUpdatingAccountSettings: false,
         hasAccountSettingsUpdateSucceeded: false,
         hasAccountSettingsUpdateFailed: false,
+      };
+
+
+    case REASSIGN_TRANSACTIONS:
+      return {
+        ...state,
+        transactionReassignmentDestinationID: null,
+        isTransactionReassignmentInProgress: true,
+        hasTransactionReassignmentSucceeded: false,
+        hasTransactionReassignmentFailed: false,
+      };
+
+    case TRANSACTION_REASSIGNMENT_SUCCEEDED:
+      return {
+        ...state,
+        transactionReassignmentDestinationID: action.payload.destinationID,
+        isTransactionReassignmentInProgress: false,
+        hasTransactionReassignmentSucceeded: true,
+        hasTransactionReassignmentFailed: false,
+      };
+
+    case TRANSACTION_REASSIGNMENT_FAILED:
+      return {
+        ...state,
+        transactionReassignmentDestinationID: null,
+        isTransactionReassignmentInProgress: false,
+        hasTransactionReassignmentSucceeded: false,
+        hasTransactionReassignmentFailed: true,
+      };
+
+    case TRANSACTION_REASSIGNMENT_COMPLETED:
+      return {
+        ...state,
+        transactionReassignmentDestinationID: null,
+        isTransactionReassignmentInProgress: false,
+        hasTransactionReassignmentSucceeded: false,
+        hasTransactionReassignmentFailed: false,
       };
 
     default:
