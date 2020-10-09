@@ -18,6 +18,8 @@ export default class CheckingSubAccountInfo implements HexaSubAccountDescribing 
   customDisplayName: string | null;
   customDescription: string | null;
 
+  avatarImageSource = require('../../../../../assets/images/icons/icon_regular.png');
+
   transactionIDs: string[];
   transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 

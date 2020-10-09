@@ -35,6 +35,8 @@ interface SubAccountDescribing {
    */
   customDescription: string | null;
 
+  avatarImageSource: NodeRequire;
+
   transactionGroup: TransactionGroup;
   transactionIDs: string[];
 }
@@ -62,7 +64,7 @@ export type SubAccountDescribingConstructorProps = {
   customDisplayName?: string | null;
   customDescription?: string | null;
   balance?: number;
-  imageSource?: NodeRequire;
+  avatarImageSource?: NodeRequire;
   secondaryAccountUUIDs?: string[];
   transactionGroup?: TransactionGroup;
   transactionIDs?: string[];

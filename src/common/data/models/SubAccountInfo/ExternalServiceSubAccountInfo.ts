@@ -24,6 +24,8 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   customDisplayName: string | null;
   customDescription: string | null;
 
+  avatarImageSource: NodeRequire;
+
   transactionIDs: string[];
   transactionGroup: TransactionGroup;
 
@@ -48,5 +50,9 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
+    this.transactionGroup = transactionGroup;
+
+    // TODO: Generate this dynamically based upon the `serviceAccountKind`.
+    this.avatarImageSource = require('../../../../assets/images/icons/icon_hexa.png');
   }
 }
