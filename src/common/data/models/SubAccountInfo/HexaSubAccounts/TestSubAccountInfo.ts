@@ -19,6 +19,8 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   customDisplayName: string | null;
   customDescription: string | null;
 
+  avatarImageSource = require('../../../../../assets/images/icons/icon_test.png');
+
   transactionIDs: string[];
   transactionGroup: TransactionGroup = TransactionGroup.TESTNET;
 
