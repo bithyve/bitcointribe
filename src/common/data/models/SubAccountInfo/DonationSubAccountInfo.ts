@@ -24,6 +24,8 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   doneeName: string;
   causeName: string;
 
+  avatarImageSource = require('../../../../assets/images/icons/icon_donation_hexa.png');
+
   transactionIDs: string[];
 
   /**
@@ -52,7 +54,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactionIDs = transactionIDs;
-    this.transactionGroup = transactionGroup;
     this.isPrimarySubAccount = isPrimarySubAccount;
+    this.transactionGroup = transactionGroup;
   }
 }
