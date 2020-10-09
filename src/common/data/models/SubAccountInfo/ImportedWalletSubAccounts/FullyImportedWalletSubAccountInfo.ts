@@ -1,4 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
+import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
 import { ImportedWalletSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
@@ -12,6 +13,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
   isPrimarySubAccount: boolean;
   balance: number;
+  visibility: AccountVisibility;
 
   defaultTitle: string;
   defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
@@ -29,6 +31,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     balance = 0,
     customDisplayName = null,
     customDescription = null,
+    visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
     isPrimarySubAccount = false,
   }: ConstructorProps) {
@@ -37,6 +40,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.visibility = visibility;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
   }

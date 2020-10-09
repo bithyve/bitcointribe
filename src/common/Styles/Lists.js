@@ -5,6 +5,17 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 
 const ListStyles = StyleSheet.create({
+  infoHeaderSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 36,
+  },
+
+  infoHeaderText: {
+    fontSize: RFValue(11),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+
   listItemTitle: {
     color: Colors.blue,
     fontSize: RFValue(13),
