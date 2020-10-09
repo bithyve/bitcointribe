@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import { RFValue } from 'react-native-responsive-fontsize';
 import { useDispatch } from "react-redux";
-import Colors from '../../../../common/Colors';
-import Fonts from '../../../../common/Fonts';
 import ButtonStyles from '../../../../common/Styles/Buttons';
+import ListStyles from '../../../../common/Styles/Lists';
 import DestinationAccountsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountsList';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import AccountShell from '../../../../common/data/models/AccountShell';
@@ -19,8 +17,8 @@ export type Props = {
 
 const HeaderSection: React.FC = () => {
   return (
-    <View style={styles.headerSection}>
-      <Text style={styles.headerText}>Choose a destination.</Text>
+    <View style={ListStyles.infoHeaderSection}>
+      <Text style={ListStyles.infoHeaderText}>Choose a destination.</Text>
     </View>
   );
 }
@@ -95,17 +93,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     alignSelf: 'center',
-  },
-
-  headerSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 36,
-  },
-
-  headerText: {
-    fontSize: RFValue(11),
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
   },
 });
 

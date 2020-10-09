@@ -1,4 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
+import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
 import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
@@ -12,6 +13,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
   isPrimarySubAccount: boolean;
   balance: number;
+  visibility: AccountVisibility;
 
   defaultTitle: string;
   defaultDescription: string = "Account with Trusted Contacts";
@@ -29,6 +31,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     balance = 0,
     customDisplayName = null,
     customDescription = null,
+    visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
     isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
@@ -38,6 +41,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.visibility = visibility;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;

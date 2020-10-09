@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { accountSettingsUpdateCompleted } from "../../../store/actions/accounts";
+import { subAccountSettingsUpdateCompleted } from "../../../store/actions/accounts";
 
 
 export default function useAccountSettingsUpdatedEffect(
@@ -11,7 +11,7 @@ export default function useAccountSettingsUpdatedEffect(
 
   useEffect(() => {
     if (hasAccountSettingsUpdateSucceeded) {
-      dispatch(accountSettingsUpdateCompleted());
+      dispatch(subAccountSettingsUpdateCompleted());
       onComplete();
     }
   }, [hasAccountSettingsUpdateSucceeded]);
