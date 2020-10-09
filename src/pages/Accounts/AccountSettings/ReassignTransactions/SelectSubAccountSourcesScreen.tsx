@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
@@ -34,7 +34,7 @@ export type Props = {
   navigation: any;
 };
 
-const SelectSourcesScreen: React.FC<Props> = ({
+const SelectSubAccountSourcesScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const accountShell = useAccountShellFromNavigation(navigation);
@@ -50,6 +50,9 @@ const SelectSourcesScreen: React.FC<Props> = ({
     return selectableSources.filter(source => selectedSourceIDs.has(source.id));
   }, [selectedSourceIDs]);
 
+  const selectedTransactionIDs = useMemo(() => {
+    selectedSources.flatMap(subAccountInfo => subAccountInfo.transactionIDs);
+  }, [selectedSources]);
 
   function handleSourceSelection(source: SubAccountDescribing) {
     if (selectedSourceIDs.has(source.id)) {
@@ -65,7 +68,7 @@ const SelectSourcesScreen: React.FC<Props> = ({
     navigation.navigate('ReassignTransactionsSelectDestination', {
       accountID: accountShell.id,
       reassignmentKind: XPubSourceKind.DESIGNATED,
-      selectedSources,
+      selectedTransactionIDs,
     });
   }
 
@@ -109,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SelectSourcesScreen;
+export default SelectSubAccountSourcesScreen;
