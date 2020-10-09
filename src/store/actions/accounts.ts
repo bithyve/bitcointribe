@@ -35,8 +35,8 @@ export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
 export const ADD_NEW_ACCOUNT_COMPLETED = 'ADD_NEW_ACCOUNT_COMPLETED';
-export const UPDATE_ACCOUNT_SETTINGS = 'UPDATE_ACCOUNT_SETTINGS';
-export const ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'ACCOUNT_SETTINGS_UPDATE_COMPLETED';
+export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS';
+export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED';
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
 export const TRANSACTION_REASSIGNMENT_COMPLETED = 'TRANSACTION_REASSIGNMENT_COMPLETED';
 
@@ -309,22 +309,23 @@ export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
   return { type: ADD_NEW_ACCOUNT_COMPLETED };
 };
 
-export interface UpdateAccountSettingsAction extends Action {
-  type: typeof UPDATE_ACCOUNT_SETTINGS;
+export interface UpdateSubAccountSettingsAction extends Action {
+  type: typeof UPDATE_SUB_ACCOUNT_SETTINGS;
   payload: SubAccountDescribing;
 };
 
-export const updateAccountSettings = (payload: SubAccountDescribing): UpdateAccountSettingsAction => {
-  return { type: UPDATE_ACCOUNT_SETTINGS, payload };
+export const updateSubAccountSettings = (payload: SubAccountDescribing): UpdateSubAccountSettingsAction => {
+  return { type: UPDATE_SUB_ACCOUNT_SETTINGS, payload };
 };
 
-export interface UpdateAccountSettingsCompletionAction extends Action {
-  type: typeof ACCOUNT_SETTINGS_UPDATE_COMPLETED;
+export interface UpdateSubAccountSettingsCompletionAction extends Action {
+  type: typeof SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED;
 };
 
-export const accountSettingsUpdateCompleted = (): UpdateAccountSettingsCompletionAction => {
-  return { type: ACCOUNT_SETTINGS_UPDATE_COMPLETED };
+export const subAccountSettingsUpdateCompleted = (): UpdateSubAccountSettingsCompletionAction => {
+  return { type: SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED };
 };
+
 
 export type ReassignTransactionsActionPayload = {
   transactionIDs: string[];

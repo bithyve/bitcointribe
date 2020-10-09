@@ -1,17 +1,15 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Input, Button } from 'react-native-elements';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import FormStyles from '../../../common/Styles/Forms';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { updateAccountSettings } from '../../../store/actions/accounts';
+import { updateSubAccountSettings } from '../../../store/actions/accounts';
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect';
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import { useDispatch } from 'react-redux';
-import AccountShell from '../../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 export type Props = {
@@ -59,7 +57,7 @@ const AccountSettingsDisplayPropertiesScreen: React.FC<Props> = ({
     primarySubAccount.customDisplayName = accountName;
     primarySubAccount.customDescription = accountDescription;
 
-    dispatch(updateAccountSettings(primarySubAccount));
+    dispatch(updateSubAccountSettings(primarySubAccount));
   }
 
   return (

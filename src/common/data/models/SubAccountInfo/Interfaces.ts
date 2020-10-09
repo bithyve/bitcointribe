@@ -1,6 +1,7 @@
 import SubAccountKind from "../../enums/SubAccountKind";
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import TransactionGroup from "../../enums/TransactionGroup";
+import AccountVisibility from "../../enums/AccountVisibility";
 
 
 interface SubAccountDescribing {
@@ -35,6 +36,8 @@ interface SubAccountDescribing {
    */
   customDescription: string | null;
 
+  visibility: AccountVisibility;
+
   avatarImageSource: NodeRequire;
 
   transactionGroup: TransactionGroup;
@@ -64,6 +67,7 @@ export type SubAccountDescribingConstructorProps = {
   customDisplayName?: string | null;
   customDescription?: string | null;
   balance?: number;
+  visibility?: AccountVisibility;
   avatarImageSource?: NodeRequire;
   secondaryAccountUUIDs?: string[];
   transactionGroup?: TransactionGroup;

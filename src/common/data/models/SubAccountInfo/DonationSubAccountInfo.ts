@@ -2,6 +2,7 @@ import { v4 as uuidV4 } from 'uuid';
 import SubAccountKind from "../../enums/SubAccountKind";
 import { DonationSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
 import TransactionGroup from '../../enums/TransactionGroup';
+import AccountVisibility from '../../enums/AccountVisibility';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   doneeName: string;
@@ -15,6 +16,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   kind: SubAccountKind = SubAccountKind.DONATION;
   isPrimarySubAccount: boolean;
   balance: number;
+  visibility: AccountVisibility;
 
   defaultTitle: string;
   defaultDescription: string = "Directly Accept Donations";
@@ -42,6 +44,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     customDescription = null,
     doneeName,
     causeName,
+    visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
     isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.MULTI_SIG_PUBLIC,
@@ -51,6 +54,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.visibility = visibility;
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactionIDs = transactionIDs;
