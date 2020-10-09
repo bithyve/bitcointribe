@@ -4,7 +4,7 @@ import { ListItem } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import AccountShell from '../../../common/data/models/AccountShell';
 import RadioButton from '../../RadioButton';
-import AccountSourceListItemContent from '../AccountSourceListItemContent';
+import DestinationAccountListItemContent from '../DestinationAccountListItemContent';
 
 export type Props = {
   selectableAccountShells: AccountShell[];
@@ -34,7 +34,7 @@ const DestinationAccountList: React.FC<Props> = ({
           ignoresTouch
         />
 
-        <AccountSourceListItemContent subAccountInfo={accountShell.primarySubAccount} />
+        <DestinationAccountListItemContent subAccountInfo={accountShell.primarySubAccount} />
       </ListItem>
     );
   };
