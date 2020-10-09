@@ -40,6 +40,10 @@ import {
   UPDATE_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
+  ReassignTransactionsActionPayload,
+  REASSIGN_TRANSACTIONS,
+  transactionReassignmentSucceeded,
+  transactionReassignmentFailed,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -146,7 +150,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-      JSON.stringify(postFetchTransactions)
+    JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -279,7 +283,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -358,11 +362,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const preFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   const res = yield call(
@@ -374,11 +378,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const postFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   if (res.status === 200) {
@@ -466,7 +470,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
+          contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -486,7 +490,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -503,7 +507,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -746,12 +750,12 @@ function* accumulativeTxAndBalWorker() {
 
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+      .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -763,7 +767,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+      .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -1111,4 +1115,36 @@ function* updateAccountSettings({ payload: account }: { payload: SubAccountDescr
 export const updateAccountSettingsWatcher = createWatcher(
   updateAccountSettings,
   UPDATE_ACCOUNT_SETTINGS,
+);
+
+
+
+function* reassignTransactions({
+  payload: {
+    transactionIDs,
+    sourceID,
+    destinationID,
+  }
+}: { payload: ReassignTransactionsActionPayload }) {
+  try {
+    // TODO: Implement backend logic here for processing transaction re-assignment
+
+    yield put(transactionReassignmentSucceeded({
+      transactionIDs,
+      sourceID,
+      destinationID,
+    }));
+  } catch (error) {
+    yield put(transactionReassignmentFailed({
+      transactionIDs,
+      sourceID,
+      destinationID,
+      error,
+    }));
+  }
+}
+
+export const reassignTransactionsWatcher = createWatcher(
+  reassignTransactions,
+  REASSIGN_TRANSACTIONS,
 );

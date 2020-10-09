@@ -8,7 +8,9 @@ function useAccountShellsInGroup(transactionGroup: TransactionGroup): AccountShe
   return useSelector(state => {
     const accountsState: AccountsState = state.accounts;
 
-    return accountsState.activeAccounts.filter(accountShell => accountShell.transactionGroup === transactionGroup);
+    return accountsState
+      .activeAccounts
+      .filter(accountShell => accountShell.transactionGroup === transactionGroup);
   });
 }
 
