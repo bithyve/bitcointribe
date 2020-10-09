@@ -1,4 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
+import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
 import TransactionGroup from '../../enums/TransactionGroup';
@@ -18,6 +19,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   serviceAccountKind: ServiceAccountKind;
   isPrimarySubAccount: boolean;
   balance: number;
+  visibility: AccountVisibility;
 
   defaultTitle: string;
   defaultDescription: string = "Account with Trusted Contacts";
@@ -38,6 +40,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
+    visibility = AccountVisibility.DEFAULT,
     isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
@@ -48,6 +51,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.visibility = visibility;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;

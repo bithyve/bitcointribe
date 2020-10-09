@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from "react-navigation-stack";
 import XPubSourceKind from '../../common/data/enums/XPubSourceKind';
-import AccountSettingsDisplayPropertiesScreen from "../../pages/Accounts/AccountSettings/DisplayPropertiesScreen";
+import AccountSettingsEditDisplayPropertiesScreen from "../../pages/Accounts/AccountSettings/EditDisplayPropertiesScreen";
 import AccountSettingsMainScreen from "../../pages/Accounts/AccountSettings/MainScreen";
 import ReassignTransactionsMainOptionsScreen from "../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
 import ReassignAllTransactionsSelectTransactionsScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
@@ -11,6 +11,7 @@ import TransactionDetailsContainerScreen from "../../pages/Accounts/Transactions
 import TransactionsListContainerScreen from "../../pages/Accounts/Transactions/TransactionsListScreenContainer";
 import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
+import AccountSettingsEditVisibilityScreen from '../../pages/Accounts/AccountSettings/EditVisibilityScreen';
 
 export const AccountSettingsStack = createStackNavigator(
   {
@@ -21,7 +22,7 @@ export const AccountSettingsStack = createStackNavigator(
       },
     },
     EditDisplayProperties: {
-      screen: AccountSettingsDisplayPropertiesScreen,
+      screen: AccountSettingsEditDisplayPropertiesScreen,
       navigationOptions: {
         title: "Name & Description",
       },
@@ -55,18 +56,11 @@ export const AccountSettingsStack = createStackNavigator(
         };
       },
     },
-  },
-  {
-    defaultNavigationOptions: ({ navigation }) => {
-      return {
-        // headerLeft: () => {
-        //   return (
-        //     <TouchableOpacity onPress={() => { navigation.goBack() }}>
-        //       <Text>Back</Text>
-        //     </TouchableOpacity>
-        //   );
-        // },
-      };
+    EditVisibility: {
+      screen: AccountSettingsEditVisibilityScreen,
+      navigationOptions: {
+        title: "Account Visibility",
+      },
     },
   },
 );

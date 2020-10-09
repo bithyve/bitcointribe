@@ -27,7 +27,7 @@ import {
   ADD_NEW_ACCOUNT_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
   ACCOUNT_SETTINGS_UPDATE_FAILED,
-  ACCOUNT_SETTINGS_UPDATE_COMPLETED,
+  SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED,
   REASSIGN_TRANSACTIONS,
   TRANSACTION_REASSIGNMENT_SUCCEEDED,
   TRANSACTION_REASSIGNMENT_FAILED,
@@ -613,7 +613,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         hasAccountSettingsUpdateFailed: true,
       };
 
-    case ACCOUNT_SETTINGS_UPDATE_COMPLETED:
+    case SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED:
       return {
         ...state,
         isUpdatingAccountSettings: false,
