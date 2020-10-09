@@ -2,12 +2,15 @@ import React, { useEffect, useMemo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { Easing, useValue } from 'react-native-reanimated';
 
-export interface Props {
+export type Props = {
   isVisible: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
-const BottomSheetBackground: React.FC<Props> = ({ isVisible, onPress }: Props) => {
+const BottomSheetBackground: React.FC<Props> = ({
+  isVisible,
+  onPress = () => {},
+}: Props) => {
   const opacity = useValue(0);
 
   useEffect(() => {

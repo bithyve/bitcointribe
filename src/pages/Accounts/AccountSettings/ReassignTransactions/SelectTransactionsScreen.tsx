@@ -50,7 +50,7 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
     navigation.navigate('ReassignTransactionsSelectDestination', {
       accountID: accountShell.id,
       reassignmentKind: XPubSourceKind.ANONYMOUS,
-      selectedTransactions,
+      selectedTransactionIDs: Array.from(selectedTransactionIDs),
     });
   }
 

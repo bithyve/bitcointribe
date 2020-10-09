@@ -998,7 +998,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentWillUnmount() {
-    if (this.focusListener) {
+    if (typeof this.focusListener === 'function') {
       this.focusListener();
     }
     if (this.unsubscribe) {
