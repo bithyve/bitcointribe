@@ -18,6 +18,9 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   customDisplayName: string | null;
   customDescription: string | null;
 
+  avatarImageSource = require('../../../../../assets/images/icons/icon_import_watch_only_wallet.png');
+
+
   transactionIDs: string[];
   transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
@@ -37,5 +40,6 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
     this.customDescription = customDescription;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
+
   }
 }
