@@ -48,7 +48,7 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
 
   function handleProceedButtonPress() {
     navigation.navigate('ReassignTransactionsSelectDestination', {
-      accountID: accountShell.id,
+      accountShellID: accountShell.id,
       reassignmentKind: XPubSourceKind.ANONYMOUS,
       selectedTransactionIDs: Array.from(selectedTransactionIDs),
     });

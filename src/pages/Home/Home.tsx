@@ -1940,7 +1940,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleAccountCardSelection = (selectedAccount: AccountShell) => {
     this.props.navigation.navigate('AccountDetails', {
-      accountID: selectedAccount.id,
+      accountShellID: selectedAccount.id,
     });
   };
 
