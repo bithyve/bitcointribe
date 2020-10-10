@@ -19,7 +19,7 @@ export function imageSourceForAccountKind(accountKind: SubAccountKind): NodeRequ
   }
 }
 
-const DestinationAccountListItemContent: React.FC<Props> = ({
+const DestinationAccountShellListItemContent: React.FC<Props> = ({
   subAccountInfo,
 }: Props) => {
 
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default DestinationAccountListItemContent;
+export default DestinationAccountShellListItemContent;

@@ -10,14 +10,14 @@ const TransactionsListScreenContainer: React.FC<Props> = ({
   navigation,
 }: Props) => {
 
-  const accountID = useMemo(() => {
-    return navigation.getParam('accountID');
+  const accountShellID = useMemo(() => {
+    return navigation.getParam('accountShellID');
   }, [navigation]);
 
   return (
     <View style={styles.rootContainer}>
       <Text>TransactionsListScreenContainer</Text>
-      <Text>Account ID: {accountID}</Text>
+      <Text>Account ID: {accountShellID}</Text>
     </View>
   );
 };

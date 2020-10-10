@@ -35,6 +35,8 @@ export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS';
 export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED';
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
 export const TRANSACTION_REASSIGNMENT_COMPLETED = 'TRANSACTION_REASSIGNMENT_COMPLETED';
+export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS';
+export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -333,6 +335,30 @@ export const transactionReassignmentCompleted = (): TransactionReassignmentCompl
 };
 
 
+
+export type MergeAccountShellsActionPayload = {
+  source: AccountShell;
+  destination: AccountShell;
+};
+
+export interface MergeAccountShellsAction extends Action {
+  type: typeof MERGE_ACCOUNT_SHELLS;
+  payload: MergeAccountShellsActionPayload;
+};
+
+export const mergeAccountShells = (payload: MergeAccountShellsActionPayload): MergeAccountShellsAction => {
+  return { type: MERGE_ACCOUNT_SHELLS, payload };
+};
+
+export interface AccountShellMergeCompletionAction extends Action {
+  type: typeof ACCOUNT_SHELL_MERGE_COMPLETED;
+};
+
+export const accountShellMergeCompleted = (): AccountShellMergeCompletionAction => {
+  return { type: ACCOUNT_SHELL_MERGE_COMPLETED };
+};
+
+
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED';
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED';
@@ -356,6 +382,9 @@ export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
 export const TRANSACTION_REASSIGNMENT_SUCCEEDED = 'TRANSACTION_REASSIGNMENT_SUCCEEDED';
 export const TRANSACTION_REASSIGNMENT_FAILED = 'TRANSACTION_REASSIGNMENT_FAILED';
+export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED';
+export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED';
+
 
 export const testcoinsReceived = (serviceType, service) => {
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
@@ -460,11 +489,20 @@ export const transactionReassignmentFailed = (
   };
 };
 
-// export const transactionReassignmentSucceeded = ({
 export const transactionReassignmentSucceeded = (payload: ReassignTransactionsActionPayload) => {
-  // transactionIDs,
-  // sourceID,
-  // destinationID,
-// }: ReassignTransactionsActionPayload) => {
   return { type: TRANSACTION_REASSIGNMENT_SUCCEEDED, payload };
+};
+
+
+export const accountShellMergeFailed = (
+  payload: MergeAccountShellsActionPayload & { error: Error }
+) => {
+  return {
+    type: ACCOUNT_SHELL_MERGE_FAILED,
+    payload,
+  };
+};
+
+export const accountShellMergeSucceeded = (payload: MergeAccountShellsActionPayload) => {
+  return { type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload };
 };
