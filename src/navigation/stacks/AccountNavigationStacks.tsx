@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from "react-navigation-stack";
 import XPubSourceKind from '../../common/data/enums/XPubSourceKind';
 import AccountSettingsEditDisplayPropertiesScreen from "../../pages/Accounts/AccountSettings/EditDisplayPropertiesScreen";
@@ -12,6 +11,7 @@ import TransactionsListContainerScreen from "../../pages/Accounts/Transactions/T
 import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
 import AccountSettingsEditVisibilityScreen from '../../pages/Accounts/AccountSettings/EditVisibilityScreen';
+import AccountSettingsMergeAccountShellsScreen from '../../pages/Accounts/AccountSettings/MergeAccountShellsScreen';
 
 export const AccountSettingsStack = createStackNavigator(
   {
@@ -60,6 +60,12 @@ export const AccountSettingsStack = createStackNavigator(
       screen: AccountSettingsEditVisibilityScreen,
       navigationOptions: {
         title: "Account Visibility",
+      },
+    },
+    MergeAccounts: {
+      screen: AccountSettingsMergeAccountShellsScreen,
+      navigationOptions: {
+        title: "Merge Accounts",
       },
     },
   },

@@ -253,11 +253,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
 
-  balanceCurrencyIcon: {
-    color: Colors.white,
-  },
-
-
   settingsButtonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
