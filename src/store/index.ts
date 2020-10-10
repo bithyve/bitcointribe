@@ -60,6 +60,7 @@ import {
   syncViaXpubAgentWatcher,
   updateAccountSettingsWatcher,
   reassignTransactionsWatcher,
+  mergeAccountShellsWatcher,
 } from './sagas/accounts';
 
 import {
@@ -150,6 +151,7 @@ const rootSaga = function* () {
     addNewAccountWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
+    mergeAccountShellsWatcher,
 
     // sss watchers
     initHCWatcher,

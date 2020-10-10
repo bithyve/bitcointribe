@@ -8,6 +8,7 @@ import useAccountShellFromNavigation from '../../../../utils/hooks/state-selecto
 import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader';
 import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
 import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList';
+import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
 
 // TODO: Remove these after testing UI.
 const sampleSources: SubAccountDescribing[] = [
@@ -15,7 +16,7 @@ const sampleSources: SubAccountDescribing[] = [
     isPrimarySubAccount: true,
     balance: 23583,
   }),
-  new CheckingSubAccountInfo({
+  new SavingsSubAccountInfo({
     isPrimarySubAccount: true,
     balance: 99121,
   }),
@@ -23,7 +24,7 @@ const sampleSources: SubAccountDescribing[] = [
     isPrimarySubAccount: true,
     balance: 11,
   }),
-  new CheckingSubAccountInfo({
+  new SavingsSubAccountInfo({
     isPrimarySubAccount: true,
     balance: 82308,
   }),
@@ -66,7 +67,7 @@ const SelectSubAccountSourcesScreen: React.FC<Props> = ({
 
   function handleProceedButtonPress() {
     navigation.navigate('ReassignTransactionsSelectDestination', {
-      accountID: accountShell.id,
+      accountShellID: accountShell.id,
       reassignmentKind: XPubSourceKind.DESIGNATED,
       selectedTransactionIDs,
     });

@@ -9,7 +9,6 @@ import ButtonStyles from '../../../common/Styles/Buttons';
 import ListStyles from '../../../common/Styles/Lists';
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList';
 import AccountVisibility from '../../../common/data/enums/AccountVisibility';
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
 import { updateSubAccountSettings } from '../../../store/actions/accounts';
 
 const SELECTABLE_VISIBILITY_OPTIONS = [

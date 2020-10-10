@@ -16,16 +16,16 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 
 
 export type Props = {
-  accountID: string;
+  accountShellID: string;
   onBackPressed: () => void;
 };
 
 const AccountDetailsNavHeader: React.FC<Props> = ({
-  accountID,
+  accountShellID,
   onBackPressed,
 }: Props) => {
   const dispatch = useDispatch();
-  const accountShell = useAccountShell(accountID);
+  const accountShell = useAccountShell(accountShellID);
   const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
   const currencyCode = useCurrencyCode();
@@ -37,7 +37,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
 
   const title = useMemo(() => {
     return primarySubAccountInfo?.customDisplayName || primarySubAccountInfo?.defaultTitle || 'Account Details';
-  }, [accountID]);
+  }, [accountShellID]);
 
   return (
     <View>
