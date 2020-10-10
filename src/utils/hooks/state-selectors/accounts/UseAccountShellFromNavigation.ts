@@ -4,11 +4,11 @@ import useAccountShell from './UseAccountShell';
 
 
 function useAccountShellFromNavigation(navigation: any): AccountShell | undefined {
-  const accountID: string = useMemo(() => {
-    return navigation.getParam('accountID') || '';
+  const accountShellID: string = useMemo(() => {
+    return navigation.getParam('accountShellID') || '';
   }, [navigation]);
 
-  return useAccountShell(accountID);
+  return useAccountShell(accountShellID);
 }
 
 export default useAccountShellFromNavigation;

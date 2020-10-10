@@ -29,17 +29,4 @@ const styles = StyleSheet.create({
   }
 });
 
-TransactionDetailsScreenContainer.navigationOptions = ({ _navigation, _navigationOptions }) => {
-  return {
-    // header: ({ _scene, _previous, navigation }) => {
-    //   const { accountID } = navigation.state.params;
-
-    //   return <NavHeader
-    //     accountID={accountID}
-    //     onBackPressed={() => navigation.goBack()}
-    //   />;
-    // },
-  };
-};
-
 export default TransactionDetailsScreenContainer;

@@ -35,13 +35,13 @@ const listItemKeyExtractor = (item: OptionsListItem) => item.title;
 const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const accountID = useMemo(() => {
-    return navigation.getParam('accountID');
+  const accountShellID = useMemo(() => {
+    return navigation.getParam('accountShellID');
   }, [navigation]);
 
   function handleListItemPressed(listItem: OptionsListItem) {
     navigation.navigate(listItem.screenName, {
-      accountID,
+      accountShellID,
     });
   }
 
