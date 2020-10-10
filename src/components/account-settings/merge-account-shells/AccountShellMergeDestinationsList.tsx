@@ -4,37 +4,37 @@ import { ListItem } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import AccountShell from '../../../common/data/models/AccountShell';
 import RadioButton from '../../RadioButton';
-import DestinationAccountListItemContent from '../DestinationAccountListItemContent';
+import AccountMergeDestinationListItemContent from '../AccountMergeDestinationListItemContent';
 
 export type Props = {
-  selectableAccountShells: AccountShell[];
-  selectedAccountShellID: string | null;
-  onAccountSelected: (accountShell: AccountShell) => void;
+  compatibleDestinations: AccountShell[];
+  selectedDestinationID: string;
+  onDestinationSelected: (accountShell: AccountShell) => void;
 };
 
 const listItemKeyExtractor = (item: AccountShell) => item.id;
 
-const DestinationAccountList: React.FC<Props> = ({
-  selectableAccountShells: selectableSubAccounts,
-  selectedAccountShellID: selectedSubAccountID,
-  onAccountSelected,
+const AccountShellMergeDestinationsList: React.FC<Props> = ({
+  compatibleDestinations,
+  selectedDestinationID,
+  onDestinationSelected,
 }: Props) => {
 
   const isChecked = useCallback((accountShell: AccountShell) => {
-    return accountShell.id === selectedSubAccountID;
-  }, [selectedSubAccountID]);
+    return selectedDestinationID === accountShell.id;
+  }, [selectedDestinationID]);
 
   const renderItem = ({ item: accountShell }: { item: AccountShell }) => {
     return (
       <ListItem
-        onPress={() => { onAccountSelected(accountShell) }}
+        onPress={() => { onDestinationSelected(accountShell) }}
       >
         <RadioButton
           isChecked={isChecked(accountShell)}
           ignoresTouch
         />
 
-        <DestinationAccountListItemContent subAccountInfo={accountShell.primarySubAccount} />
+        <AccountMergeDestinationListItemContent accountShell={accountShell} />
       </ListItem>
     );
   };
@@ -43,8 +43,8 @@ const DestinationAccountList: React.FC<Props> = ({
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{ paddingHorizontal: 14 }}
-      extraData={selectedSubAccountID}
-      data={selectableSubAccounts}
+      extraData={selectedDestinationID}
+      data={compatibleDestinations}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />
@@ -56,4 +56,5 @@ const styles = StyleSheet.create({
   }
 });
 
-export default DestinationAccountList;
+
+export default AccountShellMergeDestinationsList;

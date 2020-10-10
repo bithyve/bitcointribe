@@ -32,6 +32,10 @@ import {
   TRANSACTION_REASSIGNMENT_SUCCEEDED,
   TRANSACTION_REASSIGNMENT_FAILED,
   TRANSACTION_REASSIGNMENT_COMPLETED,
+  MERGE_ACCOUNT_SHELLS,
+  ACCOUNT_SHELL_MERGE_COMPLETED,
+  ACCOUNT_SHELL_MERGE_SUCCEEDED,
+  ACCOUNT_SHELL_MERGE_FAILED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -148,6 +152,12 @@ export type AccountsState = {
   hasTransactionReassignmentSucceeded: boolean;
   hasTransactionReassignmentFailed: boolean;
   transactionReassignmentDestinationID: string | null;
+
+  isAccountShellMergeInProgress: boolean;
+  hasAccountShellMergeSucceeded: boolean;
+  hasAccountShellMergeFailed: boolean;
+  accountShellMergeSource: AccountShell | null;
+  accountShellMergeDestination: AccountShell | null;
 }
 
 const initialState: AccountsState = {
@@ -193,6 +203,12 @@ const initialState: AccountsState = {
   hasTransactionReassignmentSucceeded: false,
   hasTransactionReassignmentFailed: false,
   transactionReassignmentDestinationID: null,
+
+  isAccountShellMergeInProgress: false,
+  hasAccountShellMergeSucceeded: false,
+  hasAccountShellMergeFailed: false,
+  accountShellMergeSource: null,
+  accountShellMergeDestination: null,
 };
 
 export default (state: AccountsState = initialState, action): AccountsState => {
@@ -625,7 +641,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case REASSIGN_TRANSACTIONS:
       return {
         ...state,
-        transactionReassignmentDestinationID: null,
+        transactionReassignmentDestinationID: action.payload.destinationID,
         isTransactionReassignmentInProgress: true,
         hasTransactionReassignmentSucceeded: false,
         hasTransactionReassignmentFailed: false,
@@ -634,7 +650,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case TRANSACTION_REASSIGNMENT_SUCCEEDED:
       return {
         ...state,
-        transactionReassignmentDestinationID: action.payload.destinationID,
         isTransactionReassignmentInProgress: false,
         hasTransactionReassignmentSucceeded: true,
         hasTransactionReassignmentFailed: false,
@@ -643,7 +658,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case TRANSACTION_REASSIGNMENT_FAILED:
       return {
         ...state,
-        transactionReassignmentDestinationID: null,
         isTransactionReassignmentInProgress: false,
         hasTransactionReassignmentSucceeded: false,
         hasTransactionReassignmentFailed: true,
@@ -656,6 +670,42 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         isTransactionReassignmentInProgress: false,
         hasTransactionReassignmentSucceeded: false,
         hasTransactionReassignmentFailed: false,
+      };
+
+    case MERGE_ACCOUNT_SHELLS:
+      return {
+        ...state,
+        accountShellMergeSource: action.payload.source,
+        accountShellMergeDestination: action.payload.destination,
+        isAccountShellMergeInProgress: true,
+        hasAccountShellMergeSucceeded: false,
+        hasAccountShellMergeFailed: false,
+      };
+
+    case ACCOUNT_SHELL_MERGE_SUCCEEDED:
+      return {
+        ...state,
+        isAccountShellMergeInProgress: false,
+        hasAccountShellMergeSucceeded: true,
+        hasAccountShellMergeFailed: false,
+      };
+
+    case ACCOUNT_SHELL_MERGE_FAILED:
+      return {
+        ...state,
+        isAccountShellMergeInProgress: false,
+        hasAccountShellMergeSucceeded: false,
+        hasAccountShellMergeFailed: true,
+      };
+
+    case ACCOUNT_SHELL_MERGE_COMPLETED:
+      return {
+        ...state,
+        accountShellMergeSource: null,
+        accountShellMergeDestination: null,
+        isAccountShellMergeInProgress: false,
+        hasAccountShellMergeSucceeded: false,
+        hasAccountShellMergeFailed: false,
       };
 
     default:
