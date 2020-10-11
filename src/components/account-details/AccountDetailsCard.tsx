@@ -85,7 +85,7 @@ const AccountDetailsCard: React.FC<Props> = ({
 
         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
           <Image
-            source={badgeImageForAccountKind(primarySubAccountInfo?.kind)}
+            source={primarySubAccountInfo.avatarImageSource}
             style={styles.accountKindBadgeImage}
           />
 
