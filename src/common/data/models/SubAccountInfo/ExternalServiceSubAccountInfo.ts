@@ -56,7 +56,18 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;
 
-    // TODO: Generate this dynamically based upon the `serviceAccountKind`.
-    this.avatarImageSource = require('../../../../assets/images/icons/icon_hexa.png');
+    this.avatarImageSource = getAvatarImageSource(serviceAccountKind);
+  }
+}
+
+
+function getAvatarImageSource(serviceAccountKind: ServiceAccountKind): NodeRequire {
+  switch (serviceAccountKind) {
+    case ServiceAccountKind.FAST_BITCOINS:
+      return require('../../../../assets/images/icons/icon_fastbitcoins_hex_dark.png');
+    case ServiceAccountKind.SWAN:
+      return require('../../../../assets/images/icons/icon_swan.png');
+    default:
+      return require('../../../../assets/images/icons/icon_hexa.png');
   }
 }

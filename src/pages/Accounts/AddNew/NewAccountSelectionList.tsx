@@ -195,13 +195,9 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
 
-  proceedButtonContainer: {
-    marginLeft: 20,
-    marginTop: heightPercentageToDP('6%'),
-  },
-
   listFooterSection: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 30,
+    paddingBottom: 40,
     alignItems: 'flex-start',
   },
 });
