@@ -7,12 +7,10 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
 
 
 export type Props = {
-  destinationAccountID: string;
   onViewAccountDetailsPressed: () => void;
 };
 
 const TransactionReassignmentSuccessBottomSheet: React.FC<Props> = ({
-  destinationAccountID,
   onViewAccountDetailsPressed,
 }: Props) => {
   return (

@@ -31,7 +31,7 @@ const AccountBalanceDisplay: React.FC<Props> = ({
   amountTextStyle,
   unitTextStyle,
 }: Props) => {
-  const balance = accountShell.balance || 0;
+  const balance = AccountShell.getTotalBalance(accountShell) || 0;
   const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();
 

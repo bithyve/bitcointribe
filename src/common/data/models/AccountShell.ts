@@ -33,6 +33,7 @@ export default class AccountShell {
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: SubAccountDescribing[];
 
+
   constructor({
     displayOrder = null,
     unit = BitcoinUnit.BTC,
@@ -50,36 +51,34 @@ export default class AccountShell {
     this.unit = unit;
   }
 
-  get transactionGroup(): TransactionGroup {
-    return this.primarySubAccount.transactionGroup;
+  static getTransactionGroup(shell: AccountShell): TransactionGroup {
+    return shell.primarySubAccount.transactionGroup;
   }
 
-  get subAccounts(): SubAccountDescribing[] {
+  static getSubAccounts(shell: AccountShell): SubAccountDescribing[] {
     return [
-      this.primarySubAccount,
-      ...this.secondarySubAccounts,
+      shell.primarySubAccount,
+      ...shell.secondarySubAccounts,
     ];
   }
 
   /**
    * Total balance of all sub-accounts in Satoshis.
   */
-  get totalBalance(): number {
-    return this
-      .subAccounts
+  static getTotalBalance = (shell: AccountShell): number => {
+    return AccountShell
+      .getSubAccounts(shell)
       .reduce((accumulated, current) => accumulated + current.balance, 0);
   }
 
-  get visiblity(): AccountVisibility {
-    return this.primarySubAccount.visibility;
+  static getVisibility(shell: AccountShell): AccountVisibility {
+    return shell.primarySubAccount.visibility;
   }
 
-  setPrimarySubAccount(subAccount: SubAccountDescribing) {
-    subAccount.accountShellID = this.id;
+  static setPrimarySubAccount(shell: AccountShell, subAccount: SubAccountDescribing) {
+    subAccount.accountShellID = shell.id;
     subAccount.isPrimarySubAccount = true;
 
-    this.primarySubAccount = subAccount;
+    shell.primarySubAccount = subAccount;
   }
-
-
 }

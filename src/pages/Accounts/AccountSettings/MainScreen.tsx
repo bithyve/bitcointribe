@@ -36,7 +36,7 @@ const listItems: SettingsListItem[] = [
   {
     title: 'Merge Account',
     subtitle: `Move all transactions to another Hexa account`,
-    screenName: '',
+    screenName: 'MergeAccounts',
     imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
   },
   {
@@ -52,13 +52,13 @@ const listItemKeyExtractor = (item: SettingsListItem) => item.title;
 const AccountSettingsMainScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
-  const accountID = useMemo(() => {
-    return navigation.getParam('accountID');
+  const accountShellID = useMemo(() => {
+    return navigation.getParam('accountShellID');
   }, [navigation]);
 
   function handleListItemPressed(listItem: SettingsListItem) {
     navigation.navigate(listItem.screenName, {
-      accountID,
+      accountShellID,
     });
   }
 

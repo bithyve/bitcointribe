@@ -48,6 +48,10 @@ import {
   REASSIGN_TRANSACTIONS,
   transactionReassignmentSucceeded,
   transactionReassignmentFailed,
+  MergeAccountShellsActionPayload,
+  MERGE_ACCOUNT_SHELLS,
+  accountShellMergeSucceeded,
+  accountShellMergeFailed,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -1204,4 +1208,32 @@ function* reassignTransactions({
 export const reassignTransactionsWatcher = createWatcher(
   reassignTransactions,
   REASSIGN_TRANSACTIONS,
+);
+
+
+function* mergeAccountShells({
+  payload: {
+    source,
+    destination,
+  }
+}: { payload: MergeAccountShellsActionPayload }) {
+  try {
+    // TODO: Implement backend logic here for processing the merge
+
+    yield put(accountShellMergeSucceeded({
+      source,
+      destination,
+    }));
+  } catch (error) {
+    yield put(accountShellMergeFailed({
+      source,
+      destination,
+      error,
+    }));
+  }
+}
+
+export const mergeAccountShellsWatcher = createWatcher(
+  mergeAccountShells,
+  MERGE_ACCOUNT_SHELLS,
 );

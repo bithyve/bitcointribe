@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useDispatch } from "react-redux";
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import ListStyles from '../../../../common/Styles/Lists';
-import DestinationAccountsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountsList';
+import DestinationAccountShellsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountShellsList';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import AccountShell from '../../../../common/data/models/AccountShell';
 import { reassignTransactions } from '../../../../store/actions/accounts';
 import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions';
-import useCompatibleDestinationAccounts from '../../../../utils/hooks/state-selectors/accounts/UseCompatibleDestinationAccounts';
+import useCompatibleAccountShells from '../../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells';
 
 export type Props = {
   navigation: any;
@@ -29,7 +29,7 @@ const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ({
   const dispatch = useDispatch();
 
   const currentAccountShell = useAccountShellFromNavigation(navigation);
-  const selectableAccountShells = useCompatibleDestinationAccounts(currentAccountShell);
+  const selectableAccountShells = useCompatibleAccountShells(currentAccountShell);
   const [selectedAccountShellID, setSelectedAccountShellID] = useState<string>(null);
 
   const selectedTransactionIDs = useMemo(() => {
@@ -52,7 +52,7 @@ const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ({
     }));
 
     navigation.dispatch(resetStackToAccountDetails({
-      accountID: currentAccountShell.id
+      accountShellID: currentAccountShell.id
     }));
   }
 
@@ -61,7 +61,7 @@ const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ({
       <HeaderSection />
 
       <View>
-        <DestinationAccountsList
+        <DestinationAccountShellsList
           selectableAccountShells={selectableAccountShells}
           selectedAccountShellID={selectedAccountShellID}
           onAccountSelected={handleAccountSelection}

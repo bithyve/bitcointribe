@@ -9,9 +9,9 @@ import useAccountShellsInGroup from '../state-selectors/accounts/UseAccountShell
 function useCompatibleReassignmentDestinationsForAccount(
   accountShell: AccountShell,
 ): SubAccountDescribing[] {
-  return useAccountShellsInGroup(accountShell.transactionGroup)
+  return useAccountShellsInGroup(AccountShell.getTransactionGroup(accountShell))
     .flatMap(shell => {
-      return shell.id === accountShell.id ? [] : shell.subAccounts;
+      return shell.id === accountShell.id ? [] : AccountShell.getSubAccounts(accountShell);
     });
 }
 
