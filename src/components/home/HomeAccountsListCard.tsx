@@ -12,6 +12,7 @@ import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/UseSecondarySubAccountForShell';
 
 
 export type Props = {
@@ -26,75 +27,33 @@ type HeaderProps = {
 type BodyProps = Props;
 
 
-export function headerImageSourceForServiceKind(kind: ServiceAccountKind): NodeRequire {
-  switch (kind) {
-    case ServiceAccountKind.SWAN:
-      return require('../../assets/images/icons/icon_swan.png');
-    case ServiceAccountKind.FAST_BITCOINS:
-      return require('../../assets/images/icons/icon_fastbitcoins_hex_dark.png');
-    default:
-      return require('../../assets/images/icons/icon_wallet.png');
-  }
-}
-
-export function headerImageSourceForSubAccountKind(kind: SubAccountKind): NodeRequire {
-  switch (kind) {
-    case SubAccountKind.TEST:
-      return require('../../assets/images/icons/icon_test.png');
-    case SubAccountKind.REGULAR:
-      return require('../../assets/images/icons/icon_regular.png');
-    case SubAccountKind.SECURE:
-      return require('../../assets/images/icons/icon_secureaccount.png');
-    case SubAccountKind.TRUSTED_CONTACTS:
-      return require('../../assets/images/icons/icon_wallet.png');
-    case SubAccountKind.DONATION:
-      return require('../../assets/images/icons/icon_donation_hexa.png');
-    case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
-      return require('../../assets/images/icons/icon_import_watch_only_wallet.png');
-    case SubAccountKind.FULLY_IMPORTED_WALLET:
-      return require('../../assets/images/icons/icon_wallet.png');
-    default:
-      return require('../../assets/images/icons/icon_wallet.png');
-  }
-}
-
 const HeaderSection: React.FC<HeaderProps> = ({
   accountShell,
 }: HeaderProps) => {
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
-
-  const cardBadgeSource: NodeRequire = useMemo(() => {
-    if (primarySubAccount.kind === SubAccountKind.SERVICE) {
-      return headerImageSourceForServiceKind((primarySubAccount as ExternalServiceSubAccountInfo).serviceAccountKind);
-    } else {
-      return headerImageSourceForSubAccountKind(primarySubAccount.kind);
-    }
-  }, [accountShell]);
-
+  const secondarySubAccounts = useSecondarySubAccountsForShell(accountShell);
 
   const secondarySubAccountBadgeIcons: NodeRequire[] = useMemo(() => {
-    // TODO: Figure out the right logic for generating secondary sub-account badge images.
-    return [];
-  }, [accountShell])
-
+    return secondarySubAccounts.map(subAccount => subAccount.avatarImageSource);
+  }, [secondarySubAccounts])
 
   return (
     <View style={styles.headerSectionContainer}>
       <Image
         style={styles.headerAccountImage}
-        source={cardBadgeSource}
+        source={primarySubAccount.avatarImageSource}
       />
 
       <View style={styles.headerBadgeContainer}>
-        {primarySubAccount.kind === SubAccountKind.SECURE && (
-          <Text style={styles.tfaIndicatorText}>2FA</Text>
-        )}
-
         {secondarySubAccountBadgeIcons.map(iconSource => {
           return (
             <Image style={styles.headerBadgeIcon} source={iconSource} />
           );
         })}
+
+        {primarySubAccount.kind === SubAccountKind.SECURE && (
+          <Text style={styles.tfaIndicatorText}>2FA</Text>
+        )}
       </View>
     </View>
   );

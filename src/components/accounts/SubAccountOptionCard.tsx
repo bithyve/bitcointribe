@@ -1,22 +1,22 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Card } from 'react-native-elements';
-import Colors from '../../../common/Colors';
+import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CardStyles from '../../../common/Styles/Cards.js';
+import CardStyles from '../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 
 export interface Props {
-  style?: Record<string, any>;
-  isSelected: boolean;
   subAccountInfo: SubAccountDescribing;
+  isSelected: boolean;
+  containerStyle?: Record<string, unknown>;
 }
 
-const AccountOptionCard: React.FC<Props> = ({
-  style,
-  isSelected,
+const SubAccountOptionCard: React.FC<Props> = ({
   subAccountInfo,
+  isSelected,
+  containerStyle = {},
 }: Props) => {
 
   const selectionIndicatorContainerStyle = useMemo(() => {
@@ -50,7 +50,7 @@ const AccountOptionCard: React.FC<Props> = ({
 
 
   return (
-    <View style={style}>
+    <View style={{ ...styles.rootContainer, ...containerStyle }}>
       {isSelected &&  (
         <LinearGradient
           colors={[
@@ -68,7 +68,7 @@ const AccountOptionCard: React.FC<Props> = ({
         containerStyle={cardContainerStyle}
         wrapperStyle={styles.cardContentWrapper}
       >
-        <Card.Image style={styles.image} source={subAccountInfo.imageSource} />
+        <Card.Image style={styles.image} source={subAccountInfo.avatarImageSource} />
 
         <View style={styles.descriptionTextContainer}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
@@ -79,7 +79,7 @@ const AccountOptionCard: React.FC<Props> = ({
           {isSelected && (
             <Image
               style={styles.selectionIndicatorImage}
-              source={require('../../../assets/images/icons/checkmark.png')}
+              source={require('../../assets/images/icons/checkmark.png')}
             />
           )}
         </View>
@@ -89,6 +89,10 @@ const AccountOptionCard: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+  },
+
   backgroundGradient: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
@@ -147,4 +151,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AccountOptionCard;
+export default SubAccountOptionCard;
