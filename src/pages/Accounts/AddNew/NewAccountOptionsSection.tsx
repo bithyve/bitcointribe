@@ -2,18 +2,17 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
-import AccountOptionCard from './AccountOptionCard';
+import SubAccountOptionCard from '../../../components/accounts/SubAccountOptionCard';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import CardStyles from '../../../common/Styles/Cards.js';
 
 export interface Props {
   choices: SubAccountDescribing[];
   selectedChoice?: SubAccountDescribing;
-  onOptionSelected: (SubAccountDescribing) => void;
+  onOptionSelected: (option: SubAccountDescribing) => void;
 }
 
 const keyExtractor = (item: SubAccountDescribing) => item.id;
-
 
 const NewAccountOptionsSection: React.FC<Props> = ({
   choices,
@@ -28,18 +27,17 @@ const NewAccountOptionsSection: React.FC<Props> = ({
         keyExtractor={keyExtractor}
         data={choices}
         extraData={[selectedChoice]}
-        renderItem={({ item: accountChoicePayload }) => {
+        renderItem={({ item: subAccountInfo }: { item: SubAccountDescribing }) => {
           return (
             <View style={styles.cardShadowContainer}>
               <View style={styles.cardRootContainer}>
                 <TouchableOpacity
                   style={styles.cardTouchableContainer}
-                  onPress={() => onOptionSelected(accountChoicePayload)}
+                  onPress={() => onOptionSelected(subAccountInfo)}
                 >
-                  <AccountOptionCard
-                    style={{ flex: 1 }}
-                    subAccountInfo={accountChoicePayload}
-                    isSelected={accountChoicePayload == selectedChoice}
+                  <SubAccountOptionCard
+                    subAccountInfo={subAccountInfo}
+                    isSelected={subAccountInfo.id == selectedChoice?.id}
                   />
                 </TouchableOpacity>
               </View>
