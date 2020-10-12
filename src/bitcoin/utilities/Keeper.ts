@@ -178,6 +178,7 @@ export default class Keeper {
 
       let res: AxiosResponse;
       if (!encKey) {
+        //Ignore this as its added to support older versions of app.
         // supporting versions prior to 1.1.0
         res = await BH_AXIOS.post('updateEphemeralChannel', {
           HEXA_ID,
@@ -185,12 +186,8 @@ export default class Keeper {
           data: dataElements,
           fetch,
           legacy: true,
-          share: shareUploadables.encryptedMetaShare,
-          messageId: shareUploadables.messageId,
-          //encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
         });
       } else {
-        //Ignore this as its added to support older versions of app.
         let encryptedDataPacket: EncryptedEphemeralData;
         // if (dataElements.DHInfo) {
         //   encryptedDataPacket = {
@@ -237,6 +234,8 @@ export default class Keeper {
           });
         }
       }
+
+      console.log('resresresresres', res)
 
       let { updated, initiatedAt, data } = res.data;
       console.log({ updated, initiatedAt, data });
