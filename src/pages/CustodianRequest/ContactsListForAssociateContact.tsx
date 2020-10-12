@@ -64,14 +64,6 @@ const ContactsListForAssociateContact = (props) => {
         }) == -1
       ) {
         trustedContactsInfo.push(associatedContact);
-        Toast(
-          // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
-          `${
-            isGuardian
-              ? 'You have been successfully added as a Keeper'
-              : 'Contact successfully added to Friends and Family'
-          }`,
-        );
         console.log({ con: associatedContact });
         postAssociation(associatedContact);
         props.navigation.navigate('Home');
@@ -82,14 +74,6 @@ const ContactsListForAssociateContact = (props) => {
     } else {
       trustedContactsInfo = [];
       trustedContactsInfo[3] = associatedContact;
-      // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
-      Toast(
-        `${
-          isGuardian
-            ? 'You have been successfully added as a Keeper'
-            : 'Contact successfully added to Friends and Family'
-        }`,
-      );
 
       postAssociation(associatedContact);
       props.navigation.navigate('Home');
@@ -132,7 +116,7 @@ const ContactsListForAssociateContact = (props) => {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => props.navigation.goBack()}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

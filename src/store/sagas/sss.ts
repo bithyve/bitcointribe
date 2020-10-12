@@ -518,6 +518,7 @@ function* downloadMetaShareWorker({ payload }) {
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
+      Toast('You have been successfully added as a Keeper');
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       let updatedRecoveryShares = {};
