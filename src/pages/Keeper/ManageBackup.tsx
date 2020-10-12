@@ -132,12 +132,12 @@ class ManageBackup extends Component<
           infoGreen: 'All Keepers are accessible',
           keeper1: {
             name: 'Add Keeper',
-            keeper1Done: true,
+            keeper1Done: false,
             type: 'Device',
           },
           keeper2: {
             name: 'Add Keeper',
-            keeper2Done: true,
+            keeper2Done: false,
             type: '',
           },
           id: 2,
