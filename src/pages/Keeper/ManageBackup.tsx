@@ -65,18 +65,21 @@ interface ManageBackupPropsTypes {
   database: any;
   overallHealth: any;
   levelHealth: {
-    shareType: string;
-    updatedAt: string;
-    status: string;
-    shareId: string;
-    reshareVersion?: number;
-    guardian?: string;
+    levelInfo:{
+      shareType: string;
+      updatedAt: string;
+      status: string;
+      shareId: string;
+      reshareVersion?: number;
+      guardian?: string;
+    }[]
   }[];
   currentLevel: any;
   healthLoading: any;
   generateMetaShare: any;
   checkMSharesHealth: any;
   createAndUploadOnEFChannel: any;
+  isLevelTwoMetaShareCreated: Boolean;
 }
 
 class ManageBackup extends Component<
@@ -165,82 +168,88 @@ class ManageBackup extends Component<
   }
 
   modifyLevelStatus = () => {
-    let levelData = this.state.levelData;
-    if(this.props.levelHealth.length == 2){
-      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+    let { levelData } = this.state;
+    let { levelHealth, currentLevel } = this.props;
+    if(!levelHealth[1] && levelHealth[0]){
+      if(levelHealth[0].levelInfo[0].shareType == 'cloud' && levelHealth[0].levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
       }
-      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+      if(levelHealth[0].levelInfo[1].shareType == "securityQuestion" && levelHealth[0].levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
       }
-      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
+      if(levelHealth[0].levelInfo[0].status == "accessible" && levelHealth[0].levelInfo[1].status == "accessible") levelData[0].status = 'good';
+      else if((levelHealth[0].levelInfo[0].status == "accessible" && levelHealth[0].levelInfo[1].status == "notAccessible") || (levelHealth[0].levelInfo[0].status == "notAccessible" && levelHealth[0].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
     }
-    if(this.props.levelHealth.length == 4){
-      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+    else if(levelHealth[1] && !levelHealth[2]){
+      if(levelHealth[1].levelInfo[0].shareType == 'cloud' && levelHealth[1].levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
       }
-      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+      if(levelHealth[1].levelInfo[1].shareType == "securityQuestion" && levelHealth[1].levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
       }
-      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
-      
-      if(this.props.levelHealth[2].status == "accessible"){
-        levelData[1].keeper1.name = this.props.levelHealth[2].guardian;
+      if(levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "accessible") levelData[0].status = 'good';
+      else if((levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "notAccessible") || (levelHealth[1].levelInfo[0].status == "notAccessible" && levelHealth[1].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
+
+      if(levelHealth[1].levelInfo[2].status == "accessible"){
+        levelData[1].keeper1.name = levelHealth[1].levelInfo[2].guardian;
         levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = this.props.levelHealth[2].shareType;
+        levelData[1].keeper1.type = levelHealth[1].levelInfo[2].shareType;
       }
-      if(this.props.levelHealth[3].status == "accessible"){
-        levelData[1].keeper2.name = this.props.levelHealth[2].guardian;
+      if(levelHealth[1].levelInfo[3].status == "accessible"){
+        levelData[1].keeper2.name = levelHealth[1].levelInfo[3].guardian;
         levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = this.props.levelHealth[2].shareType;
+        levelData[1].keeper2.type = levelHealth[1].levelInfo[3].shareType;
       }
-      if(this.props.levelHealth[2].status == "accessible" && this.props.levelHealth[3].status == "accessible") levelData[1].status = 'good';
-      console.log('levelData updated', levelData)
+      if(levelHealth[1].levelInfo[2].status == "accessible" && levelHealth[1].levelInfo[3].status == "accessible") levelData[1].status = 'good';
+      else if((levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "notAccessible") || (levelHealth[1].levelInfo[0].status == "notAccessible" && levelHealth[1].levelInfo[1].status == "accessible")) levelData[1].status = 'bad';
     }
-    if(this.props.levelHealth.length == 6){
-      if(this.props.levelHealth[0].shareType == 'cloud' && this.props.levelHealth[0].status == "accessible"){
+    else if(levelHealth[2]){
+      if(levelHealth[2].levelInfo[0].shareType == 'cloud' && levelHealth[2].levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
       }
-      if(this.props.levelHealth[1].shareType == "securityQuestion" && this.props.levelHealth[0].status == "accessible"){
+      if(levelHealth[2].levelInfo[1].shareType == "securityQuestion" && levelHealth[2].levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
       }
-      if(this.props.levelHealth[0].status == "accessible" && this.props.levelHealth[1].status == "accessible") levelData[0].status = 'good';
+      if(levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "accessible") levelData[0].status = 'good';
+      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
 
-      if(this.props.levelHealth[2].status == "accessible"){
-        levelData[1].keeper1.name = this.props.levelHealth[2].guardian;
+      if(levelHealth[2].levelInfo[2].status == "accessible"){
+        levelData[1].keeper1.name = levelHealth[2].levelInfo[2].guardian;
         levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = this.props.levelHealth[2].shareType;
+        levelData[1].keeper1.type = levelHealth[2].levelInfo[2].shareType;
       }
-      if(this.props.levelHealth[3].status == "accessible"){
-        levelData[1].keeper2.name = this.props.levelHealth[3].guardian;
+      if(levelHealth[2].levelInfo[3].status == "accessible"){
+        levelData[1].keeper2.name = levelHealth[2].levelInfo[3].guardian;
         levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = this.props.levelHealth[3].shareType;
+        levelData[1].keeper2.type = levelHealth[2].levelInfo[3].shareType;
       }
-      if(this.props.levelHealth[1].status == "accessible" && this.props.levelHealth[3].status == "accessible") levelData[1].status = 'good';
+      if(levelHealth[2].levelInfo[2].status == "accessible" && levelHealth[2].levelInfo[3].status == "accessible") levelData[1].status = 'good';
+      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[1].status = 'bad';
 
-      if(this.props.levelHealth[4].status == "accessible"){
-        levelData[2].keeper1.name = this.props.levelHealth[4].guardian;
+      if(levelHealth[2].levelInfo[4].status == "accessible"){
+        levelData[2].keeper1.name = levelHealth[2].levelInfo[2].guardian;
         levelData[2].keeper1.keeper1Done = true;
-        levelData[2].keeper1.type = this.props.levelHealth[4].shareType;
+        levelData[2].keeper1.type = levelHealth[2].levelInfo[2].shareType;
       }
-      if(this.props.levelHealth[5].status == "accessible"){
-        levelData[2].keeper2.name = this.props.levelHealth[5].guardian;
+      if(levelHealth[2].levelInfo[5].status == "accessible"){
+        levelData[2].keeper2.name = levelHealth[2].levelInfo[3].guardian;
         levelData[2].keeper2.keeper2Done = true;
-        levelData[2].keeper2.type = this.props.levelHealth[5].shareType;
+        levelData[2].keeper2.type = levelHealth[2].levelInfo[3].shareType;
       }
-      if(this.props.levelHealth[4].status == "accessible" && this.props.levelHealth[5].status == "accessible") levelData[2].status = 'good';
+      if(levelHealth[2].levelInfo[4].status == "accessible" && levelHealth[2].levelInfo[5].status == "accessible") levelData[2].status = 'good';
+      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[2].status = 'bad';
     }
     this.setState({levelData: levelData});
   }
@@ -328,13 +337,18 @@ class ManageBackup extends Component<
   }
 
   componentDidUpdate = (prevProps, prevState) => {
+    if(prevProps.levelHealth != this.props.levelHealth){
+      this.modifyLevelStatus();
+    }
   };
 
   generateShares = (level) =>{
     const { isLevel2, isPrimaryKeeper, levelData } = this.state;
     const {generateMetaShare} = this.props;
-    generateMetaShare(level);
-    let PKStatus = levelData.findIndex(value=>value.keeper1.keeper1Done == true) > -1 ? 'accessed' : 'notAccessed'
+    if(!this.props.isLevelTwoMetaShareCreated) {
+      generateMetaShare(level);
+    }
+    let PKStatus = levelData[1].keeper1.keeper1Done ? 'accessed' : 'notAccessed';
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
       selectedStatus: PKStatus,
@@ -898,6 +912,7 @@ const mapStateToProps = (state) => {
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
     currentLevel: idx(state, (_) => _.health.currentLevel),
+    isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
   };
 };

@@ -89,7 +89,10 @@ export default class LevelHealth {
     if (otp) {
       key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
     }
-    const messageId: string = LevelHealth.getMessageId(key, config.MSG_ID_LENGTH);
+    const messageId: string = LevelHealth.getMessageId(
+      key,
+      config.MSG_ID_LENGTH,
+    );
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('downloadShare', {
@@ -102,7 +105,8 @@ export default class LevelHealth {
     }
 
     const { share, encryptedDynamicNonPMDD } = res.data;
-    const metaShare = LevelHealth.decryptMetaShare(share, key).decryptedMetaShare;
+    const metaShare = LevelHealth.decryptMetaShare(share, key)
+      .decryptedMetaShare;
     return { metaShare, encryptedDynamicNonPMDD, messageId };
   };
 
@@ -186,7 +190,10 @@ export default class LevelHealth {
     if (!key) {
       key = LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength);
     }
-    const messageId: string = LevelHealth.getMessageId(key, config.MSG_ID_LENGTH);
+    const messageId: string = LevelHealth.getMessageId(
+      key,
+      config.MSG_ID_LENGTH,
+    );
     const cipher = crypto.createCipheriv(
       LevelHealth.cipherSpec.algorithm,
       key,
@@ -359,11 +366,13 @@ export default class LevelHealth {
   };
 
   public static updateHealth = async (
-    shares: [{
-      walletId: string;
-      shareId: string;
-      reshareVersion: number;
-    }],
+    shares: [
+      {
+        walletId: string;
+        shareId: string;
+        reshareVersion: number;
+      },
+    ],
   ): Promise<{
     updationInfo: Array<{
       walletId: string;
@@ -372,7 +381,6 @@ export default class LevelHealth {
       updatedAt?: number;
     }>;
   }> => {
-
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('updateSharesHealth2', {
@@ -384,7 +392,7 @@ export default class LevelHealth {
       if (err.code) throw new Error(err.code);
     }
 
-    console.log('res updateHealth', res)
+    console.log('res updateHealth', res);
 
     const { updationInfo } = res.data;
     return { updationInfo };
@@ -425,7 +433,9 @@ export default class LevelHealth {
     otpEncryptedData: string;
     otp: string;
   } => {
-    const otp: string = LevelHealth.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+    const otp: string = LevelHealth.generateOTP(
+      parseInt(config.SSS_OTP_LENGTH, 10),
+    );
     const key = LevelHealth.getDerivedKey(otp);
     // const key = crypto.scryptSync(
     //   intermediateKey,
@@ -646,28 +656,25 @@ export default class LevelHealth {
     if (this.healthCheckInitialized)
       throw new Error('Health Check is already initialized.');
 
-    // Check on starting of level 2
-    // if (!this.metaShares.length)
-    //   throw new Error('Can not initialize health check; missing MetaShares');
-    let randomIdForSecurityQ = generateRandomString(8); 
-    let randomIdForCloud = generateRandomString(8); 
+    let randomIdForSecurityQ = generateRandomString(8);
+    let randomIdForCloud = generateRandomString(8);
     let levelInfo = [
       {
         shareType: 'cloud',
         updatedAt: 0,
-        status: "notAccessible",
+        status: 'notAccessible',
         shareId: randomIdForCloud,
         reshareVersion: 0,
       },
       {
         shareType: 'securityQuestion',
         updatedAt: moment(new Date()).valueOf(),
-        status: "accessible",
+        status: 'accessible',
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
-      }
+      },
     ];
-   
+
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('sharesHealthCheckInit2', {
@@ -681,18 +688,10 @@ export default class LevelHealth {
     }
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
-
-      // for (let index = 0; index < shareIDs.length; index++) {
-      //   this.healthCheckStatus[index] = {
-      //     shareId: shareIDs[index],
-      //     updatedAt: 0,
-      //     reshareVersion: 0,
-      //   };
-      // }
     }
     return {
       success: res.data.initSuccessful,
-      levelInfo: levelInfo
+      levelInfo: levelInfo,
     };
   };
 
@@ -724,7 +723,7 @@ export default class LevelHealth {
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
 
-    console.log('updates', updates)
+    console.log('updates', updates);
 
     const shareGuardianMapping = {};
     for (const { shareId, updatedAt } of updates) {
@@ -751,8 +750,6 @@ export default class LevelHealth {
     let response = {};
     let res: AxiosResponse;
     const metaShares = this.metaShares.slice(0, 3);
-    console.log('walletID', this.walletId);
-    console.log('HEXA_ID', HEXA_ID);
     try {
       res = await BH_AXIOS.post('checkSharesHealth2', {
         HEXA_ID,
@@ -764,9 +761,60 @@ export default class LevelHealth {
       if (err.code) throw new Error(err.code);
       response = err;
     }
-    console.log('res response', res);
     return {
       data: response,
+    };
+  };
+
+  public updateHealthLevel2 = async (SecurityQuestionHealth): Promise<{
+    success: boolean;
+    message: string;
+  }> => {
+    let levelInfo = [];
+    if (this.metaShares.length) {
+      levelInfo[0] = {
+        shareType: 'cloud',
+        updatedAt: 0,
+        status: 'notAccessible',
+        shareId: this.metaShares[0].shareId,
+        reshareVersion: 0,
+      };
+      levelInfo[1] = SecurityQuestionHealth;
+      for (let i = 1; i < this.metaShares.length; i++) {
+        const element = this.metaShares[i];
+        let shareType = '';
+        if (i == 0) shareType = 'cloud';
+        if (i == 1) shareType = 'primaryKeeper';
+        let obj = {
+          shareType: shareType,
+          updatedAt: 0,
+          status: 'notAccessible',
+          shareId: element.shareId,
+          reshareVersion: 0,
+        };
+        levelInfo.push(obj);
+      }
+
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('updateHealthLevel2', {
+          HEXA_ID,
+          walletID: this.walletId,
+          level: 2,
+          levelInfo,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      return {
+        success: res.data.updateSuccessful,
+        message: '',
+      };
+    }
+    return {
+      success: false,
+      message: 'Something went wrong!',
     };
   };
 
@@ -1050,7 +1098,7 @@ export default class LevelHealth {
   public createMetaSharesKeeper = (
     tag: string,
     version?: string,
-    level? : number
+    level?: number,
   ): {
     metaShares: MetaShare[];
   } => {
@@ -1069,28 +1117,28 @@ export default class LevelHealth {
     let index = 0;
     let metaShare: MetaShare;
     for (const encryptedSecret of this.encryptedSecrets) {
-        metaShare = {
-          encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
-          meta: {
-            version: version ? version : '0',
-            validator: 'HEXA',
-            index,
-            walletId: this.walletId,
-            tag,
-            timestamp,
-            reshareVersion: 0,
-          },
-        };
+      metaShare = {
+        encryptedSecret,
+        shareId: LevelHealth.getShareId(encryptedSecret),
+        meta: {
+          version: version ? version : '0',
+          validator: 'HEXA',
+          index,
+          walletId: this.walletId,
+          tag,
+          timestamp,
+          reshareVersion: 0,
+        },
+      };
       this.metaShares.push(metaShare);
       index++;
     }
-    
+
     if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
     }
-    
+
     if (level == 3 && this.metaShares.length !== config.SSS_LEVEL2_TOTAL) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
@@ -1098,7 +1146,6 @@ export default class LevelHealth {
 
     return { metaShares: this.metaShares };
   };
-
 
   public reshareMetaShare = (index: number) => {
     this.metaShares[index].meta.reshareVersion =

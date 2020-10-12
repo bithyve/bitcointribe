@@ -19,6 +19,9 @@ export const MSHARES = 'MSHARES';
 export const CREATE_N_UPLOAD_ON_EF_CHANNEL = 'CREATE_N_UPLOAD_ON_EF_CHANNEL';
 export const UPDATE_EFCHANNEL_LOADING_STATUS =
   'UPDATE_EFCHANNEL_LOADING_STATUS';
+export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE';  
+export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
+export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';  
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -64,7 +67,6 @@ export const getHealth = () => {
 };
 
 export const checkMSharesHealth = () => {
-  console.log('testing1');
   return { type: CHECK_SHARES_HEALTH };
 };
 
@@ -104,4 +106,16 @@ export const createAndUploadOnEFChannel = (
 
 export const updateEFChannelLoader = (beingLoaded) => {
   return { type: UPDATE_EFCHANNEL_LOADING_STATUS, payload: { beingLoaded } };
+};
+
+export const updateLevelTwoMetaShareStatus = (beingLoaded) => {
+  return { type: IS_LEVEL_TWO_METASHARE, payload: { beingLoaded } };
+};
+
+export const updateLevelThreeMetaShareStatus = (beingLoaded) => {
+  return { type: IS_LEVEL_THREE_METASHARE, payload: { beingLoaded } };
+};
+
+export const initLevelTwo = () => {
+  return { type: INIT_LEVEL_TWO };
 };

@@ -8,7 +8,9 @@ import {
   INIT_LOADING_STATUS,
   UPDATE_MSHARE_LOADING_STATUS,
   MSHARES,
-  UPDATE_EFCHANNEL_LOADING_STATUS
+  UPDATE_EFCHANNEL_LOADING_STATUS,
+  IS_LEVEL_TWO_METASHARE,
+  IS_LEVEL_THREE_METASHARE
 } from '../actions/health';
 
 const initialState: {
@@ -21,7 +23,10 @@ const initialState: {
   };
   errorSending: Boolean;
   currentLevel: Number;
+  isLevelTwoMetaShareCreated: Boolean;
+  isLevelThreeMetaShareCreated: Boolean;
   levelHealth: {
+    level: number;
     levelInfo: {
       shareType: string;
       updatedAt: string;
@@ -29,7 +34,7 @@ const initialState: {
       shareId: string;
       reshareVersion?: number;
       guardian?: string;
-    };
+    }[];
   }[];
   shares: any;
 } = {
@@ -40,6 +45,8 @@ const initialState: {
     updateMSharesHealth: false,
     updateEFChannelStatus: false
   },
+  isLevelTwoMetaShareCreated: false,
+  isLevelThreeMetaShareCreated: false,
   currentLevel: 0,
   levelHealth: [],
   errorSending: false,
@@ -127,7 +134,19 @@ export default (state = initialState, action) => {
             updateEFChannelStatus: action.payload.beingLoaded,
           },
         };
-
+      
+      case IS_LEVEL_TWO_METASHARE:
+        return {
+          ...state,
+          isLevelTwoMetaShareCreated: action.payload.beingLoaded,
+        };
+    
+      case IS_LEVEL_THREE_METASHARE:
+        return {
+          ...state,
+          isLevelThreeMetaShareCreated: action.payload.beingLoaded,
+        };
+      
       
   }
   return state;

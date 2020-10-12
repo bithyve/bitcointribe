@@ -609,6 +609,32 @@ export default class S3Service {
     }
   };
 
+  public updateHealthLevel2 = async (SecurityQuestionHealth): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.levelhealth.updateHealthLevel2(SecurityQuestionHealth),
+      };
+    } catch (err) {
+      return { status: 513, err: err.message, message: ErrMap[513] };
+    }
+  };
+
   public checkHealth = async (): Promise<
     | {
         status: number;
@@ -624,7 +650,6 @@ export default class S3Service {
       }
   > => {
     try {
-      console.log('this.levelhealth.checkHealth2()');
       return {
         status: config.STATUS.SUCCESS,
         data: await this.levelhealth.checkHealth2(),
