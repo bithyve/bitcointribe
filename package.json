@@ -6,7 +6,7 @@
     "test": "jest",
     "lint": "eslint .",
     "clear": "rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
-    "prepare": "chmod +x setup.sh && ./setup.sh",
+    "prepare": "chmod +x setup.sh && sh ./setup.sh",
     "postinstall": "jetify",
     "android": "react-native run-android",
     "android-release": "cd android && ./gradlew app:assembleRelease",
