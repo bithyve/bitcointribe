@@ -9,6 +9,7 @@ import {
   TextInput,
   SafeAreaView,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
@@ -30,7 +31,7 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import Toast from '../components/Toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
@@ -50,6 +51,9 @@ export default function ContactList(props) {
     : [];
   const [contactData, setContactData] = useState([]);
   const dispatch = useDispatch();
+  const { approvingTrustedContact } = useSelector(
+    (state) => state.trustedContacts.loading,
+  );
 
   const data = {
     firstName: 'F&F request',
@@ -541,7 +545,11 @@ export default function ContactList(props) {
             onPress={() => props.onPressContinue()}
             style={styles.bottomButtonView}
           >
-            <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            {approvingTrustedContact ? (
+              <ActivityIndicator size={'small'} />
+            ) : (
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            )}
           </AppBottomSheetTouchableWrapper>
         </View>
       )}
