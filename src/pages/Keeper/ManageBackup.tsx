@@ -113,11 +113,13 @@ class ManageBackup extends Component<
             name: '',
             keeper1Done: false,
             type: '',
+            shareId: ''
           },
           keeper2: {
             name: '',
             keeper2Done: false,
             type: '',
+            shareId: ''
           },
           id: 1,
         },
@@ -129,14 +131,14 @@ class ManageBackup extends Component<
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           keeper1: {
-            name: 'Keeper Device',
+            name: 'Add Keeper',
             keeper1Done: true,
-            type: 'device',
+            type: 'Device',
           },
           keeper2: {
-            name: 'mac Pro',
+            name: 'Add Keeper',
             keeper2Done: true,
-            type: 'friends',
+            type: '',
           },
           id: 2,
         },
@@ -149,12 +151,12 @@ class ManageBackup extends Component<
           infoGreen: 'All Keepers are accessible',
           manageText: 'Setup',
           keeper1: {
-            name: '',
+            name: 'Add Keeper',
             keeper1Done: false,
             type: '',
           },
           keeper2: {
-            name: '',
+            name: 'Add Keeper',
             keeper2Done: false,
             type: '',
           },
@@ -170,86 +172,103 @@ class ManageBackup extends Component<
   modifyLevelStatus = () => {
     let { levelData } = this.state;
     let { levelHealth, currentLevel } = this.props;
-    if(!levelHealth[1] && levelHealth[0]){
-      if(levelHealth[0].levelInfo[0].shareType == 'cloud' && levelHealth[0].levelInfo[0].status == "accessible"){
+    let levelInfo = levelHealth[0].levelInfo;
+    if(levelHealth[0] && levelInfo.length == 2){
+      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
+        levelData[0].keeper1.shareId = levelInfo[0].shareId;
       }
-      if(levelHealth[0].levelInfo[1].shareType == "securityQuestion" && levelHealth[0].levelInfo[1].status == "accessible"){
+      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
+        levelData[0].keeper2.shareId = levelInfo[1].shareId;
       }
-      if(levelHealth[0].levelInfo[0].status == "accessible" && levelHealth[0].levelInfo[1].status == "accessible") levelData[0].status = 'good';
-      else if((levelHealth[0].levelInfo[0].status == "accessible" && levelHealth[0].levelInfo[1].status == "notAccessible") || (levelHealth[0].levelInfo[0].status == "notAccessible" && levelHealth[0].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
-    }
-    else if(levelHealth[1] && !levelHealth[2]){
-      if(levelHealth[1].levelInfo[0].shareType == 'cloud' && levelHealth[1].levelInfo[0].status == "accessible"){
+      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") levelData[0].status = 'good';
+      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
+    } else if(levelHealth[0] && levelInfo.length == 4){
+      console.log('manageBackup levelHealth[0]', levelHealth[0])
+      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
+        levelData[0].keeper1.shareId = levelInfo[0].shareId;
       }
-      if(levelHealth[1].levelInfo[1].shareType == "securityQuestion" && levelHealth[1].levelInfo[1].status == "accessible"){
+      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
+        levelData[0].keeper2.shareId = levelInfo[1].shareId;
       }
-      if(levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "accessible") levelData[0].status = 'good';
-      else if((levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "notAccessible") || (levelHealth[1].levelInfo[0].status == "notAccessible" && levelHealth[1].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
+      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") { 
+        levelData[0].status = 'good';
+      }
+      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) {
+        levelData[0].status = 'bad';
+      }
 
-      if(levelHealth[1].levelInfo[2].status == "accessible"){
-        levelData[1].keeper1.name = levelHealth[1].levelInfo[2].guardian;
+      if(levelInfo[2].status == "accessible"){
+        levelData[1].keeper1.name = levelInfo[2].guardian;
         levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = levelHealth[1].levelInfo[2].shareType;
+        levelData[1].keeper1.type = levelInfo[2].shareType;
+        levelData[1].keeper1.shareId = levelInfo[2].shareId;
       }
-      if(levelHealth[1].levelInfo[3].status == "accessible"){
-        levelData[1].keeper2.name = levelHealth[1].levelInfo[3].guardian;
+      if(levelInfo[3].status == "accessible"){
+        levelData[1].keeper2.name = levelInfo[3].guardian;
         levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = levelHealth[1].levelInfo[3].shareType;
+        levelData[1].keeper2.type = levelInfo[3].shareType;
+        levelData[1].keeper2.shareId = levelInfo[3].shareId;
       }
-      if(levelHealth[1].levelInfo[2].status == "accessible" && levelHealth[1].levelInfo[3].status == "accessible") levelData[1].status = 'good';
-      else if((levelHealth[1].levelInfo[0].status == "accessible" && levelHealth[1].levelInfo[1].status == "notAccessible") || (levelHealth[1].levelInfo[0].status == "notAccessible" && levelHealth[1].levelInfo[1].status == "accessible")) levelData[1].status = 'bad';
+      if(levelInfo[2].status == "accessible" && levelInfo[3].status == "accessible") levelData[1].status = 'good';
+      else if((levelInfo[2].status == "accessible" && levelInfo[3].status == "notAccessible") || (levelInfo[2].status == "notAccessible" && levelInfo[3].status == "accessible")) levelData[1].status = 'bad';
     }
-    else if(levelHealth[2]){
-      if(levelHealth[2].levelInfo[0].shareType == 'cloud' && levelHealth[2].levelInfo[0].status == "accessible"){
+    else if(levelHealth[0] && levelInfo.length == 6){
+      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper1.keeper1Done = true;
         levelData[0].keeper1.type = "cloud";
+        levelData[0].keeper2.shareId = levelInfo[0].shareId;
       }
-      if(levelHealth[2].levelInfo[1].shareType == "securityQuestion" && levelHealth[2].levelInfo[1].status == "accessible"){
+      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done = true;
         levelData[0].keeper2.type = "securityQuestion";
+        levelData[0].keeper2.shareId = levelInfo[1].shareId;
       }
-      if(levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "accessible") levelData[0].status = 'good';
-      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
+      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") levelData[0].status = 'good';
+      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
 
-      if(levelHealth[2].levelInfo[2].status == "accessible"){
-        levelData[1].keeper1.name = levelHealth[2].levelInfo[2].guardian;
+      if(levelInfo[2].status == "accessible"){
+        levelData[1].keeper1.name = levelInfo[2].guardian;
         levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = levelHealth[2].levelInfo[2].shareType;
+        levelData[1].keeper1.type = levelInfo[2].shareType;
+        levelData[1].keeper2.shareId = levelInfo[2].shareId;
       }
-      if(levelHealth[2].levelInfo[3].status == "accessible"){
-        levelData[1].keeper2.name = levelHealth[2].levelInfo[3].guardian;
+      if(levelInfo[3].status == "accessible"){
+        levelData[1].keeper2.name = levelInfo[3].guardian;
         levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = levelHealth[2].levelInfo[3].shareType;
+        levelData[1].keeper2.type = levelInfo[3].shareType;
+        levelData[1].keeper2.shareId = levelInfo[3].shareId;
       }
-      if(levelHealth[2].levelInfo[2].status == "accessible" && levelHealth[2].levelInfo[3].status == "accessible") levelData[1].status = 'good';
-      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[1].status = 'bad';
+      if(levelInfo[2].status == "accessible" && levelInfo[3].status == "accessible") levelData[1].status = 'good';
+      else if((levelInfo[2].status == "accessible" && levelInfo[3].status == "notAccessible") || (levelInfo[2].status == "notAccessible" && levelInfo[3].status == "accessible")) levelData[1].status = 'bad';
 
-      if(levelHealth[2].levelInfo[4].status == "accessible"){
-        levelData[2].keeper1.name = levelHealth[2].levelInfo[2].guardian;
+      if(levelInfo[4].status == "accessible"){
+        levelData[2].keeper1.name = levelInfo[4].guardian;
         levelData[2].keeper1.keeper1Done = true;
-        levelData[2].keeper1.type = levelHealth[2].levelInfo[2].shareType;
+        levelData[2].keeper1.type = levelInfo[4].shareType;
+        levelData[2].keeper2.shareId = levelInfo[4].shareId;
       }
-      if(levelHealth[2].levelInfo[5].status == "accessible"){
-        levelData[2].keeper2.name = levelHealth[2].levelInfo[3].guardian;
+      if(levelInfo[5].status == "accessible"){
+        levelData[2].keeper2.name = levelInfo[5].guardian;
         levelData[2].keeper2.keeper2Done = true;
-        levelData[2].keeper2.type = levelHealth[2].levelInfo[3].shareType;
+        levelData[2].keeper2.type = levelInfo[5].shareType;
+        levelData[2].keeper2.shareId = levelInfo[5].shareId;
       }
-      if(levelHealth[2].levelInfo[4].status == "accessible" && levelHealth[2].levelInfo[5].status == "accessible") levelData[2].status = 'good';
-      else if((levelHealth[2].levelInfo[0].status == "accessible" && levelHealth[2].levelInfo[1].status == "notAccessible") || (levelHealth[2].levelInfo[0].status == "notAccessible" && levelHealth[2].levelInfo[1].status == "accessible")) levelData[2].status = 'bad';
+      if(levelInfo[4].status == "accessible" && levelInfo[5].status == "accessible") levelData[2].status = 'good';
+      else if((levelInfo[4].status == "accessible" && levelInfo[5].status == "notAccessible") || (levelInfo[4].status == "notAccessible" && levelInfo[5].status == "accessible")) levelData[2].status = 'bad';
     }
     this.setState({levelData: levelData});
   }
@@ -580,7 +599,7 @@ class ManageBackup extends Component<
                             style={{ flexDirection: 'row', marginTop: 'auto' }}
                           >
                             <TouchableOpacity
-                              style={styles.appBackupButton}
+                              style={{...styles.appBackupButton, borderColor: value.keeper1.keeper1Done ? Colors.deepBlue : Colors.red, borderWidth: value.keeper1.keeper1Done ? 0 : 1}}
                               onPress={() => {
                                 if (!this.props.cloudBackupStatus) {
                                   this.cloudData();
@@ -597,7 +616,7 @@ class ManageBackup extends Component<
                                   fontSize: RFValue(11),
                                 }}
                               >
-                               {this.props.cloudBackupStatus && this.props.cloudBackupStatus.status ? "Data Backed-Up"  : "Add Backup" }
+                                {value.keeper1.keeper1Done ? "Data Backed-Up" : "Add Backup"}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -663,10 +682,8 @@ class ManageBackup extends Component<
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: Colors.red,
-                                borderWidth: value.keeper1.keeper1Done
-                                  ? 0
-                                  : 0.5,
+                                borderColor: value.keeper1.keeper1Done ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue : Colors.red,
+                                borderWidth: value.keeper1.keeper1Done ? 0 : 1,
                               }}
                               onPress={() => {
                                 if (value.id === 2) {
@@ -730,7 +747,7 @@ class ManageBackup extends Component<
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: value.keeper2.keeper2Done ? Colors.red : value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
+                                borderColor: value.keeper2.keeper2Done ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue : Colors.red,
                                 borderWidth: value.keeper2.keeper2Done
                                   ? 0
                                   : 0.5,
