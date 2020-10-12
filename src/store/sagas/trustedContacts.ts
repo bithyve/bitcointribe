@@ -118,7 +118,6 @@ function* approveTrustedContactWorker({ payload }) {
     isGuardian,
   );
   if (res.status === 200) {
-    yield put(trustedContactApproved(contactInfo.contactName, true));
     if (payload.updateEphemeralChannel) {
       const uploadXpub = true;
       const data = {
@@ -344,8 +343,11 @@ function* updateEphemeralChannelWorker({ payload }) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       // yield delay(1000); // introducing delay in order to evade database insertion collision
       yield put(downloadMShare(encryptedKey, otp));
-    } else {
-      Toast('Contact successfully added to Friends and Family');      
+      yield delay(1000); // allowing share-download saga to finish execution
+      yield put(trustedContactApproved(contactInfo.contactName, true));
+    } else if(payload.uploadXpub) {
+      Toast('Contact successfully added to Friends and Family'); 
+      yield put(trustedContactApproved(contactInfo.contactName, true));
     }
   } else {
     console.log(res.err);
