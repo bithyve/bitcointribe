@@ -344,6 +344,8 @@ function* updateEphemeralChannelWorker({ payload }) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       // yield delay(1000); // introducing delay in order to evade database insertion collision
       yield put(downloadMShare(encryptedKey, otp));
+    } else {
+      Toast('Contact successfully added to Friends and Family');      
     }
   } else {
     console.log(res.err);
