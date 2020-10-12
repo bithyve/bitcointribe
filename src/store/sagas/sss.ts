@@ -457,7 +457,7 @@ export const uploadRequestedShareWatcher = createWatcher(
   UPLOAD_REQUESTED_SHARE,
 );
 
-function* downloadMetaShareWorker({ payload }) {
+export function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
   const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted

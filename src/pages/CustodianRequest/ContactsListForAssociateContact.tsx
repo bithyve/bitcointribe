@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -26,7 +26,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 const ContactsListForAssociateContact = (props) => {
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');
-
+  const [approvingContact, setApprovingContact] = useState('');
   const isGuardian = props.navigation.getParam('isGuardian');
   const dispatch = useDispatch();
 
@@ -43,6 +43,13 @@ const ContactsListForAssociateContact = (props) => {
 
   const updateTrustedContactsInfo = async (contact?) => {
     const associatedContact = contact ? contact : contacts[0];
+
+    const selectedContactName = `${associatedContact.firstName} ${
+      associatedContact.lastName ? associatedContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+    setApprovingContact(selectedContactName);
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -54,27 +61,12 @@ const ContactsListForAssociateContact = (props) => {
             .toLowerCase()
             .trim();
 
-          const selectedContactName = `${associatedContact.firstName} ${
-            associatedContact.lastName ? associatedContact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim();
-
           return presentContactName == selectedContactName;
         }) == -1
       ) {
         trustedContactsInfo.push(associatedContact);
-        Toast(
-          // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
-          `${
-            isGuardian
-              ? 'You have been successfully added as a Keeper'
-              : 'Contact successfully added to Friends and Family'
-          }`,
-        );
         console.log({ con: associatedContact });
         postAssociation(associatedContact);
-        props.navigation.navigate('Home');
       } else {
         Toast('Contact already exists');
         return;
@@ -82,17 +74,8 @@ const ContactsListForAssociateContact = (props) => {
     } else {
       trustedContactsInfo = [];
       trustedContactsInfo[3] = associatedContact;
-      // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
-      Toast(
-        `${
-          isGuardian
-            ? 'You have been successfully added as a Keeper'
-            : 'Contact successfully added to Friends and Family'
-        }`,
-      );
 
       postAssociation(associatedContact);
-      props.navigation.navigate('Home');
     }
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
@@ -100,6 +83,19 @@ const ContactsListForAssociateContact = (props) => {
     );
     dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
+
+  const { approvedTrustedContacts } = useSelector(
+    (state) => state.trustedContacts,
+  );
+
+  useEffect(() => {
+    if (
+      approvingContact &&
+      approvedTrustedContacts &&
+      approvedTrustedContacts[approvingContact]
+    )
+      props.navigation.navigate('Home');
+  }, [approvedTrustedContacts, approvingContact]);
 
   // const continueNProceed = async () => {
   //   let AssociatedContact = JSON.parse(
@@ -132,7 +128,7 @@ const ContactsListForAssociateContact = (props) => {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => props.navigation.goBack()}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
