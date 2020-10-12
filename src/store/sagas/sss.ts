@@ -457,7 +457,7 @@ export const uploadRequestedShareWatcher = createWatcher(
   UPLOAD_REQUESTED_SHARE,
 );
 
-function* downloadMetaShareWorker({ payload }) {
+export function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
   const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
@@ -518,7 +518,6 @@ function* downloadMetaShareWorker({ payload }) {
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
-      Toast('You have been successfully added as a Keeper');
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       let updatedRecoveryShares = {};
