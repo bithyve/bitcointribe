@@ -265,6 +265,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   };
   const shareUploadables = LevelHealth.encryptMetaShare(
     s3Service.levelhealth.metaShares[1],
+    encryptedKey
   );
   let object = {
     shareId: s3Service.levelhealth.metaShares[1]
