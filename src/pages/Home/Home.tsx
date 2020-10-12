@@ -825,10 +825,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const regularAcc = new RegularAccount();
-    let res;
-    res = regularAcc.getMnemonic();
-    console.log('mnemonics', res)
     this.updateAccountCardData();
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
