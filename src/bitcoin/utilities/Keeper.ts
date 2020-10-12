@@ -147,8 +147,8 @@ export default class Keeper {
     ephemeralAddress: string,
     dataElements: EphemeralDataElementsForKeeper,
     encKey: string,
+    shareUploadables: ShareUploadables,
     fetch?: Boolean,
-    shareUploadables?: ShareUploadables,
     privateKey?: string,
   ): Promise<
     | {
@@ -185,6 +185,9 @@ export default class Keeper {
           data: dataElements,
           fetch,
           legacy: true,
+          share: shareUploadables.encryptedMetaShare,
+          messageId: shareUploadables.messageId,
+          //encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
         });
       } else {
         //Ignore this as its added to support older versions of app.

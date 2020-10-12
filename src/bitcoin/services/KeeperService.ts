@@ -61,8 +61,8 @@ export default class KeeperService {
     ephemeralAddress: string,
     dataElements: EphemeralDataElementsForKeeper,
     encKey: string,
+    shareUploadables: ShareUploadables,
     fetch?: Boolean,
-    shareUploadables?: ShareUploadables,
     privateKey?: string,
   ): Promise<
     | {
@@ -99,8 +99,8 @@ export default class KeeperService {
           ephemeralAddress,
           dataElements,
           encKey,
-          fetch,
           shareUploadables,
+          fetch,
           privateKey,
         ),
       };

@@ -41,6 +41,7 @@ import KeeperService from '../../bitcoin/services/KeeperService';
 import { EphemeralDataElementsForKeeper } from '../../bitcoin/utilities/Interface';
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
 import { encrypt } from '../../common/encryption/index';
+import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
@@ -262,6 +263,9 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     xPub: EFChannelData.xPubs,
     securityQuestion: {},
   };
+  const shareUploadables = LevelHealth.encryptMetaShare(
+    s3Service.levelhealth.metaShares[1],
+  );
   let object = {
     shareId: s3Service.levelhealth.metaShares[1]
       ? s3Service.levelhealth.metaShares[1].shareId
@@ -271,7 +275,9 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     ephemeralAddress: EFChannelData.ephemeralAddress,
     dataElements: dataElements,
     encKey: EFChannelData.uuid,
+    shareUploadables: shareUploadables
   };
+  
   let Kp = new KeeperService();
   let res = yield call(
     Kp.updateEphemeralChannel,
@@ -281,6 +287,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     object.ephemeralAddress,
     object.dataElements,
     object.encKey,
+    object.shareUploadables
   );
   yield put(updateMSharesLoader(false));
 }
