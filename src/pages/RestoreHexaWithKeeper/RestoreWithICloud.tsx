@@ -190,8 +190,7 @@ class RestoreWithICloud extends Component<
       await AsyncStorage.setItem('walletExists', 'true');
       await AsyncStorage.setItem('walletRecovered', 'true');
       calculateExchangeRate();
-      initializeHealthSetup();
-      //checkMSharesHealth();
+      checkMSharesHealth();
       setTimeout(() => {
         startupSync(); // delaying as checkMSharesHealth is also a DB inserting saga
       }, 2000);
@@ -730,7 +729,7 @@ const styles = StyleSheet.create({
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
     marginTop: wp('2%'),
-    marginBottom: wp('2%'),
+    marginBottom: wp('25%'),
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',

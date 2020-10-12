@@ -106,6 +106,7 @@ export const CloudData = async (database) => {
         walletImage,
         keeperInfo: [],
       };
+      console.log("walletImage", walletImage);
       encryptedCloudDataJson = await encrypt(CloudDataJson, key);
       // console.log('encryptedDatabase', encryptedCloudDataJson);
       return encryptedCloudDataJson;

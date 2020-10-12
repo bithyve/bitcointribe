@@ -128,7 +128,7 @@ function* checkSharesHealthWorker() {
   yield put(switchS3LoadingStatus(true));
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.checkHealth);
-
+  console.log("RES", res);
   if (res.status === 200) {
     yield put(
       updateHealth(res.data.data.data.levels, res.data.data.data.currentLevel),
