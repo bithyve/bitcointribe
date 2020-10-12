@@ -98,6 +98,9 @@ export default function Login(props) {
   const releaseCasesValue = useSelector(
     (state) => state.preferences.releaseCasesValue,
   );
+
+  const initialLoadingCompleted = useSelector((state) => state.loaders.initialLoadingCompleted)
+
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
   //       {
@@ -350,6 +353,7 @@ export default function Login(props) {
   const accountsSynched = useSelector(
     (state) => state.accounts.accountsSynched,
   );
+  let timer;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -359,15 +363,18 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          if (loaderBottomSheet.current) {
-            loaderBottomSheet.current.snapTo(0);
-          }
-          props.navigation.navigate('Home', {
-            custodyRequest,
-            recoveryRequest,
-            trustedContactRequest,
-            userKey,
-          });
+          timer = setTimeout(() => {
+            if (loaderBottomSheet.current) {
+              loaderBottomSheet.current.snapTo(0);
+            }
+            props.navigation.navigate('Home', {
+              custodyRequest,
+              recoveryRequest,
+              trustedContactRequest,
+              userKey,
+            });
+          }, 20000)
+
 
           if (dbFetched) {
             dispatch(updateWalletImage());
@@ -381,12 +388,34 @@ export default function Login(props) {
     }
   }, [isAuthenticated, dbFetched]);
 
+
+
+
+  useEffect(() => {
+    if (initialLoadingCompleted) {
+      if (loaderBottomSheet.current) {
+        loaderBottomSheet.current.snapTo(0);
+      }
+      props.navigation.navigate('Home', {
+        custodyRequest,
+        recoveryRequest,
+        trustedContactRequest,
+        userKey,
+      });
+      if (timer) {
+        clearTimeout(timer)
+      }
+
+    }
+  }, [initialLoadingCompleted])
+
+
+
+
   const handleLoaderMessages = (passcode) => {
-    const message = getRandomMessage();
-    setMessage(message.heading);
-    setSubTextMessage1(message.text);
-    setSubTextMessage2(message.subText);
-    dispatch(credsAuth(passcode));
+    setTimeout(() => {
+      dispatch(credsAuth(passcode));
+    }, 2)
   };
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -394,6 +423,7 @@ export default function Login(props) {
         headerText={message}
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
+        showGif={true}
       />
     );
   }, [message, subTextMessage1, subTextMessage2]);
@@ -509,8 +539,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -538,8 +568,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -567,8 +597,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -596,8 +626,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -767,7 +797,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
