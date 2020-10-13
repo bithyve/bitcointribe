@@ -36,7 +36,6 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AllAccountsContents from '../../components/AllAccountsContents';
 import SettingsContents from '../../components/SettingsContents';
 import { connect } from 'react-redux';
 import NoInternetModalContents from '../../components/NoInternetModalContents';
@@ -265,7 +264,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
   transactionDetailsBottomSheetRef = createRef<BottomSheet>();
   settingsBottomSheetRef = createRef<BottomSheet>();
-  allAccountsBottomSheetRef = createRef<BottomSheet>();
   custodianRequestBottomSheetRef = createRef<BottomSheet>();
   errorBottomSheetRef = createRef<BottomSheet>();
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
@@ -1062,11 +1060,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
 
           setTimeout(() => {
-            if (this.allAccountsBottomSheetRef.current) {
-              this.allAccountsBottomSheetRef.current?.snapTo(0);
-              this.settingsBottomSheetRef.current?.snapTo(0);
-            }
-
+            this.settingsBottomSheetRef.current?.snapTo(0);
             this.custodianRequestBottomSheetRef.current?.snapTo(1);
             this.transactionTabBarBottomSheetRef.current?.snapTo(1);
           }, 2);
@@ -1153,7 +1147,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              this.allAccountsBottomSheetRef.current?.snapTo(0);
               this.settingsBottomSheetRef.current?.snapTo(0);
               this.custodianRequestBottomSheetRef.current?.snapTo(1);
               this.transactionTabBarBottomSheetRef.current?.snapTo(1);
@@ -2845,58 +2838,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             )}
           />
         )}
-        {knowMoreBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-            }}
-            onCloseEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-            }}
-            enabledInnerScrolling={true}
-            ref={this.allAccountsBottomSheetRef}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-            ]}
-            renderContent={() => (
-              <AllAccountsContents
-                onPressBack={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                  );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => this.allAccountsBottomSheetRef.current?.snapTo(0),
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
 
         {!isLoading && (
           <BottomSheet
