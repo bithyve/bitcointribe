@@ -210,7 +210,7 @@ PODS:
     - React/Core
   - RNOS (1.2.6):
     - React
-  - RNReanimated (1.13.0):
+  - RNReanimated (1.13.1):
     - React
   - RNScreens (1.0.0-alpha.23):
     - React
@@ -517,7 +517,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: dedac618d8868828fd81ad5dda7598a1c4658a80
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
-  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
+  RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
@@ -539,4 +539,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: f0bbb553ff1ab8d8aec9f7f1b27f494d65a52d93
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
