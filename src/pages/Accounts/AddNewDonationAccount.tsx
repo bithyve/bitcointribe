@@ -397,9 +397,10 @@ class AddNewAccount extends PureComponent<
                 <AppBottomSheetTouchableWrapper
                   style={{
                     ...styles.bottomButtonView,
-                    backgroundColor: this.state.modelButtonIsValid
-                      ? Colors.lightBlue
-                      : Colors.blue,
+                    backgroundColor:
+                      this.state.modelButtonIsValid || this.state.disableForm
+                        ? Colors.lightBlue
+                        : Colors.blue,
                   }}
                   disabled={
                     this.state.modelButtonIsValid || this.state.disableForm
