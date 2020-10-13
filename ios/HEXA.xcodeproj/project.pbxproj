@@ -76,7 +76,6 @@
 		931F7A4365DF468BADA226D2 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
 		9C078B204079D275C37610DB /* libPods-Hexa Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C9155EA558699192E6135CA /* libPods-Hexa Stage.a */; };
 		A0647B856EF5484EB9D37E71 /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
-		AA44DA052530A214006C11BE /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		AA44DA062530A21B006C11BE /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		AA44DA072530A224006C11BE /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 		B8D1041D05D6411F9D52E7D6 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
@@ -471,7 +470,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA44DA052530A214006C11BE /* main.jsbundle in Resources */,
 				6182F77E250B23D7005B6ECE /* LaunchScreen.storyboard in Resources */,
 				6182F77F250B23D7005B6ECE /* Images.xcassets in Resources */,
 				6182F780250B23D7005B6ECE /* FiraSans-Bold.ttf in Resources */,
