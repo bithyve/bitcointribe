@@ -255,8 +255,9 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       : null,
     featuresList,
   };
-  let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-  let encryptedKey : string = encrypt(EFChannelData.uuid, otp);
+  // let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+  let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid, otp);
+  const encryptedKey = otpEncryptedData
   let dataElements: EphemeralDataElementsForKeeper = {
     publicKey: EFChannelData.publicKey,
     walletID: EFChannelData.walletID,
