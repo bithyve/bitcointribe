@@ -51,6 +51,7 @@ interface AddNewAccountStateTypes {
   doneeName: string;
   modelButtonIsValid: boolean;
   is2FAEnable: boolean;
+  disableForm: boolean;
 }
 
 interface AddNewAccountPropsTypes {
@@ -100,6 +101,7 @@ class AddNewAccount extends PureComponent<
       modelDescription: '',
       modelButtonIsValid: true,
       is2FAEnable: false,
+      disableForm: false,
     };
     this.item = {
       id: DONATION_ACCOUNT,
@@ -120,6 +122,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
+      this.setState({ disableForm: false });
       this.props.navigation.navigate('Accounts', {
         serviceType,
         index: this.props.cardData.length - 1,
@@ -286,6 +289,7 @@ class AddNewAccount extends PureComponent<
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
+                  editable={!this.state.disableForm}
                   value={this.state.accountName}
                   onChangeText={(text) => {
                     this.handleOnTextChange('donationAccountName', text);
@@ -307,6 +311,7 @@ class AddNewAccount extends PureComponent<
                   onChangeText={(text) => {
                     this.handleOnTextChange('doneeName', text);
                   }}
+                  editable={!this.state.disableForm}
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"
                   returnKeyLabel="Done"
@@ -323,6 +328,7 @@ class AddNewAccount extends PureComponent<
                   multiline={true}
                   numberOfLines={4}
                   placeholder={'Donation cause or description'}
+                  editable={!this.state.disableForm}
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
@@ -356,9 +362,10 @@ class AddNewAccount extends PureComponent<
                     borderColor={Colors.borderColor}
                     isChecked={this.state.is2FAEnable}
                     onpress={() => {
-                      this.setState({
-                        is2FAEnable: !this.state.is2FAEnable,
-                      });
+                      if (!this.state.disableForm)
+                        this.setState({
+                          is2FAEnable: !this.state.is2FAEnable,
+                        });
                     }}
                   />
                 </View>
@@ -395,16 +402,14 @@ class AddNewAccount extends PureComponent<
                       : Colors.blue,
                   }}
                   disabled={
-                    this.state.modelButtonIsValid ||
-                    this.props.accounts[
-                      this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT
-                    ].donationAccount.loading
+                    this.state.modelButtonIsValid || this.state.disableForm
                   }
-                  onPress={this.initiateDonationAccount}
+                  onPress={() => {
+                    this.setState({ disableForm: true });
+                    this.initiateDonationAccount();
+                  }}
                 >
-                  {this.props.accounts[
-                    this.state.is2FAEnable ? SECURE_ACCOUNT : REGULAR_ACCOUNT
-                  ].donationAccount.loading ? (
+                  {this.state.disableForm ? (
                     <ActivityIndicator />
                   ) : (
                     <Text style={styles.buttonText}>Proceed</Text>
