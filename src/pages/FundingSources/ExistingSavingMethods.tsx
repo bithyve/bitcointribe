@@ -10,6 +10,7 @@ import {
   AsyncStorage,
   Image,
 } from 'react-native';
+import CommonStyles from '../../common/Styles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -87,7 +88,7 @@ export default function ExistingSavingMethods(props) {
         style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }}
       />
       <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
+        <View style={CommonStyles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity
               onPress={() => props.navigation.goBack()}
@@ -101,10 +102,10 @@ export default function ExistingSavingMethods(props) {
               />
             </TouchableOpacity>
             <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Funding Sources'}
+              <Text style={CommonStyles.modalHeaderTitleText}>
+                Funding Sources
               </Text>
-              <Text style={styles.modalHeaderSmallTitleText}>
+              <Text style={CommonStyles.modalHeaderSubheadingText}>
                 View all your funding sources in one place
               </Text>
             </View>
@@ -271,7 +272,7 @@ export default function ExistingSavingMethods(props) {
                         >
                           Voucher Code {value.voucherCode}
                         </Text>
-                        
+
                       </View>
                       <View
                         style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -402,30 +403,9 @@ export default function ExistingSavingMethods(props) {
 }
 
 const styles = StyleSheet.create({
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
   modalContainer: {
     backgroundColor: Colors.backgroundColor1,
     width: '100%',
-  },
-  modalHeaderSmallTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 10,
   },
   transactionModalAmountView: {
     flexDirection: 'row',
@@ -442,14 +422,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(9),
     fontFamily: Fonts.OpenSans,
     lineHeight: RFValue(18),
-  },
-  accountInfo: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  accountInfoTitle: {
-    fontFamily: Fonts.FiraSansRegular,
   },
   cardOuterView: {
     marginLeft: 20,

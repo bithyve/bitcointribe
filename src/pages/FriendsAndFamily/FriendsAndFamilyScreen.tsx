@@ -18,9 +18,8 @@ import {
 } from 'react-native-responsive-screen';
 import { connect } from 'react-redux';
 import idx from 'idx';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import Styles from '../common/Styles';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -28,30 +27,28 @@ import {
   trustedChannelsSync,
   removeTrustedContact,
   updateAddressBookLocally,
-} from '../store/actions/trustedContacts';
-import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+} from '../../store/actions/trustedContacts';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
-import { nameToInitials } from '../common/CommonFunctions';
-import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import BottomInfoBox from '../components/BottomInfoBox';
-import AddContactAddressBook from './Contacts/AddContactAddressBook';
+} from '../../common/constants/serviceTypes';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import { nameToInitials } from '../../common/CommonFunctions';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../components/ModalHeader';
-import config from '../bitcoin/HexaConfig';
-import KnowMoreButton from '../components/KnowMoreButton';
-import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddressBookHelpContents from '../components/Helper/AddressBookHelpContents';
-// import CountDown from 'react-native-countdown-component';
-import CountDown from '../components/CountDown';
-import Config from '../bitcoin/HexaConfig';
-import { ContactTypes } from 'expo-contacts';
+import ModalHeader from '../../components/ModalHeader';
+import config from '../../bitcoin/HexaConfig';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
+import CountDown from '../../components/CountDown';
+import CommonStyles from '../../common/Styles';
 
-interface AddressBookContentsPropTypes {
+interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
@@ -63,7 +60,7 @@ interface AddressBookContentsPropTypes {
   trustedContactsInfo: any;
   removeTrustedContact: any;
 }
-interface AddressBookContentsStateTypes {
+interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
   loading: boolean;
@@ -135,9 +132,9 @@ const getImageIcon = (item) => {
   }
 };
 
-class AddressBookContents extends PureComponent<
-  AddressBookContentsPropTypes,
-  AddressBookContentsStateTypes
+class FriendsAndFamily extends PureComponent<
+  FriendsAndFamilyPropTypes,
+  FriendsAndFamilyStateTypes
 > {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
@@ -553,7 +550,7 @@ class AddressBookContents extends PureComponent<
     );
   };
 
-  renderAddContactAddressBookContents = () => {
+  renderAddContactFriendsAndFamily = () => {
     const { navigation } = this.props;
     const { isLoadContacts, selectedContact } = this.state;
     return (
@@ -616,16 +613,17 @@ class AddressBookContents extends PureComponent<
     const { navigation, trustedChannelsSync } = this.props;
     const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
     return (
-      <View style={Styles.rootView}>
-        <SafeAreaView style={Styles.statusBarStyle} />
+      <View style={CommonStyles.rootView}>
+        <SafeAreaView style={CommonStyles.statusBarStyle} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
         <View style={styles.modalContainer}>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={Styles.backIconRootContainer}>
+          <View style={CommonStyles.modalHeaderTitleView}>
+            <View style={CommonStyles.backIconRootContainer}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
-                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-                style={Styles.backIconTouchContainer}
+                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                style={CommonStyles.backIconTouchContainer}
               >
                 <FontAwesome
                   name="long-arrow-left"
@@ -633,8 +631,8 @@ class AddressBookContents extends PureComponent<
                   size={17}
                 />
               </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Friends and Family'}
+              <Text style={CommonStyles.modalHeaderTitleText}>
+                Friends and Family
               </Text>
             </View>
             <KnowMoreButton
@@ -649,6 +647,7 @@ class AddressBookContents extends PureComponent<
               textStyle={{}}
             />
           </View>
+
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -727,7 +726,7 @@ class AddressBookContents extends PureComponent<
                   >
                     <Image
                       style={styles.addGrayImage}
-                      source={require('../assets/images/icons/icon_add_grey.png')}
+                      source={require('../../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
                       <Text style={styles.contactText}>Add a Contact</Text>
@@ -758,7 +757,7 @@ class AddressBookContents extends PureComponent<
               ? hp('82%')
               : hp('82%'),
           ]}
-          renderContent={this.renderAddContactAddressBookContents}
+          renderContent={this.renderAddContactFriendsAndFamily}
           renderHeader={this.renderAddContactAddressBookHeader}
         />
         <BottomSheet
@@ -800,30 +799,13 @@ export default connect(mapStateToProps, {
   trustedChannelsSync,
   updateAddressBookLocally,
   removeTrustedContact,
-})(AddressBookContents);
+})(FriendsAndFamily);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 15,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
   },
   contactText: {
     marginLeft: 10,
@@ -862,33 +844,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
-  watermarkViewBigText: {
-    backgroundColor: Colors.backgroundColor,
-    height: wp('5%'),
-    width: wp('35%'),
-    borderRadius: 10,
-  },
-  watermarkViewSmallText: {
-    backgroundColor: Colors.backgroundColor,
-    height: wp('3%'),
-    width: wp('25%'),
-    marginTop: 3,
-    borderRadius: 10,
-  },
-  watermarkViewButton: {
-    marginLeft: 'auto',
-    backgroundColor: Colors.backgroundColor,
-    height: wp('7%'),
-    width: wp('18%'),
-    borderRadius: 10,
-  },
-  watermarkViewArrow: {
-    marginLeft: 20,
-    backgroundColor: Colors.backgroundColor,
-    height: wp('3%'),
-    width: wp('3%'),
-    borderRadius: wp('3%') / 2,
-  },
   imageIconStyle: {
     width: wp('12%'),
     height: wp('12%'),
@@ -914,43 +869,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 'auto',
   },
-  xpubViewStyle: {
-    width: wp('15%'),
-    height: wp('6%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.borderColor,
-    marginRight: 10,
-    borderRadius: 5,
-  },
-  xpubTextStyle: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-  },
   xpubIconView: {
     width: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 'auto',
     marginRight: 10,
-  },
-  waterMarkView: {
-    marginBottom: 15,
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-  },
-  waterMarkInnerView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-  },
-  waterMarkBigView: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderColor,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
   },
   addGrayImage: {
     width: wp('10%'),

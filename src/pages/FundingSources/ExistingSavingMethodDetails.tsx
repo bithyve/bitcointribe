@@ -9,6 +9,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
+import CommonStyles from '../../common/Styles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -37,8 +38,9 @@ export default function ExistingSavingMethodDetails(props) {
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }}
       />
+
       <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
+        <View style={CommonStyles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity
               onPress={() => props.navigation.goBack()}
@@ -52,10 +54,10 @@ export default function ExistingSavingMethodDetails(props) {
               />
             </TouchableOpacity>
             <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Funding Sources Detail'}
+              <Text style={CommonStyles.modalHeaderTitleText}>
+                Funding Sources Detail
               </Text>
-              <Text style={styles.modalHeaderSmallTitleText}>
+              <Text style={CommonStyles.modalHeaderSubheadingText}>
                 Funding sources full details
               </Text>
             </View>
@@ -419,32 +421,10 @@ export default function ExistingSavingMethodDetails(props) {
 }
 
 const styles = StyleSheet.create({
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
   modalContainer: {
     backgroundColor: Colors.backgroundColor1,
     width: '100%',
   },
-  modalHeaderSmallTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 10,
-  },
-
   transactionModalAmountView: {
     flexDirection: 'row',
     alignItems: 'flex-end',
