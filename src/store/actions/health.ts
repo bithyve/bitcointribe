@@ -96,11 +96,12 @@ export const createAndUploadOnEFChannel = (
   scannedData,
   featuresList,
   isPrimaryKeeper,
+  selectedShareId
 ) => {
   console.log('testing...1');
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
-    payload: { scannedData, featuresList, isPrimaryKeeper },
+    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId },
   };
 };
 

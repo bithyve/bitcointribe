@@ -227,8 +227,12 @@ export const updateSharesHealthWatcher = createWatcher(
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
   let featuresList = payload.featuresList;
+  // let selectedShareId = payload.selectedShareId;
+  
   yield put(updateMSharesLoader(true));
   let s3Service: S3Service = yield select((state) => state.sss.service);
+  // console.log('s3Service.levelhealth.metaShares', typeof s3Service.levelhealth.metaShares, selectedShareId);
+
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
@@ -252,7 +256,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     featuresList,
   };
   let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-  let encryptedKey = encrypt(EFChannelData.uuid, otp);
+  let encryptedKey : string = encrypt(EFChannelData.uuid, otp);
   let dataElements: EphemeralDataElementsForKeeper = {
     publicKey: EFChannelData.publicKey,
     walletID: EFChannelData.walletID,
@@ -265,7 +269,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   };
   const shareUploadables = LevelHealth.encryptMetaShare(
     s3Service.levelhealth.metaShares[1],
-    encryptedKey
+    EFChannelData.uuid
   );
   let object = {
     shareId: s3Service.levelhealth.metaShares[1]

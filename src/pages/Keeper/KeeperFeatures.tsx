@@ -119,7 +119,7 @@ class KeeperFeatures extends Component<
           featuresList.push(element);
         } 
       }
-      this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper);
+      this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper, this.props.navigation.state.params.selectedShareId);
     }
     this.props.navigation.replace('ManageBackupKeeper')
   }

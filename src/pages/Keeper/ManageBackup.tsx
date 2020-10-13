@@ -54,6 +54,7 @@ interface ManageBackupStateTypes {
   securityAtLevel: any;
   encryptedCloudDataJson: any;
   isPrimaryKeeper: any;
+  selectedShareId: string;
 }
 
 interface ManageBackupPropsTypes {
@@ -165,6 +166,7 @@ class ManageBackup extends Component<
       ],
       isLevel2: false,
       isPrimaryKeeper: false,
+      selectedShareId: '',
       encryptedCloudDataJson: []
     };
   }
@@ -362,7 +364,7 @@ class ManageBackup extends Component<
   };
 
   generateShares = (level) =>{
-    const { isLevel2, isPrimaryKeeper, levelData } = this.state;
+    const { isLevel2, isPrimaryKeeper, levelData, selectedShareId } = this.state;
     const {generateMetaShare} = this.props;
     if(!this.props.isLevelTwoMetaShareCreated) {
       generateMetaShare(level);
@@ -373,7 +375,8 @@ class ManageBackup extends Component<
       selectedStatus: PKStatus,
       selectedTitle: "Primary Keeper",
       isPrimaryKeeper: true,
-      isSetUp: true
+      isSetUp: true,
+      selectedShareId
     });
   }
 
@@ -687,15 +690,15 @@ class ManageBackup extends Component<
                               }}
                               onPress={() => {
                                 if (value.id === 2) {
-                                  (this.refs
-                                    .SetupPrimaryKeeperBottomSheet as any).snapTo(
-                                    1,
-                                  );
-                                  this.setState({isPrimaryKeeper: true});
+                                  setTimeout(() => {
+                                    (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+                                  }, 2);
+                                  this.setState({isPrimaryKeeper: true, selectedShareId: value.keeper1.shareId});
                                 } else {
-                                  (this.refs
-                                    .keeperTypeBottomSheet as any).snapTo(1);
-                                    this.setState({isPrimaryKeeper: false});
+                                  setTimeout(() => {
+                                    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                  }, 2);
+                                  this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper1.shareId});
                                 }
                               }}
                             >
@@ -763,8 +766,7 @@ class ManageBackup extends Component<
                                   (this.refs
                                     .keeperTypeBottomSheet as any).snapTo(1);
                                 }, 2);
-                                this.setState({isPrimaryKeeper: false});
-
+                                this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper1.shareId});
                               }}
                             >
                               {value.keeper2.keeper2Done &&

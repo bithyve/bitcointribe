@@ -194,9 +194,8 @@ const KeeperDeviceHistory = (props) => {
               (ApproveSetupBottomSheet as any).current.snapTo(1);  
             }
             else{
-              let qrScannedData = '{"uuid":"fdd217d6-82e6-435b-985c-b4a9e0163276","publicKey":"01d1d90092100c738f087550d263a75967f121fa598bb300cedbd7406c76bdff","ephemeralAddress":"e04d236f3681a22c7f7bd84f13ece1d64acb5e6fe8fd089d82a912043daa1f2e","walletName":"Sam"}'
-
-              props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper});
+              let qrScannedData = '{"uuid":"9c2d4b8b1dff873f3ed7b74b","publicKey":"72b4a594df14aae6bbfc2f716065475f39e6cae53a2e85c6eee548324e56d7a8","ephemeralAddress":"4a9e7503c964357126f1526f7e76188dca95561bb28eef97fd7dd2238573b1e9","walletName":"shivani"}'
+              props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
             }
           (QrBottomSheet as any).current.snapTo(0);
         }}
