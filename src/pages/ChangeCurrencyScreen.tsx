@@ -11,7 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import Currencies from '../common/Currencies';
+import Currencies from '../common/FiatCurrencies';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ScrollView } from 'react-native-gesture-handler';
