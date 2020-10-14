@@ -2241,25 +2241,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   updateHealthForCloud = () =>{
     let levelHealth = this.props.levelHealth;
-    console.log('levelHealth', levelHealth)
+    console.log('levelHealth', levelHealth, this.props.cloudBackupStatus);
     // health update for 1st upload to cloud 
     if(this.props.cloudBackupStatus && levelHealth.length){
-      if(levelHealth[0].shareType == 'cloud'){
-        levelHealth[0].updatedAt = moment(new Date()).valueOf();
-        levelHealth[0].status = 'accessible';
-        levelHealth[0].reshareVersion = 1;
-        levelHealth[0].guardian = 'cloud';
-        console.log('levelHealth updateHealthForCloud', levelHealth[0])
-      }
-      let shareArray = [
-        {
-          walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealth[0].shareId,
-          reshareVersion: levelHealth[0].reshareVersion
+      if(this.props.cloudBackupStatus && levelHealth.length){
+        if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
+          levelHealth[0].levelInfo[0].updatedAt = moment(new Date()).valueOf();
+          levelHealth[0].levelInfo[0].status = 'accessible';
+          levelHealth[0].levelInfo[0].reshareVersion = 1;
+          levelHealth[0].levelInfo[0].guardian = 'cloud';
+          console.log('levelHealth updateHealthForCloud', levelHealth[0])
         }
-      ];
-      console.log('updateMSharesHealth shareArray', shareArray);
-      this.props.updateMSharesHealth(shareArray);
+        let shareArray = [
+          {
+            walletId: this.props.s3Service.getWalletId().data.walletId,
+            shareId: levelHealth[0].levelInfo[0].shareId,
+            reshareVersion: levelHealth[0].levelInfo[0].reshareVersion
+          }
+        ];
+        console.log('updateMSharesHealth shareArray', shareArray);
+        this.props.updateMSharesHealth(shareArray);
+      }
     }
   }
 
