@@ -984,9 +984,9 @@ function* accountsSyncWorker({ payload }) {
 
     yield call(fetchBalanceTxWorker, {
       payload: {
-        serviceType: TEST_ACCOUNT,
+        serviceType: SECURE_ACCOUNT,
         options: {
-          service: testService,
+          service: secureService,
           restore: payload.restore,
           shouldNotInsert: true,
         },
@@ -995,9 +995,9 @@ function* accountsSyncWorker({ payload }) {
 
     yield call(fetchBalanceTxWorker, {
       payload: {
-        serviceType: SECURE_ACCOUNT,
+        serviceType: TEST_ACCOUNT,
         options: {
-          service: secureService,
+          service: testService,
           restore: payload.restore,
           shouldNotInsert: true,
         },
