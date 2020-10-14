@@ -292,7 +292,12 @@ class AddressBookContents extends PureComponent<
           };
           trustedContacts.push(element);
           if (element.isGuardian) {
-            myKeepers.push(element);
+            // const isRemovable =
+            //   Date.now() - element.initiatedAt > 1000 &&
+            //   !element.hasTrustedChannel
+            //     ? true
+            //     : false;
+            myKeepers.push({ ...element });
           }
           if (element.isWard) {
             imKeepers.push(element);
@@ -619,7 +624,7 @@ class AddressBookContents extends PureComponent<
             <View style={Styles.backIconRootContainer}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
-                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
                 style={Styles.backIconTouchContainer}
               >
                 <FontAwesome
