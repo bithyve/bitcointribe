@@ -7,10 +7,10 @@ import FriendsAndFamilyScreen from '../../pages/FriendsAndFamily/FriendsAndFamil
 import WalletSettingsContainerScreen from "../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen";
 import FundingSourcesScreen from "../../pages/FundingSources/FundingSourcesContainerScreen";
 import FundingSourceDetailsScreen from "../../pages/FundingSources/FundingSourceDetailsScreen";
-import CommonStyles from '../../common/Styles';
 import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
 import { goHomeAction } from '../actions/NavigationActions';
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
+import NavStyles from '../../common/Styles/NavStyles';
 
 
 export const WalletSettingsStack = createStackNavigator(
@@ -37,7 +37,7 @@ export const WalletSettingsStack = createStackNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: CommonStyles.modalHeaderTitleText,
+        headerTitleStyle: NavStyles.modalHeaderTitleText,
         headerLeft: () => {
           return (
             <SmallNavHeaderCloseButton
@@ -98,7 +98,7 @@ export const MoreOptionsStack = createStackNavigator(
     initialRouteName: 'MoreOptionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: CommonStyles.modalHeaderTitleText,
+        headerTitleStyle: NavStyles.modalHeaderTitleText,
         headerLeft: () => {
           return (
             <SmallNavHeaderCloseButton
