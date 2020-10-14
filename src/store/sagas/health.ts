@@ -11,7 +11,9 @@ import {
   updateLevelThreeMetaShareStatus,
   INIT_LEVEL_TWO,
   initLevelTwo,
-  checkMSharesHealth
+  checkMSharesHealth,
+  isLevel2InitializedStatus,
+  updateMSharesHealth
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -42,17 +44,26 @@ import { EphemeralDataElementsForKeeper } from '../../bitcoin/utilities/Interfac
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
 import { encrypt } from '../../common/encryption/index';
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
+import moment from 'moment';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
   const initialized = s3Service.levelhealth.healthCheckInitialized;
   if (initialized) return;
-
+  console.log('res init1');
   yield put(initLoader(true));
+  console.log('res init2');
   const res = yield call(s3Service.initializeHealth);
+  console.log('res init', res);
+  
   if (res.status === 200) {
     // Update Initial Health to reducer
-    yield put(checkMSharesHealth());
+    let obj = [{
+      level: 1,
+      levelInfo: res.data.levelInfo
+    }]
+    yield call(updateHealth, obj, 0);
+    // yield put(checkMSharesHealth());
     // Update status
     yield put(healthCheckInitialized());
 
@@ -96,8 +107,10 @@ function* generateMetaSharesWorker({ payload }) {
   );
   let serviceCall = null;
   if (level == 2) {
+    let isLevel2Initialized = yield select((state) => state.health);
     serviceCall = s3Service.generateLevel1Shares;
-    yield put(initLevelTwo());
+    console.log('generateLevel1Shares');
+    if(!isLevel2Initialized){ yield put(initLevelTwo()); }
     yield put(updateLevelTwoMetaShareStatus(true));
   } else if (level == 3) {
     serviceCall = s3Service.generateLevel2Shares;
@@ -147,6 +160,7 @@ export const checkSharesHealthWatcher = createWatcher(
 );
 
 function* updateSharesHealthWorker({ payload }) {
+  console.log('cloud health update home shareArray', payload.shares);
   // // set a timelapse for auto update and enable instantaneous manual update
   yield put(updateMSharesLoader(true));
 
@@ -166,6 +180,7 @@ function* updateSharesHealthWorker({ payload }) {
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
   const res = yield call(S3Service.updateHealth, payload.shares);
+  console.log('cloud health update home res', res);
   if (res.status === 200) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
@@ -231,7 +246,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   
   yield put(updateMSharesLoader(true));
   let s3Service: S3Service = yield select((state) => state.sss.service);
-  // console.log('s3Service.levelhealth.metaShares', typeof s3Service.levelhealth.metaShares, selectedShareId);
+  let securityQuestion = yield select((state) => state.storage.database.WALLET_SETUP);
 
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
@@ -256,7 +271,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     featuresList,
   };
   // let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-  let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid, otp);
+  let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData
   let dataElements: EphemeralDataElementsForKeeper = {
     publicKey: EFChannelData.publicKey,
@@ -266,7 +281,9 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       encryptedKey,
     },
     xPub: EFChannelData.xPubs,
-    securityQuestion: {},
+    securityQuestion: securityQuestion,
+    secondaryMnemonics: EFChannelData.secondaryMnemonics,
+    featuresList: EFChannelData.featuresList,
   };
   const shareUploadables = LevelHealth.encryptMetaShare(
     s3Service.levelhealth.metaShares[1],
@@ -283,6 +300,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     encKey: EFChannelData.uuid,
     shareUploadables: shareUploadables
   };
+  console.log('object EFCHANNEL', object);
   
   let Kp = new KeeperService();
   let res = yield call(
@@ -295,6 +313,27 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     object.encKey,
     object.shareUploadables
   );
+  if(res.status){
+    let levelHealth = yield select((state) => state.health.levelHealth);
+    console.log('cloud health update home levelHealth', levelHealth);
+    if(levelHealth[1] && levelHealth[1].levelInfo && levelHealth[1].levelInfo[2].shareType == 'primaryKeeper'){
+      levelHealth[1].levelInfo[2].updatedAt = moment(new Date()).valueOf();
+      levelHealth[1].levelInfo[2].reshareVersion = 1;
+      levelHealth[1].levelInfo[2].guardian = 'cloud';
+      let shareArray = [
+        {
+          walletId: s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[1].levelInfo[2].shareId,
+          reshareVersion: levelHealth[1].levelInfo[2].reshareVersion,
+          updatedAt: moment(new Date()).valueOf(),
+        }
+      ];
+      yield call(updateMSharesHealth, shareArray);
+    }
+    
+  }
+  console.log('res EFCHANNEL', res);
+  
   yield put(updateMSharesLoader(false));
 }
 
@@ -304,31 +343,24 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 );
 
 function* updateHealthLevel2Worker() {
-  let s3Service: S3Service = yield select((state) => state.sss.service);
-  let Health = yield select((state) => state.health.levelHealth);
-  let SecurityQuestionHealth = {};
-  if(Health && !Health[1] && Health[0]){
-    if(Health[0].levelInfo[1].shareType == "securityQuestion"){
-      SecurityQuestionHealth = Health[0].levelInfo[1];
+  console.log('INIT_LEVEL_TWO');
+  let isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized);
+  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized);
+  if(!isLevel2Initialized){
+    let s3Service: S3Service = yield select((state) => state.sss.service);
+    let Health = yield select((state) => state.health.levelHealth);
+    let SecurityQuestionHealth = Health[0].levelInfo[1];
+      
+    console.log('INIT_LEVEL_TWO SecurityQuestionHealth', SecurityQuestionHealth );
+    yield put(initLoader(true));
+    const res = yield call(s3Service.updateHealthLevel2, SecurityQuestionHealth);
+    if(res.success){
+      // Update Health to reducer
+      yield put(checkMSharesHealth());
+      yield put(isLevel2InitializedStatus(true));
     }
+    yield put(initLoader(false));
   }
-  else if(Health && Health[1] && !Health[2]){
-    if(Health[1].levelInfo[1].shareType == "securityQuestion"){
-      SecurityQuestionHealth = Health[1].levelInfo[1];
-    }
-  }
-  else if( Health && Health[2]){
-    if(Health[2].levelInfo[1].shareType == "securityQuestion"){
-      SecurityQuestionHealth = Health[2].levelInfo[1];
-    }
-  }
-  yield put(initLoader(true));
-  const res = yield call(s3Service.updateHealthLevel2, SecurityQuestionHealth);
-  if(res.success){
-    // Update Health to reducer
-    yield put(checkMSharesHealth());
-  }
-  yield put(initLoader(false));
 }
 
 export const updateHealthLevel2Watcher = createWatcher(

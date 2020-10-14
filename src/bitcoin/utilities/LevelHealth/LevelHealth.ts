@@ -371,6 +371,8 @@ export default class LevelHealth {
         walletId: string;
         shareId: string;
         reshareVersion: number;
+        updatedAt: number;
+        status?: string;
       },
     ],
   ): Promise<{

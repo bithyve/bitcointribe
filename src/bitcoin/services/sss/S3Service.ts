@@ -304,6 +304,8 @@ export default class S3Service {
       walletId: string;
       shareId: string;
       reshareVersion: number;
+      updatedAt: number;
+      status?: string;
     }],
   ): Promise<
     | {
@@ -328,7 +330,7 @@ export default class S3Service {
         data?: undefined;
       }
   > => {
-    console.log('updateMSharesHealth s3 shares', shares)
+    console.log('updateMSharesHealth s3sevice', shares)
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -626,6 +628,7 @@ export default class S3Service {
       }
   > => {
     try {
+      console.log('INIT_LEVEL_TWO', SecurityQuestionHealth)
       return {
         status: config.STATUS.SUCCESS,
         data: await this.levelhealth.updateHealthLevel2(SecurityQuestionHealth),

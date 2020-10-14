@@ -25,6 +25,8 @@ const initialState: {
   currentLevel: Number;
   isLevelTwoMetaShareCreated: Boolean;
   isLevelThreeMetaShareCreated: Boolean;
+  isLevel2Initialized: Boolean;
+  isLevel3Initialized: Boolean;
   levelHealth: {
     level: number;
     levelInfo: {
@@ -47,6 +49,8 @@ const initialState: {
   },
   isLevelTwoMetaShareCreated: false,
   isLevelThreeMetaShareCreated: false,
+  isLevel2Initialized: false,
+  isLevel3Initialized: false,
   currentLevel: 0,
   levelHealth: [],
   errorSending: false,

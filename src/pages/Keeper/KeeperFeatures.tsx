@@ -32,7 +32,7 @@ import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import RadioButton from '../../components/RadioButton';
-import { createAndUploadOnEFChannel } from '../../store/actions/health';
+import { createAndUploadOnEFChannel, updateMSharesHealth } from '../../store/actions/health';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
@@ -42,6 +42,9 @@ interface KeeperFeaturesStateTypes {
 interface KeeperFeaturesPropsTypes {
   navigation: any;
   createAndUploadOnEFChannel: any;
+  levelHealth: any[];
+  s3Service: any;
+  updateMSharesHealth: any;
 }
 
 class KeeperFeatures extends Component<
@@ -59,12 +62,6 @@ class KeeperFeatures extends Component<
           info: 'Keep an eye on your wallet health',
           id: 1,
         },
-        // {
-        //   type: 'notifications',
-        //   title: 'Get important notification',
-        //   info: 'Get selected wallet notifications',
-        //   id: 2,
-        // },
         {
           type: 'balance',
           title: 'Show Balances',
@@ -87,7 +84,25 @@ class KeeperFeatures extends Component<
     }
   };
 
-
+  updatePrimaryKeeperHealth = () =>{
+    let levelHealth = this.props.levelHealth;
+    console.log('cloud health update home levelHealth', levelHealth);
+    if(levelHealth[0].levelInfo[1].shareType == 'primaryKeeper'){
+      levelHealth[0].levelInfo[1].updatedAt = moment(new Date()).valueOf();
+      levelHealth[0].levelInfo[1].status = 'accessible';
+      levelHealth[0].levelInfo[1].reshareVersion = 1;
+      levelHealth[0].levelInfo[1].guardian = 'cloud';
+    }
+    let shareArray = [
+      {
+        walletId: this.props.s3Service.getWalletId().data.walletId,
+        shareId: levelHealth[0].levelInfo[1].shareId,
+        reshareVersion: levelHealth[0].levelInfo[1].reshareVersion,
+        updatedAt: moment(new Date()).valueOf(),
+      }
+    ];
+    this.props.updateMSharesHealth(shareArray);
+  }
 
   getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
@@ -344,6 +359,7 @@ const mapStateToProps = (state) => {
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
+    levelHealth: idx(state, (_) => _.health.levelHealth),
   };
 };
 
@@ -351,6 +367,7 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
     createAndUploadOnEFChannel,
+    updateMSharesHealth
   })(KeeperFeatures),
 );
 

@@ -9,9 +9,9 @@ export const getIconByStatus = status => {
 };
 
 export const getIconByStatusForKeeper = status => {
-  if (status == "notAccessed") {
+  if (status == "notAccessible") {
     return require("../../assets/images/icons/icon_error_red.png");
-  } else if (status == "accessed") {
+  } else if (status == "accessible") {
     return require("../../assets/images/icons/icon_check.png");
   }
 };

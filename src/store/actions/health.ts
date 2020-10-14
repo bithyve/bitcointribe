@@ -1,5 +1,7 @@
 // types and action creators: dispatched by components and sagas
 
+import { share } from "secrets.js-grempe";
+
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP';
 export const HEALTH_UPDATE = 'HEALTH_UPDATE';
 export const HEALTH_CHECK_INITIALIZED = 'HEALTH_CHECK_INITIALIZED';
@@ -21,7 +23,8 @@ export const UPDATE_EFCHANNEL_LOADING_STATUS =
   'UPDATE_EFCHANNEL_LOADING_STATUS';
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE';  
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
-export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';  
+export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
+export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED'; 
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -32,6 +35,7 @@ export const initializeHealthSetup = () => {
 };
 
 export const updateHealth = (health, currentLevel) => {
+  console.log('HEALTH_UPDATE', HEALTH_UPDATE);
   return { type: HEALTH_UPDATE, payload: { health, currentLevel } };
 };
 
@@ -44,13 +48,11 @@ export const healthInitialized = () => {
 };
 
 export const switchS3LoadingStatus = (beingLoaded) => {
-  console.log('testing3');
-  // console.log("Called s3 Loading", new Date())
   return { type: S3_LOADING_STATUS, payload: { beingLoaded } };
 };
 
 export const initLoader = (beingLoaded) => {
-  // console.log("Called s3 Loading", new Date())
+  console.log('INIT_LEVEL_TWO status' );
   return { type: INIT_LOADING_STATUS, payload: { beingLoaded } };
 };
 
@@ -75,7 +77,7 @@ export const ErrorSending = (isFailed) => {
 };
 
 export const updateMSharesHealth = (shares) => {
-  console.log('updateMSharesHealth shares', shares);
+  console.log('updateMSharesHealth action shares', share)
   return { type: UPDATE_SHARES_HEALTH, payload: { shares } };
 };
 
@@ -119,4 +121,8 @@ export const updateLevelThreeMetaShareStatus = (beingLoaded) => {
 
 export const initLevelTwo = () => {
   return { type: INIT_LEVEL_TWO };
+};
+
+export const isLevel2InitializedStatus = (beingLoaded) => {
+  return { type: IS_LEVEL2_INITIALIZED, payload: { beingLoaded } };
 };

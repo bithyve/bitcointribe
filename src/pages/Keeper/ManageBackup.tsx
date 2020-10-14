@@ -45,7 +45,8 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
-import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel } from '../../store/actions/health';
+import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel, initLevelTwo } from '../../store/actions/health';
+import { modifyLevelStatus } from './ManageBackupFunction';
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -81,6 +82,8 @@ interface ManageBackupPropsTypes {
   checkMSharesHealth: any;
   createAndUploadOnEFChannel: any;
   isLevelTwoMetaShareCreated: Boolean;
+  isLevel2Initialized: Boolean;
+  initLevelTwo: any;
 }
 
 class ManageBackup extends Component<
@@ -171,107 +174,10 @@ class ManageBackup extends Component<
     };
   }
 
-  modifyLevelStatus = () => {
-    let { levelData } = this.state;
+  modifyLevelData = () => {
     let { levelHealth, currentLevel } = this.props;
-    let levelInfo = levelHealth[0].levelInfo;
-    if(levelHealth[0] && levelInfo.length == 2){
-      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper1.keeper1Done = true;
-        levelData[0].keeper1.type = "cloud";
-        levelData[0].keeper1.shareId = levelInfo[0].shareId;
-      }
-      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
-        levelData[0].keeper2.name = 'Security Question';
-        levelData[0].keeper2.keeper2Done = true;
-        levelData[0].keeper2.type = "securityQuestion";
-        levelData[0].keeper2.shareId = levelInfo[1].shareId;
-      }
-      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") levelData[0].status = 'good';
-      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
-    } else if(levelHealth[0] && levelInfo.length == 4){
-      console.log('manageBackup levelHealth[0]', levelHealth[0])
-      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper1.keeper1Done = true;
-        levelData[0].keeper1.type = "cloud";
-        levelData[0].keeper1.shareId = levelInfo[0].shareId;
-      }
-      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
-        levelData[0].keeper2.name = 'Security Question';
-        levelData[0].keeper2.keeper2Done = true;
-        levelData[0].keeper2.type = "securityQuestion";
-        levelData[0].keeper2.shareId = levelInfo[1].shareId;
-      }
-      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") { 
-        levelData[0].status = 'good';
-      }
-      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) {
-        levelData[0].status = 'bad';
-      }
-
-      if(levelInfo[2].status == "accessible"){
-        levelData[1].keeper1.name = levelInfo[2].guardian;
-        levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = levelInfo[2].shareType;
-        levelData[1].keeper1.shareId = levelInfo[2].shareId;
-      }
-      if(levelInfo[3].status == "accessible"){
-        levelData[1].keeper2.name = levelInfo[3].guardian;
-        levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = levelInfo[3].shareType;
-        levelData[1].keeper2.shareId = levelInfo[3].shareId;
-      }
-      if(levelInfo[2].status == "accessible" && levelInfo[3].status == "accessible") levelData[1].status = 'good';
-      else if((levelInfo[2].status == "accessible" && levelInfo[3].status == "notAccessible") || (levelInfo[2].status == "notAccessible" && levelInfo[3].status == "accessible")) levelData[1].status = 'bad';
-    }
-    else if(levelHealth[0] && levelInfo.length == 6){
-      if(levelInfo[0].shareType == 'cloud' && levelInfo[0].status == "accessible"){
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper1.keeper1Done = true;
-        levelData[0].keeper1.type = "cloud";
-        levelData[0].keeper2.shareId = levelInfo[0].shareId;
-      }
-      if(levelInfo[1].shareType == "securityQuestion" && levelInfo[1].status == "accessible"){
-        levelData[0].keeper2.name = 'Security Question';
-        levelData[0].keeper2.keeper2Done = true;
-        levelData[0].keeper2.type = "securityQuestion";
-        levelData[0].keeper2.shareId = levelInfo[1].shareId;
-      }
-      if(levelInfo[0].status == "accessible" && levelInfo[1].status == "accessible") levelData[0].status = 'good';
-      else if((levelInfo[0].status == "accessible" && levelInfo[1].status == "notAccessible") || (levelInfo[0].status == "notAccessible" && levelInfo[1].status == "accessible")) levelData[0].status = 'bad';
-
-      if(levelInfo[2].status == "accessible"){
-        levelData[1].keeper1.name = levelInfo[2].guardian;
-        levelData[1].keeper1.keeper1Done = true;
-        levelData[1].keeper1.type = levelInfo[2].shareType;
-        levelData[1].keeper2.shareId = levelInfo[2].shareId;
-      }
-      if(levelInfo[3].status == "accessible"){
-        levelData[1].keeper2.name = levelInfo[3].guardian;
-        levelData[1].keeper2.keeper2Done = true;
-        levelData[1].keeper2.type = levelInfo[3].shareType;
-        levelData[1].keeper2.shareId = levelInfo[3].shareId;
-      }
-      if(levelInfo[2].status == "accessible" && levelInfo[3].status == "accessible") levelData[1].status = 'good';
-      else if((levelInfo[2].status == "accessible" && levelInfo[3].status == "notAccessible") || (levelInfo[2].status == "notAccessible" && levelInfo[3].status == "accessible")) levelData[1].status = 'bad';
-
-      if(levelInfo[4].status == "accessible"){
-        levelData[2].keeper1.name = levelInfo[4].guardian;
-        levelData[2].keeper1.keeper1Done = true;
-        levelData[2].keeper1.type = levelInfo[4].shareType;
-        levelData[2].keeper2.shareId = levelInfo[4].shareId;
-      }
-      if(levelInfo[5].status == "accessible"){
-        levelData[2].keeper2.name = levelInfo[5].guardian;
-        levelData[2].keeper2.keeper2Done = true;
-        levelData[2].keeper2.type = levelInfo[5].shareType;
-        levelData[2].keeper2.shareId = levelInfo[5].shareId;
-      }
-      if(levelInfo[4].status == "accessible" && levelInfo[5].status == "accessible") levelData[2].status = 'good';
-      else if((levelInfo[4].status == "accessible" && levelInfo[5].status == "notAccessible") || (levelInfo[4].status == "notAccessible" && levelInfo[5].status == "accessible")) levelData[2].status = 'bad';
-    }
+    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel);
+    console.log('levelData', levelData);
     this.setState({levelData: levelData});
   }
 
@@ -283,7 +189,7 @@ class ManageBackup extends Component<
         break;
       }
     }
-    this.modifyLevelStatus();
+    this.modifyLevelData();
     let level = 1;
     if (
       levelData.findIndex(
@@ -359,16 +265,21 @@ class ManageBackup extends Component<
 
   componentDidUpdate = (prevProps, prevState) => {
     if(prevProps.levelHealth != this.props.levelHealth){
-      this.modifyLevelStatus();
+      this.modifyLevelData();
+    }
+    if(prevState.selectedShareId != this.state.selectedShareId){
+      // alert(this.state.selectedShareId);
     }
   };
 
   generateShares = (level) =>{
     const { isLevel2, isPrimaryKeeper, levelData, selectedShareId } = this.state;
-    const {generateMetaShare} = this.props;
+    const {generateMetaShare, isLevel2Initialized, initLevelTwo} = this.props;
     if(!this.props.isLevelTwoMetaShareCreated) {
       generateMetaShare(level);
     }
+    console.log('isLevel2Initialized', isLevel2Initialized);
+    if(!isLevel2Initialized){ initLevelTwo() }
     let PKStatus = levelData[1].keeper1.keeper1Done ? 'accessed' : 'notAccessed';
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
@@ -932,6 +843,7 @@ const mapStateToProps = (state) => {
     levelHealth: idx(state, (_) => _.health.levelHealth),
     currentLevel: idx(state, (_) => _.health.currentLevel),
     isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
+    isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
   };
 };
@@ -943,6 +855,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     createAndUploadOnEFChannel,
+    initLevelTwo
   })(ManageBackup),
 );
 

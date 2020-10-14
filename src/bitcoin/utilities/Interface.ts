@@ -343,6 +343,8 @@ export interface EphemeralDataElementsForKeeper {
   };
   xPub? : any;
   securityQuestion?: any;
+  secondaryMnemonics?: any;
+  featuresList?: any;
 }
 
 export interface EphemeralDataForKeeper {

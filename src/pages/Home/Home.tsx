@@ -262,6 +262,7 @@ interface HomePropsTypes {
   updateMSharesHealth: any;
   setCardData: any;
   cardDataProps: any;
+  isLevel2Initialized: Boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -901,6 +902,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       regularAccount: regularAccount,
       keeperData: JSON.stringify(keeperData)
     }
+    console.log('cloudData', data);
     CloudDataBackup(data, this.setCloudBackupStatus);
     // console.log('call for google drive upload', this.props.cloudBackupStatus);
   };
@@ -2241,27 +2243,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   updateHealthForCloud = () =>{
     let levelHealth = this.props.levelHealth;
-    console.log('levelHealth', levelHealth, this.props.cloudBackupStatus);
+    console.log('cloud health update home levelHealth', levelHealth);
     // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth.length){
-      if(this.props.cloudBackupStatus && levelHealth.length){
-        if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
-          levelHealth[0].levelInfo[0].updatedAt = moment(new Date()).valueOf();
-          levelHealth[0].levelInfo[0].status = 'accessible';
-          levelHealth[0].levelInfo[0].reshareVersion = 1;
-          levelHealth[0].levelInfo[0].guardian = 'cloud';
-          console.log('levelHealth updateHealthForCloud', levelHealth[0])
-        }
-        let shareArray = [
-          {
-            walletId: this.props.s3Service.getWalletId().data.walletId,
-            shareId: levelHealth[0].levelInfo[0].shareId,
-            reshareVersion: levelHealth[0].levelInfo[0].reshareVersion
-          }
-        ];
-        console.log('updateMSharesHealth shareArray', shareArray);
-        this.props.updateMSharesHealth(shareArray);
+    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized){
+      if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
+        levelHealth[0].levelInfo[0].updatedAt = moment(new Date()).valueOf();
+        levelHealth[0].levelInfo[0].status = 'accessible';
+        levelHealth[0].levelInfo[0].reshareVersion = 1;
+        levelHealth[0].levelInfo[0].guardian = 'cloud';
       }
+      let shareArray = [
+        {
+          walletId: this.props.s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[0].levelInfo[0].shareId,
+          reshareVersion: levelHealth[0].levelInfo[0].reshareVersion,
+          updatedAt: moment(new Date()).valueOf(),
+          status: 'accessible'
+        }
+      ];
+      console.log('cloud health update home shareArray', shareArray);
+      this.props.updateMSharesHealth(shareArray);
     }
   }
 
@@ -3346,6 +3347,7 @@ const mapStateToProps = (state) => {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
+    isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
   };
 };
 
