@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles';
 
 
 export type Props = {
@@ -28,10 +27,5 @@ const SmallNavHeaderCloseButton: React.FC<Props> = ({
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  rootContainer: {
-  }
-});
 
 export default SmallNavHeaderCloseButton;

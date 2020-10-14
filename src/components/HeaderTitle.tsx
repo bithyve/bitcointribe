@@ -8,7 +8,7 @@ import {
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
+import CommonStyles from "../common/Styles/Styles";
 import KnowMoreButton from './KnowMoreButton';
 import { RFValue } from "react-native-responsive-fontsize";
 
