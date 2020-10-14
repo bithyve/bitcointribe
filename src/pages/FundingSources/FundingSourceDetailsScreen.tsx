@@ -1,67 +1,55 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
-  StatusBar,
   Text,
-  TouchableOpacity,
   SafeAreaView,
   ScrollView,
   Image,
 } from 'react-native';
+import CommonStyles from '../../common/Styles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import moment from 'moment';
+import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
 
-export default function ExistingSavingMethodDetails(props) {
+export default function FundingSourceDetails(props) {
   const FBTCAccount = props.navigation.state.params.getBittrAccount
     ? props.navigation.state.params.getBittrAccount
     : {};
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
-      <StatusBar
-        backgroundColor={Colors.backgroundColor1}
-        barStyle="dark-content"
-      />
-      <SafeAreaView
-        style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }}
-      />
+      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
+
       <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-              onPress={() => props.navigation.goBack()}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Funding Sources Detail'}
+        <View style={CommonStyles.modalNavHeaderContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <SmallNavHeaderBackButton
+              containerStyle={{ marginRight: 16 }}
+              onPress={() => props.navigation.pop()}
+            />
+
+            <View style={{ flex: 1 }}>
+              <Text style={CommonStyles.modalHeaderTitleText}>
+                Funding Sources Detail
               </Text>
-              <Text style={styles.modalHeaderSmallTitleText}>
+              <Text style={CommonStyles.modalHeaderSubheadingText}>
                 Funding sources full details
               </Text>
             </View>
           </View>
         </View>
       </View>
+
       <ScrollView style={{ flex: 1 }}>
         <View
           style={{
@@ -419,32 +407,10 @@ export default function ExistingSavingMethodDetails(props) {
 }
 
 const styles = StyleSheet.create({
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
   modalContainer: {
     backgroundColor: Colors.backgroundColor1,
     width: '100%',
   },
-  modalHeaderSmallTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 10,
-  },
-
   transactionModalAmountView: {
     flexDirection: 'row',
     alignItems: 'flex-end',

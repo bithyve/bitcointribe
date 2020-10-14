@@ -5,12 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar,
   Image,
   ScrollView,
   Platform,
   RefreshControl,
-  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -18,40 +16,37 @@ import {
 } from 'react-native-responsive-screen';
 import { connect } from 'react-redux';
 import idx from 'idx';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import Styles from '../common/Styles';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   trustedChannelsSync,
   removeTrustedContact,
   updateAddressBookLocally,
-} from '../store/actions/trustedContacts';
-import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+} from '../../store/actions/trustedContacts';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
-import { nameToInitials } from '../common/CommonFunctions';
-import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import BottomInfoBox from '../components/BottomInfoBox';
-import AddContactAddressBook from './Contacts/AddContactAddressBook';
+} from '../../common/constants/serviceTypes';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import { nameToInitials } from '../../common/CommonFunctions';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../components/ModalHeader';
-import config from '../bitcoin/HexaConfig';
-import KnowMoreButton from '../components/KnowMoreButton';
-import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddressBookHelpContents from '../components/Helper/AddressBookHelpContents';
-// import CountDown from 'react-native-countdown-component';
-import CountDown from '../components/CountDown';
-import Config from '../bitcoin/HexaConfig';
-import { ContactTypes } from 'expo-contacts';
+import ModalHeader from '../../components/ModalHeader';
+import config from '../../bitcoin/HexaConfig';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
+import CountDown from '../../components/CountDown';
+import CommonStyles from '../../common/Styles';
+import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
 
-interface AddressBookContentsPropTypes {
+interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
@@ -63,7 +58,7 @@ interface AddressBookContentsPropTypes {
   trustedContactsInfo: any;
   removeTrustedContact: any;
 }
-interface AddressBookContentsStateTypes {
+interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
   loading: boolean;
@@ -79,12 +74,12 @@ const makeFullName = (item) => {
   return item.firstName == 'Secondary' && item.lastName == 'Device'
     ? 'Keeper Device'
     : item.firstName && item.lastName
-    ? item.firstName + ' ' + item.lastName
-    : item.firstName && !item.lastName
-    ? item.firstName
-    : !item.firstName && item.lastName
-    ? item.lastName
-    : '';
+      ? item.firstName + ' ' + item.lastName
+      : item.firstName && !item.lastName
+        ? item.firstName
+        : !item.firstName && item.lastName
+          ? item.lastName
+          : '';
 };
 
 const getImageIcon = (item) => {
@@ -102,10 +97,10 @@ const getImageIcon = (item) => {
             <Text style={styles.imageIconText}>
               {item
                 ? nameToInitials(
-                    item.contactsWalletName && item.contactsWalletName !== ''
-                      ? `${item.contactsWalletName}'s Wallet`
-                      : makeFullName(item),
-                  )
+                  item.contactsWalletName && item.contactsWalletName !== ''
+                    ? `${item.contactsWalletName}'s Wallet`
+                    : makeFullName(item),
+                )
                 : ''}
             </Text>
           </View>
@@ -116,16 +111,16 @@ const getImageIcon = (item) => {
             <Text style={styles.imageIconText}>
               {item
                 ? nameToInitials(
-                    item.firstName == 'Secondary' && item.lastName == 'Device'
-                      ? 'Keeper Device'
-                      : item.firstName && item.lastName
+                  item.firstName == 'Secondary' && item.lastName == 'Device'
+                    ? 'Keeper Device'
+                    : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                          ? item.lastName
+                          : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -135,10 +130,10 @@ const getImageIcon = (item) => {
   }
 };
 
-class AddressBookContents extends PureComponent<
-  AddressBookContentsPropTypes,
-  AddressBookContentsStateTypes
-> {
+class FriendsAndFamily extends PureComponent<
+  FriendsAndFamilyPropTypes,
+  FriendsAndFamilyStateTypes
+  > {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
   focusListener: any;
@@ -216,7 +211,7 @@ class AddressBookContents extends PureComponent<
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -249,7 +244,7 @@ class AddressBookContents extends PureComponent<
             otp,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-          ];
+            ];
           console.log({ contactsWalletName });
           let usesOTP = false;
           if (!connectedVia && otp) {
@@ -374,10 +369,10 @@ class AddressBookContents extends PureComponent<
               <Text style={styles.imageIconText}>
                 {item
                   ? nameToInitials(
-                      item.contactsWalletName && item.contactsWalletName !== ''
-                        ? `${item.contactsWalletName}'s Wallet`
-                        : makeFullName(item),
-                    )
+                    item.contactsWalletName && item.contactsWalletName !== ''
+                      ? `${item.contactsWalletName}'s Wallet`
+                      : makeFullName(item),
+                  )
                   : ''}
               </Text>
             </View>
@@ -403,16 +398,16 @@ class AddressBookContents extends PureComponent<
               >
                 {item
                   ? nameToInitials(
-                      item.firstName == 'Secondary' && item.lastName == 'Device'
-                        ? 'Keeper Device'
-                        : item.firstName && item.lastName
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                         ? item.firstName + ' ' + item.lastName
                         : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-                    )
+                          ? item.firstName
+                          : !item.firstName && item.lastName
+                            ? item.lastName
+                            : '',
+                  )
                   : ''}
               </Text>
             </View>
@@ -431,12 +426,6 @@ class AddressBookContents extends PureComponent<
       <TouchableOpacity
         key={contact.id}
         onPress={() => {
-          // navigation.navigate('ContactDetails', {
-          //   contactsType,
-          //   contact,
-          //   index,
-          //   shareIndex: contact.shareIndex,
-          // });
           navigation.navigate('ContactDetailsNew', {
             contactsType,
             contact,
@@ -444,33 +433,30 @@ class AddressBookContents extends PureComponent<
             shareIndex: contact.shareIndex,
           });
         }}
-        // onLongPress={() => {
-        //   this.props.removeTrustedContact(contact.contactName);
-        // }}
         style={styles.selectedContactsView}
       >
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
             {contact.firstName === 'F&F request' &&
-            contact.contactsWalletName !== undefined &&
-            contact.contactsWalletName !== ''
-              ? `${contact.contactsWalletName}'s `
-              : contact.firstName && contact.firstName != 'Secondary'
-              ? contact.firstName + ' '
-              : contact.firstName && contact.firstName == 'Secondary'
-              ? 'Keeper '
-              : ''}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.firstName === 'F&F request' &&
               contact.contactsWalletName !== undefined &&
               contact.contactsWalletName !== ''
+              ? `${contact.contactsWalletName}'s `
+              : contact.firstName && contact.firstName != 'Secondary'
+                ? contact.firstName + ' '
+                : contact.firstName && contact.firstName == 'Secondary'
+                  ? 'Keeper '
+                  : ''}
+            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+              {contact.firstName === 'F&F request' &&
+                contact.contactsWalletName !== undefined &&
+                contact.contactsWalletName !== ''
                 ? 'Wallet'
                 : contact.lastName && contact.lastName != 'Device'
-                ? contact.lastName + ' '
-                : contact.lastName && contact.lastName == 'Device'
-                ? 'Device '
-                : ''}
+                  ? contact.lastName + ' '
+                  : contact.lastName && contact.lastName == 'Device'
+                    ? 'Device '
+                    : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -488,53 +474,53 @@ class AddressBookContents extends PureComponent<
             <View>
               {!(contact.hasXpub || contact.hasTrustedAddress) &&
                 (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                !contact.hasTrustedChannel ? (
-                  <View
-                    style={{
-                      width: wp('15%'),
-                      height: wp('6%'),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: Colors.borderColor,
-                      marginRight: 10,
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
+                  !contact.hasTrustedChannel ? (
+                    <View
                       style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansRegular,
+                        width: wp('15%'),
+                        height: wp('6%'),
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: Colors.borderColor,
+                        marginRight: 10,
+                        borderRadius: 5,
                       }}
                     >
-                      Expired
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                        }}
+                      >
+                        Expired
                     </Text>
-                  </View>
-                ) : (
-                  <CountDown
-                    onFinish={() =>
-                      this.setState({ updateList: !this.state.updateList })
-                    }
-                    id={index}
-                    size={12}
-                    until={minute}
-                    digitStyle={{
-                      backgroundColor: '#FFF',
-                      borderWidth: 0,
-                      borderColor: '#FFF',
-                      margin: -10,
-                    }}
-                    digitTxtStyle={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                    separatorStyle={{ color: Colors.textColorGrey }}
-                    timeToShow={['H', 'M', 'S']}
-                    timeLabels={{ h: null, m: null, s: null }}
-                    showSeparator
-                  />
-                ))}
+                    </View>
+                  ) : (
+                    <CountDown
+                      onFinish={() =>
+                        this.setState({ updateList: !this.state.updateList })
+                      }
+                      id={index}
+                      size={12}
+                      until={minute}
+                      digitStyle={{
+                        backgroundColor: '#FFF',
+                        borderWidth: 0,
+                        borderColor: '#FFF',
+                        margin: -10,
+                      }}
+                      digitTxtStyle={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansRegular,
+                      }}
+                      separatorStyle={{ color: Colors.textColorGrey }}
+                      timeToShow={['H', 'M', 'S']}
+                      timeLabels={{ h: null, m: null, s: null }}
+                      showSeparator
+                    />
+                  ))}
             </View>
           ) : null}
           <View style={styles.xpubIconView}>
@@ -553,7 +539,7 @@ class AddressBookContents extends PureComponent<
     );
   };
 
-  renderAddContactAddressBookContents = () => {
+  renderAddContactFriendsAndFamily = () => {
     const { navigation } = this.props;
     const { isLoadContacts, selectedContact } = this.state;
     return (
@@ -616,27 +602,20 @@ class AddressBookContents extends PureComponent<
     const { navigation, trustedChannelsSync } = this.props;
     const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
     return (
-      <View style={Styles.rootView}>
-        <SafeAreaView style={Styles.statusBarStyle} />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={CommonStyles.rootView}>
+        <SafeAreaView style={CommonStyles.statusBarStyle} />
+
         <View style={styles.modalContainer}>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={Styles.backIconRootContainer}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-                style={Styles.backIconTouchContainer}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Friends and Family'}
-              </Text>
-            </View>
+          <View style={CommonStyles.modalNavHeaderContainer}>
+            <SmallNavHeaderCloseButton
+              containerStyle={{ marginRight: 16 }}
+              onPress={() => navigation.goBack()}
+            />
+
+            <Text style={{ ...CommonStyles.modalHeaderTitleText, flex: 1 }}>
+              Friends and Family
+            </Text>
+
             <KnowMoreButton
               onpress={() => {
                 (this.HelpBottomSheet as any).current.snapTo(1);
@@ -649,6 +628,7 @@ class AddressBookContents extends PureComponent<
               textStyle={{}}
             />
           </View>
+
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -672,8 +652,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'My Keepers');
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
               </View>
             </View>
@@ -689,8 +669,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, "I'm Keeper of");
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
               </View>
             </View>
@@ -707,8 +687,8 @@ class AddressBookContents extends PureComponent<
                       return this.getElement(item, index, 'Other Contacts');
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                   <TouchableOpacity
                     onPress={() => {
                       setTimeout(() => {
@@ -727,7 +707,7 @@ class AddressBookContents extends PureComponent<
                   >
                     <Image
                       style={styles.addGrayImage}
-                      source={require('../assets/images/icons/icon_add_grey.png')}
+                      source={require('../../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
                       <Text style={styles.contactText}>Add a Contact</Text>
@@ -758,7 +738,7 @@ class AddressBookContents extends PureComponent<
               ? hp('82%')
               : hp('82%'),
           ]}
-          renderContent={this.renderAddContactAddressBookContents}
+          renderContent={this.renderAddContactFriendsAndFamily}
           renderHeader={this.renderAddContactAddressBookHeader}
         />
         <BottomSheet
@@ -800,30 +780,13 @@ export default connect(mapStateToProps, {
   trustedChannelsSync,
   updateAddressBookLocally,
   removeTrustedContact,
-})(AddressBookContents);
+})(FriendsAndFamily);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 15,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
   },
   contactText: {
     marginLeft: 10,
@@ -862,33 +825,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
-  watermarkViewBigText: {
-    backgroundColor: Colors.backgroundColor,
-    height: wp('5%'),
-    width: wp('35%'),
-    borderRadius: 10,
-  },
-  watermarkViewSmallText: {
-    backgroundColor: Colors.backgroundColor,
-    height: wp('3%'),
-    width: wp('25%'),
-    marginTop: 3,
-    borderRadius: 10,
-  },
-  watermarkViewButton: {
-    marginLeft: 'auto',
-    backgroundColor: Colors.backgroundColor,
-    height: wp('7%'),
-    width: wp('18%'),
-    borderRadius: 10,
-  },
-  watermarkViewArrow: {
-    marginLeft: 20,
-    backgroundColor: Colors.backgroundColor,
-    height: wp('3%'),
-    width: wp('3%'),
-    borderRadius: wp('3%') / 2,
-  },
   imageIconStyle: {
     width: wp('12%'),
     height: wp('12%'),
@@ -914,43 +850,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 'auto',
   },
-  xpubViewStyle: {
-    width: wp('15%'),
-    height: wp('6%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.borderColor,
-    marginRight: 10,
-    borderRadius: 5,
-  },
-  xpubTextStyle: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-  },
   xpubIconView: {
     width: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 'auto',
     marginRight: 10,
-  },
-  waterMarkView: {
-    marginBottom: 15,
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-  },
-  waterMarkInnerView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-  },
-  waterMarkBigView: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderColor,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
   },
   addGrayImage: {
     width: wp('10%'),
