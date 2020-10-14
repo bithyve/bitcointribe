@@ -32,7 +32,7 @@ import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import RadioButton from '../../components/RadioButton';
-import { createAndUploadOnEFChannel, updateMSharesHealth } from '../../store/actions/health';
+import { createAndUploadOnEFChannel, updateMSharesHealth, generateMetaShare, initLevelTwo } from '../../store/actions/health';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
@@ -45,6 +45,10 @@ interface KeeperFeaturesPropsTypes {
   levelHealth: any[];
   s3Service: any;
   updateMSharesHealth: any;
+  isLevelTwoMetaShareCreated: Boolean;
+  generateMetaShare: any;
+  initLevelTwo: any;
+  isLevel2Initialized: Boolean;
 }
 
 class KeeperFeatures extends Component<
@@ -125,6 +129,10 @@ class KeeperFeatures extends Component<
   };
 
   setUpKeeper = () =>{
+    if(!this.props.isLevelTwoMetaShareCreated) this.props.generateMetaShare(2);
+  }
+
+  uploadDataOnEFChannel = () => {
     if(this.props.navigation.state.params.qrScannedData){
       let featuresList = [];
       let isPrimaryKeeper = this.props.navigation.state.params.isPrimaryKeeper;
@@ -136,7 +144,15 @@ class KeeperFeatures extends Component<
       }
       this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper, this.props.navigation.state.params.selectedShareId);
     }
-    this.props.navigation.replace('ManageBackupKeeper')
+    this.props.navigation.replace('ManageBackupKeeper');
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if(this.props.isLevelTwoMetaShareCreated){
+      console.log('this.props.isLevelTwoMetaShareCreated', this.props.isLevelTwoMetaShareCreated)
+      if(!this.props.isLevel2Initialized){ initLevelTwo() }
+      this.uploadDataOnEFChannel();
+    }
   }
 
   render() {
@@ -360,6 +376,8 @@ const mapStateToProps = (state) => {
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     levelHealth: idx(state, (_) => _.health.levelHealth),
+    isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
+    isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
   };
 };
 
@@ -367,7 +385,9 @@ export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
     createAndUploadOnEFChannel,
-    updateMSharesHealth
+    updateMSharesHealth,
+    generateMetaShare,
+    initLevelTwo
   })(KeeperFeatures),
 );
 

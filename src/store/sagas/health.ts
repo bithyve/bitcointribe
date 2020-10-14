@@ -49,12 +49,10 @@ import moment from 'moment';
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
   const initialized = s3Service.levelhealth.healthCheckInitialized;
+  
   if (initialized) return;
-  console.log('res init1');
   yield put(initLoader(true));
-  console.log('res init2');
   const res = yield call(s3Service.initializeHealth);
-  console.log('res init', res);
   
   if (res.status === 200) {
     // Update Initial Health to reducer
@@ -62,8 +60,7 @@ function* initHealthWorker() {
       level: 1,
       levelInfo: res.data.levelInfo
     }]
-    yield call(updateHealth, obj, 0);
-    // yield put(checkMSharesHealth());
+    yield put(updateHealth(obj, 0));
     // Update status
     yield put(healthCheckInitialized());
 
@@ -83,6 +80,7 @@ function* initHealthWorker() {
       S3_SERVICE: JSON.stringify(s3Service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(initLoader(false));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -142,7 +140,6 @@ function* checkSharesHealthWorker() {
   yield put(switchS3LoadingStatus(true));
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.checkHealth);
-  console.log("RES", res);
   if (res.status === 200) {
     yield put(
       updateHealth(res.data.data.data.levels, res.data.data.data.currentLevel),

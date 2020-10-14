@@ -45,7 +45,7 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
-import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel, initLevelTwo } from '../../store/actions/health';
+import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel, initLevelTwo, updateMSharesHealth } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 
 interface ManageBackupStateTypes {
@@ -84,6 +84,8 @@ interface ManageBackupPropsTypes {
   isLevelTwoMetaShareCreated: Boolean;
   isLevel2Initialized: Boolean;
   initLevelTwo: any;
+  s3Service: any;
+  updateMSharesHealth: any;
 }
 
 class ManageBackup extends Component<
@@ -235,7 +237,6 @@ class ManageBackup extends Component<
     const { walletName, regularAccount, } = this.props;
     let encryptedCloudDataJson;
     let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
-    //console.log('s3Service.LevelHealth.metaShares', s3Service);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -254,13 +255,37 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: JSON.stringify(keeperData)
     }
-    CloudDataBackup(data, this.setCloudBackupStatus);
-    //console.log('call for google drive upload', this.props.cloudBackupStatus);
-    
+    CloudDataBackup(data, this.setCloudBackupStatus);    
   };
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
+    if(this.props.cloudBackupStatus.status){
+      this.updateHealthForCloud();
+    }
+  }
+
+  updateHealthForCloud = () =>{
+    let levelHealth = this.props.levelHealth;
+    // health update for 1st upload to cloud 
+    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized){
+      if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
+        levelHealth[0].levelInfo[0].updatedAt = ''+moment(new Date()).valueOf();
+        levelHealth[0].levelInfo[0].status = 'accessible';
+        levelHealth[0].levelInfo[0].reshareVersion = 1;
+        levelHealth[0].levelInfo[0].guardian = 'cloud';
+      }
+      let shareArray = [
+        {
+          walletId: this.props.s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[0].levelInfo[0].shareId,
+          reshareVersion: levelHealth[0].levelInfo[0].reshareVersion,
+          updatedAt: moment(new Date()).valueOf(),
+          status: 'accessible'
+        }
+      ];
+      this.props.updateMSharesHealth(shareArray);
+    }
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -275,11 +300,6 @@ class ManageBackup extends Component<
   generateShares = (level) =>{
     const { isLevel2, isPrimaryKeeper, levelData, selectedShareId } = this.state;
     const {generateMetaShare, isLevel2Initialized, initLevelTwo} = this.props;
-    if(!this.props.isLevelTwoMetaShareCreated) {
-      generateMetaShare(level);
-    }
-    console.log('isLevel2Initialized', isLevel2Initialized);
-    if(!isLevel2Initialized){ initLevelTwo() }
     let PKStatus = levelData[1].keeper1.keeper1Done ? 'accessed' : 'notAccessed';
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
@@ -855,7 +875,8 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     createAndUploadOnEFChannel,
-    initLevelTwo
+    initLevelTwo,
+    updateMSharesHealth
   })(ManageBackup),
 );
 

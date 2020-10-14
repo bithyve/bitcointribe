@@ -78,7 +78,7 @@ export default (state = initialState, action) => {
         };
     
     case HEALTH_UPDATE: 
-        return {
+      return {
         ...state,
         levelHealth: action.payload.health,
         currentLevel: action.payload.currentLevel

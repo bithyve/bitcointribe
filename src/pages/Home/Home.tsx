@@ -875,8 +875,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         () => this.props.updateLastSeen(new Date()),
       );
     }, 2);
-
-    this.cloudData();
   };
 
   cloudData = async () => {
@@ -1022,6 +1020,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
+    if(prevProps.levelHealth !== this.props.levelHealth){
+      if(this.props.levelHealth.length>0){
+        this.cloudData();
+      }
+    }
+
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue

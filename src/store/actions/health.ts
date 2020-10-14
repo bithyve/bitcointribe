@@ -19,8 +19,7 @@ export const UPDATE_MSHARE_LOADING_STATUS = 'UPDATE_MSHARE_LOADING_STATUS';
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE';
 export const MSHARES = 'MSHARES';
 export const CREATE_N_UPLOAD_ON_EF_CHANNEL = 'CREATE_N_UPLOAD_ON_EF_CHANNEL';
-export const UPDATE_EFCHANNEL_LOADING_STATUS =
-  'UPDATE_EFCHANNEL_LOADING_STATUS';
+export const UPDATE_EFCHANNEL_LOADING_STATUS = 'UPDATE_EFCHANNEL_LOADING_STATUS';
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE';  
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
 export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
@@ -35,7 +34,6 @@ export const initializeHealthSetup = () => {
 };
 
 export const updateHealth = (health, currentLevel) => {
-  console.log('HEALTH_UPDATE', HEALTH_UPDATE);
   return { type: HEALTH_UPDATE, payload: { health, currentLevel } };
 };
 
@@ -52,7 +50,6 @@ export const switchS3LoadingStatus = (beingLoaded) => {
 };
 
 export const initLoader = (beingLoaded) => {
-  console.log('INIT_LEVEL_TWO status' );
   return { type: INIT_LOADING_STATUS, payload: { beingLoaded } };
 };
 
@@ -77,12 +74,10 @@ export const ErrorSending = (isFailed) => {
 };
 
 export const updateMSharesHealth = (shares) => {
-  console.log('updateMSharesHealth action shares', share)
   return { type: UPDATE_SHARES_HEALTH, payload: { shares } };
 };
 
 export const updateMSharesLoader = (beingLoaded) => {
-  // console.log("Called s3 Loading", new Date())
   return { type: UPDATE_MSHARE_LOADING_STATUS, payload: { beingLoaded } };
 };
 
@@ -100,7 +95,6 @@ export const createAndUploadOnEFChannel = (
   isPrimaryKeeper,
   selectedShareId
 ) => {
-  console.log('testing...1');
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
     payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId },
