@@ -293,7 +293,7 @@ class AddressBookContents extends PureComponent<
           trustedContacts.push(element);
           if (element.isGuardian) {
             // const isRemovable =
-            //   Date.now() - element.initiatedAt > 1000 &&
+            //   Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY &&
             //   !element.hasTrustedChannel
             //     ? true
             //     : false;
