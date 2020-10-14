@@ -1715,7 +1715,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (type == 'voucher') {
       navigation.navigate('VoucherScanner');
     } else if (type == 'existingBuyingMethods') {
-      navigation.navigate('ExistingSavingMethods');
+      navigation.navigate('FundingSources');
     }
   };
 

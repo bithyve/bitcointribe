@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  StatusBar,
   Text,
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  AsyncStorage,
   Image,
 } from 'react-native';
 import CommonStyles from '../../common/Styles';
@@ -15,10 +13,8 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
@@ -27,8 +23,9 @@ import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { useSelector } from 'react-redux';
 import Loader from '../../components/loader';
+import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
 
-export default function ExistingSavingMethods(props) {
+export default function FundingSourcesContainerScreen(props) {
   const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
   const [FBTCAccount, setFBTCAccount] = useState([]);
   const [FBTCAccountInfo, setFBTCAccountInfo] = useState({});
@@ -44,8 +41,9 @@ export default function ExistingSavingMethods(props) {
     (async () => {
       let FBTCAccount = [];
       let accounts = FBTCAccountData;
-      //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+
       setFBTCAccountInfo(accounts);
+
       if (accounts) {
         if (accounts.checking_account.voucher.length) {
           for (let i = 0; i < accounts.checking_account.voucher.length; i++) {
@@ -80,28 +78,17 @@ export default function ExistingSavingMethods(props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
-      <StatusBar
-        backgroundColor={Colors.backgroundColor1}
-        barStyle="dark-content"
-      />
-      <SafeAreaView
-        style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }}
-      />
+      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
+
       <View style={styles.modalContainer}>
-        <View style={CommonStyles.modalHeaderTitleView}>
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-              onPress={() => props.navigation.goBack()}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
+        <View style={CommonStyles.modalNavHeaderContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <SmallNavHeaderCloseButton
+              containerStyle={{ marginRight: 16 }}
+              onPress={() => props.navigation.pop()}
+            />
+
+            <View style={{ flex: 1 }}>
               <Text style={CommonStyles.modalHeaderTitleText}>
                 Funding Sources
               </Text>
@@ -112,6 +99,7 @@ export default function ExistingSavingMethods(props) {
           </View>
         </View>
       </View>
+
       {FBTCAccountInfo ? (
         <ScrollView style={{ flex: 1 }}>
           <View
@@ -228,7 +216,7 @@ export default function ExistingSavingMethods(props) {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    props.navigation.navigate('ExistingSavingMethodDetails', {
+                    props.navigation.navigate('FundingSourceDetails', {
                       getBittrAccount: value,
                     });
                   }}
@@ -277,19 +265,19 @@ export default function ExistingSavingMethods(props) {
                       <View
                         style={{ flexDirection: 'row', alignItems: 'center' }}
                       >
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(10),
-                          marginTop: 5,
-                        }}
-                      >
-                        {value.accountType == REGULAR_ACCOUNT
-                          ? 'Checking Account'
-                          : 'Savings Account'}
-                      </Text>
-                      <Text
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                            marginTop: 5,
+                          }}
+                        >
+                          {value.accountType == REGULAR_ACCOUNT
+                            ? 'Checking Account'
+                            : 'Savings Account'}
+                        </Text>
+                        <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontFamily: Fonts.FiraSansRegular,
@@ -301,7 +289,7 @@ export default function ExistingSavingMethods(props) {
                             .utc()
                             .format('DD MMMM YYYY')}
                         </Text>
-                        </View>
+                      </View>
                     </View>
                     <View
                       style={{

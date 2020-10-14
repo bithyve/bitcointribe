@@ -29,7 +29,7 @@ const menuOptions: MenuOption[] = [
     title: 'Funding Sources',
     imageSource: require('../../assets/images/icons/existing_saving_method.png'),
     subtitle: 'Buying methods integrated in your wallet',
-    screenName: 'ExistingSavingMethods',
+    screenName: 'FundingSources',
   },
   {
     title: `Hexa Community (Telegram)`,

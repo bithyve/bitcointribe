@@ -5,10 +5,13 @@ import MoreOptionsContainerScreen from "../../pages/MoreOptions/MoreOptionsConta
 import ManagePasscodeScreen from '../../pages/ManagePasscodeScreen';
 import FriendsAndFamilyScreen from '../../pages/FriendsAndFamily/FriendsAndFamilyScreen';
 import WalletSettingsContainerScreen from "../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen";
-import ExistingSavingMethodsScreen from "../../pages/FundingSources/ExistingSavingMethods";
-import ExistingSavingMethodDetailsScreen from "../../pages/FundingSources/ExistingSavingMethodDetails";
-import KnowMoreButton from '../../components/KnowMoreButton';
-import Styles from '../../common/Styles';
+import FundingSourcesScreen from "../../pages/FundingSources/FundingSourcesContainerScreen";
+import FundingSourceDetailsScreen from "../../pages/FundingSources/FundingSourceDetailsScreen";
+import CommonStyles from '../../common/Styles';
+import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
+import { goHomeAction } from '../actions/NavigationActions';
+import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
+
 
 export const WalletSettingsStack = createStackNavigator(
   {
@@ -32,9 +35,20 @@ export const WalletSettingsStack = createStackNavigator(
     },
   },
   {
-    defaultNavigationOptions: {
-      headerTitleStyle: Styles.modalHeaderTitleText,
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        headerTitleStyle: CommonStyles.modalHeaderTitleText,
+        headerLeft: () => {
+          return (
+            <SmallNavHeaderCloseButton
+              onPress={() => { navigation.pop() }}
+              containerStyle={{ paddingLeft: 16 }}
+            />
+          );
+        },
+      };
     },
+    mode: 'modal',
   },
 );
 
@@ -43,18 +57,28 @@ export const MoreOptionsStack = createStackNavigator(
   {
     MoreOptionsRoot: {
       screen: MoreOptionsContainerScreen,
-      navigationOptions: {
-        title: "More",
+      navigationOptions: ({ navigation }) => {
+        return {
+          title: "More",
+          headerLeft: () => {
+            return (
+              <SmallNavHeaderBackButton
+                onPress={() => { navigation.dispatch(goHomeAction) }}
+                containerStyle={{ paddingLeft: 16 }}
+              />
+            );
+          },
+        };
       },
     },
-    ExistingSavingMethods: {
-      screen: ExistingSavingMethodsScreen,
+    FundingSources: {
+      screen: FundingSourcesScreen,
       navigationOptions: {
         header: null,
       },
     },
-    ExistingSavingMethodDetails: {
-      screen: ExistingSavingMethodDetailsScreen,
+    FundingSourceDetails: {
+      screen: FundingSourceDetailsScreen,
     },
     FriendsAndFamily: {
       screen: FriendsAndFamilyScreen,
@@ -72,9 +96,19 @@ export const MoreOptionsStack = createStackNavigator(
   {
     mode: 'modal',
     initialRouteName: 'MoreOptionsRoot',
-    defaultNavigationOptions: {
-      headerTitleStyle: Styles.modalHeaderTitleText,
-    }
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        headerTitleStyle: CommonStyles.modalHeaderTitleText,
+        headerLeft: () => {
+          return (
+            <SmallNavHeaderCloseButton
+              onPress={() => { navigation.pop() }}
+              containerStyle={{ paddingLeft: 16 }}
+            />
+          );
+        },
+      };
+    },
   },
 );
 

@@ -96,15 +96,27 @@ export default StyleSheet.create({
     flex: 0,
   },
 
-  backIconRootContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center'
+  // backIconRootContainer: {
+    // flex: 1,
+    // flexDirection: 'row',
+    // alignItems: 'center'
+  // },
+
+  navHeaderIconTouchContainer: {
+    // height: 30,
+    // width: 30,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // paddingHorizontal: 14,
+    // marginRight: 24,
   },
 
-  backIconTouchContainer: {
-    height: 30,
-    width: 30,
-    justifyContent: 'center'
+  modalNavHeaderContainer: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
 });

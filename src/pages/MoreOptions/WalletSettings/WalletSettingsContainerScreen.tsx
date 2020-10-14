@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
