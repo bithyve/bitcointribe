@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects';
+import { call, delay, put, select } from 'redux-saga/effects';
 import { createWatcher } from '../utils/utilities';
 import {
   INIT_DB,
@@ -19,6 +19,8 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
+import { updateWalletImage } from '../actions/sss';
+import { calculateExchangeRate, startupSync } from '../actions/accounts';
 // import { timer } from '../../utils'
 
 
@@ -40,9 +42,14 @@ function* fetchDBWorker() {
     const key = yield select((state) => state.storage.key);
     const database = yield call(dataManager.fetch, key);
     if (key && database) {
-      yield put(dbFetched(database));
-      // t.stop()
       yield call(servicesEnricherWorker, { payload: { database } });
+      yield put(dbFetched(database));
+
+      // actions post DB fetch
+      // yield delay(3000) //starting sync after a pause to let the home render relatively quickly
+      yield put(updateWalletImage());
+      yield put(calculateExchangeRate());
+      yield put(startupSync());
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',

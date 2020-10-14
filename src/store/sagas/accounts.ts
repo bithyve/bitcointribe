@@ -258,7 +258,7 @@ function* fetchBalanceTxWorker({ payload }) {
     ? payload.options.service
     : yield select((state) => state.accounts[payload.serviceType].service);
 
-  const preFetchBalances = JSON.stringify(
+    const preFetchBalances = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances,
@@ -971,38 +971,71 @@ function* accountsSyncWorker({ payload }) {
     const regularService = accounts[REGULAR_ACCOUNT].service;
     const secureService = accounts[SECURE_ACCOUNT].service;
 
-    yield all([
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: TEST_ACCOUNT,
-          options: {
-            service: testService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
+    yield call(fetchBalanceTxWorker,{
+      payload: {
+        serviceType: REGULAR_ACCOUNT,
+        options: {
+          service: regularService,
+          restore: payload.restore,
+          shouldNotInsert: true,
         },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: REGULAR_ACCOUNT,
-          options: {
-            service: regularService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
+      },
+    });
+
+    yield call(fetchBalanceTxWorker, {
+      payload: {
+        serviceType: TEST_ACCOUNT,
+        options: {
+          service: testService,
+          restore: payload.restore,
+          shouldNotInsert: true,
         },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: SECURE_ACCOUNT,
-          options: {
-            service: secureService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
+      },
+    });
+
+    yield call(fetchBalanceTxWorker, {
+      payload: {
+        serviceType: SECURE_ACCOUNT,
+        options: {
+          service: secureService,
+          restore: payload.restore,
+          shouldNotInsert: true,
         },
-      }),
-    ]);
+      },
+    });
+
+    // yield all([
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: TEST_ACCOUNT,
+    //       options: {
+    //         service: testService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: REGULAR_ACCOUNT,
+    //       options: {
+    //         service: regularService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: SECURE_ACCOUNT,
+    //       options: {
+    //         service: secureService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    // ]);
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
