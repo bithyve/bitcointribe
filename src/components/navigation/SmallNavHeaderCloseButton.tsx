@@ -16,7 +16,7 @@ const SmallNavHeaderCloseButton: React.FC<Props> = ({
 }: Props) => {
   return (
     <TouchableOpacity
-      style={{ ...CommonStyles.navHeaderIconTouchContainer, ...containerStyle }}
+      style={{ ...containerStyle }}
       onPress={onPress}
       hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
     >
