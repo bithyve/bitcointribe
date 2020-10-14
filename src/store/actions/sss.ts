@@ -92,8 +92,8 @@ export const sharePersonalCopy = (
   };
 };
 
-export const updateMSharesHealth = (DECENTRALIZED_BACKUP?) => {
-  return { type: UPDATE_MSHARES_HEALTH, payload: { DECENTRALIZED_BACKUP } };
+export const updateMSharesHealth = () => {
+  return { type: UPDATE_MSHARES_HEALTH };
 };
 
 export const checkMSharesHealth = () => {
