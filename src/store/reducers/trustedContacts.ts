@@ -11,6 +11,7 @@ import {
   PAYMENT_DETAILS_FETCHED,
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
+  APPROVE_TRUSTED_CONTACT,
 } from '../actions/trustedContacts';
 import {
   EphemeralData,
@@ -39,11 +40,11 @@ const initialState: {
     address?: string;
     paymentURI?: string;
   };
-
   loading: {
     updateEphemeralChannel: Boolean;
     updateTrustedChannel: Boolean;
     trustedChannelsSync: Boolean;
+    approvingTrustedContact: Boolean;
   };
   addressBook: any;
   trustedContactsInfo: any;
@@ -59,6 +60,7 @@ const initialState: {
     updateEphemeralChannel: false,
     updateTrustedChannel: false,
     trustedChannelsSync: false,
+    approvingTrustedContact: false,
   },
   addressBook: null,
   trustedContactsInfo: null,
@@ -82,6 +84,15 @@ export default (state = initialState, action) => {
         },
       };
 
+    case APPROVE_TRUSTED_CONTACT:
+      return {
+        ...state,
+        loading:{
+          ...state.loading,
+          approvingTrustedContact: true,
+        }
+      }
+
     case TRUSTED_CONTACT_APPROVED:
       return {
         ...state,
@@ -91,6 +102,10 @@ export default (state = initialState, action) => {
             approved: action.payload.approved,
           },
         },
+        loading:{
+          ...state.loading,
+          approvingTrustedContact: false,
+        }
       };
 
     case EPHEMERAL_CHANNEL_UPDATED:
