@@ -3,6 +3,21 @@ PODS:
   - Crashlytics (3.14.0):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
+  - EXConstants (9.1.1):
+    - UMConstantsInterface
+    - UMCore
+  - EXFileSystem (9.0.1):
+    - UMCore
+    - UMFileSystemInterface
+  - EXImageLoader (1.1.1):
+    - React-Core
+    - UMCore
+    - UMImageLoaderInterface
+  - EXPermissions (9.0.1):
+    - UMCore
+    - UMPermissionsInterface
+  - EXSecureStore (9.2.0):
+    - UMCore
   - Fabric (1.10.2)
   - FBLazyVector (0.63.3)
   - FBReactNativeSpec (0.63.3):
@@ -400,11 +415,33 @@ PODS:
     - React
   - TcpSockets (3.3.2):
     - React
+  - UMAppLoader (1.2.0)
+  - UMBarCodeScannerInterface (5.2.1)
+  - UMCameraInterface (5.2.1)
+  - UMConstantsInterface (5.2.1)
+  - UMCore (5.3.0)
+  - UMFaceDetectorInterface (5.2.1)
+  - UMFileSystemInterface (5.2.1)
+  - UMFontInterface (5.2.1)
+  - UMImageLoaderInterface (5.2.1)
+  - UMPermissionsInterface (5.2.1):
+    - UMCore
+  - UMReactNativeAdapter (5.4.0):
+    - React-Core
+    - UMCore
+    - UMFontInterface
+  - UMSensorsInterface (5.2.1)
+  - UMTaskManagerInterface (5.2.1)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
   - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXConstants (from `../node_modules/expo-constants/ios`)
+  - EXFileSystem (from `../node_modules/expo-file-system/ios`)
+  - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
+  - EXPermissions (from `../node_modules/expo-permissions/ios`)
+  - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
   - Fabric
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
@@ -462,6 +499,19 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - TcpSockets (from `../node_modules/react-native-tcp`)
+  - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
+  - UMBarCodeScannerInterface (from `../node_modules/unimodules-barcode-scanner-interface/ios`)
+  - UMCameraInterface (from `../node_modules/unimodules-camera-interface/ios`)
+  - UMConstantsInterface (from `../node_modules/unimodules-constants-interface/ios`)
+  - "UMCore (from `../node_modules/@unimodules/core/ios`)"
+  - UMFaceDetectorInterface (from `../node_modules/unimodules-face-detector-interface/ios`)
+  - UMFileSystemInterface (from `../node_modules/unimodules-file-system-interface/ios`)
+  - UMFontInterface (from `../node_modules/unimodules-font-interface/ios`)
+  - UMImageLoaderInterface (from `../node_modules/unimodules-image-loader-interface/ios`)
+  - UMPermissionsInterface (from `../node_modules/unimodules-permissions-interface/ios`)
+  - "UMReactNativeAdapter (from `../node_modules/@unimodules/react-native-adapter/ios`)"
+  - UMSensorsInterface (from `../node_modules/unimodules-sensors-interface/ios`)
+  - UMTaskManagerInterface (from `../node_modules/unimodules-task-manager-interface/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -488,6 +538,16 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXConstants:
+    :path: "../node_modules/expo-constants/ios"
+  EXFileSystem:
+    :path: "../node_modules/expo-file-system/ios"
+  EXImageLoader:
+    :path: "../node_modules/expo-image-loader/ios"
+  EXPermissions:
+    :path: "../node_modules/expo-permissions/ios"
+  EXSecureStore:
+    :path: "../node_modules/expo-secure-store/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -590,6 +650,32 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-vector-icons"
   TcpSockets:
     :path: "../node_modules/react-native-tcp"
+  UMAppLoader:
+    :path: "../node_modules/unimodules-app-loader/ios"
+  UMBarCodeScannerInterface:
+    :path: "../node_modules/unimodules-barcode-scanner-interface/ios"
+  UMCameraInterface:
+    :path: "../node_modules/unimodules-camera-interface/ios"
+  UMConstantsInterface:
+    :path: "../node_modules/unimodules-constants-interface/ios"
+  UMCore:
+    :path: "../node_modules/@unimodules/core/ios"
+  UMFaceDetectorInterface:
+    :path: "../node_modules/unimodules-face-detector-interface/ios"
+  UMFileSystemInterface:
+    :path: "../node_modules/unimodules-file-system-interface/ios"
+  UMFontInterface:
+    :path: "../node_modules/unimodules-font-interface/ios"
+  UMImageLoaderInterface:
+    :path: "../node_modules/unimodules-image-loader-interface/ios"
+  UMPermissionsInterface:
+    :path: "../node_modules/unimodules-permissions-interface/ios"
+  UMReactNativeAdapter:
+    :path: "../node_modules/@unimodules/react-native-adapter/ios"
+  UMSensorsInterface:
+    :path: "../node_modules/unimodules-sensors-interface/ios"
+  UMTaskManagerInterface:
+    :path: "../node_modules/unimodules-task-manager-interface/ios"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -597,6 +683,11 @@ SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   DoubleConversion: cde416483dac037923206447da6e1454df403714
+  EXConstants: f907b3b6ce16e20d1750f22af1e095e924574bcb
+  EXFileSystem: 76875135b61708b9afa7e6a89b72a60ba0fdfa20
+  EXImageLoader: 02ca02c9cd5cc8a97b423207a73a791e0a86bea5
+  EXPermissions: 80ac3acbdb145930079810fe5b08c022b3428aa8
+  EXSecureStore: 579cbccd9cd093e6f4336aba073b059008bd78e0
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
   FBLazyVector: 878b59e31113e289e275165efbe4b54fa614d43d
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
@@ -664,8 +755,21 @@ SPEC CHECKSUMS:
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
+  UMAppLoader: 61049c8d55590b74e9ae1d5429bf68d96b4a2528
+  UMBarCodeScannerInterface: e5e4c87797d3d01214e25cd1618866caf5d4f17f
+  UMCameraInterface: 415ac060034edecacdbbaa739c223e3f276e0056
+  UMConstantsInterface: 1a52f2d884c95e8829439da13e36b7669a1a8fb4
+  UMCore: d98083b522b08c0a8ba3992bc263c624ae5d887c
+  UMFaceDetectorInterface: 67c6c82451338da01a4bc00ec46365a2a8ea9057
+  UMFileSystemInterface: 303d696ede28102a7e11d111808bd2ed2c5eb62f
+  UMFontInterface: 6edf1ee8bc55d2030766f8cf0a7b20a5d5a913b0
+  UMImageLoaderInterface: 9cdbf3bab6a513bddd88505cb2340fe02d6a11c0
+  UMPermissionsInterface: 019170ad655f464e3f8d23d2a8bcbda2e645cde4
+  UMReactNativeAdapter: 538efe92e781b5d7678cf95b34c46f2d0989a557
+  UMSensorsInterface: cb5bf31d52c4349f0ff9e3c049bbe4df0d80d383
+  UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: 3d0ed1ca2bad17b5e1548a9566c818ccbe698557
+PODFILE CHECKSUM: 27d651374787928d60078eebcaf2b1694c5a3773
 
 COCOAPODS: 1.8.4
