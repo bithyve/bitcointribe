@@ -34,7 +34,7 @@ function useAccountShellsInGroup(transactionGroup: TransactionGroup): AccountShe
     const accountsState: AccountsState = state.accounts;
 
     return accountsState
-      .activeAccounts
+      .activeAccountShells
       .concat(sampleShells)
       .filter(accountShell => AccountShell.getTransactionGroup(accountShell) === transactionGroup);
   });

@@ -37,6 +37,7 @@ export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
 export const TRANSACTION_REASSIGNMENT_COMPLETED = 'TRANSACTION_REASSIGNMENT_COMPLETED';
 export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS';
 export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED';
+export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -356,6 +357,18 @@ export interface AccountShellMergeCompletionAction extends Action {
 
 export const accountShellMergeCompleted = (): AccountShellMergeCompletionAction => {
   return { type: ACCOUNT_SHELL_MERGE_COMPLETED };
+};
+
+export interface AccountShellsOrderUpdatedAction extends Action {
+  type: typeof ACCOUNT_SHELLS_ORDER_UPDATED;
+  payload: AccountShell[];
+};
+
+export const accountShellsOrderUpdated = (payload: AccountShell[]): AccountShellsOrderUpdatedAction => {
+  return {
+    type: ACCOUNT_SHELLS_ORDER_UPDATED,
+    payload,
+  };
 };
 
 

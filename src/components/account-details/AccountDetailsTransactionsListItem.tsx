@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListItem } from 'react-native-elements';
-import { TransactionDescribing } from '../../common/data/models/Transactions/Interfaces';
 import TransactionListItemContent from './TransactionListItemContent';
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
 
 export type Props = {
   transaction: TransactionDescribing;
