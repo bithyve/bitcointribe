@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { TransactionDescribing } from '../../common/data/models/Transactions/Interfaces';
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
 import Colors from '../../common/Colors';
 import TransactionsListItem from './AccountDetailsTransactionsListItem';
 

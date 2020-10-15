@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Image } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import TransactionKind from '../../common/data/enums/TransactionKind';
-import { TransactionDescribing } from '../../common/data/models/Transactions/Interfaces';
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
 import moment from 'moment';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';

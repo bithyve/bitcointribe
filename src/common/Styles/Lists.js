@@ -32,6 +32,21 @@ const ListStyles = StyleSheet.create({
   listItemContentContainer: {
     paddingVertical: 10,
   },
+
+  thumbnailImageSmall: {
+    width: 28,
+    height: 28,
+  },
+
+  thumbnailImageMedium: {
+    width: 40,
+    height: 40,
+  },
+
+  reorderItemIconImage: {
+    width: 44,
+    height: 44,
+  },
 });
 
 export default ListStyles;

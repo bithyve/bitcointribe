@@ -77,8 +77,8 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
 import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
 import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
-import { AccountDetailsStack } from './stacks/AccountNavigationStacks';
-import { MoreOptionsStack } from './stacks/MoreOptions';
+import { AccountDetailsStack } from './stacks/accounts/AccountNavigationStacks';
+import MoreOptionsStack from './stacks/more-options/MoreOptionsStacks';
 
 
 const SetupNavigator = createStackNavigator(
