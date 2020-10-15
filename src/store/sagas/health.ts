@@ -327,7 +327,21 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     ];
     console.log('shareArray after EF channel', shareArray)
     yield put(updateMSharesHealth(shareArray));
-    s3Service.updateGuardianInMetaShare(s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
+    
+    const res = yield call(s3Service.updateGuardianInMetaShare, s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
+    console.log("RES", res);
+    if (res.status === 200) {
+        let s3Service: S3Service = yield select((state) => state.sss.service);
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          S3_SERVICE: JSON.stringify(s3Service),
+        };
+        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+      } else {
+        if (res.err === 'ECONNABORTED') requestTimedout();
+        throw new Error(res.err);
+      }
   }
   yield put(updateMSharesLoader(false));
 }

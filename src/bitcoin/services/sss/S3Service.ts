@@ -1000,13 +1000,30 @@ export default class S3Service {
     }
   };
 
-  public updateGuardianInMetaShare = (
+   public updateGuardianInMetaShare = async (
     shareId: string,
-    name: string,
-  ) => {
+     name: string,
+  ): Promise<
+    | {
+        status: number;
+        data: MetaShare[];
+      }
+    | {
+        status: number;
+        err: any;
+      }
+  > => {
     try {
-      this.levelhealth.updateGuardianInMetaShare(shareId, name);
+      return {
+        status: config.STATUS.SUCCESS,
+        data: (await this.levelhealth.updateGuardianInMetaShare(shareId, name)).data,
+      };
     } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+      };
     }
+    
   };
 }

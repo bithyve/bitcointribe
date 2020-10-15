@@ -1366,10 +1366,12 @@ export default class LevelHealth {
     }
   };
 
-  public updateGuardianInMetaShare = (
+  public updateGuardianInMetaShare = async (
     shareId: string,
-    name: string,
-  ) =>{
+     name: string,
+  ) : Promise<{
+   data: MetaShare[];
+  }> => {
     for (let i = 0; i < this.metaShares.length; i++) {
       const element = this.metaShares[i];
       console.log('updateGuardianInMetaShare Guardian name', name)
@@ -1379,5 +1381,6 @@ export default class LevelHealth {
       }
     }
     console.log('updateGuardianInMetaShare outside for', this.metaShares);
+    return {data: this.metaShares};
   }
 }
