@@ -14,7 +14,6 @@ export const modifyLevelStatus = (
         levelData[0].keeper1.type = 'cloud';
         levelData[0].keeper1.shareId = levelHealth.levelInfo[0].shareId;
       }// Level 1 => security question
-      console.log('levelHealth.levelInfo[1].status', levelHealth.levelInfo[1].status)
       if (levelHealth.levelInfo[1]) {
         levelData[0].keeper2.name = 'Security Question';
         levelData[0].keeper2.keeper2Done =

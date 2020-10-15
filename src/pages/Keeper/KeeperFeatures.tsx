@@ -128,8 +128,10 @@ class KeeperFeatures extends Component<
     this.setState({ selectedIds: selectedId });
   };
 
-  setUpKeeper = () =>{
-    if(!this.props.isLevelTwoMetaShareCreated) this.props.generateMetaShare(2);
+  setUpKeeper = async() =>{
+    if(!this.props.isLevelTwoMetaShareCreated) await this.props.generateMetaShare(2);
+    if(!this.props.isLevel2Initialized){ this.props.initLevelTwo() }
+    this.uploadDataOnEFChannel();
   }
 
   uploadDataOnEFChannel = () => {
@@ -147,13 +149,6 @@ class KeeperFeatures extends Component<
     this.props.navigation.replace('ManageBackupKeeper');
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    if(this.props.isLevelTwoMetaShareCreated){
-      console.log('this.props.isLevelTwoMetaShareCreated', this.props.isLevelTwoMetaShareCreated)
-      if(!this.props.isLevel2Initialized){ initLevelTwo() }
-      this.uploadDataOnEFChannel();
-    }
-  }
 
   render() {
     const { levelData, selectedIds } = this.state;

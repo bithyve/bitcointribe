@@ -389,12 +389,11 @@ export default class LevelHealth {
         HEXA_ID,
         toUpdate: shares,
       });
+      console.log('updateSharesHealth2 res', res)
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
-
-    console.log('res updateHealth', res);
 
     const { updationInfo } = res.data;
     return { updationInfo };
@@ -708,8 +707,6 @@ export default class LevelHealth {
       throw new Error('Can not initialize health check; missing MetaShares');
 
     const metaShares = this.metaShares.slice(0, 3);
-    console.log('walletID', this.walletId);
-    console.log('HEXA_ID', HEXA_ID);
     try {
       res = await BH_AXIOS.post('checkSharesHealth2', {
         HEXA_ID,
@@ -720,12 +717,8 @@ export default class LevelHealth {
       if (err.code) throw new Error(err.code);
     }
 
-    console.log('res response', res);
-
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
-
-    console.log('updates', updates);
 
     const shareGuardianMapping = {};
     for (const { shareId, updatedAt } of updates) {
@@ -758,6 +751,7 @@ export default class LevelHealth {
         walletID: this.walletId,
       });
       response = res;
+      console.log('checkSharesHealth2 result', res);
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -796,7 +790,7 @@ export default class LevelHealth {
         };
         levelInfo.push(obj);
       }
-
+      console.log('INIT_LEVEL_TWO levelInfo', levelInfo );
       let res: AxiosResponse;
       try {
         res = await BH_AXIOS.post('updateHealthLevel2', {
@@ -805,6 +799,7 @@ export default class LevelHealth {
           level: 2,
           levelInfo,
         });
+        console.log('INIT_LEVEL_TWO axios res', res );
       } catch (err) {
         if (err.response) throw new Error(err.response.data.err);
         if (err.code) throw new Error(err.code);
@@ -847,8 +842,6 @@ export default class LevelHealth {
       bhXpub,
       shareIDs,
     };
-
-    console.log({ socialStaticNonPMDD });
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
@@ -1151,7 +1144,7 @@ export default class LevelHealth {
 
   public reshareMetaShare = (index: number) => {
     this.metaShares[index].meta.reshareVersion =
-      this.metaShares[index].meta.reshareVersion + 1;
+    this.metaShares[index].meta.reshareVersion + 1;
     console.log({ resharing: this.metaShares[index] });
     return this.metaShares[index];
   };
@@ -1349,7 +1342,6 @@ export default class LevelHealth {
         if (err.code) throw new Error(err.code);
       }
       const { encryptedImage } = res.data;
-      console.log({ encryptedImage });
       if (!encryptedImage) throw new Error();
 
       const { walletImage } = this.decryptWI(encryptedImage);

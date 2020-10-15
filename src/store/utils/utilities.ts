@@ -118,20 +118,11 @@ export const serviceGenerator2 = async (
   res = regularAcc.getMnemonic();
   if (res.status !== 200) throw new Error('Regular account gen failed');
   primaryMnemonic = res.data.mnemonic;
-  console.log({ primaryMnemonic });
   // Test account
   const testAcc = new TestAccount(primaryMnemonic);
 
   // Share generation/restoration
   const s3Service = new S3Service(primaryMnemonic);
-  // if (metaShares) {
-  //   res = s3Service.restoreMetaShares(metaShares);
-  //   if (res.status !== 200) throw new Error('Share restoration failed');
-  // } else {
-  //   res = s3Service.generateLevel1Shares(securityAns);
-  //   // res = s3Service.generateShares(securityAns);
-  //   if (res.status !== 200) throw new Error('Share generation failed');
-  // }
 
   // share history initialization
   const createdAt = Date.now();
