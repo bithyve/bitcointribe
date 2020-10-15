@@ -105,38 +105,38 @@ export default function AddContactSendRequest(props) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
   const updateTrustedContactsInfo = async (contact) => {
-    if (trustedContactsInfo) {
+    let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+    if (tcInfo) {
       if (
-        trustedContactsInfo.findIndex((trustedContact) => {
+        tcInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
 
-          const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          const presentContactName = `${trustedContact.firstName} ${
+            trustedContact.lastName ? trustedContact.lastName : ''
+          }`
             .toLowerCase()
             .trim();
 
-          const selectedContactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
-            }`
+          const selectedContactName = `${contact.firstName} ${
+            contact.lastName ? contact.lastName : ''
+          }`
             .toLowerCase()
             .trim();
 
           return presentContactName == selectedContactName;
         }) == -1
       ) {
-        trustedContactsInfo.push(contact);
+        tcInfo.push(contact);
       }
     } else {
-      trustedContactsInfo = [];
-      trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
-      trustedContactsInfo[1] = null;
-      trustedContactsInfo[2] = null;
-      trustedContactsInfo[3] = contact;
+      tcInfo = [];
+      tcInfo[0] = null; // securing initial 3 positions for Guardians
+      tcInfo[1] = null;
+      tcInfo[2] = null;
+      tcInfo[3] = contact;
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+    await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
+    dispatch(updateTrustedContactInfoLocally(tcInfo));
   };
 
   const dispatch = useDispatch();
@@ -206,7 +206,7 @@ export default function AddContactSendRequest(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -232,8 +232,9 @@ export default function AddContactSendRequest(props) {
     }
     console.log({ Contact });
 
-    const contactName = `${Contact.firstName} ${Contact.lastName ? Contact.lastName : ''
-      }`
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -366,9 +367,11 @@ export default function AddContactSendRequest(props) {
           subHeaderText={'Send to your contact'}
           contactText={'Adding to Friends and Family:'}
           contact={Contact ? Contact : null}
-          infoText={`Click here to accept contact request from ${WALLET_SETUP.walletName
-            } Hexa wallet - link will expire in ${config.TC_REQUEST_EXPIRY / (60000 * 60)
-            } hours`}
+          infoText={`Click here to accept contact request from ${
+            WALLET_SETUP.walletName
+          } Hexa wallet - link will expire in ${
+            config.TC_REQUEST_EXPIRY / (60000 * 60)
+          } hours`}
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
@@ -515,7 +518,7 @@ export default function AddContactSendRequest(props) {
               onPress={() => {
                 props.navigation.goBack();
               }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
             >
               <FontAwesome
@@ -602,10 +605,10 @@ export default function AddContactSendRequest(props) {
                   {Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                        ? Contact.lastName
-                        : ''}
+                    ? Contact.firstName
+                    : !Contact.firstName && Contact.lastName
+                    ? Contact.lastName
+                    : ''}
                 </Text>
                 {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
                   <Text
@@ -654,41 +657,41 @@ export default function AddContactSendRequest(props) {
                 />
               </View>
             ) : (
-                <View
+              <View
+                style={{
+                  position: 'absolute',
+                  marginLeft: 15,
+                  marginRight: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.backgroundColor,
+                  width: 70,
+                  height: 70,
+                  borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
+                }}
+              >
+                <Text
                   style={{
-                    position: 'absolute',
-                    marginLeft: 15,
-                    marginRight: 15,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.backgroundColor,
-                    width: 70,
-                    height: 70,
-                    borderRadius: 70 / 2,
-                    shadowColor: Colors.shadowBlue,
-                    shadowOpacity: 1,
-                    shadowOffset: { width: 2, height: 2 },
+                    textAlign: 'center',
+                    fontSize: RFValue(20),
+                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
                   }}
                 >
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      fontSize: RFValue(20),
-                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                    }}
-                  >
-                    {nameToInitials(
-                      Contact.firstName && Contact.lastName
-                        ? Contact.firstName + ' ' + Contact.lastName
-                        : Contact.firstName && !Contact.lastName
-                          ? Contact.firstName
-                          : !Contact.firstName && Contact.lastName
-                            ? Contact.lastName
-                            : '',
-                    )}
-                  </Text>
-                </View>
-              )}
+                  {nameToInitials(
+                    Contact.firstName && Contact.lastName
+                      ? Contact.firstName + ' ' + Contact.lastName
+                      : Contact.firstName && !Contact.lastName
+                      ? Contact.firstName
+                      : !Contact.firstName && Contact.lastName
+                      ? Contact.lastName
+                      : '',
+                  )}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
         <View style={{ marginTop: 'auto' }}>
