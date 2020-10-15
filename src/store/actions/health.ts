@@ -23,7 +23,8 @@ export const UPDATE_EFCHANNEL_LOADING_STATUS = 'UPDATE_EFCHANNEL_LOADING_STATUS'
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE';  
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
 export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
-export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED'; 
+export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED';
+export const KEEPER_INFO = 'KEEPER_INFO';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -120,3 +121,7 @@ export const initLevelTwo = () => {
 export const isLevel2InitializedStatus = (beingLoaded) => {
   return { type: IS_LEVEL2_INITIALIZED, payload: { beingLoaded } };
 };
+
+export const updatedKeeperInfo = (info) =>{
+  return { type: KEEPER_INFO, payload: { info } };
+}

@@ -10,7 +10,8 @@ import {
   MSHARES,
   UPDATE_EFCHANNEL_LOADING_STATUS,
   IS_LEVEL_TWO_METASHARE,
-  IS_LEVEL_THREE_METASHARE
+  IS_LEVEL_THREE_METASHARE,
+  KEEPER_INFO
 } from '../actions/health';
 
 const initialState: {
@@ -38,6 +39,11 @@ const initialState: {
       guardian?: string;
     }[];
   }[];
+  keeperInfo: {
+    shareId: string;
+    name: string;
+    uuid: string;
+  }[];
   shares: any;
 } = {
   loading: {
@@ -54,7 +60,8 @@ const initialState: {
   currentLevel: 0,
   levelHealth: [],
   errorSending: false,
-  shares: null
+  shares: null,
+  keeperInfo: []
 };
 
 export default (state = initialState, action) => {
@@ -84,72 +91,78 @@ export default (state = initialState, action) => {
         currentLevel: action.payload.currentLevel
       };
 
-      case GET_HEALTH_OBJECT: 
-        return {
+    case GET_HEALTH_OBJECT: 
+      return {
+      ...state,
+      levelHealth: action.payload.health,
+    };
+
+    case ERROR_SENDING:
+      return {
         ...state,
-        levelHealth: action.payload.health,
+        errorSending: action.payload.isFailed,
       };
-
-      case ERROR_SENDING:
-        return {
-          ...state,
-          errorSending: action.payload.isFailed,
-        };
-      
-      case S3_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            checkMSharesHealth: action.payload.beingLoaded,
-          },
-        };
-      
-      case INIT_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            initLoader: action.payload.beingLoaded,
-          },
-        };
-
-      case UPDATE_MSHARE_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateMSharesHealth: action.payload.beingLoaded,
-          },
-        };
-
-        
-      case MSHARES: 
-        return {
-        ...state,
-        shares: action.payload.shares,
-      };
-
-      case UPDATE_EFCHANNEL_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateEFChannelStatus: action.payload.beingLoaded,
-          },
-        };
-      
-      case IS_LEVEL_TWO_METASHARE:
-        return {
-          ...state,
-          isLevelTwoMetaShareCreated: action.payload.beingLoaded,
-        };
     
-      case IS_LEVEL_THREE_METASHARE:
-        return {
-          ...state,
-          isLevelThreeMetaShareCreated: action.payload.beingLoaded,
-        };
+    case S3_LOADING_STATUS:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          checkMSharesHealth: action.payload.beingLoaded,
+        },
+      };
+    
+    case INIT_LOADING_STATUS:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          initLoader: action.payload.beingLoaded,
+        },
+      };
+
+    case UPDATE_MSHARE_LOADING_STATUS:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          updateMSharesHealth: action.payload.beingLoaded,
+        },
+      };
+
+      
+    case MSHARES: 
+      return {
+      ...state,
+      shares: action.payload.shares,
+    };
+
+    case UPDATE_EFCHANNEL_LOADING_STATUS:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          updateEFChannelStatus: action.payload.beingLoaded,
+        },
+      };
+    
+    case IS_LEVEL_TWO_METASHARE:
+      return {
+        ...state,
+        isLevelTwoMetaShareCreated: action.payload.beingLoaded,
+      };
+  
+    case IS_LEVEL_THREE_METASHARE:
+      return {
+        ...state,
+        isLevelThreeMetaShareCreated: action.payload.beingLoaded,
+      };
+
+    case KEEPER_INFO:
+      return {
+        ...state,
+        keeperInfo: action.payload.info,
+      };
       
       
   }

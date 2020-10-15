@@ -1,23 +1,22 @@
+import { MetaShare } from "../../bitcoin/utilities/Interface";
+
 export const modifyLevelStatus = (
   levelData,
   levelHealthVar,
   currentLevel,
-  metaShare
+  keeperInfo : any[]
 ): any[] => {
-  console.log('metaShare modifyLevelStatus', metaShare);
-  console.log('levelHealthVar', levelHealthVar);
   
   if (levelHealthVar) {
     let levelHealth = levelHealthVar[levelHealthVar.length - 1];
-    if(metaShare.length>0){
-      for (let i = 0; i < metaShare.length; i++) {
-        const element = metaShare[i];
-        if(levelHealth.levelInfo[i] && levelHealth.levelInfo[i].shareId == element.shareId){
-          levelHealth.levelInfo[i].guardian = element.meta.guardian ? element.meta.guardian : levelHealth.levelInfo[i].guardian;
+    if(keeperInfo.length>0){
+      for (let i = 0; i < levelHealth.levelInfo.length; i++) {
+        const element = levelHealth.levelInfo[i];
+        if(keeperInfo.findIndex(value=>value.shareId == element.shareId) > -1){
+          levelHealth.levelInfo[i].guardian = keeperInfo[keeperInfo.findIndex(value=>value.shareId == element.shareId)].name;
         }
       }
     }
-    console.log('metaShare modifyLevelStatus', levelHealth);
     if (levelHealth.levelInfo) {
       if (levelHealth.levelInfo[0] && levelHealth.levelInfo[1]) {
         // Level 1 => cloud

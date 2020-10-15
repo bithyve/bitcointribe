@@ -86,6 +86,7 @@ interface ManageBackupPropsTypes {
   initLevelTwo: any;
   s3Service: any;
   updateMSharesHealth: any;
+  keeperInfo: any[];
 }
 
 class ManageBackup extends Component<
@@ -177,10 +178,8 @@ class ManageBackup extends Component<
   }
 
   modifyLevelData = () => {
-    let { levelHealth, currentLevel, s3Service } = this.props;
-    console.log('s3Service.levelhealth.metaShares', s3Service);
-    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel, s3Service.levelhealth.metaShares);
-    console.log('levelData', levelData);
+    let { levelHealth, currentLevel, s3Service, keeperInfo } = this.props;
+    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel, keeperInfo);
     this.setState({levelData: levelData});
   }
 
@@ -353,7 +352,6 @@ class ManageBackup extends Component<
           <RefreshControl
             refreshing={healthLoading}
             onRefresh={() => {
-              console.log('RefreshControl')
               checkMSharesHealth();
             }}
           />
@@ -866,6 +864,7 @@ const mapStateToProps = (state) => {
     isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
+    keeperInfo: idx(state, (_) => _.health.keeperInfo),
   };
 };
 

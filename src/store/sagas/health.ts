@@ -13,7 +13,8 @@ import {
   initLevelTwo,
   checkMSharesHealth,
   isLevel2InitializedStatus,
-  updateMSharesHealth
+  updateMSharesHealth,
+  updatedKeeperInfo
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -106,7 +107,6 @@ function* generateMetaSharesWorker({ payload }) {
   if (level == 2) {
     let isLevel2Initialized = yield select((state) => state.health);
     serviceCall = s3Service.generateLevel1Shares;
-    console.log('generate Shares saga');
     if(!isLevel2Initialized){ yield put(initLevelTwo()); }
     yield put(updateLevelTwoMetaShareStatus(true));
   } else if (level == 3) {
@@ -325,23 +325,51 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         updatedAt: moment(new Date()).valueOf(),
       }
     ];
-    console.log('shareArray after EF channel', shareArray)
     yield put(updateMSharesHealth(shareArray));
-    
-    const res = yield call(s3Service.updateGuardianInMetaShare, s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
-    console.log("RES", res);
-    if (res.status === 200) {
-        let s3Service: S3Service = yield select((state) => state.sss.service);
-        const { SERVICES } = yield select((state) => state.storage.database);
-        const updatedSERVICES = {
-          ...SERVICES,
-          S3_SERVICE: JSON.stringify(s3Service),
-        };
-        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-      } else {
-        if (res.err === 'ECONNABORTED') requestTimedout();
-        throw new Error(res.err);
+    let keeperInfo = yield select((state) => state.health.keeperInfo);
+    let flag = false;
+    if(keeperInfo.length>0){
+      for (let i = 0; i < keeperInfo.length; i++) {
+        const element = keeperInfo[i];
+        if(element.shareId == s3Service.levelhealth.metaShares[1].shareId){
+          keeperInfo[i].name = EFChannelData.walletName;
+          keeperInfo[i].uuid = EFChannelData.uuid;
+          break;
+        }
+        else{
+          flag = true;
+          break;
+        }
       }
+    }
+    else{
+      flag = true;
+    }
+    if(flag){
+      let obj = {
+        shareId: s3Service.levelhealth.metaShares[1].shareId,
+        name: EFChannelData.walletName,
+        uuid: EFChannelData.uuid,
+      }
+      keeperInfo.push(obj);
+    }
+    yield put(updatedKeeperInfo(keeperInfo));
+    
+    // const res = yield call(s3Service.updateGuardianInMetaShare, s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
+    // console.log("RES", res);
+
+    // if (res.status === 200) {
+    //     let s3Service: S3Service = yield select((state) => state.sss.service);
+    //     const { SERVICES } = yield select((state) => state.storage.database);
+    //     const updatedSERVICES = {
+    //       ...SERVICES,
+    //       S3_SERVICE: JSON.stringify(s3Service),
+    //     };
+    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    // } else {
+    //   if (res.err === 'ECONNABORTED') requestTimedout();
+    //   throw new Error(res.err);
+    // }
   }
   yield put(updateMSharesLoader(false));
 }
@@ -353,14 +381,12 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 
 function* updateHealthLevel2Worker() {
   let isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized);
-  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized);
   if(!isLevel2Initialized){
     let s3Service: S3Service = yield select((state) => state.sss.service);
     let Health = yield select((state) => state.health.levelHealth);
     let SecurityQuestionHealth = Health[0].levelInfo[1];
     yield put(initLoader(true));
     const res = yield call(s3Service.updateHealthLevel2, SecurityQuestionHealth);
-    console.log('INIT_LEVEL_TWO res', res );
     if(res.success){
       // Update Health to reducer
       yield put(checkMSharesHealth());
