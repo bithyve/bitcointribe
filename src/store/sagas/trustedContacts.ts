@@ -512,21 +512,27 @@ export function* trustedChannelsSyncWorker() {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  yield call(fetchNotificationsWorker); // refreshes DHInfos
-  let DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
-  if (DHInfos) {
-    DHInfos = JSON.parse(DHInfos);
-  } else {
-    DHInfos = [];
-  }
-
+ 
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
+  let DHInfos;
   for (const contactName of Object.keys(contacts)) {
     let { trustedChannel, ephemeralChannel, encKey } = contacts[contactName];
 
+    
     if (!trustedChannel) {
       // trusted channel not setup; probably need to still get the counter party's pubKey
-
+      
+      // update DHInfos(once) only if there's a contact w/ trusted channel pending
+      if(!DHInfos){
+        yield call(fetchNotificationsWorker); // refreshes DHInfos
+        DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
+        if (DHInfos) {
+          DHInfos = JSON.parse(DHInfos);
+        } else {
+          DHInfos = [];
+        }
+      }
+     
       let contactsPublicKey;
       DHInfos.forEach((dhInfo: { address: string; publicKey: string }) => {
         if (dhInfo.address === ephemeralChannel.address) {

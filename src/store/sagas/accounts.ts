@@ -1076,16 +1076,10 @@ function* startupSyncWorker({ payload }) {
       payload: { serviceTypes: [REGULAR_ACCOUNT, SECURE_ACCOUNT] },
     });
   } catch (err) {
-    console.log('Trusted Derivative accounts sync failed: ', err);
+    console.log('Derivative accounts sync failed: ', err);
   }
 
   yield put(startupSyncLoaded(true))
-  try {
-    console.log('Synching trusted channels...');
-    yield call(trustedChannelsSyncWorker);
-  } catch (err) {
-    console.log('Trusted Channels sync failed: ', err);
-  }
 }
 
 export const startupSyncWatcher = createWatcher(
