@@ -97,8 +97,8 @@ export default function Login(props) {
     (state) => state.preferences.releaseCasesValue,
   );
 
-  const initialLoadingCompleted = useSelector(
-    (state) => state.loaders.initialLoadingCompleted,
+  const startupSyncLoaded = useSelector(
+    (state) => state.loaders.startupSyncLoaded,
   );
 
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
@@ -363,13 +363,17 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          loaderBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Home', {
-            custodyRequest,
-            recoveryRequest,
-            trustedContactRequest,
-            userKey,
-          });
+          timer = setTimeout(() => {
+            if (loaderBottomSheet.current) {
+              loaderBottomSheet.current.snapTo(0);
+            }
+            props.navigation.navigate('Home', {
+              custodyRequest,
+              recoveryRequest,
+              trustedContactRequest,
+              userKey,
+            });
+          }, 20000);
         } else {
           props.navigation.replace('RestoreAndRecoverWallet');
         }
@@ -377,31 +381,22 @@ export default function Login(props) {
     }
   }, [isAuthenticated]);
 
-  // useEffect(() => {
-  //   if (isAuthenticated && dbFetched) {
-  //     console.log('FIRING', dbFetched);
-  //     dispatch(updateWalletImage());
-  //     dispatch(calculateExchangeRate());
-  //     dispatch(startupSync());
-  //   }
-  // }, [isAuthenticated, dbFetched]);
-
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     if (loaderBottomSheet.current) {
-  //       loaderBottomSheet.current.snapTo(0);
-  //     }
-  //     props.navigation.navigate('Home', {
-  //       custodyRequest,
-  //       recoveryRequest,
-  //       trustedContactRequest,
-  //       userKey,
-  //     });
-  //     if (timer) {
-  //       clearTimeout(timer);
-  //     }
-  //   }
-  // }, [isAuthenticated]);
+  useEffect(() => {
+    if (startupSyncLoaded) {
+      if (loaderBottomSheet.current) {
+        loaderBottomSheet.current.snapTo(0);
+      }
+      props.navigation.navigate('Home', {
+        custodyRequest,
+        recoveryRequest,
+        trustedContactRequest,
+        userKey,
+      });
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }, [startupSyncLoaded]);
 
   const handleLoaderMessages = (passcode) => {
     setTimeout(() => {

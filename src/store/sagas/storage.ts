@@ -46,7 +46,6 @@ function* fetchDBWorker() {
       yield put(dbFetched(database));
 
       // actions post DB fetch
-      // yield delay(3000) //starting sync after a pause to let the home render relatively quickly
       yield put(updateWalletImage());
       yield put(calculateExchangeRate());
       yield put(startupSync());
