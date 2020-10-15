@@ -53,53 +53,71 @@ import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
+import android.content.Context;
+import com.facebook.react.PackageList;
+import com.facebook.react.ReactInstanceManager;
+import java.lang.reflect.InvocationTargetException;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
-  private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
-      new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
+    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
+            new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
 
-  @Override
-  public String getFileProviderAuthority() {
-    return BuildConfig.APPLICATION_ID + ".provider";
-  }
-
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
+    public String getFileProviderAuthority() {
+        return BuildConfig.APPLICATION_ID + ".provider";
+    }
+
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return BuildConfig.DEBUG;
+        }
+
+        @Override
+        protected List<ReactPackage> getPackages() {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            List<ReactPackage> packages = new PackageList(this).getPackages();
+            // Packages that cannot be autolinked yet can be added manually here, for example:
+            // packages.add(new MyReactNativePackage());
+
+            packages.add(new RNFirebaseMessagingPackage());
+            packages.add(new RNFirebaseAnalyticsPackage());
+            packages.add(new RNFirebaseNotificationsPackage());
+
+
+
+
+
+            return packages;
+            // return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            //       new RNFSPackage(),
+            //       new CheckPackageInstallationPackage(),
+            //       new RNLocalizePackage(),
+            //       new ReactNativeConfigPackage(),
+            //       new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),new RNFirebaseAnalyticsPackage(),
+            //     new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
+            //     new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
+            //     new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
+            //     new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
+            //     new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
+            //     new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
+        }
+
+        @Override
+        protected String getJSMainModuleName() {
+            return "index";
+        }
+    };
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
     }
 
     @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(),
-            new RNFSPackage(),
-            new CheckPackageInstallationPackage(),
-            new RNLocalizePackage(),
-            new ReactNativeConfigPackage(),
-            new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),new RNFirebaseAnalyticsPackage(),
-          new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
-          new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
-          new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
-          new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
-          new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
-          new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
+    public void onCreate() {
+        super.onCreate();
+        Fabric.with(this, new Crashlytics());
+        SoLoader.init(this, /* native exopackage */ false);
     }
-
-    @Override
-    protected String getJSMainModuleName() {
-      return "index";
-    }
-  };
-
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    Fabric.with(this, new Crashlytics());
-    SoLoader.init(this, /* native exopackage */ false);
-  }
 }
