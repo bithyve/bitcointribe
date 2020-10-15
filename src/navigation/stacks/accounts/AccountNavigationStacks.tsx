@@ -1,17 +1,17 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
-import XPubSourceKind from '../../common/data/enums/XPubSourceKind';
-import AccountSettingsEditDisplayPropertiesScreen from "../../pages/Accounts/AccountSettings/EditDisplayPropertiesScreen";
-import AccountSettingsMainScreen from "../../pages/Accounts/AccountSettings/MainScreen";
-import ReassignTransactionsMainOptionsScreen from "../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
-import ReassignAllTransactionsSelectTransactionsScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
-import AccountDetailsContainerScreen from "../../pages/Accounts/Details/AccountDetailsContainerScreen";
-import TransactionDetailsContainerScreen from "../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
-import TransactionsListContainerScreen from "../../pages/Accounts/Transactions/TransactionsListScreenContainer";
-import ReassignTransactionsSelectDestinationScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
-import ReassignSubAccountSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
-import AccountSettingsEditVisibilityScreen from '../../pages/Accounts/AccountSettings/EditVisibilityScreen';
-import AccountSettingsMergeAccountShellsScreen from '../../pages/Accounts/AccountSettings/MergeAccountShellsScreen';
+import XPubSourceKind from '../../../common/data/enums/XPubSourceKind';
+import AccountSettingsEditDisplayPropertiesScreen from "../../../pages/Accounts/AccountSettings/EditDisplayPropertiesScreen";
+import AccountSettingsMainScreen from "../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen";
+import ReassignTransactionsMainOptionsScreen from "../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
+import ReassignAllTransactionsSelectTransactionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
+import AccountDetailsContainerScreen from "../../../pages/Accounts/Details/AccountDetailsContainerScreen";
+import TransactionDetailsContainerScreen from "../../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
+import TransactionsListContainerScreen from "../../../pages/Accounts/Transactions/TransactionsListScreenContainer";
+import ReassignTransactionsSelectDestinationScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
+import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
+import AccountSettingsEditVisibilityScreen from '../../../pages/Accounts/AccountSettings/EditVisibilityScreen';
+import AccountSettingsMergeAccountShellsScreen from '../../../pages/Accounts/AccountSettings/MergeAccountShellsScreen';
 
 export const AccountSettingsStack = createStackNavigator(
   {

@@ -7,7 +7,7 @@ function useAccountShell(accountShellID: string): AccountShell | undefined {
   return useSelector(state => {
     const accountsState: AccountsState = state.accounts;
 
-    return accountsState.activeAccounts.find(accountShell => accountShell.id === accountShellID);
+    return accountsState.activeAccountShells.find(accountShell => accountShell.id === accountShellID);
   });
 }
 
