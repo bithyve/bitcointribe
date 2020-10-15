@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TransactionDescribing } from '../../../../common/data/models/Transactions/Interfaces';
+import TransactionDescribing from '../../../../common/data/models/Transactions/Interfaces';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import sampleTransactions from '../../Details/SampleTransactions';
 import { Button } from 'react-native-elements';

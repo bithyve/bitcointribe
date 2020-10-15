@@ -1,8 +1,13 @@
 import { useSelector } from 'react-redux';
 import AccountShell from '../../../../common/data/models/AccountShell';
-import { AccountsState } from '../../../../store/reducers/accounts';
+import useAccountsState from './UseAccountsState';
+import { useMemo } from 'react';
 
 
 export default function useActiveAccountShells(): AccountShell[] {
-  return useSelector(state => state.accounts.activeAccounts);
+  const accountsState = useAccountsState();
+
+  return useMemo(() => {
+    return accountsState.activeAccountShells;
+  }, [accountsState.activeAccountShells]);
 }
