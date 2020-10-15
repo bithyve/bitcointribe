@@ -42,7 +42,13 @@ import expo.modules.constants.ConstantsPackage;
 import expo.modules.permissions.PermissionsPackage;
 import expo.modules.filesystem.FileSystemPackage;
 
+// unimodule changes
+import io.hexawallet.hexa.generated.BasePackageList;
 import java.util.Arrays;
+import org.unimodules.adapters.react.ModuleRegistryAdapter;
+import org.unimodules.adapters.react.ReactModuleRegistryProvider;
+import org.unimodules.core.interfaces.SingletonModule;
+
 import java.util.List;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
@@ -58,9 +64,14 @@ import com.facebook.react.PackageList;
 import com.facebook.react.ReactInstanceManager;
 import java.lang.reflect.InvocationTargetException;
 
+
+
+
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
-    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
-            new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
+//    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
+//            new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
+
+    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(new BasePackageList().getPackageList(), null);
 
     @Override
     public String getFileProviderAuthority() {
@@ -84,23 +95,12 @@ public class MainApplication extends Application implements ShareApplication, Re
             packages.add(new RNFirebaseAnalyticsPackage());
             packages.add(new RNFirebaseNotificationsPackage());
 
-
-
-
-
+            // Add unimodules
+            List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
+                    new ModuleRegistryAdapter(mModuleRegistryProvider)
+            );
+            packages.addAll(unimodules);
             return packages;
-            // return Arrays.<ReactPackage>asList(new MainReactPackage(),
-            //       new RNFSPackage(),
-            //       new CheckPackageInstallationPackage(),
-            //       new RNLocalizePackage(),
-            //       new ReactNativeConfigPackage(),
-            //       new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),new RNFirebaseAnalyticsPackage(),
-            //     new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
-            //     new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
-            //     new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
-            //     new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
-            //     new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
-            //     new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
         }
 
         @Override
