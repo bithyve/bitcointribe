@@ -34,6 +34,7 @@ import {
   ACCOUNT_SHELL_MERGE_COMPLETED,
   ACCOUNT_SHELL_MERGE_SUCCEEDED,
   ACCOUNT_SHELL_MERGE_FAILED,
+  ACCOUNT_SHELLS_ORDER_UPDATED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -121,8 +122,8 @@ export type AccountsState = {
   // sure it's really a concern of the "Accounts state".
   exchangeRates?: any;
 
-  activeAccounts: AccountShell[];
-  archivedAccounts: AccountShell[];
+  activeAccountShells: AccountShell[];
+  archivedAccountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
   // up account data from `activeAccounts` using a UUID.
@@ -167,27 +168,30 @@ const initialState: AccountsState = {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
-  activeAccounts: [
+  activeAccountShells: [
     new AccountShell({
       primarySubAccount: new TestSubAccountInfo({
         isPrimarySubAccount: true,
       }),
       unit: BitcoinUnit.TSATS,
+      displayOrder: 1,
     }),
     new AccountShell({
       primarySubAccount: new CheckingSubAccountInfo({
         isPrimarySubAccount: true,
       }),
       unit: BitcoinUnit.SATS,
+      displayOrder: 2,
     }),
     new AccountShell({
       primarySubAccount: new SavingsSubAccountInfo({
         isPrimarySubAccount: true,
       }),
       unit: BitcoinUnit.SATS,
+      displayOrder: 3,
     }),
   ],
-  archivedAccounts: [],
+  archivedAccountShells: [],
 
   isGeneratingNewAccount: false,
   hasNewAccountGenerationSucceeded: false,
@@ -572,7 +576,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         ...state,
         isGeneratingNewAccount: false,
         hasNewAccountGenerationSucceeded: true,
-        activeAccounts: state.activeAccounts.concat(action.payload),
+        activeAccountShells: state.activeAccountShells.concat(action.payload),
       };
 
 
@@ -686,6 +690,12 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         isAccountShellMergeInProgress: false,
         hasAccountShellMergeSucceeded: false,
         hasAccountShellMergeFailed: false,
+      };
+
+    case ACCOUNT_SHELLS_ORDER_UPDATED:
+      return {
+        ...state,
+        activeAccountShells: action.payload,
       };
 
     default:

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { TransactionDescribing } from '../../../common/data/models/Transactions/Interfaces';
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
 
 export type Props = {
   navigation: any;
