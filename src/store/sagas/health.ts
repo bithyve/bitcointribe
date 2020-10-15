@@ -139,6 +139,7 @@ function* checkSharesHealthWorker() {
   yield put(switchS3LoadingStatus(true));
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.checkHealth);
+
   if (res.status === 200) {
     yield put(
       updateHealth(res.data.data.data.levels, res.data.data.data.currentLevel),
@@ -174,8 +175,17 @@ function* updateSharesHealthWorker({ payload }) {
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
   const res = yield call(S3Service.updateHealth, payload.shares);
-  console.log('res', res)
   if (res.status === 200) {
+    if(res.data.updationResult){
+      let s3Service: S3Service = yield select((state) => state.sss.service);
+      for (let i = 0; i < res.data.updationResult.length; i++) {
+        const element = res.data.updationResult[i];
+        if(element.walletId == s3Service.getWalletId().data.walletId){
+          yield put(updateHealth(res.data.updationResult[i].levels, res.data.updationResult[i].currentLevel));
+          break;
+        }
+      }
+    }
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
     Object.keys(UNDER_CUSTODY).forEach((tag) => {
@@ -263,6 +273,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       : null,
     featuresList,
   };
+
   // let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
   let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData
@@ -310,12 +321,13 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: s3Service.levelhealth.metaShares[1].shareId,
-        reshareVersion: 1,
+        reshareVersion: 0,
         updatedAt: moment(new Date()).valueOf(),
       }
     ];
     console.log('shareArray after EF channel', shareArray)
     yield put(updateMSharesHealth(shareArray));
+    s3Service.updateGuardianInMetaShare(s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
   }
   yield put(updateMSharesLoader(false));
 }

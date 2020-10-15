@@ -177,8 +177,9 @@ class ManageBackup extends Component<
   }
 
   modifyLevelData = () => {
-    let { levelHealth, currentLevel } = this.props;
-    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel);
+    let { levelHealth, currentLevel, s3Service } = this.props;
+    console.log('s3Service.levelhealth.metaShares', s3Service);
+    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel, s3Service.levelhealth.metaShares);
     console.log('levelData', levelData);
     this.setState({levelData: levelData});
   }
@@ -236,7 +237,7 @@ class ManageBackup extends Component<
   cloudData = async () => {
     const { walletName, regularAccount, } = this.props;
     let encryptedCloudDataJson;
-    let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
+    let shares; //= JSON.stringify(s3Service.levelhealth.metaShares);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [

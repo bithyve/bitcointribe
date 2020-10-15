@@ -1020,7 +1020,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if(prevProps.levelHealth !== this.props.levelHealth){
+    if(prevProps.levelHealth != this.props.levelHealth && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
       if(this.props.levelHealth.length>0){
         this.cloudData();
       }

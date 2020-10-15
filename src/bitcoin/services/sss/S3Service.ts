@@ -319,6 +319,22 @@ export default class S3Service {
             encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
+          updationResult: Array<{
+            levels: Array<{
+              levelInfo: Array<{
+                _id: string;
+                shareType: string;
+                updatedAt: number;
+                status: string;
+                shareId: string;
+                reshareVersion: number;
+              }>;
+              _id?: string;
+              level: number;
+            }>
+            currentLevel: number;
+            walletId: string;
+          }>
         };
         err?: undefined;
         message?: undefined;
@@ -981,6 +997,16 @@ export default class S3Service {
         err: err.message,
         message: 'Failed to fetch Wallet Image',
       };
+    }
+  };
+
+  public updateGuardianInMetaShare = (
+    shareId: string,
+    name: string,
+  ) => {
+    try {
+      this.levelhealth.updateGuardianInMetaShare(shareId, name);
+    } catch (err) {
     }
   };
 }

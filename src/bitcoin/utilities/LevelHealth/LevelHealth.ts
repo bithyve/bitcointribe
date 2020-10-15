@@ -382,6 +382,22 @@ export default class LevelHealth {
       updated: boolean;
       updatedAt?: number;
     }>;
+    updationResult: Array<{
+      levels: Array<{
+        levelInfo: Array<{
+          _id: string;
+          shareType: string;
+          updatedAt: number;
+          status: string;
+          shareId: string;
+          reshareVersion: number;
+        }>;
+        _id?: string;
+        level: number;
+      }>
+      currentLevel: number;
+      walletId: string;
+    }>
   }> => {
     let res: AxiosResponse;
     try {
@@ -394,9 +410,7 @@ export default class LevelHealth {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
-
-    const { updationInfo } = res.data;
-    return { updationInfo };
+    return res.data;
   };
 
   public static getShareId = (encryptedSecret: string): string =>
@@ -1351,4 +1365,19 @@ export default class LevelHealth {
       throw new Error('Failed to fetch Wallet Image');
     }
   };
+
+  public updateGuardianInMetaShare = (
+    shareId: string,
+    name: string,
+  ) =>{
+    for (let i = 0; i < this.metaShares.length; i++) {
+      const element = this.metaShares[i];
+      console.log('updateGuardianInMetaShare Guardian name', name)
+      if(element.shareId == shareId){
+        console.log('updateGuardianInMetaShare element.shareId inside if', shareId);
+        this.metaShares[i].meta.guardian = name.toLowerCase().trim();
+      }
+    }
+    console.log('updateGuardianInMetaShare outside for', this.metaShares);
+  }
 }
