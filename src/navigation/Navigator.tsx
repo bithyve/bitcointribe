@@ -61,11 +61,9 @@ import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import HomeStack from './stacks/home/HomeStack';
-import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
 import SendStack from './stacks/send/SendStack';
-import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
-import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
-import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
+import AddNewAccountStack from './stacks/accounts/AddNewAccountStack';
+import AccountDetailsStack from './stacks/accounts/AccountDetailsStack';
 
 
 const SetupNavigator = createStackNavigator(
@@ -110,27 +108,6 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'Intermediate',
 ];
-
-const AddNewAccountStack = createStackNavigator(
-  {
-    AccountSelectionList: {
-      screen: NewAccountSelectionList,
-      navigationOptions: {
-        header: ({ navigation }) => {
-          return <NavigationHeader title="Add New" onBackPress={() => navigation.goBack()} />
-        },
-      },
-    },
-    AddNewHexaAccountDetails: {
-      screen: AddNewHexaAccountDetails,
-      navigationOptions: AddNewHexaAccountDetails.navigationOptions,
-    },
-  },
-  {
-    mode: 'modal',
-    initialRouteName: 'AccountSelectionList',
-  },
-);
 
 const HomeNavigator = createStackNavigator(
   {

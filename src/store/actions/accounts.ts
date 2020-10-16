@@ -33,8 +33,8 @@ export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
-export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
-export const ADD_NEW_ACCOUNT_COMPLETED = 'ADD_NEW_ACCOUNT_COMPLETED';
+export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL';
+export const ADD_NEW_ACCOUNT_SHELL_COMPLETED = 'ADD_NEW_ACCOUNT_SHELL_COMPLETED';
 export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS';
 export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED';
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
@@ -293,23 +293,23 @@ export const updateDonationPreferences = (
   };
 };
 
-export interface AddNewAccountAction extends Action {
-  type: typeof ADD_NEW_ACCOUNT;
+export interface AddNewAccountShellAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_SHELL;
   payload: SubAccountDescribing;
 };
 
-export const addNewAccount = (payload: SubAccountDescribing): AddNewAccountAction => {
+export const addNewAccountShell = (payload: SubAccountDescribing): AddNewAccountShellAction => {
   return {
-    type: ADD_NEW_ACCOUNT,
+    type: ADD_NEW_ACCOUNT_SHELL,
     payload,
   }
 }
-export interface AddNewAccountCompletionAction extends Action {
-  type: typeof ADD_NEW_ACCOUNT_COMPLETED;
+export interface AddNewAccountShellCompletionAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_SHELL_COMPLETED;
 };
 
-export const newAccountAddCompleted = (): AddNewAccountCompletionAction => {
-  return { type: ADD_NEW_ACCOUNT_COMPLETED };
+export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletionAction => {
+  return { type: ADD_NEW_ACCOUNT_SHELL_COMPLETED };
 };
 
 export interface UpdateSubAccountSettingsAction extends Action {
