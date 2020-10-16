@@ -13,7 +13,7 @@ import {
   trustedChannelFetched,
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
-  TRUSTED_CHANNELS_SYNC,
+  TRUSTED_CHANNELS_SETUP_SYNC,
   paymentDetailsFetched,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
@@ -497,9 +497,9 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 );
 
-export function* trustedChannelsSyncWorker() {
+export function* trustedChannelsSetupSyncWorker() {
   // TODO: simplify and optimise the saga
-  yield put(switchTCLoading('trustedChannelsSync'));
+  yield put(switchTCLoading('trustedChannelsSetupSync'));
 
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
@@ -560,6 +560,7 @@ export function* trustedChannelsSyncWorker() {
               .trustedChannel;
         }
       } else {
+        // ECDH pub not available for this contact
         continue;
       }
     }
@@ -613,6 +614,7 @@ export function* trustedChannelsSyncWorker() {
           }
         }
       } else {
+        // updating trusted derivative acc(from trusted-channel) in case of non-updation(handles recovery failures)
         const accountNumber =
           regularService.hdWallet.trustedContactToDA[contactName];
         if (accountNumber) {
@@ -642,7 +644,7 @@ export function* trustedChannelsSyncWorker() {
         }
       }
     } else {
-      // generate a corresponding derivative acc and assign xpub
+      // generate a corresponding derivative acc and assign xpub(uploading info to trusted channel)
       const res = yield call(
         regularService.getDerivativeAccXpub,
         TRUSTED_CONTACTS,
@@ -729,16 +731,16 @@ export function* trustedChannelsSyncWorker() {
       payload: { SERVICES: updatedSERVICES },
     });
 
-    console.log('Updating WI...');
-    yield put(updateWalletImage());
+    // console.log('Updating WI...');
+    // yield put(updateWalletImage()); // TODO: re-enable once the WI updation is refactored and optimised 
 
     yield call(AsyncStorage.setItem, 'preSyncTC', postSyncTC);
   }
 
-  yield put(switchTCLoading('trustedChannelsSync'));
+  yield put(switchTCLoading('trustedChannelsSetupSync'));
 }
 
-export const trustedChannelsSyncWatcher = createWatcher(
-  trustedChannelsSyncWorker,
-  TRUSTED_CHANNELS_SYNC,
+export const trustedChannelsSetupSyncWatcher = createWatcher(
+  trustedChannelsSetupSyncWorker,
+  TRUSTED_CHANNELS_SETUP_SYNC,
 );

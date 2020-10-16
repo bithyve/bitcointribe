@@ -108,7 +108,7 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
-  trustedChannelsSyncWatcher,
+  trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
 } from './sagas/trustedContacts';
 
@@ -214,7 +214,7 @@ const rootSaga = function* () {
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
-    trustedChannelsSyncWatcher,
+    trustedChannelsSetupSyncWatcher,
   ];
 
   yield all(
