@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import RNSecureStorage, { ACCESSIBLE } from "rn-secure-storage";
 import Config from "react-native-config";
 
 export const store = async (hash, enc_key) => {
@@ -10,6 +11,12 @@ export const store = async (hash, enc_key) => {
     await SecureStore.setItemAsync(
       Config.ENC_KEY_STORAGE_IDENTIFIER,
       JSON.stringify({ hash, enc_key }),
+    );
+
+    await RNSecureStorage.set(
+      Config.ENC_KEY_STORAGE_IDENTIFIER,
+      JSON.stringify({ hash, enc_key }),
+      { accessible: ACCESSIBLE.WHEN_UNLOCKED }
     );
   } catch (err) {
     console.log(err);
