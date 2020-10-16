@@ -1,17 +1,36 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import NavigationHeader from '../NavigationHeader';
+import { View, StyleSheet, Text } from 'react-native';
 import FormStyles from '../../../../common/Styles/Forms';
 import ButtonStyles from '../../../../common/Styles/Buttons';
+import ListStyles from '../../../../common/Styles/Lists';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
-import { addNewAccount } from '../../../../store/actions/accounts';
+import { addNewAccountShell } from '../../../../store/actions/accounts';
 import useAccountGenerationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountGenerationCompletionEffect';
 import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
 import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 
-export interface Props {
+export type Props = {
   navigation: any;
+};
+
+type HeaderSectionProps = {
+  subAccountInfo: SubAccountDescribing;
+};
+
+
+const HeaderSection: React.FC<HeaderSectionProps> = ({
+  subAccountInfo,
+}) => {
+  const title = useMemo(() => {
+    return `Enter details for the new ${subAccountInfo.defaultTitle}`;
+  }, [subAccountInfo.defaultTitle]);
+
+  return (
+    <View style={ListStyles.infoHeaderSection}>
+      <Text style={ListStyles.infoHeaderText}>{title}</Text>
+    </View>
+  );
 }
 
 const AddNewHexaAccountDetails: React.FC<Props> = ({
@@ -48,11 +67,13 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
     currentSubAccountInfo.customDisplayName = accountName;
     currentSubAccountInfo.customDescription = accountDescription;
 
-    dispatch(addNewAccount(currentSubAccountInfo));
+    dispatch(addNewAccountShell(currentSubAccountInfo));
   }
 
   return (
     <View style={styles.rootContainer}>
+      <HeaderSection subAccountInfo={currentSubAccountInfo} />
+
       <View style={styles.formContainer}>
         <Input
           inputContainerStyle={[FormStyles.textInputContainer, styles.textInputContainer]}
@@ -80,7 +101,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
         />
       </View>
 
-      <View style={styles.listFooterSection}>
+      <View style={styles.footerSection}>
         <Button
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
@@ -96,7 +117,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   rootContainer: {
-    paddingVertical: 20,
+    flex: 1,
   },
 
   formContainer: {
@@ -107,28 +128,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  listFooterSection: {
+  footerSection: {
     paddingHorizontal: 16,
     alignItems: 'flex-start',
   },
 });
 
-
-AddNewHexaAccountDetails.navigationOptions = ({ navigation, navigationOptions }) => {
-  const { params } = navigation.state;
-
-  return {
-    header: ({ scene, previous, navigation }) => {
-      const currentSubAccountInfo: SubAccountDescribing = params.currentSubAccountInfo;
-      const title = `Enter details for the new ${currentSubAccountInfo.defaultTitle}`;
-
-      return <NavigationHeader
-        title={title}
-        titleStyle={{ fontSize: 18, fontWeight: '400' }}
-        onBackPress={() => navigation.pop()}
-      />
-    },
-  };
-};
 
 export default AddNewHexaAccountDetails;

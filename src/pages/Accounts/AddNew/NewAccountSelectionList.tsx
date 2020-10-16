@@ -7,7 +7,7 @@ import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountGenerationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountGenerationCompletionEffect';
-import { addNewAccount } from '../../../store/actions/accounts';
+import { addNewAccountShell } from '../../../store/actions/accounts';
 import { useDispatch } from "react-redux";
 import { goHomeAction } from '../../../navigation/actions/NavigationActions';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
@@ -26,9 +26,9 @@ const sectionListItemKeyExtractor = index => index;
 function titleForSectionHeader(kind: SectionKind) {
   switch (kind) {
     case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-      return "Add A New Account";
+      return "Create a Hexa Account";
     case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-      return "Add A Service";
+      return "Integrate A Service";
     case SectionKind.IMPORT_WALLET:
       return "Import A Wallet";
   }
@@ -63,7 +63,51 @@ const NewAccountSelectionList: React.FC<Props> = ({
     return selectedChoice !== null;
   }, [selectedChoice]);
 
-  const ListFooter = () => {
+
+  function handleProceedButtonPress() {
+    if (selectedChoice instanceof ExternalServiceSubAccountInfo) {
+      // TODO: Present options for choosing b/w a standalone Service account or
+      // adding it to a Hexa account (e.g. Checking or Savings account).
+      switch (selectedChoice.serviceAccountKind) {
+        case ServiceAccountKind.FAST_BITCOINS:
+          dispatch(addNewAccountShell(selectedChoice));
+          break;
+        default:
+          break;
+      }
+    }
+
+    switch (selectedChoice.kind) {
+      case SubAccountKind.TEST:
+      case SubAccountKind.REGULAR:
+      case SubAccountKind.SECURE:
+        navigation.navigate('AddNewHexaAccountDetails', {
+          currentSubAccountInfo: selectedChoice,
+        });
+        break;
+      case SubAccountKind.DONATION:
+        // TODO: Implement alongside Re-integrating current "Add donation account" UI.
+        break;
+      case SubAccountKind.TRUSTED_CONTACTS:
+        dispatch(addNewAccountShell(selectedChoice));
+        break;
+      case SubAccountKind.SERVICE:
+        // TODO: Implement alongside supporting Service integration from "Add New".
+        break;
+      case SubAccountKind.FULLY_IMPORTED_WALLET:
+      case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
+        // TODO: Implement alongside supporting Import integration from "Add New".
+        break;
+      default:
+        break;
+    }
+  }
+
+  function handleChoiceSelection(choice: SubAccountDescribing) {
+    setSelectedChoice(choice);
+  }
+
+  const ListFooter: React.FC = () => {
     return (
       <View style={styles.listFooterSection}>
         <Button
@@ -78,52 +122,10 @@ const NewAccountSelectionList: React.FC<Props> = ({
     );
   };
 
-  function handleProceedButtonPress() {
-    if (selectedChoice instanceof ExternalServiceSubAccountInfo) {
-      // TODO: Present options for choosing b/w a standalone Service account or
-      // adding it to a Hexa account (e.g. Checking or Savings account).
-      switch (selectedChoice.serviceAccountKind) {
-        case ServiceAccountKind.FAST_BITCOINS:
-          dispatch(addNewAccount(selectedChoice));
-          break;
-        default:
-          break;
-      }
-    }
-
-    switch (selectedChoice.kind) {
-      case SubAccountKind.TEST:
-      case SubAccountKind.REGULAR:
-      case SubAccountKind.SECURE:
-      case SubAccountKind.DONATION:
-        navigation.navigate('AddNewHexaAccountDetails', {
-          currentSubAccountInfo: selectedChoice,
-        });
-        break;
-      case SubAccountKind.TRUSTED_CONTACTS:
-        dispatch(addNewAccount(selectedChoice));
-        break;
-      // case AccountKind.SERVICE:
-        // if ((selectedChoice as ExternalServiceSubAccountInfo).serviceAccountKind === ServiceAccountKind.FAST_BITCOINS) {
-          // dispatch(addNewAccount({ payload: selectedChoice }));
-          // break;
-        // }
-      case SubAccountKind.FULLY_IMPORTED_WALLET:
-      case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
-        break;
-      default:
-        break;
-    }
-  }
-
-  function handleChoiceSelection(choice: SubAccountDescribing) {
-    setSelectedChoice(choice);
-  }
-
   return (
-    <SafeAreaView style={styles.rootContainer}>
+    <View style={styles.rootContainer}>
       <SectionList
-        contentContainerStyle={{ paddingVertical: 12 }}
+        contentContainerStyle={{ paddingVertical: 25 }}
         ListFooterComponent={<ListFooter />}
         extraData={[selectedChoice]}
         sections={[
@@ -178,7 +180,7 @@ const NewAccountSelectionList: React.FC<Props> = ({
         stickySectionHeadersEnabled={false}
       >
       </SectionList>
-    </SafeAreaView>
+    </View>
   );
 };
 

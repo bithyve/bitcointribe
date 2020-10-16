@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { newAccountAddCompleted } from "../../../store/actions/accounts";
+import { newAccountShellCreationCompleted } from "../../../store/actions/accounts";
 
 
 export default function useAccountGenerationCompletionEffect(onComplete: () => void) {
@@ -9,7 +9,7 @@ export default function useAccountGenerationCompletionEffect(onComplete: () => v
 
   useEffect(() => {
     if (hasNewAccountGenerationSucceeded) {
-      dispatch(newAccountAddCompleted());
+      dispatch(newAccountShellCreationCompleted());
       onComplete();
     }
   }, [hasNewAccountGenerationSucceeded]);
