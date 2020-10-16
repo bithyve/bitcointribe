@@ -1,16 +1,16 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
-import ChangeCurrencyScreen from '../../pages/ChangeCurrencyScreen';
-import MoreOptionsContainerScreen from "../../pages/MoreOptions/MoreOptionsContainerScreen";
-import ManagePasscodeScreen from '../../pages/ManagePasscodeScreen';
-import FriendsAndFamilyScreen from '../../pages/FriendsAndFamily/FriendsAndFamilyScreen';
-import WalletSettingsContainerScreen from "../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen";
-import FundingSourcesScreen from "../../pages/FundingSources/FundingSourcesContainerScreen";
-import FundingSourceDetailsScreen from "../../pages/FundingSources/FundingSourceDetailsScreen";
-import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
-import { goHomeAction } from '../actions/NavigationActions';
-import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
-import NavStyles from '../../common/Styles/NavStyles';
+import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen';
+import MoreOptionsContainerScreen from "../../../pages/MoreOptions/MoreOptionsContainerScreen";
+import ManagePasscodeScreen from '../../../pages/ManagePasscodeScreen';
+import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen';
+import WalletSettingsContainerScreen from "../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen";
+import FundingSourcesScreen from "../../../pages/FundingSources/FundingSourcesContainerScreen";
+import FundingSourceDetailsScreen from "../../../pages/FundingSources/FundingSourceDetailsScreen";
+import CommonStyles from '../../../common/Styles/Styles';
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
+import { goHomeAction } from '../../actions/NavigationActions';
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 
 
 export const WalletSettingsStack = createStackNavigator(
@@ -37,7 +37,7 @@ export const WalletSettingsStack = createStackNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        headerTitleStyle: CommonStyles.modalHeaderTitleText,
         headerLeft: () => {
           return (
             <SmallNavHeaderCloseButton
@@ -98,7 +98,7 @@ export const MoreOptionsStack = createStackNavigator(
     initialRouteName: 'MoreOptionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        headerTitleStyle: CommonStyles.modalHeaderTitleText,
         headerLeft: () => {
           return (
             <SmallNavHeaderCloseButton

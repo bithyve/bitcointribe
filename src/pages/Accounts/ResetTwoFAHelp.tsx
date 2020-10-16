@@ -22,7 +22,7 @@ import Colors from '../../common/Colors';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import QrCodeModalContents from '../../components/QrCodeModalContents';

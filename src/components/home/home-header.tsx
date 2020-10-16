@@ -11,7 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from './../../common/Fonts';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';

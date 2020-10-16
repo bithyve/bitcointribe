@@ -17,7 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import { nameToInitials } from '../../common/CommonFunctions';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

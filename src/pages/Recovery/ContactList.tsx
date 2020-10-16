@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
