@@ -13,7 +13,9 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
   isPrimarySubAccount: boolean;
   balance: number;
+
   visibility: AccountVisibility;
+  isTFAEnabled: boolean;
 
   defaultTitle: string;
   defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
@@ -32,6 +34,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
+    isTFAEnabled = false,
     transactionIDs = [],
     isPrimarySubAccount = false,
   }: ConstructorProps) {
@@ -41,6 +44,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
+    this.isTFAEnabled = isTFAEnabled;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;
   }

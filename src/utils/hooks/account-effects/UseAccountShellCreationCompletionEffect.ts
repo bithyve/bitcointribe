@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { newAccountShellCreationCompleted } from "../../../store/actions/accounts";
 
 
-export default function useAccountGenerationCompletionEffect(onComplete: () => void) {
+export default function useAccountShellCreationCompletionEffect(onComplete: () => void) {
   const dispatch = useDispatch();
   const { hasNewAccountGenerationSucceeded } = useSelector(state => state.accounts);
 
