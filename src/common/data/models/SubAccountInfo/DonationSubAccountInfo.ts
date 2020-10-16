@@ -16,7 +16,9 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   kind: SubAccountKind = SubAccountKind.DONATION;
   isPrimarySubAccount: boolean;
   balance: number;
+
   visibility: AccountVisibility;
+  isTFAEnabled: boolean;
 
   defaultTitle: string;
   defaultDescription: string = "Directly Accept Donations";
@@ -45,6 +47,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     doneeName,
     causeName,
     visibility = AccountVisibility.DEFAULT,
+    isTFAEnabled = false,
     transactionIDs = [],
     isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.MULTI_SIG_PUBLIC,
@@ -55,6 +58,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
+    this.isTFAEnabled = isTFAEnabled;
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactionIDs = transactionIDs;

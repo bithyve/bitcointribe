@@ -19,7 +19,9 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   serviceAccountKind: ServiceAccountKind;
   isPrimarySubAccount: boolean;
   balance: number;
+
   visibility: AccountVisibility;
+  isTFAEnabled: boolean;
 
   defaultTitle: string;
   defaultDescription: string = "Account with Trusted Contacts";
@@ -41,6 +43,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     customDescription = null,
     transactionIDs = [],
     visibility = AccountVisibility.DEFAULT,
+    isTFAEnabled = false,
     isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
@@ -51,6 +54,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.balance = balance;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
+    this.isTFAEnabled = isTFAEnabled;
     this.visibility = visibility;
     this.transactionIDs = transactionIDs;
     this.isPrimarySubAccount = isPrimarySubAccount;

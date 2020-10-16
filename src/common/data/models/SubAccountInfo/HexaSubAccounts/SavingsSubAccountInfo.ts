@@ -14,6 +14,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   isPrimarySubAccount: boolean;
   balance: number;
   visibility: AccountVisibility;
+  isTFAEnabled: boolean = true;
 
   defaultTitle: string;
   defaultDescription: string = "Multi-factor security";

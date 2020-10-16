@@ -9,13 +9,13 @@ import {
   Linking,
   Alert,
   Image,
+  AppState
 } from 'react-native';
 import { Easing } from 'react-native-reanimated';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
 import AddModalContents from '../../components/AddModalContents';
-import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
@@ -62,8 +62,8 @@ import CustomBottomTabs, {
   TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
 import {
-  fetchDerivativeAccBalTx,
   addTransferDetails,
+  fetchDerivativeAccBalTx,
 } from '../../store/actions/accounts';
 import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';

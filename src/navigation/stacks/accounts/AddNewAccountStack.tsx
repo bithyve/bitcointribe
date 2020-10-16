@@ -1,11 +1,12 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
 import NewAccountSelectionList from "../../../pages/Accounts/AddNew/NewAccountSelectionList";
-import AddNewHexaAccountDetails from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails";
+import AddNewHexaAccountDetailsScreen from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen";
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import { goHomeAction } from '../../actions/NavigationActions';
+import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen';
 
 
 const AddNewAccountStack = createStackNavigator(
@@ -22,7 +23,13 @@ const AddNewAccountStack = createStackNavigator(
       },
     },
     AddNewHexaAccountDetails: {
-      screen: AddNewHexaAccountDetails,
+      screen: AddNewHexaAccountDetailsScreen,
+      navigationOptions: {
+        title: "Account Details"
+      }
+    },
+    AddNewDonationAccountDetails: {
+      screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
         title: "Account Details"
       }

@@ -47,7 +47,7 @@ const HeaderSection: React.FC<HeaderProps> = ({
           );
         })}
 
-        {primarySubAccount.kind === SubAccountKind.SECURE && (
+        {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
       </View>
