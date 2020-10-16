@@ -31,7 +31,6 @@ import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
-import SettingManagePin from '../pages/SettingManagePin';
 import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
@@ -60,13 +59,9 @@ import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
-import ExistingSavingMethods from '../pages/FastBitcoin/ExistingSavingMethods';
-import ExistingSavingMethodDetails from '../pages/FastBitcoin/ExistingSavingMethodDetails';
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
-import AddressBookContents from '../pages/AddressBookContents';
-import ChangeCurrency from '../pages/ChangeCurrency';
 import UpdateApp from '../pages/UpdateApp';
 import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
@@ -75,7 +70,6 @@ import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
-import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
@@ -84,6 +78,7 @@ import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
+import { MoreOptionsStack } from './stacks/MoreOptions';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -172,7 +167,6 @@ const HomeNavigator = createStackNavigator(
     SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,
-    SettingManagePin,
     RestoreByCloudQrCodeContents,
     EmailModalContents,
     Buy,
@@ -199,19 +193,14 @@ const HomeNavigator = createStackNavigator(
     SettingGetNewPin,
     ContactsListForAssociateContact,
     LostTwoFA,
-    ExistingSavingMethods,
-    ExistingSavingMethodDetails,
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
-    AddressBookContents,
-    ChangeCurrency,
     SettingWalletNameChange,
     SettingNewWalletName,
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
-    ContactDetails,
     ContactDetailsNew,
     Receive,
     PairNewWallet,
@@ -227,6 +216,9 @@ const HomeNavigator = createStackNavigator(
       navigationOptions: {
         gesturesEnabled: false,
       },
+    },
+    MoreOptions: {
+      screen: MoreOptionsStack,
     },
   },
   {

@@ -97,7 +97,9 @@ export default function Login(props) {
     (state) => state.preferences.releaseCasesValue,
   );
 
-  const initialLoadingCompleted = useSelector((state) => state.loaders.initialLoadingCompleted)
+  const startupSyncLoaded = useSelector(
+    (state) => state.loaders.startupSyncLoaded,
+  );
 
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
@@ -371,26 +373,16 @@ export default function Login(props) {
               trustedContactRequest,
               userKey,
             });
-          }, 20000)
-
-
-          if (dbFetched) {
-            dispatch(updateWalletImage());
-            dispatch(calculateExchangeRate());
-            dispatch(startupSync());
-          }
+          }, 20000);
         } else {
           props.navigation.replace('RestoreAndRecoverWallet');
         }
       });
     }
-  }, [isAuthenticated, dbFetched]);
-
-
-
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (initialLoadingCompleted) {
+    if (startupSyncLoaded) {
       if (loaderBottomSheet.current) {
         loaderBottomSheet.current.snapTo(0);
       }
@@ -401,19 +393,15 @@ export default function Login(props) {
         userKey,
       });
       if (timer) {
-        clearTimeout(timer)
+        clearTimeout(timer);
       }
-
     }
-  }, [initialLoadingCompleted])
-
-
-
+  }, [startupSyncLoaded]);
 
   const handleLoaderMessages = (passcode) => {
     setTimeout(() => {
       dispatch(credsAuth(passcode));
-    }, 2)
+    }, 2);
   };
   const renderLoaderModalContent = useCallback(() => {
     return (
@@ -537,8 +525,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -566,8 +554,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -595,8 +583,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -624,8 +612,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -795,7 +783,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

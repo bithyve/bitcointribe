@@ -63,6 +63,7 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { startupSyncLoaded} from '../actions/loaders';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -257,7 +258,7 @@ function* fetchBalanceTxWorker({ payload }) {
     ? payload.options.service
     : yield select((state) => state.accounts[payload.serviceType].service);
 
-  const preFetchBalances = JSON.stringify(
+    const preFetchBalances = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances,
@@ -907,6 +908,41 @@ function* accountsSyncWorker({ payload }) {
     const regularService = accounts[REGULAR_ACCOUNT].service;
     const secureService = accounts[SECURE_ACCOUNT].service;
 
+    // sequential sync
+    // yield call(fetchBalanceTxWorker,{
+    //   payload: {
+    //     serviceType: REGULAR_ACCOUNT,
+    //     options: {
+    //       service: regularService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // yield call(fetchBalanceTxWorker, {
+    //   payload: {
+    //     serviceType: SECURE_ACCOUNT,
+    //     options: {
+    //       service: secureService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // yield call(fetchBalanceTxWorker, {
+    //   payload: {
+    //     serviceType: TEST_ACCOUNT,
+    //     options: {
+    //       service: testService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // concurrent sync
     yield all([
       fetchBalanceTxWorker({
         payload: {
@@ -962,6 +998,7 @@ export const accountsSyncWatcher = createWatcher(
 );
 
 function* startupSyncWorker({ payload }) {
+
   try {
     console.log('Synching accounts...');
     yield call(accountsSyncWorker, { payload });
@@ -978,6 +1015,7 @@ function* startupSyncWorker({ payload }) {
     console.log('Trusted Derivative accounts sync failed: ', err);
   }
 
+  yield put(startupSyncLoaded(true))
   try {
     console.log('Synching trusted channels...');
     yield call(trustedChannelsSyncWorker);

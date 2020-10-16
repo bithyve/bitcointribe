@@ -457,7 +457,7 @@ export const uploadRequestedShareWatcher = createWatcher(
   UPLOAD_REQUESTED_SHARE,
 );
 
-function* downloadMetaShareWorker({ payload }) {
+export function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
   const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
@@ -515,10 +515,15 @@ function* downloadMetaShareWorker({ payload }) {
       };
 
       console.log({ updatedBackup });
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+        },
+      });
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
-      yield put(updateMSharesHealth(updatedBackup));
+      yield put(updateMSharesHealth());
     } else {
       let updatedRecoveryShares = {};
       let updated = false;
@@ -915,7 +920,7 @@ export const sharePersonalCopyWatcher = createWatcher(
   SHARE_PERSONAL_COPY,
 );
 
-function* updateMSharesHealthWorker({ payload }) {
+function* updateMSharesHealthWorker() {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
@@ -923,13 +928,10 @@ function* updateMSharesHealthWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
-  if (!DECENTRALIZED_BACKUP) {
-    DECENTRALIZED_BACKUP = yield select(
+   const DECENTRALIZED_BACKUP = yield select(
       (state) => state.storage.database.DECENTRALIZED_BACKUP,
     );
-  }
-
+  
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
@@ -943,20 +945,22 @@ function* updateMSharesHealthWorker({ payload }) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
     console.log({ updationInfo });
+
+    let removed = false;
     Object.keys(UNDER_CUSTODY).forEach((tag) => {
       for (let info of updationInfo) {
         if (info.updated) {
-          if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-            // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-            if (info.encryptedDynamicNonPMDD)
-              UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-                info.encryptedDynamicNonPMDD;
-          }
+          // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+          //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+          //   if (info.encryptedDynamicNonPMDD)
+          //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+          //       info.encryptedDynamicNonPMDD;
+          // }
         } else {
           if (info.removeShare) {
             if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
               delete UNDER_CUSTODY[tag];
-
+              removed = true;
               for (const contactName of Object.keys(
                 trustedContactsService.tc.trustedContacts,
               )) {
@@ -972,21 +976,25 @@ function* updateMSharesHealthWorker({ payload }) {
       }
     });
 
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
-    };
-
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      UNDER_CUSTODY,
-    };
-    yield call(insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      },
-    });
+    if(removed){
+      // update db post share removal
+      const updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+      };
+  
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY,
+      };
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+          SERVICES: updatedSERVICES,
+        },
+      });
+    }
+   
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });

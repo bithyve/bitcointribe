@@ -47,6 +47,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
+import { downloadMetaShareWorker } from './sss';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -112,7 +113,6 @@ function* approveTrustedContactWorker({ payload }) {
     contactsWalletName,
   );
   if (res.status === 200) {
-    yield put(trustedContactApproved(contactInfo.contactName, true));
     if (payload.updateEphemeralChannel) {
       const uploadXpub = true;
       const data = {
@@ -335,7 +335,12 @@ function* updateEphemeralChannelWorker({ payload }) {
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       // yield delay(1000); // introducing delay in order to evade database insertion collision
-      yield put(downloadMShare(encryptedKey, otp));
+      yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp } });
+      Toast('You have been successfully added as a Keeper');
+      yield put(trustedContactApproved(contactInfo.contactName, true));
+    } else if(payload.uploadXpub) {
+      Toast('Contact successfully added to Friends and Family'); 
+      yield put(trustedContactApproved(contactInfo.contactName, true));
     }
   } else {
     console.log(res.err);

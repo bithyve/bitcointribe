@@ -1011,7 +1011,7 @@ class ContactDetailsNew extends PureComponent<
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 style={styles.backArrowView}
-                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               >
                 <FontAwesome
                   name="long-arrow-left"
@@ -1255,16 +1255,31 @@ class ContactDetailsNew extends PureComponent<
               ) : null}
             </View>
           )}
-          {this.Contact.isRemovable &&
-          (Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY ||
-            this.Contact.hasTrustedChannel) ? (
+          {this.Contact.isRemovable ? (
             <TouchableOpacity
               style={{
                 ...styles.bottomButton,
               }}
               onPress={() => {
-                this.props.removeTrustedContact(contact.contactName);
-                this.props.navigation.goBack();
+                Alert.alert(
+                  'Remove Contact',
+                  'Are you sure about removing the contact?',
+                  [
+                    {
+                      text: 'Yes',
+                      onPress: () => {
+                        this.props.removeTrustedContact(contact.contactName);
+                        this.props.navigation.goBack();
+                      },
+                    },
+                    {
+                      text: 'Cancel',
+                      onPress: () => {},
+                      style: 'cancel',
+                    },
+                  ],
+                  { cancelable: false },
+                );
               }}
             >
               <View>
