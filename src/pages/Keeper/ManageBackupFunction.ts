@@ -1,13 +1,13 @@
 import { MetaShare } from "../../bitcoin/utilities/Interface";
 
 export const modifyLevelStatus = (
-  levelData,
-  levelHealthVar,
-  currentLevel,
+  levelData: any[],
+  levelHealthVar: any[],
+  currentLevel: number,
   keeperInfo : any[]
 ): any[] => {
   
-  if (levelHealthVar) {
+  if (levelHealthVar.length > 0) {
     let levelHealth = levelHealthVar[levelHealthVar.length - 1];
     if(keeperInfo.length>0){
       for (let i = 0; i < levelHealth.levelInfo.length; i++) {
