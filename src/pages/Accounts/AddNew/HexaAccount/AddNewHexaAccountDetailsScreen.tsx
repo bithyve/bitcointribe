@@ -6,16 +6,16 @@ import ListStyles from '../../../../common/Styles/Lists';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';
-import useAccountGenerationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountGenerationCompletionEffect';
+import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
 import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
-import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
+import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces';
 
 export type Props = {
   navigation: any;
 };
 
 type HeaderSectionProps = {
-  subAccountInfo: SubAccountDescribing;
+  subAccountInfo: HexaSubAccountDescribing;
 };
 
 
@@ -33,13 +33,13 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   );
 }
 
-const AddNewHexaAccountDetails: React.FC<Props> = ({
+const AddNewHexaAccountDetailsScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const dispatch = useDispatch();
   const nameInputRef = useRef<Input>(null);
 
-  const currentSubAccountInfo: SubAccountDescribing = useMemo(() => {
+  const currentSubAccountInfo: HexaSubAccountDescribing = useMemo(() => {
     return navigation.getParam('currentSubAccountInfo');
   }, [navigation.state.params]);
 
@@ -59,7 +59,7 @@ const AddNewHexaAccountDetails: React.FC<Props> = ({
 
   // TODO: We need a bit more design clarity about what to do after new
   // account creation succeeds or fails.
-  useAccountGenerationCompletionEffect(() => {
+  useAccountShellCreationCompletionEffect(() => {
     navigation.dispatch(goHomeAction);
   });
 
@@ -135,4 +135,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default AddNewHexaAccountDetails;
+export default AddNewHexaAccountDetailsScreen;

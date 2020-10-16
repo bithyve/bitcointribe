@@ -38,6 +38,11 @@ interface SubAccountDescribing {
 
   visibility: AccountVisibility;
 
+  /**
+   * Whether or not Two-Factor Authentication is enabled for this sub-account.
+   */
+  isTFAEnabled: boolean;
+
   avatarImageSource: NodeRequire;
 
   transactionGroup: TransactionGroup;
@@ -68,6 +73,7 @@ export type SubAccountDescribingConstructorProps = {
   customDescription?: string | null;
   balance?: number;
   visibility?: AccountVisibility;
+  isTFAEnabled?: boolean;
   avatarImageSource?: NodeRequire;
   secondaryAccountUUIDs?: string[];
   transactionGroup?: TransactionGroup;

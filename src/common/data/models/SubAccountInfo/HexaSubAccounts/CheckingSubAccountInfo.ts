@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from 'uuid';
+ import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
@@ -14,6 +14,7 @@ export default class CheckingSubAccountInfo implements HexaSubAccountDescribing 
   isPrimarySubAccount: boolean;
   balance: number;
   visibility: AccountVisibility;
+  isTFAEnabled: boolean = false;
 
   defaultTitle: string;
   defaultDescription: string = "Fast and easy";
