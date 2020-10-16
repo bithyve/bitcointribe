@@ -105,10 +105,7 @@ function* generateMetaSharesWorker({ payload }) {
   );
   let serviceCall = null;
   if (level == 2) {
-    let isLevel2Initialized = yield select((state) => state.health);
     serviceCall = s3Service.generateLevel1Shares;
-    if(!isLevel2Initialized){ yield put(initLevelTwo()); }
-    yield put(updateLevelTwoMetaShareStatus(true));
   } else if (level == 3) {
     serviceCall = s3Service.generateLevel2Shares;
     yield put(updateLevelThreeMetaShareStatus(true));
@@ -116,6 +113,11 @@ function* generateMetaSharesWorker({ payload }) {
   if (serviceCall != null) {
     const res = yield call(serviceCall, answer, walletName, appVersion, level);
     if (res.status === 200) {
+      if(level == 2){
+        let isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized);
+        if(!isLevel2Initialized){ yield put(initLevelTwo()); }
+        yield put(updateLevelTwoMetaShareStatus(true));
+      }
       let s3Service: S3Service = yield select((state) => state.sss.service);
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
@@ -387,10 +389,10 @@ function* updateHealthLevel2Worker() {
     let SecurityQuestionHealth = Health[0].levelInfo[1];
     yield put(initLoader(true));
     const res = yield call(s3Service.updateHealthLevel2, SecurityQuestionHealth);
-    if(res.success){
+    if(res.data.success){
       // Update Health to reducer
       yield put(checkMSharesHealth());
-      yield put(isLevel2InitializedStatus(true));
+      yield put(isLevel2InitializedStatus());
     }
     yield put(initLoader(false));
   }

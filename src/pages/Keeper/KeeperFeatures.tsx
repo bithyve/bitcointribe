@@ -88,6 +88,13 @@ class KeeperFeatures extends Component<
     }
   };
 
+  componentDidUpdate = (prevProp, prevState) =>{
+    if(prevProp.isLevel2Initialized != this.props.isLevel2Initialized){
+  //console.log("ISIDE this.props.isLevel2Initialized", this.props.isLevel2Initialized);
+  this.uploadDataOnEFChannel();
+}
+  }
+
   updatePrimaryKeeperHealth = () =>{
     let levelHealth = this.props.levelHealth;
     console.log('cloud health update home levelHealth', levelHealth);
@@ -130,8 +137,6 @@ class KeeperFeatures extends Component<
 
   setUpKeeper = async() =>{
     if(!this.props.isLevelTwoMetaShareCreated) await this.props.generateMetaShare(2);
-    if(!this.props.isLevel2Initialized){ this.props.initLevelTwo() }
-    this.uploadDataOnEFChannel();
   }
 
   uploadDataOnEFChannel = () => {
@@ -144,6 +149,7 @@ class KeeperFeatures extends Component<
           featuresList.push(element);
         } 
       }
+      console.log("this.props.navigation.state.params.selectedShareId", this.props.navigation.state.params.selectedShareId);
       this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper, this.props.navigation.state.params.selectedShareId);
     }
     this.props.navigation.replace('ManageBackupKeeper');

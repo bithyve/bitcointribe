@@ -118,8 +118,8 @@ export const initLevelTwo = () => {
   return { type: INIT_LEVEL_TWO };
 };
 
-export const isLevel2InitializedStatus = (beingLoaded) => {
-  return { type: IS_LEVEL2_INITIALIZED, payload: { beingLoaded } };
+export const isLevel2InitializedStatus = () => {
+  return { type: IS_LEVEL2_INITIALIZED };
 };
 
 export const updatedKeeperInfo = (info) =>{

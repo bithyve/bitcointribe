@@ -11,7 +11,8 @@ import {
   UPDATE_EFCHANNEL_LOADING_STATUS,
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
-  KEEPER_INFO
+  KEEPER_INFO,
+  IS_LEVEL2_INITIALIZED
 } from '../actions/health';
 
 const initialState: {
@@ -84,7 +85,7 @@ export default (state = initialState, action) => {
           },
         };
     
-    case HEALTH_UPDATE: 
+    case HEALTH_UPDATE:
       return {
         ...state,
         levelHealth: action.payload.health,
@@ -162,6 +163,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         keeperInfo: action.payload.info,
+      };
+
+      case IS_LEVEL2_INITIALIZED:
+      return {
+        ...state,
+        isLevel2Initialized: true,
       };
       
       
