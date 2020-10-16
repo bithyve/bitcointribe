@@ -18,7 +18,6 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
-import MoreHomePageTabContents from '../../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddModalContents from '../../components/AddModalContents';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
@@ -36,7 +35,6 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import SettingsContents from '../../components/SettingsContents';
 import { connect } from 'react-redux';
 import NoInternetModalContents from '../../components/NoInternetModalContents';
 import NetInfo from '@react-native-community/netinfo';
