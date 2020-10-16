@@ -1,8 +1,7 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
-
 
 export type Props = {
   onPress: () => void;
@@ -11,11 +10,11 @@ export type Props = {
 
 const SmallNavHeaderCloseButton: React.FC<Props> = ({
   onPress,
-  containerStyle,
+  containerStyle = {},
 }: Props) => {
   return (
     <TouchableOpacity
-      style={{ ...containerStyle }}
+      style={{ ...styles.rootContainer, ...containerStyle }}
       onPress={onPress}
       hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
     >
@@ -27,5 +26,11 @@ const SmallNavHeaderCloseButton: React.FC<Props> = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    paddingLeft: 16,
+  },
+});
 
 export default SmallNavHeaderCloseButton;
