@@ -74,11 +74,9 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
 import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
-import NewAccountSelectionList from '../pages/Accounts/AddNew/NewAccountSelectionList';
-import AddNewHexaAccountDetails from '../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetails';
-import NavigationHeader from '../pages/Accounts/AddNew/NavigationHeader';
-import { AccountDetailsStack } from './stacks/accounts/AccountNavigationStacks';
+import AccountDetailsStack from './stacks/accounts/AccountDetailsStack';
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStacks';
+import AddNewAccountStack from './stacks/accounts/AddNewAccountStack';
 
 
 const SetupNavigator = createStackNavigator(
@@ -128,27 +126,6 @@ const MODAL_ROUTES = [
   'Confirmation',
   'Intermediate',
 ];
-
-const AddNewAccountStack = createStackNavigator(
-  {
-    AccountSelectionList: {
-      screen: NewAccountSelectionList,
-      navigationOptions: {
-        header: ({ navigation }) => {
-          return <NavigationHeader title="Add New" onBackPress={() => navigation.goBack()} />
-        },
-      },
-    },
-    AddNewHexaAccountDetails: {
-      screen: AddNewHexaAccountDetails,
-      navigationOptions: AddNewHexaAccountDetails.navigationOptions,
-    },
-  },
-  {
-    mode: 'modal',
-    initialRouteName: 'AccountSelectionList',
-  },
-);
 
 const HomeNavigator = createStackNavigator(
   {

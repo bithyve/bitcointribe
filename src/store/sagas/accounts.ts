@@ -38,7 +38,7 @@ import {
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
-  ADD_NEW_ACCOUNT,
+  ADD_NEW_ACCOUNT_SHELL,
   newAccountAdded,
   newAccountAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
@@ -1174,7 +1174,7 @@ export const updateDonationPreferencesWatcher = createWatcher(
 );
 
 
-function* addNewAccount({ payload: subAccountInfo }: { payload: SubAccountDescribing }) {
+function* addNewAccountShell({ payload: subAccountInfo }: { payload: SubAccountDescribing }) {
   // TODO: Devise some way to reference and call a new account creation service here.
 
   const bitcoinUnit = subAccountInfo.kind == SubAccountKind.TEST ? BitcoinUnit.TSATS : BitcoinUnit.SATS;
@@ -1196,9 +1196,9 @@ function* addNewAccount({ payload: subAccountInfo }: { payload: SubAccountDescri
   }
 }
 
-export const addNewAccountWatcher = createWatcher(
-  addNewAccount,
-  ADD_NEW_ACCOUNT,
+export const addNewAccountShellWatcher = createWatcher(
+  addNewAccountShell,
+  ADD_NEW_ACCOUNT_SHELL,
 );
 
 

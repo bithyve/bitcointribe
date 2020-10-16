@@ -21,10 +21,10 @@ import {
   AVERAGE_TX_FEE,
   SETTED_DONATION_ACC,
   SETUP_DONATION_ACCOUNT,
-  ADD_NEW_ACCOUNT,
+  ADD_NEW_ACCOUNT_SHELL,
   NEW_ACCOUNT_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
-  ADD_NEW_ACCOUNT_COMPLETED,
+  ADD_NEW_ACCOUNT_SHELL_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
   ACCOUNT_SETTINGS_UPDATE_FAILED,
   SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED,
@@ -583,7 +583,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         }
       };
 
-    case ADD_NEW_ACCOUNT:
+    case ADD_NEW_ACCOUNT_SHELL:
       return {
         ...state,
         isGeneratingNewAccount: true,
@@ -608,7 +608,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         hasNewAccountGenerationFailed: true,
       };
 
-    case ADD_NEW_ACCOUNT_COMPLETED:
+    case ADD_NEW_ACCOUNT_SHELL_COMPLETED:
       return {
         ...state,
         isGeneratingNewAccount: false,
