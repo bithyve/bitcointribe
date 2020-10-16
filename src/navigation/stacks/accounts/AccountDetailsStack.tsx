@@ -13,7 +13,7 @@ import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Account
 import AccountSettingsEditVisibilityScreen from '../../../pages/Accounts/AccountSettings/EditVisibilityScreen';
 import AccountSettingsMergeAccountShellsScreen from '../../../pages/Accounts/AccountSettings/MergeAccountShellsScreen';
 
-export const AccountSettingsStack = createStackNavigator(
+const AccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
@@ -72,7 +72,7 @@ export const AccountSettingsStack = createStackNavigator(
 );
 
 
-export const AccountDetailsStack = createStackNavigator(
+const AccountDetailsStack = createStackNavigator(
   {
     AccountDetailsRoot: {
       screen: AccountDetailsContainerScreen,
@@ -102,3 +102,5 @@ export const AccountDetailsStack = createStackNavigator(
     initialRouteName: 'AccountDetailsRoot',
   },
 );
+
+export default AccountDetailsStack;
