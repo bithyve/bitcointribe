@@ -48,6 +48,7 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
+import { UPDATE_LAST_SEEN } from '../actions/preferences';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -346,8 +347,8 @@ function* updateEphemeralChannelWorker({ payload }) {
       yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp } });
       Toast('You have been successfully added as a Keeper');
       yield put(trustedContactApproved(contactInfo.contactName, true));
-    } else if(payload.uploadXpub) {
-      Toast('Contact successfully added to Friends and Family'); 
+    } else if (payload.uploadXpub) {
+      Toast('Contact successfully added to Friends and Family');
       yield put(trustedContactApproved(contactInfo.contactName, true));
     }
   } else {
@@ -512,18 +513,16 @@ export function* trustedChannelsSetupSyncWorker() {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
- 
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   let DHInfos;
   for (const contactName of Object.keys(contacts)) {
     let { trustedChannel, ephemeralChannel, encKey } = contacts[contactName];
 
-    
     if (!trustedChannel) {
       // trusted channel not setup; probably need to still get the counter party's pubKey
-      
+
       // update DHInfos(once) only if there's a contact w/ trusted channel pending
-      if(!DHInfos){
+      if (!DHInfos) {
         yield call(fetchNotificationsWorker); // refreshes DHInfos
         DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
         if (DHInfos) {
@@ -532,7 +531,7 @@ export function* trustedChannelsSetupSyncWorker() {
           DHInfos = [];
         }
       }
-     
+
       let contactsPublicKey;
       DHInfos.forEach((dhInfo: { address: string; publicKey: string }) => {
         if (dhInfo.address === ephemeralChannel.address) {
@@ -732,7 +731,7 @@ export function* trustedChannelsSetupSyncWorker() {
     });
 
     // console.log('Updating WI...');
-    // yield put(updateWalletImage()); // TODO: re-enable once the WI updation is refactored and optimised 
+    // yield put(updateWalletImage()); // TODO: re-enable once the WI updation is refactored and optimised
 
     yield call(AsyncStorage.setItem, 'preSyncTC', postSyncTC);
   }
@@ -743,4 +742,23 @@ export function* trustedChannelsSetupSyncWorker() {
 export const trustedChannelsSetupSyncWatcher = createWatcher(
   trustedChannelsSetupSyncWorker,
   TRUSTED_CHANNELS_SETUP_SYNC,
+);
+
+function* updateLastSeenWorker({ payload }) {
+  // updates last seen for all trusted channels
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
+    const res = yield call(trustedContacts.updateLastSeen);
+    if (res.status !== 200 || !res.updated) {
+      console.log('Failed to update last seen', res.err);
+    }
+  }
+}
+
+export const updateLastSeenWatcher = createWatcher(
+  updateLastSeenWorker,
+  UPDATE_LAST_SEEN,
 );

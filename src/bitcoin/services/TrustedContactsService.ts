@@ -292,4 +292,34 @@ export default class TrustedContactsService {
       };
     }
   };
+
+  public updateLastSeen = async (): Promise<
+    | {
+        status: number;
+        data: {
+          updated: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updateLastSeen(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update last seen',
+      };
+    }
+  };
 }

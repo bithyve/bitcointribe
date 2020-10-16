@@ -744,4 +744,31 @@ export default class TrustedContacts {
       throw new Error(err.message);
     }
   };
+
+  public updateLastSeen = async (): Promise<{
+    updated: any;
+  }> => {
+    const channelsToUpdate = [];
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate.push({
+          channelAddress: trustedChannel.address,
+          publicKey,
+        });
+      }
+    }
+
+    if (channelsToUpdate.length) {
+      const res = await BH_AXIOS.post('updateLastSeen', {
+        HEXA_ID,
+        channelsToUpdate,
+      });
+
+      const { updated } = res.data;
+      return { updated };
+    } else {
+      throw new Error('No trusted channels to update');
+    }
+  };
 }
