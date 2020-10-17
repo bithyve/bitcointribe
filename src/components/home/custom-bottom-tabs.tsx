@@ -8,7 +8,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import BottomSheet from '@gorhom/bottom-sheet';
 
 export enum BottomTab {
   Transactions,

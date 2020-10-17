@@ -39,22 +39,6 @@ export default function TransactionDetails(props) {
   }
   const serviceType = props.serviceType ? props.serviceType : null;
 
-  // useEffect(() => { // retiring in app notes
-  //   (async () => {
-  //     const descriptionHistory = JSON.parse(
-  //       await AsyncStorage.getItem('descriptionHistory'),
-  //     );
-  //     if (descriptionHistory) {
-  //       const descrip = descriptionHistory[txDetails.txid];
-  //       if (descrip) {
-  //         setDescription(descrip);
-  //       } else {
-  //         setDescription('');
-  //       }
-  //     }
-  //   })();
-  // }, [txDetails]);
-
   const getImageByAccountType = (accountType, primaryAccType?) => {
     if (accountType == 'FAST_BITCOINS') {
       return (
