@@ -19,7 +19,7 @@ export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC';
 export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
-export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
+export const SYNC_LAST_SEENS = 'SYNC_LAST_SEENS';
 
 export const initializeTrustedContact = (contactInfo: {
   contactName: string;
@@ -126,9 +126,9 @@ export const trustedChannelsSetupSync = () => {
   };
 };
 
-export const updateLastSeen = () => {
+export const syncLastSeens = () => {
   return {
-    type: UPDATE_LAST_SEEN,
+    type: SYNC_LAST_SEENS,
   };
 };
 

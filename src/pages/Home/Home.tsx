@@ -45,7 +45,6 @@ import {
 } from '../../store/actions/sss';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
-import { updateLastSeen } from '../../store/actions/preferences';
 
 import {
   approveTrustedContact,
@@ -239,7 +238,6 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  updateLastSeen: any;
   setCardData: any;
   cardDataProps: any;
 }
@@ -842,12 +840,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.handleDeeplinkModal();
 
     setTimeout(() => {
-      this.setState(
-        {
-          isLoading: false,
-        },
-        () => this.props.updateLastSeen(new Date()),
-      );
+      this.setState({
+        isLoading: false,
+      });
     }, 2);
   };
 
@@ -3006,7 +3001,6 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     updateAddressBookLocally,
-    updateLastSeen,
     setCardData,
   })(Home),
 );

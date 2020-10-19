@@ -48,7 +48,7 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
-import { UPDATE_LAST_SEEN } from '../actions/preferences';
+import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -744,21 +744,37 @@ export const trustedChannelsSetupSyncWatcher = createWatcher(
   TRUSTED_CHANNELS_SETUP_SYNC,
 );
 
-function* updateLastSeenWorker({ payload }) {
-  // updates last seen for all trusted channels
+function* syncLastSeensWorker({ payload }) {
+  // updates and fetches last seen for all trusted channels
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
 
+  const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
   if (Object.keys(trustedContacts.tc.trustedContacts).length) {
-    const res = yield call(trustedContacts.updateLastSeen);
-    if (res.status !== 200 || !res.updated) {
+    const res = yield call(trustedContacts.syncLastSeens);
+    console.log({ res });
+    if (res.status === 200) {
+      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+      if (preSyncTC !== postSyncTC) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+        };
+        yield call(insertDBWorker, {
+          payload: { SERVICES: updatedSERVICES },
+        });
+      }
+    } else {
       console.log('Failed to update last seen', res.err);
     }
   }
 }
 
-export const updateLastSeenWatcher = createWatcher(
-  updateLastSeenWorker,
-  UPDATE_LAST_SEEN,
+export const syncLastSeensWatcher = createWatcher(
+  syncLastSeensWorker,
+  SYNC_LAST_SEENS,
 );
