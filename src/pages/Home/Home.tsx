@@ -916,7 +916,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
           const element = levelHealthVar.levelInfo[i];
           if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
-            KPInfo.push(keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)]);
+            let kpInfoElement = keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)];
+            let object = {
+              type: kpInfoElement.type,
+              name: kpInfoElement.name,
+              shareId: kpInfoElement.shareId,
+              data: kpInfoElement.data
+            }
+            KPInfo.push(object);
           }
         }
       }

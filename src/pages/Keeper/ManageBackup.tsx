@@ -45,7 +45,7 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
-import { generateMetaShare, checkMSharesHealth, createAndUploadOnEFChannel, initLevelTwo, updateMSharesHealth } from '../../store/actions/health';
+import { generateMetaShare, checkMSharesHealth, initLevelTwo, updateMSharesHealth } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 
 interface ManageBackupStateTypes {
@@ -80,7 +80,6 @@ interface ManageBackupPropsTypes {
   healthLoading: any;
   generateMetaShare: any;
   checkMSharesHealth: any;
-  createAndUploadOnEFChannel: any;
   isLevelTwoMetaShareCreated: Boolean;
   isLevel2Initialized: Boolean;
   initLevelTwo: any;
@@ -293,9 +292,6 @@ class ManageBackup extends Component<
       this.modifyLevelData();
       this.updateCloudData();
     }
-    if(prevState.selectedShareId != this.state.selectedShareId){
-      // alert(this.state.selectedShareId);
-    }
   };
 
   generateShares = (level) =>{
@@ -321,7 +317,14 @@ class ManageBackup extends Component<
         for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
           const element = levelHealthVar.levelInfo[i];
           if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
-            KPInfo.push(keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)]);
+            let kpInfoElement = keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)];
+            let object = {
+              type: kpInfoElement.type,
+              name: kpInfoElement.name,
+              shareId: kpInfoElement.shareId,
+              data: kpInfoElement.data
+            }
+            KPInfo.push(object);
           }
         }
       }
@@ -715,7 +718,7 @@ class ManageBackup extends Component<
                                   (this.refs
                                     .keeperTypeBottomSheet as any).snapTo(1);
                                 }, 2);
-                                this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper1.shareId});
+                                this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper2.shareId});
                               }}
                             >
                               {value.keeper2.keeper2Done &&
@@ -785,7 +788,8 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper
+                    isPrimaryKeeper: isPrimaryKeeper,
+                    selectedShareId: this.state.selectedShareId
                   });
                 }
                 if (type === 'device') {
@@ -794,7 +798,8 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper
+                    isPrimaryKeeper: isPrimaryKeeper,
+                    selectedShareId: this.state.selectedShareId
                   });
                 }
                 if (type === 'pdf') {
@@ -803,7 +808,8 @@ class ManageBackup extends Component<
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
                     isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper
+                    isPrimaryKeeper: isPrimaryKeeper,
+                    selectedShareId: this.state.selectedShareId
                   });
                 }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -893,7 +899,6 @@ export default withNavigationFocus(
     setCloudBackupStatus,
     generateMetaShare,
     checkMSharesHealth,
-    createAndUploadOnEFChannel,
     initLevelTwo,
     updateMSharesHealth
   })(ManageBackup),

@@ -240,12 +240,11 @@ export const updateSharesHealthWatcher = createWatcher(
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
   let featuresList = payload.featuresList;
-  // let selectedShareId = payload.selectedShareId;
+  let type = payload.isPrimaryKeeper ? 'device' : payload.type;
   
   yield put(updateMSharesLoader(true));
   let s3Service: S3Service = yield select((state) => state.sss.service);
   let securityQuestion = yield select((state) => state.storage.database.WALLET_SETUP);
-
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
@@ -268,8 +267,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       : null,
     featuresList,
   };
-
-  // let otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
   let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData
   let dataElements: EphemeralDataElementsForKeeper = {
@@ -284,22 +281,25 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     secondaryMnemonics: EFChannelData.secondaryMnemonics,
     featuresList: EFChannelData.featuresList,
   };
+  let share  = s3Service.levelhealth.metaShares[1];
+  if(payload.selectedShareId){
+    share = payload.share;
+  }
+  
   const shareUploadables = LevelHealth.encryptMetaShare(
-    s3Service.levelhealth.metaShares[1],
+    share,
     EFChannelData.uuid
   );
   let object = {
-    shareId: s3Service.levelhealth.metaShares[1]
-      ? s3Service.levelhealth.metaShares[1].shareId
-      : '',
-    shareType: 'device',
+    shareId: share.shareId ? share.shareId : '',
+    shareType: type,
     publicKey: EFChannelData.publicKey,
     ephemeralAddress: EFChannelData.ephemeralAddress,
     dataElements: dataElements,
     encKey: EFChannelData.uuid,
     shareUploadables: shareUploadables
   };
-  
+
   let Kp = new KeeperService();
   let res = yield call(
     Kp.updateEphemeralChannel,
@@ -315,7 +315,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     let shareArray = [
       {
         walletId: s3Service.getWalletId().data.walletId,
-        shareId: s3Service.levelhealth.metaShares[1].shareId,
+        shareId: share.shareId,
         reshareVersion: 0,
         updatedAt: moment(new Date()).valueOf(),
       }
@@ -326,11 +326,12 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     if(keeperInfo.length>0){
       for (let i = 0; i < keeperInfo.length; i++) {
         const element = keeperInfo[i];
-        if(element.shareId == s3Service.levelhealth.metaShares[1].shareId){
+        if(element.shareId == share.shareId){
           keeperInfo[i].name = EFChannelData.walletName;
           keeperInfo[i].uuid = EFChannelData.uuid;
           keeperInfo[i].publicKey = EFChannelData.publicKey;
           keeperInfo[i].ephemeralAddress = EFChannelData.ephemeralAddress;
+          keeperInfo[i].type = type;
           break;
         }
         else{
@@ -344,31 +345,16 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     }
     if(flag){
       let obj = {
-        shareId: s3Service.levelhealth.metaShares[1].shareId,
+        shareId: share.shareId,
         name: EFChannelData.walletName,
         uuid: EFChannelData.uuid,
         publicKey: EFChannelData.publicKey,
         ephemeralAddress: EFChannelData.ephemeralAddress,
+        type
       }
       keeperInfo.push(obj);
     }
     yield put(updatedKeeperInfo(keeperInfo));
-    
-    // const res = yield call(s3Service.updateGuardianInMetaShare, s3Service.levelhealth.metaShares[1].shareId, EFChannelData.walletName);
-    // console.log("RES", res);
-
-    // if (res.status === 200) {
-    //     let s3Service: S3Service = yield select((state) => state.sss.service);
-    //     const { SERVICES } = yield select((state) => state.storage.database);
-    //     const updatedSERVICES = {
-    //       ...SERVICES,
-    //       S3_SERVICE: JSON.stringify(s3Service),
-    //     };
-    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    // } else {
-    //   if (res.err === 'ECONNABORTED') requestTimedout();
-    //   throw new Error(res.err);
-    // }
   }
   yield put(updateMSharesLoader(false));
 }

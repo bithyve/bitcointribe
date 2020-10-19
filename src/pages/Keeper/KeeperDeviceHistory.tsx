@@ -202,7 +202,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={()=>{
            let qrScannedData = '{"uuid": "a55d0e028365822430d43544","publicKey": "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e","ephemeralAddress": "9ed7b8aa315ec5a03ed4fa7bd98223911f398a991d2babb9a3fcc05cf92b8516","walletName":"Shivani"}';
-           props.navigation.navigate('KeeperFeatures', {qrScannedData: qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
+           props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
         }}
       />
     );

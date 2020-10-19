@@ -27,11 +27,13 @@ import {
   generateMetaShare,
   initLevelTwo,
 } from '../../store/actions/health';
+import { MetaShare } from '../../bitcoin/utilities/Interface';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
   selectedIds: any[];
   setUpLoader: Boolean;
+  setupKeeperClicked: boolean;
 }
 
 interface KeeperFeaturesPropsTypes {
@@ -45,6 +47,9 @@ interface KeeperFeaturesPropsTypes {
   initLevelTwo: any;
   isLevel2Initialized: Boolean;
   updateMSharesHealthStatus: Boolean;
+  isLevel3Initialized: Boolean;
+  metaShare: MetaShare[];
+  keeperInfo: any[];
 }
 
 class KeeperFeatures extends Component<
@@ -76,19 +81,25 @@ class KeeperFeatures extends Component<
         },
       ],
       setUpLoader: false,
+      setupKeeperClicked: false,
     };
   }
 
   componentDidUpdate = (prevProp, prevState) => {
-    if (prevProp.isLevel2Initialized != this.props.isLevel2Initialized) {
-      this.uploadDataOnEFChannel();
-    }
     if (
       prevProp.updateMSharesHealthStatus !=
         this.props.updateMSharesHealthStatus &&
       !this.props.updateMSharesHealthStatus
     ) {
       this.setState({ setUpLoader: false });
+    }
+
+    if (
+      this.props.isLevel2Initialized &&
+      prevState.setupKeeperClicked != this.state.setupKeeperClicked &&
+      this.state.setupKeeperClicked
+    ) {
+      this.uploadDataOnEFChannel();
     }
   };
 
@@ -106,31 +117,56 @@ class KeeperFeatures extends Component<
   };
 
   setUpKeeper = async () => {
-    this.setState({ setUpLoader: true });
     if (!this.props.isLevelTwoMetaShareCreated)
       await this.props.generateMetaShare(2);
+    this.setState({ setupKeeperClicked: true });
   };
 
   uploadDataOnEFChannel = () => {
-    if (this.props.navigation.state.params.qrScannedData) {
+    let {
+      isLevel3Initialized,
+      isLevel2Initialized,
+      navigation,
+      createAndUploadOnEFChannel,
+      metaShare,
+      keeperInfo,
+      levelHealth,
+    } = this.props;
+    let { selectedIds, levelData } = this.state;
+    let shareId = navigation.state.params.selectedShareId;
+    if (navigation.state.params.qrScannedData) {
       let featuresList = [];
-      let isPrimaryKeeper = this.props.navigation.state.params.isPrimaryKeeper;
-      for (let i = 0; i < this.state.levelData.length; i++) {
-        const element = this.state.levelData[i];
-        if (
-          this.state.selectedIds.findIndex((value) => value == element.id) > -1
-        ) {
+      for (let i = 0; i < levelData.length; i++) {
+        const element = levelData[i];
+        if (selectedIds.findIndex((value) => value == element.id) > -1) {
           featuresList.push(element);
         }
       }
-      this.props.createAndUploadOnEFChannel(
-        this.props.navigation.state.params.qrScannedData,
+      let share = {};
+      if (
+        !isLevel3Initialized &&
+        isLevel2Initialized &&
+        shareId &&
+        metaShare.findIndex((value) => value.shareId == shareId) > -1
+      ) {
+        share =
+          metaShare[metaShare.findIndex((value) => value.shareId == shareId)];
+        console.log(
+          'share',
+          metaShare.findIndex((value) => value.shareId == shareId),
+          share,
+        );
+      }
+      createAndUploadOnEFChannel(
+        navigation.state.params.qrScannedData,
         featuresList,
-        isPrimaryKeeper,
-        this.props.navigation.state.params.selectedShareId,
+        navigation.state.params.isPrimaryKeeper,
+        shareId,
+        share,
+        'device',
       );
     }
-    this.props.navigation.replace('ManageBackupKeeper');
+    navigation.replace('ManageBackupKeeper');
   };
 
   render() {
@@ -365,6 +401,9 @@ const mapStateToProps = (state) => {
     ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     updateMSharesHealthStatus: idx(state, (_) => _.health.updateMSharesHealth),
+    isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
+    metaShare: idx(state, (_) => _.sss.service.levelhealth.metaShares),
+    keeperInfo: idx(state, (_) => _.health.keeperInfo),
   };
 };
 

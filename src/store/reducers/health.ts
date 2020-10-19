@@ -46,6 +46,7 @@ const initialState: {
     uuid: string;
     publicKey: string;
     ephemeralAddress: string;
+    type: string;
     data?: any;
   }[];
   shares: any;
