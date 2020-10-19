@@ -746,7 +746,7 @@ export default class TrustedContacts {
   };
 
   public syncLastSeens = async (): Promise<{
-    updated: any;
+    updated: Boolean;
   }> => {
     const channelsToUpdate = {};
     for (const contact of Object.values(this.trustedContacts)) {
@@ -781,6 +781,63 @@ export default class TrustedContacts {
       }
 
       return { updated };
+    } else {
+      throw new Error('No trusted channels to update');
+    }
+  };
+
+  public syncTrustedChannels = async (
+    contacts?: Contacts,
+  ): Promise<{
+    synched: Boolean;
+  }> => {
+    const channelsToSync = {};
+    for (const contact of Object.values(
+      contacts ? contacts : this.trustedContacts,
+    )) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        let pub, dataHash;
+        trustedChannel.data.forEach((subChan: TrustedData) => {
+          if (subChan.publicKey !== publicKey) {
+            // counter party's data
+            pub = subChan.publicKey;
+            dataHash = subChan.dataHash;
+          }
+          channelsToSync[trustedChannel.address] = { publicKey: pub, dataHash };
+        });
+      }
+    }
+
+    if (Object.keys(channelsToSync).length) {
+      const res = await BH_AXIOS.post('syncTrustedChannels', {
+        HEXA_ID,
+        channelsToSync,
+      });
+
+      const { synched, synchedChannels } = res.data;
+      console.log({ synchedChannels });
+      if (Object.keys(synchedChannels).length) {
+        for (const contact of Object.values(
+          contacts ? contacts : this.trustedContacts,
+        )) {
+          const { trustedChannel } = contact;
+          if (trustedChannel) {
+            const { publicKey, data, dataHash, lastSeen } = synchedChannels[
+              trustedChannel.address
+            ]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.data = data;
+                subChan.dataHash = dataHash;
+                subChan.lastSeen = lastSeen;
+              }
+            });
+          }
+        }
+      }
+
+      return { synched };
     } else {
       throw new Error('No trusted channels to update');
     }

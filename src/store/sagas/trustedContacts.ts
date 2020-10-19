@@ -18,6 +18,7 @@ import {
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
   updateTrustedContactInfoLocally,
+  SYNC_TRUSTED_CHANNELS,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -750,9 +751,9 @@ function* syncLastSeensWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
-
   if (Object.keys(trustedContacts.tc.trustedContacts).length) {
+    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
     const res = yield call(trustedContacts.syncLastSeens);
     console.log({ res });
     if (res.status === 200) {
@@ -769,7 +770,7 @@ function* syncLastSeensWorker({ payload }) {
         });
       }
     } else {
-      console.log('Failed to update last seen', res.err);
+      console.log('Failed to sync last seens', res.err);
     }
   }
 }
@@ -777,4 +778,40 @@ function* syncLastSeensWorker({ payload }) {
 export const syncLastSeensWatcher = createWatcher(
   syncLastSeensWorker,
   SYNC_LAST_SEENS,
+);
+
+function* syncTrustedChannelsWorker({ payload }) {
+  // syncs trusted channels
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  const { contacts } = payload;
+
+  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
+    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+    const res = yield call(trustedContacts.syncTrustedChannels, contacts);
+    console.log({ res });
+    if (res.status === 200 && res.data && res.data.synched) {
+      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+      if (preSyncTC !== postSyncTC) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+        };
+        yield call(insertDBWorker, {
+          payload: { SERVICES: updatedSERVICES },
+        });
+      }
+    } else {
+      console.log('Failed to sync trusted channels', res.err);
+    }
+  }
+}
+
+export const syncTrustedChannelsWatcher = createWatcher(
+  syncTrustedChannelsWorker,
+  SYNC_TRUSTED_CHANNELS,
 );

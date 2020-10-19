@@ -257,6 +257,7 @@ export interface TrustedData {
   publicKey: string;
   data: TrustedDataElements;
   lastSeen?: number;
+  dataHash?: string;
 }
 
 export interface EncryptedTrustedData {

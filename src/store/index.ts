@@ -111,6 +111,7 @@ import {
   trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
   syncLastSeensWatcher,
+  syncTrustedChannelsWatcher,
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
@@ -217,6 +218,7 @@ const rootSaga = function* () {
     fetchTrustedChannelWatcher,
     trustedChannelsSetupSyncWatcher,
     syncLastSeensWatcher,
+    syncTrustedChannelsWatcher,
   ];
 
   yield all(
