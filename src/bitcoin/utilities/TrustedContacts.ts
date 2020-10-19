@@ -576,6 +576,7 @@ export default class TrustedContacts {
     const decryptedTrustedData: TrustedData = {
       publicKey: encryptedData.publicKey,
       data,
+      lastSeen: encryptedData.lastSeen,
     };
     const { overallTrustedData } = this.updateTrustedChannelData(
       contactName,
@@ -635,6 +636,11 @@ export default class TrustedContacts {
       const encryptedDataPacket: EncryptedTrustedData = {
         publicKey,
         encryptedData,
+        dataHash: crypto
+          .createHash('sha256')
+          .update(encryptedData)
+          .digest('hex'),
+        lastSeen: Date.now(),
       };
 
       let res: AxiosResponse;
@@ -796,13 +802,17 @@ export default class TrustedContacts {
       contacts ? contacts : this.trustedContacts,
     )) {
       const { trustedChannel, publicKey } = contact;
-      if (trustedChannel) {
+      if (
+        trustedChannel &&
+        trustedChannel.data &&
+        trustedChannel.data.length === 2 // ensures channel-setup completion
+      ) {
         let pub, dataHash;
         trustedChannel.data.forEach((subChan: TrustedData) => {
           if (subChan.publicKey !== publicKey) {
             // counter party's data
             pub = subChan.publicKey;
-            dataHash = subChan.dataHash;
+            dataHash = subChan.encDataHash;
           }
           channelsToSync[trustedChannel.address] = { publicKey: pub, dataHash };
         });
@@ -816,20 +826,26 @@ export default class TrustedContacts {
       });
 
       const { synched, synchedChannels } = res.data;
-      console.log({ synchedChannels });
+
       if (Object.keys(synchedChannels).length) {
         for (const contact of Object.values(
           contacts ? contacts : this.trustedContacts,
         )) {
-          const { trustedChannel } = contact;
+          const { trustedChannel, symmetricKey } = contact;
           if (trustedChannel) {
-            const { publicKey, data, dataHash, lastSeen } = synchedChannels[
-              trustedChannel.address
-            ]; // counterparty's pub
+            const {
+              publicKey,
+              encryptedData,
+              dataHash,
+              lastSeen,
+            } = synchedChannels[trustedChannel.address]; // counterparty's pub
             trustedChannel.data.forEach((subChan: TrustedData) => {
               if (subChan.publicKey === publicKey) {
-                subChan.data = data;
-                subChan.dataHash = dataHash;
+                subChan.data = this.decryptData(
+                  symmetricKey,
+                  encryptedData,
+                ).data;
+                subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;
               }
             });

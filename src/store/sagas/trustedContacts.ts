@@ -19,6 +19,7 @@ import {
   REMOVE_TRUSTED_CONTACT,
   updateTrustedContactInfoLocally,
   SYNC_TRUSTED_CHANNELS,
+  syncTrustedChannels,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -738,6 +739,9 @@ export function* trustedChannelsSetupSyncWorker() {
   }
 
   yield put(switchTCLoading('trustedChannelsSetupSync'));
+
+  // synching trusted channel data
+  yield put(syncTrustedChannels());
 }
 
 export const trustedChannelsSetupSyncWatcher = createWatcher(
@@ -804,6 +808,7 @@ function* syncTrustedChannelsWorker({ payload }) {
         yield call(insertDBWorker, {
           payload: { SERVICES: updatedSERVICES },
         });
+        console.log('Trusted channels synched');
       }
     } else {
       console.log('Failed to sync trusted channels', res.err);
