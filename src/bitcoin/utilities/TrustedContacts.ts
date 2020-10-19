@@ -576,6 +576,10 @@ export default class TrustedContacts {
     const decryptedTrustedData: TrustedData = {
       publicKey: encryptedData.publicKey,
       data,
+      encDataHash: crypto
+        .createHash('sha256')
+        .update(encryptedData.encryptedData)
+        .digest('hex'),
       lastSeen: encryptedData.lastSeen,
     };
     const { overallTrustedData } = this.updateTrustedChannelData(
@@ -818,7 +822,7 @@ export default class TrustedContacts {
         });
       }
     }
-
+    console.log({ channelsToSync });
     if (Object.keys(channelsToSync).length) {
       const res = await BH_AXIOS.post('syncTrustedChannels', {
         HEXA_ID,
@@ -826,7 +830,7 @@ export default class TrustedContacts {
       });
 
       const { synched, synchedChannels } = res.data;
-
+      console.log({ synched, synchedChannels });
       if (Object.keys(synchedChannels).length) {
         for (const contact of Object.values(
           contacts ? contacts : this.trustedContacts,

@@ -237,7 +237,7 @@ class FriendsAndFamily extends PureComponent<
               hasXpub = true;
             }
           }
-          console.log({ trustedContactsService });
+
           const {
             isWard,
             trustedAddress,
@@ -246,7 +246,7 @@ class FriendsAndFamily extends PureComponent<
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ];
-          console.log({ contactsWalletName });
+
           let usesOTP = false;
           if (!connectedVia && otp) {
             usesOTP = true;
