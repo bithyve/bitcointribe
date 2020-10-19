@@ -22,6 +22,9 @@ PODS:
     - UMPermissionsInterface
   - EXSecureStore (9.2.0):
     - UMCore
+  - EXSQLite (8.4.0):
+    - UMCore
+    - UMFileSystemInterface
   - Fabric (1.10.2)
   - FBLazyVector (0.63.3)
   - FBReactNativeSpec (0.63.3):
@@ -447,6 +450,7 @@ DEPENDENCIES:
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
   - EXPermissions (from `../node_modules/expo-permissions/ios`)
   - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
+  - EXSQLite (from `../node_modules/expo-sqlite/ios`)
   - Fabric
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
@@ -555,6 +559,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-permissions/ios"
   EXSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
+  EXSQLite:
+    :path: "../node_modules/expo-sqlite/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -696,6 +702,7 @@ SPEC CHECKSUMS:
   EXImageLoader: 02ca02c9cd5cc8a97b423207a73a791e0a86bea5
   EXPermissions: 80ac3acbdb145930079810fe5b08c022b3428aa8
   EXSecureStore: 579cbccd9cd093e6f4336aba073b059008bd78e0
+  EXSQLite: d0d8677c13e60d5db2812387f059c697be27d3fb
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
   FBLazyVector: 878b59e31113e289e275165efbe4b54fa614d43d
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f

@@ -44,7 +44,6 @@ function* fetchDBWorker() {
     if (key && database) {
       yield call(servicesEnricherWorker, { payload: { database } });
       yield put(dbFetched(database));
-
       // actions post DB fetch
       yield put(updateWalletImage());
       yield put(calculateExchangeRate());
@@ -186,7 +185,6 @@ function* servicesEnricherWorker({ payload }) {
           : new TrustedContactsService(),
       };
     }
-
     yield put(servicesEnriched(services));
     if (migrated) {
       database.VERSION = DeviceInfo.getVersion();

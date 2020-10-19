@@ -155,7 +155,6 @@ export default function ContactList(props) {
   };
 
   useEffect(() => {
-    debugger
     (async () => {
       await AsyncStorage.getItem('ContactData', (err, value) => {
         if (err) console.log('ERROR in COntactData', err);
