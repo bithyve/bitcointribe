@@ -21,17 +21,17 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import RadioButton from '../../components/RadioButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-// import * as ExpoContacts from 'expo-contacts';
+import * as ExpoContacts from 'expo-contacts';
 
 async function requestContactsPermission() {
   try {
-    let isContactOpen=false;
-      AsyncStorage.getItem('isContactOpen', (err, value) => {
+    let isContactOpen = false;
+    AsyncStorage.getItem('isContactOpen', (err, value) => {
       if (err) console.log(err)
-       else {
+      else {
         isContactOpen = JSON.parse(value)
       }
-  });
+    });
     if (!isContactOpen) {
       await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
     }
@@ -85,43 +85,43 @@ export default function ContactList(props) {
     }
   };
 
-  useEffect(function() {
+  useEffect(function () {
     getSelectedContactList();
   }, []);
 
   // TODO: Migrate it using react-native-contact
-  // const getContactsAsync = async () => {
-  //   if (Platform.OS === 'android') {
-  //     if (!(await requestContactsPermission())) {
-  //       Alert.alert('Cannot select tursted contacts; permission denied');
-  //       return;
-  //     }
-  //   }
-  //   ExpoContacts.getContactsAsync().then(({ data }) => {
-  //     if (!data.length) Alert.alert('No contacts found!');
-  //     //   console.log({ data });
-  //     else {
-  //       const contactData = data.map(contact => {
-  //         const communicationMode = [];
-  //         if (contact.phoneNumbers)
-  //           communicationMode.push(...contact.phoneNumbers);
-  //         if (contact.emails) communicationMode.push(...contact.emails);
-  //         return {
-  //           name: contact.name,
-  //           id: contact.id,
-  //           checked: false,
-  //           communicationMode,
-  //           status: '',
-  //         };
-  //       });
-  //       setContactData(contactData);
-  //     }
-  //   });
-  // };
+  const getContactsAsync = async () => {
+    if (Platform.OS === 'android') {
+      if (!(await requestContactsPermission())) {
+        Alert.alert('Cannot select tursted contacts; permission denied');
+        return;
+      }
+    }
+    ExpoContacts.getContactsAsync().then(({ data }) => {
+      if (!data.length) Alert.alert('No contacts found!');
+      //   console.log({ data });
+      else {
+        const contactData = data.map(contact => {
+          const communicationMode = [];
+          if (contact.phoneNumbers)
+            communicationMode.push(...contact.phoneNumbers);
+          if (contact.emails) communicationMode.push(...contact.emails);
+          return {
+            name: contact.name,
+            id: contact.id,
+            checked: false,
+            communicationMode,
+            status: '',
+          };
+        });
+        setContactData(contactData);
+      }
+    });
+  };
 
   useEffect(() => {
     // TODO: Migrate it using react-native-contact
-    // getContactsAsync();
+    getContactsAsync();
   }, []);
 
   function onContactSelect(index) {

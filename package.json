@@ -66,6 +66,7 @@
     "domain-browser": "^1.2.0",
     "elliptic": "^6.5.2",
     "events": "^1.1.1",
+    "expo-contacts": "^8.6.0",
     "expo-secure-store": "^9.2.0",
     "https-browserify": "0.0.1",
     "icepick": "^2.4.0",

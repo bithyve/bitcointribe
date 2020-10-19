@@ -135,7 +135,7 @@ const ContactsListForAssociateContact = (props) => {
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>
-              {'Associate a contact'}
+              {'Associate a contactc'}
             </Text>
           </View>
 

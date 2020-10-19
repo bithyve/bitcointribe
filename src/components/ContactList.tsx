@@ -20,7 +20,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import RadioButton from '../components/RadioButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-// import * as ExpoContacts from 'expo-contacts';
+import * as ExpoContacts from 'expo-contacts';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
@@ -155,6 +155,7 @@ export default function ContactList(props) {
   };
 
   useEffect(() => {
+    debugger
     (async () => {
       await AsyncStorage.getItem('ContactData', (err, value) => {
         if (err) console.log('ERROR in COntactData', err);
@@ -185,8 +186,7 @@ export default function ContactList(props) {
         await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
       }
     })();
-    // TODO: Migrate it using react-native-contact
-    // getContactsAsync();
+    getContactsAsync();
   }, []);
 
   const filterContacts = (keyword) => {
@@ -399,22 +399,22 @@ export default function ContactList(props) {
       <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
           ? selectedContacts.map((value) => {
-              return (
-                <View style={styles.selectedContactView}>
-                  <Text style={styles.selectedContactNameText}>
-                    {value.name ? value.name.split(' ')[0] : ''}{' '}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {value.name ? value.name.split(' ')[1] : ''}
-                    </Text>
+            return (
+              <View style={styles.selectedContactView}>
+                <Text style={styles.selectedContactNameText}>
+                  {value.name ? value.name.split(' ')[0] : ''}{' '}
+                  <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                    {value.name ? value.name.split(' ')[1] : ''}
                   </Text>
-                  <AppBottomSheetTouchableWrapper
-                    onPress={() => onCancel(value)}
-                  >
-                    <AntDesign name="close" size={17} color={Colors.white} />
-                  </AppBottomSheetTouchableWrapper>
-                </View>
-              );
-            })
+                </Text>
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => onCancel(value)}
+                >
+                  <AntDesign name="close" size={17} color={Colors.white} />
+                </AppBottomSheetTouchableWrapper>
+              </View>
+            );
+          })
           : null}
       </View>
       {/* <View style={{ flexDirection: 'row' }}>
@@ -549,8 +549,8 @@ export default function ContactList(props) {
             {approvingTrustedContact ? (
               <ActivityIndicator size={'small'} />
             ) : (
-              <Text style={styles.buttonText}>Confirm & Proceed</Text>
-            )}
+                <Text style={styles.buttonText}>Confirm & Proceed</Text>
+              )}
           </AppBottomSheetTouchableWrapper>
         </View>
       )}

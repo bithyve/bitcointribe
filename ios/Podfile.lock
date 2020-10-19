@@ -6,6 +6,10 @@ PODS:
   - EXConstants (9.1.1):
     - UMConstantsInterface
     - UMCore
+  - EXContacts (8.6.0):
+    - UMCore
+    - UMFileSystemInterface
+    - UMPermissionsInterface
   - EXFileSystem (9.0.1):
     - UMCore
     - UMFileSystemInterface
@@ -438,6 +442,7 @@ DEPENDENCIES:
   - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
+  - EXContacts (from `../node_modules/expo-contacts/ios`)
   - EXFileSystem (from `../node_modules/expo-file-system/ios`)
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
   - EXPermissions (from `../node_modules/expo-permissions/ios`)
@@ -540,6 +545,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   EXConstants:
     :path: "../node_modules/expo-constants/ios"
+  EXContacts:
+    :path: "../node_modules/expo-contacts/ios"
   EXFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   EXImageLoader:
@@ -683,33 +690,29 @@ SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   DoubleConversion: cde416483dac037923206447da6e1454df403714
-  EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
-  EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
-  EXContacts: 5ec0cb83ea2ea68694eac97ddf2a5cfefb8e2286
-  EXFileSystem: 7e53a2c30a2eb6987ba6d5158ab908f947523228
-  EXFont: 71d07dc5d2153db7d1a23f1e0cc1b6341d55c432
-  EXKeepAwake: d4caf9a1a7691126ade4ca0b76592e93250a8f29
-  EXLinearGradient: b7d4a703ac9802078a8a8e212d205929c18b03e4
-  EXLocation: 452a1d9edceb1b93deb86fd785236606d33742dd
-  EXPermissions: df10ad83df2f6b647aec304619354f8ab48d5f63
-  EXRandom: 573a6b84af755c0fffc0dd744e25aa73f69680fb
-  EXSecureStore: bf94958c936b2b9e3813509d2e7e6b8a263d40df
-  EXSQLite: ddc1e6727bd7d36e649f07590fe3ae5511c1f039
-  EXWebBrowser: 18924c3d2a3a1aa95d413672f058beff589c80f4
+  EXConstants: f907b3b6ce16e20d1750f22af1e095e924574bcb
+  EXContacts: dbc32dd1e2798cce1beeced230da989931b47890
+  EXFileSystem: 76875135b61708b9afa7e6a89b72a60ba0fdfa20
+  EXImageLoader: 02ca02c9cd5cc8a97b423207a73a791e0a86bea5
+  EXPermissions: 80ac3acbdb145930079810fe5b08c022b3428aa8
+  EXSecureStore: 579cbccd9cd093e6f4336aba073b059008bd78e0
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
-  Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
-  FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
-  FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
-  FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
-  FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
-  FirebaseMessaging: 4235f949ce1c4e827aeb19705ba5c53f9b85aa10
-  Folly: de497beb10f102453a1afa9edbf8cf8a251890de
+  FBLazyVector: 878b59e31113e289e275165efbe4b54fa614d43d
+  FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
+  Firebase: 8db6f2d1b2c5e2984efba4949a145875a8f65fe5
+  FirebaseAnalytics: 5dd088bd2e67bb9d13dbf792d1164ceaf3052193
+  FirebaseCore: d889d9e12535b7f36ac8bfbf1713a0836a3012cd
+  FirebaseCoreDiagnostics: 770ac5958e1372ce67959ae4b4f31d8e127c3ac1
+  FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
+  FirebaseInstanceID: ac5a82fcd21f804dbfc8f318eff9e1d7a9916e49
+  FirebaseMessaging: fc1f98b4592f8f2ea538169b1c317c6e76f81300
+  Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
-  GoogleIDFASupport: aaf8c10bd429abb1c15349d5252244f5eda8ead1
-  GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
-  jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
-  nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  GoogleAppMeasurement: 966e88df9d19c15715137bb2ddaf52373f111436
+  GoogleDataTransport: b7f406340a291370045a270c599e53c6fa6ec20f
+  GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
+  jail-monkey: 80c9e34da2cd54023e5ad08bf7051ec75bd43d5b
+  nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
