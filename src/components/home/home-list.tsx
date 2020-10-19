@@ -282,13 +282,13 @@ const HomeList = ({
 const styles = StyleSheet.create({
   card: {
     margin: 0,
-    width: wp('42.6%'),
-    height: hp('20.1%'),
+    width: wp(44),
+    height: hp(21),
     borderColor: Colors.borderColor,
     borderWidth: 1,
-    marginRight: wp('2%'),
-    marginBottom: wp('2%'),
-    padding: wp('3'),
+    marginRight: wp(3.4),
+    marginBottom: wp(2.85),
+    padding: wp(3),
     backgroundColor: Colors.white,
   },
   cardTitle: {

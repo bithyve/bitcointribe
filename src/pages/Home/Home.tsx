@@ -451,7 +451,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             },
             () => {
               setTimeout(() => {
-                this.qrTabBarBottomSheetRef.current?.close();
+                this.closeBottomSheet();
               }, 2);
 
               if (this.state.tabBarIndex === 999) {
@@ -462,7 +462,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+                this.closeBottomSheet();
               }, 2);
             },
           );
@@ -502,7 +502,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+                this.closeBottomSheet();
               }, 2);
             },
           );
@@ -540,7 +540,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+                this.closeBottomSheet();
               }, 2);
             },
           );
@@ -579,7 +579,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+                this.transactionTabBarBottomSheetRef.current?.close();
               }, 2);
             },
           );
@@ -612,7 +612,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+                this.closeBottomSheet();
               }, 2);
             },
           );
@@ -706,8 +706,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
+                  ? 'User Checking Account'
+                  : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
             bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
@@ -759,9 +759,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -796,7 +796,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -950,12 +950,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch((err) => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then((notifications) => { });
   };
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -1026,10 +1026,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           : '',
       });
     }
-
-    if (prevState.isLoading && !this.state.isLoading) {
-      this.transactionTabBarBottomSheetRef.current?.snapTo(1);
-    }
   };
 
   handleDeeplinkModal = () => {
@@ -1055,7 +1051,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
           setTimeout(() => {
             this.custodianRequestBottomSheetRef.current?.snapTo(1);
-            this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+            this.closeBottomSheet();
           }, 2);
         },
       );
@@ -1077,7 +1073,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           setTimeout(() => {
             this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-            this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+            this.closeBottomSheet();
           }, 2);
         },
       );
@@ -1141,11 +1137,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
             setTimeout(() => {
               this.custodianRequestBottomSheetRef.current?.snapTo(1);
-              this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+              this.closeBottomSheet();
             }, 2);
           },
         );
-        // navigation.navigate('Home', { custodyRequest });
       } else if (splits[6] === 'rk') {
         const recoveryRequest = { requester, rk: splits[7] };
         this.setState(
@@ -1162,7 +1157,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
             setTimeout(() => {
               this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-              this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+              this.closeBottomSheet();
             }, 2);
           },
         );
@@ -1172,7 +1167,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1207,7 +1202,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
             setTimeout(() => {
               this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-              this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+              this.closeBottomSheet();
             }, 2);
           },
         );
@@ -1234,7 +1229,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           setTimeout(() => {
             this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-            this.transactionTabBarBottomSheetRef.current?.snapTo(1);
+            this.closeBottomSheet();
           }, 2);
         },
       );
@@ -1264,9 +1259,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     });
 
     setTimeout(() => {
-      this.transactionTabBarBottomSheetRef.current?.snapTo(1);
-      this.addTabBarBottomSheetRef.current?.close();
-      this.qrTabBarBottomSheetRef.current?.close();
+      this.closeBottomSheet();
     }, 500);
 
     this.getAssociatedContact();
@@ -1504,7 +1497,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1515,19 +1508,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1566,13 +1559,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1581,7 +1574,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1739,7 +1732,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // this.processDLReques t(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     if (tab === BottomTab.More) {
@@ -1880,7 +1873,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1974,18 +1967,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     bottomSheetRef: React.RefObject<RNBottomSheet>,
     newIndex: number,
   ) => {
-    if (newIndex === 0) {
-      bottomSheetRef.current?.snapTo(1);
-    } else if (newIndex === 1) {
-      this.setState({ bottomSheetState: BottomSheetState.Closed });
-    } else if (newIndex > 1) {
-      this.setState({ bottomSheetState: BottomSheetState.Open });
+    console.log("Handle bottom sheet position change");
+
+    if (bottomSheetRef === this.getActiveBottomSheetRef()) {
+      const newState = newIndex >= 1 ? BottomSheetState.Open : BottomSheetState.Closed;
+      this.setState({ bottomSheetState: newState });
     }
   };
 
   closeBottomSheet = () => {
     this.setState({ bottomSheetState: BottomSheetState.Closed }, () => {
-      this.getActiveBottomSheetRef().current?.snapTo(0);
+      this.getActiveBottomSheetRef().current?.close();
     });
   };
 
@@ -2068,8 +2060,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2132,9 +2124,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2264,37 +2256,36 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
-        <View style={{ flex: 7 }}>
-          <View style={styles.cardViewContainer}>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={cardData}
-              extraData={{
-                balances,
-                switchOn,
-                walletName,
-                currencyCode,
-                accounts,
-                exchangeRates,
-              }}
-              keyExtractor={(_, index) => String(index)}
-              renderItem={(Items) => (
-                <HomeList
-                  isBalanceLoading={isBalanceLoading}
-                  Items={Items}
-                  navigation={navigation}
-                  getIconByAccountType={getIconByAccountType}
-                  switchOn={switchOn}
-                  accounts={accounts}
-                  addNewDisable={cardDataProps.length == 4 ? true : false}
-                  CurrencyCode={currencyCode}
-                  balances={balances}
-                  exchangeRates={exchangeRates}
-                />
-              )}
-            />
-          </View>
+        <View style={styles.accountCardsContainer}>
+          <FlatList
+            contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={cardData}
+            extraData={{
+              balances,
+              switchOn,
+              walletName,
+              currencyCode,
+              accounts,
+              exchangeRates,
+            }}
+            keyExtractor={(_, index) => String(index)}
+            renderItem={(Items) => (
+              <HomeList
+                isBalanceLoading={isBalanceLoading}
+                Items={Items}
+                navigation={navigation}
+                getIconByAccountType={getIconByAccountType}
+                switchOn={switchOn}
+                accounts={accounts}
+                addNewDisable={cardDataProps.length == 4 ? true : false}
+                CurrencyCode={currencyCode}
+                balances={balances}
+                exchangeRates={exchangeRates}
+              />
+            )}
+          />
         </View>
 
         <BottomSheetBackground
@@ -2307,19 +2298,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           onSelect={this.handleBottomTabSelection}
           selectedTab={selectedBottomTab}
         />
+
         {isLoading ? <Loader /> : null}
 
-        {/* Bottom Sheets */}
+
+        {/* ---- Bottom Sheets ---- */}
+
         {!isLoading && (
           <RNBottomSheet
             ref={this.transactionTabBarBottomSheetRef}
             snapPoints={[
               -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('18%')
-                : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
@@ -2365,11 +2354,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('18%')
-                : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('65%')
                 : hp('64%'),
             ]}
@@ -2398,9 +2382,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 0,
                       },
                       () => {
-                        this.addContactAddressBookBottomSheetRef.current?.snapTo(
-                          1,
-                        );
+                        this.addContactAddressBookBottomSheetRef.current?.snapTo(1);
                       },
                     );
                   }
@@ -2411,18 +2393,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </RNBottomSheet>
         )}
 
-        {/* QR Code Bottom Sheet */}
+
+        {/* ---- QR Code Bottom Sheet ---- */}
+
         {!isLoading && (
           <RNBottomSheet
             ref={this.qrTabBarBottomSheetRef}
             initialSnapIndex={0}
             snapPoints={[
               -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('18%')
-                : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
                 ? hp('82%')
                 : hp('82%'),
@@ -2442,7 +2421,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
 
               <QrCodeModalContents
-                onClose={() => this.qrTabBarBottomSheetRef.current?.snapTo(1)}
+                onClose={() => this.closeBottomSheet() }
                 onQrScan={(qrData) => this.processQRData(qrData)}
                 onPressQrScanner={() => {
                   navigation.navigate('QrScanner', {
@@ -2562,6 +2541,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             )}
           />
         )}
+
         {!isLoading && (
           <BottomSheet
             onCloseEnd={() => {
@@ -3012,18 +2992,16 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
-  cardViewContainer: {
-    height: '100%',
-    backgroundColor: Colors.backgroundColor,
-    marginTop: hp('4%'),
+  accountCardsContainer: {
+    flex: 7,
+    marginTop: 30,
+    paddingLeft: 20,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
-    paddingTop: hp('1.5%'),
-    paddingBottom: hp('5%'),
+    backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
     width: '100%',
-    overflow: 'hidden',
-    paddingLeft: wp('3%'),
   },
 });
