@@ -230,6 +230,8 @@ interface HomePropsTypes {
   initializeHealthSetup: any;
   overallHealth: any;
   levelHealth: any[];
+  currentLevel: number;
+  keeperInfo: any[];
   fetchDerivativeAccBalTx: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -892,7 +894,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       regularAccount: regularAccount,
       keeperData: JSON.stringify(keeperData)
     }
-    console.log('cloudData', data);
+    // console.log('cloudData', data);
     CloudDataBackup(data, this.setCloudBackupStatus);
     // console.log('call for google drive upload', this.props.cloudBackupStatus);
   };
@@ -902,6 +904,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if(this.props.cloudBackupStatus.status){
       this.updateHealthForCloud();
     }
+  }
+
+  updateCloudData = () =>{
+    let { currentLevel, keeperInfo, levelHealth } = this.props;
+    let KPInfo: any[] = [];
+    if(levelHealth.length > 0){
+      let levelHealthVar = levelHealth[levelHealth.length - 1];
+      if(levelHealthVar.levelInfo){
+        for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
+          const element = levelHealthVar.levelInfo[i];
+          if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
+            KPInfo.push(keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)]);
+          }
+        }
+      }
+    }
+    // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 
   getNewTransactionNotifications = async () => {
@@ -1012,9 +1031,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if(prevProps.levelHealth != this.props.levelHealth && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
-      if(this.props.levelHealth.length>0){
+    if(prevProps.levelHealth != this.props.levelHealth){
+      if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
         this.cloudData();
+      }else{
+        this.updateCloudData();
       }
     }
 
@@ -3109,6 +3130,8 @@ const mapStateToProps = (state) => {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
+    currentLevel: idx(state, (_) => _.health.currentLevel),
+    keeperInfo: idx(state, (_) => _.health.keeperInfo),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
   };
 };

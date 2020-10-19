@@ -25,7 +25,7 @@ export const CheckCloudDataBackup = (recoveryCallback1) =>{
   if (Platform.OS == 'ios') {
     // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
     iCloud.downloadBackup().then((backedJson) => {
-       console.log('BackedUp JSON: ', backedJson);
+       console.log('BackedUp JSON: DONE');
       if(backedJson)
       recoveryCallback(backedJson);
       else
@@ -43,7 +43,7 @@ export const CloudDataBackup = (data, callback) => {
   if (Platform.OS == 'ios') {
     // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
     iCloud.downloadBackup().then((backedJson) => {
-       console.log('BackedUp JSON: ', backedJson);
+       console.log('BackedUp JSON: DONE');
       if (backedJson) {
         updateData(backedJson, '');
       } else {

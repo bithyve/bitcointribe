@@ -1,8 +1,7 @@
-import { call, put, select, delay } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
   INIT_HEALTH_SETUP,
-  UPDATE_HEALTH,
   CHECK_SHARES_HEALTH,
   UPDATE_SHARES_HEALTH,
   updateMSharesLoader,
@@ -19,15 +18,13 @@ import {
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
 import {
-  INIT_HEALTH_CHECK,
   switchS3LoadingStatus,
   initLoader,
   healthCheckInitialized,
   GENERATE_META_SHARE,
 } from '../actions/health';
 import { insertDBWorker } from './storage';
-import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
-import { generateRandomString } from '../../common/CommonFunctions/index';
+import { AsyncStorage } from 'react-native';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import DeviceInfo from 'react-native-device-info';
 import config from '../../bitcoin/HexaConfig';
@@ -35,15 +32,11 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
-  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
-import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import Keeper from '../../bitcoin/utilities/Keeper';
 import KeeperService from '../../bitcoin/services/KeeperService';
 import { EphemeralDataElementsForKeeper } from '../../bitcoin/utilities/Interface';
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
-import { encrypt } from '../../common/encryption/index';
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
 import moment from 'moment';
 
@@ -336,6 +329,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         if(element.shareId == s3Service.levelhealth.metaShares[1].shareId){
           keeperInfo[i].name = EFChannelData.walletName;
           keeperInfo[i].uuid = EFChannelData.uuid;
+          keeperInfo[i].publicKey = EFChannelData.publicKey;
+          keeperInfo[i].ephemeralAddress = EFChannelData.ephemeralAddress;
           break;
         }
         else{
@@ -352,6 +347,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         shareId: s3Service.levelhealth.metaShares[1].shareId,
         name: EFChannelData.walletName,
         uuid: EFChannelData.uuid,
+        publicKey: EFChannelData.publicKey,
+        ephemeralAddress: EFChannelData.ephemeralAddress,
       }
       keeperInfo.push(obj);
     }

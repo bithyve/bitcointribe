@@ -291,6 +291,7 @@ class ManageBackup extends Component<
   componentDidUpdate = (prevProps, prevState) => {
     if(prevProps.levelHealth != this.props.levelHealth){
       this.modifyLevelData();
+      this.updateCloudData();
     }
     if(prevState.selectedShareId != this.state.selectedShareId){
       // alert(this.state.selectedShareId);
@@ -309,6 +310,23 @@ class ManageBackup extends Component<
       isSetUp: true,
       selectedShareId
     });
+  }
+
+  updateCloudData = () =>{
+    let { currentLevel, keeperInfo, levelHealth } = this.props;
+    let KPInfo: any[] = [];
+    if(levelHealth.length > 0){
+      let levelHealthVar = levelHealth[levelHealth.length - 1];
+      if(levelHealthVar.levelInfo){
+        for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
+          const element = levelHealthVar.levelInfo[i];
+          if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
+            KPInfo.push(keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)]);
+          }
+        }
+      }
+    }
+    // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 
   render() {
