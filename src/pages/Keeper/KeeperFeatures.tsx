@@ -6,11 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  Image,
   ScrollView,
-  RefreshControl,
-  ImageBackground,
-  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -22,21 +19,19 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
-import {
-  approveTrustedContact,
-  fetchEphemeralChannel,
-  clearPaymentDetails,
-} from '../../store/actions/trustedContacts';
 import idx from 'idx';
-import KeeperTypeModalContents from './KeeperTypeModalContent';
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
-import moment from 'moment';
 import RadioButton from '../../components/RadioButton';
-import { createAndUploadOnEFChannel, updateMSharesHealth, generateMetaShare, initLevelTwo } from '../../store/actions/health';
+import {
+  createAndUploadOnEFChannel,
+  updateMSharesHealth,
+  generateMetaShare,
+  initLevelTwo,
+} from '../../store/actions/health';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
   selectedIds: any[];
+  setUpLoader: Boolean;
 }
 
 interface KeeperFeaturesPropsTypes {
@@ -49,6 +44,7 @@ interface KeeperFeaturesPropsTypes {
   generateMetaShare: any;
   initLevelTwo: any;
   isLevel2Initialized: Boolean;
+  updateMSharesHealthStatus: Boolean;
 }
 
 class KeeperFeatures extends Component<
@@ -79,47 +75,21 @@ class KeeperFeatures extends Component<
           id: 4,
         },
       ],
+      setUpLoader: false,
     };
   }
 
-  componentDidMount = () => {
-    if(this.props.navigation.state.params.qrScannedData){
-      console.log('this.props.navigation.state.params.qrScannedData', this.props.navigation.state.params.qrScannedData)
+  componentDidUpdate = (prevProp, prevState) => {
+    if (prevProp.isLevel2Initialized != this.props.isLevel2Initialized) {
+      this.uploadDataOnEFChannel();
     }
-  };
-
-  componentDidUpdate = (prevProp, prevState) =>{
-    if(prevProp.isLevel2Initialized != this.props.isLevel2Initialized){
-  //console.log("ISIDE this.props.isLevel2Initialized", this.props.isLevel2Initialized);
-  this.uploadDataOnEFChannel();
-}
-  }
-
-  updatePrimaryKeeperHealth = () =>{
-    let levelHealth = this.props.levelHealth;
-    console.log('cloud health update home levelHealth', levelHealth);
-    if(levelHealth[0].levelInfo[1].shareType == 'primaryKeeper'){
-      levelHealth[0].levelInfo[1].updatedAt = moment(new Date()).valueOf();
-      levelHealth[0].levelInfo[1].status = 'accessible';
-      levelHealth[0].levelInfo[1].reshareVersion = 1;
-      levelHealth[0].levelInfo[1].guardian = 'cloud';
+    if (
+      prevProp.updateMSharesHealthStatus !=
+        this.props.updateMSharesHealthStatus &&
+      !this.props.updateMSharesHealthStatus
+    ) {
+      this.setState({ setUpLoader: false });
     }
-    let shareArray = [
-      {
-        walletId: this.props.s3Service.getWalletId().data.walletId,
-        shareId: levelHealth[0].levelInfo[1].shareId,
-        reshareVersion: levelHealth[0].levelInfo[1].reshareVersion,
-        updatedAt: moment(new Date()).valueOf(),
-      }
-    ];
-    this.props.updateMSharesHealth(shareArray);
-  }
-
-  getTime = (item) => {
-    return (item.toString() && item.toString() == '0') ||
-      item.toString() == 'never'
-      ? 'never'
-      : timeFormatter(moment(new Date()), item);
   };
 
   onFeatureSelect = (value) => {
@@ -135,29 +105,36 @@ class KeeperFeatures extends Component<
     this.setState({ selectedIds: selectedId });
   };
 
-  setUpKeeper = async() =>{
-    if(!this.props.isLevelTwoMetaShareCreated) await this.props.generateMetaShare(2);
-  }
+  setUpKeeper = async () => {
+    this.setState({ setUpLoader: true });
+    if (!this.props.isLevelTwoMetaShareCreated)
+      await this.props.generateMetaShare(2);
+  };
 
   uploadDataOnEFChannel = () => {
-    if(this.props.navigation.state.params.qrScannedData){
+    if (this.props.navigation.state.params.qrScannedData) {
       let featuresList = [];
       let isPrimaryKeeper = this.props.navigation.state.params.isPrimaryKeeper;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
-        if(this.state.selectedIds.findIndex(value => value == element.id) > -1){
+        if (
+          this.state.selectedIds.findIndex((value) => value == element.id) > -1
+        ) {
           featuresList.push(element);
-        } 
+        }
       }
-      console.log("this.props.navigation.state.params.selectedShareId", this.props.navigation.state.params.selectedShareId);
-      this.props.createAndUploadOnEFChannel(this.props.navigation.state.params.qrScannedData, featuresList, isPrimaryKeeper, this.props.navigation.state.params.selectedShareId);
+      this.props.createAndUploadOnEFChannel(
+        this.props.navigation.state.params.qrScannedData,
+        featuresList,
+        isPrimaryKeeper,
+        this.props.navigation.state.params.selectedShareId,
+      );
     }
     this.props.navigation.replace('ManageBackupKeeper');
-  }
-
+  };
 
   render() {
-    const { levelData, selectedIds } = this.state;
+    const { levelData, selectedIds, setUpLoader } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -176,27 +153,27 @@ class KeeperFeatures extends Component<
               />
             </TouchableOpacity>
             <View style={{ justifyContent: 'center', width: wp('80%') }}>
-              <View style={{flexDirection: 'row'}}>
-              <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
-                {'Setup Primary Keeper\non a Personal Device'}
-              </Text>
-              <TouchableOpacity
-              style={{ marginLeft: 'auto', marginRight: wp('1%') }}
-              onPress={() => {}}
-            >
-              <Text
+              <View style={{ flexDirection: 'row' }}>
+                <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
+                  {'Setup Primary Keeper\non a Personal Device'}
+                </Text>
+                <TouchableOpacity
+                  style={{ marginLeft: 'auto', marginRight: wp('1%') }}
+                  onPress={() => {}}
+                >
+                  <Text
                     onPress={() => {}}
                     style={{
                       color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        marginLeft: 'auto',
-                        textAlign: 'center',
-                        padding: 10
+                      fontSize: RFValue(12),
+                      marginLeft: 'auto',
+                      textAlign: 'center',
+                      padding: 10,
                     }}
                   >
                     Know more
                   </Text>
-                  </TouchableOpacity>
+                </TouchableOpacity>
               </View>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
                 Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit
@@ -285,7 +262,7 @@ class KeeperFeatures extends Component<
                 ...styles.modalHeaderInfoText,
                 marginTop: hp('1.5%'),
                 marginLeft: wp('10%'),
-                marginRight: wp('10%')
+                marginRight: wp('10%'),
               }}
             >
               Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit amet,
@@ -331,6 +308,7 @@ class KeeperFeatures extends Component<
           /> */}
         <View style={styles.bottomButtonView}>
           <TouchableOpacity
+            disabled={setUpLoader ? true : false}
             onPress={() => {
               this.setUpKeeper();
             }}
@@ -340,14 +318,18 @@ class KeeperFeatures extends Component<
               backgroundColor: Colors.blue,
             }}
           >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: Colors.white,
-              }}
-            >
-              Setup keeper
-            </Text>
+            {setUpLoader ? (
+              <ActivityIndicator size={'small'} />
+            ) : (
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: Colors.white,
+                }}
+              >
+                Setup keeper
+              </Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -377,18 +359,21 @@ const mapStateToProps = (state) => {
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     levelHealth: idx(state, (_) => _.health.levelHealth),
-    isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
+    isLevelTwoMetaShareCreated: idx(
+      state,
+      (_) => _.health.isLevelTwoMetaShareCreated,
+    ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
+    updateMSharesHealthStatus: idx(state, (_) => _.health.updateMSharesHealth),
   };
 };
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    fetchEphemeralChannel,
     createAndUploadOnEFChannel,
     updateMSharesHealth,
     generateMetaShare,
-    initLevelTwo
+    initLevelTwo,
   })(KeeperFeatures),
 );
 
