@@ -43,7 +43,7 @@ export const CloudDataBackup = (data, callback) => {
   if (Platform.OS == 'ios') {
     // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
     iCloud.downloadBackup().then((backedJson) => {
-       console.log('BackedUp JSON: DONE');
+       console.log('BackedUp JSON: DONE', backedJson);
       if (backedJson) {
         updateData(backedJson, '');
       } else {
@@ -113,11 +113,13 @@ export const createFile = () => {
   let WalletData = [];
   const { data } = dataObject.regularAccount.getWalletId();
   let tempData = {
+    levelStatus: dataObject.levelStatus,
     walletName: dataObject.walletName,
     walletId: data.walletId,
     data: dataObject.encryptedCloudDataJson,
-    dateTime: new Date(),
     shares: dataObject.shares,
+    keeperData: dataObject.keeperData,
+    dateTime: moment(new Date()),
   };
   WalletData.push(tempData);
 
@@ -202,16 +204,20 @@ export const updateData = (result1, googleData) => {
     //console.log('sdgsdg', index);
     if (index === -1) {
       let tempData = {
+        levelStatus: dataObject.levelStatus,
         walletName: dataObject.walletName,
         walletId: data.walletId,
         data: dataObject.encryptedCloudDataJson,
-        dateTime: moment(new Date()),
         shares: dataObject.shares,
+        keeperData: dataObject.keeperData,
+        dateTime: moment(new Date()),
       };
       newArray.push(tempData);
     } else {
+      newArray[index].levelStatus = dataObject.levelStatus;
       newArray[index].data = dataObject.encryptedCloudDataJson;
       newArray[index].shares = dataObject.shares;
+      newArray[index].keeperData = dataObject.keeperData
       newArray[index].dateTime = moment(new Date());
     }
     console.log('ARR', newArray);

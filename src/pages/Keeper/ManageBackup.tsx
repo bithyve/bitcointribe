@@ -233,7 +233,7 @@ class ManageBackup extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  cloudData = async () => {
+  cloudData = async (kpInfo? , level?) => {
     const { walletName, regularAccount, } = this.props;
     let encryptedCloudDataJson;
     let shares; //= JSON.stringify(s3Service.levelhealth.metaShares);
@@ -248,19 +248,19 @@ class ManageBackup extends Component<
       },
     ]
     let data = {
-      levelStatus: 1,
+      levelStatus: level ? level : 1,
       shares: shares,
       encryptedCloudDataJson : encryptedCloudDataJson,
       walletName: walletName,
       regularAccount: regularAccount,
-      keeperData: JSON.stringify(keeperData)
+      keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
     }
     CloudDataBackup(data, this.setCloudBackupStatus);    
   };
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
-    if(this.props.cloudBackupStatus.status){
+    if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
       this.updateHealthForCloud();
     }
   }
@@ -326,6 +326,7 @@ class ManageBackup extends Component<
         }
       }
     }
+    this.cloudData(KPInfo, currentLevel);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 

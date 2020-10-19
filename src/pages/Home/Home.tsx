@@ -871,7 +871,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 2);
   };
 
-  cloudData = async () => {
+  cloudData = async (kpInfo? , level?) => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
     let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
@@ -887,26 +887,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       },
     ]
     let data = {
-      levelStatus: 1,
+      levelStatus: level ? level : 1,
       shares: shares,
       encryptedCloudDataJson : encryptedCloudDataJson,
       walletName: walletName,
       regularAccount: regularAccount,
-      keeperData: JSON.stringify(keeperData)
+      keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
     }
-    // console.log('cloudData', data);
+    console.log('cloudData', data);
     CloudDataBackup(data, this.setCloudBackupStatus);
     // console.log('call for google drive upload', this.props.cloudBackupStatus);
   };
 
   setCloudBackupStatus = () => {
     this.props.setCloudBackupStatus({status: true});
-    if(this.props.cloudBackupStatus.status){
+    if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
       this.updateHealthForCloud();
     }
   }
 
   updateCloudData = () =>{
+    console.log("inside updateCloudData");
     let { currentLevel, keeperInfo, levelHealth } = this.props;
     let KPInfo: any[] = [];
     if(levelHealth.length > 0){
@@ -920,6 +921,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     }
+    this.cloudData(KPInfo, currentLevel);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 
