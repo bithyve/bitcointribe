@@ -745,27 +745,41 @@ export default class TrustedContacts {
     }
   };
 
-  public updateLastSeen = async (): Promise<{
+  public syncLastSeens = async (): Promise<{
     updated: any;
   }> => {
-    const channelsToUpdate = [];
+    const channelsToUpdate = {};
     for (const contact of Object.values(this.trustedContacts)) {
       const { trustedChannel, publicKey } = contact;
       if (trustedChannel) {
-        channelsToUpdate.push({
-          channelAddress: trustedChannel.address,
-          publicKey,
-        });
+        channelsToUpdate[trustedChannel.address] = { publicKey };
       }
     }
 
-    if (channelsToUpdate.length) {
-      const res = await BH_AXIOS.post('updateLastSeen', {
+    if (Object.keys(channelsToUpdate).length) {
+      const res = await BH_AXIOS.post('syncLastSeens', {
         HEXA_ID,
         channelsToUpdate,
       });
 
-      const { updated } = res.data;
+      const { updated, updatedLastSeens } = res.data;
+      console.log({ updatedLastSeens });
+      if (Object.keys(updatedLastSeens).length) {
+        for (const contact of Object.values(this.trustedContacts)) {
+          const { trustedChannel } = contact;
+          if (trustedChannel) {
+            const { publicKey, lastSeen } = updatedLastSeens[
+              trustedChannel.address
+            ]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.lastSeen = lastSeen;
+              }
+            });
+          }
+        }
+      }
+
       return { updated };
     } else {
       throw new Error('No trusted channels to update');

@@ -293,7 +293,7 @@ export default class TrustedContactsService {
     }
   };
 
-  public updateLastSeen = async (): Promise<
+  public syncLastSeens = async (): Promise<
     | {
         status: number;
         data: {
@@ -312,7 +312,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.updateLastSeen(),
+        data: await this.tc.syncLastSeens(),
       };
     } catch (err) {
       return {

@@ -256,6 +256,7 @@ export interface TrustedDataElements {
 export interface TrustedData {
   publicKey: string;
   data: TrustedDataElements;
+  lastSeen?: number;
 }
 
 export interface EncryptedTrustedData {
