@@ -50,11 +50,8 @@ class App extends Component {
   }
 
   componentWillUnmount = async () => {
-    await AsyncStorage.setItem(
-      'isInternetModalCome',
-      JSON.stringify(false),
-    );
-  }
+    await AsyncStorage.setItem('isInternetModalCome', JSON.stringify(false));
+  };
 
   render() {
     return (
@@ -70,9 +67,9 @@ class App extends Component {
               currentScreen != 'Login' &&
               currentScreen != 'Home' &&
               currentScreen != 'Launch' &&
-              currentScreen != 'ReLogin' && !isInternetModalCome
+              currentScreen != 'ReLogin' &&
+              !isInternetModalCome
             ) {
-              console.log("global.isInternetModalCome", isInternetModalCome, typeof isInternetModalCome);
               NetInfo.addEventListener((state) => {
                 setTimeout(() => {
                   if (state.isInternetReachable === null) {

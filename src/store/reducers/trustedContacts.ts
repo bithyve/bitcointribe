@@ -43,7 +43,7 @@ const initialState: {
   loading: {
     updateEphemeralChannel: Boolean;
     updateTrustedChannel: Boolean;
-    trustedChannelsSync: Boolean;
+    trustedChannelsSetupSync: Boolean;
     approvingTrustedContact: Boolean;
   };
   addressBook: any;
@@ -59,7 +59,7 @@ const initialState: {
   loading: {
     updateEphemeralChannel: false,
     updateTrustedChannel: false,
-    trustedChannelsSync: false,
+    trustedChannelsSetupSync: false,
     approvingTrustedContact: false,
   },
   addressBook: null,

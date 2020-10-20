@@ -10,11 +10,10 @@ import {
   SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
-  UPDATE_APPLICATION_STATUS, UPDATE_LAST_SEEN,
-  CARD_DATA
-
+  UPDATE_APPLICATION_STATUS,
+  CARD_DATA,
 } from '../actions/preferences';
-import { UPDATE_APP_PREFERENCE } from "../constants";
+import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 
 const initialState = ip.freeze({
@@ -34,13 +33,13 @@ const initialState = ip.freeze({
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
-  cardData: null
-})
+  cardData: null,
+});
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case UPDATE_APP_PREFERENCE:
-      return chain(state).setIn([payload.key], payload.value).value()
+      return chain(state).setIn([payload.key], payload.value).value();
     case CURRENCY_CODE:
       return {
         ...state,
@@ -92,7 +91,6 @@ export default (state = initialState, { type, payload }) => {
         savingWarning: payload.savingWarning,
       };
 
-
     case INIT_ASYNC_MIGRATION_SUCCESS:
       return {
         ...state,
@@ -105,16 +103,13 @@ export default (state = initialState, { type, payload }) => {
         applicationStatus: payload.status,
       };
 
-    case UPDATE_LAST_SEEN:
-      return Object.assign({}, state, { lastSeen: new Date() })
-
-      case CARD_DATA:
+    case CARD_DATA:
       return {
         ...state,
         cardData: payload.cardData,
       };
 
     default:
-      return state
+      return state;
   }
-}
+};

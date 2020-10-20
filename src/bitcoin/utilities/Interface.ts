@@ -256,11 +256,15 @@ export interface TrustedDataElements {
 export interface TrustedData {
   publicKey: string;
   data: TrustedDataElements;
+  lastSeen?: number;
+  encDataHash?: string;
 }
 
 export interface EncryptedTrustedData {
   publicKey: string;
   encryptedData: string; // encrypted TrustedData
+  lastSeen?: number;
+  dataHash?: string; // hash of the encrypted TrustedData (TrustedData's encDataHash = dataHash)
 }
 
 export interface Contacts {
