@@ -58,6 +58,7 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+/ios/Carthage
 
 # environment variables
 #

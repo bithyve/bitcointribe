@@ -312,7 +312,7 @@ PODS:
     - React
   - react-native-in-app-utils (6.1.0):
     - React
-  - react-native-mail (5.2.0):
+  - react-native-mail (4.1.0):
     - React
   - react-native-netinfo (5.9.7):
     - React-Core
@@ -740,7 +740,7 @@ SPEC CHECKSUMS:
   react-native-contacts: 7b5e16196278636030c3fbbb9505543984b01697
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-in-app-utils: 96cdefc90ad74a79a95d19239a183995a6face0b
-  react-native-mail: 2d908336968d85ff27cfa0cf085ee70d3b185a34
+  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: 250dc0ca126512f618a8a2ca6a936577e1f66586
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
