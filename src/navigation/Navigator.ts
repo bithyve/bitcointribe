@@ -3,7 +3,6 @@ import {
   createStackNavigator,
   StackViewTransitionConfigs,
 } from 'react-navigation-stack';
-
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
@@ -14,7 +13,6 @@ import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
-import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
 import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
@@ -34,7 +32,7 @@ import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCode
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
-import QrScanner from '../components/QrScanner';
+import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
 import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
@@ -79,6 +77,8 @@ import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack';
 import AllTransactionsStack from './stacks/transactions/AllTransactionsStack';
+import HomeStack from './stacks/home/HomeStack';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -96,7 +96,6 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
-    RecoveryQrScanner: QrScanner,
     NewOwnQuestions,
     NewRecoveryOwnQuestions,
     UpdateApp: {
@@ -131,7 +130,7 @@ const MODAL_ROUTES = [
 const HomeNavigator = createStackNavigator(
   {
     Home: {
-      screen: Home,
+      screen: HomeStack,
       path: 'Home',
     },
     ReLogin: {
@@ -173,7 +172,7 @@ const HomeNavigator = createStackNavigator(
     EmailModalContents,
     Buy,
     Sell,
-    QrScanner,
+    QRScanner: QRScannerScreen,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,

@@ -113,6 +113,8 @@ const CustomBottomTabs: React.FC<Props> = ({ tabBarZIndex, onSelect, selectedTab
   )
 }
 
+export const TAB_BAR_HEIGHT = hp('12%');
+
 const styles = StyleSheet.create({
   bottomTabBarContainer: {
     backgroundColor: Colors.white,
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     marginTop: 'auto',
     flexDirection: 'row',
-    height: hp('12%'),
+    height: TAB_BAR_HEIGHT,
     alignItems: 'center',
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

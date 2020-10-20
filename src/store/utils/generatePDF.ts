@@ -1,5 +1,6 @@
 import { Platform, NativeModules, Alert } from 'react-native';
 import { PermissionsAndroid } from 'react-native';
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
 
 // async function requestStoragePermission() {
 //   try {
@@ -33,18 +34,6 @@ async function requestStoragePermission() {
   return null;
 }
 
-const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
-  return qrString;
-};
-
 const chunkArray = (arr: any, n: any) => {
   var chunkLength = Math.max(arr.length / n, 1);
   var chunks = [];
@@ -60,7 +49,7 @@ export default async (pdfData, fileName, title, password) => {
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
   qrData.forEach((qrString) => {
-    qrcode.push(getFormattedString(qrString));
+    qrcode.push(getFormattedStringFromQRString(qrString));
     // qrCodeString.push(chunkArray(qrString, 4));
     qrCodeString.push(qrString);
   });

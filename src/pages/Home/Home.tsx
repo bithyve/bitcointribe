@@ -1,4 +1,4 @@
-import React, { createRef, PureComponent, useMemo } from 'react';
+import React, { createRef, PureComponent } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,10 +9,10 @@ import {
   AsyncStorage,
   Linking,
   Alert,
+  Image,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
@@ -20,11 +20,11 @@ import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddModalContents from '../../components/AddModalContents';
-import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
+import ButtonStyles from '../../common/Styles/ButtonStyles';
 
 import {
   TEST_ACCOUNT,
@@ -66,7 +66,6 @@ import {
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import TransactionDetails from '../Accounts/TransactionDetails';
 import Toast from '../../components/Toast';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../../components/NotificationListContent';
@@ -80,7 +79,7 @@ import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
-  BottomTab,
+  BottomTab, TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
 import { initialCardData, closingCardData } from '../../stubs/initialCardData';
 import {
@@ -103,6 +102,7 @@ import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
+import { Button } from 'react-native-elements';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -185,7 +185,6 @@ interface HomeStateTypes {
   canNavigate: boolean;
   lastActiveTime: string;
   isContactOpen: boolean;
-  isCameraOpen: boolean;
   isLoading: boolean;
   isRequestModalOpened: boolean;
   isBalanceLoading: boolean;
@@ -241,7 +240,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   NoInternetBottomSheet: any;
   unsubscribe: any;
 
-  qrTabBarBottomSheetRef = createRef<RNBottomSheet>();
   addTabBarBottomSheetRef = createRef<RNBottomSheet>();
 
   // TODO: Completely replace `BottomSheet` with `RNBottomSheet` a la the refs above (https://trello.com/c/boUNRk6t)
@@ -290,7 +288,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       canNavigate: false,
       lastActiveTime: moment().toISOString(),
       isContactOpen: false,
-      isCameraOpen: false,
       notificationLoading: true,
       isLoading: true,
       isRequestModalOpened: false,
@@ -472,11 +469,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              // TODO -- figure out why its not closing with out timeout
-              setTimeout(() => {
-                this.qrTabBarBottomSheetRef.current?.close();
-              }, 2);
-
               if (this.state.tabBarIndex === 999) {
                 this.setState({
                   tabBarIndex: 0,
@@ -510,11 +502,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              // TODO -- figure out why its not closing with out timeout
-              setTimeout(() => {
-                this.qrTabBarBottomSheetRef.current?.close();
-              }, 2);
-
               if (this.state.tabBarIndex === 999) {
                 this.setState({
                   tabBarIndex: 0,
@@ -549,11 +536,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              // TODO -- figure out why its not closing with out timeout
-              setTimeout(() => {
-                this.qrTabBarBottomSheetRef.current?.close();
-              }, 2);
-
               if (this.state.tabBarIndex === 999) {
                 this.setState({
                   tabBarIndex: 0,
@@ -582,10 +564,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               trustedContactRequest: null,
             },
             () => {
-              setTimeout(() => {
-                this.qrTabBarBottomSheetRef.current?.close();
-              }, 2);
-
               if (this.state.tabBarIndex === 999) {
                 this.setState({
                   tabBarIndex: 0,
@@ -616,7 +594,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setAccountCardData = (newCardData) => {
-    //console.log("newCardData", newCardData);
     let newArrayFinal = [];
     let tempArray = [];
     for (let a = 0; a < newCardData.length; a++) {
@@ -1288,7 +1265,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if (!currencyCodeTmp) {
       this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
-      //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
       });
@@ -1524,7 +1500,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
-      ];
+        ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1651,6 +1627,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.navigation.navigate('AllTransactions');
     } else if (tab === BottomTab.More) {
       this.props.navigation.navigate('MoreOptions');
+    } else if (tab === BottomTab.QR) {
+        this.props.navigation.navigate('QRScanner', {
+          onCodeScanned: this.processQRData,
+        });
     } else if (tab === BottomTab.Add) {
       this.setState(
         {
@@ -1659,18 +1639,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
         () => {
           this.addTabBarBottomSheetRef.current?.expand();
-          this.qrTabBarBottomSheetRef.current?.close();
-        },
-      );
-    } else if (tab === BottomTab.QR) {
-      this.setState(
-        {
-          selectedBottomTab: tab,
-          bottomSheetState: BottomSheetState.Open,
-        },
-        () => {
-          this.addTabBarBottomSheetRef.current?.close();
-          this.qrTabBarBottomSheetRef.current?.expand();
         },
       );
     }
@@ -1874,12 +1842,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     });
   };
 
+  // TODO: This should no longer be needed after we remove the `Add` Bottom Sheet
   getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> | null => {
     switch (this.state.selectedBottomTab) {
       case BottomTab.Add:
         return this.addTabBarBottomSheetRef;
-      case BottomTab.QR:
-        return this.qrTabBarBottomSheetRef;
       default:
         return null;
     }
@@ -2164,6 +2131,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
+        <View
+          style={styles.floatingFriendsAndFamilyButtonContainer} pointerEvents="box-none"
+        >
+          <Button
+            raised
+            title="Friends & Family"
+            icon={
+              <Image
+                source={require('../../assets/images/icons/icon_contact.png')}
+                style={{ width: 18, height: 18 }}
+              />
+            }
+            buttonStyle={ButtonStyles.floatingActionButton}
+            titleStyle={{...ButtonStyles.floatingActionButtonText, marginLeft: 4 }}
+            onPress={() => navigation.navigate('FriendsAndFamily')}
+          />
+        </View>
+
         <BottomSheetBackground
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
@@ -2217,46 +2202,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       },
                     );
                   }
-                }}
-              />
-            </BottomSheetView>
-          </RNBottomSheet>
-        )}
-
-
-        {/* ---- QR Code Bottom Sheet ---- */}
-
-        {!isLoading && (
-          <RNBottomSheet
-            ref={this.qrTabBarBottomSheetRef}
-            initialSnapIndex={0}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('82%')
-                : hp('82%'),
-            ]}
-            handleComponent={BottomSheetHandle}
-            onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(
-                this.qrTabBarBottomSheetRef,
-                newPositionIndex,
-              );
-            }}
-          >
-            <BottomSheetView>
-              <BottomSheetHeader
-                title="QR"
-                onPress={this.handleBottomSheetHeaderTap}
-              />
-
-              <QrCodeModalContents
-                onClose={() => this.closeBottomSheet() }
-                onQrScan={(qrData) => this.processQRData(qrData)}
-                onPressQrScanner={() => {
-                  navigation.navigate('QrScanner', {
-                    scanedCode: this.processQRData,
-                  });
                 }}
               />
             </BottomSheetView>
@@ -2787,5 +2732,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
     width: '100%',
+  },
+
+  floatingFriendsAndFamilyButtonContainer: {
+    position: 'absolute',
+    bottom: TAB_BAR_HEIGHT,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignSelf: 'flex-end',
+    padding: 16,
   },
 });

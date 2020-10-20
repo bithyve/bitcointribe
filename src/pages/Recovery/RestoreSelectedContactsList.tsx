@@ -1144,15 +1144,6 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => {
-            props.navigation.navigate('RecoveryQrScanner', {
-              scanedCode: getQrCodeData,
-            });
-          }}
-        >
-          <Text>Scan Recovery Share</Text>
-        </TouchableOpacity> */}
 
         {metaShares.length >= 3 ? (
           <View>
