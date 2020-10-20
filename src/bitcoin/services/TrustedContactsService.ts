@@ -330,6 +330,7 @@ export default class TrustedContactsService {
         status: number;
         data: {
           synched: Boolean;
+          contactsToRemove: String[];
         };
         err?: undefined;
         message?: undefined;
