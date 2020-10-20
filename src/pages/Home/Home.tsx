@@ -9,6 +9,7 @@ import {
   AsyncStorage,
   Linking,
   Alert,
+  Image,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
@@ -25,6 +26,7 @@ import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
+import ButtonStyles from '../../common/Styles/ButtonStyles';
 
 import {
   TEST_ACCOUNT,
@@ -80,7 +82,7 @@ import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
-  BottomTab,
+  BottomTab, TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
 import { initialCardData, closingCardData } from '../../stubs/initialCardData';
 import {
@@ -103,6 +105,7 @@ import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
+import { Button } from 'react-native-elements';
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -1524,7 +1527,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
-      ];
+        ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -2164,6 +2167,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
+        <View
+          style={styles.floatingFriendsAndFamilyButtonContainer} pointerEvents="box-none"
+        >
+          <Button
+            raised
+            title="Friends & Family"
+            icon={
+              <Image
+                source={require('../../assets/images/icons/icon_contact.png')}
+                style={{ width: 18, height: 18 }}
+              />
+            }
+            buttonStyle={ButtonStyles.floatingActionButton}
+            titleStyle={{...ButtonStyles.floatingActionButtonText, marginLeft: 4 }}
+            onPress={() => navigation.navigate('FriendsAndFamily')}
+          />
+        </View>
+
         <BottomSheetBackground
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
@@ -2251,7 +2272,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
 
               <QrCodeModalContents
-                onClose={() => this.closeBottomSheet() }
+                onClose={() => this.closeBottomSheet()}
                 onQrScan={(qrData) => this.processQRData(qrData)}
                 onPressQrScanner={() => {
                   navigation.navigate('QrScanner', {
@@ -2787,5 +2808,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
     width: '100%',
+  },
+
+  floatingFriendsAndFamilyButtonContainer: {
+    position: 'absolute',
+    bottom: TAB_BAR_HEIGHT,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignSelf: 'flex-end',
+    padding: 24,
   },
 });

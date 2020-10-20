@@ -3,7 +3,6 @@ import {
   createStackNavigator,
   StackViewTransitionConfigs,
 } from 'react-navigation-stack';
-
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
@@ -14,7 +13,6 @@ import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
-import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
 import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
@@ -79,6 +77,8 @@ import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack';
 import AllTransactionsStack from './stacks/transactions/AllTransactionsStack';
+import HomeStack from './stacks/home/HomeStack';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -131,7 +131,7 @@ const MODAL_ROUTES = [
 const HomeNavigator = createStackNavigator(
   {
     Home: {
-      screen: Home,
+      screen: HomeStack,
       path: 'Home',
     },
     ReLogin: {
