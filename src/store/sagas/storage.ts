@@ -45,11 +45,13 @@ function* fetchDBWorker() {
       yield call(servicesEnricherWorker, { payload: { database } });
       yield put(dbFetched(database));
 
-      // actions post DB fetch
-      yield put(syncLastSeens());
-      yield put(updateWalletImage());
-      yield put(calculateExchangeRate());
-      yield put(startupSync());
+      if (yield call(AsyncStorage.getItem, 'walletExists')) {
+        // actions post DB fetch
+        yield put(syncLastSeens());
+        yield put(updateWalletImage());
+        yield put(calculateExchangeRate());
+        yield put(startupSync());
+      }
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',
