@@ -59,7 +59,6 @@ import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
-import { trustedChannelsSyncWorker } from './trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
@@ -1076,16 +1075,10 @@ function* startupSyncWorker({ payload }) {
       payload: { serviceTypes: [REGULAR_ACCOUNT, SECURE_ACCOUNT] },
     });
   } catch (err) {
-    console.log('Trusted Derivative accounts sync failed: ', err);
+    console.log('Derivative accounts sync failed: ', err);
   }
 
   yield put(startupSyncLoaded(true))
-  try {
-    console.log('Synching trusted channels...');
-    yield call(trustedChannelsSyncWorker);
-  } catch (err) {
-    console.log('Trusted Channels sync failed: ', err);
-  }
 }
 
 export const startupSyncWatcher = createWatcher(

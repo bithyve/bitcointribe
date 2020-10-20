@@ -1,7 +1,7 @@
 import { createAction } from 'redux-actions';
-import { UPDATE_APP_PREFERENCE } from '../constants'
-import { AsyncStorage } from 'react-native'
-import { updateTrustedContactInfoLocally } from '../actions/trustedContacts'
+import { UPDATE_APP_PREFERENCE } from '../constants';
+import { AsyncStorage } from 'react-native';
+import { updateTrustedContactInfoLocally } from '../actions/trustedContacts';
 
 export const CURRENCY_CODE = 'CURRENCY_CODE';
 export const CURRENCY_TOGGLE_VALUE = 'CURRENCY_TOGGLE_VALUE';
@@ -18,10 +18,9 @@ export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST';
 export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS';
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED';
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS';
-export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
 export const CARD_DATA = 'CARD_DATA';
-
 export const CLOUD_BACKUP_DATA_STATUS = 'CLOUD_BACKUP_DATA_STATUS';
+export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
 
 export const setCurrencyCode = (data) => {
   return {
@@ -100,47 +99,45 @@ export const setTwoFASetup = (data) => {
 };
 
 const updatePereferenceRequest = createAction(UPDATE_APP_PREFERENCE);
-export const updatePreference = (payload) => dispatch => dispatch(updatePereferenceRequest(payload))
-
-
+export const updatePreference = (payload) => (dispatch) =>
+  dispatch(updatePereferenceRequest(payload));
 
 const initAsyncMigrationRequest = createAction(INIT_ASYNC_MIGRATION_REQUEST);
 const initAsyncMigrationSuccess = createAction(INIT_ASYNC_MIGRATION_SUCCESS);
 const initAsyncMigrationFailed = createAction(INIT_ASYNC_MIGRATION_FAILED);
 
-
-
-
 export const initMigration = () => {
-  return async dispatch => {
+  return async (dispatch) => {
     dispatch(initAsyncMigrationRequest());
-    let data = await AsyncStorage.multiGet(["TrustedContactsInfo", "currencyCode"])
+    let data = await AsyncStorage.multiGet([
+      'TrustedContactsInfo',
+      'currencyCode',
+    ]);
     if (data && data[0] && data[0][1]) {
-      let trustedContacts = data[0][1]
-      dispatch(updateTrustedContactInfoLocally(JSON.parse(trustedContacts)))
+      let trustedContacts = data[0][1];
+      dispatch(updateTrustedContactInfoLocally(JSON.parse(trustedContacts)));
     }
     if (data && data[1]) {
-      let currencyCode = JSON.parse(data[1][1]) || 'USD'
-      dispatch(updatePreference(
-        {
+      let currencyCode = JSON.parse(data[1][1]) || 'USD';
+      dispatch(
+        updatePreference({
           key: 'currencyCode',
           value: currencyCode,
-        }
-      ))
+        }),
+      );
     } else {
-      let currencyCode = 'USD'
-      dispatch(updatePreference(
-        {
+      let currencyCode = 'USD';
+      dispatch(
+        updatePreference({
           key: 'currencyCode',
           value: currencyCode,
-        }
-      ))
+        }),
+      );
     }
 
     dispatch(initAsyncMigrationSuccess());
   };
-}
-
+};
 
 export const updateApplicationStatus = (data) => {
   return {

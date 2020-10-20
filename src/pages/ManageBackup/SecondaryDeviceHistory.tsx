@@ -182,18 +182,17 @@ const SecondaryDeviceHistory = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      if (trustedContactsInfo) {
-        trustedContactsInfo[0] = contact;
+      let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+
+      if (tcInfo) {
+        tcInfo[0] = contact;
       } else {
-        trustedContactsInfo = [];
-        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
-        trustedContactsInfo[0] = contact;
+        tcInfo = [];
+        tcInfo[2] = undefined; // securing initial 3 positions for Guardians
+        tcInfo[0] = contact;
       }
-      await AsyncStorage.setItem(
-        'TrustedContactsInfo',
-        JSON.stringify(trustedContactsInfo),
-      );
-      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+      await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
+      dispatch(updateTrustedContactInfoLocally(tcInfo));
     },
     [trustedContactsInfo],
   );
@@ -719,7 +718,7 @@ const SecondaryDeviceHistory = (props) => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

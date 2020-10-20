@@ -16,12 +16,12 @@ import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from 'redux-persist';
 import preferencesReducer from './reducers/preferences';
-import loaders from './reducers/loaders'
+import loaders from './reducers/loaders';
 
 const config = {
   key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ['setupAndAuth', 'loaders']
+  blacklist: ['setupAndAuth', 'loaders'],
 };
 
 import {
@@ -109,8 +109,10 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
-  trustedChannelsSyncWatcher,
+  trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
+  syncLastSeensWatcher,
+  syncTrustedChannelsWatcher,
 } from './sagas/trustedContacts';
 
 import {
@@ -224,8 +226,10 @@ const rootSaga = function* () {
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
-    trustedChannelsSyncWatcher,
-
+    trustedChannelsSetupSyncWatcher,
+    syncLastSeensWatcher,
+    syncTrustedChannelsWatcher,
+    
     // Health 
     initHealthWatcher,
     checkSharesHealthWatcher,
@@ -261,7 +265,7 @@ const rootReducer = combineReducers({
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
-  loaders
+  loaders,
 });
 
 const sagaMiddleware = createSagaMiddleware();

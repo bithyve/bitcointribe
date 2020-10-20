@@ -21,8 +21,8 @@ import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
 import { updateWalletImage } from '../actions/sss';
 import { calculateExchangeRate, startupSync } from '../actions/accounts';
+import { syncLastSeens } from '../actions/trustedContacts';
 // import { timer } from '../../utils'
-
 
 function* initDBWorker() {
   try {
@@ -46,6 +46,7 @@ function* fetchDBWorker() {
       yield put(dbFetched(database));
 
       // actions post DB fetch
+      yield put(syncLastSeens());
       yield put(updateWalletImage());
       yield put(calculateExchangeRate());
       yield put(startupSync());
@@ -105,16 +106,16 @@ function* servicesEnricherWorker({ payload }) {
       throw new Error('Database missing; services encrichment failed');
     }
 
-    let dbVersion = database.VERSION
-    let appVersion = DeviceInfo.getVersion()
-    if (appVersion === "0.7") {
-      appVersion = "0.7.0"
+    let dbVersion = database.VERSION;
+    let appVersion = DeviceInfo.getVersion();
+    if (appVersion === '0.7') {
+      appVersion = '0.7.0';
     }
-    if (appVersion === "0.8") {
-      appVersion = "0.8.0"
+    if (appVersion === '0.8') {
+      appVersion = '0.8.0';
     }
-    if (appVersion === "0.9") {
-      appVersion = "0.9.0"
+    if (appVersion === '0.9') {
+      appVersion = '0.9.0';
     }
     const {
       REGULAR_ACCOUNT,
@@ -126,15 +127,17 @@ function* servicesEnricherWorker({ payload }) {
 
     let services;
     let migrated = false;
-    if (!database.VERSION) { dbVersion = '0.7.0' }
-    else if (database.VERSION === '0.8') { dbVersion = '0.8.0' }
-    else if (database.VERSION === '0.9') { dbVersion = '0.9.0' }
-    else if (database.VERSION === '1.0') { dbVersion = '1.0.0' }
+    if (!database.VERSION) {
+      dbVersion = '0.7.0';
+    } else if (database.VERSION === '0.8') {
+      dbVersion = '0.8.0';
+    } else if (database.VERSION === '0.9') {
+      dbVersion = '0.9.0';
+    } else if (database.VERSION === '1.0') {
+      dbVersion = '1.0.0';
+    }
     if (semver.gt(appVersion, dbVersion)) {
-      if (
-        dbVersion === '0.7.0' &&
-        semver.gte(appVersion, '0.9.0')
-      ) {
+      if (dbVersion === '0.7.0' && semver.gte(appVersion, '0.9.0')) {
         // version 0.7.0 support
         console.log('Migration running for 0.7.0');
         services = {

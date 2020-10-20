@@ -27,6 +27,8 @@ import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
+import { updateLastSeen } from '../../store/actions/preferences';
+
 
 import {
   TEST_ACCOUNT,
@@ -50,7 +52,6 @@ import {
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
-import { updateLastSeen } from '../../store/actions/preferences';
 
 import {
   approveTrustedContact,
@@ -862,12 +863,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.handleDeeplinkModal();
 
     setTimeout(() => {
-      this.setState(
-        {
-          isLoading: false,
-        },
-        () => this.props.updateLastSeen(new Date()),
-      );
+      this.setState({
+        isLoading: false,
+      });
     }, 2);
   };
 
