@@ -76,7 +76,6 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import TransactionsContent from '../../components/home/transaction-content';
 import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
@@ -84,15 +83,11 @@ import CustomBottomTabs, {
   BottomTab,
 } from '../../components/home/custom-bottom-tabs';
 import { initialCardData, closingCardData } from '../../stubs/initialCardData';
-import { initialTransactionData } from '../../stubs/initialTransactionData';
 import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
 } from '../../store/actions/accounts';
-import {
-  trustedChannelActions,
-  DonationDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface';
+import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents';
@@ -106,7 +101,7 @@ import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin';
 import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
-import BottomSheetHeader from './BottomSheetHeader';
+import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 
 export const isCompatible = async (method: string, version: string) => {
@@ -170,13 +165,10 @@ interface HomeStateTypes {
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab;
-  transactions: any[];
-  modalData: any;
   tabBarIndex: number;
   bottomSheetState: BottomSheetState;
   loading: boolean;
   secondaryDeviceOtp: any;
-  selectedTransactionItem: any;
   deepLinkModalOpen: boolean;
   currencyCode: string;
   errorMessageHeader: string;
@@ -186,7 +178,6 @@ interface HomeStateTypes {
   notificationDataChange: boolean;
   appState: string;
   fbBTCAccount: any;
-  transactionsLoading: boolean;
   trustedContactRequest: any;
   recoveryRequest: any;
   custodyRequest: any;
@@ -250,13 +241,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   NoInternetBottomSheet: any;
   unsubscribe: any;
 
-  transactionTabBarBottomSheetRef = createRef<RNBottomSheet>();
   qrTabBarBottomSheetRef = createRef<RNBottomSheet>();
   addTabBarBottomSheetRef = createRef<RNBottomSheet>();
 
   // TODO: Completely replace `BottomSheet` with `RNBottomSheet` a la the refs above (https://trello.com/c/boUNRk6t)
   trustedContactRequestBottomSheetRef = createRef<BottomSheet>();
-  transactionDetailsBottomSheetRef = createRef<BottomSheet>();
   custodianRequestBottomSheetRef = createRef<BottomSheet>();
   errorBottomSheetRef = createRef<BottomSheet>();
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
@@ -281,13 +270,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: BottomTab.Transactions,
-      transactions: [],
-      modalData: initialTransactionData,
       tabBarIndex: 999,
       bottomSheetState: BottomSheetState.Closed,
       loading: false,
       secondaryDeviceOtp: {},
-      selectedTransactionItem: null,
       deepLinkModalOpen: false,
       currencyCode: 'USD',
       errorMessageHeader: '',
@@ -297,7 +283,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: false,
       appState: '',
       fbBTCAccount: {},
-      transactionsLoading: true,
       trustedContactRequest: null,
       recoveryRequest: null,
       custodyRequest: null,
@@ -577,7 +562,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               setTimeout(() => {
                 this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
-                this.transactionTabBarBottomSheetRef.current?.close();
               }, 2);
             },
           );
@@ -808,11 +792,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.setUpFocusListener();
     this.getNewTransactionNotifications();
     Linking.addEventListener('url', this.handleDeepLink);
-    setTimeout(() => {
-      this.setState({
-        transactionsLoading: false,
-      });
-    }, 1000);
 
     this.unsubscribe = NetInfo.addEventListener((state) => {
       setTimeout(() => {
@@ -1506,11 +1485,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    let regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
-      : [];
-
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
@@ -1533,21 +1507,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               derivativeAccount[accountNumber].balances.balance +
               derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
-
-          if (derivativeAccount[accountNumber].transactions) {
-            derivativeAccount[
-              accountNumber
-            ].transactions.transactionDetails.forEach((tx) => {
-              let include = true;
-              for (const currentTx of regularTransactions) {
-                if (tx.txid === currentTx.txid) {
-                  include = false;
-                  break;
-                }
-              }
-              if (include) regularTransactions.push(tx);
-            });
-          }
         }
       }
     }
@@ -1558,11 +1517,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         .unconfirmedBalance
       : 0;
 
-    const secureTransactions = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
-      : [];
-
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -1570,45 +1524,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
         dAccountType
-        ];
+      ];
+
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
           if (derivativeAccount[accountNumber].balances) {
             secureBalance +=
               derivativeAccount[accountNumber].balances.balance +
               derivativeAccount[accountNumber].balances.unconfirmedBalance;
-          }
-
-          if (derivativeAccount[accountNumber].transactions) {
-            derivativeAccount[
-              accountNumber
-            ].transactions.transactionDetails.forEach((tx) => {
-              let include = true;
-              for (const currentTx of secureTransactions) {
-                if (tx.txid === currentTx.txid) {
-                  include = false;
-                  break;
-                }
-              }
-              if (include) secureTransactions.push(tx);
-            });
           }
         }
       }
     }
 
     // donation transactions
-    const additionalTxs = [];
     let additionalBalances = 0;
+
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
         accounts[serviceType].service[
@@ -1625,32 +1560,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           const account = derivativeAccounts[additionAcc][index];
 
-          if (account.balances)
+          if (account.balances) {
             additionalBalances +=
               account.balances.balance + account.balances.unconfirmedBalance;
-          if (
-            account.transactions &&
-            account.transactions.transactionDetails.length
-          )
-            additionalTxs.push(...account.transactions.transactionDetails);
+          }
         }
       }
     }
 
     const accumulativeBalance =
       regularBalance + secureBalance + additionalBalances;
-
-    const accumulativeTransactions = [
-      ...testTransactions,
-      ...regularTransactions,
-      ...secureTransactions,
-      ...additionalTxs,
-    ];
-    if (accumulativeTransactions.length) {
-      accumulativeTransactions.sort(function (left, right) {
-        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
-      });
-    }
 
     this.setState({
       balances: {
@@ -1659,7 +1578,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         secureBalance,
         accumulativeBalance,
       },
-      transactions: accumulativeTransactions,
       isBalanceLoading: false,
     });
   };
@@ -1724,38 +1642,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     }, 2);
     this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
-    // this.processDLReques t(key, true);
   };
 
   onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
-    if (tab === BottomTab.More) {
-      this.props.navigation.navigate('MoreOptions');
-    }
     if (tab === BottomTab.Transactions) {
+      this.props.navigation.navigate('AllTransactions');
+    } else if (tab === BottomTab.More) {
+      this.props.navigation.navigate('MoreOptions');
+    } else if (tab === BottomTab.Add) {
       this.setState(
         {
-          modalData: initialTransactionData,
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
         },
         () => {
-          this.transactionTabBarBottomSheetRef.current?.expand();
-          this.addTabBarBottomSheetRef.current?.close();
-          this.qrTabBarBottomSheetRef.current?.close();
-        },
-      );
-    }
-    if (tab === BottomTab.Add) {
-      this.setState(
-        {
-          modalData: [],
-          selectedBottomTab: tab,
-          bottomSheetState: BottomSheetState.Open,
-        },
-        () => {
-          this.transactionTabBarBottomSheetRef.current?.close();
           this.addTabBarBottomSheetRef.current?.expand();
           this.qrTabBarBottomSheetRef.current?.close();
         },
@@ -1763,12 +1665,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (tab === BottomTab.QR) {
       this.setState(
         {
-          modalData: initialTransactionData,
           selectedBottomTab: tab,
           bottomSheetState: BottomSheetState.Open,
         },
         () => {
-          this.transactionTabBarBottomSheetRef.current?.close();
           this.addTabBarBottomSheetRef.current?.close();
           this.qrTabBarBottomSheetRef.current?.expand();
         },
@@ -1962,8 +1862,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     bottomSheetRef: React.RefObject<RNBottomSheet>,
     newIndex: number,
   ) => {
-    console.log("Handle bottom sheet position change");
-
     if (bottomSheetRef === this.getActiveBottomSheetRef()) {
       const newState = newIndex >= 1 ? BottomSheetState.Open : BottomSheetState.Closed;
       this.setState({ bottomSheetState: newState });
@@ -1972,35 +1870,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   closeBottomSheet = () => {
     this.setState({ bottomSheetState: BottomSheetState.Closed }, () => {
-      this.getActiveBottomSheetRef().current?.close();
+      this.getActiveBottomSheetRef()?.current?.close();
     });
   };
 
-  getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> => {
+  getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> | null => {
     switch (this.state.selectedBottomTab) {
-      case BottomTab.Transactions:
-        return this.transactionTabBarBottomSheetRef;
       case BottomTab.Add:
         return this.addTabBarBottomSheetRef;
       case BottomTab.QR:
         return this.qrTabBarBottomSheetRef;
       default:
-        return this.transactionTabBarBottomSheetRef;
+        return null;
     }
   };
 
-  expandModalOnHeaderTap = () => {
-    this.setState({ bottomSheetState: BottomSheetState.Open }, () => {
-      this.getActiveBottomSheetRef().current?.expand();
-    });
-  };
-
   handleBottomSheetHeaderTap = () => {
-    const { bottomSheetState } = this.state;
-
-    if (bottomSheetState === BottomSheetState.Closed) {
-      this.expandModalOnHeaderTap();
-    } else {
+    if (this.state.bottomSheetState === BottomSheetState.Open) {
       this.closeBottomSheet();
     }
   };
@@ -2073,7 +1959,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       setTimeout(() => {
         this.notificationsListBottomSheetRef.current?.snapTo(0);
       }, 2);
-      this.handleBottomTabSelection(BottomTab.Transactions);
     }
   };
 
@@ -2185,11 +2070,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       cardData,
       switchOn,
       CurrencyCode,
-      transactions,
       balances,
       selectedBottomTab,
-      modalData,
-      selectedTransactionItem,
       tabBarIndex,
       deepLinkModalOpen,
       errorMessageHeader,
@@ -2199,7 +2081,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationData,
       fbBTCAccount,
       loading,
-      transactionsLoading,
       currencyCode,
       trustedContactRequest,
       recoveryRequest,
@@ -2296,52 +2177,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         {isLoading ? <Loader /> : null}
 
-
         {/* ---- Bottom Sheets ---- */}
-
-        {!isLoading && (
-          <RNBottomSheet
-            ref={this.transactionTabBarBottomSheetRef}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('82%')
-                : hp('82%'),
-            ]}
-            handleComponent={BottomSheetHandle}
-            onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(
-                this.transactionTabBarBottomSheetRef,
-                newPositionIndex,
-              );
-            }}
-          >
-            <BottomSheetView>
-              <BottomSheetHeader
-                title="Transactions"
-                onPress={this.handleBottomSheetHeaderTap}
-              />
-
-              <TransactionsContent
-                isFromAccount={false}
-                transactionLoading={transactionsLoading}
-                transactions={transactions}
-                setTransactionItem={(item) =>
-                  this.setState({ selectedTransactionItem: item })
-                }
-                setTabBarZIndex={(index) =>
-                  this.setState({ tabBarIndex: index })
-                }
-                transactionDetailsBottomSheetRef={
-                  this.transactionDetailsBottomSheetRef
-                }
-              />
-            </BottomSheetView>
-          </RNBottomSheet>
-        )}
 
         {!isLoading && (
           <RNBottomSheet
@@ -2382,7 +2218,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     );
                   }
                 }}
-                addData={modalData}
               />
             </BottomSheetView>
           </RNBottomSheet>
@@ -2655,51 +2490,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       );
                     },
                   );
-                }}
-              />
-            )}
-          />
-        )}
-
-        {!isLoading && (
-          <BottomSheet
-            enabledInnerScrolling={true}
-            onCloseEnd={() => {
-              this.setState({
-                tabBarIndex: 999,
-              });
-            }}
-            onCloseStart={() => {
-              this.setState({
-                tabBarIndex: 999,
-              });
-            }}
-            onOpenEnd={() => {
-              this.setState({
-                tabBarIndex: 0,
-              });
-            }}
-            ref={this.transactionDetailsBottomSheetRef}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('82%')
-                : hp('82%'),
-            ]}
-            renderContent={() => (
-              <TransactionDetails
-                item={selectedTransactionItem}
-                onPressKnowMore={() => {
-                  this.transactionDetailsBottomSheetRef.current?.snapTo(1);
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  this.transactionDetailsBottomSheetRef.current?.snapTo(0);
                 }}
               />
             )}

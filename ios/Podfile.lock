@@ -101,7 +101,7 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (5.8.0):
     - GoogleUtilities/Logger
-  - jail-monkey (2.3.3):
+  - jail-monkey (2.3.2):
     - React
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
@@ -127,7 +127,7 @@ PODS:
     - React
   - react-native-contacts (5.0.6):
     - React
-  - react-native-in-app-utils (6.1.0):
+  - react-native-in-app-utils (6.0.2):
     - React
   - react-native-mail (4.1.0):
     - React
@@ -210,7 +210,7 @@ PODS:
     - React/Core
   - RNOS (1.2.6):
     - React
-  - RNReanimated (1.13.1):
+  - RNReanimated (1.13.0):
     - React
   - RNScreens (1.0.0-alpha.23):
     - React
@@ -495,7 +495,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
   GoogleIDFASupport: aaf8c10bd429abb1c15349d5252244f5eda8ead1
   GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
-  jail-monkey: 80c9e34da2cd54023e5ad08bf7051ec75bd43d5b
+  jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
@@ -504,7 +504,7 @@ SPEC CHECKSUMS:
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
   react-native-config: 9a061347e0136fdb32d43a34d60999297d672361
   react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
-  react-native-in-app-utils: 96cdefc90ad74a79a95d19239a183995a6face0b
+  react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: 60fdd787790926ac643d4988a7b3a772bdb9396b
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
@@ -517,7 +517,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: dedac618d8868828fd81ad5dda7598a1c4658a80
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
-  RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
+  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
