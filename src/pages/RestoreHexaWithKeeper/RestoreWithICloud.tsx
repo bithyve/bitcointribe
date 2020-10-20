@@ -54,7 +54,8 @@ import LoaderModal from '../../components/LoaderModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import {
   checkMSharesHealth,
-  recoverWalletUsingIcloud
+  recoverWalletUsingIcloud,
+  downloadShares
 } from '../../store/actions/health';
 import axios from 'axios';
 import {
@@ -91,6 +92,8 @@ interface RestoreWithICloudPropsTypes {
   calculateExchangeRate: any;
   startupSync: any;
   initializeHealthSetup: any;
+  downloadShares: any;
+  metaShare: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -203,7 +206,37 @@ class RestoreWithICloud extends Component<
         });
       }
     }
+
+    if (prevProps.metaShare !== this.props.metaShare) {
+      this.updateList();
+    }
   };
+
+  updateList = () => {
+    const { listData } = this.state;
+    const { metaShare } = this.props;
+    let updatedListData = [];
+    console.log("metaShare listData", metaShare, listData);
+    if(metaShare){
+      for(let i =0 ; i < listData.length; i++){
+        if(listData[i].shareId === metaShare.shareId){
+          listData[i].status = "received";
+        }
+        updatedListData.push(listData[i]);
+         }
+        this.setState({listData: updatedListData});
+        }
+    this.checkRecovery();    
+  }
+
+  checkRecovery = () => {
+    const { listData, selectedBackup } = this.state;
+    for(let i =0 ; i < listData.length; i++){
+      if(listData[i].status === "received" && selectedBackup.level === 2 && selectedBackup.shares){
+        
+      }
+    }
+  }
 
   getData = (result) => {
     console.log('FILE DATA', result);
@@ -231,6 +264,7 @@ class RestoreWithICloud extends Component<
   restoreWallet = () => {
     let listDataArray = [];
     const { selectedBackup } = this.state;
+    console.log("selectedBackup",selectedBackup);
     const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
@@ -241,12 +275,13 @@ class RestoreWithICloud extends Component<
      let obj;
      for(let i =0 ; i < KeeperData.length; i++){
       obj = {
-        type: 'device',//selectedBackup.type,
+        type: 'device',//KeeperData[i].type,
         title: KeeperData[i].name,
         info: '',
         time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
         status: 'waiting',
         image: null,
+        shareId: KeeperData[i].shareId
       }
       listDataArray.push(obj);
      }
@@ -262,8 +297,10 @@ class RestoreWithICloud extends Component<
   //   
   };
 
-  handleScannedData = (scannedData) =>{
-console.log("scannedData", scannedData);
+  handleScannedData = async (scannedData) =>{
+    
+  console.log("scannedData", scannedData);
+  this.props.downloadShares(scannedData.uuid);
   }
 
   render() {
@@ -731,6 +768,8 @@ const mapStateToProps = (state) => {
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     walletImageChecked: idx(state, (_) => _.sss.walletImageChecked),
     SERVICES: idx(state, (_) => _.storage.database.SERVICES),
+    metaShare: idx(state, (_) => _.health.metaShare),
+
   };
 };
 
@@ -743,6 +782,7 @@ export default withNavigationFocus(
     checkMSharesHealth,
     startupSync,
     initializeHealthSetup,
+    downloadShares
   })(RestoreWithICloud),
 );
 

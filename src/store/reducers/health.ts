@@ -1,3 +1,4 @@
+import { MetaShare } from '../../bitcoin/utilities/Interface';
 import {
   HEALTH_CHECK_INITIALIZED,
   HEALTH_CHECK_INITIALIZE,
@@ -12,7 +13,8 @@ import {
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
   KEEPER_INFO,
-  IS_LEVEL2_INITIALIZED
+  IS_LEVEL2_INITIALIZED,
+  SHARE_RECEIVED
 } from '../actions/health';
 
 const initialState: {
@@ -50,6 +52,7 @@ const initialState: {
     data?: any;
   }[];
   shares: any;
+  metaShare: MetaShare;
 } = {
   loading: {
     levelHealthCheck: false,
@@ -66,7 +69,8 @@ const initialState: {
   levelHealth: [],
   errorSending: false,
   shares: null,
-  keeperInfo: []
+  keeperInfo: [],
+  metaShare: null,
 };
 
 export default (state = initialState, action) => {
@@ -173,6 +177,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLevel2Initialized: true,
+      };
+
+      case SHARE_RECEIVED:
+      return {
+        ...state,
+        metaShare: action.payload.metaShare,
       };
       
       

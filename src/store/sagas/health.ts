@@ -17,6 +17,8 @@ import {
   walletRecoveryFailed,
   RECOVER_WALLET_USING_ICLOUD,
   walletImageChecked,
+  shareReceived,
+  DOWNLOAD_SHARES,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -449,4 +451,28 @@ function* recoverWalletFromIcloudWorker({ payload }) {
 export const recoverWalletFromIcloudWatcher = createWatcher(
   recoverWalletFromIcloudWorker,
   RECOVER_WALLET_USING_ICLOUD,
+);
+
+function* downloadShareWorker({ payload }) {
+  console.log("downloadShareWorker", payload)
+  const { encryptedKey } = payload;
+
+  if(!encryptedKey) return;
+  const res = yield call(
+    S3Service.downloadShare,
+    encryptedKey
+  );
+
+  if (res.status === 200) {
+    console.log("SHARES DOWNLOAD",res.data);
+    // TODO: recreate accounts and write to database
+    yield put(shareReceived(res.data)); // storing in redux state (for demo)
+  } else {
+    console.log({ err: res.err });
+  }
+}
+
+export const downloadShareWatcher = createWatcher(
+  downloadShareWorker,
+  DOWNLOAD_SHARES,
 );

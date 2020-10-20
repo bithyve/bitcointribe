@@ -121,7 +121,8 @@ import {
   generateMetaSharesWatcher,
   createAndUploadOnEFChannelWatcher,
   updateHealthLevel2Watcher,
-  recoverWalletFromIcloudWatcher
+  recoverWalletFromIcloudWatcher,
+  downloadShareWatcher
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -237,6 +238,7 @@ const rootSaga = function* () {
     createAndUploadOnEFChannelWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
+    downloadShareWatcher
   ];
 
   yield all(

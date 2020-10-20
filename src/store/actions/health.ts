@@ -28,6 +28,8 @@ export const KEEPER_INFO = 'KEEPER_INFO';
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
 export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
+export const DOWNLOAD_SHARES = "DOWNLOAD_SHARED";
+export const SHARE_RECEIVED = "SHARE_RECEIVED";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -103,6 +105,14 @@ export const generateMetaShare = (level) => {
 
 export const sharesGenerated = (shares) => {
   return { type: MSHARES, payload: { shares } };
+};
+
+export const downloadShares = (encryptedKey) => {
+  return { type: DOWNLOAD_SHARES, payload: { encryptedKey } };
+};
+
+export const shareReceived = (metaShare) => {
+  return { type: SHARE_RECEIVED, payload: { metaShare } };
 };
 
 export const createAndUploadOnEFChannel = (

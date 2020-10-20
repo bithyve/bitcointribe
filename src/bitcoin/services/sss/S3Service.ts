@@ -76,7 +76,7 @@ export default class S3Service {
 
   public static downloadShare = async (
     encryptedKey: string,
-    otp: string,
+    otp?: string,
   ): Promise<
     | {
         status: number;
