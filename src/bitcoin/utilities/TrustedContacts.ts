@@ -192,6 +192,7 @@ export default class TrustedContacts {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
+    isGuardian?: boolean,
   ): {
     channelAddress: string;
     ephemeralAddress: string;
@@ -238,7 +239,7 @@ export default class TrustedContacts {
       },
       contactsPubKey: encodedPublicKey,
       contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
-      isWard: contactsWalletName ? true : false,
+      isWard: isGuardian ? true : false,
     };
     return {
       channelAddress,
@@ -575,6 +576,11 @@ export default class TrustedContacts {
     const decryptedTrustedData: TrustedData = {
       publicKey: encryptedData.publicKey,
       data,
+      encDataHash: crypto
+        .createHash('sha256')
+        .update(encryptedData.encryptedData)
+        .digest('hex'),
+      lastSeen: encryptedData.lastSeen,
     };
     const { overallTrustedData } = this.updateTrustedChannelData(
       contactName,
@@ -634,6 +640,11 @@ export default class TrustedContacts {
       const encryptedDataPacket: EncryptedTrustedData = {
         publicKey,
         encryptedData,
+        dataHash: crypto
+          .createHash('sha256')
+          .update(encryptedData)
+          .digest('hex'),
+        lastSeen: Date.now(),
       };
 
       let res: AxiosResponse;
@@ -666,6 +677,13 @@ export default class TrustedContacts {
 
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        const { walletName } = data.data ? data.data : { walletName: null };
+        if (walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: walletName,
+          };
+        }
         return { updated, data };
       }
       return { updated };
@@ -711,6 +729,12 @@ export default class TrustedContacts {
       if (data) {
         data = this.processTrustedChannelData(contactName, data, symmetricKey)
           .data;
+        if (data.walletName) {
+          this.trustedContacts[contactName] = {
+            ...this.trustedContacts[contactName],
+            contactsWalletName: data.walletName,
+          };
+        }
       }
 
       if (contactsWalletName) {
@@ -728,6 +752,114 @@ export default class TrustedContacts {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
       throw new Error(err.message);
+    }
+  };
+
+  public syncLastSeens = async (): Promise<{
+    updated: Boolean;
+  }> => {
+    const channelsToUpdate = {};
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate[trustedChannel.address] = { publicKey };
+      }
+    }
+
+    if (Object.keys(channelsToUpdate).length) {
+      const res = await BH_AXIOS.post('syncLastSeens', {
+        HEXA_ID,
+        channelsToUpdate,
+      });
+
+      const { updated, updatedLastSeens } = res.data;
+      console.log({ updatedLastSeens });
+      if (Object.keys(updatedLastSeens).length) {
+        for (const contact of Object.values(this.trustedContacts)) {
+          const { trustedChannel } = contact;
+          if (trustedChannel) {
+            const { publicKey, lastSeen } = updatedLastSeens[
+              trustedChannel.address
+            ]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.lastSeen = lastSeen;
+              }
+            });
+          }
+        }
+      }
+
+      return { updated };
+    } else {
+      throw new Error('No trusted channels to update');
+    }
+  };
+
+  public syncTrustedChannels = async (
+    contacts?: Contacts,
+  ): Promise<{
+    synched: Boolean;
+  }> => {
+    const channelsToSync = {};
+    for (const contact of Object.values(
+      contacts ? contacts : this.trustedContacts,
+    )) {
+      const { trustedChannel, publicKey } = contact;
+      if (
+        trustedChannel &&
+        trustedChannel.data &&
+        trustedChannel.data.length === 2 // ensures channel-setup completion
+      ) {
+        let pub, dataHash;
+        trustedChannel.data.forEach((subChan: TrustedData) => {
+          if (subChan.publicKey !== publicKey) {
+            // counter party's data
+            pub = subChan.publicKey;
+            dataHash = subChan.encDataHash;
+          }
+          channelsToSync[trustedChannel.address] = { publicKey: pub, dataHash };
+        });
+      }
+    }
+    console.log({ channelsToSync });
+    if (Object.keys(channelsToSync).length) {
+      const res = await BH_AXIOS.post('syncTrustedChannels', {
+        HEXA_ID,
+        channelsToSync,
+      });
+
+      const { synched, synchedChannels } = res.data;
+      console.log({ synched, synchedChannels });
+      if (Object.keys(synchedChannels).length) {
+        for (const contact of Object.values(
+          contacts ? contacts : this.trustedContacts,
+        )) {
+          const { trustedChannel, symmetricKey } = contact;
+          if (trustedChannel) {
+            const {
+              publicKey,
+              encryptedData,
+              dataHash,
+              lastSeen,
+            } = synchedChannels[trustedChannel.address]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.data = this.decryptData(
+                  symmetricKey,
+                  encryptedData,
+                ).data;
+                subChan.encDataHash = dataHash;
+                subChan.lastSeen = lastSeen;
+              }
+            });
+          }
+        }
+      }
+
+      return { synched };
+    } else {
+      throw new Error('No trusted channels to update');
     }
   };
 }

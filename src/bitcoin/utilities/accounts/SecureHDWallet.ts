@@ -77,11 +77,11 @@ export default class SecureHDWallet extends Bitcoin {
     iv: Buffer;
     keyLength: number;
   } = {
-      algorithm: 'aes-192-cbc',
-      salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
-      keyLength: 24,
-      iv: Buffer.alloc(16, 0),
-    };
+    algorithm: 'aes-192-cbc',
+    salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+    keyLength: 24,
+    iv: Buffer.alloc(16, 0),
+  };
 
   constructor(
     primaryMnemonic: string,
@@ -612,7 +612,7 @@ export default class SecureHDWallet extends Bitcoin {
       internalAddresses,
       usedAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
-      1,
+        1,
       this.derivativeAccounts[accountType][accountNumber]
         .nextFreeChangeAddressIndex - 1,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
@@ -1540,15 +1540,15 @@ export default class SecureHDWallet extends Bitcoin {
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
-      fee: number;
-      balance: number;
-      txPrerequisites?: undefined;
-    }
+        fee: number;
+        balance: number;
+        txPrerequisites?: undefined;
+      }
     | {
-      txPrerequisites: TransactionPrerequisite;
-      fee?: undefined;
-      balance?: undefined;
-    }
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
+      }
   > => {
     let inputUTXOs;
     if (derivativeAccountDetails) {
@@ -2013,7 +2013,7 @@ export default class SecureHDWallet extends Bitcoin {
               let itr = 0;
               itr <=
               derivativeInstance.nextFreeChangeAddressIndex +
-              this.derivativeGapLimit;
+                this.derivativeGapLimit;
               itr++
             ) {
               const multiSig = this.createSecureMultiSig(
@@ -2194,8 +2194,9 @@ export default class SecureHDWallet extends Bitcoin {
     } else {
       const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${config.DPATH_PURPOSE}'/${this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+      const path = `m/${config.DPATH_PURPOSE}'/${
+        this.network === bitcoinJS.networks.bitcoin ? 0 : 1
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();

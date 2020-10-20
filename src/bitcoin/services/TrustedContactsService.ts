@@ -83,6 +83,7 @@ export default class TrustedContactsService {
     encodedPublicKey: string,
     encKey: string,
     contactsWalletName?: string,
+    isGuardian?: boolean,
   ):
     | {
         status: number;
@@ -108,6 +109,7 @@ export default class TrustedContactsService {
           encodedPublicKey,
           encKey,
           contactsWalletName,
+          isGuardian,
         ),
       };
     } catch (err) {
@@ -287,6 +289,68 @@ export default class TrustedContactsService {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
+      };
+    }
+  };
+
+  public syncLastSeens = async (): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.syncLastSeens(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to sync last seens',
+      };
+    }
+  };
+
+  public syncTrustedChannels = async (
+    contacts?,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          synched: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.syncTrustedChannels(contacts),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to sync trusted channels',
       };
     }
   };

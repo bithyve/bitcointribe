@@ -98,6 +98,13 @@ export interface DerivativeAccountElements {
   nextFreeAddressIndex?: number;
   nextFreeChangeAddressIndex?: number;
   receivingAddress?: string;
+  confirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
@@ -164,9 +171,9 @@ export interface DonationDerivativeAccount {
 }
 export interface DerivativeAccounts {
   [accountType: string]:
-  | DerivativeAccount
-  | TrustedContactDerivativeAccount
-  | DonationDerivativeAccount;
+    | DerivativeAccount
+    | TrustedContactDerivativeAccount
+    | DonationDerivativeAccount;
 }
 
 export enum notificationType {
@@ -240,6 +247,7 @@ export interface TrustedDataElements {
   tpub?: string;
   walletID?: string;
   FCM?: string;
+  walletName?: string;
   shareTransferDetails?: {
     otp: string;
     encryptedKey: string;
@@ -248,11 +256,15 @@ export interface TrustedDataElements {
 export interface TrustedData {
   publicKey: string;
   data: TrustedDataElements;
+  lastSeen?: number;
+  encDataHash?: string;
 }
 
 export interface EncryptedTrustedData {
   publicKey: string;
   encryptedData: string; // encrypted TrustedData
+  lastSeen?: number;
+  dataHash?: string; // hash of the encrypted TrustedData (TrustedData's encDataHash = dataHash)
 }
 
 export interface Contacts {

@@ -175,7 +175,7 @@ class HexaConfig {
     },
   };
 
-  TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
+  public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10),
     instance: {
@@ -184,7 +184,7 @@ class HexaConfig {
     },
   };
 
-  DONATION_ACCOUNT: DonationDerivativeAccount = {
+  public DONATION_ACCOUNT: DonationDerivativeAccount = {
     series: parseInt(Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10),
     instance: {
       max: parseInt(Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10),
