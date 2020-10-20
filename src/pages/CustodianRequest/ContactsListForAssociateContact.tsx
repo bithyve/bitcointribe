@@ -50,9 +50,11 @@ const ContactsListForAssociateContact = (props) => {
       .toLowerCase()
       .trim();
     setApprovingContact(selectedContactName);
-    if (trustedContactsInfo) {
+
+    let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+    if (tcInfo) {
       if (
-        trustedContactsInfo.findIndex((trustedContact) => {
+        tcInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
 
           const presentContactName = `${trustedContact.firstName} ${
@@ -64,7 +66,7 @@ const ContactsListForAssociateContact = (props) => {
           return presentContactName == selectedContactName;
         }) == -1
       ) {
-        trustedContactsInfo.push(associatedContact);
+        tcInfo.push(associatedContact);
         console.log({ con: associatedContact });
         postAssociation(associatedContact);
       } else {
@@ -72,16 +74,13 @@ const ContactsListForAssociateContact = (props) => {
         return;
       }
     } else {
-      trustedContactsInfo = [];
-      trustedContactsInfo[3] = associatedContact;
+      tcInfo = [];
+      tcInfo[3] = associatedContact;
 
       postAssociation(associatedContact);
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+    await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
+    dispatch(updateTrustedContactInfoLocally(tcInfo));
   };
 
   const { approvedTrustedContacts } = useSelector(

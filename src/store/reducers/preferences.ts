@@ -16,7 +16,7 @@ import {
   CARD_DATA
 
 } from '../actions/preferences';
-import { UPDATE_APP_PREFERENCE } from "../constants";
+import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 
 const initialState = ip.freeze({
@@ -43,7 +43,7 @@ const initialState = ip.freeze({
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case UPDATE_APP_PREFERENCE:
-      return chain(state).setIn([payload.key], payload.value).value()
+      return chain(state).setIn([payload.key], payload.value).value();
     case CURRENCY_CODE:
       return {
         ...state,
@@ -95,7 +95,6 @@ export default (state = initialState, { type, payload }) => {
         savingWarning: payload.savingWarning,
       };
 
-
     case INIT_ASYNC_MIGRATION_SUCCESS:
       return {
         ...state,
@@ -124,6 +123,6 @@ export default (state = initialState, { type, payload }) => {
       };
 
     default:
-      return state
+      return state;
   }
-}
+};
