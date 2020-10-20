@@ -689,7 +689,7 @@ class ManageBackup extends Component<
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.status == 'good' || value.status == 'bad'
+                                {value.status == 'good' || value.status == 'bad' && value.keeper1.name
                                   ? value.keeper1.name
                                   : value.id == 2
                                   ? 'Add Primary Keeper'
@@ -756,7 +756,7 @@ class ManageBackup extends Component<
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {(value.status == 'bad' || value.status == 'good') && value.keeper2.keeper2Done
+                                {(value.status == 'bad' || value.status == 'good') && value.keeper2.name
                                   ? value.keeper2.name
                                   : 'Add Keeper'}
                               </Text>
