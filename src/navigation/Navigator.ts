@@ -95,7 +95,7 @@ import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/Manage
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
-import { MoreOptionsStack } from './stacks/MoreOptions';
+import MoreOptionsStack from './stacks/more-options/MoreOptionsStack';
 
 const SetupNavigator = createStackNavigator(
   {

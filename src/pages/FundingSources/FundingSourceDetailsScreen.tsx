@@ -7,7 +7,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import CommonStyles from '../../common/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -21,6 +21,7 @@ import {
 import moment from 'moment';
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
 
+
 export default function FundingSourceDetails(props) {
   const FBTCAccount = props.navigation.state.params.getBittrAccount
     ? props.navigation.state.params.getBittrAccount
@@ -31,7 +32,7 @@ export default function FundingSourceDetails(props) {
       <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
 
       <View style={styles.modalContainer}>
-        <View style={CommonStyles.modalNavHeaderContainer}>
+        <View style={NavStyles.modalNavHeaderContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <SmallNavHeaderBackButton
               containerStyle={{ marginRight: 16 }}
@@ -39,10 +40,10 @@ export default function FundingSourceDetails(props) {
             />
 
             <View style={{ flex: 1 }}>
-              <Text style={CommonStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 Funding Sources Detail
               </Text>
-              <Text style={CommonStyles.modalHeaderSubheadingText}>
+              <Text style={NavStyles.modalHeaderSubheadingText}>
                 Funding sources full details
               </Text>
             </View>

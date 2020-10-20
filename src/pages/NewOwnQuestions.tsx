@@ -19,7 +19,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../common/Fonts';
 import Colors from '../common/Colors';
 import QuestionList from '../common/QuestionList';
-import CommonStyles from '../common/Styles';
+import CommonStyles from '../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -332,39 +332,40 @@ export default function NewOwnQuestions(props) {
                   }}
                 />
               </View>
-              {question ? (
-                <View style={{ marginTop: 15 }}>
-                  <View
-                    style={{
-                      ...answerInputStyle,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingRight: 15,
-                      borderColor: ansError ? Colors.red : Colors.borderColor,
-                    }}
-                  >
-                    <TextInput
-                      style={styles.modalInputBox}
-                      placeholder={'Enter your answer'}
-                      placeholderTextColor={Colors.borderColor}
-                      value={hideShowAnswer ? answerMasked : answer}
-                      autoCompleteType="off"
-                      textContentType="none"
-                      returnKeyType="next"
-                      autoCorrect={false}
-                      editable={isEditable}
-                      autoCapitalize="none"
-                      onSubmitEditing={() =>
-                        (confirmAnswerTextInput as any).current.focus()
-                      }
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
-                      }
-                      onChangeText={(text) => {
-                        setAnswer(text);
-                        setAnswerMasked(text);
+              {question ?
+              (<View style={{ marginTop: 15 }}>
+                <View
+                  style={{
+                    ...answerInputStyle,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingRight: 15,
+                    borderColor: ansError ? Colors.red : Colors.borderColor,
+                  }}
+                >
+                  <TextInput
+                    style={styles.modalInputBox}
+                    placeholder={'Enter your answer'}
+                    placeholderTextColor={Colors.borderColor}
+                    value={hideShowAnswer ? answerMasked : answer}
+                    autoCompleteType="off"
+                    textContentType="none"
+                    returnKeyType="next"
+                    autoCorrect={false}
+                    editable={isEditable}
+                    autoCapitalize="none"
+                    onSubmitEditing={() =>
+                      (confirmAnswerTextInput as any).current.focus()
+                    }
+                    keyboardType={
+                      Platform.OS == 'ios'
+                        ? 'ascii-capable'
+                        : 'visible-password'
+                    }
+                    onChangeText={(text) => {
+
+                      setAnswer(text);
+                      setAnswerMasked(text);
                       }}
                       onFocus={() => {
                         setAnswerInputStyle(styles.inputBoxFocused);

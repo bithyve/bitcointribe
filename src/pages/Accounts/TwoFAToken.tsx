@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import commonStyle from '../../common/Styles';
+import commonStyle from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,

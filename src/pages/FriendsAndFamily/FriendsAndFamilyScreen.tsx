@@ -43,8 +43,9 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
 import CountDown from '../../components/CountDown';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
+import NavStyles from '../../common/Styles/NavStyles';
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -603,16 +604,16 @@ class FriendsAndFamily extends PureComponent<
     const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
     return (
       <View style={CommonStyles.rootView}>
-        <SafeAreaView style={CommonStyles.statusBarStyle} />
+        <SafeAreaView style={NavStyles.statusBarStyle} />
 
         <View style={styles.modalContainer}>
-          <View style={CommonStyles.modalNavHeaderContainer}>
+          <View style={NavStyles.modalNavHeaderContainer}>
             <SmallNavHeaderCloseButton
               containerStyle={{ marginRight: 16 }}
               onPress={() => navigation.goBack()}
             />
 
-            <Text style={{ ...CommonStyles.modalHeaderTitleText, flex: 1 }}>
+            <Text style={{ ...NavStyles.modalHeaderTitleText, flex: 1 }}>
               Friends and Family
             </Text>
 
