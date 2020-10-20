@@ -25,7 +25,6 @@ import Fonts from '../../common/Fonts';
 import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import QrCodeModalContents from '../../components/QrCodeModalContents';
 import QRModal from './QRModal';
 import ResetTwoFASuccess from './ResetTwoFASuccess';
 import ServerErrorModal from './ServerErrorModal';
@@ -120,13 +119,6 @@ const ResetTwoFAHelp = (props) => {
       setQrBottomSheetsFlag(false);
     }, 2);
 
-    // setTimeout(() => {
-    //   setSuccessMessageHeader('2FA Reset Successful');
-    //   setSuccessMessage('Lorem ipsum dolor sit amet, consectetur');
-    // }, 2);
-    // (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
-
-    //props.navigation.navigate('TwoFASweepFunds');
     if (QRModalHeader === 'Reset 2FA') {
       dispatch(resetTwoFA(qrData));
     } else if (QRModalHeader === 'Sweep Funds') {
@@ -142,15 +134,11 @@ const ResetTwoFAHelp = (props) => {
         infoText={
           'This can be found on the last page of your PDF personal copy'
         }
-        // noteText={
-        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
           if (QRModalHeader == 'Sweep Funds') {
-            //  TwoFAsweepFundsBottomSheet.current.snapTo(1);
-            QrBottomSheet.current.snapTo(0);
+            QrBottomSheet.current?.snapTo(0);
           }
           getQrCodeData(qrData);
         }}
@@ -209,7 +197,6 @@ const ResetTwoFAHelp = (props) => {
       <ServerErrorModal
         modalRef={ServerNotRespondingBottomSheet}
         title={'The server is not responding?'}
-        // note={'Lorem ipsum dolor sit amet, consectetur'}
         info={
           'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Hexa using the Exit Key.'
         }
@@ -273,16 +260,9 @@ const ResetTwoFAHelp = (props) => {
               setTimeout(() => {
                 setQRModalHeader('Reset 2FA');
               }, 2);
-              if (QrBottomSheet.current)
+              if (QrBottomSheet.current) {
                 (QrBottomSheet as any).current.snapTo(1);
-
-              // props.onClickResetTwoFA();
-              // props.navigation.navigate('QrScanner', {
-              //   title: 'Scan Secondary Mnemonic',
-              //   scanedCode: (qrData) => {
-              //     dispatch(resetTwoFA(qrData));
-              //   },
-              // });
+              }
             }}
             style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}
           >
@@ -326,12 +306,6 @@ const ResetTwoFAHelp = (props) => {
           <AppBottomSheetTouchableWrapper
             onPress={() => {
               (ServerNotRespondingBottomSheet as any).current.snapTo(1);
-              // props.navigation.navigate('QrScanner', {
-              //   title: 'Scan Secondary Mnemonic',
-              //   scanedCode: (qrData) => {
-              //     dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
-              //   },
-              // });
             }}
             style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}
           >

@@ -32,7 +32,7 @@ import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCode
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
-import QrScanner from '../components/QrScanner';
+import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
 import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
@@ -96,7 +96,6 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
-    RecoveryQrScanner: QrScanner,
     NewOwnQuestions,
     NewRecoveryOwnQuestions,
     UpdateApp: {
@@ -173,7 +172,7 @@ const HomeNavigator = createStackNavigator(
     EmailModalContents,
     Buy,
     Sell,
-    QrScanner,
+    QRScanner: QRScannerScreen,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,

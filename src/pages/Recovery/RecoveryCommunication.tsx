@@ -212,8 +212,8 @@ export default function RecoveryCommunication(props) {
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
       case 'qrscanner':
-        props.navigation.navigate('RecoveryQrScanner', {
-          scanedCode: getQrCodeData,
+        props.navigation.navigate('QRScanner', {
+          onCodeScanned: getQrCodeData,
         });
         break;
     }
