@@ -52,22 +52,14 @@ import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 
-const sendNotification = (trustedContacts, contactName, walletName) => {
+const sendNotification = (recipient, notification) => {
   const receivers = [];
-  const recipient = trustedContacts.tc.trustedContacts[contactName];
   if (recipient.walletID && recipient.FCMs.length)
     receivers.push({
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,
     });
 
-  const notification: INotification = {
-    notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
-    body: `Trusted Contact request accepted by ${walletName}`,
-    data: {},
-    tag: notificationTag.IMP,
-  };
   if (receivers.length)
     RelayServices.sendNotifications(receivers, notification).then(console.log);
 };
@@ -160,16 +152,34 @@ function* removeTrustedContactWorker({ payload }) {
   const trustedContactsService: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
-  let trustedContactsInfo = yield select(
+  const trustedContactsInfo = yield select(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
   let { contactName } = payload;
   contactName = contactName.toLowerCase().trim();
+
+  const dataElements: TrustedDataElements = {
+    remove: true,
+  };
+  yield call(
+    trustedContactsService.updateTrustedChannel,
+    contactName,
+    dataElements,
+  );
+
+  const { walletID, FCMs } = trustedContactsService.tc.trustedContacts[
+    contactName
+  ];
+  const recipient = {
+    walletID,
+    FCMs,
+  };
   delete trustedContactsService.tc.trustedContacts[contactName];
 
-  if (trustedContactsInfo) {
-    for (let itr = 0; itr < trustedContactsInfo.length; itr++) {
-      const trustedContact = trustedContactsInfo[itr];
+  const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+  if (tcInfo) {
+    for (let itr = 0; itr < tcInfo.length; itr++) {
+      const trustedContact = tcInfo[itr];
       if (trustedContact) {
         const presentContactName = `${trustedContact.firstName} ${
           trustedContact.lastName ? trustedContact.lastName : ''
@@ -178,15 +188,15 @@ function* removeTrustedContactWorker({ payload }) {
           .trim();
 
         if (presentContactName === contactName) {
-          if (itr < 3) trustedContactsInfo[itr] = null;
+          if (itr < 3) tcInfo[itr] = null;
           // Guardian nullified
-          else trustedContactsInfo.splice(itr, 1);
+          else tcInfo.splice(itr, 1);
           // yield call(
           //   AsyncStorage.setItem,
           //   'TrustedContactsInfo',
-          //   JSON.stringify(trustedContactsInfo),
+          //   JSON.stringify(tcInfo),
           // );
-          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+          yield put(updateTrustedContactInfoLocally(tcInfo));
           break;
         }
       }
@@ -199,6 +209,18 @@ function* removeTrustedContactWorker({ payload }) {
     TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
   };
   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+  const { walletName } = yield select(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `Trusted Contact removed by ${walletName}`,
+    data: {},
+    tag: notificationTag.IMP,
+  };
+  sendNotification(recipient, notification);
 }
 
 export const removeTrustedContactWatcher = createWatcher(
@@ -302,11 +324,22 @@ function* updateEphemeralChannelWorker({ payload }) {
         if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactInfo.contactName);
 
-          sendNotification(
-            trustedContacts,
-            contactInfo.contactName.toLowerCase().trim(),
-            walletName,
-          );
+          const notification: INotification = {
+            notificationType: notificationType.contact,
+            title: 'Friends and Family notification',
+            body: `Trusted Contact request accepted by ${walletName}`,
+            data: {},
+            tag: notificationTag.IMP,
+          };
+
+          const { walletID, FCMs } = trustedContacts.tc.trustedContacts[
+            contactInfo.contactName.toLowerCase().trim()
+          ];
+          const recipient = {
+            walletID,
+            FCMs,
+          };
+          sendNotification(recipient, notification);
         } else
           console.log(
             'Xpub updation to TC failed for: ',
@@ -796,7 +829,46 @@ function* syncTrustedChannelsWorker({ payload }) {
 
     const res = yield call(trustedContacts.syncTrustedChannels, contacts);
     console.log({ res });
+
     if (res.status === 200 && res.data && res.data.synched) {
+      const { contactsToRemove } = res.data;
+      if (contactsToRemove.length) {
+        // remove trusted contacts
+        const trustedContactsInfo = yield select(
+          (state) => state.trustedContacts.trustedContactsInfo,
+        );
+        const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+
+        for (const contactName of contactsToRemove) {
+          delete trustedContacts.tc.trustedContacts[contactName];
+          if (tcInfo) {
+            for (let itr = 0; itr < tcInfo.length; itr++) {
+              const trustedContact = tcInfo[itr];
+              if (trustedContact) {
+                const presentContactName = `${trustedContact.firstName} ${
+                  trustedContact.lastName ? trustedContact.lastName : ''
+                }`
+                  .toLowerCase()
+                  .trim();
+
+                if (presentContactName === contactName) {
+                  if (itr < 3) tcInfo[itr] = null;
+                  // Guardian nullified
+                  else tcInfo.splice(itr, 1);
+                  // yield call(
+                  //   AsyncStorage.setItem,
+                  //   'TrustedContactsInfo',
+                  //   JSON.stringify(tcInfo),
+                  // );
+                  break;
+                }
+              }
+            }
+          }
+        }
+        yield put(updateTrustedContactInfoLocally(tcInfo));
+      }
+
       const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
 
       if (preSyncTC !== postSyncTC) {
