@@ -27,16 +27,6 @@ import {
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
 import idx from 'idx';
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
-import moment from 'moment';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ModalHeader from '../../components/ModalHeader';
-import RestoreFromICloud from './RestoreFromICloud';
-import DeviceInfo from 'react-native-device-info';
-import RestoreSuccess from './RestoreSuccess';
-import ICloudBackupNotFound from './ICloudBackupNotFound';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { requestTimedout } from '../../store/utils/utilities';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
@@ -60,9 +50,11 @@ class ScanRecoveryKey extends Component<
   }
 
   barcodeRecognized = async (barcodes) => {
-    if (barcodes.data) {
-      this.setState({ isScanned: false });
-    }
+    this.props.navigation.state.params.scannedData(barcodes);
+    this.props.navigation.goBack();
+    // if (barcodes.data) {
+    //   this.setState({ isScanned: false });
+    // }
   };
 
   componentDidMount = () => {};
@@ -207,7 +199,13 @@ class ScanRecoveryKey extends Component<
           ) : (
             <TouchableOpacity
               style={{ alignSelf: 'center' }}
-              onPress={() => this.setState({ isScanned: true })}
+              onPress={() => {
+                this.barcodeRecognized({
+                  uuid: "a55d0e028365822430d43544",
+                  publicKey: "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e",
+                  walletName: "Shivani"
+              });
+                this.setState({ isScanned: true })}}
             >
               <ImageBackground
                 source={require('../../assets/images/icons/iPhone-QR.png')}

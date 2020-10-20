@@ -117,6 +117,7 @@ const SetupNavigator = createStackNavigator(
     RecoveryQrScanner: QrScanner,
     NewRecoveryOwnQuestions,
     RestoreWithICloud,
+    ScanRecoveryKey,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

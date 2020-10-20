@@ -53,10 +53,8 @@ import { decrypt, decrypt1 } from '../../common/encryption';
 import LoaderModal from '../../components/LoaderModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import {
-  recoverWalletUsingIcloud,
-} from '../../store/actions/sss';
-import {
   checkMSharesHealth,
+  recoverWalletUsingIcloud
 } from '../../store/actions/health';
 import axios from 'axios';
 import {
@@ -140,6 +138,7 @@ class RestoreWithICloud extends Component<
         dateTime: '',
         walletId: '',
         walletName: '',
+        levelStatus: '',
       },
       exchangeRates: '',
     };
@@ -230,18 +229,42 @@ class RestoreWithICloud extends Component<
   };
 
   restoreWallet = () => {
+    let listDataArray = [];
     const { selectedBackup } = this.state;
     const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     console.log('decryptedCloudDataJson', decryptedCloudDataJson);
-    if(decryptedCloudDataJson){
-    (this.refs.loaderBottomSheet as any).snapTo(1);
-    recoverWalletUsingIcloud(decryptedCloudDataJson);
-   } else{
-    (this.refs.ErrorBottomSheet as any).snapTo(1);
-   }
+    if(decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData){
+      this.setState({cloudBackup : true});
+     let KeeperData = JSON.parse(selectedBackup.keeperData);
+     let obj;
+     for(let i =0 ; i < KeeperData.length; i++){
+      obj = {
+        type: 'device',//selectedBackup.type,
+        title: KeeperData[i].name,
+        info: '',
+        time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
+        status: 'waiting',
+        image: null,
+      }
+      listDataArray.push(obj);
+     }
+     this.setState({listData: listDataArray});
+       // if(selectedBackup.type == "device"){
+      (this.refs.RestoreFromICloud as any).snapTo(0);
+    } else if(decryptedCloudDataJson && !selectedBackup.shares){
+          (this.refs.loaderBottomSheet as any).snapTo(1);
+          recoverWalletUsingIcloud(decryptedCloudDataJson); 
+    } else{
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+     }
+  //   
   };
+
+  handleScannedData = (scannedData) =>{
+console.log("scannedData", scannedData);
+  }
 
   render() {
     const {
@@ -262,7 +285,9 @@ class RestoreWithICloud extends Component<
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: 'row' }}>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                navigation.navigate('RestoreAndRecoverWallet');
+              }}
               style={styles.headerBackArrowView}
             >
               <FontAwesome
@@ -349,7 +374,7 @@ class RestoreWithICloud extends Component<
                     </Text>
                     <Text style={styles.cardsInfoText}>{item.info}</Text>
                     <Text style={styles.cardsInfoText}>
-                      Last backup {item.time} ago
+                      Last backup {item.time}
                     </Text>
                   </View>
                   {item.status == 'received' ? (
@@ -427,7 +452,7 @@ class RestoreWithICloud extends Component<
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              (this.refs.BackupNotFound as any).snapTo(1);
+              navigation.navigate("ScanRecoveryKey", {scannedData : (scannedData) => this.handleScannedData(scannedData)});
             }}
           >
             <Image
@@ -479,6 +504,16 @@ class RestoreWithICloud extends Component<
                           {'Last backup : ' +
                             timeFormatter(moment(new Date()), moment(value.dateTime).valueOf())}
                         </Text>
+
+                        <Text
+                          style={{
+                            ...styles.greyBoxText,
+                            fontSize: RFValue(10),
+                          }}
+                        >
+                          {'Backup at level : ' +
+                            value.levelStatus}
+                        </Text>
                       </View>
                     </View>
                   )}
@@ -511,7 +546,7 @@ class RestoreWithICloud extends Component<
                 }
                 cardInfo={'Restoring Wallet from'}
                 cardTitle={selectedBackup.walletName}
-                cardSubInfo={name + ' backup'}
+                levelStatus={selectedBackup.levelStatus ? name + ' backup at level ' + selectedBackup.levelStatus : ''}
                 proceedButtonText={'Restore'}
                 backButtonText={'Back'}
                 modalRef={this.refs.RestoreFromICloud}

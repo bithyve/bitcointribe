@@ -48,8 +48,8 @@ export default function RestoreFromICloud(props) {
                 fontSize: RFValue(10),
               }}
             >
-              {props.cardSubInfo}
-            </Text>
+              {props.levelStatus ? props.levelStatus : ''}            
+              </Text>
           </View>
           <View style={styles.arrowIconView}>
               <Ionicons

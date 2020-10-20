@@ -86,7 +86,6 @@ import {
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
   sharePersonalCopyWatcher,
-  recoverWalletFromIcloudWatcher
 } from './sagas/sss';
 
 import {
@@ -119,7 +118,8 @@ import {
   updateSharesHealthWatcher,
   generateMetaSharesWatcher,
   createAndUploadOnEFChannelWatcher,
-  updateHealthLevel2Watcher
+  updateHealthLevel2Watcher,
+  recoverWalletFromIcloudWatcher
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -203,7 +203,6 @@ const rootSaga = function* () {
     shareHistoryUpdateWatcher,
     updateWalletImageWatcher,
     fetchWalletImageWatcher,
-    recoverWalletFromIcloudWatcher,
 
     //fBTC
     accountSyncWatcher,
@@ -232,7 +231,8 @@ const rootSaga = function* () {
     updateSharesHealthWatcher,
     generateMetaSharesWatcher,
     createAndUploadOnEFChannelWatcher,
-    updateHealthLevel2Watcher
+    updateHealthLevel2Watcher,
+    recoverWalletFromIcloudWatcher,
   ];
 
   yield all(

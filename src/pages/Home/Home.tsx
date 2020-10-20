@@ -874,7 +874,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cloudData = async (kpInfo? , level?) => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares; //= JSON.stringify(s3Service.LevelHealth.metaShares);
+    let shares = kpInfo ? JSON.stringify(s3Service.levelhealth.metaShares[0]) : ''; //= JSON.stringify(s3Service.LevelHealth.metaShares);
     //console.log('s3Service.LevelHealth.metaShares', s3Service);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });

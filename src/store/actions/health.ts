@@ -25,6 +25,9 @@ export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
 export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
 export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED';
 export const KEEPER_INFO = 'KEEPER_INFO';
+export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
+export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
+export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -42,12 +45,20 @@ export const healthInitialize = () => {
   return { type: HEALTH_CHECK_INITIALIZE };
 };
 
+export const recoverWalletUsingIcloud = (icloudData) => {
+  return { type: RECOVER_WALLET_USING_ICLOUD, payload: { icloudData } };
+};
+
 export const healthInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
 };
 
 export const switchS3LoadingStatus = (beingLoaded) => {
   return { type: S3_LOADING_STATUS, payload: { beingLoaded } };
+};
+
+export const walletRecoveryFailed = (isFailed) => {
+  return { type: WALLET_RECOVERY_FAILED, payload: { isFailed } };
 };
 
 export const initLoader = (beingLoaded) => {
@@ -76,6 +87,10 @@ export const ErrorSending = (isFailed) => {
 
 export const updateMSharesHealth = (shares) => {
   return { type: UPDATE_SHARES_HEALTH, payload: { shares } };
+};
+
+export const walletImageChecked = (checked) => {
+  return { type: WALLET_IMAGE_CHECKED, payload: { checked } };
 };
 
 export const updateMSharesLoader = (beingLoaded) => {

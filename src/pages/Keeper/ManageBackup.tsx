@@ -233,9 +233,10 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo? , level?) => {
-    const { walletName, regularAccount, } = this.props;
+    console.log("inside Cloud data", kpInfo, level);
+    const { walletName, regularAccount, s3Service} = this.props;
     let encryptedCloudDataJson;
-    let shares; //= JSON.stringify(s3Service.levelhealth.metaShares);
+    let shares = kpInfo ? JSON.stringify(s3Service.levelhealth.metaShares[0]) : '';//= JSON.stringify(s3Service.levelhealth.metaShares);
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
