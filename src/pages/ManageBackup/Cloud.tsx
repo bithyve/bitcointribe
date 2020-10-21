@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,18 @@ import {
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { generatePersonalCopies } from '../../store/actions/sss';
 
 const Cloud = (props) => {
-  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  const [cloudData, setCloudData] = useState([
+  const [selectedStatus] = useState('Ugly'); // for preserving health of this entity
+  const [cloudData] = useState([
     {
       title: 'iCloud Drive',
       info: 'Store backup in iCloud Drive',
@@ -56,26 +55,26 @@ const Cloud = (props) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+      <View style={CommonStyles.headerContainer}>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
+          style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             props.navigation.goBack();
           }}
-          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+          hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('1%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
+          <Text style={NavStyles.modalHeaderTitleText}>Cloud</Text>
+          <Text style={NavStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
-          style={BackupStyles.cardIconImage}
+          style={CommonStyles.cardIconImage}
           source={getIconByStatus(selectedStatus)}
         />
       </View>
@@ -104,7 +103,7 @@ const Cloud = (props) => {
         <View style={{ flex: 1 }}>
           <FlatList
             data={cloudData}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <View style={styles.listElements}>
                 <Image
                   style={styles.listElementsIconImage}

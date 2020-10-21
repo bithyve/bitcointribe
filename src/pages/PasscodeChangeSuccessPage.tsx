@@ -25,10 +25,10 @@ export default function PasscodeChangeSuccessPage(props) {
         <View style={{ flex: 1 }}>
             <View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%' }}>
-           
+
             <View style={styles.successModalHeaderView}>
                 <Text style={styles.modalTitleText}>Passcode changed successfully</Text>
-            </View> 
+            </View>
             <View style={styles.successModalAmountView}>
                 <Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>Please use your new passcode to login </Text>
             </View>

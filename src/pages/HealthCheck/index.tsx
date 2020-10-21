@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,31 +9,19 @@ import {
   Text,
   Image,
   FlatList,
-  Platform,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import CommonStyles from '../../common/Styles/Styles';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
-import BackupStyles from './Styles';
-import ContactList from '../../components/ContactList';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
+
 
 function getImageByType(type) {
   if (type == 'secondaryDevice') {
@@ -52,19 +40,18 @@ function getImageByType(type) {
 
 export default function HealthCheck(props) {
   const [
-    WalletBackupAndRecoveryBottomSheet,
-    setWalletBackupAndRecoveryBottomSheet,
+    ,
   ] = useState(React.createRef());
-  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+  const [] = useState(
     React.createRef(),
   );
-  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
+  const [] = useState(
     React.createRef(),
   );
-  const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('Ugly');
-  const [contacts, setContacts] = useState([]);
+  const [] = useState(React.createRef());
+  const [selectedType] = useState('');
+  const [] = useState('Ugly');
+  const [] = useState([]);
 
   const [pageData, setPageData] = useState([
     {
@@ -120,34 +107,6 @@ export default function HealthCheck(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
-
-  //   const renderWalletBackupAndRecoveryContents = () => {
-  //     return (
-  //       <WalletBackupAndRecoveryContents
-  //         onPressManageBackup={() => {
-  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-  //         }}
-  //         onSkip={() => {
-  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-  //         }}
-  //         onStartBackup={() => {
-  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-  //         }}
-  //       />
-  //     );
-  //   };
-
-  //   const renderWalletBackupAndRecoveryHeader = () => {
-  //     return (
-  //       <SmallHeaderModal
-  //         borderColor={Colors.blue}
-  //         headerColor={Colors.blue}
-  //         onPressHandle={() => {
-  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-  //         }}
-  //       />
-  //     );
-  //   };
 
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
@@ -266,7 +225,7 @@ export default function HealthCheck(props) {
                 safeguard against loss of funds
               </Text>
               <KnowMoreButton
-                onpress={() => {}}
+                onpress={() => { }}
                 containerStyle={{ marginTop: 10, marginLeft: 25 }}
                 textStyle={{}}
               />
@@ -285,18 +244,18 @@ export default function HealthCheck(props) {
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                <HomePageShield
-                  circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                  shieldStatus={0}
-                />
-              )}
+                  <HomePageShield
+                    circleShadowColor={Colors.borderColor}
+                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                    shieldStatus={0}
+                  />
+                )}
             </View>
           </View>
           <FlatList
             data={pageData}
             extraData={selectedType}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <View
               // style={{
               //   opacity: !selectedType || item.type == selectedType ? 1 : 0.5
@@ -309,8 +268,8 @@ export default function HealthCheck(props) {
                         item.title === 'Trusted Contact 1'
                           ? 1
                           : item.title === 'Trusted Contact 2'
-                          ? 2
-                          : undefined,
+                            ? 2
+                            : undefined,
                     })
                   }
                   style={{
@@ -319,10 +278,10 @@ export default function HealthCheck(props) {
                       item.status == 'Ugly'
                         ? Colors.red
                         : item.status == 'Bad'
-                        ? Colors.yellow
-                        : item.status == 'Good'
-                        ? Colors.green
-                        : Colors.blue,
+                          ? Colors.yellow
+                          : item.status == 'Good'
+                            ? Colors.green
+                            : Colors.blue,
                     elevation:
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowColor:
@@ -385,75 +344,10 @@ export default function HealthCheck(props) {
 }
 
 const styles = StyleSheet.create({
-  knowMoreButton: {
-    marginTop: 10,
-    height: wp('6%'),
-    width: wp('18%'),
-    marginLeft: 25,
-    backgroundColor: Colors.lightBlue,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
   image: {
-    width: wp('5%'),
-    height: wp('5%'),
-    resizeMode: 'contain',
-  },
-  knowMoreButtonText: {
-    color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
-  },
-  shieldImage: {
-    width: wp('16%'),
-    height: wp('25%'),
-    resizeMode: 'contain',
-    marginLeft: 'auto',
-    marginRight: 20,
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 15,
-  },
-  modalHeader: {
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    height: 25,
-    width: '80%',
-    alignSelf: 'center',
-    borderColor: Colors.borderColor,
-  },
-  addressView: {
-    flex: 1,
-    backgroundColor: Colors.backgroundColor,
-    borderBottomLeftRadius: 8,
-    borderTopLeftRadius: 8,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: 'center',
-  },
-  addressText: {
-    fontSize: RFValue(13),
-    color: Colors.lightBlue,
-  },
-  copyIconView: {
-    width: 48,
-    height: 50,
-    backgroundColor: Colors.borderColor,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: widthPercentageToDP(5),
+    height: widthPercentageToDP(5),
+    resizeMode: "contain",
   },
   manageBackupCard: {
     padding: 20,
@@ -486,41 +380,5 @@ const styles = StyleSheet.create({
     height: 14,
     resizeMode: 'contain',
     marginLeft: 'auto',
-  },
-  listElements: {
-    flexDirection: 'row',
-    marginLeft: 20,
-    marginRight: 20,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
-    paddingTop: 25,
-    paddingBottom: 25,
-    paddingLeft: 10,
-    alignItems: 'center',
-  },
-  listElementsTitle: {
-    color: Colors.blue,
-    fontSize: RFValue(13),
-    marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  listElementsInfo: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    marginLeft: 13,
-    marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  listElementIcon: {
-    paddingRight: 5,
-    marginLeft: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listElementsIconImage: {
-    resizeMode: 'contain',
-    width: 25,
-    height: 25,
-    alignSelf: 'center',
   },
 });

@@ -14,13 +14,13 @@ import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetT
 export default function ServerErrorModal(props) {
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%' }}>
-           
+
             <View style={styles.successModalHeaderView}>
                 <Text style={{color: props.headerTextColor ? props.headerTextColor : Colors.blue,
         fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium,}}>{props.title}{props.titleNextLine ? "\n" + props.titleNextLine : null}</Text>
                 {props.info ? <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>{props.info}</Text> : null}
-            </View> 
+            </View>
             <View style={styles.successModalAmountView}>
             {props.note ?<Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.note}{props.noteNextLine ? "\n" + props.noteNextLine : null}</Text> : null }
             </View>
