@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Linking,
+  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,20 +15,11 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import openLink from '../../utils/OpenLink';
 
 export default function TestAccountHelpContents(props) {
-  const scrollViewRef = useRef();
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
+  const scrollViewRef = useRef<ScrollView>();
 
   return (
     <View style={styles.modalContainer}>
@@ -79,7 +70,7 @@ export default function TestAccountHelpContents(props) {
             sent to wallets that only support Bitcoin Mainnet
           </Text>
           <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollToEnd({ animated: true })
+            scrollViewRef.current?.scrollToEnd({ animated: true })
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
           </TouchableOpacity>
