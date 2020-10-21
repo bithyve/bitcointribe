@@ -201,8 +201,8 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={()=>{
-           //let qrScannedData = '{"uuid": "a55d0e028365822430d43544","publicKey": "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e","ephemeralAddress": "9ed7b8aa315ec5a03ed4fa7bd98223911f398a991d2babb9a3fcc05cf92b8516","walletName":"Shivani"}';
-           let qrScannedData = '{"uuid": "d091f35324fec98c0257bc1c","publicKey": "6a0047a7966072d9e733a6029073f06d88dacd32eb0e59def32121c76b5d8439","ephemeralAddress": "954e149db10f5bebc9b24e7a1c240c59562ea1603a55d917d8f741d89b302f7a","walletName":"Mac Pro"}';
+          //  let qrScannedData = '{"uuid": "892b0fe55c894848c7d7d7d6","publicKey": "6968c521ef7063560ce68b8283f9ee6bf4963ef51b4bc7a06162dbfb3e5fce9e","ephemeralAddress": "759be69891f864ce7dda85288d0675d3ae5a323a3cb32381b1b726e6975c70d0","walletName":"Mac"}';
+           let qrScannedData = '{"uuid": "3097814cfea95b9795378961","publicKey": "1f5c59c86c12c59d0634296918e056c16df27ea015fbe0c02b231b93eb34d63c","ephemeralAddress": "73ad0523983228991f4b558fce032b370c5725f2780d5018a03ad278fbc1d8df","walletName":"Gallexy"}';
            props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
         }}
       />

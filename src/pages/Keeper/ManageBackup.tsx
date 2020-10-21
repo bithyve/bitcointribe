@@ -45,7 +45,12 @@ import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
 import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
-import { generateMetaShare, checkMSharesHealth, initLevelTwo, updateMSharesHealth } from '../../store/actions/health';
+import {
+  generateMetaShare,
+  checkMSharesHealth,
+  initLevelTwo,
+  updateMSharesHealth,
+} from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 
 interface ManageBackupStateTypes {
@@ -56,6 +61,7 @@ interface ManageBackupStateTypes {
   encryptedCloudDataJson: any;
   isPrimaryKeeper: any;
   selectedShareId: string;
+  isError: boolean;
 }
 
 interface ManageBackupPropsTypes {
@@ -97,87 +103,72 @@ class ManageBackup extends Component<
     this.appStateListener = null;
     this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null;
+    let obj = {
+      shareType: '',
+      updatedAt: '',
+      status: '',
+      shareId: '',
+      reshareVersion: 0,
+      name: '',
+    }
     this.state = {
       securityAtLevel: 0,
       selectedId: 0,
+      isError: false,
       levelData: [
         {
-          type: 'icloud',
           status: 'notSetup',
-          level: 1,
+          infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          keeper1: {
-            name: '',
-            keeper1Done: false,
-            type: '',
-            shareId: ''
-          },
-          keeper2: {
-            name: '',
-            keeper2Done: false,
-            type: '',
-            shareId: ''
-          },
+          keeper1: obj,
+          keeper2: obj,
           id: 1,
         },
         {
-          type: 'keeper',
           status: 'notSetup',
-          level: 2,
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          keeper1: {
-            name: 'Add Keeper',
-            keeper1Done: false,
-            type: 'Device',
-          },
-          keeper2: {
-            name: 'Add Keeper',
-            keeper2Done: false,
-            type: '',
-          },
+          keeper1: obj,
+          keeper2: obj,
           id: 2,
         },
         {
-          type: 'keeper',
           status: 'notSetup',
-          level: 3,
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          manageText: 'Setup',
-          keeper1: {
-            name: 'Add Keeper',
-            keeper1Done: false,
-            type: '',
-          },
-          keeper2: {
-            name: 'Add Keeper',
-            keeper2Done: false,
-            type: '',
-          },
+          keeper1: obj,
+          keeper2: obj,
           id: 3,
         },
       ],
       isLevel2: false,
       isPrimaryKeeper: false,
       selectedShareId: '',
-      encryptedCloudDataJson: []
+      encryptedCloudDataJson: [],
     };
   }
 
   modifyLevelData = () => {
     let { levelHealth, currentLevel, s3Service, keeperInfo } = this.props;
-    let levelData: any[] = modifyLevelStatus(this.state.levelData, levelHealth, currentLevel, keeperInfo);
-    this.setState({levelData: levelData});
-  }
+    let levelData = modifyLevelStatus(
+      this.state.levelData,
+      levelHealth,
+      currentLevel,
+      keeperInfo,
+    );
+    this.setState({
+      levelData: levelData.levelData,
+      isError: levelData.isError,
+    });
+  };
 
   setSelectedCards = () => {
     const { levelData } = this.state;
     for (let a = 0; a < levelData.length; a++) {
-      if (levelData[a].status == 'notSetup'){
+      if (levelData[a].status == 'notSetup') {
         this.setState({ selectedId: levelData[a].id });
         break;
       }
@@ -195,10 +186,10 @@ class ManageBackup extends Component<
             (value) => value.status == 'bad' || value.status == 'notSetup',
           ) - 1
         ].id;
-    let value = 1
-    if(this.state.levelData[0].status == 'notSetup') value = 1;
-    else if(level) value = level + 1;
-    else if(level == 3) value = 3;
+    let value = 1;
+    if (this.state.levelData[0].status == 'notSetup') value = 1;
+    else if (level) value = level + 1;
+    else if (level == 3) value = 3;
     this.setState({ selectedId: value });
     this.setState({ securityAtLevel: level });
   };
@@ -224,50 +215,64 @@ class ManageBackup extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  cloudData = async (kpInfo? , level?, share?) => {
-    const { walletName, regularAccount, s3Service} = this.props;
+  cloudData = async (kpInfo?, level?, share?) => {
+    const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares = share && !(Object.keys(share).length === 0 && share.constructor === Object) ? JSON.stringify(share) : ''; 
+    let shares =
+      share &&
+      !(Object.keys(share).length === 0 && share.constructor === Object)
+        ? JSON.stringify(share)
+        : '';
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
-        shareId:'',
+        shareId: '',
         KeeperType: 'cloud',
-        updated:'',
-        reshareVersion: 0
+        updated: '',
+        reshareVersion: 0,
       },
-    ]
+    ];
     let data = {
       levelStatus: level ? level : 1,
       shares: shares,
-      encryptedCloudDataJson : encryptedCloudDataJson,
+      encryptedCloudDataJson: encryptedCloudDataJson,
       walletName: walletName,
       regularAccount: regularAccount,
-      keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
-    }
-    CloudDataBackup(data, this.setCloudBackupStatus, share);    
+      keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
+    };
+    CloudDataBackup(data, this.setCloudBackupStatus, share);
   };
 
   setCloudBackupStatus = (share) => {
-    this.props.setCloudBackupStatus({status: true});
-    if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
+    this.props.setCloudBackupStatus({ status: true });
+    if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
       this.updateHealthForCloud();
-    }
-    else if(this.props.cloudBackupStatus.status && this.props.currentLevel == 1){
+    } else if (
+      this.props.cloudBackupStatus.status &&
+      this.props.currentLevel == 1
+    ) {
       this.updateHealthForCloud(share);
     }
-  }
+  };
 
-  updateHealthForCloud = (share?) =>{
+  updateHealthForCloud = (share?) => {
     let levelHealth = this.props.levelHealth;
     let levelHealthVar = levelHealth[0].levelInfo[0];
-    if(share && !(Object.keys(share).length === 0 && share.constructor === Object) && levelHealth.length > 0){
+    if (
+      share &&
+      !(Object.keys(share).length === 0 && share.constructor === Object) &&
+      levelHealth.length > 0
+    ) {
       levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
     }
-    // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth.length && levelHealthVar.status != 'accessible'){
-      if(levelHealthVar.shareType == 'cloud'){
+    // health update for 1st upload to cloud
+    if (
+      this.props.cloudBackupStatus &&
+      levelHealth.length &&
+      levelHealthVar.status != 'accessible'
+    ) {
+      if (levelHealthVar.shareType == 'cloud') {
         levelHealthVar.updatedAt = moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
         levelHealthVar.reshareVersion = 1;
@@ -279,64 +284,91 @@ class ManageBackup extends Component<
           shareId: levelHealthVar.shareId,
           reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
-          status: 'accessible'
-        }
+          status: 'accessible',
+        },
       ];
       this.props.updateMSharesHealth(shareArray);
     }
-  }
+  };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if(prevProps.levelHealth != this.props.levelHealth){
+    if (prevProps.levelHealth != this.props.levelHealth) {
       this.modifyLevelData();
     }
-    if(prevProps.levelHealth != this.props.levelHealth){
-      if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
+    if (prevProps.levelHealth != this.props.levelHealth) {
+      if (
+        this.props.levelHealth.length > 0 &&
+        this.props.levelHealth.length == 1 &&
+        prevProps.levelHealth.length == 0
+      ) {
         this.cloudData();
-      }else{
+      } else {
         this.updateCloudData();
       }
     }
   };
 
-  generateShares = (level) =>{
+  generateShares = (level) => {
     const { levelData, selectedShareId } = this.state;
-    let PKStatus = levelData[1].keeper1.keeper1Done ? 'accessed' : 'notAccessed';
+    let PKStatus = levelData[1].keeper1.keeper1Done
+      ? 'accessed'
+      : 'notAccessed';
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
       selectedStatus: PKStatus,
-      selectedTitle: "Primary Keeper",
+      selectedTitle: 'Primary Keeper',
       isPrimaryKeeper: true,
       isSetUp: true,
-      selectedShareId
+      selectedShareId,
     });
-  }
+  };
 
-  updateCloudData = () =>{
-    let { currentLevel, keeperInfo, levelHealth, isLevel2Initialized, isLevel3Initialized, s3Service } = this.props;
+  updateCloudData = () => {
+    let {
+      currentLevel,
+      keeperInfo,
+      levelHealth,
+      isLevel2Initialized,
+      isLevel3Initialized,
+      s3Service,
+    } = this.props;
     let KPInfo: any[] = [];
     let secretShare = {};
-    if(levelHealth.length > 0){
+    if (levelHealth.length > 0) {
       let levelHealthVar = levelHealth[levelHealth.length - 1];
-      if(levelHealthVar.levelInfo){
+      if (levelHealthVar.levelInfo) {
         for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
           const element = levelHealthVar.levelInfo[i];
-          if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
-            let kpInfoElement = keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)];
+          if (
+            keeperInfo.findIndex((value) => value.shareId == element.shareId) >
+              -1 &&
+            element.status == 'accessible'
+          ) {
+            let kpInfoElement =
+              keeperInfo[
+                keeperInfo.findIndex(
+                  (value) => value.shareId == element.shareId,
+                )
+              ];
             let object = {
               type: kpInfoElement.type,
               name: kpInfoElement.name,
               shareId: kpInfoElement.shareId,
-              data: kpInfoElement.data
-            }
+              data: kpInfoElement.data,
+            };
             KPInfo.push(object);
           }
         }
 
-        if(isLevel2Initialized && !isLevel3Initialized && levelHealthVar.levelInfo[2].status == 'accessible' && levelHealthVar.levelInfo[3].status == 'accessible'){
+        if (
+          isLevel2Initialized &&
+          !isLevel3Initialized &&
+          levelHealthVar.levelInfo[2].status == 'accessible' &&
+          levelHealthVar.levelInfo[3].status == 'accessible'
+        ) {
           for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
             const element = s3Service.levelhealth.metaShares[i];
-            if(levelHealthVar.levelInfo[0].shareId == element.shareId){
+            if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
               secretShare = element;
             }
           }
@@ -345,7 +377,7 @@ class ManageBackup extends Component<
     }
     this.cloudData(KPInfo, currentLevel, secretShare);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
-  }
+  };
 
   render() {
     const {
@@ -353,9 +385,17 @@ class ManageBackup extends Component<
       selectedId,
       isLevel2,
       securityAtLevel,
-      isPrimaryKeeper
+      isPrimaryKeeper,
+      isError
     } = this.state;
-    const { navigation, overallHealth, levelHealth, healthLoading, checkMSharesHealth, currentLevel } = this.props;
+    const {
+      navigation,
+      overallHealth,
+      levelHealth,
+      healthLoading,
+      checkMSharesHealth,
+      currentLevel,
+    } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -383,35 +423,38 @@ class ManageBackup extends Component<
             />
           </TouchableOpacity>
         </View>
-        <ScrollView 
-        refreshControl={
-          <RefreshControl
-            refreshing={healthLoading}
-            onRefresh={() => {
-              checkMSharesHealth();
-            }}
-          />
-        }
-        style={{ flex: 1 }}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={healthLoading}
+              onRefresh={() => {
+                checkMSharesHealth();
+              }}
+            />
+          }
+          style={{ flex: 1 }}
+        >
           <View style={styles.topHealthView}>
             <ImageBackground
               source={require('../../assets/images/icons/keeper_sheild.png')}
               style={{ ...styles.healthShieldImage, position: 'relative' }}
               resizeMode={'contain'}
             >
-              <View
-                style={{
-                  backgroundColor: Colors.red,
-                  height: wp('3%'),
-                  width: wp('3%'),
-                  borderRadius: wp('3%') / 2,
-                  position: 'absolute',
-                  top: wp('5%'),
-                  right: 0,
-                  borderWidth: 2,
-                  borderColor: Colors.white,
-                }}
-              />
+              {isError && (
+                <View
+                  style={{
+                    backgroundColor: Colors.red,
+                    height: wp('3%'),
+                    width: wp('3%'),
+                    borderRadius: wp('3%') / 2,
+                    position: 'absolute',
+                    top: wp('5%'),
+                    right: 0,
+                    borderWidth: 2,
+                    borderColor: Colors.white,
+                  }}
+                />
+              )}
             </ImageBackground>
             <View style={styles.headerSeparator} />
             <View>
@@ -429,9 +472,10 @@ class ManageBackup extends Component<
                   style={{
                     borderRadius: 10,
                     marginTop: wp('7%'),
-                    backgroundColor: value.status == 'good' || value.status == 'bad'
-                      ? Colors.blue
-                      : Colors.backgroundColor,
+                    backgroundColor:
+                      value.status == 'good' || value.status == 'bad'
+                        ? Colors.blue
+                        : Colors.backgroundColor,
                     shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
                     shadowColor: Colors.borderColor,
                     shadowOpacity:
@@ -449,8 +493,14 @@ class ManageBackup extends Component<
                         <View
                           style={{
                             ...styles.cardHealthImageView,
-                            elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
-                            backgroundColor: value.status == 'good' ? Colors.green : Colors.red,
+                            elevation:
+                              selectedId == value.id || selectedId == 0
+                                ? 10
+                                : 0,
+                            backgroundColor:
+                              value.status == 'good'
+                                ? Colors.green
+                                : Colors.red,
                           }}
                         >
                           {value.status == 'good' ? (
@@ -481,13 +531,19 @@ class ManageBackup extends Component<
                       <TouchableOpacity
                         style={{
                           ...styles.cardButtonView,
-                          backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
+                          backgroundColor:
+                            value.status == 'notSetup'
+                              ? Colors.white
+                              : Colors.deepBlue,
                         }}
                       >
                         <Text
                           style={{
                             ...styles.cardButtonText,
-                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                            color:
+                              value.status == 'notSetup'
+                                ? Colors.textColorGrey
+                                : Colors.white,
                           }}
                         >
                           Know More
@@ -500,15 +556,21 @@ class ManageBackup extends Component<
                         <Text
                           style={{
                             ...styles.levelText,
-                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                            color:
+                              value.status == 'notSetup'
+                                ? Colors.textColorGrey
+                                : Colors.white,
                           }}
                         >
-                          Level {value.level}
+                          Level {value.id}
                         </Text>
                         <Text
                           style={{
                             ...styles.levelInfoText,
-                            color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                            color:
+                              value.status == 'notSetup'
+                                ? Colors.textColorGrey
+                                : Colors.white,
                           }}
                         >
                           {value.status == 'notSetup'
@@ -527,7 +589,10 @@ class ManageBackup extends Component<
                           style={{
                             ...styles.manageButtonText,
                             padding: 10,
-                            color: value.status == 'notSetup' ? Colors.black : Colors.white,
+                            color:
+                              value.status == 'notSetup'
+                                ? Colors.black
+                                : Colors.white,
                           }}
                           onPress={() => this.selectId(value.id)}
                         >
@@ -539,7 +604,11 @@ class ManageBackup extends Component<
                               ? 'arrowup'
                               : 'arrowright'
                           }
-                          color={value.status == 'notSetup' ? Colors.black : Colors.white}
+                          color={
+                            value.status == 'notSetup'
+                              ? Colors.black
+                              : Colors.white
+                          }
                           size={12}
                         />
                       </TouchableOpacity>
@@ -555,7 +624,10 @@ class ManageBackup extends Component<
                           <Text
                             numberOfLines={2}
                             style={{
-                              color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                              color:
+                                value.status == 'notSetup'
+                                  ? Colors.textColorGrey
+                                  : Colors.white,
                               fontFamily: Fonts.FiraSansRegular,
                               fontSize: RFValue(10),
                             }}
@@ -568,7 +640,13 @@ class ManageBackup extends Component<
                             style={{ flexDirection: 'row', marginTop: 'auto' }}
                           >
                             <TouchableOpacity
-                              style={{...styles.appBackupButton, borderColor: value.keeper1.keeper1Done ? Colors.deepBlue : Colors.red, borderWidth: value.keeper1.keeper1Done ? 0 : 1}}
+                              style={{
+                                ...styles.appBackupButton,
+                                borderColor: value.keeper1.status == 'accessible'
+                                  ? Colors.deepBlue
+                                  : Colors.red,
+                                borderWidth: value.keeper1.status == 'accessible' ? 0 : 1,
+                              }}
                               onPress={() => {
                                 if (!this.props.cloudBackupStatus) {
                                   this.cloudData();
@@ -585,19 +663,23 @@ class ManageBackup extends Component<
                                   fontSize: RFValue(11),
                                 }}
                               >
-                                {value.keeper1.keeper1Done ? "Data Backed-Up" : "Add Backup"}
+                                {value.keeper1.status == 'accessible'
+                                  ? 'Data Backed-Up'
+                                  : 'Add Backup'}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
                                 width: wp('41%'),
-                                borderColor: value.keeper2.keeper2Done
-                                ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue
-                                : Colors.red,
-                                borderWidth: value.keeper2.keeper2Done
-                                ? 0
-                                : 0.5,
+                                borderColor: value.keeper2.status == 'accessible'
+                                  ? value.status == 'notSetup'
+                                    ? Colors.white
+                                    : Colors.deepBlue
+                                  : Colors.red,
+                                borderWidth: value.keeper2.status == 'accessible'
+                                  ? 0
+                                  : 0.5,
                                 marginLeft: 'auto',
                               }}
                               onPress={() =>
@@ -617,18 +699,19 @@ class ManageBackup extends Component<
                                   position: 'relative',
                                 }}
                               >
-                                {!value.keeper2.keeper2Done
-                                ? <View
-                                  style={{
-                                    backgroundColor: Colors.red,
-                                    width: wp('1%'),
-                                    height: wp('1%'),
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                    borderRadius: wp('1%') / 2,
-                                  }}
-                                /> : null}
+                                {value.keeper2.status == 'notAccessible' ? (
+                                  <View
+                                    style={{
+                                      backgroundColor: Colors.red,
+                                      width: wp('1%'),
+                                      height: wp('1%'),
+                                      position: 'absolute',
+                                      top: 0,
+                                      right: 0,
+                                      borderRadius: wp('1%') / 2,
+                                    }}
+                                  />
+                                ) : null}
                               </ImageBackground>
                               <Text
                                 style={{
@@ -647,33 +730,52 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
+                                backgroundColor:
+                                  value.status == 'notSetup'
+                                    ? Colors.white
+                                    : Colors.deepBlue,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: value.keeper1.keeper1Done ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue : Colors.red,
-                                borderWidth: value.keeper1.keeper1Done ? 0 : 1,
+                                borderColor: value.keeper1.status == 'accessible'
+                                  ? value.status == 'notSetup'
+                                    ? Colors.white
+                                    : Colors.deepBlue
+                                  : Colors.red,
+                                borderWidth: value.keeper1.status == 'accessible' ? 0 : 1,
                               }}
                               onPress={() => {
                                 if (value.id === 2) {
                                   setTimeout(() => {
-                                    (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+                                    (this.refs
+                                      .SetupPrimaryKeeperBottomSheet as any).snapTo(
+                                      1,
+                                    );
                                   }, 2);
-                                  this.setState({isPrimaryKeeper: true, selectedShareId: value.keeper1.shareId});
+                                  this.setState({
+                                    isPrimaryKeeper: true,
+                                    selectedShareId: value.keeper1.shareId,
+                                  });
                                 } else {
                                   setTimeout(() => {
-                                    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                    (this.refs
+                                      .keeperTypeBottomSheet as any).snapTo(1);
                                   }, 2);
-                                  this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper1.shareId});
+                                  this.setState({
+                                    isPrimaryKeeper: false,
+                                    selectedShareId: value.keeper1.shareId,
+                                  });
                                 }
                               }}
                             >
-                              {value.keeper1.keeper1Done &&
-                              (value.keeper1.type == 'device' || value.keeper1.type == 'primaryKeeper' ||
-                                value.keeper1.type == 'friends') ? (
+                              {value.keeper1.status == 'accessible' &&
+                              (value.keeper1.shareType == 'device' ||
+                                value.keeper1.shareType == 'primaryKeeper' ||
+                                value.keeper1.shareType == 'contact') ? (
                                 <Image
                                   source={
-                                    value.keeper1.type == 'device' || value.keeper1.type == 'primaryKeeper'
+                                    value.keeper1.shareType == 'device' ||
+                                    value.keeper1.shareType == 'primaryKeeper'
                                       ? require('../../assets/images/icons/icon_ipad_blue.png')
                                       : require('../../assets/images/icons/pexels-photo.png')
                                   }
@@ -697,12 +799,16 @@ class ManageBackup extends Component<
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
-                                  color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                                  color:
+                                    value.status == 'notSetup'
+                                      ? Colors.textColorGrey
+                                      : Colors.white,
                                   fontSize: RFValue(11),
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.status == 'good' || value.status == 'bad' && value.keeper1.name
+                                {value.status == 'good' ||
+                                (value.status == 'bad' && value.keeper1.name)
                                   ? value.keeper1.name
                                   : value.id == 2
                                   ? 'Add Primary Keeper'
@@ -712,12 +818,19 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
+                                backgroundColor:
+                                  value.status == 'notSetup'
+                                    ? Colors.white
+                                    : Colors.deepBlue,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: value.keeper2.keeper2Done ? value.status == 'notSetup' ? Colors.white : Colors.deepBlue : Colors.red,
-                                borderWidth: value.keeper2.keeper2Done
+                                borderColor: value.keeper2.status == 'accessible'
+                                  ? value.status == 'notSetup'
+                                    ? Colors.white
+                                    : Colors.deepBlue
+                                  : Colors.red,
+                                borderWidth: value.keeper2.status == 'accessible'
                                   ? 0
                                   : 0.5,
                                 marginLeft: wp('4%'),
@@ -732,15 +845,18 @@ class ManageBackup extends Component<
                                   (this.refs
                                     .keeperTypeBottomSheet as any).snapTo(1);
                                 }, 2);
-                                this.setState({isPrimaryKeeper: false, selectedShareId: value.keeper2.shareId});
+                                this.setState({
+                                  isPrimaryKeeper: false,
+                                  selectedShareId: value.keeper2.shareId,
+                                });
                               }}
                             >
-                              {value.keeper2.keeper2Done &&
-                              (value.keeper2.type == 'device' ||
-                                value.keeper2.type == 'friends') ? (
+                              {value.keeper2.status == 'accessible' &&
+                              (value.keeper2.shareType == 'device' ||
+                                value.keeper2.shareType == 'contact') ? (
                                 <Image
                                   source={
-                                    value.keeper2.type == 'device'
+                                    value.keeper2.shareType == 'device'
                                       ? require('../../assets/images/icons/icon_ipad_blue.png')
                                       : require('../../assets/images/icons/pexels-photo.png')
                                   }
@@ -765,11 +881,16 @@ class ManageBackup extends Component<
                                 style={{
                                   ...styles.cardButtonText,
                                   fontSize: RFValue(11),
-                                  color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+                                  color:
+                                    value.status == 'notSetup'
+                                      ? Colors.textColorGrey
+                                      : Colors.white,
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {(value.status == 'bad' || value.status == 'good') && value.keeper2.name
+                                {(value.status == 'bad' ||
+                                  value.status == 'good') &&
+                                value.keeper2.name
                                   ? value.keeper2.name
                                   : 'Add Keeper'}
                               </Text>
@@ -803,7 +924,7 @@ class ManageBackup extends Component<
                     selectedTitle: name,
                     isLevel2: isLevel2,
                     isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId
+                    selectedShareId: this.state.selectedShareId,
                   });
                 }
                 if (type === 'device') {
@@ -813,7 +934,7 @@ class ManageBackup extends Component<
                     selectedTitle: name,
                     isLevel2: isLevel2,
                     isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId
+                    selectedShareId: this.state.selectedShareId,
                   });
                 }
                 if (type === 'pdf') {
@@ -823,7 +944,7 @@ class ManageBackup extends Component<
                     selectedTitle: name,
                     isLevel2: isLevel2,
                     isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId
+                    selectedShareId: this.state.selectedShareId,
                   });
                 }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -900,7 +1021,10 @@ const mapStateToProps = (state) => {
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
     currentLevel: idx(state, (_) => _.health.currentLevel),
-    isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
+    isLevelTwoMetaShareCreated: idx(
+      state,
+      (_) => _.health.isLevelTwoMetaShareCreated,
+    ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
@@ -915,7 +1039,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    updateMSharesHealth
+    updateMSharesHealth,
   })(ManageBackup),
 );
 

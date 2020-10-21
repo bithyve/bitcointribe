@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  NativeModules
+  // NativeModules
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Colors from "../common/Colors";
@@ -25,7 +25,7 @@ export default function PasscodeConfirm( props ) {
   const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
   const [ passcodeFlag, setPasscodeFlag ] = useState( true );
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 );
-  //const iCloud = NativeModules.iCloud;
+  // const iCloud = NativeModules.iCloud;
   function onPressNumber( text ) {
     let tmpPasscode = passcode;
     let tmpConfirmPasscode = confirmPasscode;
@@ -80,7 +80,7 @@ export default function PasscodeConfirm( props ) {
       setPasscodeFlag( true );
       setConfirmPasscodeFlag( 0 );
     }
-    //iCloud.startBackup("")
+    // iCloud.startBackup("");
   }, [ passcode, confirmPasscode ] );
 
   const dispatch = useDispatch();

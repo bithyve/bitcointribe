@@ -45,7 +45,7 @@ const initialState: {
       status: string;
       shareId: string;
       reshareVersion?: number;
-      guardian?: string;
+      name?: string;
     }[];
   }[];
   keeperInfo: {
