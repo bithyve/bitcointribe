@@ -7,7 +7,6 @@ import {
   Alert,
   AsyncStorage,
   Platform,
-  AppState,
 } from 'react-native';
 import Video from 'react-native-video';
 import Colors from '../common/Colors';
@@ -18,12 +17,11 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
-import { isCompatible } from './Home/Home';
 import { connect } from 'react-redux'
+import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility';
 
 interface HomePropsTypes {
   initializeDB: any;
@@ -31,7 +29,7 @@ interface HomePropsTypes {
   lastSeen: any;
 }
 
-interface HomeStateTypes {}
+interface HomeStateTypes { }
 
 class Launch extends Component<HomePropsTypes, HomeStateTypes> {
   errorBottomSheet: any;
@@ -104,13 +102,19 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
                 Alert.alert(
                   'Invalid deeplink',
                   `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                    splits[3]
+                  splits[3]
                   }`,
                 );
               } else {
                 const version = splits.pop().slice(1);
+
                 if (version) {
-                  if (!(await isCompatible(splits[4], version))) return;
+                  if (!(await checkAppVersionCompatibility({
+                    relayCheckMethod: splits[4],
+                    version,
+                  }))) {
+                    return;
+                  }
                 }
 
                 const trustedContactRequest = {
