@@ -19,7 +19,6 @@ const Colors = {
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
-  greyTextColor: '#656565'
 };
 
 export default Colors;
