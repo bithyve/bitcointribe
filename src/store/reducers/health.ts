@@ -1,4 +1,6 @@
+import S3Service from '../../bitcoin/services/sss/S3Service';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
+import { S3_SERVICE } from '../../common/constants/serviceTypes';
 import {
   HEALTH_CHECK_INITIALIZED,
   HEALTH_CHECK_INITIALIZE,
@@ -14,10 +16,14 @@ import {
   IS_LEVEL_THREE_METASHARE,
   KEEPER_INFO,
   IS_LEVEL2_INITIALIZED,
-  SHARE_RECEIVED
+  SHARE_RECEIVED,
+  DOWNLOADED_MSHARE_HEALTH,
+  ERROR_RECEIVING_HEALTH
 } from '../actions/health';
+import { SERVICES_ENRICHED } from '../actions/storage';
 
 const initialState: {
+  service: S3Service;
   loading: {
     levelHealthCheck: Boolean;
     checkMSharesHealth: Boolean;
@@ -53,7 +59,12 @@ const initialState: {
   }[];
   shares: any;
   metaShare: MetaShare;
+  downloadedMShare: {
+    [otp: string]: { status: Boolean; err?: String };
+  };
+  errorReceiving: boolean,
 } = {
+  service: null,
   loading: {
     levelHealthCheck: false,
     checkMSharesHealth: false,
@@ -71,6 +82,9 @@ const initialState: {
   shares: null,
   keeperInfo: [],
   metaShare: null,
+  downloadedMShare: {},
+  errorReceiving: false,
+
 };
 
 export default (state = initialState, action) => {
@@ -185,7 +199,31 @@ export default (state = initialState, action) => {
         metaShare: action.payload.metaShare,
       };
       
+      case DOWNLOADED_MSHARE_HEALTH:
+      return {
+        ...state,
+        downloadedMShare: {
+          ...state.downloadedMShare,
+          [action.payload.otp]: {
+            status: action.payload.status,
+            err: action.payload.err,
+          },
+        },
+      };
+
+      case ERROR_RECEIVING_HEALTH:
+      return {
+        ...state,
+        errorReceiving: action.payload.isFailed,
+      };
       
+      case SERVICES_ENRICHED:
+      return {
+        ...state,
+        service: action.payload.services[S3_SERVICE],
+        serviceEnriched: true,
+      };
+
   }
   return state;
 };

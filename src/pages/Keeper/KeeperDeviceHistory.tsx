@@ -201,7 +201,8 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={()=>{
-           let qrScannedData = '{"uuid": "a55d0e028365822430d43544","publicKey": "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e","ephemeralAddress": "9ed7b8aa315ec5a03ed4fa7bd98223911f398a991d2babb9a3fcc05cf92b8516","walletName":"Shivani"}';
+           //let qrScannedData = '{"uuid": "a55d0e028365822430d43544","publicKey": "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e","ephemeralAddress": "9ed7b8aa315ec5a03ed4fa7bd98223911f398a991d2babb9a3fcc05cf92b8516","walletName":"Shivani"}';
+           let qrScannedData = '{"uuid": "d091f35324fec98c0257bc1c","publicKey": "6a0047a7966072d9e733a6029073f06d88dacd32eb0e59def32121c76b5d8439","ephemeralAddress": "954e149db10f5bebc9b24e7a1c240c59562ea1603a55d917d8f741d89b302f7a","walletName":"Mac Pro"}';
            props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
         }}
       />

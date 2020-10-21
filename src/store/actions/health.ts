@@ -29,7 +29,12 @@ export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
 export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
 export const DOWNLOAD_SHARES = "DOWNLOAD_SHARED";
+export const DOWNLOAD_MSHARE_HEALTH = "DOWNLOAD_MSHARE_HEALTH";
 export const SHARE_RECEIVED = "SHARE_RECEIVED";
+export const DOWNLOADED_MSHARE_HEALTH = "DOWNLOADED_MSHARE_HEALTH";
+export const ERROR_RECEIVING_HEALTH = "ERROR_RECEIVING_HEALTH";
+export const FETCH_WALLET_IMAGE_HEALTH = "FETCH_WALLET_IMAGE_HEALTH";
+export const RECOVER_WALLET_HEALTH = "RECOVER_WALLET_HEALTH";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -152,3 +157,31 @@ export const isLevel2InitializedStatus = () => {
 export const updatedKeeperInfo = (info) =>{
   return { type: KEEPER_INFO, payload: { info } };
 }
+
+export const downloadMShare = (
+  encryptedKey,
+  otp?,
+  downloadType?,
+  replaceIndex?,
+) => {
+  return {
+    type: DOWNLOAD_MSHARE_HEALTH,
+    payload: { otp, encryptedKey, downloadType, replaceIndex },
+  };
+};
+
+export const downloadedMShare = (otp, status, err?) => {
+  return { type: DOWNLOADED_MSHARE_HEALTH, payload: { otp, status, err } };
+};
+
+export const ErrorReceiving = (isFailed) => {
+  return { type: ERROR_RECEIVING_HEALTH, payload: { isFailed } };
+};
+
+export const recoverWallet = () => {
+  return { type: RECOVER_WALLET_HEALTH };
+};
+
+export const fetchWalletImage = () => {
+  return { type: FETCH_WALLET_IMAGE_HEALTH };
+};

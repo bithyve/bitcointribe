@@ -1,5 +1,5 @@
 import { call, delay, put, select } from 'redux-saga/effects';
-import { createWatcher, requestTimedout } from '../utils/utilities';
+import { createWatcher, requestTimedout, serviceGenerator, serviceGenerator2 } from '../utils/utilities';
 import {
   INIT_HEALTH_SETUP,
   CHECK_SHARES_HEALTH,
@@ -19,6 +19,11 @@ import {
   walletImageChecked,
   shareReceived,
   DOWNLOAD_SHARES,
+  DOWNLOAD_MSHARE_HEALTH,
+  downloadedMShare,
+  ErrorReceiving,
+  fetchWalletImage,
+  RECOVER_WALLET_HEALTH,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -40,15 +45,16 @@ import {
 } from '../../common/constants/serviceTypes';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import KeeperService from '../../bitcoin/services/KeeperService';
-import { EphemeralDataElementsForKeeper } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElementsForKeeper, MetaShare } from '../../bitcoin/utilities/Interface';
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
 import moment from 'moment';
 import { updateTrustedContactInfoLocally } from '../actions/trustedContacts';
 import crypto from 'crypto';
+import { Alert } from 'react-native';
 
 function* initHealthWorker() {
-  let s3Service: S3Service = yield select((state) => state.sss.service);
+  let s3Service: S3Service = yield select((state) => state.health.service);
   const initialized = s3Service.levelhealth.healthCheckInitialized;
   
   if (initialized) return;
@@ -94,7 +100,7 @@ export const initHealthWatcher = createWatcher(
 );
 
 function* generateMetaSharesWorker({ payload }) {
-  let s3Service: S3Service = yield select((state) => state.sss.service);
+  let s3Service: S3Service = yield select((state) => state.health.service);
   const { walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
@@ -118,7 +124,7 @@ function* generateMetaSharesWorker({ payload }) {
         if(!isLevel2Initialized){ yield put(initLevelTwo()); }
         yield put(updateLevelTwoMetaShareStatus(true));
       }
-      let s3Service: S3Service = yield select((state) => state.sss.service);
+      let s3Service: S3Service = yield select((state) => state.health.service);
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
@@ -139,7 +145,7 @@ export const generateMetaSharesWatcher = createWatcher(
 
 function* checkSharesHealthWorker() {
   yield put(switchS3LoadingStatus(true));
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.health.service);
   const res = yield call(s3Service.checkHealth);
 
   if (res.status === 200) {
@@ -179,7 +185,7 @@ function* updateSharesHealthWorker({ payload }) {
   const res = yield call(S3Service.updateHealth, payload.shares);
   if (res.status === 200) {
     if(res.data.updationResult){
-      let s3Service: S3Service = yield select((state) => state.sss.service);
+      let s3Service: S3Service = yield select((state) => state.health.service);
       for (let i = 0; i < res.data.updationResult.length; i++) {
         const element = res.data.updationResult[i];
         if(element.walletId == s3Service.getWalletId().data.walletId){
@@ -250,7 +256,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let type = payload.isPrimaryKeeper ? 'device' : payload.type;
   
   yield put(updateMSharesLoader(true));
-  let s3Service: S3Service = yield select((state) => state.sss.service);
+  let s3Service: S3Service = yield select((state) => state.health.service);
   let securityQuestion = yield select((state) => state.storage.database.WALLET_SETUP);
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
@@ -318,6 +324,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     object.encKey,
     object.shareUploadables
   );
+  console.log("RES", res);
   if(res.status == 200){
     let shareArray = [
       {
@@ -374,7 +381,7 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 function* updateHealthLevel2Worker() {
   let isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized);
   if(!isLevel2Initialized){
-    let s3Service: S3Service = yield select((state) => state.sss.service);
+    let s3Service: S3Service = yield select((state) => state.health.service);
     let Health = yield select((state) => state.health.levelHealth);
     let SecurityQuestionHealth = Health[0].levelInfo[1];
     yield put(initLoader(true));
@@ -475,4 +482,310 @@ function* downloadShareWorker({ payload }) {
 export const downloadShareWatcher = createWatcher(
   downloadShareWorker,
   DOWNLOAD_SHARES,
+);
+
+export function* downloadMetaShareWorker({ payload }) {
+  yield put(switchS3LoadingStatus('downloadMetaShare'));
+
+  const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
+  const s3Service: S3Service = yield select((state) => state.health.service);
+
+  const { DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database,
+  );
+
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+
+  let res;
+  if (payload.downloadType !== 'recovery') {
+    let existingShares = [];
+    if (Object.keys(UNDER_CUSTODY).length) {
+      existingShares = Object.keys(UNDER_CUSTODY).map(
+        (tag) => UNDER_CUSTODY[tag].META_SHARE,
+      );
+    }
+
+    res = yield call(
+      S3Service.downloadAndValidateShare,
+      encryptedKey,
+      otp,
+      existingShares,
+      s3Service.levelhealth.walletId,
+    );
+  } else {
+    res = yield call(S3Service.downloadAndValidateShare, encryptedKey);
+  }
+
+  console.log({ res });
+  if (res.status === 200) {
+    const { metaShare, encryptedDynamicNonPMDD } = res.data;
+    let updatedBackup;
+    if (payload.downloadType !== 'recovery') {
+      //TODO: activate DNP Transportation Layer for Hexa Premium
+      // const dynamicNonPMDD = {
+      //   ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
+      //   META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
+      //     ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
+      //     : [metaShare],
+      // };
+
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+          [metaShare.meta.tag]: {
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
+        },
+        // DYNAMIC_NONPMDD: dynamicNonPMDD,
+      };
+
+      console.log({ updatedBackup });
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+        },
+      });
+
+      // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
+      yield put(downloadedMShare(otp, true));
+      //yield put(updateMSharesHealth());
+    } else {
+      let updatedRecoveryShares = {};
+      let updated = false;
+
+      if (payload.replaceIndex === 0 || payload.replaceIndex) {
+        // replacing stored key w/ scanned from Guardian's help-restore
+        updatedRecoveryShares = {
+          ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+          [payload.replaceIndex]: {
+            REQUEST_DETAILS: { KEY: encryptedKey },
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
+        };
+      } else {
+        Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(
+          (objectKey) => {
+            const recoveryShare =
+              DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
+            if (
+              recoveryShare.REQUEST_DETAILS &&
+              recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+            ) {
+              updatedRecoveryShares[objectKey] = {
+                REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+                META_SHARE: metaShare,
+                ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+              };
+              updated = true;
+            } else {
+              updatedRecoveryShares[objectKey] = recoveryShare;
+            }
+          },
+        );
+      }
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        RECOVERY_SHARES: updatedRecoveryShares,
+      };
+      // yield put(downloadedMShare(otp, true));
+      yield call(insertDBWorker, {
+        payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      });
+    }
+   
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log({ res });
+    yield put(ErrorReceiving(true));
+    // Alert.alert('Download Failed!', res.err);
+    yield put(downloadedMShare(otp, false, res.err));
+  }
+  yield put(switchS3LoadingStatus('downloadMetaShare'));
+}
+
+export const downloadMetaShareHealthWatcher = createWatcher(
+  downloadMetaShareWorker,
+  DOWNLOAD_MSHARE_HEALTH,
+);
+
+function* recoverWalletWorker({ payload }) {
+  yield put(switchS3LoadingStatus('restoreWallet'));
+
+  try {
+    const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
+      (state) => state.storage.database,
+    );
+
+    const { security } = WALLET_SETUP;
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+
+    let encDynamicNonPMDD;
+    const mappedMetaShares: { [walletId: string]: MetaShare[] } = {};
+    Object.keys(RECOVERY_SHARES).forEach((key) => {
+      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
+      if (META_SHARE) {
+        // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
+        const shares = mappedMetaShares[META_SHARE.meta.walletId]
+          ? mappedMetaShares[META_SHARE.meta.walletId]
+          : [];
+        let insert = true;
+        shares.forEach((share) => {
+          if (share.shareId === META_SHARE.shareId) insert = false;
+        }, []);
+
+        if (insert) {
+          shares.push(META_SHARE);
+          mappedMetaShares[META_SHARE.meta.walletId] = shares;
+        }
+      }
+      // if (!encDynamicNonPMDD) { // retired due to wallet image
+      //   encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      // } else {
+      //   if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
+      //     encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      //   }
+      // }
+    });
+
+    console.log({ mappedMetaShares });
+    let restorationShares: MetaShare[] = [];
+    Object.keys(mappedMetaShares).forEach((walletId) => {
+      if (mappedMetaShares[walletId].length >= 3)
+        restorationShares = mappedMetaShares[walletId];
+    });
+
+    if (Object.keys(restorationShares).length !== 3) {
+      Alert.alert('Insufficient compatible shares to recover the wallet');
+      throw new Error(`Insufficient compatible shares to recover the wallet`);
+    }
+
+    const encryptedSecrets: string[] = restorationShares.map(
+      (share) => share.encryptedSecret,
+    );
+
+    const res = yield call(
+      S3Service.recoverFromSecrets,
+      encryptedSecrets,
+      security.answer,
+    );
+
+    if (res.status === 200) {
+      const { mnemonic } = res.data;
+      const {
+        regularAcc,
+        testAcc,
+        secureAcc,
+        s3Service,
+        trustedContacts,
+      } = yield call(
+        serviceGenerator2,
+        security.answer,
+        mnemonic,
+        restorationShares,
+      );
+
+      const UNDER_CUSTODY = {};
+      let DYNAMIC_NONPMDD = {};
+      if (encDynamicNonPMDD) {
+        // decentralized restoration of Wards
+        const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
+
+        if (res.status !== 200)
+          console.log('Failed to decrypt dynamic nonPMDD');
+        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
+        dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
+          UNDER_CUSTODY[metaShare.meta.tag] = {
+            META_SHARE: metaShare,
+          };
+        });
+        DYNAMIC_NONPMDD = dynamicNonPMDD;
+      }
+
+      const DECENTRALIZED_BACKUP = {
+        RECOVERY_SHARES: {},
+        SHARES_TRANSFER_DETAILS: {},
+        UNDER_CUSTODY,
+        DYNAMIC_NONPMDD,
+      };
+      console.log({ DECENTRALIZED_BACKUP });
+
+      const SERVICES = {
+        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+        TEST_ACCOUNT: JSON.stringify(testAcc),
+        SECURE_ACCOUNT: JSON.stringify(secureAcc),
+        S3_SERVICE: JSON.stringify(s3Service),
+        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      };
+      const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      yield call(insertDBWorker, { payload });
+      yield delay(2000); // seconds delay prior to Wallet Image check
+      yield put(fetchWalletImage());
+
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
+      const current = Date.now();
+      AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
+      const securityQuestionHistory = {
+        confirmed: current,
+      };
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(securityQuestionHistory),
+      );
+
+      // personal copy health restoration
+      let updatedPDFHealth = {};
+      for (const share of restorationShares) {
+        if (share.meta.index > 2) {
+          updatedPDFHealth = {
+            ...updatedPDFHealth,
+            [share.meta.index]: {
+              shareId: `placeHolderID${share.meta.index}`,
+              updatedAt: Date.now(),
+            },
+          };
+        }
+      }
+
+      if (!updatedPDFHealth[3]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [3]: {
+            shareId: 'placeHolderID3',
+            updatedAt: 0,
+          },
+        };
+      }
+      if (!updatedPDFHealth[4]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [4]: {
+            shareId: 'placeHolderID4',
+            updatedAt: 0,
+          },
+        };
+      }
+      if (Object.keys(updatedPDFHealth).length)
+        yield call(
+          AsyncStorage.setItem,
+          'PDF Health',
+          JSON.stringify(updatedPDFHealth),
+        );
+    } else {
+      throw new Error(res.err);
+    }
+  } catch (err) {
+    console.log({ err: err.message });
+    yield put(walletRecoveryFailed(true));
+    // Alert.alert('Wallet recovery failed!', err.message);
+  }
+
+  yield put(switchS3LoadingStatus('restoreWallet'));
+}
+
+export const recoverWalletHealthWatcher = createWatcher(
+  recoverWalletWorker,
+  RECOVER_WALLET_HEALTH,
 );
