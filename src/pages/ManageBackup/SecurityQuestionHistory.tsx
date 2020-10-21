@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   SafeAreaView,
   StatusBar,
@@ -12,7 +11,8 @@ import {
   Keyboard,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -22,7 +22,6 @@ import { useDispatch } from 'react-redux';
 import { checkMSharesHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -36,8 +35,8 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecurityQuestionHelpContents from '../../components/Helper/SecurityQuestionHelpContents';
 
 const SecurityQuestionHistory = props => {
-  const [SelectedOption, setSelectedOption] = useState(0);
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
+  const [] = useState(0);
+  const [HelpBottomSheet] = useState(React.createRef());
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
       id: 1,
@@ -61,11 +60,9 @@ const SecurityQuestionHistory = props => {
   ]);
   const [
     SecurityQuestionBottomSheet,
-    setSecurityQuestionBottomSheet,
   ] = useState(React.createRef());
   const [
     HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
   ] = useState(React.createRef());
 
   const updateAutoHighlightFlags = props.navigation.getParam(
@@ -124,9 +121,9 @@ const SecurityQuestionHistory = props => {
   const renderHealthCheckSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -199,20 +196,20 @@ const SecurityQuestionHistory = props => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <SecurityQuestionHelpContents 
-      titleClicked={()=>{
-        if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
-      }}/>
+    return (
+      <SecurityQuestionHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+        }} />
     );
   }
 
@@ -221,20 +218,16 @@ const SecurityQuestionHistory = props => {
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
+
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
+
+      <View style={NavStyles.modalHeaderTitleView} >
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -258,10 +251,10 @@ const SecurityQuestionHistory = props => {
               source={require('../../assets/images/icons/icon_securityquestion.png')}
             />
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
               </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
+              <Text style={NavStyles.modalHeaderInfoText}>
                 Last backup{' '}
                 <Text
                   style={{
@@ -286,7 +279,7 @@ const SecurityQuestionHistory = props => {
               textStyle={{}}
             />
             <Image
-              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
+              style={{ ...CommonStyles.cardIconImage, alignSelf: 'center' }}
               source={getIconByStatus(
                 props.navigation.state.params.selectedStatus,
               )}
@@ -313,15 +306,15 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-         enabledInnerScrolling={true}
+        enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
-         enabledGestureInteraction={false}
-         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,
@@ -330,7 +323,7 @@ const SecurityQuestionHistory = props => {
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[
@@ -345,21 +338,3 @@ const SecurityQuestionHistory = props => {
 };
 
 export default SecurityQuestionHistory;
-
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
-});

@@ -2,13 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import ContactList from '../../components/ContactList';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -82,16 +81,8 @@ const TrustedContacts = (props) => {
         width: '100%',
       }}
     >
-      <View
-        style={{
-          ...BackupStyles.modalHeaderTitleView,
-          paddingTop: hp('0.5%'),
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: 20,
-        }}
-      >
-        <Text style={BackupStyles.modalHeaderTitleText}>
+      <View style={NavStyles.modalHeaderTitleView}>
+        <Text style={NavStyles.modalHeaderTitleText}>
           Associate a contact
         </Text>
         <AppBottomSheetTouchableWrapper
