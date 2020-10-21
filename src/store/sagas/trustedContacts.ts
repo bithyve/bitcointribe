@@ -157,7 +157,12 @@ function* removeTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.trustedContactsInfo,
   );
   const s3Service: S3Service = yield select((state) => state.sss.service);
-
+  const { DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database,
+  );
+  const shareTransferDetails = {
+    ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+  };
   let { contactName, shareIndex } = payload; // shareIndex is passed in case of Guardian
   contactName = contactName.toLowerCase().trim();
 
@@ -190,6 +195,27 @@ function* removeTrustedContactWorker({ payload }) {
     trustedContactsService.tc.trustedContacts[contactName].isGuardian = false;
     if (shareIndex !== null && shareIndex <= 2)
       s3Service.resetSharesHealth(shareIndex);
+    delete shareTransferDetails[shareIndex]; // enables createGuardian on manage backup
+
+    // resets the highlight flag for manage backup
+    let autoHighlightFlags = yield call(
+      AsyncStorage.getItem,
+      'AutoHighlightFlags',
+    );
+    if (autoHighlightFlags) {
+      autoHighlightFlags = JSON.parse(autoHighlightFlags);
+      if (shareIndex === 0)
+        autoHighlightFlags = { ...autoHighlightFlags, secondaryDevice: false };
+      else if (shareIndex === 1)
+        autoHighlightFlags = { ...autoHighlightFlags, trustedContact1: false };
+      else if (shareIndex === 2)
+        autoHighlightFlags = { ...autoHighlightFlags, trustedContact2: false };
+
+      AsyncStorage.setItem(
+        'AutoHighlightFlags',
+        JSON.stringify(autoHighlightFlags),
+      );
+    }
   } else delete trustedContactsService.tc.trustedContacts[contactName];
 
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
@@ -228,12 +254,25 @@ function* removeTrustedContactWorker({ payload }) {
     }
   }
 
+  let dbPayload = {};
   const { SERVICES } = yield select((state) => state.storage.database);
   const updatedSERVICES = {
     ...SERVICES,
     TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
   };
-  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  dbPayload = { SERVICES: updatedSERVICES };
+
+  if (isGuardian) {
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_TRANSFER_DETAILS: shareTransferDetails,
+    };
+    dbPayload = { ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup };
+  }
+
+  yield call(insertDBWorker, {
+    payload: dbPayload,
+  });
 
   const { walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
