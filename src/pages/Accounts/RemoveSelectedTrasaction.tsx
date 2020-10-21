@@ -30,7 +30,7 @@ export default function RemoveSelectedTrasaction(props) {
           </Text>
         </View>
         <ScrollView>
-        <RecipientComponent 
+        <RecipientComponent
           item={contactInfo}
           onPressElement={() => {
             if (contactInfo.note) {
@@ -40,7 +40,7 @@ export default function RemoveSelectedTrasaction(props) {
             }
           }}
           SelectedContactId={SelectedContactId}
-          serviceType={props.serviceType}  
+          serviceType={props.serviceType}
         />
         </ScrollView>
 

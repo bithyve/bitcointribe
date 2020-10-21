@@ -1,11 +1,7 @@
 import React, {
   PureComponent,
-  useEffect,
-  useState,
-  useCallback,
   createRef,
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
   Text,
@@ -20,6 +16,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -31,7 +28,6 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { nameToInitials } from '../../common/CommonFunctions';
-import Entypo from 'react-native-vector-icons/Entypo';
 import _ from 'underscore';
 import moment from 'moment';
 import {
@@ -61,7 +57,6 @@ import {
   MetaShare,
 } from '../../bitcoin/utilities/Interface';
 import {
-  updateEphemeralChannel,
   removeTrustedContact,
 } from '../../store/actions/trustedContacts';
 
@@ -97,14 +92,14 @@ const getImageIcon = (item) => {
               <Text style={styles.headerImageInitialsText}>
                 {item
                   ? nameToInitials(
-                      item.firstName && item.lastName
-                        ? item.firstName + ' ' + item.lastName
-                        : item.firstName && !item.lastName
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
                         ? item.firstName
                         : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-                    )
+                          ? item.lastName
+                          : '',
+                  )
                   : ''}
               </Text>
             </View>
@@ -153,7 +148,7 @@ interface ContactDetailsStateTypes {
 class ContactDetailsNew extends PureComponent<
   ContactDetailsPropTypes,
   ContactDetailsStateTypes
-> {
+  > {
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
@@ -280,7 +275,7 @@ class ContactDetailsNew extends PureComponent<
     if (this.Contact.firstName && SHARES_TRANSFER_DETAILS[this.index]) {
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -508,7 +503,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -530,7 +525,7 @@ class ContactDetailsNew extends PureComponent<
       UNDER_CUSTODY[requester] &&
       UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
       Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
-        config.TC_REQUEST_EXPIRY
+      config.TC_REQUEST_EXPIRY
     ) {
       const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
@@ -560,7 +555,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -594,7 +589,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -651,7 +646,7 @@ class ContactDetailsNew extends PureComponent<
 
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       let data: EphemeralDataElements = {
@@ -663,7 +658,7 @@ class ContactDetailsNew extends PureComponent<
       if (
         !SHARES_TRANSFER_DETAILS[this.index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[this.index].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -676,7 +671,7 @@ class ContactDetailsNew extends PureComponent<
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -733,7 +728,7 @@ class ContactDetailsNew extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -1028,12 +1023,12 @@ class ContactDetailsNew extends PureComponent<
                   numberOfLines={1}
                 >
                   {this.Contact.firstName === 'F&F request' &&
-                  this.Contact.contactsWalletName !== undefined &&
-                  this.Contact.contactsWalletName !== ''
+                    this.Contact.contactsWalletName !== undefined &&
+                    this.Contact.contactsWalletName !== ''
                     ? `${this.Contact.contactsWalletName}'s Wallet`
                     : this.Contact.contactName == 'Secondary Device'
-                    ? 'Keeper Device'
-                    : contact.contactName}
+                      ? 'Keeper Device'
+                      : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
                   <Text style={styles.phoneText}>
@@ -1046,42 +1041,42 @@ class ContactDetailsNew extends PureComponent<
                 ) : null}
               </View>
               {this.Contact.hasTrustedChannel &&
-              !(
-                this.Contact.hasXpub || this.Contact.hasTrustedAddress
-              ) ? null : this.Contact.contactName === 'Secondary Device' &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                ) ? null : (
-                <TouchableOpacity
-                  disabled={isSendDisabled}
-                  onPress={() => {
-                    this.setState({
-                      isSendDisabled: true,
-                    });
-
+                ) ? null : this.Contact.contactName === 'Secondary Device' &&
+                  !(
                     this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                      ? this.onPressSend()
-                      : this.Contact.contactName != 'Secondary Device'
-                      ? this.onPressResendRequest()
-                      : null;
-                  }}
-                  style={styles.resendContainer}
-                >
-                  {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
-                    <Image
-                      source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                      style={styles.bitcoinIconStyle}
-                    />
-                  ) : null}
-                  <Text style={styles.sendTextStyle}>
-                    {this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                      ? 'Send'
-                      : this.index < 3
-                      ? 'Reshare'
-                      : 'Resend Request'}
-                  </Text>
-                </TouchableOpacity>
-              )}
+                  ) ? null : (
+                    <TouchableOpacity
+                      disabled={isSendDisabled}
+                      onPress={() => {
+                        this.setState({
+                          isSendDisabled: true,
+                        });
+
+                        this.Contact.hasXpub || this.Contact.hasTrustedAddress
+                          ? this.onPressSend()
+                          : this.Contact.contactName != 'Secondary Device'
+                            ? this.onPressResendRequest()
+                            : null;
+                      }}
+                      style={styles.resendContainer}
+                    >
+                      {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
+                        <Image
+                          source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                          style={styles.bitcoinIconStyle}
+                        />
+                      ) : null}
+                      <Text style={styles.sendTextStyle}>
+                        {this.Contact.hasXpub || this.Contact.hasTrustedAddress
+                          ? 'Send'
+                          : this.index < 3
+                            ? 'Reshare'
+                            : 'Resend Request'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
             </View>
           </View>
           {Loading ? (
@@ -1120,26 +1115,26 @@ class ContactDetailsNew extends PureComponent<
               />
             </View>
           ) : (
-            <View style={{ flex: 1 }}>
-              <ScrollView style={{ flex: 1 }}>
-                {this.sortedHistory(trustedContactHistory).map((value) => {
-                  if (SelectedOption == value.id) {
-                    return (
-                      <TouchableOpacity
-                        key={value.id}
-                        onPress={() => this.SelectOption(value.id)}
-                        style={styles.selectOptionContainer}
-                      >
-                        <Text
-                          style={{
-                            color: Colors.blue,
-                            fontSize: RFValue(13),
-                            fontFamily: Fonts.FiraSansRegular,
-                          }}
+              <View style={{ flex: 1 }}>
+                <ScrollView style={{ flex: 1 }}>
+                  {this.sortedHistory(trustedContactHistory).map((value) => {
+                    if (SelectedOption == value.id) {
+                      return (
+                        <TouchableOpacity
+                          key={value.id}
+                          onPress={() => this.SelectOption(value.id)}
+                          style={styles.selectOptionContainer}
                         >
-                          {value.title}
-                        </Text>
-                        {/* <Text
+                          <Text
+                            style={{
+                              color: Colors.blue,
+                              fontSize: RFValue(13),
+                              fontFamily: Fonts.FiraSansRegular,
+                            }}
+                          >
+                            {value.title}
+                          </Text>
+                          {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(10),
@@ -1149,33 +1144,33 @@ class ContactDetailsNew extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                        <Text style={styles.dateTextStyle}>{value.date}</Text>
-                      </TouchableOpacity>
-                    );
-                  } else {
-                    return (
-                      <TouchableOpacity
-                        key={value.id}
-                        onPress={() => this.SelectOption(value.id)}
-                        style={styles.selectOptionSecond}
-                      >
-                        <View
-                          style={{ flexDirection: 'row', alignItems: 'center' }}
+                          <Text style={styles.dateTextStyle}>{value.date}</Text>
+                        </TouchableOpacity>
+                      );
+                    } else {
+                      return (
+                        <TouchableOpacity
+                          key={value.id}
+                          onPress={() => this.SelectOption(value.id)}
+                          style={styles.selectOptionSecond}
                         >
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontSize: RFValue(10),
-                              fontFamily: Fonts.FiraSansRegular,
-                            }}
+                          <View
+                            style={{ flexDirection: 'row', alignItems: 'center' }}
                           >
-                            {value.title}
-                          </Text>
-                          <Text style={styles.dateTextSecondStyle}>
-                            {value.date}
-                          </Text>
-                        </View>
-                        {/* <Text
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontSize: RFValue(10),
+                                fontFamily: Fonts.FiraSansRegular,
+                              }}
+                            >
+                              {value.title}
+                            </Text>
+                            <Text style={styles.dateTextSecondStyle}>
+                              {value.date}
+                            </Text>
+                          </View>
+                          {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(8),
@@ -1185,20 +1180,20 @@ class ContactDetailsNew extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                      </TouchableOpacity>
-                    );
-                  }
-                })}
-              </ScrollView>
-              {this.sortedHistory(trustedContactHistory).length <= 1 && (
-                <BottomInfoBox
-                  backgroundColor={Colors.white}
-                  title={'Note'}
-                  infoText={'The details of your contact will appear here.'}
-                />
-              )}
-            </View>
-          )}
+                        </TouchableOpacity>
+                      );
+                    }
+                  })}
+                </ScrollView>
+                {this.sortedHistory(trustedContactHistory).length <= 1 && (
+                  <BottomInfoBox
+                    backgroundColor={Colors.white}
+                    title={'Note'}
+                    infoText={'The details of your contact will appear here.'}
+                  />
+                )}
+              </View>
+            )}
           {this.contactsType == "I'm Keeper of" && (
             <View style={styles.keeperViewStyle}>
               <TouchableOpacity
@@ -1217,8 +1212,8 @@ class ContactDetailsNew extends PureComponent<
                   {uploading ? (
                     <ActivityIndicator size="small" />
                   ) : (
-                    <Text style={styles.buttonText}>Help Restore</Text>
-                  )}
+                      <Text style={styles.buttonText}>Help Restore</Text>
+                    )}
                   {/* <Text numberOfLines={1} style={styles.buttonInfo}>
                     Lorem ipsum dolor
                   </Text> */}
@@ -1277,7 +1272,7 @@ class ContactDetailsNew extends PureComponent<
                     },
                     {
                       text: 'Cancel',
-                      onPress: () => {},
+                      onPress: () => { },
                       style: 'cancel',
                     },
                   ],
@@ -1404,6 +1399,7 @@ export default connect(mapStateToProps, {
   ErrorSending,
   removeTrustedContact,
 })(ContactDetailsNew);
+
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
@@ -1412,18 +1408,12 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingBottom: wp('15%'),
   },
+
   modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    // paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 15,
+    ...NavStyles.modalHeaderTitleView,
+    paddingRight: 0,
   },
+
   contactText: {
     marginLeft: 10,
     fontSize: RFValue(20),
