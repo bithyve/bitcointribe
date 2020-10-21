@@ -102,39 +102,10 @@ import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBac
 import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 import { Button } from 'react-native-elements';
+import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
-export const isCompatible = async (method: string, version: string) => {
-  if (!semver.valid(version)) {
-    // handling exceptions: off standard versioning
-    if (version === '0.9') version = '0.9.0';
-    else if (version === '1.0') version = '1.0.0';
-  }
-
-  if (version && semver.gt(version, DeviceInfo.getVersion())) {
-    // checking compatibility via Relay
-    const res = await RelayServices.checkCompatibility(method, version);
-    if (res.status !== 200) {
-      console.log('Failed to check compatibility');
-      return true;
-    }
-
-    const { compatible, alternatives } = res.data;
-    if (!compatible) {
-      if (alternatives) {
-        if (alternatives.update)
-          Alert.alert('Update your app inorder to process this link/QR');
-        else if (alternatives.message) Alert.alert(alternatives.message);
-      } else {
-        Alert.alert('Incompatible link/QR, updating your app might help');
-      }
-      return false;
-    }
-    return true;
-  }
-  return true;
-};
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
@@ -399,9 +370,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     try {
       const scannedData = JSON.parse(qrData);
+
       if (scannedData.ver) {
-        if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
+        const isAppVersionCompatible = await checkAppVersionCompatibility({
+          relayCheckMethod: scannedData.type,
+          version: scannedData.ver,
+        });
+
+        if (!isAppVersionCompatible) {
+          return;
+        }
       }
+
       switch (scannedData.type) {
         case 'trustedGuardian':
           const trustedGuardianRequest = {
@@ -1062,7 +1042,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         const version = splits.pop().slice(1);
 
         if (version) {
-          if (!(await isCompatible(splits[4], version))) return;
+          const isAppVersionCompatible = await checkAppVersionCompatibility({
+            relayCheckMethod: splits[4],
+            version,
+          });
+
+          if (!isAppVersionCompatible) {
+            return;
+          }
         }
 
         const trustedContactRequest = {
