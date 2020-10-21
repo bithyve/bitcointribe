@@ -43,7 +43,6 @@ import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGeneration
 import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
-import Confirmation from '../pages/Accounts/Confirmation';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
 import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
 import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory';
@@ -121,7 +120,6 @@ const MODAL_ROUTES = [
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
-  'Confirmation',
   'Intermediate',
 ];
 
@@ -181,7 +179,6 @@ const HomeNavigator = createStackNavigator(
     WalletCreationSuccess,
     SecureScan,
     GoogleAuthenticatorOTP,
-    Confirmation,
     TwoFASetup,
     SecondaryDeviceHistory,
     TrustedContactHistory,
