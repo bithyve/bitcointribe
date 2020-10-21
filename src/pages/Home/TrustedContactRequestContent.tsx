@@ -1,9 +1,9 @@
 import React from 'react';
 import TrustedContactRequest from '../Contacts/TrustedContactRequest';
-import BottomSheet from 'reanimated-bottom-sheet';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 export interface Props {
-  bottomSheetRef: React.Ref<BottomSheet>;
+  bottomSheetRef: React.RefObject<BottomSheet>;
   trustedContactRequest: any;
   recoveryRequest: any;
   onPressAccept: (key: any) => void;
