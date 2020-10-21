@@ -289,12 +289,12 @@ class FriendsAndFamily extends PureComponent<
           };
           trustedContacts.push(element);
           if (element.isGuardian) {
-            // const isRemovable =
-            //   Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY &&
-            //   !element.hasTrustedChannel
-            //     ? true
-            //     : false;
-            myKeepers.push({ ...element });
+            const isRemovable =
+              Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY ||
+              element.hasTrustedChannel
+                ? true
+                : false;
+            myKeepers.push({ ...element, isRemovable });
           }
           if (element.isWard) {
             imKeepers.push(element);

@@ -879,30 +879,35 @@ export default function ManageBackup(props) {
       ) {
         updatedAutoHighlightFlags.secondaryDevice = true;
       }
+
       if (
         overallHealth.sharesInfo[1] &&
         overallHealth.sharesInfo[1].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact1 = true;
       }
+
       if (
         overallHealth.sharesInfo[2] &&
         overallHealth.sharesInfo[2].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact2 = true;
       }
+
       if (
         overallHealth.sharesInfo[3] &&
         overallHealth.sharesInfo[3].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy1 = true;
       }
+
       if (
         overallHealth.sharesInfo[4] &&
         overallHealth.sharesInfo[4].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy2 = true;
       }
+
       if (overallHealth.qaStatus.updatedAt) {
         updatedAutoHighlightFlags.securityAns = true;
       }
@@ -1707,7 +1712,7 @@ export default function ManageBackup(props) {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome

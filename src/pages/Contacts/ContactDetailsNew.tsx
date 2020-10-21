@@ -1268,7 +1268,10 @@ class ContactDetailsNew extends PureComponent<
                     {
                       text: 'Yes',
                       onPress: () => {
-                        this.props.removeTrustedContact(contact.contactName);
+                        this.props.removeTrustedContact(
+                          contact.contactName,
+                          contact.shareIndex,
+                        );
                         this.props.navigation.goBack();
                       },
                     },
