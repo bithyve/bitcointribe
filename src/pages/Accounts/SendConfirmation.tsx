@@ -1517,14 +1517,14 @@ const styles = StyleSheet.create({
     marginRight: wp('6%'),
   },
   tableHeadingText: {
-    color: Colors.greyTextColor,
+    color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansMedium,
   },
   priorityTableText: {
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
-    color: Colors.greyTextColor,
+    color: Colors.textColorGrey,
     textAlign: 'right',
   },
   priorityTableHeadingContainer: {
