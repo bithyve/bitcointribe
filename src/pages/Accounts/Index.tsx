@@ -95,30 +95,6 @@ function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
 }
 
-export const isCompatible = async (method: string, version: string) => {
-  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
-    // checking compatibility via Relay
-    const res = await RelayServices.checkCompatibility(method, version);
-    if (res.status !== 200) {
-      return true;
-    }
-
-    const { compatible, alternatives } = res.data;
-    if (!compatible) {
-      if (alternatives) {
-        if (alternatives.update)
-          Alert.alert('Update your app inorder to process this link/QR');
-        else if (alternatives.message) Alert.alert(alternatives.message);
-      } else {
-        Alert.alert('Incompatible link/QR, updating your app might help');
-      }
-      return false;
-    }
-    return true;
-  }
-  return true;
-};
-
 interface AccountsStateTypes {
   carouselData: any;
   presentCarouselData: any;
