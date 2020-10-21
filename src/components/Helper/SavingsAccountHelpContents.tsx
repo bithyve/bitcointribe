@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Linking,
+  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,20 +15,11 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import openLink from '../../utils/OpenLink';
 
 export default function SavingsAccountHelpContents(props) {
-  const scrollViewRef = useRef();
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
+  const scrollViewRef = useRef<ScrollView>();
 
   return (
     <View style={styles.modalContainer}>
@@ -108,7 +99,7 @@ export default function SavingsAccountHelpContents(props) {
             of {'\n'}2FA confirmation to confirm spending
           </Text>
           <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
+            scrollViewRef.current?.scrollTo({ x: 0, y: hp('80%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
           </TouchableOpacity>
@@ -162,7 +153,7 @@ export default function SavingsAccountHelpContents(props) {
             one key belongs to BitHyve signing server
           </Text>
           <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('162%'), animated: true });
+            scrollViewRef.current?.scrollTo({ x: 0, y: hp('162%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
           </TouchableOpacity>
@@ -182,7 +173,7 @@ export default function SavingsAccountHelpContents(props) {
         <View
           style={{
             height: hp('80%'),
-            marginTop: hp('2%'), 
+            marginTop: hp('2%'),
             justifyContent: 'space-between'
           }}
         >

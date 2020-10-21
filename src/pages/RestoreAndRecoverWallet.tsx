@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -8,28 +8,18 @@ import {
   StatusBar,
   Text,
   AsyncStorage,
-  Linking
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../common/Fonts';
 import Colors from '../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomInfoBox from '../components/BottomInfoBox';
+import openLink from '../utils/OpenLink';
 
 const RestoreAndRecoverWallet = props => {
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
-    });
-  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
