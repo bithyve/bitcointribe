@@ -878,34 +878,39 @@ export default function ManageBackup(props) {
         overallHealth.sharesInfo[0].updatedAt
       ) {
         updatedAutoHighlightFlags.secondaryDevice = true;
-      }
+      } else updatedAutoHighlightFlags.secondaryDevice = false;
+
       if (
         overallHealth.sharesInfo[1] &&
         overallHealth.sharesInfo[1].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact1 = true;
-      }
+      } else updatedAutoHighlightFlags.trustedContact1 = false;
+
       if (
         overallHealth.sharesInfo[2] &&
         overallHealth.sharesInfo[2].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact2 = true;
-      }
+      } else updatedAutoHighlightFlags.trustedContact2 = false;
+
       if (
         overallHealth.sharesInfo[3] &&
         overallHealth.sharesInfo[3].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy1 = true;
-      }
+      } else updatedAutoHighlightFlags.personalCopy1 = false;
+
       if (
         overallHealth.sharesInfo[4] &&
         overallHealth.sharesInfo[4].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy2 = true;
-      }
+      } else updatedAutoHighlightFlags.personalCopy2 = false;
+
       if (overallHealth.qaStatus.updatedAt) {
         updatedAutoHighlightFlags.securityAns = true;
-      }
+      } else updatedAutoHighlightFlags.securityAns = false;
 
       if (
         JSON.stringify(updatedAutoHighlightFlags) !==
@@ -1707,7 +1712,7 @@ export default function ManageBackup(props) {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome

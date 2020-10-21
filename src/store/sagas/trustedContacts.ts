@@ -51,6 +51,7 @@ import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -155,7 +156,9 @@ function* removeTrustedContactWorker({ payload }) {
   const trustedContactsInfo = yield select(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
-  let { contactName } = payload;
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  let { contactName, shareIndex } = payload; // shareIndex is passed in case of Guardian
   contactName = contactName.toLowerCase().trim();
 
   const {
@@ -182,10 +185,12 @@ function* removeTrustedContactWorker({ payload }) {
     FCMs,
   };
 
-  if (isGuardian)
+  if (isGuardian) {
     // Guardians, instead of removal, gets down-graded to trusted contacts
     trustedContactsService.tc.trustedContacts[contactName].isGuardian = false;
-  else delete trustedContactsService.tc.trustedContacts[contactName];
+    if (shareIndex !== null && shareIndex <= 2)
+      s3Service.resetSharesHealth(shareIndex);
+  } else delete trustedContactsService.tc.trustedContacts[contactName];
 
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
   if (tcInfo) {
