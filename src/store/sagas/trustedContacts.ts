@@ -158,23 +158,34 @@ function* removeTrustedContactWorker({ payload }) {
   let { contactName } = payload;
   contactName = contactName.toLowerCase().trim();
 
-  const dataElements: TrustedDataElements = {
-    remove: true,
-  };
+  const {
+    walletID,
+    FCMs,
+    isGuardian,
+  } = trustedContactsService.tc.trustedContacts[contactName];
+
+  let dataElements: TrustedDataElements;
+  if (isGuardian) dataElements = { removeGuardian: true };
+  else
+    dataElements = {
+      remove: true,
+    };
+
   yield call(
     trustedContactsService.updateTrustedChannel,
     contactName,
     dataElements,
   );
 
-  const { walletID, FCMs } = trustedContactsService.tc.trustedContacts[
-    contactName
-  ];
   const recipient = {
     walletID,
     FCMs,
   };
-  delete trustedContactsService.tc.trustedContacts[contactName];
+
+  if (isGuardian)
+    // Guardians, instead of removal, gets down-graded to trusted contacts
+    trustedContactsService.tc.trustedContacts[contactName].isGuardian = false;
+  else delete trustedContactsService.tc.trustedContacts[contactName];
 
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
   if (tcInfo) {
@@ -188,9 +199,18 @@ function* removeTrustedContactWorker({ payload }) {
           .trim();
 
         if (presentContactName === contactName) {
-          if (itr < 3) tcInfo[itr] = null;
-          // Guardian nullified
-          else tcInfo.splice(itr, 1);
+          if (itr < 3) {
+            let found = false;
+            for (let i = 3; i < tcInfo.length; i++) {
+              if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
+                found = true;
+                break;
+              }
+            }
+            // push if not already present in TC list
+            if (!found) tcInfo.push(tcInfo[itr]);
+            tcInfo[itr] = null; // Guardian position nullified
+          } else tcInfo.splice(itr, 1);
           // yield call(
           //   AsyncStorage.setItem,
           //   'TrustedContactsInfo',
@@ -216,7 +236,9 @@ function* removeTrustedContactWorker({ payload }) {
   const notification: INotification = {
     notificationType: notificationType.contact,
     title: 'Friends and Family notification',
-    body: `Trusted Contact removed by ${walletName}`,
+    body: `${
+      isGuardian ? 'Keeper' : 'Trusted Contact'
+    } removed by ${walletName}`,
     data: {},
     tag: notificationTag.IMP,
   };
@@ -822,6 +844,11 @@ function* syncTrustedChannelsWorker({ payload }) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
+  const { SERVICES, DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database,
+  );
+  const sharesUnderCustody = { ...DECENTRALIZED_BACKUP.UNDER_CUSTODY };
+
   const { contacts } = payload;
 
   if (Object.keys(trustedContacts.tc.trustedContacts).length) {
@@ -831,14 +858,23 @@ function* syncTrustedChannelsWorker({ payload }) {
     console.log({ res });
 
     if (res.status === 200 && res.data && res.data.synched) {
-      const { contactsToRemove } = res.data;
-      if (contactsToRemove.length) {
-        // remove trusted contacts
+      const { contactsToRemove, guardiansToRemove } = res.data;
+
+      if (contactsToRemove.length || guardiansToRemove.length) {
         const trustedContactsInfo = yield select(
           (state) => state.trustedContacts.trustedContactsInfo,
         );
         const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
+        // downgrade guardians and remove share
+        for (const guardianName of guardiansToRemove) {
+          trustedContacts.tc.trustedContacts[guardianName].isWard = false;
+          delete sharesUnderCustody[
+            trustedContacts.tc.trustedContacts[guardianName].contactsWalletName
+          ];
+        }
+
+        // remove trusted contacts
         for (const contactName of contactsToRemove) {
           delete trustedContacts.tc.trustedContacts[contactName];
           if (tcInfo) {
@@ -871,14 +907,24 @@ function* syncTrustedChannelsWorker({ payload }) {
 
       const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
 
-      if (preSyncTC !== postSyncTC) {
-        const { SERVICES } = yield select((state) => state.storage.database);
+      if (preSyncTC !== postSyncTC || guardiansToRemove.length) {
+        let payload = {};
         const updatedSERVICES = {
           ...SERVICES,
           TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
         };
+        payload = { SERVICES: updatedSERVICES };
+
+        if (guardiansToRemove.length) {
+          const updatedBackup = {
+            ...DECENTRALIZED_BACKUP,
+            UNDER_CUSTODY: sharesUnderCustody,
+          };
+          payload = { ...payload, DECENTRALIZED_BACKUP: updatedBackup };
+        }
+
         yield call(insertDBWorker, {
-          payload: { SERVICES: updatedSERVICES },
+          payload,
         });
         console.log('Trusted channels synched');
       }
