@@ -196,7 +196,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-          payload.contactInfo.contactName
+        payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -216,8 +216,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-            .UPLOADED_AT <
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -775,7 +775,7 @@ function* sharePersonalCopyWorker({ payload }) {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[selectedPersonalCopy.type].path
+                    personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -802,7 +802,7 @@ function* sharePersonalCopyWorker({ payload }) {
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                  personalCopyDetails[selectedPersonalCopy.type].path
+                personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -928,10 +928,10 @@ function* updateMSharesHealthWorker() {
     (state) => state.trustedContacts.service,
   );
 
-   const DECENTRALIZED_BACKUP = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
-  
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
@@ -976,13 +976,13 @@ function* updateMSharesHealthWorker() {
       }
     });
 
-    if(removed){
+    if (removed) {
       // update db post share removal
       const updatedSERVICES = {
         ...SERVICES,
         TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
       };
-  
+
       const updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY,
@@ -994,7 +994,7 @@ function* updateMSharesHealthWorker() {
         },
       });
     }
-   
+
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
