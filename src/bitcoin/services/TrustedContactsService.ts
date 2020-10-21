@@ -331,6 +331,7 @@ export default class TrustedContactsService {
         data: {
           synched: Boolean;
           contactsToRemove: String[];
+          guardiansToRemove: String[];
         };
         err?: undefined;
         message?: undefined;

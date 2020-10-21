@@ -252,6 +252,7 @@ export interface TrustedDataElements {
     otp: string;
     encryptedKey: string;
   };
+  removeGuardian?: boolean;
   remove?: boolean;
 }
 export interface TrustedData {
