@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
-  TouchableOpacity,
   Text,
-  Image,
   ActivityIndicator,
 } from 'react-native';
-import BackupStyles from '../../pages/ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
@@ -19,7 +16,6 @@ import { useSelector } from 'react-redux';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import QRCode from 'react-native-qrcode-svg';
 
 export default function TrustedContactQr(props) {
@@ -65,15 +61,6 @@ export default function TrustedContactQr(props) {
     }
   }, [SHARES_TRANSFER_DETAILS[props.index], props.contact]);
 
-  const getIconByStatus = useCallback((status) => {
-    if (status == 'Ugly') {
-      return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'Bad') {
-      return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'Good') {
-      return require('../../assets/images/icons/icon_check.png');
-    }
-  }, []);
 
   return (
     <View
@@ -85,25 +72,18 @@ export default function TrustedContactQr(props) {
         width: '100%',
       }}
     >
-      <View
-        style={{
-          ...BackupStyles.modalHeaderTitleView,
-          marginLeft: 10,
-          marginRight: 10,
-          marginTop: 5,
-        }}
-      >
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row' }}>
           <View
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
-            <Text style={BackupStyles.modalHeaderTitleText}>
+            <Text style={NavStyles.modalHeaderTitleText}>
               contact QR code
             </Text>
           </View>
         </View>
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         {!trustedContactQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />

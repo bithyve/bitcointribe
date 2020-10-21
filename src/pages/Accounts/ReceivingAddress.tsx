@@ -7,15 +7,13 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
-  Button,
   ScrollView,
   Platform,
   TouchableWithoutFeedback,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -26,7 +24,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -46,16 +43,15 @@ const ReceivingAddress = (props) => {
     ? props.navigation.state.params.getServiceType
     : null;
   const serviceType = props.navigation.getParam('serviceType');
-  const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
+  const [ReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
   const [
     SecureReceiveWarningBottomSheet,
-    setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
   const dispatch = useDispatch();
 
-  const { loading, service } = useSelector(
+  const { service } = useSelector(
     (state) => state.accounts[serviceType],
   );
   const { receivingAddress } =
@@ -66,17 +62,9 @@ const ReceivingAddress = (props) => {
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = isReceiveHelperDoneValue;
-    // let isReceiveHelperDone1 = await AsyncStorage.getItem(
-    //   'isReceiveHelperDone',
-    // );
-    // console.log(
-    //   'isReceiveHelperDone1',
-    //   isReceiveHelperDone,
-    //   isReceiveHelperDone1,
-    // );
+
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       dispatch(setReceiveHelper(true));
-      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
@@ -229,7 +217,7 @@ const ReceivingAddress = (props) => {
                   if(SecureReceiveWarningBottomSheet.current)
                   (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
                 }
-                  
+
                 }
               />
               <Button
@@ -271,8 +259,8 @@ const ReceivingAddress = (props) => {
             (ReceiveHelperBottomSheet.current as any).snapTo(0);
         }}
       >
-        <View style={BackupStyles.modalContainer}>
-          <View style={BackupStyles.modalHeaderTitleView}>
+        <View style={NavStyles.modalContainer}>
+          <View style={NavStyles.modalHeaderTitleView}>
             <View
               style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
             >
@@ -292,7 +280,7 @@ const ReceivingAddress = (props) => {
                   size={17}
                 />
               </TouchableOpacity>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 Receiving Address
               </Text>
               {serviceType == TEST_ACCOUNT ? (

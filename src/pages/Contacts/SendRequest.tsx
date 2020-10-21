@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,11 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import BottomInfoBox from '../../components/BottomInfoBox';
 import CopyThisText from '../../components/CopyThisText';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
@@ -23,19 +22,19 @@ import QRCode from 'react-native-qrcode-svg';
 
 
 const SendRequest = (props) => {
-  const [receivingAddress, setReceivingAddress] = useState('test');
+  const [receivingAddress] = useState('test');
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.modalContainer}>
-        <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalContainer}>
+        <View style={NavStyles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
               onPress={() => {
                 props.navigation.goBack();
               }}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               style={{ height: 30, width: 30, justifyContent: 'center' }}
             >
               <FontAwesome
@@ -45,18 +44,9 @@ const SendRequest = (props) => {
               />
             </TouchableOpacity>
             <View style={{ flex: 1 }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 Send Request
               </Text>
-              {/* <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansMedium,
-                }}
-              >
-                Lorem ipsum dolor sit amet, consec
-              </Text> */}
             </View>
             <TouchableOpacity
               onPress={() => { }}
@@ -107,12 +97,6 @@ const SendRequest = (props) => {
             marginBottom: hp('5%'),
           }}
         >
-          {/* <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-            }
-          /> */}
         </View>
       </View>
     </View>
@@ -121,16 +105,6 @@ const SendRequest = (props) => {
 
 const styles = StyleSheet.create({
   loader: { height: hp('27%'), justifyContent: 'center' },
-  modalContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-    alignSelf: 'center',
-    width: '100%',
-    paddingBottom: hp('2%'),
-    elevation: 10,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
-  },
 });
 
 export default SendRequest;
