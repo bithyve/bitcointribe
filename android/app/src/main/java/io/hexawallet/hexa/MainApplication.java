@@ -94,6 +94,7 @@ public class MainApplication extends Application implements ShareApplication, Re
             packages.add(new RNFirebaseMessagingPackage());
             packages.add(new RNFirebaseAnalyticsPackage());
             packages.add(new RNFirebaseNotificationsPackage());
+            packages.add(new PdfPasswordPackage());
 
             // Add unimodules
             List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
