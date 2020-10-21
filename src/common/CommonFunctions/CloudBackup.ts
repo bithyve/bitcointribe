@@ -5,6 +5,7 @@ const GoogleDrive = NativeModules.GoogleDrive;
 const iCloud = NativeModules.iCloud;
 let dataObject;
 let callBack;
+let share;
 let recoveryCallback;
 // check storage permission
 export const checkPermission = async () => {
@@ -37,15 +38,15 @@ export const CheckCloudDataBackup = (recoveryCallback1) =>{
   }
 }
 
-export const CloudDataBackup = (data, callback) => {
+export const CloudDataBackup = (data, callback, share?) => {
   dataObject = data;
   callBack = callback;
+  share = share ? share : {};
   if (Platform.OS == 'ios') {
-    // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
     iCloud.downloadBackup().then((backedJson) => {
        console.log('BackedUp JSON: DONE', backedJson);
       if (backedJson) {
-        updateData(backedJson, '');
+        updateData(backedJson, '', share);
       } else {
         createFile();
       }
@@ -125,7 +126,7 @@ export const createFile = () => {
 
   if (Platform.OS === 'ios') {
     iCloud.startBackup(JSON.stringify(WalletData));
-    callBack();
+    callBack(share);
   } else {
     const metaData = {
       name: 'HexaWalletBackup.json',
@@ -139,7 +140,7 @@ export const createFile = () => {
         // console.log('DATA', data);
         const result = err || data;
         if (result.eventName == 'successFullyUpload') {
-          callBack();
+          callBack(share);
           //dataObject.onPressSetStatus();
         }
       });
@@ -157,7 +158,7 @@ export const UpdateFile = (metaData) => {
       // console.log('ERROR updateFile', err);
       const result = err || data;
       if (result.eventName == 'successFullyUpdate') {
-        callBack();
+        callBack(share);
       }
       console.log('GoogleDrive.updateFile', result);
     });
@@ -185,7 +186,7 @@ export const readFile = (result, checkDataIsBackedup?) => {
   }
 };
 
-export const updateData = (result1, googleData) => {
+export const updateData = (result1, googleData, share?) => {
   const { data } = dataObject.regularAccount.getWalletId();
   var arr = [];
   var newArray = [];
@@ -224,7 +225,7 @@ export const updateData = (result1, googleData) => {
   }
   if (Platform.OS == 'ios') {
     iCloud.startBackup(JSON.stringify(newArray));
-    callBack();
+    callBack(share);
   } else {
     const metaData = {
       name: googleData.name,

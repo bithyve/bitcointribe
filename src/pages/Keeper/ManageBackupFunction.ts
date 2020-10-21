@@ -18,7 +18,7 @@ export const modifyLevelStatus = (
             keeperInfo[
               keeperInfo.findIndex((value) => value.shareId == element.shareId)
             ].name;
-          levelHealth.levelInfo[i].type =
+          levelHealth.levelInfo[i].shareType =
             keeperInfo[
               keeperInfo.findIndex((value) => value.shareId == element.shareId)
             ].type;
@@ -182,5 +182,6 @@ export const modifyLevelStatus = (
       }
     }
   }
+  console.log('levelData', levelData)
   return levelData;
 };

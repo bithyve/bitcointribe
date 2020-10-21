@@ -262,6 +262,7 @@ interface HomePropsTypes {
   setCardData: any;
   cardDataProps: any;
   isLevel2Initialized: Boolean;
+  isLevel3Initialized: Boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -869,11 +870,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 2);
   };
 
-  cloudData = async (kpInfo? , level?) => {
+  cloudData = async (kpInfo? , level?, share?) => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares = kpInfo ? JSON.stringify(s3Service.levelhealth.metaShares[0]) : ''; //= JSON.stringify(s3Service.LevelHealth.metaShares);
-    //console.log('s3Service.LevelHealth.metaShares', s3Service);
+    let shares = share && !(Object.keys(share).length === 0 && share.constructor === Object) ? JSON.stringify(share) : ''; 
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -893,21 +893,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
     }
     console.log('cloudData', data);
-    CloudDataBackup(data, this.setCloudBackupStatus);
+    CloudDataBackup(data, this.setCloudBackupStatus, share);
     // console.log('call for google drive upload', this.props.cloudBackupStatus);
   };
 
-  setCloudBackupStatus = () => {
+  setCloudBackupStatus = (share?) => {
     this.props.setCloudBackupStatus({status: true});
     if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
       this.updateHealthForCloud();
+    }
+    else if(this.props.cloudBackupStatus.status && this.props.currentLevel == 1){
+      this.updateHealthForCloud(share);
     }
   }
 
   updateCloudData = () =>{
     console.log("inside updateCloudData");
-    let { currentLevel, keeperInfo, levelHealth } = this.props;
+    let { currentLevel, keeperInfo, levelHealth, isLevel2Initialized, isLevel3Initialized, s3Service } = this.props;
     let KPInfo: any[] = [];
+    let secretShare = {};
     if(levelHealth.length > 0){
       let levelHealthVar = levelHealth[levelHealth.length - 1];
       if(levelHealthVar.levelInfo){
@@ -924,9 +928,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             KPInfo.push(object);
           }
         }
+       
+        if(isLevel2Initialized && !isLevel3Initialized && levelHealthVar.levelInfo[2].status == 'accessible' && levelHealthVar.levelInfo[3].status == 'accessible'){
+          for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
+            const element = s3Service.levelhealth.metaShares[i];
+            if(levelHealthVar.levelInfo[0].shareId == element.shareId){
+              secretShare = element;
+            }
+          }
+        }
       }
     }
-    this.cloudData(KPInfo, currentLevel);
+    this.cloudData(KPInfo, currentLevel, secretShare);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 
@@ -2055,7 +2068,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     bottomSheetRef: React.RefObject<RNBottomSheet>,
     newIndex: number,
   ) => {
-    console.log("Handle bottom sheet position change");
+    // console.log("Handle bottom sheet position change");
 
     if (bottomSheetRef === this.getActiveBottomSheetRef()) {
       const newState = newIndex >= 1 ? BottomSheetState.Open : BottomSheetState.Closed;
@@ -2170,27 +2183,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateHealthForCloud = () =>{
+  updateHealthForCloud = (share?) =>{
     let levelHealth = this.props.levelHealth;
-    console.log('cloud health update home levelHealth', levelHealth);
+    let levelHealthVar = levelHealth[0].levelInfo[0];
+    if(share && !(Object.keys(share).length === 0 && share.constructor === Object) && levelHealth.length > 0){
+      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
+    }
     // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized){
-      if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
-        levelHealth[0].levelInfo[0].updatedAt = moment(new Date()).valueOf();
-        levelHealth[0].levelInfo[0].status = 'accessible';
-        levelHealth[0].levelInfo[0].reshareVersion = 1;
-        levelHealth[0].levelInfo[0].guardian = 'cloud';
+    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized && levelHealthVar.status != 'accessible'){
+      if(levelHealthVar.shareType == 'cloud'){
+        levelHealthVar.updatedAt = moment(new Date()).valueOf();
+        levelHealthVar.status = 'accessible';
+        levelHealthVar.reshareVersion = 1;
+        levelHealthVar.guardian = 'cloud';
       }
       let shareArray = [
         {
           walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealth[0].levelInfo[0].shareId,
-          reshareVersion: levelHealth[0].levelInfo[0].reshareVersion,
+          shareId: levelHealthVar.shareId,
+          reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
           status: 'accessible'
         }
       ];
-      console.log('cloud health update home shareArray', shareArray);
       this.props.updateMSharesHealth(shareArray);
     }
   }
@@ -3120,6 +3135,7 @@ const mapStateToProps = (state) => {
     currentLevel: idx(state, (_) => _.health.currentLevel),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
+    isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
   };
 };
 

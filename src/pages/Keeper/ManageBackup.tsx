@@ -66,22 +66,14 @@ interface ManageBackupPropsTypes {
   regularAccount: RegularAccount;
   database: any;
   overallHealth: any;
-  levelHealth: {
-    levelInfo:{
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      guardian?: string;
-    }[]
-  }[];
+  levelHealth: any[];
   currentLevel: any;
   healthLoading: any;
   generateMetaShare: any;
   checkMSharesHealth: any;
   isLevelTwoMetaShareCreated: Boolean;
   isLevel2Initialized: Boolean;
+  isLevel3Initialized: Boolean;
   initLevelTwo: any;
   s3Service: any;
   updateMSharesHealth: any;
@@ -232,11 +224,10 @@ class ManageBackup extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  cloudData = async (kpInfo? , level?) => {
-    console.log("inside Cloud data", kpInfo, level);
+  cloudData = async (kpInfo? , level?, share?) => {
     const { walletName, regularAccount, s3Service} = this.props;
     let encryptedCloudDataJson;
-    let shares = kpInfo ? JSON.stringify(s3Service.levelhealth.metaShares[0]) : '';//= JSON.stringify(s3Service.levelhealth.metaShares);
+    let shares = share && !(Object.keys(share).length === 0 && share.constructor === Object) ? JSON.stringify(share) : ''; 
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -255,31 +246,38 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
     }
-    CloudDataBackup(data, this.setCloudBackupStatus);    
+    CloudDataBackup(data, this.setCloudBackupStatus, share);    
   };
 
-  setCloudBackupStatus = () => {
+  setCloudBackupStatus = (share) => {
     this.props.setCloudBackupStatus({status: true});
     if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
       this.updateHealthForCloud();
     }
+    else if(this.props.cloudBackupStatus.status && this.props.currentLevel == 1){
+      this.updateHealthForCloud(share);
+    }
   }
 
-  updateHealthForCloud = () =>{
+  updateHealthForCloud = (share?) =>{
     let levelHealth = this.props.levelHealth;
+    let levelHealthVar = levelHealth[0].levelInfo[0];
+    if(share && !(Object.keys(share).length === 0 && share.constructor === Object) && levelHealth.length > 0){
+      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
+    }
     // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized){
-      if(levelHealth[0].levelInfo[0].shareType == 'cloud'){
-        levelHealth[0].levelInfo[0].updatedAt = ''+moment(new Date()).valueOf();
-        levelHealth[0].levelInfo[0].status = 'accessible';
-        levelHealth[0].levelInfo[0].reshareVersion = 1;
-        levelHealth[0].levelInfo[0].guardian = 'cloud';
+    if(this.props.cloudBackupStatus && levelHealth.length && levelHealthVar.status != 'accessible'){
+      if(levelHealthVar.shareType == 'cloud'){
+        levelHealthVar.updatedAt = moment(new Date()).valueOf();
+        levelHealthVar.status = 'accessible';
+        levelHealthVar.reshareVersion = 1;
+        levelHealthVar.guardian = 'cloud';
       }
       let shareArray = [
         {
           walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealth[0].levelInfo[0].shareId,
-          reshareVersion: levelHealth[0].levelInfo[0].reshareVersion,
+          shareId: levelHealthVar.shareId,
+          reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
           status: 'accessible'
         }
@@ -291,13 +289,18 @@ class ManageBackup extends Component<
   componentDidUpdate = (prevProps, prevState) => {
     if(prevProps.levelHealth != this.props.levelHealth){
       this.modifyLevelData();
-      this.updateCloudData();
+    }
+    if(prevProps.levelHealth != this.props.levelHealth){
+      if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
+        this.cloudData();
+      }else{
+        this.updateCloudData();
+      }
     }
   };
 
   generateShares = (level) =>{
-    const { isLevel2, isPrimaryKeeper, levelData, selectedShareId } = this.state;
-    const {generateMetaShare, isLevel2Initialized, initLevelTwo} = this.props;
+    const { levelData, selectedShareId } = this.state;
     let PKStatus = levelData[1].keeper1.keeper1Done ? 'accessed' : 'notAccessed';
     this.props.navigation.navigate('KeeperDeviceHistory', {
       selectedTime: this.getTime(new Date()),
@@ -310,8 +313,9 @@ class ManageBackup extends Component<
   }
 
   updateCloudData = () =>{
-    let { currentLevel, keeperInfo, levelHealth } = this.props;
+    let { currentLevel, keeperInfo, levelHealth, isLevel2Initialized, isLevel3Initialized, s3Service } = this.props;
     let KPInfo: any[] = [];
+    let secretShare = {};
     if(levelHealth.length > 0){
       let levelHealthVar = levelHealth[levelHealth.length - 1];
       if(levelHealthVar.levelInfo){
@@ -328,9 +332,18 @@ class ManageBackup extends Component<
             KPInfo.push(object);
           }
         }
+
+        if(isLevel2Initialized && !isLevel3Initialized && levelHealthVar.levelInfo[2].status == 'accessible' && levelHealthVar.levelInfo[3].status == 'accessible'){
+          for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
+            const element = s3Service.levelhealth.metaShares[i];
+            if(levelHealthVar.levelInfo[0].shareId == element.shareId){
+              secretShare = element;
+            }
+          }
+        }
       }
     }
-    this.cloudData(KPInfo, currentLevel);
+    this.cloudData(KPInfo, currentLevel, secretShare);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   }
 
@@ -656,11 +669,11 @@ class ManageBackup extends Component<
                               }}
                             >
                               {value.keeper1.keeper1Done &&
-                              (value.keeper1.type == 'device' ||
+                              (value.keeper1.type == 'device' || value.keeper1.type == 'primaryKeeper' ||
                                 value.keeper1.type == 'friends') ? (
                                 <Image
                                   source={
-                                    value.keeper1.type == 'device'
+                                    value.keeper1.type == 'device' || value.keeper1.type == 'primaryKeeper'
                                       ? require('../../assets/images/icons/icon_ipad_blue.png')
                                       : require('../../assets/images/icons/pexels-photo.png')
                                   }
@@ -889,6 +902,7 @@ const mapStateToProps = (state) => {
     currentLevel: idx(state, (_) => _.health.currentLevel),
     isLevelTwoMetaShareCreated: idx(state, (_) => _.health.isLevelTwoMetaShareCreated),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
+    isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
   };

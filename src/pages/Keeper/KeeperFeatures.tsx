@@ -94,10 +94,10 @@ class KeeperFeatures extends Component<
       this.setState({ setUpLoader: false });
     }
 
-    if (
-      this.props.isLevel2Initialized &&
+    if ((prevProp.isLevel2Initialized != this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
+      (this.props.isLevel2Initialized &&
       prevState.setupKeeperClicked != this.state.setupKeeperClicked &&
-      this.state.setupKeeperClicked
+      this.state.setupKeeperClicked)
     ) {
       this.uploadDataOnEFChannel();
     }
@@ -117,6 +117,7 @@ class KeeperFeatures extends Component<
   };
 
   setUpKeeper = async () => {
+    this.setState({ setUpLoader: true });
     if (!this.props.isLevelTwoMetaShareCreated)
       await this.props.generateMetaShare(2);
     this.setState({ setupKeeperClicked: true });
@@ -151,11 +152,6 @@ class KeeperFeatures extends Component<
       ) {
         share =
           metaShare[metaShare.findIndex((value) => value.shareId == shareId)];
-        console.log(
-          'share',
-          metaShare.findIndex((value) => value.shareId == shareId),
-          share,
-        );
       }
       createAndUploadOnEFChannel(
         navigation.state.params.qrScannedData,
