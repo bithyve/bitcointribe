@@ -20,7 +20,7 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -33,13 +33,11 @@ import {
   updateTrustedContactInfoLocally,
 } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
   EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
-import Toast from '../../components/Toast';
 import TimerModalContents from './TimerModalContents';
 import {
   TRUSTED_CONTACTS,
@@ -54,16 +52,15 @@ export default function AddContactSendRequest(props) {
   const [isOTPType, setIsOTPType] = useState(false);
   const [
     shareOtpWithTrustedContactBottomSheet,
-    setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
   const [OTP, setOTP] = useState('');
-  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  const [SendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
-  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+  const [SendViaQRBottomSheet] = useState(
     React.createRef(),
   );
-  const [TimerModalBottomSheet, setTimerModalBottomSheet] = useState(
+  const [TimerModalBottomSheet] = useState(
     React.createRef(),
   );
   const [renderTimer, setRenderTimer] = useState(false);
@@ -79,7 +76,7 @@ export default function AddContactSendRequest(props) {
     ? props.navigation.getParam('SelectedContact')
     : [];
   console.log('SelectedContact', SelectedContact);
-  const [Contact, setContact] = useState(
+  const [Contact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
 
@@ -113,13 +110,13 @@ export default function AddContactSendRequest(props) {
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
 
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
 
@@ -145,7 +142,7 @@ export default function AddContactSendRequest(props) {
     if (Contact && Contact.firstName) {
       let contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -206,7 +203,7 @@ export default function AddContactSendRequest(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -234,7 +231,7 @@ export default function AddContactSendRequest(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -369,9 +366,9 @@ export default function AddContactSendRequest(props) {
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             WALLET_SETUP.walletName
-          } Hexa wallet - link will expire in ${
+            } Hexa wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+            } hours`}
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
@@ -474,7 +471,7 @@ export default function AddContactSendRequest(props) {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={(index) => {
+        onPressOk={() => {
           setRenderTimer(false);
           shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
           props.navigation.goBack();
@@ -500,7 +497,7 @@ export default function AddContactSendRequest(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.modalContainer}>
+      <View style={NavStyles.modalContainer}>
         <View
           style={{
             alignItems: 'center',
@@ -530,7 +527,7 @@ export default function AddContactSendRequest(props) {
             <View style={{ flex: 1 }}>
               <Text
                 style={{
-                  ...BackupStyles.modalHeaderTitleText,
+                  ...NavStyles.modalHeaderTitleText,
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -605,10 +602,10 @@ export default function AddContactSendRequest(props) {
                   {Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact.firstName && !Contact.lastName
-                    ? Contact.firstName
-                    : !Contact.firstName && Contact.lastName
-                    ? Contact.lastName
-                    : ''}
+                      ? Contact.firstName
+                      : !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : ''}
                 </Text>
                 {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
                   <Text
@@ -657,41 +654,41 @@ export default function AddContactSendRequest(props) {
                 />
               </View>
             ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    position: 'absolute',
+                    marginLeft: 15,
+                    marginRight: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.backgroundColor,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                    shadowColor: Colors.shadowBlue,
+                    shadowOpacity: 1,
+                    shadowOffset: { width: 2, height: 2 },
                   }}
                 >
-                  {nameToInitials(
-                    Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
-                  )}
-                </Text>
-              </View>
-            )}
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(
+                      Contact.firstName && Contact.lastName
+                        ? Contact.firstName + ' ' + Contact.lastName
+                        : Contact.firstName && !Contact.lastName
+                          ? Contact.firstName
+                          : !Contact.firstName && Contact.lastName
+                            ? Contact.lastName
+                            : '',
+                    )}
+                  </Text>
+                </View>
+              )}
           </View>
         </View>
         <View style={{ marginTop: 'auto' }}>
@@ -808,16 +805,6 @@ export default function AddContactSendRequest(props) {
   );
 }
 const styles = StyleSheet.create({
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
-  separatorView: {
-    marginLeft: 15,
-    marginRight: 15,
-    height: 2,
-    backgroundColor: Colors.backgroundColor,
-  },
   contactProfileView: {
     flexDirection: 'row',
     marginLeft: 20,
@@ -840,11 +827,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
-  contactIconImage: {
-    width: 20,
-    height: 20,
-    resizeMode: 'cover',
-  },
   buttonInnerView: {
     flexDirection: 'row',
     height: 40,
@@ -863,13 +845,5 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
-  },
-  commModeModalInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    marginLeft: 25,
-    marginRight: 25,
-    marginTop: hp('0.7%'),
   },
 });

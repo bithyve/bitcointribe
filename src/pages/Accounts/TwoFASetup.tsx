@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,9 +16,7 @@ import {
 import CopyThisText from '../../components/CopyThisText';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { uploadEncMShare } from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
 
 
@@ -32,9 +28,9 @@ const TwoFASetup = props => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+      <View style={CommonStyles.headerContainer}>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
+          style={CommonStyles.headerLeftIconContainer}
           onPress={
             onPressBack
               ? onPressBack
@@ -42,29 +38,29 @@ const TwoFASetup = props => {
                 props.navigation.goBack();
               }
           }
-          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+          hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('1%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>
+          <Text style={NavStyles.modalHeaderTitleText}>
             Setup Two Factor Authentication
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
+          <Text style={NavStyles.modalHeaderInfoText}>
             Please scan the following QR on your authenticator app like Google
             Authenticator in order to setup the 2FA
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
+          <Text style={NavStyles.modalHeaderInfoText}>
             The authenticator app should be installed on another device
             like your Keeper Device
           </Text>
         </View>
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         <QRCode value={qrData} size={hp('27%')} />
         <CopyThisText text={secret} />
       </View>
@@ -133,9 +129,5 @@ const TwoFASetup = props => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  loader: { height: hp('27%'), justifyContent: 'center' },
-});
 
 export default TwoFASetup;

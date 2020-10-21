@@ -80,7 +80,7 @@ export default function ShareOtpWithTrustedContact(props) {
         <View style={styles.bottomView}>
           <View style={styles.bottomInnerView}>
             <Ionicons color={Colors.blue} size={17} name={'md-time'} />
-            {props.renderTimer ? 
+            {props.renderTimer ?
             <CountDown
               size={13}
               until={TC_REQUEST_EXPIRY}
