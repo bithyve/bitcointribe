@@ -7,8 +7,8 @@ import { BottomSheetOverlay } from "@gorhom/bottom-sheet";
 const defaultBottomSheetConfigs: BottomSheetModalConfigs = {
   snapPoints: [0, '60%'],
   initialSnapIndex: 1,
-  animationDuration: 400,
-  animationEasing: Easing.out(Easing.exp),
+  animationDuration: 425,
+  animationEasing: Easing.out(Easing.cubic),
   handleComponent: BottomSheetHandle,
   overlayComponent: BottomSheetOverlay,
   overlayOpacity: 0.75,

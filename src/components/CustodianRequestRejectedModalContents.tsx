@@ -59,7 +59,7 @@ export default function CustodianRequestRejectedModalContents(props) {
           }}
         >
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressViewThrustedContacts()}
+            onPress={() => props.onPressViewTrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>View Friends and Family</Text>
@@ -111,10 +111,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular
   },
-  successModalAmountView: {
-    marginRight: wp("10%"),
-    marginLeft: wp("10%")
-  },
   successModalWalletNameText: {
     color: Colors.black,
     fontSize: RFValue(25),
@@ -127,22 +123,6 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 15,
     resizeMode: "contain"
-  },
-  successModalAmountText: {
-    color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21),
-    marginLeft: 5
-  },
-  successModalAmountUnitText: {
-    color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11)
-  },
-  successModalAmountInfoView: {
-    flex: 0.4,
-    marginRight: wp("10%"),
-    marginLeft: wp("10%")
   },
   successModalButtonView: {
     height: wp("13%"),
