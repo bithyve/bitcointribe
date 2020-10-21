@@ -9,9 +9,6 @@ import {
   FlatList,
   TextInput,
   Platform,
-  AsyncStorage,
-  Linking,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
@@ -42,6 +39,7 @@ import {
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
+import openLink from '../../utils/OpenLink';
 
 interface AddNewAccountStateTypes {
   selectedAccount: any;
@@ -206,16 +204,6 @@ class AddNewAccount extends PureComponent<
     );
   };
 
-  openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
-
   renderAccountDetailModalContent = () => {
     return (
       <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -313,7 +301,7 @@ class AddNewAccount extends PureComponent<
                 By clicking proceed you agree to our{' '}
                 <Text
                   onPress={() => {
-                    this.openLink(
+                    openLink(
                       'https://hexawallet.io/donee-terms-conditions/',
                     );
                   }}
