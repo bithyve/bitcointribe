@@ -219,7 +219,6 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <ErrorModalContents
-              modalRef={this.errorBottomSheet}
               title={'Login error'}
               info={'Error while loging in, please try again'}
               proceedButtonText={'Open Setting'}

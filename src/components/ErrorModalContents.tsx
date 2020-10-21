@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
@@ -93,7 +93,7 @@ export default function ErrorModalContents(props) {
                   : Colors.white,
               }}
             >
-              {props.proceedButtonText}
+              Okay
             </Text>
           </AppBottomSheetTouchableWrapper>
           {props.isIgnoreButton && (
