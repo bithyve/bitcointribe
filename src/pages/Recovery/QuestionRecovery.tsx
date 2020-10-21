@@ -24,7 +24,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeRecovery } from '../../store/actions/setupAndAuth';
-import commonStyle from '../../common/Styles';
+import commonStyle from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function RecoveryQuestionModalContents(props) {
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    alignItems: 'center',    
+    alignItems: 'center',
     backgroundColor: Colors.white,
   },
   dropdownBoxOpened: {

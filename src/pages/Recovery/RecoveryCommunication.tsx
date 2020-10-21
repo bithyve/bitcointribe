@@ -23,7 +23,7 @@ import RadioButton from '../../components/RadioButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import commonStyle from '../../common/Styles';
+import commonStyle from '../../common/Styles/Styles';
 import { requestShare, downloadMShare } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -212,8 +212,8 @@ export default function RecoveryCommunication(props) {
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
       case 'qrscanner':
-        props.navigation.navigate('RecoveryQrScanner', {
-          scanedCode: getQrCodeData,
+        props.navigation.navigate('QRScanner', {
+          onCodeScanned: getQrCodeData,
         });
         break;
     }

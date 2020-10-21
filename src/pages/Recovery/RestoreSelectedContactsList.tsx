@@ -17,7 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -1147,15 +1147,6 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => {
-            props.navigation.navigate('RecoveryQrScanner', {
-              scanedCode: getQrCodeData,
-            });
-          }}
-        >
-          <Text>Scan Recovery Share</Text>
-        </TouchableOpacity> */}
 
         {metaShares.length >= 3 ? (
           <View>

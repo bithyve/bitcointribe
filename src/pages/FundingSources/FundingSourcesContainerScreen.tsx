@@ -8,7 +8,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import CommonStyles from '../../common/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -81,7 +81,7 @@ export default function FundingSourcesContainerScreen(props) {
       <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
 
       <View style={styles.modalContainer}>
-        <View style={CommonStyles.modalNavHeaderContainer}>
+        <View style={NavStyles.modalNavHeaderContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <SmallNavHeaderCloseButton
               containerStyle={{ marginRight: 16 }}
@@ -89,10 +89,10 @@ export default function FundingSourcesContainerScreen(props) {
             />
 
             <View style={{ flex: 1 }}>
-              <Text style={CommonStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 Funding Sources
               </Text>
-              <Text style={CommonStyles.modalHeaderSubheadingText}>
+              <Text style={NavStyles.modalHeaderSubheadingText}>
                 View all your funding sources in one place
               </Text>
             </View>

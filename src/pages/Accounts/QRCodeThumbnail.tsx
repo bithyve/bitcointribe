@@ -13,6 +13,7 @@ import { RNCamera } from 'react-native-camera';
 
 function QRCodeThumbnail(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
+
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
       setOpenCameraFlag(false);
@@ -45,7 +46,8 @@ function QRCodeThumbnail(props) {
               </View>
             </RNCamera>
           </View>
-        </View>) :
+        </View>)
+        :
         (<TouchableOpacity
           style={{ justifyContent: 'center', alignItems: 'center' }}
           onPress={() => setOpenCameraFlag(true)}

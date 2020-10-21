@@ -712,6 +712,30 @@ export default class SSS {
     };
   };
 
+  public resetSharesHealth = async (
+    shareIndex: number,
+  ): Promise<{
+    resetted: Boolean;
+  }> => {
+    let res: AxiosResponse;
+    try {
+      if (shareIndex > 2 || !this.metaShares[shareIndex])
+        throw new Error('Share index out of bounds');
+
+      res = await BH_AXIOS.post('resetSharesHealth', {
+        HEXA_ID,
+        walletID: this.walletId,
+        shareIDs: [this.metaShares[shareIndex].shareId],
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { resetted } = res.data;
+    return { resetted };
+  };
+
   public generateStaticNonPMDD = (secureAccAssets: {
     secondaryMnemonic: string;
     twoFASecret: string;
