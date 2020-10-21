@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, FlatList } from "react-native";
 import Fonts from "../../../common/Fonts";
 import Colors from "../../../common/Colors";
-import BackupStyles from "./Styles";
+import NavStyles from '../../../common/Styles/NavStyles';
+import CommonStyles from '../../../common/Styles/Styles';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Cloud = props => {
-  const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
-  const [cloudData, setCloudData] = useState([
+  const [selectedStatus] = useState("Ugly"); // for preserving health of this entity
+  const [cloudData] = useState([
     {
       title: "iCloud Drive",
       info: "Store backup in iCloud Drive",
@@ -33,14 +34,14 @@ const Cloud = props => {
   ]);
 
   return (
-    <View style={BackupStyles.modalContainer}>
-      <View style={BackupStyles.modalHeaderTitleView}>
+    <View style={NavStyles.modalContainer}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
+          <Text style={NavStyles.modalHeaderTitleText}>Cloud</Text>
+          <Text style={NavStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
-          style={BackupStyles.cardIconImage}
+          style={CommonStyles.cardIconImage}
           source={props.getIconByStatus(selectedStatus)}
         />
       </View>
@@ -69,7 +70,7 @@ const Cloud = props => {
         <View style={{ flex: 1 }}>
           <FlatList
             data={cloudData}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <View style={styles.listElements}>
                 <Image
                   style={styles.listElementsIconImage}

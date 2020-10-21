@@ -56,26 +56,26 @@ export default function UpdateApp(props) {
       isOpenFromNotificationList &&
       releaseNumber
     ) {
-      console.log("releaseDataObj[0]",releaseDataObj[0])
-      if(DeviceInfo.getBuildNumber() >= releaseNumber)
-      setIsUpdateInValid(true);
+      console.log("releaseDataObj[0]", releaseDataObj[0])
+      if (DeviceInfo.getBuildNumber() >= releaseNumber)
+        setIsUpdateInValid(true);
       else
-      setIsUpdateInValid(false);
+        setIsUpdateInValid(false);
       if (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) {
-          setIsUpdateMandotary(true);
-        }
-     setReleaseData(releaseDataObj[0]);
-     }
+        setIsUpdateMandotary(true);
+      }
+      setReleaseData(releaseDataObj[0]);
+    }
 
-     /**
-     * Following code is for when this page is open from Login and check for update
-     */
+    /**
+    * Following code is for when this page is open from Login and check for update
+    */
     (async () => {
       if (!isOpenFromNotificationList) {
         dispatch(setReleaseCases(null))
         await AsyncStorage.setItem('releaseCases', '');
         let releaseData;
-        let releaseDataOld = releaseCasesValue; 
+        let releaseDataOld = releaseCasesValue;
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseData'),
         // );
@@ -100,8 +100,8 @@ export default function UpdateApp(props) {
 
         let releaseNotes = releaseDataObj.length
           ? releaseDataObj.find((el) => {
-              return el.reminderLimit === 0;
-            })
+            return el.reminderLimit === 0;
+          })
           : '';
         console.log('RELEASENOTE', releaseNotes);
         if (
@@ -129,16 +129,16 @@ export default function UpdateApp(props) {
 
   useEffect(() => {
     if (releaseData) {
-      console.log("ReleaseData",releaseData);
+      console.log("ReleaseData", releaseData);
       let tempReleaseNote = releaseData.releaseNotes
         ? Platform.OS == 'ios'
           ? releaseData.releaseNotes.ios
           : releaseData.releaseNotes.android
         : releaseData.notes
-        ? Platform.OS == 'ios'
-          ? releaseData.notes.ios
-          : releaseData.notes.android
-        : '';
+          ? Platform.OS == 'ios'
+            ? releaseData.notes.ios
+            : releaseData.notes.android
+          : '';
       setReleaseNotes(tempReleaseNote.split('-'));
     }
   }, [releaseData]);
@@ -167,11 +167,11 @@ export default function UpdateApp(props) {
     //JSON.parse(await AsyncStorage.getItem('releaseCases'));
     console.log('releaseCases', releaseCases);
     releaseCasesData = {
-        ...releaseData,
-        ignoreClick: _ignoreClick,
-        remindMeLaterClick: _remindMeLaterClick,
-      };
-     dispatch(setReleaseCases(releaseCasesData)); 
+      ...releaseData,
+      ignoreClick: _ignoreClick,
+      remindMeLaterClick: _remindMeLaterClick,
+    };
+    dispatch(setReleaseCases(releaseCasesData));
     await AsyncStorage.setItem(
       'releaseCases',
       JSON.stringify(releaseCasesData),
@@ -187,26 +187,28 @@ export default function UpdateApp(props) {
         <View
           style={{
             ...styles.successModalHeaderView,
-            
+
           }}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: wp('4%'),
-            marginLeft: wp('4%'), }}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center', marginRight: wp('4%'),
+            marginLeft: wp('4%'),
+          }}>
             {isOpenFromNotificationList ? (
-          <TouchableOpacity
-              onPress={() => props.navigation.goBack()}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity> ) : null}
+              <TouchableOpacity
+                onPress={() => props.navigation.goBack()}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
+                style={{ height: 30, width: 30, justifyContent: 'center' }}
+              >
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>) : null}
             <Text style={styles.modalTitleText}>
               {isUpdateInValid ? 'Your app is already updated' :
-              'We’re better than ever\nTime to update' }
+                'We’re better than ever\nTime to update'}
             </Text>
             {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
@@ -223,16 +225,16 @@ export default function UpdateApp(props) {
                   flexDirection: 'row',
                 }}
                 onPress={() => {
-                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  if (isOpenFromNotificationList) props.navigation.goBack();
                   else
-                  onClick(true, false);
+                    onClick(true, false);
                 }}
               >
                 <Text
                   onPress={() => {
-                    if(isOpenFromNotificationList) props.navigation.goBack();
-                  else
-                  onClick(true, false);
+                    if (isOpenFromNotificationList) props.navigation.goBack();
+                    else
+                      onClick(true, false);
                   }}
                   style={{
                     color: Colors.white,
@@ -291,7 +293,7 @@ export default function UpdateApp(props) {
           }}
         >
           <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>
-          For updating you will be taken to the App Store/ Play Store
+            For updating you will be taken to the App Store/ Play Store
           </Text>
 
           <View
@@ -302,22 +304,22 @@ export default function UpdateApp(props) {
             }}
           >
             {!isUpdateInValid ? (
-            <TouchableOpacity
-              disabled={false}
-              onPress={() => {
-                upgradeNow();
-              }}
-              style={{ ...styles.successModalButtonView }}
-            >
-              <Text style={styles.proceedButtonText}>Update Now</Text>
-            </TouchableOpacity>) : null }
+              <TouchableOpacity
+                disabled={false}
+                onPress={() => {
+                  upgradeNow();
+                }}
+                style={{ ...styles.successModalButtonView }}
+              >
+                <Text style={styles.proceedButtonText}>Update Now</Text>
+              </TouchableOpacity>) : null}
 
             {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
                 onPress={() => {
-                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  if (isOpenFromNotificationList) props.navigation.goBack();
                   else
-                  onClick(false, true);
+                    onClick(false, true);
                 }}
                 style={{
                   height: wp('13%'),
@@ -328,11 +330,11 @@ export default function UpdateApp(props) {
                 }}
               >
                 <Text
-                onPress={() => {
-                  if(isOpenFromNotificationList) props.navigation.goBack();
-                  else
-                  onClick(false, true);
-                }}
+                  onPress={() => {
+                    if (isOpenFromNotificationList) props.navigation.goBack();
+                    else
+                      onClick(false, true);
+                  }}
                   style={{ ...styles.proceedButtonText, color: Colors.blue }}
                 >
                   Remind me Later
