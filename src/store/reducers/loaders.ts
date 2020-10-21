@@ -10,7 +10,7 @@ const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case STARTUP_SYNC_LOADED:
           return chain(state).setIn(['startupSyncLoaded'], action.payload.loaded).value()
-            
+
         default:
             return state
     }

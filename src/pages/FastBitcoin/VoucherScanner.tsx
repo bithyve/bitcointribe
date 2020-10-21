@@ -17,7 +17,8 @@ import {
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -961,18 +962,18 @@ const VoucherScanner = (props) => {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={styles.backArrowView}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={BackupStyles.modalHeaderTitleText}>
+          <Text style={NavStyles.modalHeaderTitleText}>
             Scan a FastBitcoins voucher
           </Text>
         </View>

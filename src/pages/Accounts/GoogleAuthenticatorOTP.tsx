@@ -39,7 +39,7 @@ const GoogleAuthenticatorOTP = props => {
       props.navigation.navigate('WalletCreationSuccess');
     }
   }
-  
+
   useEffect(() => {}, []);
 
   return (

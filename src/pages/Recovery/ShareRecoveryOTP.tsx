@@ -104,7 +104,7 @@ export default function ShareRecoveryOTP(props) {
                 borderWidth: 0,
                 borderColor: '#FFF',
                 margin: -10,
-                
+
               }}
               digitTxtStyle={{ color: Colors.blue,fontSize: RFValue(19),
                 fontFamily: Fonts.FiraSansRegular, }}

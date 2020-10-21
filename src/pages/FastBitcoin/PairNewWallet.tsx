@@ -11,12 +11,11 @@ import {
   AsyncStorage,
   TextInput,
   KeyboardAvoidingView,
-  Keyboard,
   BackHandler,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -42,7 +41,7 @@ import {
   storeFbtcData
 } from '../../store/actions/fbtc';
 
-import {isEmpty} from '../../common/CommonFunctions/index';
+import { isEmpty } from '../../common/CommonFunctions/index';
 
 const PairNewWallet = (props) => {
   const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
@@ -58,29 +57,28 @@ const PairNewWallet = (props) => {
   const accountSyncFailMessage = useSelector(
     (state) => state.fbtc.accountSyncFailMessage,
   );
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const accountSyncDetails = useSelector(
     (state) => state.fbtc.accountSyncDetails,
   );
   const [errorTitle, setErrorTitle] = useState('');
-  const [errorInfo, setErrorInfo] = useState('');
-  const [errorNote, setErrorNote] = useState('');
+  const [errorInfo] = useState('');
+  const [errorNote] = useState('');
   const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
   const [showLoader, setShowLoader] = useState(false);
 
-  
-  const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
+
+  const [ErrorModalBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
   const [
     RegistrationSuccessBottomSheet,
-    setRegistrationSuccessBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
 
-  const [selectedAccount, setSelectedAccount] = useState({});
+  const [] = useState({});
 
   useEffect(() => {
-    if(FBTCAccountData){
+    if (FBTCAccountData) {
       //console.log("FBTCAccountData------- in useEffect", FBTCAccountData)
       setFBTCAccount_Data(FBTCAccountData);
     }
@@ -98,38 +96,38 @@ const PairNewWallet = (props) => {
       if (!userKey && FBTCAccountData) {
         setUserKey(FBTCAccountData.user_key);
       }
-      if(userKey1 && !isUserRegistered){
+      if (userKey1 && !isUserRegistered) {
         setUserKey(userKey1);
       }
     })();
     BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
-        return () =>
-          BackHandler.removeEventListener(
-            'hardwareBackPress',
-            hardwareBackHandler,
-          );
+    return () =>
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        hardwareBackHandler,
+      );
   }, []);
 
   const hardwareBackHandler = () => {
     props.navigation.pop(2);
-  }; 
+  };
 
   useEffect(() => {
     if (voucherCode) {
-        if (isUserRegistered) return;
-        else {
-          if (voucherCode.length == 36 && !isUserRegistered)
-            setUserKey(voucherCode);
-            else return;
-        }
+      if (isUserRegistered) return;
+      else {
+        if (voucherCode.length == 36 && !isUserRegistered)
+          setUserKey(voucherCode);
+        else return;
+      }
     }
   }, [voucherCode]);
 
   const barcodeRecognized = async (barcodes) => {
-      if (barcodes.data && barcodes.data.length == 36) {
+    if (barcodes.data && barcodes.data.length == 36) {
       setVoucherCode(barcodes.data);
-      }
-      setOpenCameraFlag(false);
+    }
+    setOpenCameraFlag(false);
   };
 
   useEffect(() => {
@@ -137,7 +135,7 @@ const PairNewWallet = (props) => {
   }, [userKey]);
 
   const createFBTCAccount = async () => {
-    let FBTCAccountData = FBTCAccount_Data; 
+    let FBTCAccountData = FBTCAccount_Data;
     //console.log('FBTCAccountData', FBTCAccountData);
 
     //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
@@ -231,7 +229,7 @@ const PairNewWallet = (props) => {
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
-        onPressIgnore={() => {}}
+        onPressIgnore={() => { }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
@@ -241,9 +239,9 @@ const PairNewWallet = (props) => {
   const renderRegistrationSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (RegistrationSuccessBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (RegistrationSuccessBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -288,9 +286,9 @@ const PairNewWallet = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorModalBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorModalBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -299,7 +297,7 @@ const PairNewWallet = (props) => {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
@@ -309,8 +307,8 @@ const PairNewWallet = (props) => {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={BackupStyles.modalHeaderTitleText}>
-          Pair a new wallet
+          <Text style={NavStyles.modalHeaderTitleText}>
+            Pair a new wallet
           </Text>
         </View>
       </View>
@@ -344,27 +342,27 @@ const PairNewWallet = (props) => {
                 </RNCamera>
               </View>
             ) : (
-              <TouchableOpacity
-                onPress={() => setOpenCameraFlag(true)}
-                style={{ alignSelf: 'center' }}
-              >
-                <ImageBackground
-                  source={require('../../assets/images/icons/iPhone-QR.png')}
-                  style={styles.cameraImage}
+                <TouchableOpacity
+                  onPress={() => setOpenCameraFlag(true)}
+                  style={{ alignSelf: 'center' }}
                 >
-                  <View style={{ flex: 1 }}>
-                    <View style={styles.topCornerView}>
-                      <View style={styles.topLeftCornerView} />
-                      <View style={styles.topRightCornerView} />
+                  <ImageBackground
+                    source={require('../../assets/images/icons/iPhone-QR.png')}
+                    style={styles.cameraImage}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <View style={styles.topCornerView}>
+                        <View style={styles.topLeftCornerView} />
+                        <View style={styles.topRightCornerView} />
+                      </View>
+                      <View style={styles.bottomCornerView}>
+                        <View style={styles.bottomLeftCornerView} />
+                        <View style={styles.bottomRightCornerView} />
+                      </View>
                     </View>
-                    <View style={styles.bottomCornerView}>
-                      <View style={styles.bottomLeftCornerView} />
-                      <View style={styles.bottomRightCornerView} />
-                    </View>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
+                  </ImageBackground>
+                </TouchableOpacity>
+              )}
             <TextInput
               placeholder={'Enter the code'}
               placeholderTextColor={Colors.borderColor}
@@ -378,35 +376,36 @@ const PairNewWallet = (props) => {
           </View>
         </ScrollView>
         {showLoader ? <Loader /> : null}
+
         <BottomInfoBox
           title={'Pair Hexa with FastBitcoins'}
           infoText={
             'Scan the QR provided on your FastBitcoins account to pair your Hexa wallet'
           }
         />
-        
-      <BottomSheet
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={false}
-        ref={RegistrationSuccessBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderRegistrationSuccessModalContent}
-        renderHeader={renderRegistrationSuccessModalHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ErrorModalBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+
+        <BottomSheet
+          enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
+          ref={RegistrationSuccessBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          ]}
+          renderContent={renderRegistrationSuccessModalContent}
+          renderHeader={renderRegistrationSuccessModalHeader}
+        />
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={ErrorModalBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
       </KeyboardAvoidingView>
     </View>
   );
@@ -484,7 +483,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 20,
   },
- 
   qrModalTextInput: {
     flex: 1,
     borderRadius: 10,
