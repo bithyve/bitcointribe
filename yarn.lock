@@ -1037,7 +1037,7 @@
     pouchdb-collections "^1.0.1"
     tiny-queue "^0.2.1"
 
-"@gorhom/bottom-sheet@^1.2.2":
+"@gorhom/bottom-sheet@^1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-1.4.1.tgz#5a9028ea243b93e0f31044b5aada58fd183f9b23"
   integrity sha512-j6+z1C4/Hon1bt/lheOfyiXuJfACKszFRUqweRYpqy/nPA5pUAYBIfpUlCxdJSq6Dl2qKYK1VwWYUpKh14s+gQ==
@@ -6705,6 +6705,11 @@ nanoid@^3.1.12:
   version "3.1.15"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.15.tgz#28e7c4ce56aff2d0c2d37814c7aef9d6c5b3e6f3"
   integrity sha512-n8rXUZ8UU3lV6+43atPrSizqzh25n1/f00Wx1sCiE7R1sSHytZLTTiQl8DjC4IDLOnEZDlgJhy0yO4VsIpMxow==
+
+nanoid@^3.1.12:
+  version "3.1.13"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.13.tgz#7f4f0729ab8a824291deb72b0d10cf357bc7563c"
+  integrity sha512-oYL7jWZUdScASxYOrcwE8EvISFGzO3/1g+t56vCyR0s2nrpmBcOc7hTAFJaVf6HMyEPJrnNelnjRnMN6KZnCPA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
