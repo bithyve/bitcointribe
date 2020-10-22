@@ -17,7 +17,7 @@ import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 
 const initialState = ip.freeze({
-  isInternetModalCome: false,
+  hasShownNoInternetWarning: false,
   currencyCode: null,
   currencyToggleValue: null,
   fcmTokenValue: '',
