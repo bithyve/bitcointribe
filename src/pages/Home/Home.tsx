@@ -34,8 +34,6 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
-import NoInternetModalContents from '../../components/NoInternetModalContents';
-import NetInfo from '@react-native-community/netinfo';
 import {
   downloadMShare,
   initHealthCheck,
@@ -205,8 +203,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
-  NoInternetBottomSheet: any;
-  unsubscribe: any;
 
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
@@ -219,7 +215,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
   notificationsListBottomSheetRef = createRef<BottomSheet>();
   custodianRequestRejectedBottomSheetRef = createRef<BottomSheet>();
-  noInternetBottomSheetRef = createRef<BottomSheet>();
 
   static whyDidYouRender = true;
 
@@ -228,9 +223,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = null;
     this.appStateListener = null;
-    this.NoInternetBottomSheet = React.createRef();
-    this.unsubscribe = null;
-    this.openBottomSheetOnLaunchTimeout = null;
 
     this.state = {
       notificationData: [],
@@ -683,14 +675,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           if (nextAppState === 'inactive' || nextAppState == 'background') {
             this.props.updatePreference({
-              key: 'isInternetModalCome',
+              key: 'hasShownNoInternetWarning',
               value: false,
             });
-            // TODO -- fix this part
-            // await AsyncStorage.setItem(
-            //   'isInternetModalCome',
-            //   JSON.stringify(false),
-            // );
           }
         },
       );
@@ -711,22 +698,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.setUpFocusListener();
     this.getNewTransactionNotifications();
 
-    this.unsubscribe = NetInfo.addEventListener((state) => {
-      setTimeout(() => {
-        if (state.isInternetReachable === null) {
-          return;
-        }
-
-        if (state.isInternetReachable) {
-          this.noInternetBottomSheetRef.current?.snapTo(0);
-        } else {
-          this.noInternetBottomSheetRef.current?.snapTo(1);
-        }
-      }, 1000);
-    });
-
     // health check
-
     const { s3Service, initHealthCheck } = this.props;
     const { healthCheckInitialized } = s3Service.sss;
     if (!healthCheckInitialized) {
@@ -954,10 +926,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cleanupListeners() {
     if (typeof this.focusListener === 'function') {
       this.props.navigation.removeListener('didFocus', this.focusListener);
-    }
-
-    if (typeof this.unsubscribe === 'function') {
-      this.unsubscribe();
     }
 
     if (typeof this.appStateListener === 'function') {
@@ -2346,29 +2314,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressHeader={() => {
                 this.notificationsListBottomSheetRef.current?.snapTo(0);
               }}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.NoInternetBottomSheet}
-          snapPoints={[-50, heightPercentageToDP('60%')]}
-          renderContent={() => (
-            <NoInternetModalContents
-              onPressTryAgain={() => {
-                this.noInternetBottomSheetRef.current?.snapTo(0);
-              }}
-              onPressIgnore={() => {
-                this.noInternetBottomSheetRef.current?.snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-            // onPressHeader={() => {
-            //   this.noInternetBottomSheetRef.current?.snapTo(0);
-            // }}
             />
           )}
         />
