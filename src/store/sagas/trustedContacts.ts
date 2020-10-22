@@ -163,6 +163,7 @@ function* removeTrustedContactWorker({ payload }) {
   const shareTransferDetails = {
     ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   };
+
   let { contactName, shareIndex } = payload; // shareIndex is passed in case of Guardian
   contactName = contactName.toLowerCase().trim();
 
@@ -170,31 +171,32 @@ function* removeTrustedContactWorker({ payload }) {
     walletID,
     FCMs,
     isGuardian,
+    trustedChannel,
   } = trustedContactsService.tc.trustedContacts[contactName];
 
-  let dataElements: TrustedDataElements;
-  if (isGuardian) dataElements = { removeGuardian: true };
-  else
-    dataElements = {
-      remove: true,
-    };
-
-  yield call(
-    trustedContactsService.updateTrustedChannel,
-    contactName,
-    dataElements,
-  );
-
-  const recipient = {
-    walletID,
-    FCMs,
+  let dataElements: TrustedDataElements = {
+    remove: true,
   };
+  // if (isGuardian) dataElements = { removeGuardian: true }; // deprecates guardian to trusted contact
+  // else
+  //   dataElements = {
+  //     remove: true,
+  //   };
 
-  if (isGuardian) {
-    // Guardians, instead of removal, gets down-graded to trusted contacts
+  if (trustedChannel) {
+    // removing established trusted contacts
+    yield call(
+      trustedContactsService.updateTrustedChannel,
+      contactName,
+      dataElements,
+    );
+  }
+
+  if (isGuardian && !trustedChannel) {
+    // Guardians gets removed post request expiry
     trustedContactsService.tc.trustedContacts[contactName].isGuardian = false;
-    if (shareIndex !== null && shareIndex <= 2)
-      s3Service.resetSharesHealth(shareIndex);
+    // if (shareIndex !== null && shareIndex <= 2)
+    //   s3Service.resetSharesHealth(shareIndex);
     delete shareTransferDetails[shareIndex]; // enables createGuardian on manage backup
 
     // resets the highlight flag for manage backup
@@ -216,7 +218,8 @@ function* removeTrustedContactWorker({ payload }) {
         JSON.stringify(autoHighlightFlags),
       );
     }
-  } else delete trustedContactsService.tc.trustedContacts[contactName];
+  }
+  delete trustedContactsService.tc.trustedContacts[contactName];
 
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
   if (tcInfo) {
@@ -230,23 +233,20 @@ function* removeTrustedContactWorker({ payload }) {
           .trim();
 
         if (presentContactName === contactName) {
-          if (itr < 3) {
-            let found = false;
-            for (let i = 3; i < tcInfo.length; i++) {
-              if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
-                found = true;
-                break;
-              }
-            }
-            // push if not already present in TC list
-            if (!found) tcInfo.push(tcInfo[itr]);
-            tcInfo[itr] = null; // Guardian position nullified
-          } else tcInfo.splice(itr, 1);
-          // yield call(
-          //   AsyncStorage.setItem,
-          //   'TrustedContactsInfo',
-          //   JSON.stringify(tcInfo),
-          // );
+          // if (itr < 3) {
+          //   let found = false;
+          //   for (let i = 3; i < tcInfo.length; i++) {
+          //     if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
+          //       found = true;
+          //       break;
+          //     }
+          //   }
+          //   // push if not already present in TC list
+          //   if (!found) tcInfo.push(tcInfo[itr]);
+          //   tcInfo[itr] = null; // Guardian position nullified
+          // } else tcInfo.splice(itr, 1);
+
+          tcInfo.splice(itr, 1);
           yield put(updateTrustedContactInfoLocally(tcInfo));
           break;
         }
@@ -274,19 +274,24 @@ function* removeTrustedContactWorker({ payload }) {
     payload: dbPayload,
   });
 
-  const { walletName } = yield select(
-    (state) => state.storage.database.WALLET_SETUP,
-  );
-  const notification: INotification = {
-    notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
-    body: `${
-      isGuardian ? 'Keeper' : 'Trusted Contact'
-    } removed by ${walletName}`,
-    data: {},
-    tag: notificationTag.IMP,
-  };
-  sendNotification(recipient, notification);
+  if (walletID && FCMs) {
+    const recipient = {
+      walletID,
+      FCMs,
+    };
+    const { walletName } = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+
+    const notification: INotification = {
+      notificationType: notificationType.contact,
+      title: 'Friends and Family notification',
+      body: `Trusted Contact removed by ${walletName}`,
+      data: {},
+      tag: notificationTag.IMP,
+    };
+    sendNotification(recipient, notification);
+  }
 }
 
 export const removeTrustedContactWatcher = createWatcher(
