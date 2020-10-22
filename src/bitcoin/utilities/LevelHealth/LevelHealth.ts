@@ -26,10 +26,12 @@ export default class LevelHealth {
 
   public static recoverFromSecrets = (
     decryptedSecrets: string[],
+    level?: number
   ): {
     mnemonic: string;
   } => {
-    if (decryptedSecrets.length >= LevelHealth.threshold) {
+    let levelThreshold = level == 2 ? LevelHealth.thresholdLevel1 : level == 3 ? LevelHealth.thresholdLevel2 : LevelHealth.threshold; 
+    if (decryptedSecrets.length >= levelThreshold) {
       const secretsArray = [];
       for (const secret of decryptedSecrets) {
         if (LevelHealth.validShare(secret)) {
@@ -43,7 +45,7 @@ export default class LevelHealth {
       return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
     } else {
       throw new Error(
-        `supplied number of shares are less than the threshold (${LevelHealth.threshold})`,
+        `supplied number of shares are less than the threshold (${levelThreshold})`,
       );
     }
   };
@@ -486,6 +488,8 @@ export default class LevelHealth {
     return randomString;
   };
   private static threshold: number = config.SSS_THRESHOLD;
+  private static thresholdLevel1: number = config.SSS_LEVEL1_THRESHOLD;
+  private static thresholdLevel2: number = config.SSS_LEVEL2_THRESHOLD;
 
   private static hexToString = (hex: string): string => secrets.hex2str(hex);
 
@@ -1105,6 +1109,12 @@ export default class LevelHealth {
   };
 
   public createMetaSharesKeeper = (
+    secureAssets: {
+      secondaryMnemonic: string;
+      twoFASecret: string;
+      secondaryXpub: string;
+      bhXpub: string;
+    },
     tag: string,
     version?: string,
     level?: number,
@@ -1114,6 +1124,11 @@ export default class LevelHealth {
     if (!this.encryptedSecrets.length) {
       throw new Error('Can not create MetaShares; missing encryptedSecrets');
     }
+
+    const {
+      encryptedSocialStaticNonPMDD,
+      encryptedBuddyStaticNonPMDD,
+    } = this.generateStaticNonPMDD(secureAssets);
 
     const timestamp = new Date().toLocaleString(undefined, {
       day: 'numeric',
@@ -1126,24 +1141,43 @@ export default class LevelHealth {
     let index = 0;
     let metaShare: MetaShare;
     for (const encryptedSecret of this.encryptedSecrets) {
-      metaShare = {
-        encryptedSecret,
-        shareId: LevelHealth.getShareId(encryptedSecret),
-        meta: {
-          version: version ? version : '0',
-          validator: 'HEXA',
-          index,
-          walletId: this.walletId,
-          tag,
-          timestamp,
-          reshareVersion: 0,
-        },
-      };
+      if (index === 1) {
+        metaShare = {
+          encryptedSecret,
+          shareId: LevelHealth.getShareId(encryptedSecret),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+          },
+          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
+        };
+      } else {
+        metaShare = {
+          encryptedSecret,
+          shareId: LevelHealth.getShareId(encryptedSecret),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+          },
+          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
+        };
+      }
+
       this.metaShares.push(metaShare);
       index++;
     }
-
-    if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
+    
+     if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
       this.metaShares = [];
       throw new Error('Something went wrong while generating metaShares');
     }

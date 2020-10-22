@@ -41,7 +41,7 @@ import { requestTimedout } from '../../store/utils/utilities';
 import RestoreWallet from './RestoreWallet';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import { CloudData } from '../../common/CommonFunctions';
+import { CloudData, isEmpty } from '../../common/CommonFunctions';
 import {
   CheckCloudDataBackup,
   CloudDataBackup,
@@ -56,7 +56,9 @@ import {
   checkMSharesHealth,
   recoverWalletUsingIcloud,
   downloadShares,
-  downloadMShare
+  downloadMShare,
+  recoverWallet,
+  updateCloudMShare,
 } from '../../store/actions/health';
 import axios from 'axios';
 import {
@@ -99,6 +101,10 @@ interface RestoreWithICloudPropsTypes {
   downloadMShare: any;
   metaShare: any;
   DECENTRALIZED_BACKUP: any;
+  recoverWallet:any;
+  updateCloudMShare: any;
+  walletRecoveryFailed: boolean;
+
 }
 
 class RestoreWithICloud extends Component<
@@ -147,6 +153,8 @@ class RestoreWithICloud extends Component<
         walletId: '',
         walletName: '',
         levelStatus: '',
+        shares: '',
+        keeperData: ''
       },
       exchangeRates: '',
       metaShares: [],
@@ -190,7 +198,8 @@ class RestoreWithICloud extends Component<
       calculateExchangeRate,
       startupSync,
       checkMSharesHealth,
-      initializeHealthSetup
+      initializeHealthSetup,
+      walletRecoveryFailed
     } = this.props;
     if (
       prevProps.walletImageChecked != walletImageChecked && prevProps.SERVICES != SERVICES
@@ -212,9 +221,12 @@ class RestoreWithICloud extends Component<
         });
       }
     }
-
     if (prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES !== this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES) {
       this.updateList();
+    }
+
+    if(prevProps.walletRecoveryFailed !== walletRecoveryFailed){
+      (this.refs.loaderBottomSheet as any).snapTo(0);
     }
   };
 
@@ -231,21 +243,24 @@ class RestoreWithICloud extends Component<
         }, []);
 
         if (insert) shares.push(META_SHARE);
-
-        for(let i =0 ; i < listData.length; i++){
-          if(listData[i].shareId === META_SHARE.shareId){
-            listData[i].status = "received";
-          }
-          updatedListData.push(listData[i]);
-           }
-          this.setState({listData: updatedListData});
-
       }
-      if(selectedBackup.shares) shares.push(selectedBackup.shares)
+      //if(selectedBackup.shares) shares.push(selectedBackup.shares)
     });
-    if (shares.length) this.setState({metaShares: shares})
-    if(shares.length === 2 && selectedBackup.level === 2){
+    for(let i =0 ; i < listData.length; i++){
+      for (let a = 0; a < shares.length; a++) {
+        if(listData[i].shareId === shares[a].shareId){
+          listData[i].status = "received";
+        }
+      } 
+      updatedListData.push(listData[i]);
+      }
+      this.setState({listData: updatedListData});
 
+    if (shares.length) this.setState({metaShares: shares})
+    if(shares.length === 2 && selectedBackup.levelStatus === 2){
+      console.log("INSIDE IF",shares.length, selectedBackup.levelStatus);
+      (this.refs.loaderBottomSheet as any).snapTo(1);
+      this.props.recoverWallet(selectedBackup.levelStatus);
     }
   }
 
@@ -280,13 +295,15 @@ class RestoreWithICloud extends Component<
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     console.log('decryptedCloudDataJson', decryptedCloudDataJson);
+
     if(decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData){
       this.setState({cloudBackup : true});
+      this.props.updateCloudMShare(JSON.parse(selectedBackup.shares), 0);
      let KeeperData = JSON.parse(selectedBackup.keeperData);
      let obj;
      for(let i =0 ; i < KeeperData.length; i++){
       obj = {
-        type: 'device',//KeeperData[i].type,
+        type:  KeeperData[i].type,
         title: KeeperData[i].name,
         info: '',
         time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
@@ -309,9 +326,10 @@ class RestoreWithICloud extends Component<
   };
 
   handleScannedData = async (scannedData) =>{
-    
-  console.log("scannedData", scannedData);
-  this.props.downloadMShare(scannedData.uuid, null, 'recovery');
+    const {DECENTRALIZED_BACKUP} = this.props;
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+  console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
+  this.props.downloadMShare(scannedData.uuid, null, 'recovery', Object.keys(RECOVERY_SHARES).length);
   //this.props.downloadShares(scannedData.uuid);
   }
 
@@ -783,6 +801,7 @@ const mapStateToProps = (state) => {
     walletImageChecked: idx(state, (_) => _.health.walletImageChecked),
     SERVICES: idx(state, (_) => _.storage.database.SERVICES),
     metaShare: idx(state, (_) => _.health.metaShare),
+    walletRecoveryFailed: idx(state, (_) => _.health.walletRecoveryFailed),
     DECENTRALIZED_BACKUP: idx(state, (_) => _.storage.database.DECENTRALIZED_BACKUP) || {},
   };
 };
@@ -798,6 +817,8 @@ export default withNavigationFocus(
     initializeHealthSetup,
     downloadShares,
     downloadMShare,
+    recoverWallet,
+    updateCloudMShare
   })(RestoreWithICloud),
 );
 

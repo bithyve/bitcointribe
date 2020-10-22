@@ -18,7 +18,8 @@ import {
   IS_LEVEL2_INITIALIZED,
   SHARE_RECEIVED,
   DOWNLOADED_MSHARE_HEALTH,
-  ERROR_RECEIVING_HEALTH
+  ERROR_RECEIVING_HEALTH,
+  WALLET_RECOVERY_FAILED_HEALTH
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -31,6 +32,7 @@ const initialState: {
     updateMSharesHealth: Boolean;
     updateEFChannelStatus: Boolean
   };
+  walletRecoveryFailed: Boolean;
   errorSending: Boolean;
   currentLevel: Number;
   isLevelTwoMetaShareCreated: Boolean;
@@ -72,6 +74,7 @@ const initialState: {
     updateMSharesHealth: false,
     updateEFChannelStatus: false
   },
+  walletRecoveryFailed: false,
   isLevelTwoMetaShareCreated: false,
   isLevelThreeMetaShareCreated: false,
   isLevel2Initialized: false,
@@ -222,6 +225,12 @@ export default (state = initialState, action) => {
         ...state,
         service: action.payload.services[S3_SERVICE],
         serviceEnriched: true,
+      };
+
+      case WALLET_RECOVERY_FAILED_HEALTH:
+      return {
+        ...state,
+        walletRecoveryFailed: action.payload.isFailed,
       };
 
   }

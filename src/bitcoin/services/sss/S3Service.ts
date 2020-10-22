@@ -50,6 +50,7 @@ export default class S3Service {
   public static recoverFromSecrets = (
     encryptedSecrets: string[],
     answer: string,
+    level?: number
   ):
     | {
         status: number;
@@ -67,7 +68,7 @@ export default class S3Service {
       } => {
     try {
       const { decryptedSecrets } = LevelHealth.decryptSecrets(encryptedSecrets, answer);
-      const { mnemonic } = LevelHealth.recoverFromSecrets(decryptedSecrets);
+      const { mnemonic } = LevelHealth.recoverFromSecrets(decryptedSecrets, level);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
     } catch (err) {
       return { status: 501, err: err.message, message: ErrMap[501] };
@@ -484,6 +485,12 @@ export default class S3Service {
   };
 
   public generateLevel1Shares = (
+    secureAssets: {
+      secondaryMnemonic: string;
+      twoFASecret: string;
+      secondaryXpub: string;
+      bhXpub: string;
+    },
     answer: string,
     tag: string,
     version: string,
@@ -507,7 +514,7 @@ export default class S3Service {
       
       const { shares } = this.levelhealth.generateLevel1Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(tag, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets,tag, version, level);
       console.log("metaShares",metaShares);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
@@ -516,6 +523,12 @@ export default class S3Service {
   };
 
   public generateLevel2Shares = (
+    secureAssets: {
+      secondaryMnemonic: string;
+      twoFASecret: string;
+      secondaryXpub: string;
+      bhXpub: string;
+    },
     answer: string,
     tag: string,
     version: string,
@@ -538,7 +551,7 @@ export default class S3Service {
     try {
       const { shares } = this.levelhealth.generateLevel2Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(tag, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets,tag, version, level);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
       return { status: 510, err: err.message, message: ErrMap[510] };
