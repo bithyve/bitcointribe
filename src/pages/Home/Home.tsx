@@ -36,8 +36,6 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
-import NoInternetModalContents from '../../components/NoInternetModalContents';
-import NetInfo from '@react-native-community/netinfo';
 import {
   downloadMShare,
   initHealthCheck,
@@ -208,8 +206,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
-  NoInternetBottomSheet: any;
-  unsubscribe: any;
 
   addTabBarBottomSheetRef = createRef<RNBottomSheet>();
 
@@ -220,7 +216,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   addContactAddressBookBottomSheetRef = createRef<BottomSheet>();
   notificationsListBottomSheetRef = createRef<BottomSheet>();
   custodianRequestRejectedBottomSheetRef = createRef<BottomSheet>();
-  noInternetBottomSheetRef = createRef<BottomSheet>();
 
   static whyDidYouRender = true;
 
@@ -229,8 +224,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = null;
     this.appStateListener = null;
-    this.NoInternetBottomSheet = React.createRef();
-    this.unsubscribe = null;
 
     this.state = {
       notificationData: [],
@@ -726,14 +719,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           if (nextAppState === 'inactive' || nextAppState == 'background') {
             this.props.updatePreference({
-              key: 'isInternetModalCome',
+              key: 'hasShownNoInternetWarning',
               value: false,
             });
-            // TODO -- fix this part
-            // await AsyncStorage.setItem(
-            //   'isInternetModalCome',
-            //   JSON.stringify(false),
-            // );
           }
         },
       );
@@ -752,22 +740,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
     Linking.addEventListener('url', this.handleDeepLink);
 
-    this.unsubscribe = NetInfo.addEventListener((state) => {
-      setTimeout(() => {
-        if (state.isInternetReachable === null) {
-          return;
-        }
-
-        if (state.isInternetReachable) {
-          this.noInternetBottomSheetRef.current?.snapTo(0);
-        } else {
-          this.noInternetBottomSheetRef.current?.snapTo(1);
-        }
-      }, 1000);
-    });
-
     // health check
-
     const { s3Service, initHealthCheck } = this.props;
     const { healthCheckInitialized } = s3Service.sss;
     if (!healthCheckInitialized) {
@@ -1026,12 +999,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (this.focusListener) {
       this.focusListener();
     }
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-    // if (this.appStateListener) {
-    //   this.appStateListener();
-    // }
     if (this.firebaseNotificationListener) {
       this.firebaseNotificationListener();
     }
@@ -2600,44 +2567,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressHeader={() => {
                 (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
               }}
-            />
-          )}
-        />
-        <BottomSheet
-          onOpenEnd={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          onOpenStart={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          onCloseStart={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.NoInternetBottomSheet}
-          snapPoints={[-50, hp('60%')]}
-          renderContent={() => (
-            <NoInternetModalContents
-              onPressTryAgain={() => {
-                this.noInternetBottomSheetRef.current?.snapTo(0);
-              }}
-              onPressIgnore={() => {
-                this.noInternetBottomSheetRef.current?.snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-            // onPressHeader={() => {
-            //   this.noInternetBottomSheetRef.current?.snapTo(0);
-            // }}
             />
           )}
         />
