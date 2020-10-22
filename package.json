@@ -40,7 +40,7 @@
     "projectDirectory": "iOS"
   },
   "dependencies": {
-    "@gorhom/bottom-sheet": "^1.2.2",
+    "@gorhom/bottom-sheet": "^1.4.1",
     "@react-native-community/netinfo": "^5.9.5",
     "@tradle/react-native-http": "2.0.1",
     "@types/node": "^14.6.0",
