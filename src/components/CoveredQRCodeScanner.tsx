@@ -61,12 +61,15 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
           style={{
             flex: 1,
           }}
-          onBarCodeRead={onCodeScanned}
+          onBarCodeRead={(data) => {
+            onCodeScanned(data)
+            setIsCameraOpen(false)
+          }}
           captureAudio={false}
         >
           <CameraFrameIndicators />
         </RNCamera>
-      </View>
+      </View >
     );
   };
 

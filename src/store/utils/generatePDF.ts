@@ -44,12 +44,25 @@ const chunkArray = (arr: any, n: any) => {
   return chunks;
 };
 
+
+const getFormattedString = (qrString: string) => {
+  qrString = qrString.split('"').join('Dquote');
+  qrString = qrString.split(':').join('Qutation');
+  qrString = qrString.split('{').join('Lbrace');
+  qrString = qrString.split('}').join('Rbrace');
+  qrString = qrString.split('/').join('Slash');
+  qrString = qrString.split(',').join('Comma');
+  qrString = qrString.split("'").join('Squote');
+  qrString = qrString.split(' ').join('Space');
+  return qrString;
+};
+
 export default async (pdfData, fileName, title, password) => {
   const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData;
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
   qrData.forEach((qrString) => {
-    qrcode.push(getFormattedStringFromQRString(qrString));
+    qrcode.push(getFormattedString(qrString));
     // qrCodeString.push(chunkArray(qrString, 4));
     qrCodeString.push(qrString);
   });
