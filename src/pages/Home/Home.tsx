@@ -404,7 +404,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     try {
-      const scannedData = JSON.parse(qrData);
+      const scannedData = JSON.parse(qrData)
       if (scannedData.ver) {
         if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
       }
@@ -440,8 +440,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   deepLinkModalOpen: true,
                 });
               }
+              navigation.goBack()
               setTimeout(() => {
-                this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                // this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1)
                 this.closeBottomSheet();
               }, 2);
             },
@@ -589,6 +591,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break;
       }
     } catch (err) {
+      console.log(err);
       Toast('Invalid QR');
     }
   };
@@ -1117,8 +1120,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[3]
           }`,
         );
       } else {
@@ -1628,9 +1630,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (tab === BottomTab.More) {
       this.props.navigation.navigate('MoreOptions');
     } else if (tab === BottomTab.QR) {
-        this.props.navigation.navigate('QRScanner', {
-          onCodeScanned: this.processQRData,
-        });
+      this.props.navigation.navigate('QRScanner', {
+        onCodeScanned: this.processQRData,
+      });
     } else if (tab === BottomTab.Add) {
       this.setState(
         {
@@ -1734,8 +1736,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   let contactName = '';
                   if (contact) {
-                    contactName = `${contact.firstName} ${
-                      contact.lastName ? contact.lastName : ''
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
                       }`
                       .toLowerCase()
                       .trim();
@@ -2144,7 +2145,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             }
             buttonStyle={ButtonStyles.floatingActionButton}
-            titleStyle={{...ButtonStyles.floatingActionButtonText, marginLeft: 4 }}
+            titleStyle={{ ...ButtonStyles.floatingActionButtonText, marginLeft: 4 }}
             onPress={() => navigation.navigate('FriendsAndFamily')}
           />
         </View>
@@ -2341,7 +2342,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={this.trustedContactRequestBottomSheetRef}
+            ref={"trustedContactRequestBottomSheetRef"}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()

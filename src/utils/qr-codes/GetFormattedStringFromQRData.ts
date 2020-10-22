@@ -1,12 +1,12 @@
 export default function getFormattedStringFromQRString(qrString: string): string {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
-
-  return qrString;
+  let dataString = qrString
+  dataString = dataString.split('Dquote').join('"');
+  dataString = dataString.split('Qutation').join(':');
+  dataString = dataString.split('Lbrace').join('{');
+  dataString = dataString.split('Rbrace').join('}');
+  dataString = dataString.split('Slash').join('/');
+  dataString = dataString.split('Comma').join(',');
+  dataString = dataString.split('Squote').join("'");
+  dataString = dataString.split('Space').join(' ');
+  return dataString;
 }
