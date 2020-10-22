@@ -1,36 +1,29 @@
 console.disableYellowBox = true;
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Navigator from './src/navigation/Navigator';
 import { Provider } from 'react-redux';
 import makeStore from './src/store';
 import NoInternetModalContents from './src/components/NoInternetModalContents';
-import BottomSheet from 'reanimated-bottom-sheet';
 import { useDispatch } from 'react-redux';
-import {
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info';
 import { setApiHeaders } from './src/services/api';
 import firebase from 'react-native-firebase';
-import { NavigationState } from 'react-navigation';
 import { updatePreference } from './src/store/actions/preferences';
 import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState';
+import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs';
+import getActiveRouteName from './src/utils/navigation/GetActiveRouteName';
 
 export const URI_PREFIX = 'hexa://';
 
-function getActiveRouteName(navigationState: NavigationState) {
-  if (!navigationState) {
-    return null;
-  }
+async function configureAPIHeaders() {
+  const version = await getVersion();
+  const buildNumber = await getBuildId();
 
-  const route = navigationState.routes[navigationState.index];
-  // Dive into nested navigators
-  if (route.routes) {
-    return getActiveRouteName(route);
-  }
-  return route.routeName;
-}
+  setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
+};
+
 
 export default function AppWrapper() {
 
@@ -38,23 +31,36 @@ export default function AppWrapper() {
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
   const store = makeStore();
 
+  useEffect(() => {
+    configureAPIHeaders();
+    firebase.analytics().setAnalyticsCollectionEnabled(true);
+  }, []);
+
   return (
     <Provider store={store} uriPrefix={URI_PREFIX}>
-      <AppContent />
+      <BottomSheetModalProvider>
+        <AppContent />
+      </BottomSheetModalProvider>
     </Provider>
   );
 }
 
 function AppContent() {
   const dispatch = useDispatch();
-  const preferencesState = usePreferencesState();
-  const noInternetBottomSheetRef = useRef<BottomSheet>();
+  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal();
 
-  async function getAppVersion() {
-    let version = await getVersion();
-    let buildNumber = await getBuildId();
-    setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
-  };
+  const preferencesState = usePreferencesState();
+  const [previousScreenName, setPreviousScreenName] = useState<string | null>();
+  const [currentScreenName, setCurrentScreenName] = useState<string | null>();
+
+  const canShowNoInternetWarning = useMemo(() => {
+    return (
+      currentScreenName != 'Login' &&
+      currentScreenName != 'Launch' &&
+      currentScreenName != 'ReLogin' &&
+      preferencesState.hasShownNoInternetWarning === false
+    );
+  }, [previousScreenName, currentScreenName, preferencesState.hasShownNoInternetWarning]);
 
   async function resetInternetWarningFlag() {
     await dispatch(updatePreference({
@@ -63,71 +69,66 @@ function AppContent() {
     }));
   }
 
-  useEffect(() => {
-    getAppVersion();
-  }, []);
+  const showNoInternetWarning = useCallback(() => {
+    presentBottomSheet(
+      <NoInternetModalContents
+        onPressTryAgain={() => {
+          dismissBottomSheet();
+        }}
+        onPressIgnore={() => {
+          resetInternetWarningFlag();
+          dismissBottomSheet();
+        }}
+      />,
+      defaultBottomSheetConfigs,
+    );
+  }, [presentBottomSheet, dismissBottomSheet]);
 
-  useEffect(() => {
-    firebase.analytics().setAnalyticsCollectionEnabled(true);
-  }, []);
+  function setupInternetWarningListener() {
+    return NetInfo.addEventListener((state) => {
+      showNoInternetWarning();
 
+      if (
+        state.isInternetReachable == null ||
+        canShowNoInternetWarning == false
+      ) {
+        return;
+      }
+
+      if (state.isInternetReachable) {
+        dismissBottomSheet();
+      } else {
+        showNoInternetWarning();
+      }
+    });
+  }
 
   useEffect(() => {
     return () => {
+      // reset when the app component unmounts
       resetInternetWarningFlag();
     };
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = setupInternetWarningListener();
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
   return (
-    <>
-      <Navigator
-        onNavigationStateChange={async (prevState, currentState) => {
-          const currentScreen = getActiveRouteName(currentState);
-          const prevScreen = getActiveRouteName(prevState);
+    <Navigator
+      onNavigationStateChange={async (prevState, currentState) => {
+        setPreviousScreenName(getActiveRouteName(prevState));
+        setCurrentScreenName(getActiveRouteName(currentState));
 
-          if (
-            currentScreen != 'Login' &&
-            currentScreen != 'Launch' &&
-            currentScreen != 'ReLogin' &&
-            !preferencesState.hasShownNoInternetWarning
-          ) {
-            NetInfo.addEventListener((state) => {
-              setTimeout(() => {
-                if (state.isInternetReachable === null) {
-                  return;
-                }
-                if (state.isInternetReachable) {
-                  noInternetBottomSheetRef.current?.snapTo(0);
-                } else {
-                  noInternetBottomSheetRef.current?.snapTo(1);
-                }
-              }, 1000);
-            });
-          }
-          if (prevScreen !== currentScreen) {
-            firebase.analytics().setCurrentScreen(currentScreen);
-          }
-        }}
-      />
-
-      <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={noInternetBottomSheetRef}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={() => (
-          <NoInternetModalContents
-            onPressTryAgain={() => {
-              noInternetBottomSheetRef.current?.snapTo(0);
-            }}
-            onPressIgnore={() => {
-              resetInternetWarningFlag();
-              noInternetBottomSheetRef.current?.snapTo(0);
-            }}
-          />
-        )}
-      />
-    </>
+        if (previousScreenName !== currentScreenName) {
+          firebase.analytics().setCurrentScreen(currentScreenName);
+        }
+      }}
+    />
   );
 }
