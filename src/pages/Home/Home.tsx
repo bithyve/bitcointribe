@@ -442,7 +442,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
               navigation.goBack()
               setTimeout(() => {
-                // this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
                 (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1)
                 this.closeBottomSheet();
               }, 2);
@@ -478,7 +477,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
                 this.closeBottomSheet();
               }, 2);
             },
@@ -511,7 +510,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
                 this.closeBottomSheet();
               }, 2);
             },
@@ -545,7 +544,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
               }, 2);
             },
           );
@@ -573,7 +572,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }
               setTimeout(() => {
-                this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
                 this.closeBottomSheet();
               }, 2);
             },
@@ -1004,7 +1003,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
 
           setTimeout(() => {
-            this.custodianRequestBottomSheetRef.current?.snapTo(1);
+            (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
             this.closeBottomSheet();
           }, 2);
         },
@@ -1026,7 +1025,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }
           setTimeout(() => {
-            this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+            (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
             this.closeBottomSheet();
           }, 2);
         },
@@ -1090,7 +1089,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              this.custodianRequestBottomSheetRef.current?.snapTo(1);
+              (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
               this.closeBottomSheet();
             }, 2);
           },
@@ -1110,7 +1109,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+              (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
               this.closeBottomSheet();
             }, 2);
           },
@@ -1154,7 +1153,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }
             setTimeout(() => {
-              this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+              (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
               this.closeBottomSheet();
             }, 2);
           },
@@ -1181,7 +1180,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }
           setTimeout(() => {
-            this.trustedContactRequestBottomSheetRef.current?.snapTo(1);
+            (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
             this.closeBottomSheet();
           }, 2);
         },
@@ -1607,7 +1606,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       deepLinkModalOpen: false,
     });
     setTimeout(() => {
-      this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
+      (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(0)
     }, 1);
     this.processDLRequest(key, false);
   };
@@ -1619,7 +1618,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         deepLinkModalOpen: false,
       });
     }, 2);
-    this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
+    (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(0)
   };
 
   onPhoneNumberChange = () => { };
@@ -1925,7 +1924,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if (value.type == 'contact') {
       setTimeout(() => {
-        this.notificationsListBottomSheetRef.current?.snapTo(0);
+        (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
       }, 2);
     }
   };
@@ -2199,7 +2198,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 0,
                       },
                       () => {
-                        this.addContactAddressBookBottomSheetRef.current?.snapTo(1);
+                        (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(1)
                       },
                     );
                   }
@@ -2229,7 +2228,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={this.custodianRequestBottomSheetRef}
+            ref={"custodianRequestBottomSheetRef"}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) {
@@ -2248,7 +2247,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         deepLinkModalOpen: true,
                       },
                       () => {
-                        this.custodianRequestBottomSheetRef.current?.snapTo(0);
+                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
                       },
                     );
 
@@ -2290,10 +2289,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 0,
                       },
                       () => {
-                        this.custodianRequestBottomSheetRef.current?.snapTo(0);
-                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
-                          1,
-                        );
+                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
+                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
                       },
                     );
                   }}
@@ -2309,7 +2306,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       deepLinkModalOpen: false,
                     },
                     () => {
-                      this.custodianRequestBottomSheetRef.current?.snapTo(0);
+                      (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
                     },
                   );
                 }}
@@ -2401,7 +2398,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               });
             }}
             enabledInnerScrolling={true}
-            ref={this.custodianRequestRejectedBottomSheetRef}
+            ref={"custodianRequestRejectedBottomSheetRef"}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
@@ -2413,9 +2410,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                         tabBarIndex: 999,
                       },
                       () => {
-                        this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
-                          0,
-                        );
+                        (this.refs.custodianRequestRejectedBottomSheetRef as any).snapTo(0);
                       },
                     );
                   }}
@@ -2431,9 +2426,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       tabBarIndex: 999,
                     },
                     () => {
-                      this.custodianRequestRejectedBottomSheetRef.current?.snapTo(
-                        0,
-                      );
+                      (this.refs.custodianRequestRejectedBottomSheetRef as any).snapTo(0);
                     },
                   );
                 }}
@@ -2517,7 +2510,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={this.addContactAddressBookBottomSheetRef}
+          ref={"addContactAddressBookBottomSheetRef"}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2534,7 +2527,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   navigation.navigate('AddContactSendRequest', {
                     SelectedContact: selectedContact,
                   });
-                  this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+                  (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
                 }
               }}
               onSelectContact={(selectedContact) => {
@@ -2543,7 +2536,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
               }}
               onSkipContinue={() => {
                 let { skippedContactsCount } = this.props.trustedContacts.tc;
@@ -2566,7 +2559,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 navigation.navigate('AddContactSendRequest', {
                   SelectedContact: [data],
                 });
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
               }}
             />
           )}
@@ -2575,7 +2568,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
               }}
             />
           )}
@@ -2596,7 +2589,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }}
           enabledInnerScrolling={true}
-          ref={this.notificationsListBottomSheetRef}
+          ref={"notificationsListBottomSheetRef"}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2611,14 +2604,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.onNotificationClicked(value)
               }
               onPressBack={() => {
-                this.notificationsListBottomSheetRef.current?.snapTo(0);
+                (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                this.notificationsListBottomSheetRef.current?.snapTo(0);
+                (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
               }}
             />
           )}
