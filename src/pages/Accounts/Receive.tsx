@@ -341,10 +341,9 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
-    if (tcInfo) {
+    if (trustedContactsInfo) {
       if (
-        tcInfo.findIndex((trustedContact) => {
+        trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
@@ -359,17 +358,20 @@ export default function Receive(props) {
           return presentContactName == selectedContactName;
         }) == -1
       ) {
-        tcInfo.push(contact);
+        trustedContactsInfo.push(contact);
       }
     } else {
-      tcInfo = [];
-      tcInfo[0] = null; // securing initial 3 positions for Guardians
-      tcInfo[1] = null;
-      tcInfo[2] = null;
-      tcInfo[3] = contact; // initial 3 reserved for Guardians
+      trustedContactsInfo = [];
+      trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+      trustedContactsInfo[1] = null;
+      trustedContactsInfo[2] = null;
+      trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
-    dispatch(updateTrustedContactInfoLocally(tcInfo));
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   const createTrustedContact = useCallback(async () => {

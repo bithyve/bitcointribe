@@ -118,9 +118,9 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate('QRScanner', {
+            props.navigation.navigate('QrScanner', {
               title: 'Scan Exit Key',
-              onCodeScanned: qrData => {
+              scanedCode: qrData => {
                 dispatch(resetTwoFA(qrData));
               },
             });
@@ -137,9 +137,9 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate('QRScanner', {
+            props.navigation.navigate('QrScanner', {
               title: 'Scan Exit Key',
-              onCodeScanned: qrData => {
+              scanedCode: qrData => {
                 dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
               },
             });

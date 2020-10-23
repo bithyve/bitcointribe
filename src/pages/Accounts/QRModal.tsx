@@ -18,17 +18,43 @@ import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
 
 export default function QRModal(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
-
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
       setOpenCameraFlag(false);
       props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
-      props.onQrScan(getFormattedStringFromQRString(barcodes.data));
+      props.onQrScan(getFormattedString(barcodes.data));
     }
+  };
+
+  useEffect(() => {
+    (async () => {
+      let isCameraOpen;
+      AsyncStorage.getItem('isCameraOpen', (err, value) => {
+        if (err) {
+          //console.log(err);
+        } else {
+          isCameraOpen = JSON.parse(value); // boolean false
+        }
+      });
+      if (!isCameraOpen) {
+        await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+      }
+    })();
+  }, []);
+
+  const getFormattedString = (qrString: string) => {
+    qrString = qrString.split('Dquote').join('"');
+    qrString = qrString.split('Qutation').join(':');
+    qrString = qrString.split('Lbrace').join('{');
+    qrString = qrString.split('Rbrace').join('}');
+    qrString = qrString.split('Slash').join('/');
+    qrString = qrString.split('Comma').join(',');
+    qrString = qrString.split('Squote').join("'");
+    qrString = qrString.split('Space').join(' ');
+    return qrString;
   };
 
   return (
@@ -252,7 +278,7 @@ export default function QRModal(props) {
                   >
                     {props.linkText}
                   </Text>
-                ) : null}
+                ) : null} 
                 {props.italicText ? (
                   <Text
                     style={{
