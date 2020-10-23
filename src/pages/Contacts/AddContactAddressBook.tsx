@@ -46,14 +46,8 @@ export default function AddContactAddressBook(props) {
     contactListErrorBottomSheet,
     setContactListErrorBottomSheet,
   ] = useState(React.createRef());
-  const [contactData, setContactData] = useState([]);
 
-  useEffect(() => {
-    if (!props.addContactModalOpened) {
-      setSelectedContacts([]);
-      getContactsAsync();
-    }
-  }, [props.addContactModalOpened]);
+  const [contactData, setContactData] = useState([]);
 
   const requestContactsPermission = async () => {
     try {
@@ -139,7 +133,7 @@ export default function AddContactAddressBook(props) {
   useEffect(() => {
     (async () => {
       await AsyncStorage.getItem('ContactData', (err, value) => {
-        if (err) console.log('ERROR in COntactData', err);
+        if (err) console.log('ERROR in ContactData', err);
         else {
           let data = JSON.parse(value);
           if (data && data.length) {

@@ -17,12 +17,16 @@ export enum BottomTab {
 }
 
 export interface Props {
-  tabBarZIndex: number;
+  tabBarZIndex?: number;
   onSelect: (tab: BottomTab) => void;
   selectedTab: BottomTab;
 }
 
-const CustomBottomTabs: React.FC<Props> = ({ tabBarZIndex, onSelect, selectedTab }: Props) => {
+const CustomBottomTabs: React.FC<Props> = ({
+  tabBarZIndex = 1,
+  onSelect,
+  selectedTab,
+}: Props) => {
   return (
     <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
       <TouchableOpacity
