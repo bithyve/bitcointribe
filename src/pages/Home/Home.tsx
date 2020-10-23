@@ -99,7 +99,6 @@ import {
   trustedChannelActions,
   DonationDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
-import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents';
@@ -818,6 +817,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const { s3Service, initializeHealthSetup } = this.props;
     const { healthCheckInitialized } = s3Service.levelhealth;
+    console.log("healthCheckInitialized", healthCheckInitialized);
     if (!healthCheckInitialized) {
       initializeHealthSetup();
     }
@@ -2847,7 +2847,7 @@ const mapStateToProps = (state) => {
     ),
     cardDataProps: idx(state, (_) => _.preferences.cardData),
 
-    s3Service: idx(state, (_) => _.sss.service),
+    s3Service: idx(state, (_) => _.health.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),

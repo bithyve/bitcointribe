@@ -201,9 +201,9 @@ class ScanRecoveryKey extends Component<
               style={{ alignSelf: 'center' }}
               onPress={() => {
                 this.barcodeRecognized({
-                  uuid: "3080d29c7d4719432999b9d9",
-                  publicKey: "4463955359b8db62148280bbdb996a689e9b11b5456557b4524c6f9508effb3e",
-                  walletName: "Nikhita mac"
+                  uuid: "e4adbbfd7ff53ed35c38e150",
+                  publicKey: "050bb531af7826ba36c24758750e33e24a584c0bcc9547a4c3a9e83d1350458f",
+                  walletName: "John mac pro"
               });
                 this.setState({ isScanned: true })}}
             >

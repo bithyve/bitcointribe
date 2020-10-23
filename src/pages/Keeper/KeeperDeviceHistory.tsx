@@ -175,14 +175,12 @@ const KeeperDeviceHistory = (props) => {
           try {
             setQrScannedData(qrData);
             if(qrData){
-            if(!props.navigation.state.params.isPrimaryKeeper){
-              (ApproveSetupBottomSheet as any).current.snapTo(1);  
-            }
-            else{
-              // let qrScannedData = '{"uuid":"9c2d4b8b1dff873f3ed7b74b","publicKey":"72b4a594df14aae6bbfc2f716065475f39e6cae53a2e85c6eee548324e56d7a8","ephemeralAddress":"4a9e7503c964357126f1526f7e76188dca95561bb28eef97fd7dd2238573b1e9","walletName":"shivani"}'
-             //let qrScannedData = '{"uuid": "a55d0e028365822430d43544","publicKey": "0ccc45d9166101f41571693b3427b785502d77c27c7a0946b5f88f079d07b81e","ephemeralAddress": "9ed7b8aa315ec5a03ed4fa7bd98223911f398a991d2babb9a3fcc05cf92b8516","walletName":"Shivani"}';
-             props.navigation.navigate('KeeperFeatures', {qrScannedData: qrData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
-            }
+            // if(!props.navigation.state.params.isPrimaryKeeper){
+            //   (ApproveSetupBottomSheet as any).current.snapTo(1);  
+            // }
+            // else{
+              props.navigation.navigate('KeeperFeatures', {qrScannedData: qrData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
+            //}
           (QrBottomSheet as any).current.snapTo(0);
         }
           } catch (err) {
@@ -202,7 +200,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={()=>{
           //  let qrScannedData = '{"uuid": "892b0fe55c894848c7d7d7d6","publicKey": "6968c521ef7063560ce68b8283f9ee6bf4963ef51b4bc7a06162dbfb3e5fce9e","ephemeralAddress": "759be69891f864ce7dda85288d0675d3ae5a323a3cb32381b1b726e6975c70d0","walletName":"Mac"}';
-           let qrScannedData = '{"uuid": "7a5933bd622c9fdd18d0b054","publicKey": "3da92f86ea6e0b6b305897197e53c93ec8d03852ce112a2c4d7cde20dc8f12e7","ephemeralAddress": "ab3d3ad234cd6ab071b0309feff10d28207d444f68c056857cf85ba93fd6c199","walletName":"GalaxyPro"}';
+           let qrScannedData = '{"uuid": "d8a28068d23a01c93891952d","publicKey": "727a4b974c3845eb0653a4de65e45d9797d38ff2b395f152850651d5bac19ebf","ephemeralAddress": "af748c4711bfa42d1e7c7b808c6322a838479979e85658e784cd7af390dbc867","walletName":"hexa keeper"}';
            props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
         }}
       />
@@ -402,7 +400,7 @@ const KeeperDeviceHistory = (props) => {
                 if(ApproveSetupBottomSheet as any)
                 (ApproveSetupBottomSheet as any).current.snapTo(0)
 
-                props.navigation.navigate('KeeperFeatures')
+                props.navigation.navigate('KeeperFeatures', {qrScannedData: qrData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
               }
               }
             />

@@ -68,6 +68,7 @@ import {
 import { initializeHealthSetup } from '../../store/actions/health';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -164,7 +165,7 @@ class RestoreWithICloud extends Component<
   // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
   componentDidMount = async () => {
-    this.cloudData();
+    await this.cloudData();
     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
     if (storedExchangeRates) {
       const exchangeRates = JSON.parse(storedExchangeRates);
@@ -280,7 +281,9 @@ class RestoreWithICloud extends Component<
       }
     }
     console.log('ARR', newArray);
-    this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
+    this.setState(state => ({
+      selectedBackup: newArray[0], walletsArray: newArray}));
+    //this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
     (this.refs.RestoreFromICloud as any).snapTo(1);
   }else{
     (this.refs.BackupNotFound as any).snapTo(1);
@@ -346,7 +349,7 @@ class RestoreWithICloud extends Component<
     if (Platform.OS == 'ios') name = 'iCloud';
     else name = 'GDrive';
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
+      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1, position: 'relative'}}>
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
@@ -495,6 +498,7 @@ class RestoreWithICloud extends Component<
             borderRadius: 10,
             marginLeft: 25,
             marginRight: 25,
+            marginTop:'auto',
             marginBottom: hp('4%'),
             justifyContent: 'space-evenly',
             alignItems: 'center',
@@ -529,12 +533,13 @@ class RestoreWithICloud extends Component<
             <Text style={styles.buttonText}>Scan Key</Text>
           </TouchableOpacity>
         </View>
+        
         {hideShow ? (
           <View style={styles.dropDownView}>
             <ScrollView>
             {walletsArray.map((value) => {
               return (
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                   activeOpacity={10}
                   onPress={() => {
                     this.setState({ hideShow: false });
@@ -585,12 +590,13 @@ class RestoreWithICloud extends Component<
                       </View>
                     </View>
                   )}
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
               );
             })}
             </ScrollView>
           </View>
         ) : null}
+        
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'RestoreFromICloud'}
@@ -604,6 +610,7 @@ class RestoreWithICloud extends Component<
             let name;
             if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
+            console.log("SELECTED BACKUP", selectedBackup);
             return (
               <RestoreFromICloud
                 title={'Restore from ' + name}
@@ -839,7 +846,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
-    width: '100%',
+    width: '80%',
     height: '80%',
     marginTop: wp('15%'),
     marginBottom: wp('25%'),
