@@ -53,9 +53,7 @@ function* fetchDBWorker() {
         yield put(startupSync());
       }
     } else {
-      console.log(
-        'Failed to fetch the database; either key is missing or database is empty',
-      );
+      // DB would be absent during wallet setup
     }
   } catch (err) {
     console.log(err);
