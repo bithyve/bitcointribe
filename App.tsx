@@ -86,8 +86,6 @@ function AppContent() {
 
   function setupInternetWarningListener() {
     return NetInfo.addEventListener((state) => {
-      showNoInternetWarning();
-
       if (
         state.isInternetReachable == null ||
         canShowNoInternetWarning == false
