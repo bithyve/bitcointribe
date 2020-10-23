@@ -19,7 +19,8 @@ import {
   SHARE_RECEIVED,
   DOWNLOADED_MSHARE_HEALTH,
   ERROR_RECEIVING_HEALTH,
-  WALLET_RECOVERY_FAILED_HEALTH
+  WALLET_RECOVERY_FAILED_HEALTH,
+  WALLET_IMAGE_HEALTH_CHECKED
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -33,6 +34,7 @@ const initialState: {
     updateEFChannelStatus: Boolean
   };
   walletRecoveryFailed: Boolean;
+  walletImageChecked: Boolean;
   errorSending: Boolean;
   currentLevel: Number;
   isLevelTwoMetaShareCreated: Boolean;
@@ -75,6 +77,7 @@ const initialState: {
     updateEFChannelStatus: false
   },
   walletRecoveryFailed: false,
+  walletImageChecked: false,
   isLevelTwoMetaShareCreated: false,
   isLevelThreeMetaShareCreated: false,
   isLevel2Initialized: false,
@@ -233,6 +236,11 @@ export default (state = initialState, action) => {
         walletRecoveryFailed: action.payload.isFailed,
       };
 
+      case WALLET_IMAGE_HEALTH_CHECKED:
+      return {
+        ...state,
+        walletImageChecked: action.payload.checked,
+      };
   }
   return state;
 };

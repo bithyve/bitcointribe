@@ -27,7 +27,7 @@ export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED';
 export const KEEPER_INFO = 'KEEPER_INFO';
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const WALLET_RECOVERY_FAILED_HEALTH = 'WALLET_RECOVERY_FAILED_HEALTH';
-export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
+export const WALLET_IMAGE_HEALTH_CHECKED = 'WALLET_IMAGE_HEALTH_CHECKED';
 export const DOWNLOAD_SHARES = "DOWNLOAD_SHARED";
 export const DOWNLOAD_MSHARE_HEALTH = "DOWNLOAD_MSHARE_HEALTH";
 export const SHARE_RECEIVED = "SHARE_RECEIVED";
@@ -99,7 +99,7 @@ export const updateMSharesHealth = (shares) => {
 };
 
 export const walletImageChecked = (checked) => {
-  return { type: WALLET_IMAGE_CHECKED, payload: { checked } };
+  return { type: WALLET_IMAGE_HEALTH_CHECKED, payload: { checked } };
 };
 
 export const updateMSharesLoader = (beingLoaded) => {

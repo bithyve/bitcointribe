@@ -202,7 +202,7 @@ class RestoreWithICloud extends Component<
       walletRecoveryFailed
     } = this.props;
     if (
-      prevProps.walletImageChecked != walletImageChecked && prevProps.SERVICES != SERVICES
+      prevProps.walletImageChecked != walletImageChecked
     ) {
       await AsyncStorage.setItem('walletExists', 'true');
       await AsyncStorage.setItem('walletRecovered', 'true');
@@ -325,7 +325,7 @@ class RestoreWithICloud extends Component<
   //   
   };
 
-  handleScannedData = async (scannedData) =>{
+  handleScannedData = async (scannedData) => {
     const {DECENTRALIZED_BACKUP} = this.props;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
   console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);

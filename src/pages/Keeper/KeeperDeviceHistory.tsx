@@ -202,7 +202,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={()=>{
           //  let qrScannedData = '{"uuid": "892b0fe55c894848c7d7d7d6","publicKey": "6968c521ef7063560ce68b8283f9ee6bf4963ef51b4bc7a06162dbfb3e5fce9e","ephemeralAddress": "759be69891f864ce7dda85288d0675d3ae5a323a3cb32381b1b726e6975c70d0","walletName":"Mac"}';
-           let qrScannedData = '{"uuid": "3097814cfea95b9795378961","publicKey": "1f5c59c86c12c59d0634296918e056c16df27ea015fbe0c02b231b93eb34d63c","ephemeralAddress": "73ad0523983228991f4b558fce032b370c5725f2780d5018a03ad278fbc1d8df","walletName":"Gallexy"}';
+           let qrScannedData = '{"uuid": "7a5933bd622c9fdd18d0b054","publicKey": "3da92f86ea6e0b6b305897197e53c93ec8d03852ce112a2c4d7cde20dc8f12e7","ephemeralAddress": "ab3d3ad234cd6ab071b0309feff10d28207d444f68c056857cf85ba93fd6c199","walletName":"GalaxyPro"}';
            props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
         }}
       />
