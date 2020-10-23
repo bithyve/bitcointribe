@@ -219,6 +219,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = null;
     this.appStateListener = null;
+    this.openBottomSheetOnLaunchTimeout = null;
 
     this.state = {
       notificationData: [],
@@ -918,6 +919,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (typeof this.appStateListener === 'function') {
       AppState.removeEventListener('change', this.appStateListener);
     }
+
+    Linking.removeEventListener('url', this.handleDeepLinkEvent);
 
     clearTimeout(this.openBottomSheetOnLaunchTimeout);
   }
