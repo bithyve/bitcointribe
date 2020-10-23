@@ -293,7 +293,7 @@ class FriendsAndFamily extends PureComponent<
               Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY &&
               !element.hasTrustedChannel
                 ? true
-                : false; // expired guardian are removable
+                : false; // expired guardians are removable
             myKeepers.push({ ...element, isRemovable });
           }
           if (element.isWard) {

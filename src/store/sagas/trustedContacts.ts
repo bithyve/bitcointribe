@@ -233,20 +233,23 @@ function* removeTrustedContactWorker({ payload }) {
           .trim();
 
         if (presentContactName === contactName) {
-          // if (itr < 3) {
-          //   let found = false;
-          //   for (let i = 3; i < tcInfo.length; i++) {
-          //     if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
-          //       found = true;
-          //       break;
-          //     }
-          //   }
-          //   // push if not already present in TC list
-          //   if (!found) tcInfo.push(tcInfo[itr]);
-          //   tcInfo[itr] = null; // Guardian position nullified
-          // } else tcInfo.splice(itr, 1);
-
-          tcInfo.splice(itr, 1);
+          if (itr < 3) {
+            // let found = false;
+            // for (let i = 3; i < tcInfo.length; i++) {
+            //   if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
+            //     found = true;
+            //     break;
+            //   }
+            // }
+            // // push if not already present in TC list
+            // if (!found) tcInfo.push(tcInfo[itr]);
+            tcInfo[itr] = null; // Guardian position nullified
+          } else tcInfo.splice(itr, 1);
+          // yield call(
+          //   AsyncStorage.setItem,
+          //   'TrustedContactsInfo',
+          //   JSON.stringify(tcInfo),
+          // );
           yield put(updateTrustedContactInfoLocally(tcInfo));
           break;
         }
