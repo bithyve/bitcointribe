@@ -25,7 +25,6 @@ import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
 import ButtonStyles from '../../common/Styles/ButtonStyles';
-
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -43,7 +42,6 @@ import {
 } from '../../store/actions/sss';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
-
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
@@ -103,6 +101,7 @@ import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle'
 import { Button } from 'react-native-elements';
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility';
 
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 500; // milleseconds
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
@@ -120,7 +119,6 @@ const getIconByAccountType = (type) => {
   }
 };
 
-// TODO: Move this somewhere else and re-use it from there.
 export enum BottomSheetState {
   Closed,
   Open,
@@ -134,11 +132,11 @@ interface HomeStateTypes {
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab;
-  tabBarIndex: number;
-  bottomSheetState: BottomSheetState;
-  loading: boolean;
+
+  /// TODO: remove the `new` prefix when all bottom sheets are refactored to use the `@gorhom/bottom-sheet` library
+  newBottomSheetState: BottomSheetState;
+
   secondaryDeviceOtp: any;
-  deepLinkModalOpen: boolean;
   currencyCode: string;
   errorMessageHeader: string;
   errorMessage: string;
@@ -151,13 +149,9 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  canNavigate: boolean;
   lastActiveTime: string;
-  isContactOpen: boolean;
   isLoading: boolean;
-  isRequestModalOpened: boolean;
   isBalanceLoading: boolean;
-  addContactModalOpened: boolean;
 }
 
 interface HomePropsTypes {
@@ -207,6 +201,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
 
+  openBottomSheetOnLaunchTimeout: number | null;
+
   addTabBarBottomSheetRef = createRef<RNBottomSheet>();
 
   // TODO: Completely replace `BottomSheet` with `RNBottomSheet` a la the refs above (https://trello.com/c/boUNRk6t)
@@ -224,6 +220,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = null;
     this.appStateListener = null;
+    this.openBottomSheetOnLaunchTimeout = null;
 
     this.state = {
       notificationData: [],
@@ -232,11 +229,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: BottomTab.Transactions,
-      tabBarIndex: 999,
-      bottomSheetState: BottomSheetState.Closed,
-      loading: false,
+      newBottomSheetState: BottomSheetState.Closed,
       secondaryDeviceOtp: {},
-      deepLinkModalOpen: false,
       currencyCode: 'USD',
       errorMessageHeader: '',
       errorMessage: '',
@@ -249,14 +243,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
-      canNavigate: false,
       lastActiveTime: moment().toISOString(),
-      isContactOpen: false,
       notificationLoading: true,
       isLoading: true,
-      isRequestModalOpened: false,
       isBalanceLoading: true,
-      addContactModalOpened: false,
     };
   }
 
@@ -286,6 +276,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     setTimeout(() => {
       this.setState({ notificationLoading: false });
     }, 500);
+
     this.notificationsListBottomSheetRef.current?.snapTo(1);
   };
 
@@ -383,7 +374,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       switch (scannedData.type) {
         case 'trustedGuardian':
-          const trustedGruardianRequest = {
+          const trustedGuardianRequest = {
             isGuardian: scannedData.isGuardian,
             approvedTC: scannedData.approvedTC,
             requester: scannedData.requester,
@@ -396,28 +387,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           };
           this.setState(
             {
-              loading: false,
-              secondaryDeviceOtp: trustedGruardianRequest,
-              trustedContactRequest: trustedGruardianRequest,
+              isLoading: false,
+              secondaryDeviceOtp: trustedGuardianRequest,
+              trustedContactRequest: trustedGuardianRequest,
               recoveryRequest: null,
               isLoadContacts: true,
             },
             () => {
-              setTimeout(() => {
-                this.closeBottomSheet();
-              }, 2);
+              navigation.goBack();
 
-              if (this.state.tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                  deepLinkModalOpen: true,
-                });
-              }
-              navigation.goBack()
-              setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1)
-                this.closeBottomSheet();
-              }, 2);
+              this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
             },
           );
 
@@ -437,22 +416,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
           this.setState(
             {
-              loading: false,
+              isLoading: false,
               secondaryDeviceOtp: secondaryDeviceGuardianRequest,
               trustedContactRequest: secondaryDeviceGuardianRequest,
               recoveryRequest: null,
             },
             () => {
-              if (this.state.tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                  deepLinkModalOpen: true,
-                });
-              }
-              setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-                this.closeBottomSheet();
-              }, 2);
+              this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
             },
           );
 
@@ -470,22 +440,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
           this.setState(
             {
-              loading: false,
+              isLoading: false,
               secondaryDeviceOtp: tcRequest,
               trustedContactRequest: tcRequest,
               recoveryRequest: null,
             },
             () => {
-              if (this.state.tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                  deepLinkModalOpen: true,
-                });
-              }
-              setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-                this.closeBottomSheet();
-              }, 2);
+              this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
             },
           );
 
@@ -504,21 +465,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
           this.setState(
             {
-              loading: false,
+              isLoading: false,
               secondaryDeviceOtp: paymentTCRequest,
               trustedContactRequest: paymentTCRequest,
               recoveryRequest: null,
             },
             () => {
-              if (this.state.tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                  deepLinkModalOpen: true,
-                });
-              }
-              setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-              }, 2);
+              this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
             },
           );
 
@@ -533,21 +486,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           };
           this.setState(
             {
-              loading: false,
+              isLoading: false,
               recoveryRequest: recoveryRequest,
               trustedContactRequest: null,
             },
             () => {
-              if (this.state.tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                  deepLinkModalOpen: true,
-                });
-              }
-              setTimeout(() => {
-                (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-                this.closeBottomSheet();
-              }, 2);
+              this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
             },
           );
           break;
@@ -729,16 +673,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
+    this.closeBottomSheet();
     this.updateAccountCardData();
     this.getBalances();
+
     this.appStateListener = AppState.addEventListener(
       'change',
       this.onAppStateChange,
     );
+
     this.bootStrapNotifications();
     this.setUpFocusListener();
     this.getNewTransactionNotifications();
-    Linking.addEventListener('url', this.handleDeepLink);
 
     // health check
     const { s3Service, initHealthCheck } = this.props;
@@ -747,14 +693,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       initHealthCheck();
     }
 
-    // call this once deeplink is detected aswell
-    this.handleDeeplinkModal();
+    Linking.addEventListener('url', this.handleDeepLink);
 
-    setTimeout(() => {
-      this.setState({
-        isLoading: false,
-      });
-    }, 2);
+    // call this once deeplink is detected aswell
+    this.handleDeepLinkModal();
   };
 
   getNewTransactionNotifications = async () => {
@@ -934,7 +876,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleDeeplinkModal = () => {
+  handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam('custodyRequest');
     const recoveryRequest = this.props.navigation.getParam('recoveryRequest');
     const trustedContactRequest = this.props.navigation.getParam(
@@ -948,16 +890,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           custodyRequest,
         },
         () => {
-          if (this.state.tabBarIndex === 999) {
-            this.setState({
-              tabBarIndex: 0,
-              deepLinkModalOpen: true,
-            });
-          }
-
           setTimeout(() => {
-            (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
-            this.closeBottomSheet();
+            this.custodianRequestBottomSheetRef.current?.snapTo(1);
           }, 2);
         },
       );
@@ -971,16 +905,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           trustedContactRequest,
         },
         () => {
-          if (this.state.tabBarIndex === 999) {
-            this.setState({
-              tabBarIndex: 0,
-              deepLinkModalOpen: true,
-            });
-          }
-          setTimeout(() => {
-            (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-            this.closeBottomSheet();
-          }, 2);
+          this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
         },
       );
 
@@ -996,15 +921,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentWillUnmount() {
-    if (this.focusListener) {
+    if (typeof this.focusListener === 'function') {
       this.focusListener();
     }
-    if (this.firebaseNotificationListener) {
+    if (typeof this.firebaseNotificationListener === 'function') {
       this.firebaseNotificationListener();
     }
-    if (this.notificationOpenedListener) {
+    if (typeof this.notificationOpenedListener === 'function') {
       this.notificationOpenedListener();
     }
+
+    clearTimeout(this.openBottomSheetOnLaunchTimeout);
+  }
+
+  openBottomSheetOnLaunch(ref: React.RefObject<BottomSheet>) {
+    this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
+      ref.current?.snapTo(1);
+    }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
   }
 
   handleDeepLink = async (event) => {
@@ -1014,51 +947,37 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (!isFocused) {
       navigation.navigate('Home');
     }
+
     const splits = event.url.split('/');
 
     if (splits[5] === 'sss') {
       const requester = splits[4];
+
       if (splits[6] === 'ek') {
         const custodyRequest = {
           requester,
           ek: splits[7],
           uploadedAt: splits[8],
         };
+
         this.setState(
           {
             custodyRequest,
           },
           () => {
-            if (this.state.tabBarIndex === 999) {
-              this.setState({
-                tabBarIndex: 0,
-                deepLinkModalOpen: true,
-              });
-            }
-            setTimeout(() => {
-              (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
-              this.closeBottomSheet();
-            }, 2);
+            this.openBottomSheetOnLaunch(this.custodianRequestBottomSheetRef);
           },
         );
       } else if (splits[6] === 'rk') {
         const recoveryRequest = { requester, rk: splits[7] };
+
         this.setState(
           {
             recoveryRequest,
             trustedContactRequest: null,
           },
           () => {
-            if (this.state.tabBarIndex === 999) {
-              this.setState({
-                tabBarIndex: 0,
-                deepLinkModalOpen: true,
-              });
-            }
-            setTimeout(() => {
-              (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-              this.closeBottomSheet();
-            }, 2);
+            this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
           },
         );
       }
@@ -1071,6 +990,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         );
       } else {
         const version = splits.pop().slice(1);
+
         if (version) {
           const isAppVersionCompatible = await checkAppVersionCompatibility({
             relayCheckMethod: splits[4],
@@ -1100,17 +1020,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             recoveryRequest: null,
           },
           () => {
-            if (this.state.tabBarIndex === 999) {
-              this.setState({
-                tabBarIndex: 0,
-                deepLinkModalOpen: true,
-              });
-            }
-            setTimeout(() => {
-              (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-              this.closeBottomSheet();
-            }, 2);
-          },
+            this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
+          }
         );
       }
     } else if (splits[4] === 'rk') {
@@ -1121,22 +1032,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         hintType: splits[7],
         hint: splits[8],
       };
+
       this.setState(
         {
           recoveryRequest,
           trustedContactRequest: null,
         },
         () => {
-          if (this.state.tabBarIndex === 999) {
-            this.setState({
-              tabBarIndex: 0,
-              deepLinkModalOpen: true,
-            });
-          }
-          setTimeout(() => {
-            (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(1);
-            this.closeBottomSheet();
-          }, 2);
+          this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
         },
       );
     } else if (splits[4] === 'rrk') {
@@ -1154,6 +1057,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   setUpFocusListener = () => {
     const { navigation } = this.props;
+
     this.focusListener = navigation.addListener('didFocus', () => {
       this.setCurrencyCodeFromAsync();
       this.getAssociatedContact();
@@ -1164,28 +1068,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     });
 
-    setTimeout(() => {
-      this.closeBottomSheet();
-    }, 500);
-
     this.getAssociatedContact();
     this.setCurrencyCodeFromAsync();
     this.checkFastBitcoin();
   };
 
+
   checkFastBitcoin = async () => {
     const { FBTCAccountData } = this.props;
+
     let getFBTCAccount = FBTCAccountData || {};
-    // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+
     this.setState({ fbBTCAccount: getFBTCAccount });
-    return;
   };
 
   setSecondaryDeviceAddresses = async () => {
     let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
-    // JSON.parse(
-    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
-    // );
+
     if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
@@ -1196,10 +1095,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
       this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
-      // await AsyncStorage.setItem(
-      //   'secondaryDeviceAddress',
-      //   JSON.stringify(secondaryDeviceOtpTemp),
-      // );
     }
   };
 
@@ -1208,7 +1103,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let AssociatedContact = JSON.parse(
       await AsyncStorage.getItem('AssociatedContacts'),
     );
-    // setAssociatedContact(AssociatedContact);
     this.setSecondaryDeviceAddresses();
   };
 
@@ -1428,11 +1322,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
           if (derivativeAccount[accountNumber].balances) {
             regularBalance +=
               derivativeAccount[accountNumber].balances.balance +
@@ -1555,24 +1444,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onTrustedContactRequestAccept = (key) => {
-    this.setState({
-      tabBarIndex: 999,
-      deepLinkModalOpen: false,
-    });
-    setTimeout(() => {
-      (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(0)
-    }, 1);
+    this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
     this.processDLRequest(key, false);
   };
 
   onTrustedContactReject = (key) => {
-    setTimeout(() => {
-      this.setState({
-        tabBarIndex: 999,
-        deepLinkModalOpen: false,
-      });
-    }, 2);
-    (this.refs.trustedContactRequestBottomSheetRef as any).snapTo(0)
+    this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
   };
 
   onPhoneNumberChange = () => { };
@@ -1590,7 +1467,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState(
         {
           selectedBottomTab: tab,
-          bottomSheetState: BottomSheetState.Open,
+          newBottomSheetState: BottomSheetState.Open,
         },
         () => {
           this.addTabBarBottomSheetRef.current?.expand();
@@ -1642,7 +1519,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
         );
         this.setState({
-          loading: false,
+          isLoading: false,
         });
       } else {
         if (isGuardian && UNDER_CUSTODY[requester]) {
@@ -1651,7 +1528,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             `You already custody a share against the wallet name: ${requester}`,
           );
           this.setState({
-            loading: false,
+            isLoading: false,
           });
         } else {
           if (!publicKey) {
@@ -1752,7 +1629,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (!UNDER_CUSTODY[requester]) {
         this.setState(
           {
-            loading: false,
+            isLoading: false,
             errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
             errorMessage: `Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore`,
             buttonText: 'Okay',
@@ -1786,17 +1663,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   ) => {
     if (bottomSheetRef === this.getActiveBottomSheetRef()) {
       const newState = newIndex >= 1 ? BottomSheetState.Open : BottomSheetState.Closed;
-      this.setState({ bottomSheetState: newState });
+      this.setState({ newBottomSheetState: newState });
     }
   };
 
   closeBottomSheet = () => {
-    this.setState({ bottomSheetState: BottomSheetState.Closed }, () => {
+    this.setState({ newBottomSheetState: BottomSheetState.Closed }, () => {
       this.getActiveBottomSheetRef()?.current?.close();
     });
   };
 
-  // TODO: This should no longer be needed after we remove the `Add` Bottom Sheet
   getActiveBottomSheetRef = (): React.RefObject<RNBottomSheet> | null => {
     switch (this.state.selectedBottomTab) {
       case BottomTab.Add:
@@ -1806,11 +1682,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleBottomSheetHeaderTap = () => {
-    if (this.state.bottomSheetState === BottomSheetState.Open) {
-      this.closeBottomSheet();
-    }
-  };
 
   onNotificationClicked = async (value) => {
     const { notificationListNew } = this.props;
@@ -1840,7 +1711,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[i].read = true;
       }
     }
-    // this.props.notificationsUpdated(asyncNotifications);
+
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotifications),
@@ -1878,10 +1749,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if (value.type == 'contact') {
       setTimeout(() => {
-        (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
+        this.notificationsListBottomSheetRef.current?.snapTo(0)
       }, 2);
     }
   };
+
 
   setupNotificationList = async () => {
     const { notificationListNew } = this.props;
@@ -1993,24 +1865,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       CurrencyCode,
       balances,
       selectedBottomTab,
-      tabBarIndex,
-      deepLinkModalOpen,
       errorMessageHeader,
       errorMessage,
       buttonText,
       selectedContact,
       notificationData,
       fbBTCAccount,
-      loading,
       currencyCode,
       trustedContactRequest,
       recoveryRequest,
       custodyRequest,
       isLoadContacts,
       isLoading,
-      isRequestModalOpened,
       isBalanceLoading,
-      addContactModalOpened,
     } = this.state;
     const {
       navigation,
@@ -2104,269 +1971,172 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         </View>
 
         <BottomSheetBackground
-          isVisible={this.state.bottomSheetState === BottomSheetState.Open}
+          isVisible={this.state.newBottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
         />
 
         <CustomBottomTabs
-          tabBarZIndex={tabBarIndex}
           onSelect={this.handleBottomTabSelection}
           selectedTab={selectedBottomTab}
         />
 
-        {isLoading ? <Loader /> : null}
+        {isLoading && <Loader />}
 
         {/* ---- Bottom Sheets ---- */}
 
-        {!isLoading && (
-          <RNBottomSheet
-            ref={this.addTabBarBottomSheetRef}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-            ]}
-            handleComponent={BottomSheetHandle}
-            onChange={(newPositionIndex: number) => {
-              this.handleBottomSheetPositionChange(
-                this.addTabBarBottomSheetRef,
-                newPositionIndex,
-              );
-            }}
-          >
-            <BottomSheetView>
-              <BottomSheetHeader
-                title="Add"
-                onPress={this.handleBottomSheetHeaderTap}
-              />
+        <RNBottomSheet
+          ref={this.addTabBarBottomSheetRef}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('64%'),
+          ]}
+          handleComponent={BottomSheetHandle}
+          onChange={(newPositionIndex: number) => {
+            this.handleBottomSheetPositionChange(
+              this.addTabBarBottomSheetRef,
+              newPositionIndex,
+            );
+          }}
+        >
+          <BottomSheetView>
+            <BottomSheetHeader
+              title="Add"
+              onPress={this.closeBottomSheet}
+            />
 
-              <AddModalContents
-                onPressElements={(type) => {
-                  if (type == 'buyBitcoins') {
-                    this.props.navigation.navigate('VoucherScanner');
-                  } else if (type == 'addContact') {
-                    this.setState(
-                      {
-                        isLoadContacts: true,
-                        tabBarIndex: 0,
-                      },
-                      () => {
-                        (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(1)
-                      },
+            <AddModalContents
+              onPressElements={(type) => {
+                if (type == 'buyBitcoins') {
+                  this.props.navigation.navigate('VoucherScanner');
+                } else if (type == 'addContact') {
+                  this.setState(
+                    {
+                      isLoadContacts: true,
+                    },
+                    () => {
+                      this.addContactAddressBookBottomSheetRef.current?.snapTo(1)
+                    },
+                  );
+                }
+              }}
+            />
+          </BottomSheetView>
+        </RNBottomSheet>
+
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={this.custodianRequestBottomSheetRef}
+          snapPoints={[-50, hp('60%')]}
+          renderContent={() => {
+            if (!custodyRequest) {
+              return null;
+            }
+
+            return (
+              <CustodianRequestModalContents
+                loading={isLoading}
+                userName={custodyRequest.requester}
+                onPressAcceptSecret={() => {
+                  this.custodianRequestBottomSheetRef.current?.snapTo(0);
+
+                  if (Date.now() - custodyRequest.uploadedAt > 600000) {
+                    Alert.alert(
+                      'Request expired!',
+                      'Please ask the sender to initiate a new request',
                     );
-                  }
-                }}
-              />
-            </BottomSheetView>
-          </RNBottomSheet>
-        )}
-
-        {!isLoading && (
-          <BottomSheet
-            onCloseEnd={() => {
-              if (tabBarIndex === 0 && !deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-            }}
-            onOpenEnd={() => {
-              if (tabBarIndex == 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-              this.setState({
-                deepLinkModalOpen: true,
-              });
-            }}
-            enabledInnerScrolling={true}
-            ref={"custodianRequestBottomSheetRef"}
-            snapPoints={[-50, hp('60%')]}
-            renderContent={() => {
-              if (!custodyRequest) {
-                return null;
-              }
-
-              return (
-                <CustodianRequestModalContents
-                  loading={loading}
-                  userName={custodyRequest.requester}
-                  onPressAcceptSecret={() => {
-                    this.setState(
-                      {
-                        loading: true,
-                        tabBarIndex: 0,
-                        deepLinkModalOpen: true,
-                      },
-                      () => {
-                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
-                      },
-                    );
-
-                    if (Date.now() - custodyRequest.uploadedAt > 600000) {
+                    this.setState({
+                      isLoading: false,
+                    });
+                  } else {
+                    if (UNDER_CUSTODY[custodyRequest.requester]) {
                       Alert.alert(
-                        'Request expired!',
-                        'Please ask the sender to initiate a new request',
+                        'Failed to store',
+                        'You cannot custody multiple shares of the same user.',
                       );
-                      this.setState({
-                        loading: false,
-                      });
+                      this.setState({ isLoading: false });
                     } else {
-                      if (UNDER_CUSTODY[custodyRequest.requester]) {
-                        Alert.alert(
-                          'Failed to store',
-                          'You cannot custody multiple shares of the same user.',
-                        );
-                        this.setState({ loading: false });
+                      if (custodyRequest.isQR) {
+                        downloadMShare(custodyRequest.ek, custodyRequest.otp);
+                        this.setState({
+                          isLoading: false,
+                        });
                       } else {
-                        if (custodyRequest.isQR) {
-                          downloadMShare(custodyRequest.ek, custodyRequest.otp);
-                          this.setState({
-                            loading: false,
-                          });
-                        } else {
-                          navigation.navigate('CustodianRequestOTP', {
-                            custodyRequest,
-                          });
-                          this.setState({
-                            loading: false,
-                          });
-                        }
+                        navigation.navigate('CustodianRequestOTP', {
+                          custodyRequest,
+                        });
+                        this.setState({
+                          isLoading: false,
+                        });
                       }
                     }
-                  }}
-                  onPressRejectSecret={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 0,
-                      },
-                      () => {
-                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
-                        (this.refs.custodianRequestBottomSheetRef as any).snapTo(1);
-                      },
-                    );
-                  }}
-                />
-              );
-            }}
-            renderHeader={() => (
-              <TransparentHeaderModal
-                onPressheader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                      deepLinkModalOpen: false,
-                    },
-                    () => {
-                      (this.refs.custodianRequestBottomSheetRef as any).snapTo(0);
-                    },
-                  );
+                  }
+                }}
+                onPressRejectSecret={() => {
+                  this.custodianRequestBottomSheetRef.current?.snapTo(0);
+                  this.custodianRequestRejectedBottomSheetRef.current?.snapTo(1);
                 }}
               />
-            )}
-          />
-        )}
+            );
+          }}
+          renderHeader={() => (
+            <TransparentHeaderModal
+              onPressheader={() => {
+                this.custodianRequestBottomSheetRef.current?.snapTo(0);
+              }}
+            />
+          )}
+        />
 
-        {!isLoading && (
-          <BottomSheet
-            onCloseEnd={() => {
-              if (tabBarIndex === 0) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-              this.setState({
-                isRequestModalOpened: false,
-              });
-            }}
-            onOpenEnd={() => {
-              if (tabBarIndex === 999) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-              this.setState({
-                deepLinkModalOpen: true,
-                isRequestModalOpened: true,
-              });
-            }}
-            enabledInnerScrolling={true}
-            ref={"trustedContactRequestBottomSheetRef"}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('70%'),
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('95%')
-                : hp('95%'),
-            ]}
-            renderContent={() => {
-              if (!trustedContactRequest && !recoveryRequest) {
-                return;
-              }
-              return (
-                <TrustedContactRequestContent
-                  isRequestModalOpened={this.state.isRequestModalOpened}
-                  trustedContactRequest={trustedContactRequest}
-                  recoveryRequest={recoveryRequest}
-                  onPressAccept={this.onTrustedContactRequestAccept}
-                  onPressReject={this.onTrustedContactReject}
-                  onPhoneNumberChange={this.onPhoneNumberChange}
-                  bottomSheetRef={this.trustedContactRequestBottomSheetRef}
-                />
-              );
-            }}
-            renderHeader={() => (
-              <ModalHeader
-                onPressHeader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                      deepLinkModalOpen: false,
-                    },
-                    () => {
-                      this.trustedContactRequestBottomSheetRef.current?.snapTo(
-                        0,
-                      );
-                    },
-                  );
-                }}
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={this.trustedContactRequestBottomSheetRef}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('95%')
+              : hp('95%'),
+          ]}
+          renderContent={() => {
+            if (!trustedContactRequest && !recoveryRequest) {
+              return;
+            }
+            return (
+              <TrustedContactRequestContent
+                trustedContactRequest={trustedContactRequest}
+                recoveryRequest={recoveryRequest}
+                onPressAccept={this.onTrustedContactRequestAccept}
+                onPressReject={this.onTrustedContactReject}
+                onPhoneNumberChange={this.onPhoneNumberChange}
+                bottomSheetRef={this.trustedContactRequestBottomSheetRef}
               />
-            )}
-          />
-        )}
+            );
+          }}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                () => {
+                  this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
+                }
+              }}
+            />
+          )}
+        />
 
-        {!isLoading && (
           <BottomSheet
-            onCloseStart={() => {
-              this.setState({
-                tabBarIndex: 999,
-              });
-            }}
-            onOpenEnd={() => {
-              this.setState({
-                tabBarIndex: 0,
-              });
-            }}
             enabledInnerScrolling={true}
-            ref={"custodianRequestRejectedBottomSheetRef"}
+            ref={this.custodianRequestRejectedBottomSheetRef}
             snapPoints={[-50, hp('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
               return (
                 <CustodianRequestRejectedModalContents
                   onPressViewThrustedContacts={() => {
-                    this.setState(
-                      {
-                        tabBarIndex: 999,
-                      },
-                      () => {
-                        (this.refs.custodianRequestRejectedBottomSheetRef as any).snapTo(0);
-                      },
-                    );
+                    this.custodianRequestRejectedBottomSheetRef.current?.snapTo(0);
                   }}
                   userName={custodyRequest.requester}
                 />
@@ -2375,31 +2145,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             renderHeader={() => (
               <TransparentHeaderModal
                 onPressheader={() => {
-                  this.setState(
-                    {
-                      tabBarIndex: 999,
-                    },
-                    () => {
-                      (this.refs.custodianRequestRejectedBottomSheetRef as any).snapTo(0);
-                    },
-                  );
+                  this.custodianRequestRejectedBottomSheetRef.current?.snapTo(0);
                 }}
               />
             )}
           />
-        )}
 
         <BottomSheet
-          onOpenEnd={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          onCloseEnd={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
           enabledInnerScrolling={true}
           ref={this.errorBottomSheetRef}
           snapPoints={[
@@ -2414,14 +2166,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               info={errorMessage}
               proceedButtonText={buttonText}
               onPressProceed={() => {
-                this.setState(
-                  {
-                    tabBarIndex: 999,
-                  },
-                  () => {
-                    this.errorBottomSheetRef.current?.snapTo(0);
-                  },
-                );
+                this.errorBottomSheetRef.current?.snapTo(0);
               }}
               isBottomImage={true}
               bottomImage={require('../../assets/images/icons/errorImage.png')}
@@ -2430,41 +2175,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                this.setState(
-                  {
-                    tabBarIndex: 999,
-                  },
-                  () => this.errorBottomSheetRef.current?.snapTo(0),
-                );
+                this.errorBottomSheetRef.current?.snapTo(0);
               }}
             />
           )}
         />
 
         <BottomSheet
-          onCloseEnd={() => {
-            this.setState({
-              addContactModalOpened: false,
-            });
-          }}
-          onOpenEnd={() => {
-            this.setState({
-              tabBarIndex: 0,
-              addContactModalOpened: true,
-            });
-          }}
-          onOpenStart={() => {
-            this.setState({
-              tabBarIndex: 0,
-            });
-          }}
-          onCloseStart={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
-          }}
           enabledInnerScrolling={true}
-          ref={"addContactAddressBookBottomSheetRef"}
+          ref={this.addContactAddressBookBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2473,7 +2192,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <AddContactAddressBook
-              addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
@@ -2481,7 +2199,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   navigation.navigate('AddContactSendRequest', {
                     SelectedContact: selectedContact,
                   });
-                  (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
+                  this.addContactAddressBookBottomSheetRef.current?.snapTo(0)
                 }
               }}
               onSelectContact={(selectedContact) => {
@@ -2490,7 +2208,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0)
               }}
               onSkipContinue={() => {
                 let { skippedContactsCount } = this.props.trustedContacts.tc;
@@ -2513,7 +2231,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 navigation.navigate('AddContactSendRequest', {
                   SelectedContact: [data],
                 });
-                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0)
               }}
             />
           )}
@@ -2522,7 +2240,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                (this.refs.addContactAddressBookBottomSheetRef as any).snapTo(0)
+                this.addContactAddressBookBottomSheetRef.current?.snapTo(0)
               }}
             />
           )}
@@ -2530,20 +2248,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         <BottomSheet
           onOpenEnd={() => {
-            this.setState(
-              {
-                tabBarIndex: 0,
-              },
-              () => this.onNotificationListOpen(),
-            );
-          }}
-          onCloseEnd={() => {
-            this.setState({
-              tabBarIndex: 999,
-            });
+            this.onNotificationListOpen();
           }}
           enabledInnerScrolling={true}
-          ref={"notificationsListBottomSheetRef"}
+          ref={this.notificationsListBottomSheetRef}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2558,14 +2266,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.onNotificationClicked(value)
               }
               onPressBack={() => {
-                (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
+                this.notificationsListBottomSheetRef.current?.snapTo(0)
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                (this.refs.notificationsListBottomSheetRef as any).snapTo(0)
+                this.notificationsListBottomSheetRef.current?.snapTo(0)
               }}
             />
           )}
