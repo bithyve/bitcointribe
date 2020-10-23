@@ -81,8 +81,7 @@ import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
-// var Mailer = require('NativeModules').RNMail;
-import Mailer from 'react-native-mail';
+var Mailer = require('NativeModules').RNMail;
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
@@ -313,6 +312,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       );
     } else {
       // adding transfer details to he ephemeral data
+
       const data: EphemeralDataElements = {
         ...payload.data,
         shareTransferDetails: {
@@ -812,8 +812,8 @@ function* sharePersonalCopyWorker({ payload }) {
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {
-            let errorMessage = idx(err, _ => _.message)
-            if (errorMessage !== "User did not share") {
+            let errorMessage = idx(err, (_) => _.message);
+            if (errorMessage !== 'User did not share') {
               throw new Error(`Share failed: ${err}`);
             }
           }
@@ -882,8 +882,8 @@ function* sharePersonalCopyWorker({ payload }) {
         try {
           yield call(Share.open, shareOptions);
         } catch (err) {
-          let errorMessage = idx(err, _ => _.message)
-          if (errorMessage !== "User did not share") {
+          let errorMessage = idx(err, (_) => _.message);
+          if (errorMessage !== 'User did not share') {
             throw new Error(`Share failed: ${err}`);
           }
         }
@@ -928,10 +928,10 @@ function* updateMSharesHealthWorker() {
     (state) => state.trustedContacts.service,
   );
 
-   const DECENTRALIZED_BACKUP = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
-  
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
@@ -976,13 +976,13 @@ function* updateMSharesHealthWorker() {
       }
     });
 
-    if(removed){
+    if (removed) {
       // update db post share removal
       const updatedSERVICES = {
         ...SERVICES,
         TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
       };
-  
+
       const updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY,
@@ -994,7 +994,7 @@ function* updateMSharesHealthWorker() {
         },
       });
     }
-   
+
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });

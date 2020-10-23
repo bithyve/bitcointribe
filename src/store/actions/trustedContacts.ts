@@ -37,6 +37,7 @@ export const approveTrustedContact = (
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
+  isGuardian?: boolean,
 ) => {
   return {
     type: APPROVE_TRUSTED_CONTACT,
@@ -45,6 +46,7 @@ export const approveTrustedContact = (
       contactsPublicKey,
       updateEphemeralChannel,
       contactsWalletName,
+      isGuardian,
     },
   };
 };
@@ -232,7 +234,6 @@ export const switchTCLoading = (beingLoaded) => {
     payload: { beingLoaded },
   };
 };
-
 
 const updateAddressBookLocallyRequest = createAction(
   UPDATE_ADDRESS_BOOK_LOCALLY,

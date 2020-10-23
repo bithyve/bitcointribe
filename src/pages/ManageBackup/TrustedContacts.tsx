@@ -63,9 +63,11 @@ const TrustedContacts = (props) => {
     () => (
       <ContactList
         isTrustedContact={true}
+        isShowSkipContact={true}
         style={{}}
         onPressContinue={onPressContinue}
         onSelectContact={selectedContactsList}
+        onPressSkip={onPressSkip}
       />
     ),
     [onPressContinue, selectedContactsList],

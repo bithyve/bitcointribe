@@ -257,14 +257,14 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     let regularBalance = accounts1[REGULAR_ACCOUNT].service
       ? accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts1[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -288,17 +288,17 @@ const VoucherScanner = (props) => {
 
     let secureBalance = accounts1[SECURE_ACCOUNT].service
       ? accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
         accounts1[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -657,7 +657,7 @@ const VoucherScanner = (props) => {
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
-        onPressIgnore={() => {}}
+        onPressIgnore={() => { }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
@@ -822,14 +822,14 @@ const VoucherScanner = (props) => {
                 selectedAccount.accountName === 'Test Account'
                   ? TEST_ACCOUNT
                   : selectedAccount.accountName === 'Checking Account'
-                  ? REGULAR_ACCOUNT
-                  : SECURE_ACCOUNT,
+                    ? REGULAR_ACCOUNT
+                    : SECURE_ACCOUNT,
               index:
                 selectedAccount.accountName === 'Test Account'
                   ? 0
                   : selectedAccount.accountName === 'Checking Account'
-                  ? 1
-                  : 2,
+                    ? 1
+                    : 2,
             });
           }}
           onPressBack={() => {
@@ -967,7 +967,7 @@ const VoucherScanner = (props) => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={styles.backArrowView}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -1007,27 +1007,27 @@ const VoucherScanner = (props) => {
                 </RNCamera>
               </View>
             ) : (
-              <TouchableOpacity
-                onPress={() => setOpenCameraFlag(true)}
-                style={{ alignSelf: 'center' }}
-              >
-                <ImageBackground
-                  source={require('../../assets/images/icons/iPhone-QR.png')}
-                  style={styles.cameraImage}
+                <TouchableOpacity
+                  onPress={() => setOpenCameraFlag(true)}
+                  style={{ alignSelf: 'center' }}
                 >
-                  <View style={{ flex: 1 }}>
-                    <View style={styles.topCornerView}>
-                      <View style={styles.topLeftCornerView} />
-                      <View style={styles.topRightCornerView} />
+                  <ImageBackground
+                    source={require('../../assets/images/icons/iPhone-QR.png')}
+                    style={styles.cameraImage}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <View style={styles.topCornerView}>
+                        <View style={styles.topLeftCornerView} />
+                        <View style={styles.topRightCornerView} />
+                      </View>
+                      <View style={styles.bottomCornerView}>
+                        <View style={styles.bottomLeftCornerView} />
+                        <View style={styles.bottomRightCornerView} />
+                      </View>
                     </View>
-                    <View style={styles.bottomCornerView}>
-                      <View style={styles.bottomLeftCornerView} />
-                      <View style={styles.bottomRightCornerView} />
-                    </View>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
+                  </ImageBackground>
+                </TouchableOpacity>
+              )}
             <TextInput
               placeholder={'Enter Voucher Code'}
               placeholderTextColor={Colors.borderColor}
@@ -1145,7 +1145,7 @@ const VoucherScanner = (props) => {
               </Text>
             </View>
           </View>
-        </View> ) : null}
+        </View>) : null}
         <Text
           style={{
             marginTop: 'auto',
@@ -1203,7 +1203,7 @@ const VoucherScanner = (props) => {
                 />
                 <Text style={styles.cardAmountText}>
                   {selectedAccount &&
-                  selectedAccount.accountType === REGULAR_ACCOUNT
+                    selectedAccount.accountType === REGULAR_ACCOUNT
                     ? UsNumberFormat(balances.regularBalance)
                     : UsNumberFormat(balances.secureBalance)}
                 </Text>
