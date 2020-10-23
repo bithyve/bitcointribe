@@ -71,7 +71,7 @@ const LostTwoFA = props => {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -118,9 +118,9 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate('QrScanner', {
+            props.navigation.navigate('QRScanner', {
               title: 'Scan Exit Key',
-              scanedCode: qrData => {
+              onCodeScanned: qrData => {
                 dispatch(resetTwoFA(qrData));
               },
             });
@@ -137,9 +137,9 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate('QrScanner', {
+            props.navigation.navigate('QRScanner', {
               title: 'Scan Exit Key',
-              scanedCode: qrData => {
+              onCodeScanned: qrData => {
                 dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
               },
             });
