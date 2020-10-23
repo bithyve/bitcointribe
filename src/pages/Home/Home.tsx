@@ -2235,7 +2235,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       downloadMShare,
       overallHealth,
       levelHealth,
-      cardDataProps
+      cardDataProps,
+      currentLevel
     } = this.props;
     return (
       <ImageBackground
@@ -2260,8 +2261,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             balances={balances}
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
-            navigation={this.props.navigation}
-            overallHealth={overallHealth}
+            navigation={navigation}
+            currentLevel={currentLevel}
             onSwitchToggle={this.onSwitchToggle}
             setCurrencyToggleValue={this.setCurrencyToggleValue}
           />

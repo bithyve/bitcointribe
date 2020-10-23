@@ -11,7 +11,6 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
-  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -21,13 +20,11 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import {
@@ -110,7 +107,7 @@ class ManageBackup extends Component<
       shareId: '',
       reshareVersion: 0,
       name: '',
-    }
+    };
     this.state = {
       securityAtLevel: 0,
       selectedId: 0,
@@ -151,8 +148,12 @@ class ManageBackup extends Component<
     };
   }
 
+  componentDidMount = () => {
+    this.modifyLevelData();
+  };
+
   modifyLevelData = () => {
-    let { levelHealth, currentLevel, s3Service, keeperInfo } = this.props;
+    let { levelHealth, currentLevel, keeperInfo } = this.props;
     let levelData = modifyLevelStatus(
       this.state.levelData,
       levelHealth,
@@ -163,6 +164,7 @@ class ManageBackup extends Component<
       levelData: levelData.levelData,
       isError: levelData.isError,
     });
+    this.setSelectedCards();
   };
 
   setSelectedCards = () => {
@@ -173,7 +175,6 @@ class ManageBackup extends Component<
         break;
       }
     }
-    this.modifyLevelData();
     let level = 1;
     if (
       levelData.findIndex(
@@ -190,12 +191,7 @@ class ManageBackup extends Component<
     if (this.state.levelData[0].status == 'notSetup') value = 1;
     else if (level) value = level + 1;
     else if (level == 3) value = 3;
-    this.setState({ selectedId: value });
-    this.setState({ securityAtLevel: level });
-  };
-
-  componentDidMount = () => {
-    this.setSelectedCards();
+    this.setState({ selectedId: value, securityAtLevel: level });
   };
 
   selectId = (value) => {
@@ -216,7 +212,7 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, s3Service } = this.props;
+    const { walletName, regularAccount } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
@@ -308,21 +304,6 @@ class ManageBackup extends Component<
     }
   };
 
-  generateShares = (level) => {
-    const { levelData, selectedShareId } = this.state;
-    let PKStatus = levelData[1].keeper1.keeper1Done
-      ? 'accessed'
-      : 'notAccessed';
-    this.props.navigation.navigate('KeeperDeviceHistory', {
-      selectedTime: this.getTime(new Date()),
-      selectedStatus: PKStatus,
-      selectedTitle: 'Primary Keeper',
-      isPrimaryKeeper: true,
-      isSetUp: true,
-      selectedShareId,
-    });
-  };
-
   updateCloudData = () => {
     let {
       currentLevel,
@@ -379,6 +360,35 @@ class ManageBackup extends Component<
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   };
 
+  goToHistory = (value) =>{
+    let {
+      shareType,
+      keeperStatus,
+      name,
+      id,
+      shareId,
+      updatedAt
+    } = value;
+    let navigationParams = {
+      selectedTime: this.getTime(updatedAt),
+      selectedStatus: keeperStatus,
+      selectedTitle: name,
+      isLevel2: this.state.isLevel2,
+      isPrimaryKeeper: id === 2 ? true : false,
+      selectedShareId: shareId,
+    }
+    if (shareType == 'device' || shareType == 'primaryKeeper') {
+      this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
+    }
+    else if(shareType == 'contact'){
+      this.props.navigation.navigate('TrustedContactHistoryKeeper', navigationParams);
+    }
+    else if(shareType){
+      this.props.navigation.navigate('PersonalCopyHistoryKeeper', navigationParams);
+    }
+  }
+  
+
   render() {
     const {
       levelData,
@@ -386,15 +396,12 @@ class ManageBackup extends Component<
       isLevel2,
       securityAtLevel,
       isPrimaryKeeper,
-      isError
+      isError,
     } = this.state;
     const {
       navigation,
-      overallHealth,
-      levelHealth,
       healthLoading,
       checkMSharesHealth,
-      currentLevel,
     } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -642,10 +649,12 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                borderColor: value.keeper1.status == 'accessible'
-                                  ? Colors.deepBlue
-                                  : Colors.red,
-                                borderWidth: value.keeper1.status == 'accessible' ? 0 : 1,
+                                borderColor:
+                                  value.keeper1.status == 'accessible'
+                                    ? Colors.deepBlue
+                                    : Colors.red,
+                                borderWidth:
+                                  value.keeper1.status == 'accessible' ? 0 : 1,
                               }}
                               onPress={() => {
                                 if (!this.props.cloudBackupStatus) {
@@ -672,14 +681,16 @@ class ManageBackup extends Component<
                               style={{
                                 ...styles.appBackupButton,
                                 width: wp('41%'),
-                                borderColor: value.keeper2.status == 'accessible'
-                                  ? value.status == 'notSetup'
-                                    ? Colors.white
-                                    : Colors.deepBlue
-                                  : Colors.red,
-                                borderWidth: value.keeper2.status == 'accessible'
-                                  ? 0
-                                  : 0.5,
+                                borderColor:
+                                  value.keeper2.status == 'accessible'
+                                    ? value.status == 'notSetup'
+                                      ? Colors.white
+                                      : Colors.deepBlue
+                                    : Colors.red,
+                                borderWidth:
+                                  value.keeper2.status == 'accessible'
+                                    ? 0
+                                    : 0.5,
                                 marginLeft: 'auto',
                               }}
                               onPress={() =>
@@ -738,33 +749,33 @@ class ManageBackup extends Component<
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
                                 borderColor: value.keeper1.status == 'accessible'
-                                  ? value.status == 'notSetup'
-                                    ? Colors.white
-                                    : Colors.deepBlue
-                                  : Colors.red,
+                                    ? value.status == 'notSetup'
+                                      ? Colors.white
+                                      : Colors.deepBlue
+                                    : Colors.red,
                                 borderWidth: value.keeper1.status == 'accessible' ? 0 : 1,
                               }}
                               onPress={() => {
-                                if (value.id === 2) {
-                                  setTimeout(() => {
-                                    (this.refs
-                                      .SetupPrimaryKeeperBottomSheet as any).snapTo(
-                                      1,
-                                    );
-                                  }, 2);
-                                  this.setState({
-                                    isPrimaryKeeper: true,
-                                    selectedShareId: value.keeper1.shareId,
-                                  });
-                                } else {
-                                  setTimeout(() => {
-                                    (this.refs
-                                      .keeperTypeBottomSheet as any).snapTo(1);
-                                  }, 2);
-                                  this.setState({
-                                    isPrimaryKeeper: false,
-                                    selectedShareId: value.keeper1.shareId,
-                                  });
+                                this.setState({
+                                  selectedShareId: value.keeper1.shareId,
+                                  isPrimaryKeeper:
+                                    value.id === 2 ? true : false,
+                                });
+                                if(value.keeper1.status == 'accessible'){
+                                  let obj = {
+                                    shareType: value.keeper1.shareType,
+                                    keeperStatus: value.keeper1.status,
+                                    name: value.keeper1.name,
+                                    id: value.id,
+                                    shareId: value.keeper1.shareId,
+                                    updatedAt: value.keeper1.updatedAt
+                                  }
+                                  this.goToHistory(obj);
+                                  return;
+                                }
+                                else{
+                                  if (value.id === 2) (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+                                  else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
                                 }
                               }}
                             >
@@ -825,30 +836,35 @@ class ManageBackup extends Component<
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
-                                borderColor: value.keeper2.status == 'accessible'
-                                  ? value.status == 'notSetup'
-                                    ? Colors.white
-                                    : Colors.deepBlue
-                                  : Colors.red,
-                                borderWidth: value.keeper2.status == 'accessible'
-                                  ? 0
-                                  : 0.5,
+                                borderColor:
+                                  value.keeper2.status == 'accessible'
+                                    ? value.status == 'notSetup'
+                                      ? Colors.white
+                                      : Colors.deepBlue
+                                    : Colors.red,
+                                borderWidth:
+                                  value.keeper2.status == 'accessible'
+                                    ? 0
+                                    : 0.5,
                                 marginLeft: wp('4%'),
                               }}
                               onPress={() => {
-                                if (value.id === 2) {
-                                  this.setState({ isLevel2: true });
-                                } else {
-                                  this.setState({ isLevel2: false });
+                                this.setState({ selectedShareId: value.keeper2.shareId, isLevel2: value.id == 2 ? true : false, isPrimaryKeeper: false, });
+                                if(value.keeper1.status == 'accessible'){
+                                  let obj = {
+                                    shareType: value.keeper2.shareType,
+                                    keeperStatus: value.keeper2.status,
+                                    name: value.keeper2.name,
+                                    id: value.id,
+                                    shareId: value.keeper2.shareId,
+                                    updatedAt: value.keeper2.updatedAt
+                                  }
+                                  this.goToHistory(obj);
+                                  return;
                                 }
-                                setTimeout(() => {
-                                  (this.refs
-                                    .keeperTypeBottomSheet as any).snapTo(1);
-                                }, 2);
-                                this.setState({
-                                  isPrimaryKeeper: false,
-                                  selectedShareId: value.keeper2.shareId,
-                                });
+                                else{
+                                  (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                }
                               }}
                             >
                               {value.keeper2.status == 'accessible' &&
@@ -984,13 +1000,20 @@ class ManageBackup extends Component<
               }
               proceedButtonText={'Proceed'}
               backButtonText={'Back'}
-              onPressBack={() => {
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
-              }}
+              onPressBack={() => (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
               onPressContinue={() => {
-                this.generateShares(2);
-                // navigation.navigate('KeeperFeatures');
-                // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+                const { levelData, selectedShareId } = this.state;
+                let PKStatus = levelData[1].keeper1.keeper1Done
+                  ? 'accessed'
+                  : 'notAccessed';
+                this.props.navigation.navigate('KeeperDeviceHistory', {
+                  selectedTime: this.getTime(new Date()),
+                  selectedStatus: PKStatus,
+                  selectedTitle: 'Primary Keeper',
+                  isPrimaryKeeper: true,
+                  isSetUp: true,
+                  selectedShareId,
+                });
               }}
             />
           )}

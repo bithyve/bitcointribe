@@ -60,7 +60,7 @@ const HomeHeader = ({
   exchangeRates,
   CurrencyCode,
   navigation,
-  overallHealth,
+  currentLevel,
   onSwitchToggle,
   setCurrencyToggleValue,
 }) => {
@@ -216,7 +216,7 @@ const HomeHeader = ({
               fontSize: RFValue(18),
             }}
           >
-            1
+            {currentLevel}
           </Text>
         </ImageBackground>
         <TouchableOpacity
