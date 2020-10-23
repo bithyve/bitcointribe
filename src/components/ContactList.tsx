@@ -398,22 +398,22 @@ export default function ContactList(props) {
       <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
           ? selectedContacts.map((value) => {
-            return (
-              <View style={styles.selectedContactView}>
-                <Text style={styles.selectedContactNameText}>
-                  {value.name ? value.name.split(' ')[0] : ''}{' '}
-                  <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                    {value.name ? value.name.split(' ')[1] : ''}
+              return (
+                <View style={styles.selectedContactView}>
+                  <Text style={styles.selectedContactNameText}>
+                    {value.name ? value.name.split(' ')[0] : ''}{' '}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {value.name ? value.name.split(' ')[1] : ''}
+                    </Text>
                   </Text>
-                </Text>
-                <AppBottomSheetTouchableWrapper
-                  onPress={() => onCancel(value)}
-                >
-                  <AntDesign name="close" size={17} color={Colors.white} />
-                </AppBottomSheetTouchableWrapper>
-              </View>
-            );
-          })
+                  <AppBottomSheetTouchableWrapper
+                    onPress={() => onCancel(value)}
+                  >
+                    <AntDesign name="close" size={17} color={Colors.white} />
+                  </AppBottomSheetTouchableWrapper>
+                </View>
+              );
+            })
           : null}
       </View>
       {/* <View style={{ flexDirection: 'row' }}>
@@ -548,8 +548,8 @@ export default function ContactList(props) {
             {approvingTrustedContact ? (
               <ActivityIndicator size={'small'} />
             ) : (
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
-              )}
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            )}
           </AppBottomSheetTouchableWrapper>
         </View>
       )}
