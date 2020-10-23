@@ -71,7 +71,7 @@ const LostTwoFA = props => {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage, errorMessageHeader]);
+  }, [errorMessage,errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
