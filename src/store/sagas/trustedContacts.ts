@@ -226,9 +226,8 @@ function* removeTrustedContactWorker({ payload }) {
     for (let itr = 0; itr < tcInfo.length; itr++) {
       const trustedContact = tcInfo[itr];
       if (trustedContact) {
-        const presentContactName = `${trustedContact.firstName} ${
-          trustedContact.lastName ? trustedContact.lastName : ''
-        }`
+        const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
+          }`
           .toLowerCase()
           .trim();
 
@@ -933,9 +932,8 @@ function* syncTrustedChannelsWorker({ payload }) {
             for (let itr = 0; itr < tcInfo.length; itr++) {
               const trustedContact = tcInfo[itr];
               if (trustedContact) {
-                const presentContactName = `${trustedContact.firstName} ${
-                  trustedContact.lastName ? trustedContact.lastName : ''
-                }`
+                const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
+                  }`
                   .toLowerCase()
                   .trim();
 

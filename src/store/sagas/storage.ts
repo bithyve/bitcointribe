@@ -189,7 +189,6 @@ function* servicesEnricherWorker({ payload }) {
           : new TrustedContactsService(),
       };
     }
-
     yield put(servicesEnriched(services));
     if (migrated) {
       database.VERSION = DeviceInfo.getVersion();

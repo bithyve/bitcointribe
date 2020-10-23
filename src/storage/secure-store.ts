@@ -1,5 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
-import Config from "react-native-config";
+import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
+import Config from 'react-native-config';
 
 export const store = async (hash, enc_key) => {
   try {
@@ -7,9 +8,20 @@ export const store = async (hash, enc_key) => {
       console.log('Old key identified, removing...');
       await SecureStore.deleteItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
     }
+    if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
+      console.log('Old key identified, removing...');
+      await RNSecureStorage.remove(Config.ENC_KEY_STORAGE_IDENTIFIER);
+    }
+
     await SecureStore.setItemAsync(
       Config.ENC_KEY_STORAGE_IDENTIFIER,
       JSON.stringify({ hash, enc_key }),
+    );
+
+    await RNSecureStorage.set(
+      Config.ENC_KEY_STORAGE_IDENTIFIER,
+      JSON.stringify({ hash, enc_key }),
+      { accessible: ACCESSIBLE.WHEN_UNLOCKED },
     );
   } catch (err) {
     console.log(err);
@@ -18,9 +30,12 @@ export const store = async (hash, enc_key) => {
   return true;
 };
 
-export const fetch = async hash_current => {
+export const fetch = async (hash_current) => {
   try {
-    const value = await SecureStore.getItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
+    const value = await SecureStore.getItemAsync(
+      Config.ENC_KEY_STORAGE_IDENTIFIER,
+    );
+
     if (!value) {
       throw new Error('Identifier missing');
     }
@@ -36,7 +51,7 @@ export const fetch = async hash_current => {
   }
 };
 
-export const remove = async key => {
+export const remove = async (key) => {
   try {
     await SecureStore.deleteItemAsync(key);
   } catch (err) {

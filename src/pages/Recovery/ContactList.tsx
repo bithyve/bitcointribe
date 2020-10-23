@@ -24,13 +24,13 @@ import * as ExpoContacts from 'expo-contacts';
 
 async function requestContactsPermission() {
   try {
-    let isContactOpen=false;
-      AsyncStorage.getItem('isContactOpen', (err, value) => {
+    let isContactOpen = false;
+    AsyncStorage.getItem('isContactOpen', (err, value) => {
       if (err) console.log(err)
-       else {
+      else {
         isContactOpen = JSON.parse(value)
       }
-  });
+    });
     if (!isContactOpen) {
       await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
     }
@@ -84,10 +84,11 @@ export default function ContactList(props) {
     }
   };
 
-  useEffect(function() {
+  useEffect(function () {
     getSelectedContactList();
   }, []);
 
+  // TODO: Migrate it using react-native-contact
   const getContactsAsync = async () => {
     if (Platform.OS === 'android') {
       if (!(await requestContactsPermission())) {
@@ -118,6 +119,7 @@ export default function ContactList(props) {
   };
 
   useEffect(() => {
+    // TODO: Migrate it using react-native-contact
     getContactsAsync();
   }, []);
 

@@ -34,7 +34,7 @@ export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
+  options?: { loader?; fetchTransactionsSync?; restore?},
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };

@@ -63,7 +63,7 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { startupSyncLoaded} from '../actions/loaders';
+import { startupSyncLoaded } from '../actions/loaders';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -232,7 +232,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-      JSON.stringify(postFetchTransactions)
+    JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -258,7 +258,7 @@ function* fetchBalanceTxWorker({ payload }) {
     ? payload.options.service
     : yield select((state) => state.accounts[payload.serviceType].service);
 
-    const preFetchBalances = JSON.stringify(
+  const preFetchBalances = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances,
@@ -365,7 +365,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -449,11 +449,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const preFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   const res = yield call(
@@ -465,11 +465,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const postFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   if (res.status === 200) {
@@ -557,7 +557,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
+          contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -577,7 +577,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -594,7 +594,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -842,16 +842,16 @@ function* accumulativeTxAndBalWorker() {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+      .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -863,7 +863,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+      .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
