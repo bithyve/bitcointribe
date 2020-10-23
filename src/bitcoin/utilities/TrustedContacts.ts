@@ -800,6 +800,8 @@ export default class TrustedContacts {
     contacts?: Contacts,
   ): Promise<{
     synched: Boolean;
+    contactsToRemove: String[];
+    guardiansToRemove: String[];
   }> => {
     const channelsToSync = {};
     for (const contact of Object.values(
@@ -831,12 +833,16 @@ export default class TrustedContacts {
 
       const { synched, synchedChannels } = res.data;
       console.log({ synched, synchedChannels });
+
+      const contactsToRemove = [];
+      const guardiansToRemove = [];
       if (Object.keys(synchedChannels).length) {
-        for (const contact of Object.values(
+        for (const contactName of Object.keys(
           contacts ? contacts : this.trustedContacts,
         )) {
+          const contact = this.trustedContacts[contactName];
           const { trustedChannel, symmetricKey } = contact;
-          if (trustedChannel) {
+          if (trustedChannel && synchedChannels[trustedChannel.address]) {
             const {
               publicKey,
               encryptedData,
@@ -845,10 +851,14 @@ export default class TrustedContacts {
             } = synchedChannels[trustedChannel.address]; // counterparty's pub
             trustedChannel.data.forEach((subChan: TrustedData) => {
               if (subChan.publicKey === publicKey) {
-                subChan.data = this.decryptData(
+                const decryptedData: TrustedDataElements = this.decryptData(
                   symmetricKey,
                   encryptedData,
                 ).data;
+                if (decryptedData.remove) contactsToRemove.push(contactName);
+                if (decryptedData.removeGuardian)
+                  guardiansToRemove.push(contactName);
+                subChan.data = decryptedData;
                 subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;
               }
@@ -857,7 +867,7 @@ export default class TrustedContacts {
         }
       }
 
-      return { synched };
+      return { synched, contactsToRemove, guardiansToRemove };
     } else {
       throw new Error('No trusted channels to update');
     }

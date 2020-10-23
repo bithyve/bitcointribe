@@ -51,11 +51,12 @@ export const approveTrustedContact = (
   };
 };
 
-export const removeTrustedContact = (contactName) => {
+export const removeTrustedContact = (contactName, shareIndex?) => {
   return {
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
       contactName,
+      shareIndex,
     },
   };
 };

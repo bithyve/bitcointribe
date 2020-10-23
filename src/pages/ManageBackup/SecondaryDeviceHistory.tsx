@@ -514,9 +514,6 @@ const SecondaryDeviceHistory = (props) => {
         onBackPress={() => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        // noteText={
-        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {

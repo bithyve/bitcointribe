@@ -691,6 +691,34 @@ export default class S3Service {
     }
   };
 
+  public resetSharesHealth = async (
+    shareIndex: number,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          resetted: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.resetSharesHealth(shareIndex),
+      };
+    } catch (err) {
+      return { status: 514, err: err.message, message: ErrMap[514] };
+    }
+  };
+
   public updateDynamicNonPMDD = async (
     dynamicNonPMDD: any,
   ): Promise<

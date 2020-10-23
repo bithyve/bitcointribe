@@ -18,31 +18,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { TransactionDetails } from '../../bitcoin/utilities/Interface';
-
-const InfoBox = ({ text, isFromAccount }) => {
-  return (
-    <View
-      style={{
-        ...styles.infoBoxContainer,
-        marginBottom: isFromAccount ? hp('3%') : hp('15%') + 22,
-      }}
-    >
-      <Text style={styles.viewTransactionText}>
-        View your transactions here.
-      </Text>
-
-      <Text
-        style={{
-          color: Colors.textColorGrey,
-          fontSize: RFValue(12),
-          fontFamily: Fonts.FiraSansRegular,
-        }}
-      >
-        {text}
-      </Text>
-    </View>
-  );
-};
+import EmptyListInfoBox from '../empty-states/EmptyListInfoBox';
 
 const TransactionsContent = ({
   transactions,
@@ -53,6 +29,7 @@ const TransactionsContent = ({
   isFromAccount,
   infoBoxInfoText = 'All your recent transactions across the accounts appear here',
 }) => {
+
   const LoadingView: React.FC = () => {
     return (
       <View style={styles.modalContentContainer}>
@@ -79,8 +56,16 @@ const TransactionsContent = ({
             );
           })}
         </View>
+
         <View style={{ backgroundColor: Colors.white }}>
-          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
+          <EmptyListInfoBox
+            headingText="View your transactions here"
+            infoText={infoBoxInfoText}
+            containerStyle={{
+              marginBottom: isFromAccount ? hp('3%') : hp('15%') + 22,
+              marginHorizontal: 15,
+            }}
+          />
         </View>
       </View>
     );
@@ -91,7 +76,14 @@ const TransactionsContent = ({
       <View style={styles.modalContentContainer}>
         <View style={{ flex: 1 }}></View>
         <View style={{ backgroundColor: Colors.white }}>
-          <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
+          <EmptyListInfoBox
+            headingText="View your transactions here"
+            infoText={infoBoxInfoText}
+            containerStyle={{
+              marginBottom: isFromAccount ? hp('3%') : hp('15%') + 22,
+              marginHorizontal: 15,
+            }}
+          />
         </View>
       </View>
     );
@@ -101,7 +93,7 @@ const TransactionsContent = ({
     return <LoadingView />;
   }
 
-  if (transactions.length === 0) {
+  if (transactions.length < 2) {
     return <EmptyView />;
   }
 
@@ -215,7 +207,14 @@ const TransactionsContent = ({
       </View>
 
       {transactions.length <= 1 && (
-        <InfoBox text={infoBoxInfoText} isFromAccount={isFromAccount} />
+        <EmptyListInfoBox
+          headingText="View your transactions here"
+          infoText={infoBoxInfoText}
+          containerStyle={{
+            marginBottom: isFromAccount ? hp('3%') : hp('15%') + 22,
+            marginHorizontal: 15,
+          }}
+        />
       )}
     </View>
   );
@@ -273,24 +272,6 @@ const styles = StyleSheet.create({
     width: wp('8%'),
     height: wp('8%'),
     backgroundColor: Colors.white,
-  },
-  infoBoxContainer: {
-    margin: 15,
-    backgroundColor: Colors.backgroundColor,
-    padding: 10,
-    paddingTop: 20,
-    paddingBottom: 20,
-    borderRadius: 7,
-  },
-  textNote: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  viewTransactionText: {
-    color: Colors.blue,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
   },
   separatorView: {
     marginLeft: 15,

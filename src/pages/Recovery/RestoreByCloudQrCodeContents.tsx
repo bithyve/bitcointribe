@@ -8,11 +8,8 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import KnowMoreButton from '../../components/KnowMoreButton';
-import QrScanner from '../../components/QrScanner';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   restoreShareFromQR,
@@ -26,7 +23,6 @@ import Toast from '../../components/Toast';
 
 export default function RestoreByCloudQrCodeContents(props) {
   const [qrData, setQrData] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
   const [qrDataArray, setQrDataArray] = useState([]);
   let [counter, setCounter] = useState(1);
   let [startNumberCounter, setStartNumberCounter] = useState(1);
@@ -239,16 +235,14 @@ export default function RestoreByCloudQrCodeContents(props) {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            // backgroundColor: 'red',
           }}
         >
           <QrCodeModalContents
-            onClose={() => {}}
             flag={true}
             onQrScan={(qrData) => getQrCodeData(qrData)}
             onPressQrScanner={() => {
-              props.navigation.navigate('QrScanner', {
-                scanedCode: getQrCodeData,
+              props.navigation.navigate('QRScanner', {
+                onCodeScanned: getQrCodeData,
               });
             }}
           />
