@@ -8,6 +8,7 @@ import {
   EncryptedEphemeralData,
   trustedChannelActions,
   ShareUploadables,
+  MetaShare,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -791,6 +792,97 @@ export default class TrustedContacts {
       }
 
       return { updated };
+    } else {
+      throw new Error('No trusted channels to update');
+    }
+  };
+
+  public syncLastSeensAndHealth = async (
+    metaShares: MetaShare[],
+    healthCheckStatus,
+  ): Promise<{
+    updated: Boolean;
+    healthCheckStatus;
+  }> => {
+    const channelsToUpdate = {};
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate[trustedChannel.address] = { publicKey };
+      }
+    }
+
+    if (Object.keys(channelsToUpdate).length) {
+      const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
+        HEXA_ID,
+        channelsToUpdate,
+        shareIDs: metaShares
+          ? metaShares.map((metaShare) => metaShare.shareId)
+          : null, // legacy HC
+      });
+
+      const { updated, updatedLastSeens } = res.data;
+      const updates: Array<{
+        shareId: string;
+        updatedAt: number;
+        reshareVersion: number;
+      }> = res.data.lastUpdateds; // legacy HC
+      console.log({ updatedLastSeens, updates });
+
+      // synching health: legacy
+      if (updates.length) {
+        for (const { shareId, updatedAt, reshareVersion } of updates) {
+          for (let index = 0; index < metaShares.length; index++) {
+            if (metaShares[index] && metaShares[index].shareId === shareId) {
+              const currentReshareVersion =
+                healthCheckStatus[index].reshareVersion !== undefined
+                  ? healthCheckStatus[index].reshareVersion
+                  : 0;
+
+              if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+
+              healthCheckStatus[index] = {
+                shareId,
+                updatedAt,
+                reshareVersion,
+              };
+            }
+          }
+        }
+      }
+
+      if (Object.keys(updatedLastSeens).length) {
+        for (const contactName of Object.keys(this.trustedContacts)) {
+          const { trustedChannel } = this.trustedContacts[contactName];
+          if (trustedChannel) {
+            const { publicKey, lastSeen } = updatedLastSeens[
+              trustedChannel.address
+            ]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.lastSeen = lastSeen;
+
+                // update health via channel
+                if (lastSeen > 0) {
+                  for (let index = 0; index < metaShares.length; index++) {
+                    if (metaShares[index].meta.guardian === contactName) {
+                      healthCheckStatus[index] = {
+                        shareId: metaShares[index].shareId,
+                        updatedAt: lastSeen,
+                        reshareVersion: healthCheckStatus[index]
+                          ? healthCheckStatus[index].reshareVersion
+                          : 0,
+                      };
+                    }
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      return { updated, healthCheckStatus };
     } else {
       throw new Error('No trusted channels to update');
     }

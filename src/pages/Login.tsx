@@ -182,57 +182,17 @@ export default function Login(props) {
     (state) => state.setupAndAuth,
   );
   const { dbFetched } = useSelector((state) => state.storage);
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
 
+  // const s3Service = useSelector((state) => state.sss.service);
   // useEffect(() => {
-  //   const testBalance = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-  //       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-  //       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const secureBalance = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-  //       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-  //         .unconfirmedBalance
-  //     : 0;
-  //   const accumulativeBalance = regularBalance + secureBalance;
-
-  //   const testTransactions = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-  //     : [];
-  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-  //         .transactionDetails
-  //     : [];
-
-  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-  //         .transactionDetails
-  //     : [];
-  //   const accumulativeTransactions = [
-  //     ...testTransactions,
-  //     ...regularTransactions,
-  //     ...secureTransactions,
-  //   ];
-
-  //   setBalances({
-  //     testBalance,
-  //     regularBalance,
-  //     secureBalance,
-  //     accumulativeBalance,
-  //   });
-  //   setTransactions(accumulativeTransactions);
-  // }, [accounts]);
-
+  //   // HC init and down-streaming
+  //   if (s3Service && s3Service.checkHealth) {
+  //     const { healthCheckInitialized } = s3Service.sss;
+  //     if (healthCheckInitialized) {
+  //       dispatch(checkMSharesHealth());
+  //     }
+  //   }
+  // }, [s3Service]);
   const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
@@ -243,10 +203,6 @@ export default function Login(props) {
       }
     }
   }, [s3Service]);
-
-  useEffect(() => {
-    AsyncStorage.removeItem('lastSeen');
-  }, []);
 
   const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
