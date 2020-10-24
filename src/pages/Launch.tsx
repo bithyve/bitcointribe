@@ -43,6 +43,8 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
   componentDidMount = () => {
     this.props.initializeDB();
     AppState.addEventListener("change", this.handleAppStateChange);
+    Linking.addEventListener('url', this.handleAppStateChange);
+
     Linking.getInitialURL()
       .then(url => console.log({url}))
     this.handleDeeplink();

@@ -999,7 +999,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (!isFocused) {
       navigation.navigate('Home');
     }
-
+    console.log('event.url is ', event.url)
     const splits = event.url.split('/');
 
     if (splits[5] === 'sss') {
