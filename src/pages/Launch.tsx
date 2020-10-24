@@ -42,8 +42,10 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = () => {
     this.props.initializeDB();
-
-    this.handleDeepLink();
+    AppState.addEventListener("change", this.handleAppStateChange);
+    Linking.getInitialURL()
+      .then(url => console.log({url}))
+    this.handleDeeplink();
   };
 
   handleAppStateChange = async (nextAppState) => {
@@ -78,32 +80,26 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleDeepLink = async () => {
+  handleDeeplink = async () => {
     try {
       const url = await Linking.getInitialURL();
-
+      console.log('inside handleDeepLInk ', {url})
       setTimeout(async () => {
-        if (await AsyncStorage.getItem('hasCreds')) {
-          if (!url) {
-            this.props.navigation.replace('Login');
-          } else {
+        if (await AsyncStorage.getItem('hasCreds'))
+          if (!url) this.props.navigation.replace('Login');
+          else {
             const splits = url.split('/');
-
             if (splits[5] === 'sss') {
               const requester = splits[4];
-
               if (splits[6] === 'ek') {
                 const custodyRequest = {
                   requester,
                   ek: splits[7],
                   uploadedAt: splits[8],
                 };
-
                 this.props.navigation.replace('Login', { custodyRequest });
-
               } else if (splits[6] === 'rk') {
                 const recoveryRequest = { requester, rk: splits[7] };
-
                 this.props.navigation.replace('Login', { recoveryRequest });
               }
             } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
@@ -152,20 +148,15 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
               );
             } else if (url.includes('fastbitcoins')) {
               const userKey = url.substr(url.lastIndexOf('/') + 1);
-
               this.props.navigation.navigate('Login', { userKey });
             } else {
               const EmailToken = url.substr(url.lastIndexOf('/') + 1);
-
               console.log('EmailToken', EmailToken);
               this.props.navigation.navigate('SignUpDetails', { EmailToken });
             }
           }
-        } else {
-          this.props.navigation.replace('PasscodeConfirm');
-        }
+        else this.props.navigation.replace('PasscodeConfirm');
       }, 4000);
-
     } catch (err) {
       (this.errorBottomSheet as any).current.snapTo(1);
     }
