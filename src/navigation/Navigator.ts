@@ -131,7 +131,7 @@ const HomeNavigator = createStackNavigator(
   {
     Home: {
       screen: HomeStack,
-      path: 'Home',
+      path: 'home',
     },
     ReLogin: {
       screen: ReLogin,

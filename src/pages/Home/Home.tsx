@@ -742,7 +742,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       initHealthCheck();
     }
 
-    Linking.addEventListener('url', this.handleDeepLink);
+    Linking.addEventListener('url', this.handleDeepLinkEvent);
+
+    Linking
+      .getInitialURL()
+      .then(this.handleDeepLinking);
 
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal();
@@ -939,15 +943,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           custodyRequest,
         },
         () => {
-          setTimeout(() => {
-            this.custodianRequestBottomSheetRef.current?.snapTo(1);
-          }, 2);
+          this.openBottomSheetOnLaunch(this.custodianRequestBottomSheetRef);
         },
       );
-      return;
-    }
-
-    if (recoveryRequest || trustedContactRequest) {
+    } else if (recoveryRequest || trustedContactRequest) {
       this.setState(
         {
           recoveryRequest,
@@ -957,33 +956,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.openBottomSheetOnLaunch(this.trustedContactRequestBottomSheetRef);
         },
       );
-
-      return;
-    }
-
-    if (userKey) {
+    } else if (userKey) {
       this.props.navigation.navigate('PairNewWallet', { userKey });
-      return;
     }
-
-    return;
   };
 
-  componentWillUnmount() {
+  cleanupListeners() {
     if (typeof this.focusListener === 'function') {
-      this.focusListener();
+      this.props.navigation.removeListener('didFocus', this.focusListener);
     }
+
     if (typeof this.unsubscribe === 'function') {
       this.unsubscribe();
     }
-    if (typeof this.firebaseNotificationListener === 'function') {
-      this.firebaseNotificationListener();
-    }
-    if (typeof this.notificationOpenedListener === 'function') {
-      this.notificationOpenedListener();
+
+    if (typeof this.appStateListener === 'function') {
+      AppState.removeEventListener('change', this.appStateListener);
     }
 
     clearTimeout(this.openBottomSheetOnLaunchTimeout);
+  }
+
+  componentWillUnmount() {
+    this.cleanupListeners();
   }
 
   openBottomSheetOnLaunch(ref: React.RefObject<BottomSheet>) {
@@ -992,15 +987,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
   }
 
-  handleDeepLink = async (event) => {
+  handleDeepLinkEvent = async ({ url }) => {
     const { navigation, isFocused } = this.props;
     // if user is in any other screen before opening
     // deep link , we will navigate user to home first
     if (!isFocused) {
       navigation.navigate('Home');
     }
-    console.log('event.url is ', event.url)
-    const splits = event.url.split('/');
+
+    console.log('Home::handleDeepLinkEvent::URL: ', url);
+
+    this.handleDeepLinking(url);
+  }
+
+  handleDeepLinking = async (url: string) => {
+    console.log("Home::handleDeepLinking::URL: " + url);
+
+    const splits = url.split('/');
 
     if (splits[5] === 'sss') {
       const requester = splits[4];
@@ -1094,9 +1097,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       );
     }
 
-    if (event.url.includes('fastbitcoins')) {
-      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-      navigation.navigate('PairNewWallet', { userKey });
+    if (url.includes('fastbitcoins')) {
+      const userKey = url.substr(url.lastIndexOf('/') + 1);
+      this.props.navigation.navigate('PairNewWallet', { userKey });
     }
   };
 
