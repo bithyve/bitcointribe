@@ -5,7 +5,6 @@ import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFa
 import FundingSourcesScreen from "../../../pages/FundingSources/FundingSourcesContainerScreen";
 import FundingSourceDetailsScreen from "../../../pages/FundingSources/FundingSourceDetailsScreen";
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
-import { goHomeAction } from '../../actions/NavigationActions';
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import NavStyles from '../../../common/Styles/NavStyles';
 import WalletSettingsStack from './WalletSettingsStack';
@@ -19,9 +18,15 @@ const MoreOptionsStack = createStackNavigator(
         return {
           title: "More",
           headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.dispatch(goHomeAction) }} />;
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
           },
         };
+      },
+    },
+    FriendsAndFamily: {
+      screen: FriendsAndFamilyScreen,
+      navigationOptions: {
+        header: null,
       },
     },
     FundingSources: {
@@ -33,12 +38,6 @@ const MoreOptionsStack = createStackNavigator(
     FundingSourceDetails: {
       screen: FundingSourceDetailsScreen,
     },
-    FriendsAndFamily: {
-      screen: FriendsAndFamilyScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
     WalletSettings: {
       screen: WalletSettingsStack,
       navigationOptions: {
@@ -47,13 +46,12 @@ const MoreOptionsStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
     initialRouteName: 'MoreOptionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
         headerTitleStyle: NavStyles.modalHeaderTitleText,
         headerLeft: () => {
-          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },
       };
     },

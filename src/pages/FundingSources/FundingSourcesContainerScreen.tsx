@@ -23,7 +23,7 @@ import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { useSelector } from 'react-redux';
 import Loader from '../../components/loader';
-import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
+import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
 
 export default function FundingSourcesContainerScreen(props) {
   const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
@@ -83,7 +83,7 @@ export default function FundingSourcesContainerScreen(props) {
       <View style={styles.modalContainer}>
         <View style={NavStyles.modalNavHeaderContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <SmallNavHeaderCloseButton
+            <SmallNavHeaderBackButton
               containerStyle={{ marginRight: 16 }}
               onPress={() => props.navigation.pop()}
             />

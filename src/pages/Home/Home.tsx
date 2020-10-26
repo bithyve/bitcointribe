@@ -162,7 +162,7 @@ interface HomeStateTypes {
   switchOn: boolean;
   CurrencyCode: string;
   balances: any;
-  selectedBottomTab: BottomTab;
+  selectedBottomTab: BottomTab | null;
 
   /// TODO: remove the `new` prefix when all bottom sheets are refactored to use the `@gorhom/bottom-sheet` library
   newBottomSheetState: BottomSheetState;
@@ -264,7 +264,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       switchOn: false,
       CurrencyCode: 'USD',
       balances: {},
-      selectedBottomTab: BottomTab.Transactions,
+      selectedBottomTab: null,
       newBottomSheetState: BottomSheetState.Closed,
       secondaryDeviceOtp: {},
       currencyCode: 'USD',
@@ -1714,8 +1714,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   closeBottomSheet = () => {
-    this.setState({ newBottomSheetState: BottomSheetState.Closed }, () => {
-      this.getActiveBottomSheetRef()?.current?.close();
+    this.getActiveBottomSheetRef()?.current?.close();
+
+    this.setState({
+      newBottomSheetState: BottomSheetState.Closed,
+      selectedBottomTab: null,
     });
   };
 
