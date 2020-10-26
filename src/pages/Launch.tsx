@@ -42,9 +42,19 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = () => {
     this.props.initializeDB();
-    // AppState.addEventListener("change", this.handleAppStateChange);
-    this.handleDeeplink();
+
+    AppState.addEventListener("change", this.handleAppStateChange);
+    Linking.addEventListener('url', this.handleAppStateChange);
+
+    this.handleDeepLinking();
   };
+
+
+  componentWillUnmount = () => {
+    AppState.removeEventListener("change", this.handleAppStateChange);
+    Linking.removeEventListener('url', this.handleAppStateChange);
+  };
+
 
   handleAppStateChange = async (nextAppState) => {
     // no need to trigger login screen if accounts are not synced yet
@@ -78,9 +88,12 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleDeeplink = async () => {
+  handleDeepLinking = async () => {
     try {
       const url = await Linking.getInitialURL();
+
+      console.log("Launch::handleDeepLinking::initialURL: " + url);
+
       setTimeout(async () => {
         if (await AsyncStorage.getItem('hasCreds'))
           if (!url) this.props.navigation.replace('Login');
