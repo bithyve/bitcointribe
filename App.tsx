@@ -1,4 +1,4 @@
-console.disableYellowBox = true;
+
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Navigator from './src/navigation/Navigator';
 import { Provider } from 'react-redux';
@@ -14,6 +14,9 @@ import usePreferencesState from './src/utils/hooks/state-selectors/preferences/U
 import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs';
 import getActiveRouteName from './src/utils/navigation/GetActiveRouteName';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
 
 export const URI_PREFIX = 'hexa://';
 
