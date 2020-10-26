@@ -6,24 +6,6 @@ export const modifyLevelStatus = (
 ): { levelData: any[]; isError: boolean } => {
   let isError = false;
   if (levelHealthVar && levelHealthVar.length > 0) {
-    let levelHealth = levelHealthVar[levelHealthVar.length - 1];
-    if (keeperInfo.length > 0) {
-      for (let i = 0; i < levelHealth.levelInfo.length; i++) {
-        const element = levelHealth.levelInfo[i];
-        if (
-          keeperInfo.findIndex((value) => value.shareId == element.shareId) > -1
-        ) {
-          levelHealth.levelInfo[i].name =
-            keeperInfo[
-              keeperInfo.findIndex((value) => value.shareId == element.shareId)
-            ].name;
-          levelHealth.levelInfo[i].shareType =
-            keeperInfo[
-              keeperInfo.findIndex((value) => value.shareId == element.shareId)
-            ].type;
-        }
-      }
-    }
 
     // CASE 1: currentLevel = 0 && currentLevel = 1 && !levelHealthVar[1] && !levelHealthVar[2]
     if (

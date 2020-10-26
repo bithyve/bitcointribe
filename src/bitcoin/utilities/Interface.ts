@@ -343,6 +343,7 @@ export interface Keepers {
 export interface EphemeralDataElementsForKeeper {
   publicKey?: string;
   walletID?: string;
+  hexaID?: string;
   shareTransferDetails?: {
     otp: string;
     encryptedKey: string;
@@ -351,6 +352,7 @@ export interface EphemeralDataElementsForKeeper {
   securityQuestion?: any;
   secondaryMnemonics?: any;
   featuresList?: any;
+  twoFASecret?: any;
 }
 
 export interface EphemeralDataForKeeper {

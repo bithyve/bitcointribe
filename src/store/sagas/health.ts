@@ -272,7 +272,7 @@ export const updateSharesHealthWatcher = createWatcher(
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
   let featuresList = payload.featuresList;
-  let type = payload.isPrimaryKeeper ? 'device' : payload.type;
+  let type = payload.isPrimaryKeeper ? 'primaryKeeper' : payload.type;
   
   yield put(updateMSharesLoader(true));
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -289,30 +289,27 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   let secureXpub = s3ServiceSecure.getXpubsForAccount();
-  let EFChannelData = {
-    ...JSON.parse(payload.scannedData),
-    xPubs: { testXpub, regularXpub, secureXpub },
-    walletID: s3Service.getWalletId().data.walletId,
-    hexaId: config.HEXA_ID,
-    secondaryMnemonics: payload.isPrimaryKeeper
-      ? s3ServiceSecure.getSecondaryMnemonics()
-      : null,
-    featuresList,
-  };
+
+  const secondaryMnemonic = s3ServiceSecure.secureHDWallet.secondaryMnemonic;
+  const twoFASecret = s3ServiceSecure.secureHDWallet.twoFASetup.secret;
+  let EFChannelData = JSON.parse(payload.scannedData);
   let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData
   let dataElements: EphemeralDataElementsForKeeper = {
     publicKey: EFChannelData.publicKey,
-    walletID: EFChannelData.walletID,
+    hexaID: config.HEXA_ID,
+    walletID: s3Service.getWalletId().data.walletId,
     shareTransferDetails: {
       otp,
       encryptedKey,
     },
-    xPub: EFChannelData.xPubs,
+    xPub: { testXpub, regularXpub, secureXpub },
     securityQuestion: securityQuestion,
-    secondaryMnemonics: EFChannelData.secondaryMnemonics,
-    featuresList: EFChannelData.featuresList,
+    secondaryMnemonics: secondaryMnemonic,
+    featuresList: featuresList,
+    twoFASecret: twoFASecret
   };
+  console.log('dataElements', dataElements);
   let share  = s3Service.levelhealth.metaShares[1];
   if(payload.selectedShareId){
     share = payload.share;
@@ -322,26 +319,17 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     share,
     EFChannelData.uuid
   );
-  let object = {
-    shareId: share.shareId ? share.shareId : '',
-    shareType: type,
-    publicKey: EFChannelData.publicKey,
-    ephemeralAddress: EFChannelData.ephemeralAddress,
-    dataElements: dataElements,
-    encKey: EFChannelData.uuid,
-    shareUploadables: shareUploadables
-  };
 
   let Kp = new KeeperService();
   let res = yield call(
     Kp.updateEphemeralChannel,
-    object.shareId,
-    object.shareType,
-    object.publicKey,
-    object.ephemeralAddress,
-    object.dataElements,
-    object.encKey,
-    object.shareUploadables
+    share.shareId,
+    type,
+    EFChannelData.publicKey,
+    EFChannelData.ephemeralAddress,
+    dataElements,
+    EFChannelData.uuid,
+    shareUploadables
   );
   console.log("RES", res);
   if(res.status == 200){
@@ -351,6 +339,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         shareId: share.shareId,
         reshareVersion: 0,
         updatedAt: moment(new Date()).valueOf(),
+        name: EFChannelData.walletName,
+        shareType: type
       }
     ];
     yield put(updateMSharesHealth(shareArray));
@@ -532,7 +522,7 @@ export function* downloadMetaShareWorker({ payload }) {
       s3Service.levelhealth.walletId,
     );
   } else {
-    res = yield call(S3Service.downloadAndValidateShare, encryptedKey);
+    res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
   }
 
   console.log({ res });
@@ -852,9 +842,19 @@ export function* cloudMetaShareWorker({ payload }) {
         RECOVERY_SHARES: updatedRecoveryShares,
       };
       console.log("updatedBackup",updatedBackup);
+      let InsertDBData;
+      // if(payload.walletImage.SERVICES){
+      //   InsertDBData = { DECENTRALIZED_BACKUP: updatedBackup, SERVICES: payload.walletImage.SERVICES}
+      // }
+      // else{
+        InsertDBData = { DECENTRALIZED_BACKUP: updatedBackup }
+      // }
+      console.log('InsertDBData', InsertDBData);
+      
+      
       // yield put(downloadedMShare(otp, true));
       yield call(insertDBWorker, {
-        payload: { DECENTRALIZED_BACKUP: updatedBackup },
+        payload: InsertDBData,
       });
    
   yield put(switchS3LoadingStatus('downloadMetaShare'));

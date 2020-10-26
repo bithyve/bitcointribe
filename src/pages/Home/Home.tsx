@@ -2051,7 +2051,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         levelHealthVar.updatedAt = moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
         levelHealthVar.reshareVersion = 1;
-        levelHealthVar.guardian = 'cloud';
+        levelHealthVar.name = 'Cloud';
       }
       let shareArray = [
         {
@@ -2059,7 +2059,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           shareId: levelHealthVar.shareId,
           reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
-          status: 'accessible'
+          status: 'accessible',
+          shareType: 'cloud'
         }
       ];
       this.props.updateMSharesHealth(shareArray);

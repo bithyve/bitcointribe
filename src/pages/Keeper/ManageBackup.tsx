@@ -850,7 +850,7 @@ class ManageBackup extends Component<
                               }}
                               onPress={() => {
                                 this.setState({ selectedShareId: value.keeper2.shareId, isLevel2: value.id == 2 ? true : false, isPrimaryKeeper: false, });
-                                if(value.keeper1.status == 'accessible'){
+                                if(value.keeper2.status == 'accessible'){
                                   let obj = {
                                     shareType: value.keeper2.shareType,
                                     keeperStatus: value.keeper2.status,
