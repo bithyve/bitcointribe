@@ -1,12 +1,12 @@
 //
-//  Use this file to import your target's public headers that you would like to expose to Swift.
+//  HEXA-Bridging-Header.h
+//  HEXA Stage
+//
+//  Created by Muneer PP on 9/7/20.
 //
 
-#import <Foundation/Foundation.h>
+#ifndef HEXA_Bridging_Header_h
+#define HEXA_Bridging_Header_h
 
-       
-@class PdfGenerate;
-@interface PdfGenerate : NSObject
--(void)generatePdf;
 
-@end
+#endif /* HEXA_Bridging_Header_h */

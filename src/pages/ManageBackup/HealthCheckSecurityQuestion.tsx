@@ -54,7 +54,7 @@ function HealthCheckSecurityQuestion(props) {
         AnswerCounter++;
         setAnswerCounter(AnswerCounter);
       } else {
-        props.navigation.navigate('ReLogin', {isPasscodeCheck: true});
+        props.navigation.navigate('ReLogin', { isPasscodeCheck: true });
         setShowAnswer(true);
         setErrorText('');
         return;

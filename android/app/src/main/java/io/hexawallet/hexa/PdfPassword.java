@@ -75,7 +75,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         return "PdfPassword";
     }
 
-    @ReactMethod   
+    @ReactMethod
     public void createPdf(String pdfData, Callback errorCallback, Callback successCallback) {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
@@ -85,7 +85,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
             //Add password protection.
             pdfWriter.setEncryption(jsonObj.getString("password").getBytes(), jsonObj.getString("password").getBytes(),
-                   PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+                    PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
             document.open();
             addMetaData(document);
             addTitlePage(document,pdfData);

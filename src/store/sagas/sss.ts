@@ -81,7 +81,7 @@ import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
-var Mailer = require('NativeModules').RNMail;
+import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
@@ -196,7 +196,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-          payload.contactInfo.contactName
+        payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -216,8 +216,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-            .UPLOADED_AT <
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -515,10 +515,15 @@ export function* downloadMetaShareWorker({ payload }) {
       };
 
       console.log({ updatedBackup });
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+        },
+      });
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
-      yield put(updateMSharesHealth(updatedBackup));
+      yield put(updateMSharesHealth());
     } else {
       let updatedRecoveryShares = {};
       let updated = false;
@@ -770,7 +775,7 @@ function* sharePersonalCopyWorker({ payload }) {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[selectedPersonalCopy.type].path
+                    personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -797,7 +802,7 @@ function* sharePersonalCopyWorker({ payload }) {
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                  personalCopyDetails[selectedPersonalCopy.type].path
+                personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -915,7 +920,7 @@ export const sharePersonalCopyWatcher = createWatcher(
   SHARE_PERSONAL_COPY,
 );
 
-function* updateMSharesHealthWorker({ payload }) {
+function* updateMSharesHealthWorker() {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
@@ -923,12 +928,9 @@ function* updateMSharesHealthWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
-  if (!DECENTRALIZED_BACKUP) {
-    DECENTRALIZED_BACKUP = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
-  }
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
 
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
@@ -943,20 +945,22 @@ function* updateMSharesHealthWorker({ payload }) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
     console.log({ updationInfo });
+
+    let removed = false;
     Object.keys(UNDER_CUSTODY).forEach((tag) => {
       for (let info of updationInfo) {
         if (info.updated) {
-          if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-            // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-            if (info.encryptedDynamicNonPMDD)
-              UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-                info.encryptedDynamicNonPMDD;
-          }
+          // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+          //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+          //   if (info.encryptedDynamicNonPMDD)
+          //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+          //       info.encryptedDynamicNonPMDD;
+          // }
         } else {
           if (info.removeShare) {
             if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
               delete UNDER_CUSTODY[tag];
-
+              removed = true;
               for (const contactName of Object.keys(
                 trustedContactsService.tc.trustedContacts,
               )) {
@@ -972,21 +976,25 @@ function* updateMSharesHealthWorker({ payload }) {
       }
     });
 
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
-    };
+    if (removed) {
+      // update db post share removal
+      const updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+      };
 
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      UNDER_CUSTODY,
-    };
-    yield call(insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      },
-    });
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY,
+      };
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+          SERVICES: updatedSERVICES,
+        },
+      });
+    }
+
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });

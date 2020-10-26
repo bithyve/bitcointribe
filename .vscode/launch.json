@@ -12,6 +12,16 @@
       "platform": "ios"
     },
     {
+      "name": "Debug iOS (HEXA Dev)",
+      "cwd": "${workspaceFolder}",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "ios",
+      "runArguments": [
+        "--scheme=HEXA Dev",
+      ],
+    },
+    {
       "name": "Debug Android",
       "cwd": "${workspaceFolder}",
       "type": "reactnative",

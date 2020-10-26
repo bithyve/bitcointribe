@@ -3,7 +3,6 @@ import {
   createStackNavigator,
   StackViewTransitionConfigs,
 } from 'react-navigation-stack';
-
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
@@ -14,7 +13,6 @@ import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
-import Home from '../pages/Home/Home';
 import ReLogin from '../pages/ReLogin';
 import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
@@ -27,16 +25,14 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-//import TransactionDetails from '../pages/Accounts/TransactionDetails';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
-import SettingManagePin from '../pages/SettingManagePin';
 import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
-import QrScanner from '../components/QrScanner';
+import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
 import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
@@ -60,13 +56,9 @@ import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
-import ExistingSavingMethods from '../pages/FastBitcoin/ExistingSavingMethods';
-import ExistingSavingMethodDetails from '../pages/FastBitcoin/ExistingSavingMethodDetails';
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
-import AddressBookContents from '../pages/AddressBookContents';
-import ChangeCurrency from '../pages/ChangeCurrency';
 import UpdateApp from '../pages/UpdateApp';
 import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
@@ -75,7 +67,6 @@ import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
-import ContactDetails from '../pages/Contacts/ContactDetails';
 import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
@@ -84,6 +75,9 @@ import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
+import AllTransactionsStack from './stacks/transactions/AllTransactionsStack';
+import HomeStack from './stacks/home/HomeStack';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -101,7 +95,6 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
-    RecoveryQrScanner: QrScanner,
     NewOwnQuestions,
     NewRecoveryOwnQuestions,
     UpdateApp: {
@@ -130,21 +123,24 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
   'Confirmation',
-  'TransactionDetails',
   'Intermediate',
+  'AllTransactions',
 ];
 
 const HomeNavigator = createStackNavigator(
   {
     Home: {
-      screen: Home,
-      path: 'Home',
+      screen: HomeStack,
+      path: 'home',
     },
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
       },
+    },
+    AllTransactions: {
+      screen: AllTransactionsStack,
     },
     Intermediate,
     Accounts,
@@ -172,12 +168,11 @@ const HomeNavigator = createStackNavigator(
     SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,
-    SettingManagePin,
     RestoreByCloudQrCodeContents,
     EmailModalContents,
     Buy,
     Sell,
-    QrScanner,
+    QRScanner: QRScannerScreen,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,
@@ -199,19 +194,14 @@ const HomeNavigator = createStackNavigator(
     SettingGetNewPin,
     ContactsListForAssociateContact,
     LostTwoFA,
-    ExistingSavingMethods,
-    ExistingSavingMethodDetails,
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
-    AddressBookContents,
-    ChangeCurrency,
     SettingWalletNameChange,
     SettingNewWalletName,
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
-    ContactDetails,
     ContactDetailsNew,
     Receive,
     PairNewWallet,
