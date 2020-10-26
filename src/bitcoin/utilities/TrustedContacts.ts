@@ -815,10 +815,9 @@ export default class TrustedContacts {
     if (Object.keys(channelsToUpdate).length) {
       const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
         HEXA_ID,
+        walletID: metaShares[0].meta.walletId,
+        shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
         channelsToUpdate,
-        shareIDs: metaShares
-          ? metaShares.map((metaShare) => metaShare.shareId)
-          : null, // legacy HC
       });
 
       const { updated, updatedLastSeens } = res.data;
