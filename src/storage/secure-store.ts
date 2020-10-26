@@ -50,14 +50,19 @@ export const fetch = async (hash_current) => {
     let hash: any, enc_key: any;
     if(RNValue) {
       ({ hash, enc_key } = JSON.parse(RNValue));
-      console.log({ hash, enc_key })
+
       if (hash_current !== hash) {
         throw new Error('Nothing exist against the provided key');
       }
     }
     if(value) {
       ({ hash, enc_key } = JSON.parse(value));
-      console.log({ hash, enc_key })
+      await RNSecureStorage.set(
+        Config.ENC_KEY_STORAGE_IDENTIFIER,
+        JSON.stringify({ hash, enc_key }),
+        { accessible: ACCESSIBLE.WHEN_UNLOCKED },
+      );
+
       if (hash_current !== hash) {
         throw new Error('Nothing exist against the provided key');
       }
