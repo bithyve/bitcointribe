@@ -2,12 +2,10 @@ import React, { useMemo } from 'react'
 import { View, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from 'react-native'
 import Colors from '../../common/Colors';
 import DeviceInfo from 'react-native-device-info';
-import Fonts from './../../common/Fonts';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { RFValue } from 'react-native-responsive-fontsize';
 
 export enum BottomTab {
   Transactions,
@@ -19,7 +17,7 @@ export enum BottomTab {
 export interface Props {
   tabBarZIndex?: number;
   onSelect: (tab: BottomTab) => void;
-  selectedTab: BottomTab;
+  selectedTab: BottomTab | null;
 }
 
 type TabItem = {

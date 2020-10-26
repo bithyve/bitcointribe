@@ -5,6 +5,7 @@ import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFa
 import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen';
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
+import MoreOptionsStack from '../more-options/MoreOptionsStack';
 
 const HomeStack = createStackNavigator(
   {
@@ -24,6 +25,12 @@ const HomeStack = createStackNavigator(
       screen: HomeQRScannerScreen,
       navigationOptions: {
         title: "QR",
+      },
+    },
+    MoreOptions: {
+      screen: MoreOptionsStack,
+      navigationOptions: {
+        header: null,
       },
     },
   },

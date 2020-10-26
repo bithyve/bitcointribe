@@ -75,7 +75,6 @@ import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
-import MoreOptionsStack from './stacks/more-options/MoreOptionsStack';
 import AllTransactionsStack from './stacks/transactions/AllTransactionsStack';
 import HomeStack from './stacks/home/HomeStack';
 
@@ -125,6 +124,7 @@ const MODAL_ROUTES = [
   'RecoveryRequestOTP',
   'Confirmation',
   'Intermediate',
+  'AllTransactions',
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -217,9 +217,6 @@ const HomeNavigator = createStackNavigator(
       navigationOptions: {
         gesturesEnabled: false,
       },
-    },
-    MoreOptions: {
-      screen: MoreOptionsStack,
     },
   },
   {
