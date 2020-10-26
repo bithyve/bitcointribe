@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
@@ -22,12 +21,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
-import {
-  updateMSharesHealth,
-  checkMSharesHealth,
-  updateWalletImage,
-} from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -35,7 +28,6 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
-const LOADER_MESSAGE_TIME = 4000;
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
@@ -78,19 +70,19 @@ const getRandomMessage = () => {
 
 export default function Login(props) {
   const initialMessage = getRandomMessage();
-  let [message, setMessage] = useState(initialMessage.heading);
-  let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
-  let [subTextMessage2, setSubTextMessage2] = useState(initialMessage.subText);
+  let [message] = useState(initialMessage.heading);
+  let [subTextMessage1] = useState(initialMessage.text);
+  let [subTextMessage2] = useState(initialMessage.subText);
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
   const [JailBrokenInfo, setJailBrokenInfo] = useState('');
-  const [passcodeFlag, setPasscodeFlag] = useState(true);
+  const [passcodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+  const [loaderBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(
+  const [ErrorBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
   const releaseCasesValue = useSelector(
@@ -102,53 +94,7 @@ export default function Login(props) {
   );
 
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
-  // const releases =[
-  //       {
-  //           "build": "40",
-  //           "version": "0.8",
-  //           "releaseNotes": {
-  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
-  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //           },
-  //           "reminderLimit": 2
-  //       },
-  //       {
-  //         "build": "39",
-  //         "version": "0.8",
-  //         "releaseNotes": {
-  //             "ios": "dfsdg",
-  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //         },
-  //         "reminderLimit": -1
-  //     },
-  //     {
-  //       "build": "38",
-  //       "version": "0.8",
-  //       "releaseNotes": {
-  //           "ios": "64356354",
-  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //       },
-  //       "reminderLimit": -1
-  //   },
-  //   {
-  //     "build": "37",
-  //     "version": "0.8",
-  //     "releaseNotes": {
-  //         "ios": "dfgdgdg",
-  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //     },
-  //     "reminderLimit": -1
-  // },
-  //       {
-  //           "build": "35",
-  //           "version": "3.40",
-  //           "releaseNotes": {
-  //               "ios": "ios notes for release 319",
-  //               "android": "android notes for release 319"
-  //           },
-  //           "reminderLimit": -1
-  //       }
-  //   ];
+
   const onPressNumber = useCallback(
     (text) => {
       let tmpPasscode = passcode;
@@ -172,41 +118,12 @@ export default function Login(props) {
     }
   }, [passcode]);
 
-  const DECENTRALIZED_BACKUP = useSelector(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
-  );
-  // const testAccService = accounts[TEST_ACCOUNT].service;
-  // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
+
   const dispatch = useDispatch();
+
   const { isAuthenticated, authenticationFailed } = useSelector(
     (state) => state.setupAndAuth,
   );
-  const { dbFetched } = useSelector((state) => state.storage);
-
-  // const s3Service = useSelector((state) => state.sss.service);
-  // useEffect(() => {
-  //   // HC init and down-streaming
-  //   if (s3Service && s3Service.checkHealth) {
-  //     const { healthCheckInitialized } = s3Service.sss;
-  //     if (healthCheckInitialized) {
-  //       dispatch(checkMSharesHealth());
-  //     }
-  //   }
-  // }, [s3Service]);
-
-  // const [updatedHealth, setUpdatedHealth] = useState(false);
-  // useEffect(() => {
-  //   // HC up-streaming
-  //   if (DECENTRALIZED_BACKUP) {
-  //     if (
-  //       Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length &&
-  //       !updatedHealth
-  //     ) {
-  //       dispatch(updateMSharesHealth());
-  //       setUpdatedHealth(true);
-  //     }
-  //   }
-  // }, [DECENTRALIZED_BACKUP]);
 
   useEffect(() => {
     if (JailMonkey.isJailBroken()) {
@@ -264,30 +181,6 @@ export default function Login(props) {
       });
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
 
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -296,9 +189,6 @@ export default function Login(props) {
   );
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector((state) => state.preferences.isMigrated);
-  const accountsSynched = useSelector(
-    (state) => state.accounts.accountsSynched,
-  );
   let timer;
 
   useEffect(() => {
