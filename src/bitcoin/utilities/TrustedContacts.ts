@@ -847,7 +847,7 @@ export default class TrustedContacts {
         updatedAt: number;
         reshareVersion: number;
       }> = res.data.lastUpdateds; // legacy HC
-      console.log({ updatedLastSeens, updates });
+      console.log({ updatedLastSeens, updates, updationInfo });
 
       // synching health: legacy
       if (updates.length) {
