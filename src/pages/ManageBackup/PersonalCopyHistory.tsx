@@ -27,6 +27,7 @@ import {
   personalCopyGenerated,
   pdfHealthChecked,
   pdfHealthCheckFailed,
+  calculateOverallHealth,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -130,7 +131,8 @@ const PersonalCopyHistory = (props) => {
   useEffect(() => {
     if (healthChecked) {
       Toast('PDF scanned Successfully');
-      dispatch(checkMSharesHealth());
+      // dispatch(checkMSharesHealth());
+      dispatch(calculateOverallHealth());
       dispatch(pdfHealthChecked(''));
     }
   }, [healthChecked]);
@@ -527,7 +529,7 @@ const PersonalCopyHistory = (props) => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

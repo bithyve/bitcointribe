@@ -36,7 +36,11 @@ import {
   notificationTag,
   trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
-import { downloadMShare, updateWalletImage } from '../actions/sss';
+import {
+  calculateOverallHealth,
+  downloadMShare,
+  updateWalletImage,
+} from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -892,6 +896,8 @@ export const syncLastSeensWatcher = createWatcher(
 );
 
 function* syncLastSeensAndHealthWorker({ payload }) {
+  yield put(switchTCLoading('syncLastSeensAndHealth'));
+
   // updates and fetches last seen for all trusted channels
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
@@ -938,6 +944,8 @@ function* syncLastSeensAndHealthWorker({ payload }) {
       console.log('Failed to sync last seens', res.err);
     }
   }
+  yield put(calculateOverallHealth(s3Service));
+  yield put(switchTCLoading('syncLastSeensAndHealth'));
 }
 
 export const syncLastSeensAndHealthWatcher = createWatcher(
