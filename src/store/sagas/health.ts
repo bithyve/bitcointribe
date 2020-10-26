@@ -305,11 +305,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     },
     xPub: { testXpub, regularXpub, secureXpub },
     securityQuestion: securityQuestion,
-    secondaryMnemonics: secondaryMnemonic,
     featuresList: featuresList,
-    twoFASecret: twoFASecret
+    secondaryMnemonics: payload.isPrimaryKeeper ? secondaryMnemonic : null,
+    twoFASecret: payload.isPrimaryKeeper ? twoFASecret : null
   };
-  console.log('dataElements', dataElements);
   let share  = s3Service.levelhealth.metaShares[1];
   if(payload.selectedShareId){
     share = payload.share;
