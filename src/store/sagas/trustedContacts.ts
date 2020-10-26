@@ -903,6 +903,13 @@ function* syncLastSeensAndHealthWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
   const s3Service: S3Service = yield select((state) => state.sss.service);
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+  const underCustody = { ...DECENTRALIZED_BACKUP.UNDER_CUSTODY };
+  const metaSharesUnderCustody = Object.keys(underCustody).map(
+    (tag) => underCustody[tag].META_SHARE,
+  );
 
   if (Object.keys(trustedContacts.tc.trustedContacts).length) {
     const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
@@ -914,14 +921,57 @@ function* syncLastSeensAndHealthWorker({ payload }) {
       trustedContacts.syncLastSeensAndHealth,
       metaShares.slice(0, 3),
       healthCheckStatus,
+      metaSharesUnderCustody,
     );
     console.log({ res });
     if (res.status === 200) {
+      const { updationInfo } = res.data;
+      let shareRemoved = false;
+
+      if (updationInfo) {
+        // removing shares under-custody based on reshare-version@HealthSchema
+        Object.keys(underCustody).forEach((tag) => {
+          for (let info of updationInfo) {
+            if (info.updated) {
+              // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+              //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+              //   if (info.encryptedDynamicNonPMDD)
+              //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+              //       info.encryptedDynamicNonPMDD;
+              // }
+            } else {
+              if (info.removeShare) {
+                if (
+                  info.walletId === underCustody[tag].META_SHARE.meta.walletId
+                ) {
+                  delete underCustody[tag];
+                  shareRemoved = true;
+                  for (const contactName of Object.keys(
+                    trustedContacts.tc.trustedContacts,
+                  )) {
+                    const contact =
+                      trustedContacts.tc.trustedContacts[contactName];
+                    if (contact.walletID === info.walletId) {
+                      contact.isWard = false;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
       const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
       const { healthCheckStatus } = res.data;
       const postSyncHCStatus = JSON.stringify({ healthCheckStatus });
 
-      if (preSyncTC !== postSyncTC || preSyncHCStatus !== postSyncHCStatus) {
+      if (
+        preSyncTC !== postSyncTC ||
+        preSyncHCStatus !== postSyncHCStatus ||
+        shareRemoved
+      ) {
+        let dbPayload = {};
         const { SERVICES } = yield select((state) => state.storage.database);
         let updatedSERVICES = {
           ...SERVICES,
@@ -935,9 +985,21 @@ function* syncLastSeensAndHealthWorker({ payload }) {
             S3_SERVICE: JSON.stringify(s3Service),
           };
         }
+        dbPayload = {
+          SERVICES: updatedSERVICES,
+        };
+
+        console.log({ shareRemoved });
+        if (shareRemoved) {
+          const updatedBackup = {
+            ...DECENTRALIZED_BACKUP,
+            UNDER_CUSTODY: underCustody,
+          };
+          dbPayload = { ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup };
+        }
 
         yield call(insertDBWorker, {
-          payload: { SERVICES: updatedSERVICES },
+          payload: dbPayload,
         });
       }
     } else {
