@@ -32,17 +32,35 @@ export const store = async (hash, enc_key) => {
 
 export const fetch = async (hash_current) => {
   try {
+    let RNValue
+    if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
+      RNValue = await RNSecureStorage.get(
+        Config.ENC_KEY_STORAGE_IDENTIFIER
+      );
+    }
+    
     const value = await SecureStore.getItemAsync(
       Config.ENC_KEY_STORAGE_IDENTIFIER,
     );
-
-    if (!value) {
+    
+    if (!value && !RNValue) {
       throw new Error('Identifier missing');
     }
 
-    const { hash, enc_key } = JSON.parse(value);
-    if (hash_current !== hash) {
-      throw new Error('Nothing exist against the provided key');
+    let hash: any, enc_key: any;
+    if(RNValue) {
+      ({ hash, enc_key } = JSON.parse(RNValue));
+      console.log({ hash, enc_key })
+      if (hash_current !== hash) {
+        throw new Error('Nothing exist against the provided key');
+      }
+    }
+    if(value) {
+      ({ hash, enc_key } = JSON.parse(value));
+      console.log({ hash, enc_key })
+      if (hash_current !== hash) {
+        throw new Error('Nothing exist against the provided key');
+      }
     }
     return enc_key;
   } catch (err) {
@@ -53,7 +71,12 @@ export const fetch = async (hash_current) => {
 
 export const remove = async (key) => {
   try {
+    console.log('trying to remove')
     await SecureStore.deleteItemAsync(key);
+
+    if (await RNSecureStorage.exists(key)) {
+      await RNSecureStorage.remove(key);
+    }
   } catch (err) {
     console.log(err);
     return false;
