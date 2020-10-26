@@ -1129,6 +1129,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         {this.state.is_initiated ? (
           <View style={{ flex: 1 }}>
             <ScrollView
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={{
                 backgroundColor: Colors.backgroundColor,
               }}
