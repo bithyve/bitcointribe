@@ -193,16 +193,6 @@ export default function Login(props) {
   //     }
   //   }
   // }, [s3Service]);
-  const s3Service = useSelector((state) => state.sss.service);
-  useEffect(() => {
-    // HC init and down-streaming
-    if (s3Service && s3Service.checkHealth) {
-      const { healthCheckInitialized } = s3Service.sss;
-      if (healthCheckInitialized) {
-        dispatch(checkMSharesHealth());
-      }
-    }
-  }, [s3Service]);
 
   const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {

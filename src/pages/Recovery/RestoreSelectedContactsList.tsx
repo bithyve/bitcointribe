@@ -62,6 +62,7 @@ import axios from 'axios';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
+import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -479,7 +480,8 @@ export default function RestoreSelectedContactsList(props) {
         // dispatch(syncAccounts(true)); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
 
         dispatch(calculateExchangeRate());
-        dispatch(checkMSharesHealth());
+        // dispatch(checkMSharesHealth());
+        dispatch(syncLastSeensAndHealth());
 
         // setTimeout(() => {
         //   (loaderBottomSheet as any).current.snapTo(0);

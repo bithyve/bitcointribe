@@ -359,7 +359,7 @@ const SecondaryDeviceHistory = (props) => {
         onPressOk={async () => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
-          dispatch(checkMSharesHealth());
+          // dispatch(checkMSharesHealth());
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
           if (next) {
             props.navigation.goBack();
