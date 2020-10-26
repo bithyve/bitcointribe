@@ -12,9 +12,7 @@ import {
   Image,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
-import {
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
@@ -1949,7 +1947,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           style={{
             flex: 3.8,
             paddingTop:
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('5%') : 0,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? heightPercentageToDP('5%') : 0,
           }}
         >
           <HomeHeader
@@ -2037,8 +2035,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
+              ? heightPercentageToDP('65%')
+              : heightPercentageToDP('64%'),
           ]}
           handleComponent={BottomSheetHandle}
           onChange={(newPositionIndex: number) => {
@@ -2076,7 +2074,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.custodianRequestBottomSheetRef}
-          snapPoints={[-50, hp('60%')]}
+          snapPoints={[-50, heightPercentageToDP('60%')]}
           renderContent={() => {
             if (!custodyRequest) {
               return null;
@@ -2143,11 +2141,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('70%'),
+              ? heightPercentageToDP('65%')
+              : heightPercentageToDP('70%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('95%')
-              : hp('95%'),
+              ? heightPercentageToDP('95%')
+              : heightPercentageToDP('95%'),
           ]}
           renderContent={() => {
             if (!trustedContactRequest && !recoveryRequest) {
@@ -2178,7 +2176,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <BottomSheet
             enabledInnerScrolling={true}
             ref={this.custodianRequestRejectedBottomSheetRef}
-            snapPoints={[-50, hp('60%')]}
+            snapPoints={[-50, heightPercentageToDP('60%')]}
             renderContent={() => {
               if (!custodyRequest) return null;
               return (
@@ -2205,8 +2203,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('35%')
-              : hp('40%'),
+              ? heightPercentageToDP('35%')
+              : heightPercentageToDP('40%'),
           ]}
           renderContent={() => (
             <ErrorModalContents
@@ -2235,8 +2233,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
+              ? heightPercentageToDP('82%')
+              : heightPercentageToDP('82%'),
           ]}
           renderContent={() => (
             <AddContactAddressBook
@@ -2303,8 +2301,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
+              ? heightPercentageToDP('82%')
+              : heightPercentageToDP('82%'),
           ]}
           renderContent={() => (
             <NotificationListContent
@@ -2330,7 +2328,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
-          snapPoints={[-50, hp('60%')]}
+          snapPoints={[-50, heightPercentageToDP('60%')]}
           renderContent={() => (
             <NoInternetModalContents
               onPressTryAgain={() => {
@@ -2425,11 +2423,12 @@ const styles = StyleSheet.create({
 
   floatingFriendsAndFamilyButtonContainer: {
     position: 'absolute',
+    zIndex: 0,
     bottom: TAB_BAR_HEIGHT,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
-    padding: 16,
+    padding: heightPercentageToDP(1),
   },
 });
