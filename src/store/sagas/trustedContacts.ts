@@ -20,6 +20,7 @@ import {
   updateTrustedContactInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
+  SYNC_LAST_SEENS_AND_HEALTH,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -889,6 +890,60 @@ function* syncLastSeensWorker({ payload }) {
 export const syncLastSeensWatcher = createWatcher(
   syncLastSeensWorker,
   SYNC_LAST_SEENS,
+);
+
+function* syncLastSeensAndHealthWorker({ payload }) {
+  // updates and fetches last seen for all trusted channels
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
+    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+    const { metaShares, healthCheckStatus } = s3Service.sss;
+    const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
+
+    const res = yield call(
+      trustedContacts.syncLastSeensAndHealth,
+      metaShares.slice(0, 3),
+      healthCheckStatus,
+    );
+    console.log({ res });
+    if (res.status === 200) {
+      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+      const { healthCheckStatus } = res.data;
+      const postSyncHCStatus = JSON.stringify({ healthCheckStatus });
+
+      if (preSyncTC !== postSyncTC || preSyncHCStatus !== postSyncHCStatus) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        let updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+        };
+
+        if (preSyncHCStatus !== postSyncHCStatus) {
+          s3Service.sss.healthCheckStatus = healthCheckStatus;
+          updatedSERVICES = {
+            ...updatedSERVICES,
+            S3_SERVICE: JSON.stringify(s3Service),
+          };
+        }
+
+        yield call(insertDBWorker, {
+          payload: { SERVICES: updatedSERVICES },
+        });
+      }
+    } else {
+      console.log('Failed to sync last seens', res.err);
+    }
+  }
+}
+
+export const syncLastSeensAndHealthWatcher = createWatcher(
+  syncLastSeensAndHealthWorker,
+  SYNC_LAST_SEENS_AND_HEALTH,
 );
 
 function* syncTrustedChannelsWorker({ payload }) {
