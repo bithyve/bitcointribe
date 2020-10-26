@@ -9,6 +9,7 @@ import {
   trustedChannelActions,
   ShareUploadables,
   MetaShare,
+  EncDynamicNonPMDD,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -800,9 +801,18 @@ export default class TrustedContacts {
   public syncLastSeensAndHealth = async (
     metaShares: MetaShare[],
     healthCheckStatus,
+    metaSharesUnderCustody: MetaShare[],
   ): Promise<{
     updated: Boolean;
     healthCheckStatus;
+    updationInfo: Array<{
+      walletId: string;
+      shareId: string;
+      updated: boolean;
+      updatedAt?: number;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+      err?: string;
+    }>;
   }> => {
     const channelsToUpdate = {};
     for (const contact of Object.values(this.trustedContacts)) {
@@ -813,14 +823,25 @@ export default class TrustedContacts {
     }
 
     if (Object.keys(channelsToUpdate).length) {
+      const toUpdate = []; // healths to update(shares under custody)
+      for (const share of metaSharesUnderCustody) {
+        toUpdate.push({
+          walletId: share.meta.walletId,
+          shareId: share.shareId,
+          reshareVersion: share.meta.reshareVersion,
+        });
+      }
+
       const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
         HEXA_ID,
         walletID: metaShares[0].meta.walletId,
         shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
-        channelsToUpdate,
+        channelsToUpdate, // LS update
+        toUpdate, // share under-custody update
       });
 
-      const { updated, updatedLastSeens } = res.data;
+      const { updated, updatedLastSeens } = res.data; // LS data
+      const { updationInfo } = res.data; // share under-custody update info
       const updates: Array<{
         shareId: string;
         updatedAt: number;
@@ -881,7 +902,7 @@ export default class TrustedContacts {
         }
       }
 
-      return { updated, healthCheckStatus };
+      return { updated, healthCheckStatus, updationInfo };
     } else {
       throw new Error('No trusted channels to update');
     }

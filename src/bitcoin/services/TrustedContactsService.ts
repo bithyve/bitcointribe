@@ -8,6 +8,7 @@ import {
   trustedChannelActions,
   ShareUploadables,
   MetaShare,
+  EncDynamicNonPMDD,
 } from '../utilities/Interface';
 
 export default class TrustedContactsService {
@@ -297,12 +298,21 @@ export default class TrustedContactsService {
   public syncLastSeensAndHealth = async (
     metaShares: MetaShare[],
     healthCheckStatus,
+    metaSharesUnderCustody: MetaShare[],
   ): Promise<
     | {
         status: number;
         data: {
           updated: Boolean;
           healthCheckStatus: any;
+          updationInfo: Array<{
+            walletId: string;
+            shareId: string;
+            updated: boolean;
+            updatedAt?: number;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+            err?: string;
+          }>;
         };
         err?: undefined;
         message?: undefined;
@@ -320,6 +330,7 @@ export default class TrustedContactsService {
         data: await this.tc.syncLastSeensAndHealth(
           metaShares,
           healthCheckStatus,
+          metaSharesUnderCustody,
         ),
       };
     } catch (err) {
