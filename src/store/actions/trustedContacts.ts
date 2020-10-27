@@ -22,6 +22,7 @@ export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
 export const SYNC_LAST_SEENS = 'SYNC_LAST_SEENS';
 export const SYNC_LAST_SEENS_AND_HEALTH = 'SYNC_LAST_SEENS_AND_HEALTH';
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS';
+export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC';
 
 export const initializeTrustedContact = (contactInfo: {
   contactName: string;
@@ -145,6 +146,12 @@ export const syncTrustedChannels = (contacts?) => {
   return {
     type: SYNC_TRUSTED_CHANNELS,
     payload: { contacts },
+  };
+};
+
+export const postRecoveryChannelSync = () => {
+  return {
+    type: POST_RECOVERY_CHANNEL_SYNC,
   };
 };
 
