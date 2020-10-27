@@ -969,6 +969,15 @@ export default class TrustedContacts {
                 subChan.data = decryptedData;
                 subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;
+
+                // updating FCMs, if any(post ward recovery)
+                if (
+                  decryptedData.FCM &&
+                  !contact.FCMs.includes(decryptedData.FCM)
+                )
+                  this.trustedContacts[contactName].FCMs.push(
+                    decryptedData.FCM,
+                  );
               }
             });
           }

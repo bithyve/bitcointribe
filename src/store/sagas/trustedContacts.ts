@@ -21,6 +21,7 @@ import {
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
   SYNC_LAST_SEENS_AND_HEALTH,
+  POST_RECOVERY_CHANNEL_SYNC,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -1148,4 +1149,31 @@ function* syncTrustedChannelsWorker({ payload }) {
 export const syncTrustedChannelsWatcher = createWatcher(
   syncTrustedChannelsWorker,
   SYNC_TRUSTED_CHANNELS,
+);
+
+function* postRecoveryChannelSyncWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const trustedData: TrustedDataElements = {
+    FCM: yield call(AsyncStorage.getItem, 'fcmToken'),
+    version: DeviceInfo.getVersion(),
+  };
+  for (const contactName of Object.keys(trustedContacts.tc.trustedContacts)) {
+    yield call(trustedContacts.updateTrustedChannel, contactName, trustedData);
+  }
+
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+  };
+
+  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+}
+
+export const postRecoveryChannelSyncWatcher = createWatcher(
+  postRecoveryChannelSyncWorker,
+  POST_RECOVERY_CHANNEL_SYNC,
 );
