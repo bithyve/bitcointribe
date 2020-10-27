@@ -7,6 +7,8 @@ import {
   TrustedDataElements,
   trustedChannelActions,
   ShareUploadables,
+  MetaShare,
+  EncDynamicNonPMDD,
 } from '../utilities/Interface';
 
 export default class TrustedContactsService {
@@ -289,6 +291,53 @@ export default class TrustedContactsService {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
+      };
+    }
+  };
+
+  public syncLastSeensAndHealth = async (
+    metaShares: MetaShare[],
+    healthCheckStatus,
+    metaSharesUnderCustody: MetaShare[],
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+          healthCheckStatus: any;
+          updationInfo: Array<{
+            walletId: string;
+            shareId: string;
+            updated: boolean;
+            updatedAt?: number;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+            err?: string;
+          }>;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.syncLastSeensAndHealth(
+          metaShares,
+          healthCheckStatus,
+          metaSharesUnderCustody,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to sync last seens',
       };
     }
   };

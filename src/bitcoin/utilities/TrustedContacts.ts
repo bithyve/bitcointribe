@@ -8,6 +8,8 @@ import {
   EncryptedEphemeralData,
   trustedChannelActions,
   ShareUploadables,
+  MetaShare,
+  EncDynamicNonPMDD,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -796,6 +798,112 @@ export default class TrustedContacts {
     }
   };
 
+  public syncLastSeensAndHealth = async (
+    metaShares: MetaShare[],
+    healthCheckStatus,
+    metaSharesUnderCustody: MetaShare[],
+  ): Promise<{
+    updated: Boolean;
+    healthCheckStatus;
+    updationInfo: Array<{
+      walletId: string;
+      shareId: string;
+      updated: boolean;
+      updatedAt?: number;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+      err?: string;
+    }>;
+  }> => {
+    const channelsToUpdate = {};
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate[trustedChannel.address] = { publicKey };
+      }
+    }
+
+    const toUpdate = []; // healths to update(shares under custody)
+    for (const share of metaSharesUnderCustody) {
+      toUpdate.push({
+        walletId: share.meta.walletId,
+        shareId: share.shareId,
+        reshareVersion: share.meta.reshareVersion,
+      });
+    }
+
+    const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
+      HEXA_ID,
+      walletID: metaShares[0].meta.walletId,
+      shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
+      channelsToUpdate, // LS update
+      toUpdate, // share under-custody update
+    });
+
+    const { updated, updatedLastSeens } = res.data; // LS data
+    const { updationInfo } = res.data; // share under-custody update info
+    const updates: Array<{
+      shareId: string;
+      updatedAt: number;
+      reshareVersion: number;
+    }> = res.data.lastUpdateds; // legacy HC
+    console.log({ updatedLastSeens, updates, updationInfo });
+
+    // synching health: legacy
+    if (updates.length) {
+      for (const { shareId, updatedAt, reshareVersion } of updates) {
+        for (let index = 0; index < metaShares.length; index++) {
+          if (metaShares[index] && metaShares[index].shareId === shareId) {
+            const currentReshareVersion =
+              healthCheckStatus[index].reshareVersion !== undefined
+                ? healthCheckStatus[index].reshareVersion
+                : 0;
+
+            if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+
+            healthCheckStatus[index] = {
+              shareId,
+              updatedAt,
+              reshareVersion,
+            };
+          }
+        }
+      }
+    }
+
+    if (Object.keys(updatedLastSeens).length) {
+      for (const contactName of Object.keys(this.trustedContacts)) {
+        const { trustedChannel } = this.trustedContacts[contactName];
+        if (trustedChannel) {
+          const { publicKey, lastSeen } = updatedLastSeens[
+            trustedChannel.address
+          ]; // counterparty's pub
+          trustedChannel.data.forEach((subChan: TrustedData) => {
+            if (subChan.publicKey === publicKey) {
+              subChan.lastSeen = lastSeen;
+
+              // update health via channel
+              if (lastSeen > 0) {
+                for (let index = 0; index < metaShares.length; index++) {
+                  if (metaShares[index].meta.guardian === contactName) {
+                    healthCheckStatus[index] = {
+                      shareId: metaShares[index].shareId,
+                      updatedAt: lastSeen,
+                      reshareVersion: healthCheckStatus[index]
+                        ? healthCheckStatus[index].reshareVersion
+                        : 0,
+                    };
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+    }
+
+    return { updated, healthCheckStatus, updationInfo };
+  };
+
   public syncTrustedChannels = async (
     contacts?: Contacts,
   ): Promise<{
@@ -856,11 +964,20 @@ export default class TrustedContacts {
                   encryptedData,
                 ).data;
                 if (decryptedData.remove) contactsToRemove.push(contactName);
-                if (decryptedData.removeGuardian)
-                  guardiansToRemove.push(contactName);
+                // if (decryptedData.removeGuardian)
+                //   guardiansToRemove.push(contactName);
                 subChan.data = decryptedData;
                 subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;
+
+                // updating FCMs, if any(post ward recovery)
+                if (
+                  decryptedData.FCM &&
+                  !contact.FCMs.includes(decryptedData.FCM)
+                )
+                  this.trustedContacts[contactName].FCMs.push(
+                    decryptedData.FCM,
+                  );
               }
             });
           }

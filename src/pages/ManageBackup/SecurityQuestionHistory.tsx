@@ -35,7 +35,7 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecurityQuestionHelpContents from '../../components/Helper/SecurityQuestionHelpContents';
 
-const SecurityQuestionHistory = props => {
+const SecurityQuestionHistory = (props) => {
   const [SelectedOption, setSelectedOption] = useState(0);
   const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
@@ -112,7 +112,7 @@ const SecurityQuestionHistory = props => {
         isIgnoreButton={false}
         onPressProceed={() => {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          dispatch(checkMSharesHealth());
+          // dispatch(checkMSharesHealth());
           props.navigation.goBack();
         }}
         bottomImage={require('../../assets/images/icons/sendSuccess.png')}
@@ -124,20 +124,20 @@ const SecurityQuestionHistory = props => {
   const renderHealthCheckSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
 
-  const sortedHistory = history => {
-    const currentHistory = history.filter(element => {
+  const sortedHistory = (history) => {
+    const currentHistory = history.filter((element) => {
       if (element.date) return element;
     });
 
     const sortedHistory = _.sortBy(currentHistory, 'date');
-    sortedHistory.forEach(element => {
+    sortedHistory.forEach((element) => {
       element.date = moment(element.date)
         .utc()
         .local()
@@ -147,7 +147,7 @@ const SecurityQuestionHistory = props => {
     return sortedHistory;
   };
 
-  const updateHistory = securityQuestionHistory => {
+  const updateHistory = (securityQuestionHistory) => {
     const updatedSecurityQuestionsHistory = [...securityQuestionsHistory];
     if (securityQuestionHistory.created)
       updatedSecurityQuestionsHistory[0].date = securityQuestionHistory.created;
@@ -199,22 +199,23 @@ const SecurityQuestionHistory = props => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <SecurityQuestionHelpContents 
-      titleClicked={()=>{
-        if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
-      }}/>
+    return (
+      <SecurityQuestionHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
-  }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -234,7 +235,7 @@ const SecurityQuestionHistory = props => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -313,15 +314,15 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-         enabledInnerScrolling={true}
+        enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
-         enabledGestureInteraction={false}
-         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,
@@ -330,7 +331,7 @@ const SecurityQuestionHistory = props => {
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[
