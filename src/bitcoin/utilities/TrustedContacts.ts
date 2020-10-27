@@ -822,90 +822,86 @@ export default class TrustedContacts {
       }
     }
 
-    if (Object.keys(channelsToUpdate).length) {
-      const toUpdate = []; // healths to update(shares under custody)
-      for (const share of metaSharesUnderCustody) {
-        toUpdate.push({
-          walletId: share.meta.walletId,
-          shareId: share.shareId,
-          reshareVersion: share.meta.reshareVersion,
-        });
-      }
-
-      const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
-        HEXA_ID,
-        walletID: metaShares[0].meta.walletId,
-        shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
-        channelsToUpdate, // LS update
-        toUpdate, // share under-custody update
+    const toUpdate = []; // healths to update(shares under custody)
+    for (const share of metaSharesUnderCustody) {
+      toUpdate.push({
+        walletId: share.meta.walletId,
+        shareId: share.shareId,
+        reshareVersion: share.meta.reshareVersion,
       });
+    }
 
-      const { updated, updatedLastSeens } = res.data; // LS data
-      const { updationInfo } = res.data; // share under-custody update info
-      const updates: Array<{
-        shareId: string;
-        updatedAt: number;
-        reshareVersion: number;
-      }> = res.data.lastUpdateds; // legacy HC
-      console.log({ updatedLastSeens, updates, updationInfo });
+    const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
+      HEXA_ID,
+      walletID: metaShares[0].meta.walletId,
+      shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
+      channelsToUpdate, // LS update
+      toUpdate, // share under-custody update
+    });
 
-      // synching health: legacy
-      if (updates.length) {
-        for (const { shareId, updatedAt, reshareVersion } of updates) {
-          for (let index = 0; index < metaShares.length; index++) {
-            if (metaShares[index] && metaShares[index].shareId === shareId) {
-              const currentReshareVersion =
-                healthCheckStatus[index].reshareVersion !== undefined
-                  ? healthCheckStatus[index].reshareVersion
-                  : 0;
+    const { updated, updatedLastSeens } = res.data; // LS data
+    const { updationInfo } = res.data; // share under-custody update info
+    const updates: Array<{
+      shareId: string;
+      updatedAt: number;
+      reshareVersion: number;
+    }> = res.data.lastUpdateds; // legacy HC
+    console.log({ updatedLastSeens, updates, updationInfo });
 
-              if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+    // synching health: legacy
+    if (updates.length) {
+      for (const { shareId, updatedAt, reshareVersion } of updates) {
+        for (let index = 0; index < metaShares.length; index++) {
+          if (metaShares[index] && metaShares[index].shareId === shareId) {
+            const currentReshareVersion =
+              healthCheckStatus[index].reshareVersion !== undefined
+                ? healthCheckStatus[index].reshareVersion
+                : 0;
 
-              healthCheckStatus[index] = {
-                shareId,
-                updatedAt,
-                reshareVersion,
-              };
-            }
+            if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+
+            healthCheckStatus[index] = {
+              shareId,
+              updatedAt,
+              reshareVersion,
+            };
           }
         }
       }
+    }
 
-      if (Object.keys(updatedLastSeens).length) {
-        for (const contactName of Object.keys(this.trustedContacts)) {
-          const { trustedChannel } = this.trustedContacts[contactName];
-          if (trustedChannel) {
-            const { publicKey, lastSeen } = updatedLastSeens[
-              trustedChannel.address
-            ]; // counterparty's pub
-            trustedChannel.data.forEach((subChan: TrustedData) => {
-              if (subChan.publicKey === publicKey) {
-                subChan.lastSeen = lastSeen;
+    if (Object.keys(updatedLastSeens).length) {
+      for (const contactName of Object.keys(this.trustedContacts)) {
+        const { trustedChannel } = this.trustedContacts[contactName];
+        if (trustedChannel) {
+          const { publicKey, lastSeen } = updatedLastSeens[
+            trustedChannel.address
+          ]; // counterparty's pub
+          trustedChannel.data.forEach((subChan: TrustedData) => {
+            if (subChan.publicKey === publicKey) {
+              subChan.lastSeen = lastSeen;
 
-                // update health via channel
-                if (lastSeen > 0) {
-                  for (let index = 0; index < metaShares.length; index++) {
-                    if (metaShares[index].meta.guardian === contactName) {
-                      healthCheckStatus[index] = {
-                        shareId: metaShares[index].shareId,
-                        updatedAt: lastSeen,
-                        reshareVersion: healthCheckStatus[index]
-                          ? healthCheckStatus[index].reshareVersion
-                          : 0,
-                      };
-                    }
+              // update health via channel
+              if (lastSeen > 0) {
+                for (let index = 0; index < metaShares.length; index++) {
+                  if (metaShares[index].meta.guardian === contactName) {
+                    healthCheckStatus[index] = {
+                      shareId: metaShares[index].shareId,
+                      updatedAt: lastSeen,
+                      reshareVersion: healthCheckStatus[index]
+                        ? healthCheckStatus[index].reshareVersion
+                        : 0,
+                    };
                   }
                 }
               }
-            });
-          }
+            }
+          });
         }
       }
-
-      return { updated, healthCheckStatus, updationInfo };
-    } else {
-      throw new Error('No trusted channels to update');
     }
+
+    return { updated, healthCheckStatus, updationInfo };
   };
 
   public syncTrustedChannels = async (

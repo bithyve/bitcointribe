@@ -57,6 +57,7 @@ import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import DeviceInfo from 'react-native-device-info';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -404,6 +405,7 @@ function* updateEphemeralChannelWorker({ payload }) {
           walletID,
           FCM,
           walletName,
+          version: DeviceInfo.getVersion(),
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
