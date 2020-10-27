@@ -32,10 +32,9 @@ export const fetch = async (hash_current) => {
     if (value) {
       ({ hash, enc_key } = JSON.parse(value));
       if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
-        console.log('upgrading storage to new version...');
         await RNSecureStorage.remove(Config.ENC_KEY_STORAGE_IDENTIFIER);
       }
-
+      console.log('upgrading to new version...');
       await RNSecureStorage.set(
         Config.ENC_KEY_STORAGE_IDENTIFIER,
         JSON.stringify({ hash, enc_key }),
