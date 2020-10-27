@@ -1499,7 +1499,7 @@ class SendToContact extends Component<
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
             <SendConfirmationContent
-              title={'Sent Unsuccessful'}
+              title={'Send Unsuccessful'}
               info={
                 'There seems to be a problem' +
                 '\n' +
