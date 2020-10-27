@@ -30,7 +30,6 @@ import HeaderTitle from '../../components/HeaderTitle';
 import RequestModalContents from '../../components/RequestModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import Entypo from 'react-native-vector-icons/Entypo';
-import RecoveryQuestionModalContents from '../../components/RecoveryQuestionModalContents';
 import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,67 +38,47 @@ import {
   recoverWallet,
   walletRecoveryFailed,
   ErrorReceiving,
-  checkMSharesHealth,
 } from '../../store/actions/sss';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
 import LoaderModal from '../../components/LoaderModal';
 import {
-  TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes';
-import {
-  getTestcoins,
-  fetchBalance,
-  fetchTransactions,
-  syncAccounts,
   calculateExchangeRate,
   startupSync,
 } from '../../store/actions/accounts';
 import axios from 'axios';
-import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
-import config from '../../bitcoin/HexaConfig';
-import Toast from '../../components/Toast';
 import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
-  let [message, setMessage] = useState('Creating your wallet');
+  let [message] = useState('Creating your wallet');
   const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-  const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
+  const [loaderBottomSheet] = useState(React.createRef());
+  const [walletNameBottomSheet] = useState(
     React.createRef(),
   );
-  const [successMessageBottomSheet, setSuccessMessageBottomSheet] = useState(
+  const [successMessageBottomSheet] = useState(
     React.createRef(),
   );
   const [
     recoveryQuestionBottomSheet,
-    setRecoveryQuestionBottomSheet,
   ] = useState(React.createRef());
-  const [requestBottomSheet, setRequestBottomSheet] = useState(
+
+  const [requestBottomSheet] = useState(
     React.createRef(),
   );
-  const [walletNameOpenModal, setWalletNameOpenModal] = useState('close');
-  // const [walletName, setWalletName] = useState("");
-  const [isContactSelected, setIsContactSelected] = useState(true);
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
-    id: '',
-    question: '',
-  });
-  const [answer, setAnswer] = useState('');
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [RestoreByCloudQrCode, setRestoreByCloudQrCode] = useState(
+  const [walletNameOpenModal] = useState('close');
+  const [ErrorBottomSheet] = useState(React.createRef());
+  const [RestoreByCloudQrCode] = useState(
     React.createRef(),
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
-  const [ErrorBottomSheet1, setErrorBottomSheet1] = useState(React.createRef());
+  const [ErrorBottomSheet1] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const { downloadMetaShare } = useSelector((state) => state.sss.loading);
@@ -111,31 +90,13 @@ export default function RestoreSelectedContactsList(props) {
     (state) => state.sss.errorReceiving,
   );
   console.log('isWalletRecoveryFailed', isWalletRecoveryFailed);
-  // function openCloseModal() {
-  //   if (!walletName) {
-  //     walletNameBottomSheet.current.snapTo(0);
-  //     return;
-  //   }
-  //   if (walletNameOpenModal == "closed") {
-  //     setWalletNameOpenModal("half");
-  //     return;
-  //   }
-  //   if (walletNameOpenModal == "half") {
-  //     setWalletNameOpenModal("full");
-  //     return;
-  //   }
-  //   if (walletNameOpenModal == "full") {
-  //     setWalletNameOpenModal("closed");
-  //     return;
-  //   }
-  // }
 
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector((state) => state.accounts);
 
   const dispatch = useDispatch();
 
-  const { DECENTRALIZED_BACKUP, SERVICES, WALLET_SETUP } = useSelector(
+  const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
     (state) => state.storage.database,
   );
 
@@ -201,29 +162,6 @@ export default function RestoreSelectedContactsList(props) {
     }
   }, [walletNameOpenModal]);
 
-  const openRequestModal = () => {
-    (requestBottomSheet as any).current.snapTo(1);
-  };
-
-  // function renderContent() {
-  //   return (
-  //     <RecoveryWalletNameModalContents
-  //       onTextChange={text => {
-  //         setWalletName(text);
-  //       }}
-  //       onPressTextBoxFocus={() => {
-  //         setWalletNameOpenModal("full");
-  //       }}
-  //       onPressTextBoxBlur={() => {
-  //         setWalletNameOpenModal("half");
-  //       }}
-  //       onPressProceed={() => {
-  //         walletNameBottomSheet.current.snapTo(0);
-  //         recoveryQuestionBottomSheet.current.snapTo(1);
-  //       }}
-  //     />
-  //   );
-  // }
 
   const getSelectedContactList = async () => {
     let contactList = await AsyncStorage.getItem('selectedContacts');
@@ -308,26 +246,7 @@ export default function RestoreSelectedContactsList(props) {
     return;
   }
 
-  const submitRecoveryQuestion = () => {
-    (recoveryQuestionBottomSheet.current as any).snapTo(0);
-    (successMessageBottomSheet.current as any).snapTo(1);
-  };
 
-  function renderRecoveryQuestionContent() {
-    return (
-      <RecoveryQuestionModalContents
-        onQuestionSelect={(value) => {
-          setDropdownBoxValue(value);
-        }}
-        onTextChange={(text) => {
-          setAnswer(text);
-        }}
-        onPressConfirm={() => submitRecoveryQuestion()}
-        onPressKnowMore={() => { }}
-        bottomSheetRef={recoveryQuestionBottomSheet}
-      />
-    );
-  }
 
   function renderSuccessContent() {
     return (
@@ -471,25 +390,9 @@ export default function RestoreSelectedContactsList(props) {
       if (SERVICES && walletImageChecked) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
-        // props.navigation.navigate('Home');
-        // dispatch(fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }));
-        // dispatch(
-        //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
-        // );
-        // dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
-        // // dispatch(fetchTransactions(TEST_ACCOUNT));
-        // dispatch(fetchTransactions(REGULAR_ACCOUNT));
-        // dispatch(fetchTransactions(SECURE_ACCOUNT));
-        // dispatch(syncAccounts(true)); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
 
         dispatch(calculateExchangeRate());
-        // dispatch(checkMSharesHealth());
         dispatch(syncLastSeensAndHealth());
-
-        // setTimeout(() => {
-        //   (loaderBottomSheet as any).current.snapTo(0);
-        //   props.navigation.navigate('Home');
-        // }, 4000);
 
         setTimeout(() => {
           dispatch(startupSync()); // delaying as checkMSharesHealth is also a DB inserting saga
@@ -529,49 +432,6 @@ export default function RestoreSelectedContactsList(props) {
     },
     [RECOVERY_SHARES],
   );
-
-  // const getQrCodeData = useCallback((qrData) => {
-  //   try {
-  //     const scannedData = JSON.parse(qrData);
-  //     switch (scannedData.type) {
-  //       case 'ReverseRecoveryQR':
-  //         const recoveryRequest = {
-  //           requester: scannedData.requester,
-  //           publicKey: scannedData.publicKey,
-  //           uploadedAt: scannedData.UPLOADED_AT,
-  //           isQR: true,
-  //         };
-
-  //         // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
-  //         //   Alert.alert(
-  //         //     'Invalid share',
-  //         //     "Following share doesn't belong to your wallet",
-  //         //   );
-  //         //   return;
-  //         // }
-
-  //         if (
-  //           Date.now() - recoveryRequest.uploadedAt >
-  //           config.TC_REQUEST_EXPIRY
-  //         ) {
-  //           Alert.alert(
-  //             `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
-  //             `Please ask your Guardian to initiate a new ${
-  //               recoveryRequest.isQR ? 'QR' : 'Link'
-  //             }`,
-  //           );
-  //         }
-
-  //         downloadSecret(null, recoveryRequest.publicKey);
-  //         break;
-
-  //       default:
-  //         break;
-  //     }
-  //   } catch (err) {
-  //     Toast('Invalid QR');
-  //   }
-  // }, []);
 
   const updateStatusOnShareDownloadForTrustedContact = async () => {
     let mod = false;
