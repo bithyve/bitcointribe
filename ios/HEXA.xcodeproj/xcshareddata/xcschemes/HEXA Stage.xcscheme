@@ -24,8 +24,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-               BuildableName = "Hexa Stage.app"
-               BlueprintName = "Hexa Stage"
+               BuildableName = "HEXA Stage.app"
+               BlueprintName = "HEXA Stage"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -40,9 +40,9 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -54,8 +54,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-            BuildableName = "Hexa Stage.app"
-            BlueprintName = "Hexa Stage"
+            BuildableName = "HEXA Stage.app"
+            BlueprintName = "HEXA Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -71,8 +71,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-            BuildableName = "Hexa Stage.app"
-            BlueprintName = "Hexa Stage"
+            BuildableName = "HEXA Stage.app"
+            BlueprintName = "HEXA Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -21,7 +21,7 @@ end
 target 'HEXA Dev' do
   all_pods
 end
-target 'Hexa Stage' do
+target 'HEXA Stage' do
   all_pods
 end
 # very important to have, unless you removed React dependencies for Libraries
