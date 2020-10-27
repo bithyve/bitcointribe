@@ -968,8 +968,8 @@ export default class TrustedContacts {
                   encryptedData,
                 ).data;
                 if (decryptedData.remove) contactsToRemove.push(contactName);
-                if (decryptedData.removeGuardian)
-                  guardiansToRemove.push(contactName);
+                // if (decryptedData.removeGuardian)
+                //   guardiansToRemove.push(contactName);
                 subChan.data = decryptedData;
                 subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;

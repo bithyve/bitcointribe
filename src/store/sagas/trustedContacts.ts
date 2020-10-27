@@ -162,6 +162,9 @@ function* removeTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.trustedContactsInfo,
   );
   const s3Service: S3Service = yield select((state) => state.sss.service);
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
   const { DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
@@ -226,6 +229,13 @@ function* removeTrustedContactWorker({ payload }) {
   }
   delete trustedContactsService.tc.trustedContacts[contactName];
 
+  // remove contact details from trusted derivative account
+  const { trustedContactToDA, derivativeAccounts } = regularAccount.hdWallet;
+  const accountNumber = trustedContactToDA[contactName];
+  if (accountNumber) {
+    delete derivativeAccounts[TRUSTED_CONTACTS][accountNumber].contactDetails;
+  }
+
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
   if (tcInfo) {
     for (let itr = 0; itr < tcInfo.length; itr++) {
@@ -266,6 +276,7 @@ function* removeTrustedContactWorker({ payload }) {
   const { SERVICES } = yield select((state) => state.storage.database);
   const updatedSERVICES = {
     ...SERVICES,
+    REGULAR_ACCOUNT: JSON.stringify(regularAccount),
     TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
   };
   dbPayload = { SERVICES: updatedSERVICES };
@@ -1024,6 +1035,10 @@ function* syncTrustedChannelsWorker({ payload }) {
   const { SERVICES, DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
   const sharesUnderCustody = { ...DECENTRALIZED_BACKUP.UNDER_CUSTODY };
 
   const { contacts } = payload;
@@ -1043,17 +1058,29 @@ function* syncTrustedChannelsWorker({ payload }) {
         );
         const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
-        // downgrade guardians and remove share
-        for (const guardianName of guardiansToRemove) {
-          trustedContacts.tc.trustedContacts[guardianName].isWard = false;
-          delete sharesUnderCustody[
-            trustedContacts.tc.trustedContacts[guardianName].contactsWalletName
-          ];
-        }
+        // // downgrade guardians and remove share
+        // for (const guardianName of guardiansToRemove) {
+        //   trustedContacts.tc.trustedContacts[guardianName].isWard = false;
+        //   delete sharesUnderCustody[
+        //     trustedContacts.tc.trustedContacts[guardianName].contactsWalletName
+        //   ];
+        // }
 
         // remove trusted contacts
         for (const contactName of contactsToRemove) {
           delete trustedContacts.tc.trustedContacts[contactName];
+
+          // remove contact details from trusted derivative account
+          const {
+            trustedContactToDA,
+            derivativeAccounts,
+          } = regularAccount.hdWallet;
+          const accountNumber = trustedContactToDA[contactName];
+          if (accountNumber) {
+            delete derivativeAccounts[TRUSTED_CONTACTS][accountNumber]
+              .contactDetails;
+          }
+
           if (tcInfo) {
             for (let itr = 0; itr < tcInfo.length; itr++) {
               const trustedContact = tcInfo[itr];
@@ -1086,10 +1113,17 @@ function* syncTrustedChannelsWorker({ payload }) {
 
       if (preSyncTC !== postSyncTC || guardiansToRemove.length) {
         let payload = {};
-        const updatedSERVICES = {
+        let updatedSERVICES = {
           ...SERVICES,
           TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
         };
+
+        if (contactsToRemove.length) {
+          updatedSERVICES = {
+            ...updatedSERVICES,
+            REGULAR_ACCOUNT: JSON.stringify(regularAccount),
+          };
+        }
         payload = { SERVICES: updatedSERVICES };
 
         if (guardiansToRemove.length) {
