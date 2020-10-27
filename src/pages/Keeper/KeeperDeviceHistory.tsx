@@ -160,7 +160,7 @@ const KeeperDeviceHistory = (props) => {
   const renderQrContent = useCallback(() => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        // isFromKeeperDeviceHistory={true}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -198,11 +198,11 @@ const KeeperDeviceHistory = (props) => {
           }, 2);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={()=>{
-          //  let qrScannedData = '{"uuid": "892b0fe55c894848c7d7d7d6","publicKey": "6968c521ef7063560ce68b8283f9ee6bf4963ef51b4bc7a06162dbfb3e5fce9e","ephemeralAddress": "759be69891f864ce7dda85288d0675d3ae5a323a3cb32381b1b726e6975c70d0","walletName":"Mac"}';
-           let qrScannedData = '{"uuid": "d8a28068d23a01c93891952d","publicKey": "727a4b974c3845eb0653a4de65e45d9797d38ff2b395f152850651d5bac19ebf","ephemeralAddress": "af748c4711bfa42d1e7c7b808c6322a838479979e85658e784cd7af390dbc867","walletName":"hexa keeper"}';
-           props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
-        }}
+        // onPressContinue={()=>{
+        //   // let qrScannedData = '{"uuid": "2d5ea54f8126f0b027e62a06","publicKey": "21943cd77af9e8a0c7bed20b105349b76ceb22f5599afd8e24926da729302b44","ephemeralAddress": "250780490291b3efbc6f1cc22403eb82db19aadf143081fd4319c7b5481dd6bf","walletName":"Gallexy"}';
+        //    let qrScannedData = '{"uuid": "bcc7887f2a833bebcfd242d4","publicKey": "7a790e056f2eb609053de8b8fae7f4a7a5528bf06a0caf79e1e0e167e8df651b","ephemeralAddress": "47952058e2c10a7e45b5352a98e52caac9d3b1d6fd45a5ae1912cb5efc0a0584","walletName":"Gal"}';
+        //    props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
+        // }}
       />
     );
   }, [QrBottomSheetsFlag]);

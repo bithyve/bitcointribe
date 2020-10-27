@@ -73,7 +73,7 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
 import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
 import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
-import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
+import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
 import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
 import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import Intermediate from '../pages/Intermediate';

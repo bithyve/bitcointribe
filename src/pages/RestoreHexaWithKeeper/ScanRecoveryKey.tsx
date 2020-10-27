@@ -50,11 +50,11 @@ class ScanRecoveryKey extends Component<
   }
 
   barcodeRecognized = async (barcodes) => {
-    this.props.navigation.state.params.scannedData(barcodes);
+    this.props.navigation.state.params.scannedData(JSON.parse(barcodes.data));
     this.props.navigation.goBack();
-    // if (barcodes.data) {
-    //   this.setState({ isScanned: false });
-    // }
+    if (barcodes.data) {
+      this.setState({ isScanned: false });
+    }
   };
 
   componentDidMount = () => {};
@@ -200,12 +200,15 @@ class ScanRecoveryKey extends Component<
             <TouchableOpacity
               style={{ alignSelf: 'center' }}
               onPress={() => {
-                this.barcodeRecognized({
-                  encryptedKey: "a62de99fc3e82b87e767aa905d3587bf19373807279542b09dfd4af48d373917",
-                  otp: "D5CZ19",
-                  publicKey: "5263e42f09198cbb687d1e4c19022de9bc0600356e08285a59473c01b00dd223",
-                  walletName: "Mac"
-              });
+                // this.barcodeRecognized('{"encryptedKey":"588c2e1a8bdeb88c1708f6c9adb6a59b8668d014f2a78cdafb0f742d6455af0a","otp":"GVVDFB","publicKey":"418184b47230a9673a67451652a185ae984ae6939effaa87d3aae17623008f3a","walletName":"Mac Pro"}');
+
+
+                // this.barcodeRecognized(JSON.stringify({
+                //   encryptedKey: "0cbd51c1a8f5d95d4d35c3304808b4da3df4534c4167838605aca7f01b232ec0",
+                //   otp: "F8D6C5",
+                //   publicKey: "51a5a4b0d33f719cd039eb9421d4bd23b1f0551b0b6e1f8a283291bfbb3b1825",
+                //   walletName: "Mac"
+                // }));
                 this.setState({ isScanned: true })}}
             >
               <ImageBackground

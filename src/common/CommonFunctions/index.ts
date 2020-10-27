@@ -193,3 +193,7 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
   }
 
 };
+
+export const isEmptyObject = (obj) => {
+  return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+}

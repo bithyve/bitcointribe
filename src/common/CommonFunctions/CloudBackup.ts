@@ -34,7 +34,7 @@ export const CheckCloudDataBackup = (recoveryCallback1) =>{
     });
   } else {
     let checkDataIsBackedup = true;
-    GoogleDriveLogin(checkDataIsBackedup);
+    GoogleDriveLogin({checkDataIsBackedup});
   }
 }
 
@@ -46,21 +46,22 @@ export const CloudDataBackup = (data, callback, share?) => {
     iCloud.downloadBackup().then((backedJson) => {
        console.log('BackedUp JSON: DONE', backedJson);
       if (backedJson) {
-        updateData(backedJson, '', share);
+        updateData({result1: backedJson, googleData: '', share});
       } else {
-        createFile();
+        createFile({});
       }
     });
   } else {
-    GoogleDriveLogin();
+    GoogleDriveLogin({share});
   }
 };
 
-export const GoogleDriveLogin = (checkDataIsBackedup?) => {
+export const GoogleDriveLogin = (params: {checkDataIsBackedup?: boolean, share?: any}) => {
+  let { checkDataIsBackedup, share } = params;
   GoogleDrive.setup()
     .then(() => {
       GoogleDrive.login((err, data) => {
-        handleLogin(err, data, checkDataIsBackedup);
+        handleLogin({err, data, checkDataIsBackedup, share});
       });
     })
     .catch((err) => {
@@ -68,8 +69,9 @@ export const GoogleDriveLogin = (checkDataIsBackedup?) => {
     });
 };
 
-export const handleLogin = async (e, data, checkDataIsBackedup?) => {
-  const result = e || data;
+export const handleLogin = async (params : {err: any; data: any; checkDataIsBackedup?: boolean; share?: any;}) => {
+  let {err, data, checkDataIsBackedup, share} = params;
+  const result = err || data;
   console.log('GOOGLE ReSULT', data);
   // console.log('Error', e);
   if (result.eventName == 'onLogin') {
@@ -77,15 +79,16 @@ export const handleLogin = async (e, data, checkDataIsBackedup?) => {
       throw new Error('Storage Permission Denied');
     }
     //this.createFile();
-    checkFileIsAvailable(checkDataIsBackedup);
+    checkFileIsAvailable({checkDataIsBackedup: params.checkDataIsBackedup, share});
   }
 };
 
-export const checkFileIsAvailable = async (checkDataIsBackedup?) => {
+export const checkFileIsAvailable = async (params: {checkDataIsBackedup?: boolean, share?: any}) => {
   /**
    * TODO: Check if file exist if not then create new file having name HexaWalletBackup.json
-   * If file exist then call readFile
+   * If file exist then call 
    */
+  let { checkDataIsBackedup, share } = params;
   const metaData = {
     name: 'HexaWalletBackup.json',
     description: 'Backup data for my app',
@@ -97,20 +100,20 @@ export const checkFileIsAvailable = async (checkDataIsBackedup?) => {
     // console.log('checkFileIsAvailable', result);
     if(!checkDataIsBackedup){
       if (result && result.eventName == 'listEmpty') {
-        createFile();
+        createFile({share});
       } else if (result.eventName == 'failure') {
         console.log('FAILURE');
       } else {
-        readFile(result);
+        readFile({result, share});
       }
     } else{
-      readFile(result, checkDataIsBackedup);
+      readFile({result, checkDataIsBackedup, share});
     }
-    
   });
 };
 
-export const createFile = () => {
+export const createFile = (params:{share?: any}) => {
+  let { share } = params;
   let WalletData = [];
   const { data } = dataObject.regularAccount.getWalletId();
   let tempData = {
@@ -151,7 +154,8 @@ export const createFile = () => {
   }
 };
 
-export const UpdateFile = (metaData) => {
+export const UpdateFile = (params : {metaData: any, share?: any}) => {
+  let { metaData, share } = params;
   try {
     GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
       // console.log('DATA updateFile', data);
@@ -167,7 +171,8 @@ export const UpdateFile = (metaData) => {
   }
 };
 
-export const readFile = (result, checkDataIsBackedup?) => {
+export const readFile = (params: {result: any, checkDataIsBackedup?: any, share?: any}) => {
+  let { result, checkDataIsBackedup, share } = params;
   const metaData = {
     id: result.id,
   };
@@ -177,7 +182,7 @@ export const readFile = (result, checkDataIsBackedup?) => {
       if(checkDataIsBackedup){
         recoveryCallback(result1);
       }else{
-        updateData(result1, result);
+        updateData({result1, googleData: result, share});
       }
       
     });
@@ -186,7 +191,8 @@ export const readFile = (result, checkDataIsBackedup?) => {
   }
 };
 
-export const updateData = (result1, googleData, share?) => {
+export const updateData = (params: {result1: any, googleData: any, share?: any}) => {
+  let {result1, googleData, share} = params;
   const { data } = dataObject.regularAccount.getWalletId();
   var arr = [];
   var newArray = [];
@@ -233,6 +239,6 @@ export const updateData = (result1, googleData, share?) => {
       data: JSON.stringify(newArray),
       id: googleData.id,
     };
-    UpdateFile(metaData);
+    UpdateFile({metaData, share});
   }
 };

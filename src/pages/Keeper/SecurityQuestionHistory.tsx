@@ -31,7 +31,8 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import SecurityQuestion from './SecurityQuestion';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
-import { checkMSharesHealth } from '../../store/actions/health';
+import { checkMSharesHealth, updateMSharesHealth } from '../../store/actions/health';
+import { useSelector } from 'react-redux';
 
 const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
@@ -63,7 +64,19 @@ const SecurityQuestionHistory = (props) => {
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
   ] = useState(React.createRef());
-
+  const levelHealth: {
+    level: number;
+    levelInfo: {
+      shareType: string;
+      updatedAt: string;
+      status: string;
+      shareId: string;
+      reshareVersion?: number;
+      name?: string;
+    }[];
+  }[] = useSelector((state) => state.health.levelHealth);
+  const currentLevel: Number = useSelector((state) => state.health.currentLevel);
+  const s3Service = useSelector((state) => state.health.service);
   const next = props.navigation.getParam('next');
   const dispatch = useDispatch();
 
@@ -81,9 +94,8 @@ const SecurityQuestionHistory = (props) => {
         onPressConfirm={async () => {
           Keyboard.dismiss();
           saveConfirmationHistory();
-          setTimeout(() => {
-            (SecurityQuestionBottomSheet as any).current.snapTo(0);
-          }, 2);
+          updateHealthForSQ();
+          (SecurityQuestionBottomSheet as any).current.snapTo(0);
           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
@@ -190,6 +202,30 @@ const SecurityQuestionHistory = (props) => {
       if (securityQuestionHistory) updateHistory(securityQuestionHistory);
     })();
   }, []);
+
+  const updateHealthForSQ = () => {
+    if(levelHealth.length>0 && levelHealth[0].levelInfo.length>0){
+      let levelHealthVar = currentLevel == 0 || currentLevel == 1 ? levelHealth[0].levelInfo[1] : currentLevel == 2 ? levelHealth[1].levelInfo[1] : levelHealth[2].levelInfo[1];
+      // health update for 1st upload to cloud 
+      if(levelHealthVar.shareType == 'cloud'){
+        levelHealthVar.updatedAt = ""+moment(new Date()).valueOf();
+        levelHealthVar.status = 'accessible';
+        levelHealthVar.reshareVersion = 1;
+        levelHealthVar.name = 'Cloud';
+      }
+      let shareArray = [
+        {
+          walletId: s3Service.getWalletId().data.walletId,
+          shareId: levelHealthVar.shareId,
+          reshareVersion: levelHealthVar.reshareVersion,
+          updatedAt: moment(new Date()).valueOf(),
+          status: 'accessible',
+          shareType: 'securityQuestion'
+        }
+      ];
+      dispatch(updateMSharesHealth(shareArray));
+    }
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>

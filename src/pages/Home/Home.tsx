@@ -1017,7 +1017,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
         this.cloudData();
       }else{
-        this.updateCloudData();
+        // this.updateCloudData();
       }
     }
 
@@ -2050,7 +2050,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if(levelHealthVar.shareType == 'cloud'){
         levelHealthVar.updatedAt = moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
-        levelHealthVar.reshareVersion = 1;
+        levelHealthVar.reshareVersion = 0;
         levelHealthVar.name = 'Cloud';
       }
       let shareArray = [

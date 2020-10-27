@@ -119,46 +119,69 @@ function* servicesEnricherWorker({ payload }) {
     if (appVersion === '0.9') {
       appVersion = '0.9.0';
     }
-    const {
-      REGULAR_ACCOUNT,
-      TEST_ACCOUNT,
-      SECURE_ACCOUNT,
-      S3_SERVICE,
-      TRUSTED_CONTACTS,
-    } = database.SERVICES;
-
     let services;
     let migrated = false;
-    if (!database.VERSION) {
-      dbVersion = '0.7.0';
-    } else if (database.VERSION === '0.8') {
-      dbVersion = '0.8.0';
-    } else if (database.VERSION === '0.9') {
-      dbVersion = '0.9.0';
-    } else if (database.VERSION === '1.0') {
-      dbVersion = '1.0.0';
-    }
-    if (semver.gt(appVersion, dbVersion)) {
-      if (dbVersion === '0.7.0' && semver.gte(appVersion, '0.9.0')) {
-        // version 0.7.0 support
-        console.log('Migration running for 0.7.0');
-        services = {
-          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
-          TRUSTED_CONTACTS: new TrustedContactsService(),
-        };
-        // hydrating new/missing async storage variables
-        yield call(
-          AsyncStorage.setItem,
-          'walletID',
-          services.S3_SERVICE.sss.walletId,
-        );
+    if (database.SERVICES) {
+      const {
+        REGULAR_ACCOUNT,
+        TEST_ACCOUNT,
+        SECURE_ACCOUNT,
+        S3_SERVICE,
+        TRUSTED_CONTACTS,
+      } = database.SERVICES;
 
-        migrated = true;
+      if (!database.VERSION) {
+        dbVersion = '0.7.0';
+      } else if (database.VERSION === '0.8') {
+        dbVersion = '0.8.0';
+      } else if (database.VERSION === '0.9') {
+        dbVersion = '0.9.0';
+      } else if (database.VERSION === '1.0') {
+        dbVersion = '1.0.0';
+      }
+      if (semver.gt(appVersion, dbVersion)) {
+        if (dbVersion === '0.7.0' && semver.gte(appVersion, '0.9.0')) {
+          // version 0.7.0 support
+          console.log('Migration running for 0.7.0');
+          services = {
+            REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+            TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+            SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+            S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+            TRUSTED_CONTACTS: new TrustedContactsService(),
+          };
+          // hydrating new/missing async storage variables
+          yield call(
+            AsyncStorage.setItem,
+            'walletID',
+            services.S3_SERVICE.sss.walletId,
+          );
+
+          migrated = true;
+        } else {
+          // default enrichment (when database versions are different but migration is not available)
+          services = {
+            REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+            TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+            SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+            S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+            TRUSTED_CONTACTS: TRUSTED_CONTACTS
+              ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+              : new TrustedContactsService(),
+          };
+        }
+
+        if (semver.eq(appVersion, '1.1.0')) {
+          // version 1.0 and lower support
+
+          // re-derive primary extended keys (standardization)
+          const secureAccount: SecureAccount = services.SECURE_ACCOUNT;
+          if (secureAccount.secureHDWallet.rederivePrimaryXKeys()) {
+            console.log('Standardized Primary XKeys for secure a/c');
+            migrated = true;
+          }
+        }
       } else {
-        // default enrichment (when database versions are different but migration is not available)
         services = {
           REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
           TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
@@ -169,30 +192,8 @@ function* servicesEnricherWorker({ payload }) {
             : new TrustedContactsService(),
         };
       }
-
-      if (semver.eq(appVersion, '1.1.0')) {
-        // version 1.0 and lower support
-
-        // re-derive primary extended keys (standardization)
-        const secureAccount: SecureAccount = services.SECURE_ACCOUNT;
-        if (secureAccount.secureHDWallet.rederivePrimaryXKeys()) {
-          console.log('Standardized Primary XKeys for secure a/c');
-          migrated = true;
-        }
-      }
-    } else {
-      services = {
-        REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-        TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-        SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-        S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
-        TRUSTED_CONTACTS: TRUSTED_CONTACTS
-          ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
-          : new TrustedContactsService(),
-      };
+      yield put(servicesEnriched(services));
     }
-
-    yield put(servicesEnriched(services));
     if (migrated) {
       database.VERSION = DeviceInfo.getVersion();
       yield call(insertDBWorker, { payload: database });

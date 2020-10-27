@@ -271,7 +271,7 @@ class ManageBackup extends Component<
       if (levelHealthVar.shareType == 'cloud') {
         levelHealthVar.updatedAt = moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
-        levelHealthVar.reshareVersion = 1;
+        levelHealthVar.reshareVersion = 0;
         levelHealthVar.guardian = 'cloud';
       }
       let shareArray = [
@@ -281,6 +281,7 @@ class ManageBackup extends Component<
           reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
           status: 'accessible',
+          shareType: 'cloud'
         },
       ];
       this.props.updateMSharesHealth(shareArray);
@@ -291,65 +292,42 @@ class ManageBackup extends Component<
     if (prevProps.levelHealth != this.props.levelHealth) {
       this.modifyLevelData();
     }
-    if (prevProps.levelHealth != this.props.levelHealth) {
-      if (
-        this.props.levelHealth.length > 0 &&
-        this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0
-      ) {
+
+    if(prevProps.levelHealth != this.props.levelHealth){
+      if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
         this.cloudData();
-      } else {
+      }else{
         this.updateCloudData();
       }
     }
   };
 
-  updateCloudData = () => {
-    let {
-      currentLevel,
-      keeperInfo,
-      levelHealth,
-      isLevel2Initialized,
-      isLevel3Initialized,
-      s3Service,
-    } = this.props;
+  updateCloudData = () =>{
+    console.log("inside updateCloudData");
+    let { currentLevel, keeperInfo, levelHealth, isLevel2Initialized, isLevel3Initialized, s3Service } = this.props;
     let KPInfo: any[] = [];
     let secretShare = {};
-    if (levelHealth.length > 0) {
+    if(levelHealth.length > 0){
       let levelHealthVar = levelHealth[levelHealth.length - 1];
-      if (levelHealthVar.levelInfo) {
+      if(levelHealthVar.levelInfo){
         for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
           const element = levelHealthVar.levelInfo[i];
-          if (
-            keeperInfo.findIndex((value) => value.shareId == element.shareId) >
-              -1 &&
-            element.status == 'accessible'
-          ) {
-            let kpInfoElement =
-              keeperInfo[
-                keeperInfo.findIndex(
-                  (value) => value.shareId == element.shareId,
-                )
-              ];
+          if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
+            let kpInfoElement = keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)];
             let object = {
               type: kpInfoElement.type,
               name: kpInfoElement.name,
               shareId: kpInfoElement.shareId,
-              data: kpInfoElement.data,
-            };
+              data: kpInfoElement.data
+            }
             KPInfo.push(object);
           }
         }
-
-        if (
-          isLevel2Initialized &&
-          !isLevel3Initialized &&
-          levelHealthVar.levelInfo[2].status == 'accessible' &&
-          levelHealthVar.levelInfo[3].status == 'accessible'
-        ) {
+       
+        if(isLevel2Initialized && !isLevel3Initialized && levelHealthVar.levelInfo[2].status == 'accessible' && levelHealthVar.levelInfo[3].status == 'accessible'){
           for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
             const element = s3Service.levelhealth.metaShares[i];
-            if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
+            if(levelHealthVar.levelInfo[0].shareId == element.shareId){
               secretShare = element;
             }
           }
@@ -358,7 +336,7 @@ class ManageBackup extends Component<
     }
     this.cloudData(KPInfo, currentLevel, secretShare);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
-  };
+  }
 
   goToHistory = (value) =>{
     let {
@@ -657,7 +635,7 @@ class ManageBackup extends Component<
                                   value.keeper1.status == 'accessible' ? 0 : 1,
                               }}
                               onPress={() => {
-                                if (!this.props.cloudBackupStatus) {
+                                if (!this.props.cloudBackupStatus.status) {
                                   this.cloudData();
                                 }
                               }}
