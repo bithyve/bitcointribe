@@ -52,7 +52,7 @@ export const fetch = async (hash_current) => {
       ({ hash, enc_key } = JSON.parse(RNValue));
 
       if (hash_current !== hash) {
-        throw new Error('Nothing exist against the provided key');
+        throw new Error('Incorrect Passcode, upgraded');
       }
     }
     if(value) {
@@ -64,7 +64,7 @@ export const fetch = async (hash_current) => {
       );
 
       if (hash_current !== hash) {
-        throw new Error('Nothing exist against the provided key');
+        throw new Error('Incorrect passcode, legacy');
       }
     }
     return enc_key;
