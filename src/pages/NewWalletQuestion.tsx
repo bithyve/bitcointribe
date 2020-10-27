@@ -36,12 +36,9 @@ import LoaderModal from '../components/LoaderModal';
 import {
   getTestcoins,
   calculateExchangeRate,
-  accountsSynched,
 } from '../store/actions/accounts';
 import {
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
@@ -54,7 +51,7 @@ export default function NewWalletQuestion(props) {
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
+  const [dropdownBoxList] = useState(QuestionList);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
     question: '',
@@ -75,105 +72,14 @@ export default function NewWalletQuestion(props) {
   let [tempAns, setTempAns] = useState('');
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
-  const { isInitialized, loading } = useSelector((state) => state.setupAndAuth);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(
+  const { isInitialized } = useSelector((state) => state.setupAndAuth);
+  const [loaderBottomSheet] = useState(React.createRef());
+  const [confirmAnswerTextInput] = useState(
     React.createRef(),
   );
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector((state) => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
-
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
-  // useEffect(() => {
-  //   const testBalance = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const secureBalance = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-  //     accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-  //       .unconfirmedBalance
-  //     : 0;
-  //   const accumulativeBalance = regularBalance + secureBalance;
-
-  //   const testTransactions = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-  //     : [];
-  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-  //       .transactionDetails
-  //     : [];
-
-  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-  //       .transactionDetails
-  //     : [];
-  //   const accumulativeTransactions = [
-  //     ...testTransactions,
-  //     ...regularTransactions,
-  //     ...secureTransactions,
-  //   ];
-
-  //   setBalances({
-  //     testBalance,
-  //     regularBalance,
-  //     secureBalance,
-  //     accumulativeBalance,
-  //   });
-  //   setTransactions(accumulativeTransactions);
-  // }, [accounts]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining a half an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-  //         const { balances } = testAccService.hdWallet;
-  //         const netBalance = testAccService
-  //           ? balances.balance + balances.unconfirmedBalance
-  //           : 0;
-  //         if (!netBalance) {
-  //           console.log('Getting Testcoins');
-  //           dispatch(getTestcoins(TEST_ACCOUNT));
-  //         }
-  //       }
-  //   })();
-  // }, [testAccService]);
 
   useEffect(() => {
     (async () => {
@@ -585,7 +491,7 @@ export default function NewWalletQuestion(props) {
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={(event) => setConfirm()}
+                      onSubmitEditing={() => setConfirm()}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
