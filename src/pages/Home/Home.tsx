@@ -102,7 +102,7 @@ import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 import { Button } from 'react-native-elements';
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 500; // milliseconds
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -753,7 +753,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.addEventListener('url', this.handleDeepLinkEvent);
-
     Linking.getInitialURL().then(this.handleDeepLinking);
 
     // call this once deeplink is detected aswell
@@ -992,6 +991,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   openBottomSheetOnLaunch(ref: React.RefObject<BottomSheet>) {
+    this.props.navigation.popToTop();
+
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       ref.current?.snapTo(1);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
