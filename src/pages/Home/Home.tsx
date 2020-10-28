@@ -10,6 +10,7 @@ import {
   Linking,
   Alert,
   Image,
+  EdgeInsetsPropType,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -637,8 +638,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     allCards.push(...defaultCardData, ...additionalCardData);
     this.props.setCardData(allCards);
     this.setAccountCardData([
-      ...defaultCardData,
-      ...additionalCardData,
+      ...defaultCardData.slice(0, 2),
+      // ...additionalCardData,
       ...closingCardData,
     ]);
   };
@@ -1995,9 +1996,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <View style={styles.accountCardsContainer}>
           <FlatList
             contentContainerStyle={{
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingTop: 36,
+              alignItems: 'flex-start',
             }}
+            contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}
@@ -2448,13 +2450,11 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     flex: 7,
     marginTop: 30,
-    paddingLeft: 20,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     backgroundColor: Colors.backgroundColor,
-    justifyContent: 'center',
     width: '100%',
   },
 
