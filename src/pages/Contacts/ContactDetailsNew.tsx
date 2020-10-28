@@ -27,7 +27,7 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { nameToInitials } from '../../common/CommonFunctions';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import _ from 'underscore';
 import moment from 'moment';
 import {
@@ -622,10 +622,6 @@ class ContactDetailsNew extends PureComponent<
     }
   };
 
-  isEmpty = (obj) => {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  };
-
   createGuardian = async () => {
     const {
       trustedContacts,
@@ -812,7 +808,7 @@ class ContactDetailsNew extends PureComponent<
   };
 
   SendShareModalFunction = () => {
-    if (!this.isEmpty(this.Contact)) {
+    if (!isEmpty(this.Contact)) {
       return (
         <SendShareModal
           contact={this.Contact ? this.Contact : null}

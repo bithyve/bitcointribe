@@ -62,7 +62,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
+import { getCurrencyImageByRegion, isEmpty } from '../../common/CommonFunctions/index';
 import moment from 'moment';
 import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
@@ -84,16 +84,8 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import DonationWebPageModalContents from '../../components/DonationWebPageModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
-import {
-  DonationDerivativeAccount,
-  DonationDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface';
 import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
-// import accounts from '../../store/reducers/accounts';
 
-function isEmpty(obj) {
-  return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-}
 
 interface AccountsStateTypes {
   carouselData: any;
