@@ -31,7 +31,7 @@ import ModalHeader from '../../components/ModalHeader';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import DeviceInfo from 'react-native-device-info';
-import { nameToInitials } from '../../common/CommonFunctions';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SendViaQR from '../../components/SendViaQR';
 import SendViaLink from '../../components/SendViaLink';
@@ -109,10 +109,6 @@ export default function Receive(props) {
   const carouselIndex = props.navigation.state.params.carouselIndex
     ? props.navigation.state.params.carouselIndex
     : null;
-
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
 
   const dispatch = useDispatch();
   const [receiveLink, setReceiveLink] = useState('');
