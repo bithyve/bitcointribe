@@ -37,8 +37,8 @@ import {
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
   ADD_NEW_ACCOUNT_SHELL,
-  newAccountAdded,
-  newAccountAddFailed,
+  newAccountShellAdded,
+  newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
@@ -1175,6 +1175,8 @@ export const updateDonationPreferencesWatcher = createWatcher(
 function* addNewAccountShell({ payload: subAccountInfo }: { payload: SubAccountDescribing }) {
   // TODO: Devise some way to reference and call a new account creation service here.
 
+  console.log('addNewAccountShell saga');
+
   const bitcoinUnit = subAccountInfo.kind == SubAccountKind.TEST ? BitcoinUnit.TSATS : BitcoinUnit.SATS;
 
   const newAccountShell = new AccountShell({
@@ -1188,9 +1190,10 @@ function* addNewAccountShell({ payload: subAccountInfo }: { payload: SubAccountD
     //   newAccountService.generateNewAccount,
     //   ...payload,
     // );
-    yield put(newAccountAdded({ accountShell: newAccountShell }));
+    yield put(newAccountShellAdded({ accountShell: newAccountShell }));
   } catch (error) {
-    yield put(newAccountAddFailed({ accountShell: newAccountShell, error }));
+    console.log('addNewAccountShell saga::error: ' + error);
+    yield put(newAccountShellAddFailed({ accountShell: newAccountShell, error }));
   }
 }
 

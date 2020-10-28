@@ -22,7 +22,7 @@ import {
   SETTED_DONATION_ACC,
   SETUP_DONATION_ACCOUNT,
   ADD_NEW_ACCOUNT_SHELL,
-  NEW_ACCOUNT_ADDED,
+  NEW_ACCOUNT_SHELL_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
   ADD_NEW_ACCOUNT_SHELL_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
@@ -141,9 +141,9 @@ export type AccountsState = {
     secure?: any;
   };
 
-  isGeneratingNewAccount: boolean;
-  hasNewAccountGenerationSucceeded: boolean;
-  hasNewAccountGenerationFailed: boolean;
+  isGeneratingNewAccountShell: boolean;
+  hasNewAccountShellGenerationSucceeded: boolean;
+  hasNewAccountShellGenerationFailed: boolean;
 
   isUpdatingAccountSettings: boolean;
   hasAccountSettingsUpdateSucceeded: boolean;
@@ -195,9 +195,9 @@ const initialState: AccountsState = {
   ],
   archivedAccountShells: [],
 
-  isGeneratingNewAccount: false,
-  hasNewAccountGenerationSucceeded: false,
-  hasNewAccountGenerationFailed: false,
+  isGeneratingNewAccountShell: false,
+  hasNewAccountShellGenerationSucceeded: false,
+  hasNewAccountShellGenerationFailed: false,
 
   isUpdatingAccountSettings: false,
   hasAccountSettingsUpdateSucceeded: false,
@@ -586,16 +586,16 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case ADD_NEW_ACCOUNT_SHELL:
       return {
         ...state,
-        isGeneratingNewAccount: true,
-        hasNewAccountGenerationSucceeded: false,
-        hasNewAccountGenerationFailed: false,
+        isGeneratingNewAccountShell: true,
+        hasNewAccountShellGenerationSucceeded: false,
+        hasNewAccountShellGenerationFailed: false,
       };
 
-    case NEW_ACCOUNT_ADDED:
+    case NEW_ACCOUNT_SHELL_ADDED:
       return {
         ...state,
-        isGeneratingNewAccount: false,
-        hasNewAccountGenerationSucceeded: true,
+        isGeneratingNewAccountShell: false,
+        hasNewAccountShellGenerationSucceeded: true,
         activeAccountShells: state.activeAccountShells.concat(action.payload),
       };
 
@@ -603,17 +603,17 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case NEW_ACCOUNT_ADD_FAILED:
       return {
         ...state,
-        isGeneratingNewAccount: false,
-        hasNewAccountGenerationSucceeded: false,
-        hasNewAccountGenerationFailed: true,
+        isGeneratingNewAccountShell: false,
+        hasNewAccountShellGenerationSucceeded: false,
+        hasNewAccountShellGenerationFailed: true,
       };
 
     case ADD_NEW_ACCOUNT_SHELL_COMPLETED:
       return {
         ...state,
-        isGeneratingNewAccount: false,
-        hasNewAccountGenerationSucceeded: false,
-        hasNewAccountGenerationFailed: false,
+        isGeneratingNewAccountShell: false,
+        hasNewAccountShellGenerationSucceeded: false,
+        hasNewAccountShellGenerationFailed: false,
       };
 
     case ACCOUNT_SETTINGS_UPDATED:

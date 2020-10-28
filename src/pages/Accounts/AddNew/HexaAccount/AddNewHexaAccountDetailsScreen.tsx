@@ -60,13 +60,14 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ({
   // TODO: We need a bit more design clarity about what to do after new
   // account creation succeeds or fails.
   useAccountShellCreationCompletionEffect(() => {
+    console.log('dispatching go home action');
     navigation.dispatch(goHomeAction);
   });
 
   function handleProceedButtonPress() {
     currentSubAccountInfo.customDisplayName = accountName;
     currentSubAccountInfo.customDescription = accountDescription;
-
+    console.log('dispatching addNewAccountShell');
     dispatch(addNewAccountShell(currentSubAccountInfo));
   }
 

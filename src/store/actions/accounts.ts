@@ -409,7 +409,7 @@ export const ALTERNATE_TRANSFER_ST2_EXECUTED =
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
-export const NEW_ACCOUNT_ADDED = 'NEW_ACCOUNT_ADDED';
+export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED';
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
@@ -492,17 +492,17 @@ export const settedDonationAccount = (serviceType, successful) => {
   return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
 };
 
-export const newAccountAddFailed = ({ accountShell, error }: {
+export const newAccountShellAddFailed = ({ accountShell, error }: {
   accountShell: AccountShell,
   error: Error,
 }) => {
   return { type: NEW_ACCOUNT_ADD_FAILED, payload: { accountShell, error } };
 };
 
-export const newAccountAdded = ({ accountShell }: {
+export const newAccountShellAdded = ({ accountShell }: {
   accountShell: AccountShell,
 }) => {
-  return { type: NEW_ACCOUNT_ADDED, payload: accountShell };
+  return { type: NEW_ACCOUNT_SHELL_ADDED, payload: accountShell };
 };
 
 
