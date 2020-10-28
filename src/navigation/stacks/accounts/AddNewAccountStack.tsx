@@ -4,7 +4,6 @@ import NewAccountSelectionList from "../../../pages/Accounts/AddNew/NewAccountSe
 import AddNewHexaAccountDetailsScreen from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen";
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import NavStyles from '../../../common/Styles/NavStyles';
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import { goHomeAction } from '../../actions/NavigationActions';
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen';
 
