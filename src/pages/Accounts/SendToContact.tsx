@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Component } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Image,
@@ -14,7 +14,6 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
-  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -26,7 +25,6 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import { nameToInitials } from '../../common/CommonFunctions';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   transferST1,
   addTransferDetails,
@@ -50,7 +48,6 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AccountSelectionModalContents from './AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
@@ -180,7 +177,6 @@ class SendToContact extends Component<
       averageTxFees,
       serviceType,
       spendableBalance,
-      spendableBalances,
       selectedContact,
     } = this.state;
 
@@ -336,7 +332,6 @@ class SendToContact extends Component<
   };
 
   getAccountBalances = () => {
-    const { spendableBalance, serviceType } = this.state;
     const { accounts } = this.props;
 
     const testBalance = accounts[TEST_ACCOUNT].service
@@ -801,7 +796,6 @@ class SendToContact extends Component<
     const {
       isFromAddressBook,
       isOpen,
-      exchangeRates,
       selectedContact,
       serviceType,
       removeItem,
@@ -817,13 +811,11 @@ class SendToContact extends Component<
       InputStyle1,
       InputStyleNote,
       isInvalidBalance,
-      recipients,
       spendableBalances,
     } = this.state;
     const {
       accounts,
       loading,
-      transferST1,
       removeTransferDetails,
       clearTransfer,
       addTransferDetails,
