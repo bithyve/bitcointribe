@@ -55,7 +55,7 @@ const HomeAccountCardsList: React.FC<Props> = ({
   function handleAccountReordering(orderedAccounts: AccountShell[]) {}
 
   function handleGridCardLongPress() {
-    // 📝 For now, long-pressing to re-order is on the backburnner
+    // 📝 For now, long-pressing to re-order is on the backburner
     // until we can make it WYSIWYG.
 
     // showEditModeBottomSheet();

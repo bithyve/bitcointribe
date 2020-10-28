@@ -33,6 +33,10 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
 }: Props) => {
 
   const columnData: Array<AccountShell[]> = useMemo(() => {
+    if (accountShells.length == 0) {
+      return [];
+    }
+
     if (accountShells.length <= 2) {
       return [accountShells];
     }
