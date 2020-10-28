@@ -10,6 +10,7 @@ import {
   Linking,
   Alert,
   Image,
+  EdgeInsetsPropType,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -102,7 +103,7 @@ import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 import { Button } from 'react-native-elements';
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 500; // milliseconds
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
 export const isCompatible = async (method: string, version: string) => {
   if (!semver.valid(version)) {
@@ -637,8 +638,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     allCards.push(...defaultCardData, ...additionalCardData);
     this.props.setCardData(allCards);
     this.setAccountCardData([
-      ...defaultCardData,
-      ...additionalCardData,
+      ...defaultCardData.slice(0, 2),
+      // ...additionalCardData,
       ...closingCardData,
     ]);
   };
@@ -753,7 +754,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.addEventListener('url', this.handleDeepLinkEvent);
-
     Linking.getInitialURL().then(this.handleDeepLinking);
 
     // call this once deeplink is detected aswell
@@ -992,6 +992,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   openBottomSheetOnLaunch(ref: React.RefObject<BottomSheet>) {
+    this.props.navigation.popToTop();
+
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       ref.current?.snapTo(1);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
@@ -1994,9 +1996,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <View style={styles.accountCardsContainer}>
           <FlatList
             contentContainerStyle={{
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingTop: 36,
+              alignItems: 'flex-start',
             }}
+            contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}
@@ -2447,13 +2450,11 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     flex: 7,
     marginTop: 30,
-    paddingLeft: 20,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     backgroundColor: Colors.backgroundColor,
-    justifyContent: 'center',
     width: '100%',
   },
 

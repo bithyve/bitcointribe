@@ -6,11 +6,19 @@ import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen';
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import MoreOptionsStack from '../more-options/MoreOptionsStack';
+import AllTransactionsStack from '../transactions/AllTransactionsStack';
+
 
 const HomeStack = createStackNavigator(
   {
     HomeRoot: {
       screen: HomeScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    AllTransactions: {
+      screen: AllTransactionsStack,
       navigationOptions: {
         header: null,
       },
