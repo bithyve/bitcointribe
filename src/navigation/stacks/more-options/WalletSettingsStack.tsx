@@ -6,6 +6,7 @@ import ChangeCurrencyScreen from "../../../pages/ChangeCurrencyScreen";
 import SmallNavHeaderCloseButton from "../../../components/navigation/SmallNavHeaderCloseButton";
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
 
 
 const WalletSettingsStack = createStackNavigator(
@@ -34,7 +35,7 @@ const WalletSettingsStack = createStackNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },

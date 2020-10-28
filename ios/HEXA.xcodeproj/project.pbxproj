@@ -81,6 +81,7 @@
 		DF98272D8CB14F19972464BB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
 		E1385A540A86AA9F2D54A10F /* libPods-HEXA Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A6E33311AF8F0F19ADDF937 /* libPods-HEXA Stage.a */; };
 		E59524329FB64B6B9EB4F44A /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
+		E8FB8586092FAE960FDFF30C /* libPods-HEXA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9115E22B4A66E8FC95C641 /* libPods-HEXA.a */; };
 		EC871328B5214142B36CC294 /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
 		ECA21601D47443C3B3738345 /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
 		FC9848DE447644B59209F6C3 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
@@ -97,7 +98,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HEXA/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HEXA/main.m; sourceTree = "<group>"; };
 		158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-MediumItalic.ttf"; path = "../src/assets/fonts/FiraSans-MediumItalic.ttf"; sourceTree = "<group>"; };
-		1B41126F1A2004BD234318C2 /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		1BDE786A62844DE89D7EE379 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		1D8C2E83F3E98BB226E06CA3 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2121541CEFBC5474EFAAFBCC /* libPods-HEXA Dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,8 +108,8 @@
 		39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-ExtraBold.ttf"; path = "../src/assets/fonts/OpenSans-ExtraBold.ttf"; sourceTree = "<group>"; };
 		3A6E33311AF8F0F19ADDF937 /* libPods-HEXA Stage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Stage.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../src/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
-		46C08DA0D06A8E449B7275C7 /* libPods-HEXA Dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-SemiBold.ttf"; path = "../src/assets/fonts/FiraSans-SemiBold.ttf"; sourceTree = "<group>"; };
+		526190C89C026136C22C1088 /* libPods-HEXA Dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5395FCDF04064C3DBEEE4A64 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		559C9AB9CDAC4F3FA05EC3FE /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		57F664D38343416FB1C55280 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
@@ -128,29 +128,28 @@
 		67A86A5BF4334540878AED10 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		6A234933673440BFB6559B6D /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		70412DE9AEA54C18972F9DD5 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
-		7AD1A200CEA1AB4405B6DCD3 /* Pods-HEXA Dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Dev.release.xcconfig"; path = "Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev.release.xcconfig"; sourceTree = "<group>"; };
 		7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Regular.ttf"; path = "../src/assets/fonts/FiraSans-Regular.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HEXA/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		849CCF395205ADE2EC9A555A /* Pods-HEXA Stage.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Stage.debug.xcconfig"; path = "Target Support Files/Pods-HEXA Stage/Pods-HEXA Stage.debug.xcconfig"; sourceTree = "<group>"; };
 		8A1B98A7327A4AD8A5860B74 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		907350EA4610E0971FE686A6 /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 		917A2A003A01429481FD026C /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		96E40822F039459A97686C32 /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Italic.ttf"; path = "../src/assets/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Medium.ttf"; path = "../src/assets/fonts/FiraSans-Medium.ttf"; sourceTree = "<group>"; };
 		9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
+		9F3386980706334032A712F9 /* Pods-HEXA Dev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Dev.debug.xcconfig"; path = "Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev.debug.xcconfig"; sourceTree = "<group>"; };
 		A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-BookItalic.ttf"; path = "../src/assets/fonts/FiraSans-BookItalic.ttf"; sourceTree = "<group>"; };
+		A7B355600C2ED22B770138F8 /* Pods-HEXA Dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Dev.release.xcconfig"; path = "Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev.release.xcconfig"; sourceTree = "<group>"; };
 		AA11C3A12548270900B032D1 /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "HEXA/HEXA.Dev-Info.plist"; sourceTree = "<group>"; };
 		AA11C3A32548271A00B032D1 /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "HEXA.Stage-Info.plist"; path = "HEXA/HEXA.Stage-Info.plist"; sourceTree = "<group>"; };
 		AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Light.ttf"; path = "../src/assets/fonts/OpenSans-Light.ttf"; sourceTree = "<group>"; };
-		B9AD12D33B607AC538FF8B8A /* libPods-HEXA Stage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Stage.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B0A87F089E485685570E93 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		C807C0C4089E5F977D811348 /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		C88B0D378D49456C80224451 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		C8BC543B70204B8FB3B09520 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		D242AB8F3F014E068BE8C13D /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiboldItalic.ttf"; path = "../src/assets/fonts/OpenSans-SemiboldItalic.ttf"; sourceTree = "<group>"; };
+		DE88C037E8DEEF26F177E351 /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Semibold.ttf"; path = "../src/assets/fonts/OpenSans-Semibold.ttf"; sourceTree = "<group>"; };
-		E046A7136C7DF8888C0EADF0 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Italic.ttf"; path = "../src/assets/fonts/FiraSans-Italic.ttf"; sourceTree = "<group>"; };
 		E3FD67BF6764BFB0005E8845 /* Pods-HEXA Stage.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Stage.release.xcconfig"; path = "Target Support Files/Pods-HEXA Stage/Pods-HEXA Stage.release.xcconfig"; sourceTree = "<group>"; };
 		E4611B89DA35F6F0EF368513 /* Pods-HEXA Dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Dev.release.xcconfig"; path = "Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev.release.xcconfig"; sourceTree = "<group>"; };
@@ -834,7 +833,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HEXA/Pods-HEXA-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9DD8C5B042977CEB86DF6A37 /* [CP] Check Pods Manifest.lock */ = {
+		76A983C3E4CD74207AE247BB /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -849,36 +848,14 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HEXA-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-HEXA Dev-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B32D29D6DD08C502CBE83118 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HEXA Stage-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B3D8288AD4FA6232B67ACA0A /* [CP] Copy Pods Resources */ = {
+		B1AF2570E0EF7939E95B028E /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -926,78 +903,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HEXA Stage/Pods-HEXA Stage-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CA8C5BF5CA9107082239D747 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CAD01EAA45FFF3B3A79F5209 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-HEXA Dev-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

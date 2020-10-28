@@ -899,7 +899,6 @@ export default function Receive(props) {
           <AddContactAddressBook
             isLoadContacts={isLoadContacts}
             modalTitle="Select a Contact"
-            modalRef={AddContactAddressBookBookBottomSheet}
             proceedButtonText={'Confirm & Proceed'}
             onPressContinue={(selectedContacts) =>
               onPressContinue(selectedContacts)
