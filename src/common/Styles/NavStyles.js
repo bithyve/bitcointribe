@@ -5,7 +5,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 
 
 const NavStyles = StyleSheet.create({
-
   modalHeaderTitleView: {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
@@ -22,6 +21,8 @@ const NavStyles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
+    textAlign: 'left',
+    marginHorizontal: 0,
   },
 
   modalHeaderInfoText: {

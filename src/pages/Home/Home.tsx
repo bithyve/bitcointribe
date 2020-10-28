@@ -903,7 +903,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.cleanupListeners();
   }
 
-
   openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
     this.props.navigation.popToTop();
 
