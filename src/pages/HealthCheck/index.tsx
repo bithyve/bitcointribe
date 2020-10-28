@@ -170,17 +170,6 @@ export default function HealthCheck(props) {
     }
   }, [overallHealth]);
 
-  // useEffect(() => {
-  //   // HC down-streaming
-  //   if (s3Service) {
-  //     const { healthCheckInitialized } = s3Service.sss;
-
-  //     if (healthCheckInitialized) {
-  //       dispatch(checkMSharesHealth());
-  //     }
-  //   }
-  // }, []);
-
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -204,7 +193,7 @@ export default function HealthCheck(props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={{ marginLeft: 'auto', marginRight: 10 }}
-            onPress={() => {}}
+            onPress={() => { }}
           >
             <Image
               source={require('../../assets/images/icons/icon_settings1.png')}
@@ -256,11 +245,7 @@ export default function HealthCheck(props) {
             data={pageData}
             extraData={selectedType}
             renderItem={({ item }) => (
-              <View
-              // style={{
-              //   opacity: !selectedType || item.type == selectedType ? 1 : 0.5
-              // }}
-              >
+              <View>
                 <TouchableOpacity
                   onPress={() =>
                     props.navigation.navigate(item.route, {
@@ -326,18 +311,6 @@ export default function HealthCheck(props) {
             )}
           />
         </ScrollView>
-        {/* <BottomSheet
-          enabledInnerScrolling={true}
-          ref={WalletBackupAndRecoveryBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderWalletBackupAndRecoveryContents}
-          renderHeader={renderWalletBackupAndRecoveryHeader}
-        /> */}
       </View>
     </View>
   );
