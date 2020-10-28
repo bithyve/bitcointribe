@@ -25,7 +25,7 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SendViaLink from '../../components/SendViaLink';
-import { nameToInitials } from '../../common/CommonFunctions';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
@@ -98,9 +98,7 @@ export default function AddContactSendRequest(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
+
   const updateTrustedContactsInfo = async (contact) => {
     let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
     if (tcInfo) {

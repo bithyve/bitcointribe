@@ -38,6 +38,7 @@ import {
   uploadRequestedShare,
 } from '../../store/actions/sss';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
@@ -50,6 +51,7 @@ import {
   fetchNotifications,
   notificationsUpdated,
 } from '../../store/actions/notifications';
+import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCurrencyToggleValue,
@@ -138,8 +140,9 @@ interface HomeStateTypes {
   switchOn: boolean;
   CurrencyCode: string;
   balances: any;
-
   selectedBottomTab: BottomTab | null;
+
+  /// TODO: remove the `new` prefix when all bottom sheets are refactored to use the `@gorhom/bottom-sheet` library
   bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
 
@@ -150,10 +153,12 @@ interface HomeStateTypes {
   selectedContact: any[];
   notificationDataChange: boolean;
   appState: string;
+  fbBTCAccount: any;
   trustedContactRequest: any;
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
+  lastActiveTime: string;
   isBalanceLoading: boolean;
 }
 
@@ -183,6 +188,8 @@ interface HomePropsTypes {
   isFocused: boolean;
   notificationListNew: any;
   notificationsUpdated: any;
+  FBTCAccountData: any;
+  storeFbtcData: any;
   setCurrencyCode: any;
   currencyCode: any;
   setCurrencyToggleValue: any;
@@ -231,10 +238,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       selectedContact: [],
       notificationDataChange: false,
       appState: '',
+      fbBTCAccount: {},
       trustedContactRequest: null,
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
+      lastActiveTime: moment().toISOString(),
       notificationLoading: true,
       isBalanceLoading: true,
     };
@@ -904,7 +913,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.cleanupListeners();
   }
 
-  openBottomSheetOnLaunch(ref: React.RefObject<BottomSheet>) {
+
+  openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
     this.props.navigation.popToTop();
 
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
@@ -1042,11 +1052,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = navigation.addListener('didFocus', () => {
       this.setCurrencyCodeFromAsync();
       this.getAssociatedContact();
+      this.checkFastBitcoin();
       this.props.fetchNotifications();
+      this.setState({
+        lastActiveTime: moment().toISOString(),
+      });
     });
 
     this.getAssociatedContact();
     this.setCurrencyCodeFromAsync();
+    this.checkFastBitcoin();
+  };
+
+  checkFastBitcoin = async () => {
+    const { FBTCAccountData } = this.props;
+
+    let getFBTCAccount = FBTCAccountData || {};
+
+    this.setState({ fbBTCAccount: getFBTCAccount });
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -2161,6 +2184,7 @@ const mapStateToProps = (state) => {
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
@@ -2187,11 +2211,13 @@ export default withNavigationFocus(
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,
+    storeFbtcData,
     setCurrencyCode,
     setCurrencyToggleValue,
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
+    updateAddressBookLocally,
     setCardData,
   })(Home),
 );
