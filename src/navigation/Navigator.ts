@@ -209,16 +209,26 @@ const HomeNavigator = createStackNavigator(
   },
   {
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: ({ navigation }) => ({
-      header: null,
-    }),
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        header: null,
+        headerTitleContainerStyle: {
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+        },
+      };
+    },
     transitionConfig: (transitionProps, prevTransitionProps) => {
+
+      // 📝 Override the default presentation mode for screens that we
+      // want to present modally
       const isModal = MODAL_ROUTES.some(
         (screenName) =>
           screenName === transitionProps.scene.route.routeName ||
           (prevTransitionProps &&
             screenName === prevTransitionProps.scene.route.routeName),
       );
+
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
         prevTransitionProps,
