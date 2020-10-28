@@ -62,6 +62,8 @@ const PersonalCopyHistory = (props) => {
     (state) => state.sss.pdfHealthCheckFailed,
   );
   const s3Service: S3Service = useSelector((state) => state.sss.service);
+  const overallHealth = s3Service.sss.healthCheckStatus;
+
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -235,8 +237,9 @@ const PersonalCopyHistory = (props) => {
   const generated = useSelector(
     (state) => state.sss.personalCopyGenerated[selectedPersonalCopy.type],
   );
-
+      
   useEffect(() => {
+    console.log({overallHealth});
     (async () => {
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
