@@ -323,15 +323,15 @@ export default class TrustedContacts {
     shareUploadables?: ShareUploadables,
   ): Promise<
     | {
-      updated: any;
-      publicKey: string;
-      data: EphemeralDataElements;
-    }
+        updated: any;
+        publicKey: string;
+        data: EphemeralDataElements;
+      }
     | {
-      updated: any;
-      publicKey: string;
-      data?: undefined;
-    }
+        updated: any;
+        publicKey: string;
+        data?: undefined;
+      }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -545,17 +545,17 @@ export default class TrustedContacts {
 
         newTrustedData.data.walletID
           ? (this.trustedContacts[contactName].walletID =
-            newTrustedData.data.walletID)
+              newTrustedData.data.walletID)
           : null;
 
         if (newTrustedData.data.FCM)
           this.trustedContacts[contactName].FCMs
             ? this.trustedContacts[contactName].FCMs.push(
-              newTrustedData.data.FCM,
-            )
+                newTrustedData.data.FCM,
+              )
             : (this.trustedContacts[contactName].FCMs = [
-              newTrustedData.data.FCM,
-            ]);
+                newTrustedData.data.FCM,
+              ]);
       }
     } else {
       trustedData = [newTrustedData];
@@ -599,13 +599,13 @@ export default class TrustedContacts {
     shareUploadables?: ShareUploadables,
   ): Promise<
     | {
-      updated: any;
-      data: TrustedData;
-    }
+        updated: any;
+        data: TrustedData;
+      }
     | {
-      updated: any;
-      data?: undefined;
-    }
+        updated: any;
+        data?: undefined;
+      }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -964,8 +964,8 @@ export default class TrustedContacts {
                   encryptedData,
                 ).data;
                 if (decryptedData.remove) contactsToRemove.push(contactName);
-                // if (decryptedData.removeGuardian)
-                //   guardiansToRemove.push(contactName);
+                if (decryptedData.removeGuardian)
+                  guardiansToRemove.push(contactName);
                 subChan.data = decryptedData;
                 subChan.encDataHash = dataHash;
                 subChan.lastSeen = lastSeen;

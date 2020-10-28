@@ -1792,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: !this.state.notificationDataChange,
     });
 
-    if (value.info.includes('Trusted Contact request accepted by')) {
+    if (value.info.includes('F&F request accepted by')) {
       navigation.navigate('FriendsAndFamily');
       return;
     }

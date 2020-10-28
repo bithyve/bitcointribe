@@ -63,6 +63,9 @@ import {
   TrustedDataElements,
   WalletImage,
   ShareUploadables,
+  INotification,
+  notificationType,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -85,6 +88,19 @@ import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
+import RelayServices from '../../bitcoin/services/RelayService';
+
+const sendNotification = (recipient, notification) => {
+  const receivers = [];
+  if (recipient.walletID && recipient.FCMs.length)
+    receivers.push({
+      walletId: recipient.walletID,
+      FCMs: recipient.FCMs,
+    });
+
+  if (receivers.length)
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+};
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -196,7 +212,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ]; // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
-        payload.contactInfo.contactName
+          payload.contactInfo.contactName
         ];
       if (accountNumber) {
         delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
@@ -210,14 +226,52 @@ function* uploadEncMetaShareWorker({ payload }) {
       trustedContacts.tc.trustedContacts[
         payload.previousGuardianName
       ].isGuardian = false;
+
+      const {
+        walletID,
+        FCMs,
+        trustedChannel,
+      } = trustedContacts.tc.trustedContacts[payload.previousGuardianName];
+
+      if (trustedChannel) {
+        // dispatching remove share action to the previous guardian
+        const dataElements = { removeGuardian: true };
+
+        const res = yield call(
+          trustedContacts.updateTrustedChannel,
+          payload.previousGuardianName,
+          dataElements,
+        );
+
+        if (res.status === 200) {
+          if (walletID && FCMs) {
+            const recipient = {
+              walletID,
+              FCMs,
+            };
+            const { walletName } = yield select(
+              (state) => state.storage.database.WALLET_SETUP,
+            );
+
+            const notification: INotification = {
+              notificationType: notificationType.contact,
+              title: 'Friends and Family notification',
+              body: `Removed as a Keeper by ${walletName}`,
+              data: {},
+              tag: notificationTag.IMP,
+            };
+            sendNotification(recipient, notification);
+          }
+        }
+      }
     }
   } else {
     // preventing re-uploads till expiry
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
       if (
         Date.now() -
-        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-          .UPLOADED_AT <
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+            .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -666,8 +720,16 @@ function* generatePersonalCopyWorker({ payload }) {
       };
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
-      const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
-      const originalSharingDetails = personalCopyDetails[selectedPersonalCopy.type] && personalCopyDetails[selectedPersonalCopy.type].sharingDetails ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails : {}
+      const originalSharedStatus = personalCopyDetails[
+        selectedPersonalCopy.type
+      ]
+        ? personalCopyDetails[selectedPersonalCopy.type].shared
+        : false;
+      const originalSharingDetails =
+        personalCopyDetails[selectedPersonalCopy.type] &&
+        personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          : {};
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
@@ -775,7 +837,7 @@ function* sharePersonalCopyWorker({ payload }) {
                 path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                    personalCopyDetails[selectedPersonalCopy.type].path
+                      personalCopyDetails[selectedPersonalCopy.type].path
                     : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
                 type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                 name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -802,7 +864,7 @@ function* sharePersonalCopyWorker({ payload }) {
             url:
               Platform.OS == 'android'
                 ? 'file://' +
-                personalCopyDetails[selectedPersonalCopy.type].path
+                  personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
@@ -994,7 +1056,6 @@ function* updateMSharesHealthWorker() {
         },
       });
     }
-
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });

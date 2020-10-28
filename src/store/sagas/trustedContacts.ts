@@ -243,8 +243,9 @@ function* removeTrustedContactWorker({ payload }) {
     for (let itr = 0; itr < tcInfo.length; itr++) {
       const trustedContact = tcInfo[itr];
       if (trustedContact) {
-        const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+        const presentContactName = `${trustedContact.firstName} ${
+          trustedContact.lastName ? trustedContact.lastName : ''
+        }`
           .toLowerCase()
           .trim();
 
@@ -306,7 +307,7 @@ function* removeTrustedContactWorker({ payload }) {
     const notification: INotification = {
       notificationType: notificationType.contact,
       title: 'Friends and Family notification',
-      body: `Trusted Contact removed by ${walletName}`,
+      body: `F&F removed by ${walletName}`,
       data: {},
       tag: notificationTag.IMP,
     };
@@ -419,7 +420,7 @@ function* updateEphemeralChannelWorker({ payload }) {
           const notification: INotification = {
             notificationType: notificationType.contact,
             title: 'Friends and Family notification',
-            body: `Trusted Contact request accepted by ${walletName}`,
+            body: `F&F request accepted by ${walletName}`,
             data: {},
             tag: notificationTag.IMP,
           };
@@ -1061,12 +1062,12 @@ function* syncTrustedChannelsWorker({ payload }) {
         const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
         // // downgrade guardians and remove share
-        // for (const guardianName of guardiansToRemove) {
-        //   trustedContacts.tc.trustedContacts[guardianName].isWard = false;
-        //   delete sharesUnderCustody[
-        //     trustedContacts.tc.trustedContacts[guardianName].contactsWalletName
-        //   ];
-        // }
+        for (const guardianName of guardiansToRemove) {
+          trustedContacts.tc.trustedContacts[guardianName].isWard = false;
+          delete sharesUnderCustody[
+            trustedContacts.tc.trustedContacts[guardianName].contactsWalletName
+          ];
+        }
 
         // remove trusted contacts
         for (const contactName of contactsToRemove) {
@@ -1087,8 +1088,9 @@ function* syncTrustedChannelsWorker({ payload }) {
             for (let itr = 0; itr < tcInfo.length; itr++) {
               const trustedContact = tcInfo[itr];
               if (trustedContact) {
-                const presentContactName = `${trustedContact.firstName} ${trustedContact.lastName ? trustedContact.lastName : ''
-                  }`
+                const presentContactName = `${trustedContact.firstName} ${
+                  trustedContact.lastName ? trustedContact.lastName : ''
+                }`
                   .toLowerCase()
                   .trim();
 
