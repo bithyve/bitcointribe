@@ -661,7 +661,7 @@ export default class SecureAccount {
       );
       return { generated };
     } catch (err) {
-      console.log({ err });
+      // console.log({ err });
       return { generated: false };
     }
   };
@@ -822,9 +822,9 @@ export default class SecureAccount {
 
       const txHex = signedTxb.buildIncomplete().toHex();
 
-      console.log(
-        '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
-      );
+      // console.log(
+      //   '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
+      // );
 
       return {
         status: config.STATUS.SUCCESS,
@@ -911,13 +911,13 @@ export default class SecureAccount {
         inputs,
         txb,
       );
-      console.log('---- Transaction Signed ----');
+      // console.log('---- Transaction Signed ----');
 
       const txHex = signedTxb.build().toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       const { txid } = await this.secureHDWallet.broadcastTransaction(txHex);
-      console.log('---- Transaction Broadcasted ----');
-      console.log({ txid });
+      // console.log('---- Transaction Broadcasted ----');
+      // console.log({ txid });
 
       this.secureHDWallet.removeSecondaryXpriv();
       return { status: config.STATUS.SUCCESS, data: { txid } };

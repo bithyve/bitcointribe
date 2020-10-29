@@ -53,7 +53,7 @@ export default function CommunicationModeModalContents(props) {
       );
     }
     setSelectedContactMode(selectedContactMode);
-    console.log("selectedContactMode", selectedContactMode);
+    // console.log("selectedContactMode", selectedContactMode);
     setRadioOnOff(!radioOnOff);
   };
 

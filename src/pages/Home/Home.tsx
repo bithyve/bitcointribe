@@ -1013,6 +1013,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinking = async (url: string) => {
+    url = url || ''
     console.log('Home::handleDeepLinking::URL: ' + url);
 
     const splits = url.split('/');
