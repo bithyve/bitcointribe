@@ -77,6 +77,15 @@
 		AA11C3A22548270900B032D1 /* HEXA.Dev-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11C3A12548270900B032D1 /* HEXA.Dev-Info.plist */; };
 		AA11C3A42548271A00B032D1 /* HEXA.Stage-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11C3A32548271A00B032D1 /* HEXA.Stage-Info.plist */; };
 		AA44DA062530A21B006C11BE /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
+		AAD1875F254B00F00055BB32 /* iCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875B254B00F00055BB32 /* iCloud.m */; };
+		AAD18760254B00F00055BB32 /* iCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875B254B00F00055BB32 /* iCloud.m */; };
+		AAD18761254B00F00055BB32 /* iCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875B254B00F00055BB32 /* iCloud.m */; };
+		AAD18762254B00F00055BB32 /* ICloudBackup.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875C254B00F00055BB32 /* ICloudBackup.m */; };
+		AAD18763254B00F00055BB32 /* ICloudBackup.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875C254B00F00055BB32 /* ICloudBackup.m */; };
+		AAD18764254B00F00055BB32 /* ICloudBackup.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875C254B00F00055BB32 /* ICloudBackup.m */; };
+		AAD18765254B00F00055BB32 /* iCloudHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875D254B00F00055BB32 /* iCloudHelper.swift */; };
+		AAD18766254B00F00055BB32 /* iCloudHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875D254B00F00055BB32 /* iCloudHelper.swift */; };
+		AAD18767254B00F00055BB32 /* iCloudHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD1875D254B00F00055BB32 /* iCloudHelper.swift */; };
 		B8D1041D05D6411F9D52E7D6 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
 		C0D2EBAD35E54C34BB47A2C0 /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
 		DF98272D8CB14F19972464BB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
@@ -137,6 +146,11 @@
 		A7B355600C2ED22B770138F8 /* Pods-HEXA Dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Dev.release.xcconfig"; path = "Target Support Files/Pods-HEXA Dev/Pods-HEXA Dev.release.xcconfig"; sourceTree = "<group>"; };
 		AA11C3A12548270900B032D1 /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "HEXA/HEXA.Dev-Info.plist"; sourceTree = "<group>"; };
 		AA11C3A32548271A00B032D1 /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "HEXA.Stage-Info.plist"; path = "HEXA/HEXA.Stage-Info.plist"; sourceTree = "<group>"; };
+		AAD1875A254B00F00055BB32 /* iCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloud.h; sourceTree = "<group>"; };
+		AAD1875B254B00F00055BB32 /* iCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloud.m; sourceTree = "<group>"; };
+		AAD1875C254B00F00055BB32 /* ICloudBackup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICloudBackup.m; sourceTree = "<group>"; };
+		AAD1875D254B00F00055BB32 /* iCloudHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iCloudHelper.swift; sourceTree = "<group>"; };
+		AAD1875E254B00F00055BB32 /* ICloudBackup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICloudBackup.h; sourceTree = "<group>"; };
 		AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Light.ttf"; path = "../src/assets/fonts/OpenSans-Light.ttf"; sourceTree = "<group>"; };
 		C1B0A87F089E485685570E93 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		C88B0D378D49456C80224451 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -207,6 +221,7 @@
 		13B07FAE1A68108700A75B9A /* HEXA */ = {
 			isa = PBXGroup;
 			children = (
+				AAD1876B254B00F60055BB32 /* iCloud */,
 				619CF22F250654D100A8E6DF /* GoogleService-Info.plist */,
 				619CF234250654F600A8E6DF /* GoogleService-Info.plist */,
 				619CF232250654E300A8E6DF /* GoogleService-Info.plist */,
@@ -285,6 +300,18 @@
 				ECB1BF22CC23631AD4981276 /* Pods-HEXA Stage.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		AAD1876B254B00F60055BB32 /* iCloud */ = {
+			isa = PBXGroup;
+			children = (
+				AAD1875A254B00F00055BB32 /* iCloud.h */,
+				AAD1875B254B00F00055BB32 /* iCloud.m */,
+				AAD1875E254B00F00055BB32 /* ICloudBackup.h */,
+				AAD1875C254B00F00055BB32 /* ICloudBackup.m */,
+				AAD1875D254B00F00055BB32 /* iCloudHelper.swift */,
+			);
+			path = iCloud;
 			sourceTree = "<group>";
 		};
 		ED5E1CB499D246C4A53D8164 /* Resources */ = {
@@ -823,10 +850,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				AAD18762254B00F00055BB32 /* ICloudBackup.m in Sources */,
 				6111483A250647BD00ED433D /* PdfPassword.m in Sources */,
+				AAD1875F254B00F00055BB32 /* iCloud.m in Sources */,
 				611148352506478E00ED433D /* PdfGenerate.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				AA5C3130251393B300A9E291 /* iCloudHelper.swift in Sources */,
+				AAD18765254B00F00055BB32 /* iCloudHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -835,9 +864,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6182F776250B23D7005B6ECE /* AppDelegate.m in Sources */,
+				AAD18763254B00F00055BB32 /* ICloudBackup.m in Sources */,
 				6182F777250B23D7005B6ECE /* PdfPassword.m in Sources */,
+				AAD18760254B00F00055BB32 /* iCloud.m in Sources */,
 				6182F778250B23D7005B6ECE /* PdfGenerate.swift in Sources */,
 				6182F779250B23D7005B6ECE /* main.m in Sources */,
+				AAD18766254B00F00055BB32 /* iCloudHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -846,9 +878,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6182F7A2250B2742005B6ECE /* AppDelegate.m in Sources */,
+				AAD18764254B00F00055BB32 /* ICloudBackup.m in Sources */,
 				6182F7A3250B2742005B6ECE /* PdfPassword.m in Sources */,
+				AAD18761254B00F00055BB32 /* iCloud.m in Sources */,
 				6182F7A4250B2742005B6ECE /* PdfGenerate.swift in Sources */,
 				6182F7A5250B2742005B6ECE /* main.m in Sources */,
+				AAD18767254B00F00055BB32 /* iCloudHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
