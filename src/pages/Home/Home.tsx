@@ -670,7 +670,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const date = new Date();
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
-    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+    // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
       .notifications()
       .scheduleNotification(notification, {
