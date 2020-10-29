@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
@@ -22,12 +21,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-// import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
-// import {
-//   updateMSharesHealth,
-//   checkMSharesHealth,
-//   updateWalletImage,
-// } from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -35,9 +28,9 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
-const LOADER_MESSAGE_TIME = 5000;
+const LOADER_MESSAGE_TIME = 3000;
 export default function Login(props) {
-  // loader messages code has been removed
+  // if you are looking for loader messages code
   // please refer to v1.3.1 # 147 or earlier
 
   const [passcode, setPasscode] = useState('');
@@ -55,10 +48,6 @@ export default function Login(props) {
   const releaseCasesValue = useSelector(
     (state) => state.preferences.releaseCasesValue,
   );
-
-  // const startupSyncLoaded = useSelector(
-  //   (state) => state.loaders.startupSyncLoaded,
-  // );
 
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
 
@@ -120,7 +109,7 @@ export default function Login(props) {
 
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
-        console.log('Release note', res.data.releases);
+        // console.log('Release note', res.data.releases);
         let releaseCases = releaseCasesValue;
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseCases'),
@@ -178,9 +167,7 @@ export default function Login(props) {
   );
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector((state) => state.preferences.isMigrated);
-  const accountsSynched = useSelector(
-    (state) => state.accounts.accountsSynched,
-  );
+
   let timer;
 
   useEffect(() => {
@@ -190,7 +177,6 @@ export default function Login(props) {
         dispatch(initMigration());
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
-        console.log('checking if wallet exissts', {LOADER_MESSAGE_TIME})
         if (exists) {
           console.log('starting timer ', {LOADER_MESSAGE_TIME}, Date.now())
           timer = setTimeout(() => {
@@ -212,31 +198,12 @@ export default function Login(props) {
     }
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (startupSyncLoaded) {
-      console.log('sync complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
-    
-      if (loaderBottomSheet.current) {
-        loaderBottomSheet.current.snapTo(0);
-      }
-      props.navigation.navigate('Home', {
-        custodyRequest,
-        recoveryRequest,
-        trustedContactRequest,
-        userKey,
-      });
-      // if (timer) {
-      //   console.log('clearing timer... ')
-      //   clearTimeout(timer);
-      // }
-    }
-  }, [startupSyncLoaded]);
-
   const handleLoaderMessages = (passcode) => {
     setTimeout(() => {
       dispatch(credsAuth(passcode));
     }, 2);
   };
+
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal

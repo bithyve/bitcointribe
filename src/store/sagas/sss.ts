@@ -1773,7 +1773,7 @@ function* updateWalletImageWorker({ payload }) {
     }
   }
 
-  console.log({ walletImage });
+  // console.log({ walletImage });
 
   if (Object.keys(walletImage).length === 0) {
     console.log('WI: nothing to update');
@@ -1802,7 +1802,7 @@ function* fetchWalletImageWorker({ payload }) {
   console.log({ res });
   if (res.status === 200) {
     const walletImage: WalletImage = res.data.walletImage;
-    console.log({ walletImage });
+    // console.log({ walletImage });
 
     if (!Object.keys(walletImage).length)
       console.log('Failed fetch: Empty Wallet Image');
