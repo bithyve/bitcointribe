@@ -453,7 +453,7 @@ function* uploadRequestedShareWorker({ payload }) {
     tag
   ];
 
-  // // preventing re-uploads till expiry
+  // preventing re-uploads till expiry
   // if (TRANSFER_DETAILS) {
   //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
   //     return;
