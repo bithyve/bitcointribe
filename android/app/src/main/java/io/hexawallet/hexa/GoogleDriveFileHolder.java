@@ -9,7 +9,7 @@ class GoogleDriveFileHolder {
     private long size;
     private DateTime createdTime;
     private Boolean starred;
-    private String mimeType;
+    private String mimeType; 
 
 
     public DateTime getCreatedTime() {

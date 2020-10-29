@@ -54,7 +54,7 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
-import io.hexawallet.hexa.GoogleDrivePackage;
+import io.hexawallet.hexa.GoogleDrivePackage; 
 
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
