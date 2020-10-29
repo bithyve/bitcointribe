@@ -94,7 +94,7 @@ export default function SendViaLink(props) {
         if (shareApps[i].url) {
       isAppInstalled(shareApps[i].title)
     .then((isInstalled) => {
-      console.log("isInstalled", isInstalled);
+      // console.log("isInstalled", isInstalled);
       shareApps[i].isAvailable = Boolean(isInstalled);
         // isInstalled is true if the app is installed or false if not
     });
@@ -121,7 +121,7 @@ export default function SendViaLink(props) {
     return new Promise(async (resolve, reject) => {
       
       NativeModules.CheckPackageInstallation.isPackageInstalled(packagename, (isInstalled) => {
-        console.log("RESOLVE", packagename, resolve);
+        // console.log("RESOLVE", packagename, resolve);
             resolve(isInstalled);
         });
     });
