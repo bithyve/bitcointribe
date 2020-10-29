@@ -178,9 +178,9 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          console.log('starting timer ', {LOADER_MESSAGE_TIME}, Date.now())
+          // console.log('starting timer ', {LOADER_MESSAGE_TIME}, Date.now())
           timer = setTimeout(() => {
-            console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
+            // console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
             if (loaderBottomSheet.current) {
               loaderBottomSheet.current.snapTo(0);
             }
@@ -213,7 +213,7 @@ export default function Login(props) {
         showGif={true}
       />
     );
-  }, ['message', 'subTextMessage1', 'subTextMessage2']);
+  }, ['', '', '']);
 
   const renderLoaderModalHeader = () => {
     return (

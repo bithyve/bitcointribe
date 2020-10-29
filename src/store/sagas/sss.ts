@@ -1268,7 +1268,6 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
-  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
