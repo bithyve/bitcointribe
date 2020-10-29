@@ -1,7 +1,6 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
-apply plugin: 'io.fabric'      
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"     
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
 
@@ -63,7 +62,7 @@ android {
         versionCode 148
         versionName "1.3.0"
         missingDimensionStrategy 'react-native-camera', 'general' 
-        multiDexEnabled true
+        multiDexEnabled false
         resValue "string", "build_config_package", "io.hexawallet.hexa"
     }                         
                                  
@@ -170,9 +169,6 @@ dependencies {
     implementation project(':react-native-screens')
     implementation project(':react-native-reanimated')
     implementation project(':react-native-gesture-handler')
-    compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-    transitive = true;
-    }   
     compile ('com.google.android.gms:play-services-drive:10.2.0') {
     force = true;
     }

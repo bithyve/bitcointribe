@@ -50,8 +50,6 @@ import org.unimodules.adapters.react.ReactModuleRegistryProvider;
 import org.unimodules.core.interfaces.SingletonModule;
 
 import java.util.List;
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
 
@@ -118,7 +116,6 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
         SoLoader.init(this, /* native exopackage */ false);
     }
 }
