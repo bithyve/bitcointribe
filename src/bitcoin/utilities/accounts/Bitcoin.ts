@@ -181,7 +181,7 @@ export default class Bitcoin {
       };
 
       const addressesInfo = Txs;
-      console.log({ addressesInfo });
+      // console.log({ addressesInfo });
       const txMap = new Map();
 
       for (const addressInfo of addressesInfo) {
@@ -236,7 +236,7 @@ export default class Bitcoin {
                 senderAddresses: tx.senderAddresses,
                 blockTime: tx.Status.block_time, // only available when tx is confirmed
               };
-              console.log({ outgoingTx, incomingTx });
+              // console.log({ outgoingTx, incomingTx });
               transactions.transactionDetails.push(...[outgoingTx, incomingTx]);
             } else {
               const transaction = {
@@ -302,9 +302,9 @@ export default class Bitcoin {
         nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
       };
     } catch (err) {
-      console.log(
-        `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
-      );
+      // console.log(
+      //  `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+      //);
       throw new Error('Fetching balance-txn by addresses failed');
     }
   };
@@ -384,10 +384,10 @@ export default class Bitcoin {
 
       return txCounts;
     } catch (err) {
-      console.log(
-        `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
-      );
-      console.log('Using Blockcypher fallback');
+      // console.log(
+      //  `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
+      //);
+      // console.log('Using Blockcypher fallback');
 
       try {
         for (const address of addresses) {
@@ -396,9 +396,9 @@ export default class Bitcoin {
         }
         return txCounts;
       } catch (err) {
-        console.log(
-          `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
-        );
+        // console.log(
+        //  `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
+        //);
         throw new Error('Transaction fetching failed');
       }
     }
@@ -518,7 +518,7 @@ export default class Bitcoin {
     const UTXOs = [];
     // tslint:disable-next-line:forin
     for (const address of addresses) {
-      console.log(`Fetching utxos corresponding to ${address}`);
+      // console.log(`Fetching utxos corresponding to ${address}`);
       const utxos = await this.fetchUnspentOutputs(address);
       UTXOs.push(...utxos);
     }
@@ -566,16 +566,16 @@ export default class Bitcoin {
       }
       return { UTXOs };
     } catch (err) {
-      console.log(`An error occurred while connecting to Esplora: ${err}`);
-      console.log('Switching to Blockcypher UTXO fallback');
+      // console.log(`An error occurred while connecting to Esplora: ${err}`);
+      // console.log('Switching to Blockcypher UTXO fallback');
 
       try {
         const UTXOs = await this.blockcypherUTXOFallback(addresses);
         return { UTXOs };
       } catch (err) {
-        console.log(
-          `Blockcypher UTXO fallback failed with the following error: ${err}`,
-        );
+        // console.log(
+        //  `Blockcypher UTXO fallback failed with the following error: ${err}`,
+        //);
         throw new Error('multi utxo fetch failed');
       }
     }
@@ -598,10 +598,10 @@ export default class Bitcoin {
 
       return data;
     } catch (err) {
-      console.log(
-        `An error occurred while fetching transaction details from Esplora: ${err}`,
-      );
-      console.log('Switching to Blockcypher fallback');
+      // console.log(
+       // `An error occurred while fetching transaction details from Esplora: ${err}`,
+      //);
+      // console.log('Switching to Blockcypher fallback');
       let data;
       try {
         if (this.network === bitcoinJS.networks.testnet) {
@@ -613,9 +613,9 @@ export default class Bitcoin {
         }
         return data;
       } catch (err) {
-        console.log(
-          `Blockcypher fetch txn details fallback failed with the following error: ${err}`,
-        );
+        // console.log(
+        //  `Blockcypher fetch txn details fallback failed with the following error: ${err}`,
+        //);
         throw new Error('fetch transaction detaisl failed');
       }
     }
@@ -692,7 +692,7 @@ export default class Bitcoin {
 
       return { feeRatesByPriority, rates };
     } catch (err) {
-      console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
+      // console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
       // try {
       //   const chainInfo = await this.fetchChainInfo();
       //   const {
@@ -782,9 +782,9 @@ export default class Bitcoin {
       }
       return { txid: res.data };
     } catch (err) {
-      console.log(
-        `An error occurred while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
-      );
+      // console.log(
+      //  `An error occurred while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
+      //);
       try {
         let res: AxiosResponse;
         if (this.network === bitcoinJS.networks.testnet) {
@@ -798,7 +798,7 @@ export default class Bitcoin {
           txid,
         };
       } catch (err) {
-        console.log(err.message);
+        // console.log(err.message);
         throw new Error('Transaction broadcasting failed');
       }
     }

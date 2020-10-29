@@ -115,9 +115,9 @@ export default class Relay {
           receivers,
           notification,
         });
-        console.log({ res });
+        // console.log({ res });
       } catch (err) {
-        console.log({ err });
+        // console.log({ err });
         if (err.response) throw new Error(err.response.data.err);
         if (err.code) throw new Error(err.code);
       }
@@ -148,9 +148,9 @@ export default class Relay {
           donationId,
           txNote,
         });
-        console.log({ res });
+        // console.log({ res });
       } catch (err) {
-        console.log({ err });
+        // console.log({ err });
         if (err.response) throw new Error(err.response.data.err);
         if (err.code) throw new Error(err.code);
       }
