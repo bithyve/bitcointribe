@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   View,
   Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
-  Platform,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  StatusBar,
-  BackHandler,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -24,16 +18,21 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 
 function RecipientSendConfirmation(props) {
-  const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const currencyToggleValue = useSelector(
-    (state) => state.preferences.currencyToggleValue,
-  );
+  const currencyCode = useCurrencyCode();
+  const currencyKind: CurrencyKind = useCurrencyKind();
+
+  const prefersBTC: boolean = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
 
   const getCorrectAmountCurrency = () => {
-    const switchOn = currencyToggleValue ? true : false;
-    if (!switchOn) {
+    if (prefersBTC === false) {
       return (
         props.item.currencyAmount &&
         props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()

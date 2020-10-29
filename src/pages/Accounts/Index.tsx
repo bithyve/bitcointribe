@@ -18,7 +18,6 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -32,7 +31,6 @@ import ToggleSwitch from '../../components/ToggleSwitch';
 import Carousel, { getInputRangeFromIndexes } from 'react-native-snap-carousel';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -54,14 +52,13 @@ import {
   syncViaXpubAgent,
 } from '../../store/actions/accounts';
 import {
-  setCurrencyToggleValue,
   setTestAccountHelperDone,
   setTransactionHelper,
+  currencyKindSet,
 } from '../../store/actions/preferences';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import { getCurrencyImageByRegion, isEmpty } from '../../common/CommonFunctions/index';
 import moment from 'moment';
 import config from '../../bitcoin/HexaConfig';
@@ -75,7 +72,6 @@ import CheckingAccountHelpContents from '../../components/Helper/CheckingAccount
 import deviceInfoModule from 'react-native-device-info';
 import SavingsAccountHelpContents from '../../components/Helper/SavingsAccountHelpContents';
 import Loader from '../../components/loader';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
@@ -85,6 +81,7 @@ import DonationWebPageModalContents from '../../components/DonationWebPageModalC
 import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
 import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 
 interface AccountsStateTypes {
@@ -106,11 +103,11 @@ interface AccountsStateTypes {
   isRegularAccountHelperDone: boolean;
   isDonationAccountHelperDone: boolean;
   exchangeRates: any;
-  switchOn: boolean;
   CurrencyCode: string;
   transactions: any[];
   spendableBalance: any;
   providedBalance: any;
+  prefersBitcoin: boolean;
 }
 
 interface AccountsPropsTypes {
@@ -131,12 +128,13 @@ interface AccountsPropsTypes {
   FBTCAccountData: any;
   currencyCode: any;
   currencyToggleValue: any;
-  setCurrencyToggleValue: any;
   setTestAccountHelperDone: any;
   isTestHelperDoneValue: any;
   setTransactionHelper: any;
   isTransactionHelperDoneValue: any;
   setAverageTxFee: any;
+  currencyKind: CurrencyKind;
+  currencyKindSet: (kind: CurrencyKind) => void;
 }
 
 class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
@@ -198,7 +196,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       carouselInitIndex: this.props.navigation.state.params
         ? this.props.navigation.getParam('index')
         : 1,
-      switchOn: true,
       is_initiated: false,
       isTestHelperDone: true,
       isRegularAccountHelperDone: true,
@@ -215,6 +212,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       providedBalance: 0,
       spendableBalance: 0,
       FBTCAccount: {},
+      prefersBitcoin: this.props.currencyKind === CurrencyKind.BITCOIN,
     };
   }
 
@@ -528,14 +526,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = this.props.currencyToggleValue;
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
     let currencyCodeTmp = this.props.currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
     this.setState({
-      switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
   };
@@ -715,12 +707,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   RenderItem = ({ item, index }) => {
-    let {
-      spendableBalance,
-      switchOn,
-      exchangeRates,
-      CurrencyCode,
-    } = this.state;
+
     return (
       <ImageBackground
         source={item.backgroundImage}
@@ -897,7 +884,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             )}
           </View>
           <View style={{ flexDirection: 'row' }}>
-            {item.accountType == 'Test Account' || this.state.switchOn ? (
+            {item.accountType == 'Test Account' || this.state.prefersBitcoin ? (
               <Image
                 style={styles.cardBitCoinImage}
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
@@ -928,7 +915,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(this.state.netBalance)
-                : this.state.switchOn
+                : this.state.prefersBitcoin
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.exchangeRates
                 ? (
@@ -940,7 +927,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
-                : this.state.switchOn
+                : this.state.prefersBitcoin
                 ? 'sats'
                 : this.state.CurrencyCode.toLocaleLowerCase()}
             </Text>
@@ -1007,8 +994,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   render() {
     const {
       serviceType,
-      // averageTxFees,
-      netBalance,
       carouselInitIndex,
       showLoader,
       transactionLoading,
@@ -1018,14 +1003,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isDonationAccountHelperDone,
       transactionItem,
       isHelperDone,
-      switchOn,
+      prefersBitcoin,
       CurrencyCode,
       transactions,
       spendableBalance,
-      presentCarouselData,
       carouselData,
     } = this.state;
-    const { navigation, exchangeRates, accounts } = this.props;
+
+    const { exchangeRates, accounts } = this.props;
+
     const averageTxFees = this.getAverageTxFees();
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1053,7 +1039,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           <Text style={styles.headerText}>Accounts</Text>
           <TouchableOpacity
             style={{ height: 54, justifyContent: 'center' }}
-            onPress={() => {}}
+            // onPress={() => {}}
           >
             <View
               style={{
@@ -1083,13 +1069,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 }
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={Colors.blue}
-                onpress={async () => {
-                  this.setState({ switchOn: !this.state.switchOn });
-                  let temp = !switchOn ? 'true' : '';
-                  this.props.setCurrencyToggleValue(temp);
-                  //await AsyncStorage.setItem('currencyToggleValue', temp);
+                onpress={() => {
+                  const newValue = prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN;
+
+                  this.setState(
+                    { prefersBitcoin: newValue == CurrencyKind.BITCOIN },
+                    () => {
+                      this.props.currencyKindSet(newValue);
+                    }
+                  )
                 }}
-                toggle={switchOn}
+                toggle={prefersBitcoin}
               />
             </View>
           </TouchableOpacity>
@@ -1161,7 +1151,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       Available to spend:{' '}
                       {serviceType == TEST_ACCOUNT
                         ? UsNumberFormat(spendableBalance)
-                        : switchOn
+                        : prefersBitcoin
                         ? UsNumberFormat(spendableBalance)
                         : exchangeRates
                         ? (
@@ -1171,7 +1161,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         : null}{' '}
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
-                        : switchOn
+                        : prefersBitcoin
                         ? 'sats'
                         : CurrencyCode.toLocaleLowerCase()}
                     </Text>
@@ -1185,7 +1175,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     >
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
-                        : switchOn
+                        : prefersBitcoin
                           ? 'sats'
                           : CurrencyCode.toLocaleLowerCase()}
                     </Text> */}
@@ -1338,7 +1328,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               >
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
-                                  : switchOn
+                                  : prefersBitcoin
                                   ? UsNumberFormat(item.amount)
                                   : exchangeRates
                                   ? (
@@ -1354,7 +1344,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               >
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
-                                  : switchOn
+                                  : prefersBitcoin
                                   ? 'sats'
                                   : CurrencyCode.toLocaleLowerCase()}
                               </Text>
@@ -1428,7 +1418,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
                         Tran Fee : (~
-                        {switchOn || serviceType === TEST_ACCOUNT
+                        {prefersBitcoin || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
                               ? averageTxFees['medium'].averageTxFee
                               : 0) +
@@ -1449,7 +1439,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         {/* {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
                         ({serviceType == TEST_ACCOUNT
                           ? 't-sats'
-                          : switchOn
+                          : prefersBitcoin
                             ? 'sats'
                             : CurrencyCode.toLocaleLowerCase()}) */}
                       </Text>
@@ -1636,11 +1626,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   transactionLoading={transactionLoading}
                   transactions={transactions}
                   setTransactionItem={
-                    (item) => {}
+                    () => {}
                     //this.setState({ selectedTransactionItem: item })
                   }
                   setTabBarZIndex={
-                    (index) => {}
+                    () => {}
                     //this.setState({ tabBarIndex: index })
                   }
                   transactionDetailsBottomSheetRef={
@@ -1934,8 +1924,8 @@ const mapStateToProps = (state) => {
     accounts: idx(state, (_) => _.accounts) || [],
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyKind: idx(state, (_) => _.preferences.currencyKind),
     cardData: idx(state, (_) => _.preferences.cardData),
-    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     isTestHelperDoneValue: idx(
       state,
       (_) => _.preferences.isTestHelperDoneValue,
@@ -1945,7 +1935,6 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.isTransactionHelperDoneValue,
     ),
     averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
-    // service: idx(state, (_) => _.accounts)
   };
 };
 
@@ -1959,7 +1948,7 @@ export default withNavigationFocus(
     fetchDerivativeAccXpub,
     fetchDerivativeAccBalTx,
     fetchDerivativeAccAddress,
-    setCurrencyToggleValue,
+    currencyKindSet,
     setTestAccountHelperDone,
     setTransactionHelper,
     setAverageTxFee,
