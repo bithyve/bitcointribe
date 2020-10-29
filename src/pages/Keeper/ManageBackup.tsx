@@ -41,7 +41,7 @@ import SetupPrimaryKeeper from './SetupPrimaryKeeper';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData } from '../../common/CommonFunctions';
-import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
+import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -237,7 +237,8 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    CloudDataBackup(data, this.setCloudBackupStatus, share);
+    let cloudObject = new CloudBackup({dataObject: data, callBack: this.setCloudBackupStatus, share});
+    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
   };
 
   setCloudBackupStatus = (share) => {

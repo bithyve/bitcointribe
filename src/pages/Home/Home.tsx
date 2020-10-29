@@ -108,7 +108,7 @@ import {
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences';
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin';
-import { CloudDataBackup } from '../../common/CommonFunctions/CloudBackup';
+import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import Loader from '../../components/loader';
 import TrustedContactRequestContent from './TrustedContactRequestContent';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
@@ -812,9 +812,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       regularAccount: regularAccount,
       keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
     }
-    console.log('cloudData', data);
-    CloudDataBackup(data, this.setCloudBackupStatus, share);
-    // console.log('call for google drive upload', this.props.cloudBackupStatus);
+    let cloudObject = new CloudBackup({dataObject: data, callBack: this.setCloudBackupStatus, share});
+    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
   };
 
   setCloudBackupStatus = (share?) => {

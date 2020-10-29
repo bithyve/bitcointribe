@@ -73,14 +73,12 @@ export default function KeeperTypeModalContents(props) {
             if(isLevel2 && value.type === 'pdf'){return;}
             return (
               <AppBottomSheetTouchableWrapper
-                disabled={value.type === 'contact' ? true : false}
                 activeOpacity={10}
                 onPress={() => onKeeperSelect(value)}
                 style={styles.keeperTypeElementView}
               >
                 <View style={styles.typeRadioButtonView}>
                   <RadioButton
-                    disabled={value.type === 'contact' ? true : false}
                     size={15}
                     color={Colors.lightBlue}
                     borderColor={Colors.borderColor}

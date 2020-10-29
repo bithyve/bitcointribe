@@ -42,10 +42,7 @@ import RestoreWallet from './RestoreWallet';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import { CloudData, isEmpty } from '../../common/CommonFunctions';
-import {
-  CheckCloudDataBackup,
-  CloudDataBackup,
-} from '../../common/CommonFunctions/CloudBackup';
+import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import { setCloudBackupStatus } from '../../store/actions/preferences';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SSS from '../../bitcoin/utilities/sss/SSS';
@@ -189,7 +186,8 @@ class RestoreWithICloud extends Component<
   };
 
   cloudData = async () => {
-    CheckCloudDataBackup((result) => this.getData(result));
+    let cloudObject = new CloudBackup({recoveryCallback: (result) => this.getData(result)});
+    cloudObject.CheckCloudDataBackup((result) => this.getData(result));
   };
 
   componentDidUpdate = async (prevProps) => {
