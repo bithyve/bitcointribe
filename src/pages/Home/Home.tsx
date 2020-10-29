@@ -10,7 +10,6 @@ import {
   Linking,
   Alert,
   Image,
-  EdgeInsetsPropType,
 } from 'react-native';
 import { Easing } from "react-native-reanimated";
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -140,7 +139,6 @@ interface HomeStateTypes {
   balances: any;
   selectedBottomTab: BottomTab | null;
 
-  /// TODO: remove the `new` prefix when all bottom sheets are refactored to use the `@gorhom/bottom-sheet` library
   bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
 
@@ -2003,7 +2001,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     const {
       cardData,
-      CurrencyCode,
       balances,
       selectedBottomTab,
       notificationData,
