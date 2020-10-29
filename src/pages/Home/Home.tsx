@@ -638,8 +638,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     allCards.push(...defaultCardData, ...additionalCardData);
     this.props.setCardData(allCards);
     this.setAccountCardData([
-      ...defaultCardData.slice(0, 2),
-      // ...additionalCardData,
+      ...defaultCardData,
+      ...additionalCardData,
       ...closingCardData,
     ]);
   };
