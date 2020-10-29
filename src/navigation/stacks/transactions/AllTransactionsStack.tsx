@@ -2,7 +2,6 @@ import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
 import AllTransactionsContainerScreen from "../../../pages/Transactions/AllTransactionsContainerScreen";
 import SmallNavHeaderBackButton from "../../../components/navigation/SmallNavHeaderBackButton";
-import { goHomeAction } from "../../actions/NavigationActions";
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import AllTransactionsDetailsContainerScreen from '../../../pages/Transactions/AllTransactionsDetailsContainerScreen';
@@ -16,7 +15,7 @@ const AllTransactionsStack = createStackNavigator(
         return {
           title: "Transactions",
           headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.dispatch(goHomeAction) }} />;
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
           },
         };
       },
@@ -29,13 +28,12 @@ const AllTransactionsStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
     initialRouteName: 'AllTransactionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
         headerTitleStyle: NavStyles.modalHeaderTitleText,
         headerLeft: () => {
-          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },
       };
     },

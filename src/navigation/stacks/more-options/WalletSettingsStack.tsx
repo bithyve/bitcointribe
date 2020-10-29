@@ -15,9 +15,6 @@ const WalletSettingsStack = createStackNavigator(
       navigationOptions: ({ navigation }) => {
         return {
           title: "Wallet Settings",
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
-          },
         };
       },
     },

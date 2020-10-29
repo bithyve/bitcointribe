@@ -111,7 +111,7 @@ export default function HealthCheck(props) {
     },
   ]);
 
-  const getIconByStatus = status => {
+  const getIconByStatus = (status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -121,48 +121,47 @@ export default function HealthCheck(props) {
     }
   };
 
+  //   const renderWalletBackupAndRecoveryContents = () => {
+  //     return (
+  //       <WalletBackupAndRecoveryContents
+  //         onPressManageBackup={() => {
+  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+  //         }}
+  //         onSkip={() => {
+  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+  //         }}
+  //         onStartBackup={() => {
+  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+  //         }}
+  //       />
+  //     );
+  //   };
 
-//   const renderWalletBackupAndRecoveryContents = () => {
-//     return (
-//       <WalletBackupAndRecoveryContents
-//         onPressManageBackup={() => {
-//           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-//         }}
-//         onSkip={() => {
-//           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-//         }}
-//         onStartBackup={() => {
-//           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-//         }}
-//       />
-//     );
-//   };
-
-//   const renderWalletBackupAndRecoveryHeader = () => {
-//     return (
-//       <SmallHeaderModal
-//         borderColor={Colors.blue}
-//         headerColor={Colors.blue}
-//         onPressHandle={() => {
-//           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-//         }}
-//       />
-//     );
-//   };
+  //   const renderWalletBackupAndRecoveryHeader = () => {
+  //     return (
+  //       <SmallHeaderModal
+  //         borderColor={Colors.blue}
+  //         headerColor={Colors.blue}
+  //         onPressHandle={() => {
+  //           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+  //         }}
+  //       />
+  //     );
+  //   };
 
   const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector(state => state.sss.service);
+  const s3Service: S3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     //WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
     if (!s3Service.levelhealth.healthCheckInitialized) dispatch(initializeHealthSetup());
   }, []);
 
-  const { overallHealth } = useSelector(state => state.sss);
+  const { overallHealth } = useSelector((state) => state.sss);
 
   useEffect(() => {
     if (overallHealth) {
       const updatedPageData = [...pageData];
-      updatedPageData.forEach(data => {
+      updatedPageData.forEach((data) => {
         switch (data.title) {
           case 'Secondary Device':
             if (overallHealth.sharesInfo[0].shareStage === 'Good') {
@@ -212,16 +211,16 @@ export default function HealthCheck(props) {
     }
   }, [overallHealth]);
 
-  useEffect(() => {
-    // HC down-streaming
-    if (s3Service) {
-      const { healthCheckInitialized } = s3Service.levelhealth;
+  // useEffect(() => {
+  //   // HC down-streaming
+  //   if (s3Service) {
+  //     const { healthCheckInitialized } = s3Service.levelhealth;
 
-      if (healthCheckInitialized) {
-        dispatch(checkMSharesHealth());
-      }
-    }
-  }, []);
+  //     if (healthCheckInitialized) {
+  //       dispatch(checkMSharesHealth());
+  //     }
+  //   }
+  // }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -234,7 +233,7 @@ export default function HealthCheck(props) {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
@@ -242,22 +241,23 @@ export default function HealthCheck(props) {
                 color={Colors.blue}
                 size={17}
               />
-              </View>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{marginLeft: 'auto',
-            marginRight: 10,}}
-            onPress={() => {
-            }}
+            style={{ marginLeft: 'auto', marginRight: 10 }}
+            onPress={() => {}}
           >
-          <Image source={require("../../assets/images/icons/icon_settings1.png")} style={styles.image} />
+            <Image
+              source={require('../../assets/images/icons/icon_settings1.png')}
+              style={styles.image}
+            />
           </TouchableOpacity>
         </View>
         <ScrollView>
           <View style={{ flexDirection: 'row', marginTop: 10 }}>
             <View style={{ flex: 2 }}>
               <Text style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}>
-              Health Check
+                Health Check
               </Text>
               <Text
                 style={{ ...CommonStyles.headerTitlesInfoText, marginLeft: 25 }}
@@ -396,10 +396,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   image: {
-    width: wp("5%"),
-    height: wp("5%"),
-    resizeMode: "contain",
-
+    width: wp('5%'),
+    height: wp('5%'),
+    resizeMode: 'contain',
   },
   knowMoreButtonText: {
     color: Colors.white,

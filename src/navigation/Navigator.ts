@@ -92,8 +92,6 @@ import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/Manage
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
-import MoreOptionsStack from './stacks/more-options/MoreOptionsStack';
-import AllTransactionsStack from './stacks/transactions/AllTransactionsStack';
 import HomeStack from './stacks/home/HomeStack';
 
 
@@ -151,16 +149,13 @@ const HomeNavigator = createStackNavigator(
   {
     Home: {
       screen: HomeStack,
-      path: 'Home',
+      path: 'home',
     },
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
       },
-    },
-    AllTransactions: {
-      screen: AllTransactionsStack,
     },
     Intermediate,
     Accounts,
@@ -254,9 +249,6 @@ const HomeNavigator = createStackNavigator(
       navigationOptions: {
         gesturesEnabled: false,
       },
-    },
-    MoreOptions: {
-      screen: MoreOptionsStack,
     },
   },
   {

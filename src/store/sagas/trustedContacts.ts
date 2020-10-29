@@ -20,6 +20,8 @@ import {
   updateTrustedContactInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
+  SYNC_LAST_SEENS_AND_HEALTH,
+  POST_RECOVERY_CHANNEL_SYNC,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -35,7 +37,11 @@ import {
   notificationTag,
   trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
-import { downloadMShare, updateWalletImage } from '../actions/sss';
+import {
+  calculateOverallHealth,
+  downloadMShare,
+  updateWalletImage,
+} from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -52,6 +58,7 @@ import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import DeviceInfo from 'react-native-device-info';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -157,12 +164,16 @@ function* removeTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.trustedContactsInfo,
   );
   const s3Service: S3Service = yield select((state) => state.sss.service);
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
   const { DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
   const shareTransferDetails = {
     ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   };
+
   let { contactName, shareIndex } = payload; // shareIndex is passed in case of Guardian
   contactName = contactName.toLowerCase().trim();
 
@@ -170,31 +181,32 @@ function* removeTrustedContactWorker({ payload }) {
     walletID,
     FCMs,
     isGuardian,
+    trustedChannel,
   } = trustedContactsService.tc.trustedContacts[contactName];
 
-  let dataElements: TrustedDataElements;
-  if (isGuardian) dataElements = { removeGuardian: true };
-  else
-    dataElements = {
-      remove: true,
-    };
-
-  yield call(
-    trustedContactsService.updateTrustedChannel,
-    contactName,
-    dataElements,
-  );
-
-  const recipient = {
-    walletID,
-    FCMs,
+  let dataElements: TrustedDataElements = {
+    remove: true,
   };
+  // if (isGuardian) dataElements = { removeGuardian: true }; // deprecates guardian to trusted contact
+  // else
+  //   dataElements = {
+  //     remove: true,
+  //   };
 
-  if (isGuardian) {
-    // Guardians, instead of removal, gets down-graded to trusted contacts
+  if (trustedChannel) {
+    // removing established trusted contacts
+    yield call(
+      trustedContactsService.updateTrustedChannel,
+      contactName,
+      dataElements,
+    );
+  }
+
+  if (isGuardian && !trustedChannel) {
+    // Guardians gets removed post request expiry
     trustedContactsService.tc.trustedContacts[contactName].isGuardian = false;
-    if (shareIndex !== null && shareIndex <= 2)
-      s3Service.resetSharesHealth(shareIndex);
+    // if (shareIndex !== null && shareIndex <= 2)
+    //   s3Service.resetSharesHealth(shareIndex);
     delete shareTransferDetails[shareIndex]; // enables createGuardian on manage backup
 
     // resets the highlight flag for manage backup
@@ -216,7 +228,15 @@ function* removeTrustedContactWorker({ payload }) {
         JSON.stringify(autoHighlightFlags),
       );
     }
-  } else delete trustedContactsService.tc.trustedContacts[contactName];
+  }
+  delete trustedContactsService.tc.trustedContacts[contactName];
+
+  // remove contact details from trusted derivative account
+  const { trustedContactToDA, derivativeAccounts } = regularAccount.hdWallet;
+  const accountNumber = trustedContactToDA[contactName];
+  if (accountNumber) {
+    delete derivativeAccounts[TRUSTED_CONTACTS][accountNumber].contactDetails;
+  }
 
   const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
   if (tcInfo) {
@@ -231,15 +251,15 @@ function* removeTrustedContactWorker({ payload }) {
 
         if (presentContactName === contactName) {
           if (itr < 3) {
-            let found = false;
-            for (let i = 3; i < tcInfo.length; i++) {
-              if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
-                found = true;
-                break;
-              }
-            }
-            // push if not already present in TC list
-            if (!found) tcInfo.push(tcInfo[itr]);
+            // let found = false;
+            // for (let i = 3; i < tcInfo.length; i++) {
+            //   if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
+            //     found = true;
+            //     break;
+            //   }
+            // }
+            // // push if not already present in TC list
+            // if (!found) tcInfo.push(tcInfo[itr]);
             tcInfo[itr] = null; // Guardian position nullified
           } else tcInfo.splice(itr, 1);
           // yield call(
@@ -258,6 +278,7 @@ function* removeTrustedContactWorker({ payload }) {
   const { SERVICES } = yield select((state) => state.storage.database);
   const updatedSERVICES = {
     ...SERVICES,
+    REGULAR_ACCOUNT: JSON.stringify(regularAccount),
     TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
   };
   dbPayload = { SERVICES: updatedSERVICES };
@@ -274,19 +295,24 @@ function* removeTrustedContactWorker({ payload }) {
     payload: dbPayload,
   });
 
-  const { walletName } = yield select(
-    (state) => state.storage.database.WALLET_SETUP,
-  );
-  const notification: INotification = {
-    notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
-    body: `${
-      isGuardian ? 'Keeper' : 'Trusted Contact'
-    } removed by ${walletName}`,
-    data: {},
-    tag: notificationTag.IMP,
-  };
-  sendNotification(recipient, notification);
+  if (walletID && FCMs) {
+    const recipient = {
+      walletID,
+      FCMs,
+    };
+    const { walletName } = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+
+    const notification: INotification = {
+      notificationType: notificationType.contact,
+      title: 'Friends and Family notification',
+      body: `F&F removed by ${walletName}`,
+      data: {},
+      tag: notificationTag.IMP,
+    };
+    sendNotification(recipient, notification);
+  }
 }
 
 export const removeTrustedContactWatcher = createWatcher(
@@ -380,6 +406,7 @@ function* updateEphemeralChannelWorker({ payload }) {
           walletID,
           FCM,
           walletName,
+          version: DeviceInfo.getVersion(),
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
@@ -393,7 +420,7 @@ function* updateEphemeralChannelWorker({ payload }) {
           const notification: INotification = {
             notificationType: notificationType.contact,
             title: 'Friends and Family notification',
-            body: `Trusted Contact request accepted by ${walletName}`,
+            body: `F&F request accepted by ${walletName}`,
             data: {},
             tag: notificationTag.IMP,
           };
@@ -883,6 +910,126 @@ export const syncLastSeensWatcher = createWatcher(
   SYNC_LAST_SEENS,
 );
 
+function* syncLastSeensAndHealthWorker({ payload }) {
+  yield put(switchTCLoading('syncLastSeensAndHealth'));
+
+  // updates and fetches last seen for all trusted channels
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+  const underCustody = { ...DECENTRALIZED_BACKUP.UNDER_CUSTODY };
+  const metaSharesUnderCustody = Object.keys(underCustody).map(
+    (tag) => underCustody[tag].META_SHARE,
+  );
+
+  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
+    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+    const { metaShares, healthCheckStatus } = s3Service.sss;
+    const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
+
+    const res = yield call(
+      trustedContacts.syncLastSeensAndHealth,
+      metaShares.slice(0, 3),
+      healthCheckStatus,
+      metaSharesUnderCustody,
+    );
+    console.log({ res });
+    if (res.status === 200) {
+      const { updationInfo } = res.data;
+      let shareRemoved = false;
+
+      if (updationInfo) {
+        // removing shares under-custody based on reshare-version@HealthSchema
+        Object.keys(underCustody).forEach((tag) => {
+          for (let info of updationInfo) {
+            if (info.updated) {
+              // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+              //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+              //   if (info.encryptedDynamicNonPMDD)
+              //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+              //       info.encryptedDynamicNonPMDD;
+              // }
+            } else {
+              if (info.removeShare) {
+                if (
+                  info.walletId === underCustody[tag].META_SHARE.meta.walletId
+                ) {
+                  delete underCustody[tag];
+                  shareRemoved = true;
+                  for (const contactName of Object.keys(
+                    trustedContacts.tc.trustedContacts,
+                  )) {
+                    const contact =
+                      trustedContacts.tc.trustedContacts[contactName];
+                    if (contact.walletID === info.walletId) {
+                      contact.isWard = false;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+      const { healthCheckStatus } = res.data;
+      const postSyncHCStatus = JSON.stringify({ healthCheckStatus });
+
+      if (
+        preSyncTC !== postSyncTC ||
+        preSyncHCStatus !== postSyncHCStatus ||
+        shareRemoved
+      ) {
+        let dbPayload = {};
+        const { SERVICES } = yield select((state) => state.storage.database);
+        let updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+        };
+
+        if (preSyncHCStatus !== postSyncHCStatus) {
+          s3Service.sss.healthCheckStatus = healthCheckStatus;
+          updatedSERVICES = {
+            ...updatedSERVICES,
+            S3_SERVICE: JSON.stringify(s3Service),
+          };
+        }
+        dbPayload = {
+          SERVICES: updatedSERVICES,
+        };
+
+        console.log({ shareRemoved });
+        if (shareRemoved) {
+          const updatedBackup = {
+            ...DECENTRALIZED_BACKUP,
+            UNDER_CUSTODY: underCustody,
+          };
+          dbPayload = { ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup };
+        }
+
+        yield call(insertDBWorker, {
+          payload: dbPayload,
+        });
+      }
+    } else {
+      console.log('Failed to sync last seens', res.err);
+    }
+  }
+  yield put(calculateOverallHealth(s3Service));
+  yield put(switchTCLoading('syncLastSeensAndHealth'));
+}
+
+export const syncLastSeensAndHealthWatcher = createWatcher(
+  syncLastSeensAndHealthWorker,
+  SYNC_LAST_SEENS_AND_HEALTH,
+);
+
 function* syncTrustedChannelsWorker({ payload }) {
   // syncs trusted channels
   const trustedContacts: TrustedContactsService = yield select(
@@ -891,6 +1038,10 @@ function* syncTrustedChannelsWorker({ payload }) {
   const { SERVICES, DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
   const sharesUnderCustody = { ...DECENTRALIZED_BACKUP.UNDER_CUSTODY };
 
   const { contacts } = payload;
@@ -910,7 +1061,7 @@ function* syncTrustedChannelsWorker({ payload }) {
         );
         const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
-        // downgrade guardians and remove share
+        // // downgrade guardians and remove share
         for (const guardianName of guardiansToRemove) {
           trustedContacts.tc.trustedContacts[guardianName].isWard = false;
           delete sharesUnderCustody[
@@ -921,6 +1072,18 @@ function* syncTrustedChannelsWorker({ payload }) {
         // remove trusted contacts
         for (const contactName of contactsToRemove) {
           delete trustedContacts.tc.trustedContacts[contactName];
+
+          // remove contact details from trusted derivative account
+          const {
+            trustedContactToDA,
+            derivativeAccounts,
+          } = regularAccount.hdWallet;
+          const accountNumber = trustedContactToDA[contactName];
+          if (accountNumber) {
+            delete derivativeAccounts[TRUSTED_CONTACTS][accountNumber]
+              .contactDetails;
+          }
+
           if (tcInfo) {
             for (let itr = 0; itr < tcInfo.length; itr++) {
               const trustedContact = tcInfo[itr];
@@ -953,10 +1116,17 @@ function* syncTrustedChannelsWorker({ payload }) {
 
       if (preSyncTC !== postSyncTC || guardiansToRemove.length) {
         let payload = {};
-        const updatedSERVICES = {
+        let updatedSERVICES = {
           ...SERVICES,
           TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
         };
+
+        if (contactsToRemove.length) {
+          updatedSERVICES = {
+            ...updatedSERVICES,
+            REGULAR_ACCOUNT: JSON.stringify(regularAccount),
+          };
+        }
         payload = { SERVICES: updatedSERVICES };
 
         if (guardiansToRemove.length) {
@@ -981,4 +1151,31 @@ function* syncTrustedChannelsWorker({ payload }) {
 export const syncTrustedChannelsWatcher = createWatcher(
   syncTrustedChannelsWorker,
   SYNC_TRUSTED_CHANNELS,
+);
+
+function* postRecoveryChannelSyncWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const trustedData: TrustedDataElements = {
+    FCM: yield call(AsyncStorage.getItem, 'fcmToken'),
+    version: DeviceInfo.getVersion(),
+  };
+  for (const contactName of Object.keys(trustedContacts.tc.trustedContacts)) {
+    yield call(trustedContacts.updateTrustedChannel, contactName, trustedData);
+  }
+
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+  };
+
+  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+}
+
+export const postRecoveryChannelSyncWatcher = createWatcher(
+  postRecoveryChannelSyncWorker,
+  POST_RECOVERY_CHANNEL_SYNC,
 );

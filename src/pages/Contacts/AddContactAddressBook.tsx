@@ -46,14 +46,8 @@ export default function AddContactAddressBook(props) {
     contactListErrorBottomSheet,
     setContactListErrorBottomSheet,
   ] = useState(React.createRef());
-  const [contactData, setContactData] = useState([]);
 
-  useEffect(() => {
-    if (!props.addContactModalOpened) {
-      setSelectedContacts([]);
-      getContactsAsync();
-    }
-  }, [props.addContactModalOpened]);
+  const [contactData, setContactData] = useState([]);
 
   const requestContactsPermission = async () => {
     try {
@@ -79,6 +73,7 @@ export default function AddContactAddressBook(props) {
   useEffect(() => {
     getContactsAsync();
   }, [props.isLoadContacts]);
+
 
   const getContact = () => {
     if (props.isLoadContacts) {
@@ -115,10 +110,11 @@ export default function AddContactAddressBook(props) {
         setContactPermissionAndroid(false);
         return;
       } else {
+        // TODO: Migrate it using react-native-contact
         getContact();
       }
     } else if (Platform.OS === 'ios') {
-      const { status, expires, permissions } = await Permissions.getAsync(
+      const { status, expires, permissions } = await Permissions.askAsync(
         Permissions.CONTACTS,
       );
       if (status === 'denied') {
@@ -137,7 +133,7 @@ export default function AddContactAddressBook(props) {
   useEffect(() => {
     (async () => {
       await AsyncStorage.getItem('ContactData', (err, value) => {
-        if (err) console.log('ERROR in COntactData', err);
+        if (err) console.log('ERROR in ContactData', err);
         else {
           let data = JSON.parse(value);
           if (data && data.length) {
@@ -202,9 +198,8 @@ export default function AddContactAddressBook(props) {
 
   const isTrustedContact = useCallback(
     (selectedContact) => {
-      const contactName = `${selectedContact.firstName} ${
-        selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+      const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
+        }`
         .toLowerCase()
         .trim();
 
@@ -408,26 +403,26 @@ export default function AddContactAddressBook(props) {
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map((value) => {
-                  return (
-                    <View style={styles.selectedContactView}>
-                      <Text style={styles.selectedContactNameText}>
-                        {value.name ? value.name.split(' ')[0] : ''}{' '}
-                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {value.name ? value.name.split(' ')[1] : ''}
-                        </Text>
+                return (
+                  <View style={styles.selectedContactView}>
+                    <Text style={styles.selectedContactNameText}>
+                      {value.name ? value.name.split(' ')[0] : ''}{' '}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {value.name ? value.name.split(' ')[1] : ''}
                       </Text>
-                      <AppBottomSheetTouchableWrapper
-                        onPress={() => onCancel(value)}
-                      >
-                        <AntDesign
-                          name="close"
-                          size={17}
-                          color={Colors.white}
-                        />
-                      </AppBottomSheetTouchableWrapper>
-                    </View>
-                  );
-                })
+                    </Text>
+                    <AppBottomSheetTouchableWrapper
+                      onPress={() => onCancel(value)}
+                    >
+                      <AntDesign
+                        name="close"
+                        size={17}
+                        color={Colors.white}
+                      />
+                    </AppBottomSheetTouchableWrapper>
+                  </View>
+                );
+              })
               : null}
           </View>
           {/* <View style={{ alignItems: 'flex-end' }}>

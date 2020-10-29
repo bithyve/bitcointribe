@@ -63,6 +63,9 @@ import {
   TrustedDataElements,
   WalletImage,
   ShareUploadables,
+  INotification,
+  notificationType,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -81,10 +84,23 @@ import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
-var Mailer = require('NativeModules').RNMail;
+import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
+import RelayServices from '../../bitcoin/services/RelayService';
+
+const sendNotification = (recipient, notification) => {
+  const receivers = [];
+  if (recipient.walletID && recipient.FCMs.length)
+    receivers.push({
+      walletId: recipient.walletID,
+      FCMs: recipient.FCMs,
+    });
+
+  if (receivers.length)
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+};
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -210,6 +226,44 @@ function* uploadEncMetaShareWorker({ payload }) {
       trustedContacts.tc.trustedContacts[
         payload.previousGuardianName
       ].isGuardian = false;
+
+      const {
+        walletID,
+        FCMs,
+        trustedChannel,
+      } = trustedContacts.tc.trustedContacts[payload.previousGuardianName];
+
+      if (trustedChannel) {
+        // dispatching remove share action to the previous guardian
+        const dataElements = { removeGuardian: true };
+
+        const res = yield call(
+          trustedContacts.updateTrustedChannel,
+          payload.previousGuardianName,
+          dataElements,
+        );
+
+        if (res.status === 200) {
+          if (walletID && FCMs) {
+            const recipient = {
+              walletID,
+              FCMs,
+            };
+            const { walletName } = yield select(
+              (state) => state.storage.database.WALLET_SETUP,
+            );
+
+            const notification: INotification = {
+              notificationType: notificationType.contact,
+              title: 'Friends and Family notification',
+              body: `Removed as a Keeper by ${walletName}`,
+              data: {},
+              tag: notificationTag.IMP,
+            };
+            sendNotification(recipient, notification);
+          }
+        }
+      }
     }
   } else {
     // preventing re-uploads till expiry
@@ -666,8 +720,16 @@ function* generatePersonalCopyWorker({ payload }) {
       };
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
-      const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
-      const originalSharingDetails = personalCopyDetails[selectedPersonalCopy.type] && personalCopyDetails[selectedPersonalCopy.type].sharingDetails ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails : {}
+      const originalSharedStatus = personalCopyDetails[
+        selectedPersonalCopy.type
+      ]
+        ? personalCopyDetails[selectedPersonalCopy.type].shared
+        : false;
+      const originalSharingDetails =
+        personalCopyDetails[selectedPersonalCopy.type] &&
+        personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          : {};
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
@@ -928,10 +990,10 @@ function* updateMSharesHealthWorker() {
     (state) => state.trustedContacts.service,
   );
 
-   const DECENTRALIZED_BACKUP = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
-  
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
@@ -976,13 +1038,13 @@ function* updateMSharesHealthWorker() {
       }
     });
 
-    if(removed){
+    if (removed) {
       // update db post share removal
       const updatedSERVICES = {
         ...SERVICES,
         TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
       };
-  
+
       const updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY,
@@ -994,7 +1056,6 @@ function* updateMSharesHealthWorker() {
         },
       });
     }
-   
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });

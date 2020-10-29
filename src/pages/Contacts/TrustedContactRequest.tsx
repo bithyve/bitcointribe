@@ -29,15 +29,6 @@ export default function TrustedContactRequest(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
 
-  useEffect(() => {
-    if (!props.isRequestModalOpened) {
-      setWrongInputError('');
-      setPhoneNumber('');
-      setEmailId('');
-      setPasscode('');
-      setPasscodeArray([]);
-    }
-  }, [props.isRequestModalOpened]);
 
   function onPressNumber(text, i) {
     let tempPasscode = passcodeArray;

@@ -70,7 +70,7 @@ const HomeList = ({
   addNewDisable,
 }) => {
   return (
-    <View style={{ flexDirection: 'column' }}>
+    <View>
       {Items.item.map((value) => {
         if (value.accountType === 'add') {
           return (

@@ -112,6 +112,8 @@ import {
   removeTrustedContactWatcher,
   syncLastSeensWatcher,
   syncTrustedChannelsWatcher,
+  syncLastSeensAndHealthWatcher,
+  postRecoveryChannelSyncWatcher,
 } from './sagas/trustedContacts';
 
 import {
@@ -232,7 +234,9 @@ const rootSaga = function* () {
     fetchTrustedChannelWatcher,
     trustedChannelsSetupSyncWatcher,
     syncLastSeensWatcher,
+    syncLastSeensAndHealthWatcher,
     syncTrustedChannelsWatcher,
+    postRecoveryChannelSyncWatcher,
     
     // Health 
     initHealthWatcher,
@@ -247,6 +251,7 @@ const rootSaga = function* () {
     downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
     fetchWalletImageHealthWatcher
+    
   ];
 
   yield all(

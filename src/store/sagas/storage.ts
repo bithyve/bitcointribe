@@ -21,7 +21,7 @@ import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
 import { updateWalletImage } from '../actions/sss';
 import { calculateExchangeRate, startupSync } from '../actions/accounts';
-import { syncLastSeens } from '../actions/trustedContacts';
+import { syncLastSeensAndHealth } from '../actions/trustedContacts';
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -47,15 +47,13 @@ function* fetchDBWorker() {
 
       if (yield call(AsyncStorage.getItem, 'walletExists')) {
         // actions post DB fetch
-        yield put(syncLastSeens());
+        yield put(syncLastSeensAndHealth());
         yield put(updateWalletImage());
         yield put(calculateExchangeRate());
         yield put(startupSync());
       }
     } else {
-      console.log(
-        'Failed to fetch the database; either key is missing or database is empty',
-      );
+      // DB would be absent during wallet setup
     }
   } catch (err) {
     console.log(err);

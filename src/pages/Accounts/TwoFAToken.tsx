@@ -157,7 +157,7 @@ export default function TwoFAToken(props) {
   const renderSendUnSuccessContents = () => {
     return (
       <SendConfirmationContent
-        title={'Sent Unsuccessful'}
+        title={'Send Unsuccessful'}
         info={
           'There seems to be a problem' + '\n' + transfer.stage3.failed
             ? 'Invalid 2FA token, please try again.'

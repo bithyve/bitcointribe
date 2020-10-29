@@ -1206,7 +1206,7 @@ class SendConfirmation extends Component<
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
             <SendConfirmationContent
-              title={'Sent Unsuccessful'}
+              title={'Send Unsuccessful'}
               info={'Something went wrong, please try again'}
               userInfo={transfer.details ? transfer.details : []}
               isFromContact={false}

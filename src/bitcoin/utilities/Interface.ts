@@ -254,6 +254,7 @@ export interface TrustedDataElements {
   };
   removeGuardian?: boolean;
   remove?: boolean;
+  version?: string;
 }
 export interface TrustedData {
   publicKey: string;

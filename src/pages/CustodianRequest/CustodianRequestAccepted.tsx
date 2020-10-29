@@ -7,16 +7,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { useDispatch } from 'react-redux';
-import { updateMSharesHealth } from '../../store/actions/sss';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function CustodianRequestAccepted(props) {
   const requester = props.navigation.getParam('requester');
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(updateMSharesHealth());
-  }, []);
 
   const onPressAssociateContacts = () => {
     props.navigation.navigate('ContactsListForAssociateContact');

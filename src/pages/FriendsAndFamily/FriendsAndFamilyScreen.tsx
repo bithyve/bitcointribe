@@ -44,8 +44,8 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
 import CountDown from '../../components/CountDown';
 import CommonStyles from '../../common/Styles/Styles';
-import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderCloseButton';
 import NavStyles from '../../common/Styles/NavStyles';
+import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -290,10 +290,10 @@ class FriendsAndFamily extends PureComponent<
           trustedContacts.push(element);
           if (element.isGuardian) {
             const isRemovable =
-              Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY ||
-              element.hasTrustedChannel
+              Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY &&
+              !element.hasTrustedChannel
                 ? true
-                : false;
+                : false; // expired guardians are removable
             myKeepers.push({ ...element, isRemovable });
           }
           if (element.isWard) {
@@ -609,7 +609,7 @@ class FriendsAndFamily extends PureComponent<
 
         <View style={styles.modalContainer}>
           <View style={NavStyles.modalNavHeaderContainer}>
-            <SmallNavHeaderCloseButton
+            <SmallNavHeaderBackButton
               containerStyle={{ marginRight: 16 }}
               onPress={() => navigation.goBack()}
             />

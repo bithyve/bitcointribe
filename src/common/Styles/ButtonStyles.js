@@ -36,6 +36,7 @@ const ButtonStyles = StyleSheet.create({
 
   floatingActionButton: {
     ...primaryActionButton,
+    minHeight: 48,
     borderRadius: 9999,
     paddingHorizontal: 14,
     shadowOpacity: 0.14,
