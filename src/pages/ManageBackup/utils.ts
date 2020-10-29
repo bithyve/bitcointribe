@@ -16,8 +16,8 @@ export const verifyPersonalCopyAccess = async (personalCopyDetails) => {
     Platform.OS == 'android'
       ? 'file://' + personalCopyDetails.path
       : personalCopyDetails.path;
-      // remove this when we are able to access and check android file system
-      if (Platform.OS == 'android') return false;
+  // remove this when we are able to access and check android file system
+  // if (Platform.OS == 'android') return false;
   try {
     return RNFS.exists(path);
   } catch (err) {

@@ -64,7 +64,7 @@ const PersonalCopyHistory = (props) => {
   );
   const s3Service: S3Service = useSelector((state) => state.sss.service);
   const overallHealth = useSelector((state) => state.sss.overallHealth);
-   
+
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -238,7 +238,7 @@ const PersonalCopyHistory = (props) => {
   const generated = useSelector(
     (state) => state.sss.personalCopyGenerated[selectedPersonalCopy.type],
   );
-      
+
   useEffect(() => {
     (async () => {
       let personalCopyDetails = await AsyncStorage.getItem(
@@ -252,11 +252,11 @@ const PersonalCopyHistory = (props) => {
           personalCopyDetails[selectedPersonalCopy.type],
         ))
       ) {
-          // generate a pdf only if health is less than 100% 
-          if(overallHealth.overallStatus < 100){
-            dispatch(generatePersonalCopy(selectedPersonalCopy));
-            setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
-          }
+        // generate a pdf only if health is less than 100%
+        if (overallHealth.overallStatus < 100) {
+          dispatch(generatePersonalCopy(selectedPersonalCopy));
+          setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
+        }
       } else {
         setPersonalCopyDetails(personalCopyDetails);
       }
@@ -346,6 +346,7 @@ const PersonalCopyHistory = (props) => {
             'personalCopyDetails',
             JSON.stringify(personalCopyDetails),
           );
+
           setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
