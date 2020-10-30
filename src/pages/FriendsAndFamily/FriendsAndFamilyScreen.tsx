@@ -446,11 +446,12 @@ class FriendsAndFamilyScreen extends PureComponent<
     var minute =
       config.TC_REQUEST_EXPIRY / 1000 -
       (Date.now() - contact.initiatedAt) / 1000;
+
     return (
       <TouchableOpacity
         key={contact.id}
         onPress={() => {
-          navigation.navigate('ContactDetailsNew', {
+          navigation.navigate('ContactDetails', {
             contactsType,
             contact,
             index,
@@ -613,7 +614,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   renderAddContactAddressBookHeader = () => {
     return (
-      <ModalHeader/>
+      <ModalHeader />
     );
   };
 
