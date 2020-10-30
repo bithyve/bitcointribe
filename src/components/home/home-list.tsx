@@ -131,7 +131,7 @@ const HomeList = ({
           return (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Accounts', {
+                navigation.navigate('AccountDetails', {
                   serviceType: value.accountType,
                   index: value.id - 1,
                 });
