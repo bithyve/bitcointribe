@@ -59,11 +59,11 @@ import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
-import { trustedChannelsSyncWorker } from './trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { startupSyncLoaded } from '../actions/loaders';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -232,7 +232,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-      JSON.stringify(postFetchTransactions)
+    JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -365,7 +365,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -449,11 +449,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const preFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   const res = yield call(
@@ -465,11 +465,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const postFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ]
+      accountNumber
+      ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-          accountNumber
-        ],
+      accountNumber
+      ],
   );
 
   if (res.status === 200) {
@@ -557,7 +557,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
+          contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -577,7 +577,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -594,7 +594,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-              ];
+                ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -842,16 +842,16 @@ function* accumulativeTxAndBalWorker() {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+      .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -863,7 +863,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+      .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -971,38 +971,73 @@ function* accountsSyncWorker({ payload }) {
     const regularService = accounts[REGULAR_ACCOUNT].service;
     const secureService = accounts[SECURE_ACCOUNT].service;
 
-    yield all([
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: TEST_ACCOUNT,
-          options: {
-            service: testService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: REGULAR_ACCOUNT,
-          options: {
-            service: regularService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: SECURE_ACCOUNT,
-          options: {
-            service: secureService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-    ]);
+    // sequential sync
+    // yield call(fetchBalanceTxWorker,{
+    //   payload: {
+    //     serviceType: REGULAR_ACCOUNT,
+    //     options: {
+    //       service: regularService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // yield call(fetchBalanceTxWorker, {
+    //   payload: {
+    //     serviceType: SECURE_ACCOUNT,
+    //     options: {
+    //       service: secureService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // yield call(fetchBalanceTxWorker, {
+    //   payload: {
+    //     serviceType: TEST_ACCOUNT,
+    //     options: {
+    //       service: testService,
+    //       restore: payload.restore,
+    //       shouldNotInsert: true,
+    //     },
+    //   },
+    // });
+
+    // concurrent sync
+    // yield all([
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: TEST_ACCOUNT,
+    //       options: {
+    //         service: testService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: REGULAR_ACCOUNT,
+    //       options: {
+    //         service: regularService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: SECURE_ACCOUNT,
+    //       options: {
+    //         service: secureService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    // ]);
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
@@ -1026,6 +1061,14 @@ export const accountsSyncWatcher = createWatcher(
 );
 
 function* startupSyncWorker({ payload }) {
+  /*
+  Skippiing this entire sync process
+  to improve login performance.
+
+  This will be modified and enhanced in a follow up release.
+  Leaving this here for reference till next release.
+
+  console.log('startupsync started ', Date.now())
   try {
     console.log('Synching accounts...');
     yield call(accountsSyncWorker, { payload });
@@ -1039,15 +1082,12 @@ function* startupSyncWorker({ payload }) {
       payload: { serviceTypes: [REGULAR_ACCOUNT, SECURE_ACCOUNT] },
     });
   } catch (err) {
-    console.log('Trusted Derivative accounts sync failed: ', err);
+    console.log('Derivative accounts sync failed: ', err);
   }
-
-  try {
-    console.log('Synching trusted channels...');
-    yield call(trustedChannelsSyncWorker);
-  } catch (err) {
-    console.log('Trusted Channels sync failed: ', err);
-  }
+  console.log('startupsync complete ', Date.now())
+  */
+ 
+  yield put(startupSyncLoaded(true))
 }
 
 export const startupSyncWatcher = createWatcher(

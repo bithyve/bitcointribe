@@ -27,6 +27,7 @@ import {
   personalCopyGenerated,
   pdfHealthChecked,
   pdfHealthCheckFailed,
+  calculateOverallHealth,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -47,6 +48,7 @@ import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
+import { State } from 'react-native-gesture-handler';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -61,6 +63,8 @@ const PersonalCopyHistory = (props) => {
     (state) => state.sss.pdfHealthCheckFailed,
   );
   const s3Service: S3Service = useSelector((state) => state.sss.service);
+  const overallHealth = useSelector((state) => state.sss.overallHealth);
+
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -130,7 +134,8 @@ const PersonalCopyHistory = (props) => {
   useEffect(() => {
     if (healthChecked) {
       Toast('PDF scanned Successfully');
-      dispatch(checkMSharesHealth());
+      // dispatch(checkMSharesHealth());
+      dispatch(calculateOverallHealth());
       dispatch(pdfHealthChecked(''));
     }
   }, [healthChecked]);
@@ -247,9 +252,11 @@ const PersonalCopyHistory = (props) => {
           personalCopyDetails[selectedPersonalCopy.type],
         ))
       ) {
-        dispatch(generatePersonalCopy(selectedPersonalCopy));
-        setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
-        // saveInTransitHistory();
+        // generate a pdf only if health is less than 100%
+        if (overallHealth.overallStatus < 100) {
+          dispatch(generatePersonalCopy(selectedPersonalCopy));
+          setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
+        }
       } else {
         setPersonalCopyDetails(personalCopyDetails);
       }
@@ -339,6 +346,7 @@ const PersonalCopyHistory = (props) => {
             'personalCopyDetails',
             JSON.stringify(personalCopyDetails),
           );
+
           setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
@@ -527,7 +535,7 @@ const PersonalCopyHistory = (props) => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

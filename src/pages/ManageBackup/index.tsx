@@ -17,7 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import { nameToInitials } from '../../common/CommonFunctions';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -42,6 +42,7 @@ import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
 
 export default function ManageBackup(props) {
   const [
@@ -182,7 +183,7 @@ export default function ManageBackup(props) {
   ]);
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
-  let trustedContactsInfo = useSelector(
+  const trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
   let trustedContactsService = useSelector(
@@ -193,7 +194,7 @@ export default function ManageBackup(props) {
   const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
-    (state) => state.sss.loading.checkMSharesHealth,
+    (state) => state.trustedContacts.loading.syncLastSeensAndHealth,
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
@@ -846,8 +847,9 @@ export default function ManageBackup(props) {
       setIs_initiated(true);
     });
     let focusListener = props.navigation.addListener('didFocus', () => {
-      setContactsFromAsync();
-      dispatch(checkMSharesHealth());
+      // setContactsFromAsync();
+      // dispatch(checkMSharesHealth());
+      dispatch(syncLastSeensAndHealth());
       // setAutoHighlightFlagsFromAsync();
     });
     return () => {
@@ -879,30 +881,35 @@ export default function ManageBackup(props) {
       ) {
         updatedAutoHighlightFlags.secondaryDevice = true;
       }
+
       if (
         overallHealth.sharesInfo[1] &&
         overallHealth.sharesInfo[1].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact1 = true;
       }
+
       if (
         overallHealth.sharesInfo[2] &&
         overallHealth.sharesInfo[2].updatedAt
       ) {
         updatedAutoHighlightFlags.trustedContact2 = true;
       }
+
       if (
         overallHealth.sharesInfo[3] &&
         overallHealth.sharesInfo[3].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy1 = true;
       }
+
       if (
         overallHealth.sharesInfo[4] &&
         overallHealth.sharesInfo[4].updatedAt
       ) {
         updatedAutoHighlightFlags.personalCopy2 = true;
       }
+
       if (overallHealth.qaStatus.updatedAt) {
         updatedAutoHighlightFlags.securityAns = true;
       }
@@ -1324,31 +1331,32 @@ export default function ManageBackup(props) {
     }
   };
 
-  useEffect(() => {
-    onContactsUpdate();
-  }, [contacts]);
+  // useEffect(() => {
+  //   onContactsUpdate();
+  // }, [contacts]);
 
-  const onContactsUpdate = async () => {
-    if (contacts.length) {
-      if (
-        contacts.findIndex((value) => value && value.type == 'contact1') != -1
-      ) {
-        pageData[1].personalInfo =
-          contacts[
-            contacts.findIndex((value) => value && value.type == 'contact1')
-          ];
-      }
-      if (
-        contacts.findIndex((value) => value && value.type == 'contact2') != -1
-      ) {
-        pageData[2].personalInfo =
-          contacts[
-            contacts.findIndex((value) => value && value.type == 'contact2')
-          ];
-      }
-    }
-    setPageData(pageData);
-  };
+  // const onContactsUpdate = async () => {
+  //   console.log({ contacts });
+  //   if (contacts.length) {
+  //     if (
+  //       contacts.findIndex((value) => value && value.type == 'contact1') != -1
+  //     ) {
+  //       pageData[1].personalInfo =
+  //         contacts[
+  //           contacts.findIndex((value) => value && value.type == 'contact1')
+  //         ];
+  //     }
+  //     if (
+  //       contacts.findIndex((value) => value && value.type == 'contact2') != -1
+  //     ) {
+  //       pageData[2].personalInfo =
+  //         contacts[
+  //           contacts.findIndex((value) => value && value.type == 'contact2')
+  //         ];
+  //     }
+  //   }
+  //   setPageData(pageData);
+  // };
 
   const getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
@@ -1362,16 +1370,7 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
-        (async () => {
-          const intialHealthSync = await AsyncStorage.getItem(
-            'initalHealthSync',
-          );
-          if (!intialHealthSync) {
-            dispatch(checkMSharesHealth());
-            // TODO -- replace this
-            AsyncStorage.setItem('initalHealthSync', 'true');
-          }
-        })();
+        // dispatch(checkMSharesHealth());
       } else {
         // console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());
@@ -1707,7 +1706,7 @@ export default function ManageBackup(props) {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
@@ -1745,7 +1744,8 @@ export default function ManageBackup(props) {
                 <RefreshControl
                   refreshing={healthLoading}
                   onRefresh={() => {
-                    dispatch(checkMSharesHealth());
+                    // dispatch(checkMSharesHealth());
+                    dispatch(syncLastSeensAndHealth());
                   }}
                 />
               }

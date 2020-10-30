@@ -221,7 +221,9 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyLabel="Done"
               />
             </View>
-            <Text style={styles.titleTextStyle}>Donation cause or description</Text>
+            <Text style={styles.titleTextStyle}>
+              Donation cause or description
+            </Text>
             <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
               <TextInput
                 style={{
@@ -243,6 +245,7 @@ export default function SettingDonationWebPageContents(props) {
                 placeholderTextColor={Colors.borderColor}
                 returnKeyType="done"
                 returnKeyLabel="Done"
+                blurOnSubmit={true}
               />
             </View>
 

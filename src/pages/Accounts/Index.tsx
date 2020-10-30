@@ -27,7 +27,7 @@ import {
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import Carousel, { getInputRangeFromIndexes } from 'react-native-snap-carousel';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -498,7 +498,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     const { presentCarouselData, serviceType } = this.state;
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
-      console.log({ derivativeAccountDetails });
+      // console.log({ derivativeAccountDetails });
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
         this.props.syncViaXpubAgent(
           serviceType,
@@ -531,7 +531,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // const storedAverageTxFees = JSON.parse(
     //   await AsyncStorage.getItem('storedAverageTxFees'),
     // );
-    console.log({ storedAverageTxFees });
+    // console.log({ storedAverageTxFees });
 
     const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
       ? 'MAINNET'
@@ -544,7 +544,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         return;
       }
     }
-    console.log('Fetching average fee...', network);
+    // console.log('Fetching average fee...', network);
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
@@ -1129,6 +1129,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         {this.state.is_initiated ? (
           <View style={{ flex: 1 }}>
             <ScrollView
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={{
                 backgroundColor: Colors.backgroundColor,
               }}

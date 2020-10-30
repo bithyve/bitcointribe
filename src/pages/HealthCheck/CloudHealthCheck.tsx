@@ -17,8 +17,6 @@ import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import KnowMoreButton from '../../components/KnowMoreButton';
-import QrScanner from '../../components/QrScanner';
 import { RNCamera } from 'react-native-camera';
 import BackupStyles from './Styles';
 import { getIconByStatus } from './utils';
@@ -47,6 +45,7 @@ export default function CloudHealthCheck(props) {
                     <Text style={styles.modalHeaderTitleText}>{""}</Text>
                 </View>
             </View>
+
             <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 30, marginRight: 20, }}>
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <Text style={BackupStyles.modalHeaderTitleText}>Confirm Recovery Key{"\n"}from Cloud</Text>
@@ -56,18 +55,7 @@ export default function CloudHealthCheck(props) {
                 </View>
                 <Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
             </View>
-            <View style={{ marginLeft: 30 }}>
-                {/* <Text style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansMedium
-                }}>Lorem Ipsum Dolor</Text>
-                <Text numberOfLines={2} style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(11),
-                    fontFamily: Fonts.FiraSansMedium
-                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text> */}
-            </View>
+
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{
                     width: wp('100%'),

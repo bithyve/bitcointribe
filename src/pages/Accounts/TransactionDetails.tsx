@@ -18,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles';
+import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import ContactList from '../../components/ContactList';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -38,22 +38,6 @@ export default function TransactionDetails(props) {
     return null;
   }
   const serviceType = props.serviceType ? props.serviceType : null;
-
-  // useEffect(() => { // retiring in app notes
-  //   (async () => {
-  //     const descriptionHistory = JSON.parse(
-  //       await AsyncStorage.getItem('descriptionHistory'),
-  //     );
-  //     if (descriptionHistory) {
-  //       const descrip = descriptionHistory[txDetails.txid];
-  //       if (descrip) {
-  //         setDescription(descrip);
-  //       } else {
-  //         setDescription('');
-  //       }
-  //     }
-  //   })();
-  // }, [txDetails]);
 
   const getImageByAccountType = (accountType, primaryAccType?) => {
     if (accountType == 'FAST_BITCOINS') {

@@ -31,7 +31,7 @@ const Contacts = (props) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
+  // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(

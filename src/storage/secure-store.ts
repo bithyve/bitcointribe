@@ -1,15 +1,18 @@
 import * as SecureStore from 'expo-secure-store';
-import Config from "react-native-config";
+import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
+import Config from 'react-native-config';
 
 export const store = async (hash, enc_key) => {
   try {
-    if (await SecureStore.getItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
+    if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
       console.log('Old key identified, removing...');
-      await SecureStore.deleteItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
+      await RNSecureStorage.remove(Config.ENC_KEY_STORAGE_IDENTIFIER);
     }
-    await SecureStore.setItemAsync(
+
+    await RNSecureStorage.set(
       Config.ENC_KEY_STORAGE_IDENTIFIER,
       JSON.stringify({ hash, enc_key }),
+      { accessible: ACCESSIBLE.WHEN_UNLOCKED },
     );
   } catch (err) {
     console.log(err);
@@ -18,16 +21,47 @@ export const store = async (hash, enc_key) => {
   return true;
 };
 
-export const fetch = async hash_current => {
+export const fetch = async (hash_current) => {
   try {
-    const value = await SecureStore.getItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
-    if (!value) {
+    let hash: any, enc_key: any;
+
+    const value = await SecureStore.getItemAsync(
+      Config.ENC_KEY_STORAGE_IDENTIFIER,
+    );
+
+    if (value) {
+      ({ hash, enc_key } = JSON.parse(value));
+      if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
+        await RNSecureStorage.remove(Config.ENC_KEY_STORAGE_IDENTIFIER);
+      }
+      console.log('upgrading to new version...');
+      await RNSecureStorage.set(
+        Config.ENC_KEY_STORAGE_IDENTIFIER,
+        JSON.stringify({ hash, enc_key }),
+        { accessible: ACCESSIBLE.WHEN_UNLOCKED },
+      );
+
+      await SecureStore.deleteItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
+      if (hash_current !== hash) {
+        throw new Error('Incorrect passcode, legacy');
+      } else return enc_key;
+    }
+
+    let RNValue;
+    if (await RNSecureStorage.exists(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
+      RNValue = await RNSecureStorage.get(Config.ENC_KEY_STORAGE_IDENTIFIER);
+    }
+
+    if (!value && !RNValue) {
       throw new Error('Identifier missing');
     }
 
-    const { hash, enc_key } = JSON.parse(value);
-    if (hash_current !== hash) {
-      throw new Error('Nothing exist against the provided key');
+    if (RNValue) {
+      ({ hash, enc_key } = JSON.parse(RNValue));
+
+      if (hash_current !== hash) {
+        throw new Error('Incorrect Passcode, upgraded');
+      }
     }
     return enc_key;
   } catch (err) {
@@ -36,9 +70,14 @@ export const fetch = async hash_current => {
   }
 };
 
-export const remove = async key => {
+export const remove = async (key) => {
   try {
+    console.log('trying to remove');
     await SecureStore.deleteItemAsync(key);
+
+    if (await RNSecureStorage.exists(key)) {
+      await RNSecureStorage.remove(key);
+    }
   } catch (err) {
     console.log(err);
     return false;

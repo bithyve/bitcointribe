@@ -259,7 +259,7 @@ export default class SSS {
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       // const { deleted } = await SSS.affirmDecryption(messageId);
       // if (!deleted) {
-      //   console.log('Unable to remove the share from the server');
+      //  console.log('Unable to remove the share from the server');
       // }
       return { metaShare, encryptedDynamicNonPMDD };
     }
@@ -712,6 +712,30 @@ export default class SSS {
     };
   };
 
+  public resetSharesHealth = async (
+    shareIndex: number,
+  ): Promise<{
+    resetted: Boolean;
+  }> => {
+    let res: AxiosResponse;
+    try {
+      if (shareIndex > 2 || !this.metaShares[shareIndex])
+        throw new Error('Share index out of bounds');
+
+      res = await BH_AXIOS.post('resetSharesHealth', {
+        HEXA_ID,
+        walletID: this.walletId,
+        shareIDs: [this.metaShares[shareIndex].shareId],
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { resetted } = res.data;
+    return { resetted };
+  };
+
   public generateStaticNonPMDD = (secureAccAssets: {
     secondaryMnemonic: string;
     twoFASecret: string;
@@ -740,7 +764,7 @@ export default class SSS {
       shareIDs,
     };
 
-    console.log({ socialStaticNonPMDD });
+    // console.log({ socialStaticNonPMDD });
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
@@ -1195,11 +1219,11 @@ export default class SSS {
         if (err.code) throw new Error(err.code);
       }
       const { encryptedImage } = res.data;
-      console.log({ encryptedImage });
+      // console.log({ encryptedImage });
       if (!encryptedImage) throw new Error();
 
       const { walletImage } = this.decryptWI(encryptedImage);
-      console.log({ walletImage });
+      // console.log({ walletImage });
       return { walletImage };
     } catch (err) {
       throw new Error('Failed to fetch Wallet Image');

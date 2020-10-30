@@ -17,8 +17,12 @@ export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
-export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
+export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC';
 export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
+export const SYNC_LAST_SEENS = 'SYNC_LAST_SEENS';
+export const SYNC_LAST_SEENS_AND_HEALTH = 'SYNC_LAST_SEENS_AND_HEALTH';
+export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS';
+export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC';
 
 export const initializeTrustedContact = (contactInfo: {
   contactName: string;
@@ -49,11 +53,12 @@ export const approveTrustedContact = (
   };
 };
 
-export const removeTrustedContact = (contactName) => {
+export const removeTrustedContact = (contactName, shareIndex?) => {
   return {
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
       contactName,
+      shareIndex,
     },
   };
 };
@@ -119,9 +124,34 @@ export const fetchTrustedChannel = (
   };
 };
 
-export const trustedChannelsSync = () => {
+export const trustedChannelsSetupSync = () => {
   return {
-    type: TRUSTED_CHANNELS_SYNC,
+    type: TRUSTED_CHANNELS_SETUP_SYNC,
+  };
+};
+
+export const syncLastSeens = () => {
+  return {
+    type: SYNC_LAST_SEENS,
+  };
+};
+
+export const syncLastSeensAndHealth = () => {
+  return {
+    type: SYNC_LAST_SEENS_AND_HEALTH,
+  };
+};
+
+export const syncTrustedChannels = (contacts?) => {
+  return {
+    type: SYNC_TRUSTED_CHANNELS,
+    payload: { contacts },
+  };
+};
+
+export const postRecoveryChannelSync = () => {
+  return {
+    type: POST_RECOVERY_CHANNEL_SYNC,
   };
 };
 

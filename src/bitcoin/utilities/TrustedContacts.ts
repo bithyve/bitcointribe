@@ -8,6 +8,8 @@ import {
   EncryptedEphemeralData,
   trustedChannelActions,
   ShareUploadables,
+  MetaShare,
+  EncDynamicNonPMDD,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -412,7 +414,7 @@ export default class TrustedContacts {
       }
 
       let { updated, initiatedAt, data } = res.data;
-      console.log({ updated, initiatedAt, data });
+      // console.log({ updated, initiatedAt, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (initiatedAt)
         this.trustedContacts[
@@ -495,7 +497,7 @@ export default class TrustedContacts {
         ); // only one element would contain the public key (uploaded by the counterparty)
 
         if (!contactsPublicKey) {
-          console.log(`Approval failed, ${contactName}'s public key missing`);
+          // console.log(`Approval failed, ${contactName}'s public key missing`);
           throw new Error(
             `Approval failed, ${contactName}'s public key missing`,
           );
@@ -538,7 +540,7 @@ export default class TrustedContacts {
       if (!updated) {
         // counterparty's data reception for the first time
         trustedData.push(newTrustedData);
-        console.log({ newTrustedData });
+        // console.log({ newTrustedData });
         // update counterparty's walletId and FCM
 
         newTrustedData.data.walletID
@@ -576,6 +578,11 @@ export default class TrustedContacts {
     const decryptedTrustedData: TrustedData = {
       publicKey: encryptedData.publicKey,
       data,
+      encDataHash: crypto
+        .createHash('sha256')
+        .update(encryptedData.encryptedData)
+        .digest('hex'),
+      lastSeen: encryptedData.lastSeen,
     };
     const { overallTrustedData } = this.updateTrustedChannelData(
       contactName,
@@ -635,6 +642,11 @@ export default class TrustedContacts {
       const encryptedDataPacket: EncryptedTrustedData = {
         publicKey,
         encryptedData,
+        dataHash: crypto
+          .createHash('sha256')
+          .update(encryptedData)
+          .digest('hex'),
+        lastSeen: Date.now(),
       };
 
       let res: AxiosResponse;
@@ -713,7 +725,7 @@ export default class TrustedContacts {
         address: trustedChannel.address,
         identifier: publicKey,
       });
-      console.log({ res });
+      // console.log({ res });
 
       let { data } = res.data;
       if (data) {
@@ -742,6 +754,239 @@ export default class TrustedContacts {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
       throw new Error(err.message);
+    }
+  };
+
+  public syncLastSeens = async (): Promise<{
+    updated: Boolean;
+  }> => {
+    const channelsToUpdate = {};
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate[trustedChannel.address] = { publicKey };
+      }
+    }
+
+    if (Object.keys(channelsToUpdate).length) {
+      const res = await BH_AXIOS.post('syncLastSeens', {
+        HEXA_ID,
+        channelsToUpdate,
+      });
+
+      const { updated, updatedLastSeens } = res.data;
+      // console.log({ updatedLastSeens });
+      if (Object.keys(updatedLastSeens).length) {
+        for (const contact of Object.values(this.trustedContacts)) {
+          const { trustedChannel } = contact;
+          if (trustedChannel) {
+            const { publicKey, lastSeen } = updatedLastSeens[
+              trustedChannel.address
+            ]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                subChan.lastSeen = lastSeen;
+              }
+            });
+          }
+        }
+      }
+
+      return { updated };
+    } else {
+      throw new Error('No trusted channels to update');
+    }
+  };
+
+  public syncLastSeensAndHealth = async (
+    metaShares: MetaShare[],
+    healthCheckStatus,
+    metaSharesUnderCustody: MetaShare[],
+  ): Promise<{
+    updated: Boolean;
+    healthCheckStatus;
+    updationInfo: Array<{
+      walletId: string;
+      shareId: string;
+      updated: boolean;
+      updatedAt?: number;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+      err?: string;
+    }>;
+  }> => {
+    const channelsToUpdate = {};
+    for (const contact of Object.values(this.trustedContacts)) {
+      const { trustedChannel, publicKey } = contact;
+      if (trustedChannel) {
+        channelsToUpdate[trustedChannel.address] = { publicKey };
+      }
+    }
+
+    const toUpdate = []; // healths to update(shares under custody)
+    for (const share of metaSharesUnderCustody) {
+      toUpdate.push({
+        walletId: share.meta.walletId,
+        shareId: share.shareId,
+        reshareVersion: share.meta.reshareVersion,
+      });
+    }
+
+    const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
+      HEXA_ID,
+      walletID: metaShares[0].meta.walletId,
+      shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
+      channelsToUpdate, // LS update
+      toUpdate, // share under-custody update
+    });
+
+    const { updated, updatedLastSeens } = res.data; // LS data
+    const { updationInfo } = res.data; // share under-custody update info
+    const updates: Array<{
+      shareId: string;
+      updatedAt: number;
+      reshareVersion: number;
+    }> = res.data.lastUpdateds; // legacy HC
+    // console.log({ updatedLastSeens, updates, updationInfo });
+
+    // synching health: legacy
+    if (updates.length) {
+      for (const { shareId, updatedAt, reshareVersion } of updates) {
+        for (let index = 0; index < metaShares.length; index++) {
+          if (metaShares[index] && metaShares[index].shareId === shareId) {
+            const currentReshareVersion =
+              healthCheckStatus[index].reshareVersion !== undefined
+                ? healthCheckStatus[index].reshareVersion
+                : 0;
+
+            if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+
+            healthCheckStatus[index] = {
+              shareId,
+              updatedAt,
+              reshareVersion,
+            };
+          }
+        }
+      }
+    }
+
+    if (Object.keys(updatedLastSeens).length) {
+      for (const contactName of Object.keys(this.trustedContacts)) {
+        const { trustedChannel } = this.trustedContacts[contactName];
+        if (trustedChannel) {
+          const { publicKey, lastSeen } = updatedLastSeens[
+            trustedChannel.address
+          ]; // counterparty's pub
+          trustedChannel.data.forEach((subChan: TrustedData) => {
+            if (subChan.publicKey === publicKey) {
+              subChan.lastSeen = lastSeen;
+
+              // update health via channel
+              if (lastSeen > 0) {
+                for (let index = 0; index < metaShares.length; index++) {
+                  if (metaShares[index].meta.guardian === contactName) {
+                    healthCheckStatus[index] = {
+                      shareId: metaShares[index].shareId,
+                      updatedAt: lastSeen,
+                      reshareVersion: healthCheckStatus[index]
+                        ? healthCheckStatus[index].reshareVersion
+                        : 0,
+                    };
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+    }
+
+    return { updated, healthCheckStatus, updationInfo };
+  };
+
+  public syncTrustedChannels = async (
+    contacts?: Contacts,
+  ): Promise<{
+    synched: Boolean;
+    contactsToRemove: String[];
+    guardiansToRemove: String[];
+  }> => {
+    const channelsToSync = {};
+    for (const contact of Object.values(
+      contacts ? contacts : this.trustedContacts,
+    )) {
+      const { trustedChannel, publicKey } = contact;
+      if (
+        trustedChannel &&
+        trustedChannel.data &&
+        trustedChannel.data.length === 2 // ensures channel-setup completion
+      ) {
+        let pub, dataHash;
+        trustedChannel.data.forEach((subChan: TrustedData) => {
+          if (subChan.publicKey !== publicKey) {
+            // counter party's data
+            pub = subChan.publicKey;
+            dataHash = subChan.encDataHash;
+          }
+          channelsToSync[trustedChannel.address] = { publicKey: pub, dataHash };
+        });
+      }
+    }
+    // console.log({ channelsToSync });
+    if (Object.keys(channelsToSync).length) {
+      const res = await BH_AXIOS.post('syncTrustedChannels', {
+        HEXA_ID,
+        channelsToSync,
+      });
+
+      const { synched, synchedChannels } = res.data;
+      // console.log({ synched, synchedChannels });
+
+      const contactsToRemove = [];
+      const guardiansToRemove = [];
+      if (Object.keys(synchedChannels).length) {
+        for (const contactName of Object.keys(
+          contacts ? contacts : this.trustedContacts,
+        )) {
+          const contact = this.trustedContacts[contactName];
+          const { trustedChannel, symmetricKey } = contact;
+          if (trustedChannel && synchedChannels[trustedChannel.address]) {
+            const {
+              publicKey,
+              encryptedData,
+              dataHash,
+              lastSeen,
+            } = synchedChannels[trustedChannel.address]; // counterparty's pub
+            trustedChannel.data.forEach((subChan: TrustedData) => {
+              if (subChan.publicKey === publicKey) {
+                const decryptedData: TrustedDataElements = this.decryptData(
+                  symmetricKey,
+                  encryptedData,
+                ).data;
+                if (decryptedData.remove) contactsToRemove.push(contactName);
+                if (decryptedData.removeGuardian)
+                  guardiansToRemove.push(contactName);
+                subChan.data = decryptedData;
+                subChan.encDataHash = dataHash;
+                subChan.lastSeen = lastSeen;
+
+                // updating FCMs, if any(post ward recovery)
+                if (
+                  decryptedData.FCM &&
+                  !contact.FCMs.includes(decryptedData.FCM)
+                )
+                  this.trustedContacts[contactName].FCMs.push(
+                    decryptedData.FCM,
+                  );
+              }
+            });
+          }
+        }
+      }
+
+      return { synched, contactsToRemove, guardiansToRemove };
+    } else {
+      throw new Error('No trusted channels to update');
     }
   };
 }

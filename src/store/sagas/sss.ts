@@ -63,6 +63,9 @@ import {
   TrustedDataElements,
   WalletImage,
   ShareUploadables,
+  INotification,
+  notificationType,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -81,10 +84,23 @@ import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
-var Mailer = require('NativeModules').RNMail;
+import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
+import RelayServices from '../../bitcoin/services/RelayService';
+
+const sendNotification = (recipient, notification) => {
+  const receivers = [];
+  if (recipient.walletID && recipient.FCMs.length)
+    receivers.push({
+      walletId: recipient.walletID,
+      FCMs: recipient.FCMs,
+    });
+
+  if (receivers.length)
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+};
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -210,6 +226,44 @@ function* uploadEncMetaShareWorker({ payload }) {
       trustedContacts.tc.trustedContacts[
         payload.previousGuardianName
       ].isGuardian = false;
+
+      const {
+        walletID,
+        FCMs,
+        trustedChannel,
+      } = trustedContacts.tc.trustedContacts[payload.previousGuardianName];
+
+      if (trustedChannel) {
+        // dispatching remove share action to the previous guardian
+        const dataElements = { removeGuardian: true };
+
+        const res = yield call(
+          trustedContacts.updateTrustedChannel,
+          payload.previousGuardianName,
+          dataElements,
+        );
+
+        if (res.status === 200) {
+          if (walletID && FCMs) {
+            const recipient = {
+              walletID,
+              FCMs,
+            };
+            const { walletName } = yield select(
+              (state) => state.storage.database.WALLET_SETUP,
+            );
+
+            const notification: INotification = {
+              notificationType: notificationType.contact,
+              title: 'Friends and Family notification',
+              body: `Removed as a Keeper by ${walletName}`,
+              data: {},
+              tag: notificationTag.IMP,
+            };
+            sendNotification(recipient, notification);
+          }
+        }
+      }
     }
   } else {
     // preventing re-uploads till expiry
@@ -399,7 +453,7 @@ function* uploadRequestedShareWorker({ payload }) {
     tag
   ];
 
-  // // preventing re-uploads till expiry
+  // preventing re-uploads till expiry
   // if (TRANSFER_DETAILS) {
   //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
   //     return;
@@ -515,10 +569,15 @@ export function* downloadMetaShareWorker({ payload }) {
       };
 
       console.log({ updatedBackup });
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+        },
+      });
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
-      yield put(updateMSharesHealth(updatedBackup));
+      yield put(updateMSharesHealth());
     } else {
       let updatedRecoveryShares = {};
       let updated = false;
@@ -661,8 +720,16 @@ function* generatePersonalCopyWorker({ payload }) {
       };
     } else {
       personalCopyDetails = JSON.parse(personalCopyDetails);
-      const originalSharedStatus = personalCopyDetails[selectedPersonalCopy.type] ? personalCopyDetails[selectedPersonalCopy.type].shared : false
-      const originalSharingDetails = personalCopyDetails[selectedPersonalCopy.type] && personalCopyDetails[selectedPersonalCopy.type].sharingDetails ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails : {}
+      const originalSharedStatus = personalCopyDetails[
+        selectedPersonalCopy.type
+      ]
+        ? personalCopyDetails[selectedPersonalCopy.type].shared
+        : false;
+      const originalSharingDetails =
+        personalCopyDetails[selectedPersonalCopy.type] &&
+        personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          : {};
       personalCopyDetails = {
         ...personalCopyDetails,
         [selectedPersonalCopy.type]: {
@@ -915,7 +982,7 @@ export const sharePersonalCopyWatcher = createWatcher(
   SHARE_PERSONAL_COPY,
 );
 
-function* updateMSharesHealthWorker({ payload }) {
+function* updateMSharesHealthWorker() {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
@@ -923,12 +990,9 @@ function* updateMSharesHealthWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
-  if (!DECENTRALIZED_BACKUP) {
-    DECENTRALIZED_BACKUP = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
-  }
+  const DECENTRALIZED_BACKUP = yield select(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
 
   const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
@@ -943,20 +1007,22 @@ function* updateMSharesHealthWorker({ payload }) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
     console.log({ updationInfo });
+
+    let removed = false;
     Object.keys(UNDER_CUSTODY).forEach((tag) => {
       for (let info of updationInfo) {
         if (info.updated) {
-          if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-            // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-            if (info.encryptedDynamicNonPMDD)
-              UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-                info.encryptedDynamicNonPMDD;
-          }
+          // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+          //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+          //   if (info.encryptedDynamicNonPMDD)
+          //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+          //       info.encryptedDynamicNonPMDD;
+          // }
         } else {
           if (info.removeShare) {
             if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
               delete UNDER_CUSTODY[tag];
-
+              removed = true;
               for (const contactName of Object.keys(
                 trustedContactsService.tc.trustedContacts,
               )) {
@@ -972,21 +1038,24 @@ function* updateMSharesHealthWorker({ payload }) {
       }
     });
 
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
-    };
+    if (removed) {
+      // update db post share removal
+      const updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+      };
 
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      UNDER_CUSTODY,
-    };
-    yield call(insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      },
-    });
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY,
+      };
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+          SERVICES: updatedSERVICES,
+        },
+      });
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -1199,7 +1268,6 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
-  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
@@ -1704,7 +1772,7 @@ function* updateWalletImageWorker({ payload }) {
     }
   }
 
-  console.log({ walletImage });
+  // console.log({ walletImage });
 
   if (Object.keys(walletImage).length === 0) {
     console.log('WI: nothing to update');
@@ -1733,7 +1801,7 @@ function* fetchWalletImageWorker({ payload }) {
   console.log({ res });
   if (res.status === 200) {
     const walletImage: WalletImage = res.data.walletImage;
-    console.log({ walletImage });
+    // console.log({ walletImage });
 
     if (!Object.keys(walletImage).length)
       console.log('Failed fetch: Empty Wallet Image');

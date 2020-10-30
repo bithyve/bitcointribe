@@ -877,47 +877,40 @@ const TrustedContactHistory = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      if (trustedContactsInfo) {
-        if (trustedContactsInfo[index]) {
+      let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+
+      if (tcInfo) {
+        if (tcInfo[index]) {
           let found = false;
-          for (let i = 3; i < trustedContactsInfo.length; i++) {
+          for (let i = 3; i < tcInfo.length; i++) {
             // push if not present in TC list
-            if (
-              trustedContactsInfo[i] &&
-              trustedContactsInfo[i].name == trustedContactsInfo[index].name
-            ) {
+            if (tcInfo[i] && tcInfo[i].name == tcInfo[index].name) {
               found = true;
               break;
             }
           }
 
-          if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
+          if (!found) tcInfo.push(tcInfo[index]);
         }
 
-        for (let i = 0; i < trustedContactsInfo.length; i++) {
-          if (
-            trustedContactsInfo[i] &&
-            trustedContactsInfo[i].name == contact.name
-          ) {
-            trustedContactsInfo.splice(i, 1);
+        for (let i = 0; i < tcInfo.length; i++) {
+          if (tcInfo[i] && tcInfo[i].name == contact.name) {
+            tcInfo.splice(i, 1);
             break;
           }
         }
 
-        trustedContactsInfo[index] = contact;
+        tcInfo[index] = contact;
       } else {
-        trustedContactsInfo = [];
-        trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
-        trustedContactsInfo[1] = null;
-        trustedContactsInfo[2] = null;
-        trustedContactsInfo[index] = contact;
+        tcInfo = [];
+        tcInfo[0] = null; // securing initial 3 positions for Guardians
+        tcInfo[1] = null;
+        tcInfo[2] = null;
+        tcInfo[index] = contact;
       }
-      await AsyncStorage.setItem(
-        'TrustedContactsInfo',
-        JSON.stringify(trustedContactsInfo),
-      );
+      await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
 
-      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+      dispatch(updateTrustedContactInfoLocally(tcInfo));
     },
     [index, trustedContactsInfo],
   );
@@ -1259,7 +1252,7 @@ const TrustedContactHistory = (props) => {
             onPress={() => {
               props.navigation.goBack();
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

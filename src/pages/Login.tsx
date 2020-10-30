@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
@@ -22,12 +21,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
-import {
-  updateMSharesHealth,
-  checkMSharesHealth,
-  updateWalletImage,
-} from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -35,7 +28,7 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
-const LOADER_MESSAGE_TIME = 4000;
+const LOADER_MESSAGE_TIME = 3000;
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
@@ -77,6 +70,7 @@ const getRandomMessage = () => {
 };
 
 export default function Login(props) {
+  
   const initialMessage = getRandomMessage();
   let [message, setMessage] = useState(initialMessage.heading);
   let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
@@ -97,56 +91,8 @@ export default function Login(props) {
     (state) => state.preferences.releaseCasesValue,
   );
 
-  const initialLoadingCompleted = useSelector((state) => state.loaders.initialLoadingCompleted)
-
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
-  // const releases =[
-  //       {
-  //           "build": "40",
-  //           "version": "0.8",
-  //           "releaseNotes": {
-  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
-  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //           },
-  //           "reminderLimit": 2
-  //       },
-  //       {
-  //         "build": "39",
-  //         "version": "0.8",
-  //         "releaseNotes": {
-  //             "ios": "dfsdg",
-  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //         },
-  //         "reminderLimit": -1
-  //     },
-  //     {
-  //       "build": "38",
-  //       "version": "0.8",
-  //       "releaseNotes": {
-  //           "ios": "64356354",
-  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //       },
-  //       "reminderLimit": -1
-  //   },
-  //   {
-  //     "build": "37",
-  //     "version": "0.8",
-  //     "releaseNotes": {
-  //         "ios": "dfgdgdg",
-  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
-  //     },
-  //     "reminderLimit": -1
-  // },
-  //       {
-  //           "build": "35",
-  //           "version": "3.40",
-  //           "releaseNotes": {
-  //               "ios": "ios notes for release 319",
-  //               "android": "android notes for release 319"
-  //           },
-  //           "reminderLimit": -1
-  //       }
-  //   ];
+
   const onPressNumber = useCallback(
     (text) => {
       let tmpPasscode = passcode;
@@ -170,95 +116,10 @@ export default function Login(props) {
     }
   }, [passcode]);
 
-  const DECENTRALIZED_BACKUP = useSelector(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
-  );
-  // const testAccService = accounts[TEST_ACCOUNT].service;
-  // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
     (state) => state.setupAndAuth,
   );
-  const { dbFetched } = useSelector((state) => state.storage);
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
-
-  // useEffect(() => {
-  //   const testBalance = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-  //       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-  //       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const secureBalance = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-  //       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-  //         .unconfirmedBalance
-  //     : 0;
-  //   const accumulativeBalance = regularBalance + secureBalance;
-
-  //   const testTransactions = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-  //     : [];
-  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-  //         .transactionDetails
-  //     : [];
-
-  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-  //         .transactionDetails
-  //     : [];
-  //   const accumulativeTransactions = [
-  //     ...testTransactions,
-  //     ...regularTransactions,
-  //     ...secureTransactions,
-  //   ];
-
-  //   setBalances({
-  //     testBalance,
-  //     regularBalance,
-  //     secureBalance,
-  //     accumulativeBalance,
-  //   });
-  //   setTransactions(accumulativeTransactions);
-  // }, [accounts]);
-
-  const s3Service = useSelector((state) => state.sss.service);
-  useEffect(() => {
-    // HC init and down-streaming
-    if (s3Service && s3Service.checkHealth) {
-      const { healthCheckInitialized } = s3Service.sss;
-      if (healthCheckInitialized) {
-        dispatch(checkMSharesHealth());
-      }
-    }
-  }, [s3Service]);
-
-  useEffect(() => {
-    AsyncStorage.removeItem('lastSeen');
-  }, []);
-
-  const [updatedHealth, setUpdatedHealth] = useState(false);
-  useEffect(() => {
-    // HC up-streaming
-    if (DECENTRALIZED_BACKUP) {
-      if (
-        Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length &&
-        !updatedHealth
-      ) {
-        dispatch(updateMSharesHealth());
-        setUpdatedHealth(true);
-      }
-    }
-  }, [DECENTRALIZED_BACKUP]);
 
   useEffect(() => {
     if (JailMonkey.isJailBroken()) {
@@ -290,7 +151,7 @@ export default function Login(props) {
 
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
-        console.log('Release note', res.data.releases);
+        // console.log('Release note', res.data.releases);
         let releaseCases = releaseCasesValue;
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseCases'),
@@ -348,9 +209,7 @@ export default function Login(props) {
   );
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector((state) => state.preferences.isMigrated);
-  const accountsSynched = useSelector(
-    (state) => state.accounts.accountsSynched,
-  );
+
   let timer;
 
   useEffect(() => {
@@ -361,7 +220,9 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
+          // console.log('starting timer ', {LOADER_MESSAGE_TIME}, Date.now())
           timer = setTimeout(() => {
+            // console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
             if (loaderBottomSheet.current) {
               loaderBottomSheet.current.snapTo(0);
             }
@@ -371,57 +232,27 @@ export default function Login(props) {
               trustedContactRequest,
               userKey,
             });
-          }, 20000)
-
-
-          if (dbFetched) {
-            dispatch(updateWalletImage());
-            dispatch(calculateExchangeRate());
-            dispatch(startupSync());
-          }
+          }, LOADER_MESSAGE_TIME);
         } else {
           props.navigation.replace('RestoreAndRecoverWallet');
         }
       });
     }
-  }, [isAuthenticated, dbFetched]);
-
-
-
-
-  useEffect(() => {
-    if (initialLoadingCompleted) {
-      if (loaderBottomSheet.current) {
-        loaderBottomSheet.current.snapTo(0);
-      }
-      props.navigation.navigate('Home', {
-        custodyRequest,
-        recoveryRequest,
-        trustedContactRequest,
-        userKey,
-      });
-      if (timer) {
-        clearTimeout(timer)
-      }
-
-    }
-  }, [initialLoadingCompleted])
-
-
-
+  }, [isAuthenticated]);
 
   const handleLoaderMessages = (passcode) => {
     setTimeout(() => {
       dispatch(credsAuth(passcode));
-    }, 2)
+    }, 2);
   };
+
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
         headerText={message}
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
-        showGif={true}
+        showGif={false}
       />
     );
   }, [message, subTextMessage1, subTextMessage2]);
@@ -537,8 +368,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -566,8 +397,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -595,8 +426,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -624,8 +455,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -795,7 +626,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

@@ -9,7 +9,6 @@ export interface Props {
   onPressAccept: (key: any) => void;
   onPressReject: (key: any) => void;
   onPhoneNumberChange: (key: any) => void;
-  isRequestModalOpened: boolean;
 }
 
 const TrustedContactRequestContent: React.FC<Props> = ({
@@ -19,7 +18,6 @@ const TrustedContactRequestContent: React.FC<Props> = ({
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
-  isRequestModalOpened,
 }: Props) => {
   if (!trustedContactRequest && !recoveryRequest) return;
 
@@ -28,7 +26,6 @@ const TrustedContactRequestContent: React.FC<Props> = ({
 
   return (
     <TrustedContactRequest
-      isRequestModalOpened={isRequestModalOpened}
       isQR={isQR}
       inputType={
         hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null

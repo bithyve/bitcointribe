@@ -43,8 +43,9 @@ const initialState: {
   loading: {
     updateEphemeralChannel: Boolean;
     updateTrustedChannel: Boolean;
-    trustedChannelsSync: Boolean;
+    trustedChannelsSetupSync: Boolean;
     approvingTrustedContact: Boolean;
+    syncLastSeensAndHealth: Boolean;
   };
   addressBook: any;
   trustedContactsInfo: any;
@@ -59,8 +60,9 @@ const initialState: {
   loading: {
     updateEphemeralChannel: false,
     updateTrustedChannel: false,
-    trustedChannelsSync: false,
+    trustedChannelsSetupSync: false,
     approvingTrustedContact: false,
+    syncLastSeensAndHealth: false,
   },
   addressBook: null,
   trustedContactsInfo: null,
@@ -87,11 +89,11 @@ export default (state = initialState, action) => {
     case APPROVE_TRUSTED_CONTACT:
       return {
         ...state,
-        loading:{
+        loading: {
           ...state.loading,
           approvingTrustedContact: true,
-        }
-      }
+        },
+      };
 
     case TRUSTED_CONTACT_APPROVED:
       return {
@@ -102,10 +104,10 @@ export default (state = initialState, action) => {
             approved: action.payload.approved,
           },
         },
-        loading:{
+        loading: {
           ...state.loading,
           approvingTrustedContact: false,
-        }
+        },
       };
 
     case EPHEMERAL_CHANNEL_UPDATED:
