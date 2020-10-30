@@ -64,7 +64,17 @@ const loaderMessages = [
   },
 ];
 
+const getRandomMessage = () => {
+  const randomIndex = Math.floor(Math.random() * 6);
+  return loaderMessages[randomIndex];
+};
+
 export default function Login(props) {
+  
+  const initialMessage = getRandomMessage();
+  let [message, setMessage] = useState(initialMessage.heading);
+  let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
+  let [subTextMessage2, setSubTextMessage2] = useState(initialMessage.subText);
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
