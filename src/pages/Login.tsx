@@ -29,10 +29,42 @@ import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
 const LOADER_MESSAGE_TIME = 3000;
-export default function Login(props) {
-  // if you are looking for loader messages code
-  // please refer to v1.3.1 # 147 or earlier
+const loaderMessages = [
+  {
+    heading: 'Non-custodial buys',
+    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
+    subText: '(*select locations)',
+  },
+  {
+    heading: 'Friends & Family',
+    text:
+      'Add contacts to Hexa and send sats w/o asking for address every time',
+    subText: '',
+  },
+  {
+    heading: 'Hexa Savings Account',
+    text: 'Don’t forget to set up your 2FA code on an authenticator app',
+    subText: '',
+  },
+  {
+    heading: 'Introducing Donation Accounts',
+    text:
+      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
+    subText: '',
+  },
+  {
+    heading: 'Satoshis or Sats',
+    text: '1 bitcoin = 100 million satoshis or sats',
+    subText: 'Hexa uses sats to make using bitcoin easier',
+  },
+  {
+    heading: 'Hexa Test Account',
+    text: 'Test Account comes preloaded with test-sats',
+    subText: 'Best place to start if you are new to Bitcoin',
+  },
+];
 
+export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -207,13 +239,13 @@ export default function Login(props) {
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
-        headerText={''}//message
-        messageText={''}//subTextMessage1
-        messageText2={''}//subTextMessage2
-        showGif={true}
+        headerText={message}
+        messageText={subTextMessage1}
+        messageText2={subTextMessage2}
+        showGif={false}
       />
     );
-  }, ['', '', '']);
+  }, [message, subTextMessage1, subTextMessage2]);
 
   const renderLoaderModalHeader = () => {
     return (
