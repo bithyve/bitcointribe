@@ -1998,10 +1998,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <View style={styles.accountCardsContainer}>
           <FlatList
             contentContainerStyle={{
-              paddingTop: 36,
-              alignItems: 'flex-start',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
-            contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
+            // contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}
@@ -2452,11 +2452,13 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     flex: 7,
     marginTop: 30,
+    paddingLeft: 20,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
     width: '100%',
   },
 
