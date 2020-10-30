@@ -40,7 +40,7 @@ export default function UpdateApp(props) {
   const releaseNumber = props.navigation.state.params.releaseNumber
     ? props.navigation.state.params.releaseNumber
     : '';
-  console.log('releaseDataObj', releaseDataObj);
+  // console.log('releaseDataObj', releaseDataObj);
   const [releaseNotes, setReleaseNotes] = useState([]);
   const [isUpdateMandotary, setIsUpdateMandotary] = useState(false);
   const [releaseData, setReleaseData] = useState({});
@@ -56,7 +56,7 @@ export default function UpdateApp(props) {
       isOpenFromNotificationList &&
       releaseNumber
     ) {
-      console.log("releaseDataObj[0]",releaseDataObj[0])
+      // console.log("releaseDataObj[0]",releaseDataObj[0])
       if(DeviceInfo.getBuildNumber() >= releaseNumber)
       setIsUpdateInValid(true);
       else
@@ -79,7 +79,7 @@ export default function UpdateApp(props) {
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseData'),
         // );
-        console.log('releaseDataOld', releaseDataOld);
+        // console.log('releaseDataOld', releaseDataOld);
         if (releaseDataObj[0] && releaseDataObj[0].reminderLimit > 0) {
           if (!releaseDataOld) {
             releaseData = {
@@ -103,7 +103,7 @@ export default function UpdateApp(props) {
               return el.reminderLimit === 0;
             })
           : '';
-        console.log('RELEASENOTE', releaseNotes);
+        // console.log('RELEASENOTE', releaseNotes);
         if (
           releaseNotes ||
           (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) ||
@@ -129,7 +129,7 @@ export default function UpdateApp(props) {
 
   useEffect(() => {
     if (releaseData) {
-      console.log("ReleaseData",releaseData);
+      // console.log("ReleaseData",releaseData);
       let tempReleaseNote = releaseData.releaseNotes
         ? Platform.OS == 'ios'
           ? releaseData.releaseNotes.ios
@@ -156,7 +156,7 @@ export default function UpdateApp(props) {
       if (supported) {
         Linking.openURL(url);
       } else {
-        console.log("Don't know how to open URI: " + url);
+        // console.log("Don't know how to open URI: " + url);
       }
     });
   };
@@ -165,7 +165,7 @@ export default function UpdateApp(props) {
     let releaseCasesData;
     let releaseCases = releaseCasesValue;
     //JSON.parse(await AsyncStorage.getItem('releaseCases'));
-    console.log('releaseCases', releaseCases);
+    // console.log('releaseCases', releaseCases);
     releaseCasesData = {
         ...releaseData,
         ignoreClick: _ignoreClick,

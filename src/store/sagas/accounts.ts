@@ -1006,38 +1006,38 @@ function* accountsSyncWorker({ payload }) {
     // });
 
     // concurrent sync
-    yield all([
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: TEST_ACCOUNT,
-          options: {
-            service: testService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: REGULAR_ACCOUNT,
-          options: {
-            service: regularService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: SECURE_ACCOUNT,
-          options: {
-            service: secureService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-    ]);
+    // yield all([
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: TEST_ACCOUNT,
+    //       options: {
+    //         service: testService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: REGULAR_ACCOUNT,
+    //       options: {
+    //         service: regularService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    //   fetchBalanceTxWorker({
+    //     payload: {
+    //       serviceType: SECURE_ACCOUNT,
+    //       options: {
+    //         service: secureService,
+    //         restore: payload.restore,
+    //         shouldNotInsert: true,
+    //       },
+    //     },
+    //   }),
+    // ]);
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
@@ -1061,7 +1061,14 @@ export const accountsSyncWatcher = createWatcher(
 );
 
 function* startupSyncWorker({ payload }) {
+  /*
+  Skippiing this entire sync process
+  to improve login performance.
 
+  This will be modified and enhanced in a follow up release.
+  Leaving this here for reference till next release.
+
+  console.log('startupsync started ', Date.now())
   try {
     console.log('Synching accounts...');
     yield call(accountsSyncWorker, { payload });
@@ -1077,7 +1084,9 @@ function* startupSyncWorker({ payload }) {
   } catch (err) {
     console.log('Derivative accounts sync failed: ', err);
   }
-
+  console.log('startupsync complete ', Date.now())
+  */
+ 
   yield put(startupSyncLoaded(true))
 }
 

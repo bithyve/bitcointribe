@@ -66,7 +66,7 @@ export default function SendViaLink(props) {
     },
   ]);
   const contact = props.contact;
-  ////console.log("Contact SEND VIA LINK", contact);
+  // console.log("Contact SEND VIA LINK", contact);
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function SendViaLink(props) {
         if (shareApps[i].url) {
       isAppInstalled(shareApps[i].title)
     .then((isInstalled) => {
-      console.log("isInstalled", isInstalled);
+      // console.log("isInstalled", isInstalled);
       shareApps[i].isAvailable = Boolean(isInstalled);
         // isInstalled is true if the app is installed or false if not
     });
@@ -121,7 +121,7 @@ export default function SendViaLink(props) {
     return new Promise(async (resolve, reject) => {
       
       NativeModules.CheckPackageInstallation.isPackageInstalled(packagename, (isInstalled) => {
-        console.log("RESOLVE", packagename, resolve);
+        // console.log("RESOLVE", packagename, resolve);
             resolve(isInstalled);
         });
     });
@@ -183,7 +183,7 @@ function isAppInstalledIOS(key) {
       let url = appUrl + 'text=' + infoText + '\n' + shareLink; //+ '&phone=' + mobile;
       Linking.openURL(url)
         .then((data) => {
-          ////console.log('WhatsApp Opened');
+          // console.log('WhatsApp Opened');
         })
         .catch(() => {
           alert('Make sure WhatsApp installed on your device');
@@ -196,7 +196,7 @@ function isAppInstalledIOS(key) {
       let url = appUrl + infoText + '\n' + shareLink;
       Linking.openURL(url)
         .then((data) => {
-          ////console.log('Telegram Opened');
+          // console.log('Telegram Opened');
         })
         .catch(() => {
           alert('Make sure Telegram installed on your device');
@@ -209,7 +209,7 @@ function isAppInstalledIOS(key) {
       let url = appUrl;
           Linking.openURL(url)
           .then((data) => {
-            ////console.log('Messenger Opened');
+            // console.log('Messenger Opened');
           })
           .catch(() => {
             alert('Make sure Facebook Messenger installed on your device');

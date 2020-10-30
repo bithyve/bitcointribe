@@ -411,7 +411,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     // this.consumedAddresses = [];
-    // // generating all consumed addresses:
+    // generating all consumed addresses:
     // for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
     //   const multiSig = this.createSecureMultiSig(itr);
     //   this.consumedAddresses.push(multiSig.address);
@@ -748,7 +748,7 @@ export default class SecureHDWallet extends Bitcoin {
         this.derivativeAccounts[dAccountType][accountNumber][
           'usedAddresses'
         ] = usedAddresses;
-        console.log({ derivativeAccUsedAddresses: usedAddresses });
+        // console.log({ derivativeAccUsedAddresses: usedAddresses });
         batchedDerivativeAddresses.push(...usedAddresses);
       }
     }
@@ -784,7 +784,7 @@ export default class SecureHDWallet extends Bitcoin {
       );
 
       const addressesInfo = Txs;
-      console.log({ addressesInfo });
+      // console.log({ addressesInfo });
 
       for (const dAccountType of accountTypes) {
         if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -1013,9 +1013,9 @@ export default class SecureHDWallet extends Bitcoin {
 
       return { synched: true };
     } catch (err) {
-      console.log(
-        `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
-      );
+      // console.log(
+      //  `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+      //);
       throw new Error('Fetching balance-txn by addresses failed');
     }
   };
@@ -1240,7 +1240,7 @@ export default class SecureHDWallet extends Bitcoin {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
-    console.log({ res });
+    // console.log({ res });
     const { setupSuccessful, setupData } = res.data;
     if (!setupSuccessful) {
       throw new Error('Secure account setup failed');
@@ -1398,7 +1398,7 @@ export default class SecureHDWallet extends Bitcoin {
         }
         output.address = changeAddress;
 
-        console.log(`adding the change address: ${output.address}`);
+        // console.log(`adding the change address: ${output.address}`);
       }
     }
 
@@ -1411,7 +1411,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
       return 0;
     });
-    console.log({ sortedOutputs: outputs });
+    // console.log({ sortedOutputs: outputs });
 
     return outputs;
   };
@@ -1474,7 +1474,7 @@ export default class SecureHDWallet extends Bitcoin {
       outputUTXOs,
       averageTxFees['medium'].feePerByte,
     );
-    console.log({ inputUTXOs, outputUTXOs, fee });
+    // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return { fee };
   };
@@ -1515,7 +1515,7 @@ export default class SecureHDWallet extends Bitcoin {
 
       inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
-    console.log({ inputUTXOs });
+    // console.log({ inputUTXOs });
 
     let confirmedBalance = 0;
     inputUTXOs.forEach((confirmedUtxo) => {
@@ -1581,7 +1581,7 @@ export default class SecureHDWallet extends Bitcoin {
       inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
 
-    console.log('Input UTXOs:', inputUTXOs);
+    // console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0;
     inputUTXOs.forEach((confirmedUtxo) => {
       confirmedBalance += confirmedUtxo.value;
@@ -1594,11 +1594,11 @@ export default class SecureHDWallet extends Bitcoin {
         value: recipient.amount,
       });
     }
-    console.log('Output UTXOs:', outputUTXOs);
+    // console.log('Output UTXOs:', outputUTXOs);
 
     const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
     let defaultFeePerByte, defaultEstimatedBlocks;
-    console.log({ averageTxFees });
+    // console.log({ averageTxFees });
     if (averageTxFees) {
       defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
       defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
@@ -1613,10 +1613,10 @@ export default class SecureHDWallet extends Bitcoin {
     const defaultPriorityOutputs = assets.outputs;
     const defaultPriorityFee = assets.fee;
 
-    console.log('-------Transaction--------');
-    console.log('\tDynamic Fee', defaultPriorityFee);
-    console.log('\tInputs:', defaultPriorityInputs);
-    console.log('\tOutputs:', defaultPriorityOutputs);
+    // console.log('-------Transaction--------');
+    // console.log('\tDynamic Fee', defaultPriorityFee);
+    // console.log('\tInputs:', defaultPriorityInputs);
+    // console.log('\tOutputs:', defaultPriorityOutputs);
 
     let netAmount = 0;
     recipients.forEach((recipient) => {
@@ -1667,7 +1667,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    console.log({ txPrerequisites });
+    // console.log({ txPrerequisites });
     return { txPrerequisites };
   };
 
@@ -1689,11 +1689,11 @@ export default class SecureHDWallet extends Bitcoin {
         inputs = txPrerequisites[txnPriority].inputs;
         outputs = txPrerequisites[txnPriority].outputs;
       }
-      console.log({ inputs, outputs });
+      // console.log({ inputs, outputs });
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
       );
-      console.log({ txb });
+      // console.log({ txb });
 
       for (const input of inputs) {
         txb.addInput(input.txId, input.vout, nSequence);
@@ -1731,7 +1731,7 @@ export default class SecureHDWallet extends Bitcoin {
   } => {
     // single signature (via primary mnemonic), to be followed by server signing
     try {
-      console.log('------ Transaction Signing ----------');
+      // console.log('------ Transaction Signing ----------');
       let vin = 0;
       const childIndexArray = [];
 
@@ -1792,15 +1792,15 @@ export default class SecureHDWallet extends Bitcoin {
         if (err.code) throw new Error(err.code);
       }
 
-      console.log(
-        '---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----',
-      );
+      // console.log(
+      //  '---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----',
+      //);
 
-      console.log({ txHex: res.data.txHex });
-      console.log('------ Broadcasting Transaction --------');
+      // console.log({ txHex: res.data.txHex });
+      // console.log('------ Broadcasting Transaction --------');
 
       const { txid } = await this.broadcastTransaction(res.data.txHex);
-      console.log({ txid });
+      // console.log({ txid });
 
       return { txid };
     } catch (err) {
@@ -1816,10 +1816,10 @@ export default class SecureHDWallet extends Bitcoin {
   } => {
     // dual signing (via primary and secondary mnemonic), generates a fully-signed broadcastable transaction
     try {
-      console.log('------ Transaction Signing ----------');
+      // console.log('------ Transaction Signing ----------');
       let vin = 0;
       inputs.forEach((input) => {
-        console.log('Signing Input:', input);
+        // console.log('Signing Input:', input);
         const {
           multiSig,
           primaryPriv,
@@ -2197,7 +2197,7 @@ export default class SecureHDWallet extends Bitcoin {
       const path = `m/${config.DPATH_PURPOSE}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
       }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
-      console.log({ path });
+      // console.log({ path });
       const xpriv = root.derivePath(path).toBase58();
       const xpub = root.derivePath(path).neutered().toBase58();
       this.derivativeAccounts[accountType][accountNumber] = {

@@ -42,6 +42,7 @@ import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
 
 export default function ManageBackup(props) {
   const [
@@ -193,7 +194,7 @@ export default function ManageBackup(props) {
   const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
-    (state) => state.sss.loading.checkMSharesHealth,
+    (state) => state.trustedContacts.loading.syncLastSeensAndHealth,
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
@@ -847,7 +848,8 @@ export default function ManageBackup(props) {
     });
     let focusListener = props.navigation.addListener('didFocus', () => {
       // setContactsFromAsync();
-      dispatch(checkMSharesHealth());
+      // dispatch(checkMSharesHealth());
+      dispatch(syncLastSeensAndHealth());
       // setAutoHighlightFlagsFromAsync();
     });
     return () => {
@@ -1368,16 +1370,7 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
-        (async () => {
-          const intialHealthSync = await AsyncStorage.getItem(
-            'initalHealthSync',
-          );
-          if (!intialHealthSync) {
-            dispatch(checkMSharesHealth());
-            // TODO -- replace this
-            AsyncStorage.setItem('initalHealthSync', 'true');
-          }
-        })();
+        // dispatch(checkMSharesHealth());
       } else {
         // console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());
@@ -1751,7 +1744,8 @@ export default function ManageBackup(props) {
                 <RefreshControl
                   refreshing={healthLoading}
                   onRefresh={() => {
-                    dispatch(checkMSharesHealth());
+                    // dispatch(checkMSharesHealth());
+                    dispatch(syncLastSeensAndHealth());
                   }}
                 />
               }

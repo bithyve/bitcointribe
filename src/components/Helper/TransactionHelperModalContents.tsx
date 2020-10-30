@@ -23,7 +23,7 @@ export default function TransactionHelperModalContents(props) {
       if (supported) {
         Linking.openURL(url);
       } else {
-        console.log("Don't know how to open URI: " + url);
+        // console.log("Don't know how to open URI: " + url);
       }
     });
   };

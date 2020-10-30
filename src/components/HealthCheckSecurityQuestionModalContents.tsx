@@ -43,7 +43,7 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
           };
           
       const setBackspace =(event) => {
-        console.log("event,key", event.nativeEvent.key);
+        // console.log("event,key", event.nativeEvent.key);
        
        if(event.nativeEvent.key == "Backspace"){
         setErrorText('');
