@@ -1998,8 +1998,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <View style={styles.accountCardsContainer}>
           <FlatList
             contentContainerStyle={{
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingTop: 36,
+              alignItems: 'flex-start',
             }}
             // contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
