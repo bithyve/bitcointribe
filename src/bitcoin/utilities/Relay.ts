@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import config from '../HexaConfig';
 import { INotification, EncryptedImage } from './Interface';
-import { BH_AXIOS } from '../../services/api';
+import { BH_AXIOS } from '../../networking/api';
 import idx from 'idx';
 
 const { HEXA_ID } = config;

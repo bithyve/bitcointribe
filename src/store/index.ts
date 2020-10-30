@@ -15,6 +15,7 @@ import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from 'redux-persist';
 import preferencesReducer from './reducers/preferences';
+import swanIntegrationReducer from './reducers/SwanIntegration';
 import loaders from './reducers/loaders';
 
 const config = {
@@ -116,8 +117,10 @@ import {
   postRecoveryChannelSyncWatcher,
 } from './sagas/trustedContacts';
 
-import { fromPrivateKey } from 'bip32';
-import reducer from './reducers/fbtc';
+import {
+  fetchSwanTokenWatcher,
+  linkSwanWalletWatcher,
+} from './sagas/SwanIntegration';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -223,6 +226,10 @@ const rootSaga = function* () {
     syncLastSeensAndHealthWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+
+    // Swan Integration
+    fetchSwanTokenWatcher,
+    linkSwanWalletWatcher,
   ];
 
   yield all(
@@ -250,6 +257,7 @@ const rootReducer = combineReducers({
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
+  swanIntegration: swanIntegrationReducer,
   loaders,
 });
 

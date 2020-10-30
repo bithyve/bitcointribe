@@ -1,16 +1,15 @@
 console.disableYellowBox = true;
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import Navigator from './src/navigation/Navigator';
 import { store, Provider } from './src/store';
 import NoInternetModalContents from './src/components/NoInternetModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info';
-import { setApiHeaders } from './src/services/api';
+import { setApiHeaders } from './src/networking/api';
 import firebase from 'react-native-firebase';
 import { NavigationState } from 'react-navigation';
 import { AsyncStorage } from 'react-native';

@@ -10,7 +10,6 @@ import {
   Linking,
   Alert,
   Image,
-  EdgeInsetsPropType,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -18,7 +17,7 @@ import DeviceInfo from 'react-native-device-info';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import AddModalContents from '../../components/AddModalContents';
+import AddModalContents from '../../components/home/AddModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import RNBottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -102,6 +101,7 @@ import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBac
 import BottomSheetHeader from '../Accounts/BottomSheetHeader';
 import BottomSheetHandle from '../../components/bottom-sheets/BottomSheetHandle';
 import { Button } from 'react-native-elements';
+import addMenuItems, { HomeAddMenuItem, HomeAddMenuKind } from './AddMenuItems';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
@@ -624,8 +624,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
+                  ? 'User Checking Account'
+                  : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
             bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
@@ -677,14 +677,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        () => { }, //console.log('err', err)
       );
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {
+      .then(() => {
         //console.log('logging notifications', notifications);
       });
   };
@@ -714,7 +714,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -761,9 +761,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
-    const { notificationListNew } = this.props;
     let newTransactions = [];
-    const { accounts, fetchDerivativeAccBalTx } = this.props;
+    const { accounts } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
     const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
 
@@ -859,15 +858,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch(() => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then(() => { });
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = (prevProps) => {
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
@@ -901,7 +900,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         addTransferDetails,
         clearPaymentDetails,
       } = this.props;
-      const { balances } = this.state;
       let { address, paymentURI } = paymentDetails;
       let options: any = {};
       if (paymentURI) {
@@ -1057,7 +1055,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1168,9 +1166,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getAssociatedContact = async () => {
     // TODO -- need to check this
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
     this.setSecondaryDeviceAddresses();
   };
 
@@ -1213,7 +1208,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.storeFCMToken();
           this.scheduleNotification();
         })
-        .catch((error) => {
+        .catch(() => {
           // User has rejected permissions
           //console.log(
           // 'PERMISSION REQUEST :: notification permission rejected',
@@ -1287,7 +1282,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.notificationOpenedListener = firebase
       .notifications()
       .onNotificationOpened(async (notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
         this.props.fetchNotifications();
         this.onNotificationOpen(notificationOpen.notification);
       });
@@ -1299,7 +1293,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .notifications()
       .getInitialNotification();
     if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
 
       this.props.fetchNotifications();
       this.onNotificationOpen(notificationOpen.notification);
@@ -1307,14 +1300,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage((message) => {
+    firebase.messaging().onMessage(() => {
       //process data message
     });
   };
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
-    const { notificationListNew } = this.props;
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1366,7 +1358,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1377,14 +1369,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1403,8 +1395,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     // secure derivative accounts
@@ -1413,7 +1405,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1473,7 +1465,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
-    const { notificationListNew } = this.props;
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1518,11 +1509,32 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.processDLRequest(key, false);
   };
 
-  onTrustedContactReject = (key) => {
+  onTrustedContactReject = () => {
     this.trustedContactRequestBottomSheetRef.current?.snapTo(0);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
+
+  handleAddMenuItemSelection = ({ kind: itemKind }: HomeAddMenuItem) => {
+    switch (itemKind) {
+      case HomeAddMenuKind.BUY_BITCOIN_FROM_FAST_BITCOINS:
+        this.props.navigation.navigate('VoucherScanner');
+        this.closeBottomSheet();
+        break;
+      case HomeAddMenuKind.ADD_CONTACT:
+        this.setState(
+          { isLoadContacts: true },
+          () => {
+            this.addContactAddressBookBottomSheetRef.current?.snapTo(1);
+          }
+        );
+        break;
+      case HomeAddMenuKind.ADD_SWAN_ACCOUNT:
+        this.props.navigation.navigate('SwanIntegrationDemo');
+        this.closeBottomSheet();
+        break;
+    }
+  };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     if (tab === BottomTab.Transactions) {
@@ -1565,7 +1577,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       uploadRequestedShare,
       navigation,
       approveTrustedContact,
-      fetchEphemeralChannel,
       fetchTrustedChannel,
       walletName,
       trustedContacts,
@@ -1615,13 +1626,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
           }
 
-          let existingContact, existingContactName;
+          let existingContactName;
           Object.keys(trustedContacts.tc.trustedContacts).forEach(
             (contactName) => {
               const contact = trustedContacts.tc.trustedContacts[contactName];
               if (contact.contactsPubKey === publicKey) {
                 existingContactName = contactName;
-                existingContact = contact;
               }
             },
           );
@@ -1638,7 +1648,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1758,7 +1768,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
-    const { notificationListNew } = this.props;
     //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1807,8 +1816,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1829,7 +1838,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
-    const { notificationListNew } = this.props;
     // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1870,9 +1878,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -1935,7 +1943,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const {
       cardData,
       switchOn,
-      CurrencyCode,
       balances,
       selectedBottomTab,
       errorMessageHeader,
@@ -1943,7 +1950,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       buttonText,
       selectedContact,
       notificationData,
-      fbBTCAccount,
       currencyCode,
       trustedContactRequest,
       recoveryRequest,
@@ -1954,7 +1960,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } = this.state;
     const {
       navigation,
-      notificationList,
       exchangeRates,
       accounts,
       walletName,
@@ -2001,7 +2006,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               paddingTop: 36,
               alignItems: 'flex-start',
             }}
-            // contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}
@@ -2087,22 +2091,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
 
             <AddModalContents
-              onPressElements={(type) => {
-                if (type == 'buyBitcoins') {
-                  this.props.navigation.navigate('VoucherScanner');
-                } else if (type == 'addContact') {
-                  this.setState(
-                    {
-                      isLoadContacts: true,
-                    },
-                    () => {
-                      this.addContactAddressBookBottomSheetRef.current?.snapTo(
-                        1,
-                      );
-                    },
-                  );
-                }
-              }}
+              menuItems={addMenuItems}
+              onItemSelected={this.handleAddMenuItemSelection}
             />
           </BottomSheetView>
         </RNBottomSheet>

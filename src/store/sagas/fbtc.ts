@@ -15,7 +15,7 @@ import {
   GET_BALANCES,
 } from '../actions/fbtc';
 
-import { accountSync, getQuote, executeOrder } from '../../services/fbtc';
+import { accountSync, getQuote, executeOrder } from '../../networking/fbtc';
 
 import { createWatcher } from '../utils/utilities';
 

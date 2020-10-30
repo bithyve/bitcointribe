@@ -28,7 +28,7 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
-import { BH_AXIOS } from '../../../services/api';
+import { BH_AXIOS } from '../../../networking/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 

@@ -14,7 +14,7 @@ import {
 import crypto from 'crypto';
 import config from '../HexaConfig';
 import { ec as EC } from 'elliptic';
-import { BH_AXIOS } from '../../services/api';
+import { BH_AXIOS } from '../../networking/api';
 import { AxiosResponse } from 'axios';
 import SSS from './sss/SSS';
 var ec = new EC('curve25519');

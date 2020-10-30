@@ -54,7 +54,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
   const walletName = props.navigation.getParam('walletName');
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   // if (isInitialized) {
-  //     props.navigation.navigate('HomeNav');
+  //     props.navigation.navigate('Main');
   // }
   const setConfirm = event => {
     console.log('event,key', event.key);

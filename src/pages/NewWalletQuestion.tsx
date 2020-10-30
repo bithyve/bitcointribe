@@ -230,7 +230,7 @@ export default function NewWalletQuestion(props) {
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      props.navigation.navigate('HomeNav');
+      props.navigation.navigate('Main');
     }
   }, [isInitialized]);
 

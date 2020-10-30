@@ -12,7 +12,7 @@ import {
   EncryptedImage,
   WalletImage,
 } from '../Interface';
-import { BH_AXIOS } from '../../../services/api';
+import { BH_AXIOS } from '../../../networking/api';
 const { HEXA_ID } = config;
 export default class SSS {
   public static cipherSpec: {
