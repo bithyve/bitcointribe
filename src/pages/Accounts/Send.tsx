@@ -156,12 +156,21 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     this.updateAccountData();
     this.props.clearTransfer(this.state.serviceType);
     this.getAccountBalances();
-    if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
+
+    if (this.state.serviceType === SECURE_ACCOUNT) {
+      this.twoFASetupMethod();
+    }
+
     this.checkNShowHelperModal();
     this.setRecipientAddress();
-    if (!this.state.averageTxFees) this.storeAverageTxFees();
-    if (this.props.regularAccount.hdWallet.derivativeAccounts)
+
+    if (!this.state.averageTxFees) {
+      this.storeAverageTxFees();
+    }
+
+    if (this.props.regularAccount.hdWallet.derivativeAccounts) {
       this.updateAddressBook();
+    }
 
     if (this.state.isLoading) {
       InteractionManager.runAfterInteractions(() => {
@@ -305,11 +314,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             accountNumber <= derivativeAccount.instance.using;
             accountNumber++
           ) {
-            // console.log({
-            //   accountNumber,
-            //   balances: trustedAccounts[accountNumber].balances,
-            //   transactions: trustedAccounts[accountNumber].transactions,
-            // });
             if (derivativeAccount[accountNumber].balances) {
               derivativeBalance +=
                 derivativeAccount[accountNumber].balances.balance +
@@ -381,16 +385,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       spendableBalance,
       derivativeAccountDetails,
     } = this.state;
-    // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-    // console.log("instance setRecipientAddress", instance);
-    // let isAddressValid = instance.isValidAddress(recipientAddress);
-    // console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
-    // if (isAddressValid) {
-    //   let item = {
-    //     id: recipientAddress, // address serves as the id during manual addition
-    //   };
-    //   this.onSelectContact(item);
-    // }
+
     const { type } = service[serviceType].service.addressDiff(
       recipientAddress.trim(),
     );
@@ -633,9 +628,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   updateAddressBook = async () => {
-    const { regularAccount, trustedContactsService } = this.props;
+    const { regularAccount, trustedContactsService, trustedContactsInfo } = this.props;
     const { serviceType } = this.state;
-    let { trustedContactsInfo } = this.props;
+
     if (trustedContactsInfo) {
       if (trustedContactsInfo.length) {
         const sendableTrustedContacts = [];
@@ -752,6 +747,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
         <View style={styles.modalContentContainer}>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -768,7 +764,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                           getServiceType(serviceType, carouselIndex);
                         }
                         clearTransfer(serviceType);
-                        this.props.navigation.goBack();
+                        this.props.navigation.pop();
                       }}
                       style={styles.backButton}
                       hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}

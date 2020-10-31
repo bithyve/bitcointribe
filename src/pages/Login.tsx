@@ -197,7 +197,6 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           timer = setTimeout(() => {
-            // console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
             if (loaderBottomSheet.current) {
               loaderBottomSheet.current.snapTo(0);
             }

@@ -23,6 +23,7 @@ import {
 } from '../constants';
 import { chain } from 'icepick';
 
+
 const initialState: {
   service: TrustedContactsService;
   serviceEnriched: Boolean;

@@ -14,7 +14,6 @@ import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySec
 import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
@@ -25,7 +24,6 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
@@ -61,10 +59,8 @@ import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
-import SendToContact from '../pages/Accounts/SendToContact';
-import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
-import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
+import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
@@ -73,6 +69,8 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 import HomeStack from './stacks/home/HomeStack';
+import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
+import SendStack from './stacks/send/SendStack';
 
 
 const SetupNavigator = createStackNavigator(
@@ -134,7 +132,9 @@ const HomeNavigator = createStackNavigator(
       },
     },
     Intermediate,
-    Accounts,
+    AccountDetails: {
+      screen: AccountDetailsStack,
+    },
     ManageBackup,
     SecondaryDevice,
     TrustedContacts,
@@ -145,18 +145,11 @@ const HomeNavigator = createStackNavigator(
     AddNewAccount,
     AddNewDonationAccount,
     Send: {
-      screen: Send,
+      screen: SendStack,
       navigationOptions: {
         gesturesEnabled: false,
       },
     },
-    SendToContact: {
-      screen: SendToContact,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,
     RestoreByCloudQrCodeContents,
@@ -190,7 +183,7 @@ const HomeNavigator = createStackNavigator(
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
-    ContactDetailsNew,
+    ContactDetails,
     Receive,
     PairNewWallet,
     NewOwnQuestions,
