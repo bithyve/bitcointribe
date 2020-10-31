@@ -196,6 +196,18 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
+          timer = setTimeout(() => {
+            // console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
+            if (loaderBottomSheet.current) {
+              loaderBottomSheet.current.snapTo(0);
+            }
+            props.navigation.navigate('Home', {
+              custodyRequest,
+              recoveryRequest,
+              trustedContactRequest,
+              userKey,
+            });
+          }, LOADER_MESSAGE_TIME);
         } else {
           props.navigation.replace('RestoreAndRecoverWallet');
         }
