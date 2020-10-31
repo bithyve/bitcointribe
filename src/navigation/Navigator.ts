@@ -26,7 +26,6 @@ import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
-import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
 import EmailModalContents from '../pages/EmailModalContents';
 import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
@@ -152,7 +151,6 @@ const HomeNavigator = createStackNavigator(
     },
     TwoFAToken,
     RecoveryRequestOTP,
-    RestoreByCloudQrCodeContents,
     EmailModalContents,
     QRScanner: QRScannerScreen,
     HealthCheck,
