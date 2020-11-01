@@ -19,7 +19,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import BottomInfoBox from '../components/BottomInfoBox';
 import openLink from '../utils/OpenLink';
 
-const RestoreAndRecoverWallet = props => {
+const WalletInitializationScreen = props => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -60,9 +60,12 @@ const RestoreAndRecoverWallet = props => {
           </Text>
           <TouchableOpacity
             onPress={async () => {
-              if (await AsyncStorage.getItem('recoveryExists'))
+              if (await AsyncStorage.getItem('recoveryExists')) {
                 props.navigation.navigate('RestoreSelectedContactsList');
-              else props.navigation.navigate('WalletNameRecovery');
+
+              } else {
+                props.navigation.navigate('WalletNameRecovery');
+              }
             }}
             style={{
               ...styles.NewWalletTouchableView,
@@ -96,7 +99,7 @@ const RestoreAndRecoverWallet = props => {
                 'By proceeding to the next step, you agree to our '
               }
               linkText={'Terms of Service'}
-              onPress={()=>openLink("https://hexawallet.io/terms-of-service/")}
+              onPress={() => openLink("https://hexawallet.io/terms-of-service/")}
             />
           </View>
         </View>
@@ -105,7 +108,7 @@ const RestoreAndRecoverWallet = props => {
   );
 };
 
-export default RestoreAndRecoverWallet;
+export default WalletInitializationScreen;
 
 let styles = StyleSheet.create({
   container: {
