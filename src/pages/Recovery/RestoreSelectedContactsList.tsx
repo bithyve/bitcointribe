@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -40,7 +40,7 @@ import {
   ErrorReceiving,
 } from '../../store/actions/sss';
 import ModalHeader from '../../components/ModalHeader';
-import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
+import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents';
 
 import LoaderModal from '../../components/LoaderModal';
 import {
@@ -57,28 +57,19 @@ export default function RestoreSelectedContactsList(props) {
   const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-  const [loaderBottomSheet] = useState(React.createRef());
-  const [walletNameBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [successMessageBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    recoveryQuestionBottomSheet,
-  ] = useState(React.createRef());
-
-  const [requestBottomSheet] = useState(
-    React.createRef(),
-  );
   const [walletNameOpenModal] = useState('close');
-  const [ErrorBottomSheet] = useState(React.createRef());
-  const [RestoreByCloudQrCode] = useState(
-    React.createRef(),
-  );
-  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
-  const [ErrorBottomSheet1] = useState(React.createRef());
+
+
+  const loaderBottomSheet = useRef<BottomSheet>();
+  const requestBottomSheet = useRef<BottomSheet>();
+  const walletNameBottomSheet = useRef<BottomSheet>();
+  const successMessageBottomSheet = useRef<BottomSheet>();
+  const recoveryQuestionBottomSheet = useRef<BottomSheet>();
+  const ErrorBottomSheet = useRef<BottomSheet>();
+  const RestoreByCloudQrCode = useRef<BottomSheet>();
+
+
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const { downloadMetaShare } = useSelector((state) => state.sss.loading);
@@ -109,7 +100,6 @@ export default function RestoreSelectedContactsList(props) {
   const [metaShares, setMetaShares] = useState([]);
 
   useEffect(() => {
-    // (ErrorBottomSheet as any).current.snapTo(1);
     (async () => {
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
       if (storedExchangeRates) {
@@ -277,48 +267,15 @@ export default function RestoreSelectedContactsList(props) {
     getSelectedContactList();
   };
 
-  const renderErrorModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={'Recovery Key Request'}
-        titleNextLine={'from Cloud unsuccessful'}
-        info={'There seems to a problem'}
-        note={'You can choose to try again or select a different source'}
-        noteNextLine={'for Personal Copies'}
-        proceedButtonText={'Try Again'}
-        cancelButtonText={'Select others'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  };
-
-  const renderErrorModalHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ErrorBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    );
-  };
-
   const renderErrorModalContent1 = useCallback(() => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet1}
+        modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
         proceedButtonText={'Try again'}
         onPressProceed={() => {
-          (ErrorBottomSheet1 as any).current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/errorImage.png')}
@@ -327,13 +284,7 @@ export default function RestoreSelectedContactsList(props) {
   }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader1 = useCallback(() => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ErrorBottomSheet1 as any).current.snapTo(0);
-      // }}
-      />
-    );
+    return <ModalHeader />;
   }, []);
 
   if (isWalletRecoveryFailed) {
@@ -343,7 +294,7 @@ export default function RestoreSelectedContactsList(props) {
         'There was an error while recovering your wallet, please try again',
       );
     }, 2);
-    (ErrorBottomSheet1 as any).current.snapTo(1);
+    (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(walletRecoveryFailed(null));
   }
 
@@ -355,7 +306,7 @@ export default function RestoreSelectedContactsList(props) {
       );
 
       setTimeout(() => {
-        (ErrorBottomSheet1 as any).current.snapTo(1);
+        (ErrorBottomSheet as any).current.snapTo(1);
       }, 2);
       dispatch(ErrorReceiving(null));
     }
@@ -464,15 +415,9 @@ export default function RestoreSelectedContactsList(props) {
 
   useEffect(() => {
     if (openmodal == 'closed') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(false);
-      }, 10);
       (RestoreByCloudQrCode as any).current.snapTo(0);
     }
     if (openmodal == 'full') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(true);
-      }, 10);
       (RestoreByCloudQrCode as any).current.snapTo(1);
     }
   }, [openmodal]);
@@ -487,6 +432,8 @@ export default function RestoreSelectedContactsList(props) {
   }
 
   const onScanCompleted = async (shareCode) => {
+    (RestoreByCloudQrCode as any).current.snapTo(0);
+
     let selectedDocsTemp = JSON.parse(
       await AsyncStorage.getItem('selectedDocuments'),
     );
@@ -513,13 +460,8 @@ export default function RestoreSelectedContactsList(props) {
 
   function renderRestoreByCloudQrCodeContent() {
     return (
-      <RestoreByCloudQrCodeContents
-        onScanCompleted={(shareCode) => onScanCompleted(shareCode)}
-        modalRef={RestoreByCloudQrCodeContents}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onPressBack={() => {
-          (RestoreByCloudQrCode as any).current.snapTo(0);
-        }}
+      <RestoreByCloudQRCodeContents
+        onScanCompleted={onScanCompleted}
       />
     );
   }
@@ -566,7 +508,7 @@ export default function RestoreSelectedContactsList(props) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.navigate('RestoreAndRecoverWallet');
+            props.navigation.goBack();
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -866,10 +808,10 @@ export default function RestoreSelectedContactsList(props) {
           )}
         </TouchableOpacity>
         <View style={styles.separator} />
+
         <TouchableOpacity
           onPress={
             () => (RestoreByCloudQrCode as any).current.snapTo(1)
-            // props.navigation.navigate('RestoreWalletUsingDocuments')
           }
         >
           <View
@@ -1051,37 +993,15 @@ export default function RestoreSelectedContactsList(props) {
         renderContent={RequestModalContentFunction}
         renderHeader={RequestHeaderFunction}
       />
-      <BottomSheet
-        onOpenEnd={() => {}}
-        onCloseEnd={() => {}}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        enabledGestureInteraction={false}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
 
       <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          (RestoreByCloudQrCode as any).current.snapTo(0);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
         enabledInnerScrolling={true}
         ref={RestoreByCloudQrCode as any}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}
       />
+
       <BottomSheet
         onCloseEnd={() => {}}
         enabledGestureInteraction={false}
@@ -1091,10 +1011,11 @@ export default function RestoreSelectedContactsList(props) {
         renderContent={renderLoaderModalContent}
         renderHeader={renderLoaderModalHeader}
       />
+
       <BottomSheet
         enabledInnerScrolling={true}
         enabledGestureInteraction={false}
-        ref={ErrorBottomSheet1 as any}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
