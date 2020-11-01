@@ -83,7 +83,7 @@ export default function PasscodeConfirm( props ) {
 
   const dispatch = useDispatch();
   const { hasCreds } = useSelector( state => state.setupAndAuth );
-  if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
+  if ( hasCreds ) props.navigation.replace( "WalletInitialization" );
 
   return (
     <SafeAreaView style={ { flex: 1 } }>

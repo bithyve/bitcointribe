@@ -120,7 +120,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate('RestoreAndRecoverWallet');
+              props.navigation.navigate('WalletInitialization');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
