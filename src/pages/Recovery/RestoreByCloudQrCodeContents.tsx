@@ -183,7 +183,7 @@ export default function RestoreByCloudQrCodeContents(props) {
             <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
               <KnowMoreButton
                 onpress={() => {
-                  alert(qrData);
+                  // Alert.alert(qrData);
                 }}
                 containerStyle={{}}
                 textStyle={{}}
@@ -240,6 +240,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           <QrCodeModalContents
             flag={true}
             onQrScan={(qrData) => getQrCodeData(qrData)}
+            onClose={() => {}}
             onPressQrScanner={() => {
               props.navigation.navigate('QRScanner', {
                 onCodeScanned: getQrCodeData,
