@@ -77,6 +77,7 @@ const VoucherScanner = (props) => {
     : '';
   const [bitcoinAddress, setBitcoinAddress] = useState('');
   const QuoteDetails = useSelector((state) => state.fbtc.getQuoteDetails);
+  const currencyCode = useSelector((state) => state.preferences.currencyCode)
   const executeOrderDetails = useSelector(
     (state) => state.fbtc.executeOrderDetails,
   );
@@ -797,6 +798,7 @@ const VoucherScanner = (props) => {
           purchasedFor={QuoteDetails ? QuoteDetails.amount : ''}
           redeemAmount={QuoteDetails ? QuoteDetails.bitcoin_amount : ''}
           bitcoinRate={QuoteDetails ? QuoteDetails.exchange_rate : ''}
+          currencyCode={currencyCode}
           loading={false}
         />
       );

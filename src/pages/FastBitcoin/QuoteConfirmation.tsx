@@ -46,7 +46,7 @@ export default function QuoteConfirmation(props) {
               >
                 <Image
                   style={styles.cardBitCoinImage}
-                  source={require('../../assets/images/icons/dollar_grey.png')}
+                  source={require(`../../assets/images/icons/icon_${props.currencyCode}_gray.png`)}
                 />
                 <Text style={styles.cardAmountText}>{props.purchasedFor}</Text>
               </View>
@@ -99,7 +99,7 @@ export default function QuoteConfirmation(props) {
                     width: wp('3.5%'),
                     height: wp('3.5%'),
                   }}
-                  source={require('../../assets/images/icons/dollar_grey.png')}
+                  source={require(`../../assets/images/icons/icon_${props.currencyCode}_gray.png`)}
                 />
                 <Text
                   style={{
