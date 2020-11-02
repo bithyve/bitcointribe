@@ -36,6 +36,11 @@ async function requestContactsPermission() {
     }
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      {
+        'title': 'Contacts',
+        'message': 'Address book details like name and image are used for you to better recognize your Hexa Friends and Family contacts. Don’t worry, they don’t get stored anywhere else and are for your eyes only.',
+        'buttonPositive': 'Accept'
+      }
     );
     return PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
