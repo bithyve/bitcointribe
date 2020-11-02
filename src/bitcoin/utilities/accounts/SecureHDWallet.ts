@@ -814,19 +814,20 @@ export default class SecureHDWallet extends Bitcoin {
           } = derivativeAccounts[accountNumber];
           const externalAddresses = [];
           const internalAddresses = [];
+          const ownedAddresses = {};
 
           for (
             let itr = 0;
             itr < nextFreeAddressIndex + this.derivativeGapLimit;
             itr++
           ) {
-            externalAddresses.push(
-              this.createSecureMultiSig(
-                itr,
-                false,
-                this.derivativeAccounts[dAccountType][accountNumber].xpub,
-              ).address,
+            const { address } = this.createSecureMultiSig(
+              itr,
+              false,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
             );
+            externalAddresses.push(address);
+            ownedAddresses[address] = true;
           }
 
           for (
@@ -834,19 +835,14 @@ export default class SecureHDWallet extends Bitcoin {
             itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
             itr++
           ) {
-            internalAddresses.push(
-              this.createSecureMultiSig(
-                itr,
-                true,
-                this.derivativeAccounts[dAccountType][accountNumber].xpub,
-              ).address,
+            const { address } = this.createSecureMultiSig(
+              itr,
+              true,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
             );
-          }
-
-          const ownedAddresses = {};
-          derivativeAccounts[accountNumber].usedAddresses.forEach((address) => {
+            internalAddresses.push(address);
             ownedAddresses[address] = true;
-          });
+          }
 
           const UTXOs = [];
           for (const addressSpecificUTXOs of Utxos) {
