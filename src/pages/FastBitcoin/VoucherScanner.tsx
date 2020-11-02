@@ -798,7 +798,7 @@ const VoucherScanner = (props) => {
           purchasedFor={QuoteDetails ? QuoteDetails.amount : ''}
           redeemAmount={QuoteDetails ? QuoteDetails.bitcoin_amount : ''}
           bitcoinRate={QuoteDetails ? QuoteDetails.exchange_rate : ''}
-          currencyCode={currencyCode}
+          currencyCode={QuoteDetails ? QuoteDetails.currency : ''}
           loading={false}
         />
       );
