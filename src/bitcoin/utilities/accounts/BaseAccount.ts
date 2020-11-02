@@ -732,13 +732,13 @@ export default class BaseAccount {
       }
 
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
-      console.log('---- Transaction Signed ----');
+      // console.log('---- Transaction Signed ----');
 
       const txHex = signedTxb.build().toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
-      console.log('---- Transaction Broadcasted ----');
-      console.log({ txid });
+      // console.log('---- Transaction Broadcasted ----');
+      // console.log({ txid });
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {

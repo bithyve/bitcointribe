@@ -453,7 +453,7 @@ function* uploadRequestedShareWorker({ payload }) {
     tag
   ];
 
-  // // preventing re-uploads till expiry
+  // preventing re-uploads till expiry
   // if (TRANSFER_DETAILS) {
   //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
   //     return;
@@ -1268,7 +1268,6 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
-  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
@@ -1773,7 +1772,7 @@ function* updateWalletImageWorker({ payload }) {
     }
   }
 
-  console.log({ walletImage });
+  // console.log({ walletImage });
 
   if (Object.keys(walletImage).length === 0) {
     console.log('WI: nothing to update');
@@ -1802,7 +1801,7 @@ function* fetchWalletImageWorker({ payload }) {
   console.log({ res });
   if (res.status === 200) {
     const walletImage: WalletImage = res.data.walletImage;
-    console.log({ walletImage });
+    // console.log({ walletImage });
 
     if (!Object.keys(walletImage).length)
       console.log('Failed fetch: Empty Wallet Image');

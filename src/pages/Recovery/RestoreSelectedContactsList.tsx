@@ -479,7 +479,7 @@ export default function RestoreSelectedContactsList(props) {
         //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
         // );
         // dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
-        // // dispatch(fetchTransactions(TEST_ACCOUNT));
+        // dispatch(fetchTransactions(TEST_ACCOUNT));
         // dispatch(fetchTransactions(REGULAR_ACCOUNT));
         // dispatch(fetchTransactions(SECURE_ACCOUNT));
         // dispatch(syncAccounts(true)); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)

@@ -414,7 +414,7 @@ export default class TrustedContacts {
       }
 
       let { updated, initiatedAt, data } = res.data;
-      console.log({ updated, initiatedAt, data });
+      // console.log({ updated, initiatedAt, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (initiatedAt)
         this.trustedContacts[
@@ -497,7 +497,7 @@ export default class TrustedContacts {
         ); // only one element would contain the public key (uploaded by the counterparty)
 
         if (!contactsPublicKey) {
-          console.log(`Approval failed, ${contactName}'s public key missing`);
+          // console.log(`Approval failed, ${contactName}'s public key missing`);
           throw new Error(
             `Approval failed, ${contactName}'s public key missing`,
           );
@@ -540,7 +540,7 @@ export default class TrustedContacts {
       if (!updated) {
         // counterparty's data reception for the first time
         trustedData.push(newTrustedData);
-        console.log({ newTrustedData });
+        // console.log({ newTrustedData });
         // update counterparty's walletId and FCM
 
         newTrustedData.data.walletID
@@ -725,7 +725,7 @@ export default class TrustedContacts {
         address: trustedChannel.address,
         identifier: publicKey,
       });
-      console.log({ res });
+      // console.log({ res });
 
       let { data } = res.data;
       if (data) {
@@ -775,7 +775,7 @@ export default class TrustedContacts {
       });
 
       const { updated, updatedLastSeens } = res.data;
-      console.log({ updatedLastSeens });
+      // console.log({ updatedLastSeens });
       if (Object.keys(updatedLastSeens).length) {
         for (const contact of Object.values(this.trustedContacts)) {
           const { trustedChannel } = contact;
@@ -846,7 +846,7 @@ export default class TrustedContacts {
       updatedAt: number;
       reshareVersion: number;
     }> = res.data.lastUpdateds; // legacy HC
-    console.log({ updatedLastSeens, updates, updationInfo });
+    // console.log({ updatedLastSeens, updates, updationInfo });
 
     // synching health: legacy
     if (updates.length) {
@@ -932,7 +932,7 @@ export default class TrustedContacts {
         });
       }
     }
-    console.log({ channelsToSync });
+    // console.log({ channelsToSync });
     if (Object.keys(channelsToSync).length) {
       const res = await BH_AXIOS.post('syncTrustedChannels', {
         HEXA_ID,
@@ -940,7 +940,7 @@ export default class TrustedContacts {
       });
 
       const { synched, synchedChannels } = res.data;
-      console.log({ synched, synchedChannels });
+      // console.log({ synched, synchedChannels });
 
       const contactsToRemove = [];
       const guardiansToRemove = [];

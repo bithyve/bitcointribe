@@ -699,7 +699,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const date = new Date();
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
-    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+    // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
       .notifications()
       .scheduleNotification(notification, {
@@ -1122,7 +1122,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.handleDeepLinking(url);
   };
 
-  handleDeepLinking = async (url: string) => {
+  handleDeepLinking = async (url: string | null) => {
+    if (url == null) { return; }
+
     console.log('Home::handleDeepLinking::URL: ' + url);
 
     const splits = url.split('/');
@@ -2170,7 +2172,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               paddingTop: 36,
               alignItems: 'flex-start',
             }}
-            contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
+            // contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}
@@ -2639,11 +2641,13 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     flex: 7,
     marginTop: 30,
+    paddingLeft: 20,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
     width: '100%',
   },
 

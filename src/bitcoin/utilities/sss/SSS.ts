@@ -259,7 +259,7 @@ export default class SSS {
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       // const { deleted } = await SSS.affirmDecryption(messageId);
       // if (!deleted) {
-      //   console.log('Unable to remove the share from the server');
+      //  console.log('Unable to remove the share from the server');
       // }
       return { metaShare, encryptedDynamicNonPMDD };
     }
@@ -764,7 +764,7 @@ export default class SSS {
       shareIDs,
     };
 
-    console.log({ socialStaticNonPMDD });
+    // console.log({ socialStaticNonPMDD });
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
@@ -1219,11 +1219,11 @@ export default class SSS {
         if (err.code) throw new Error(err.code);
       }
       const { encryptedImage } = res.data;
-      console.log({ encryptedImage });
+      // console.log({ encryptedImage });
       if (!encryptedImage) throw new Error();
 
       const { walletImage } = this.decryptWI(encryptedImage);
-      console.log({ walletImage });
+      // console.log({ walletImage });
       return { walletImage };
     } catch (err) {
       throw new Error('Failed to fetch Wallet Image');

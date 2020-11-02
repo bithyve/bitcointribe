@@ -461,7 +461,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccounts[accountType][accountNumber][
       'usedAddresses'
     ] = usedAddresses;
-    console.log({ derivativeAccUsedAddresses: usedAddresses });
+    // console.log({ derivativeAccUsedAddresses: usedAddresses });
 
     const res = await this.fetchBalanceTransactionsByAddresses(
       externalAddresses,
@@ -602,7 +602,7 @@ export default class HDSegwitWallet extends Bitcoin {
         this.derivativeAccounts[dAccountType][accountNumber][
           'usedAddresses'
         ] = usedAddresses;
-        console.log({ derivativeAccUsedAddresses: usedAddresses });
+        // console.log({ derivativeAccUsedAddresses: usedAddresses });
         batchedDerivativeAddresses.push(...usedAddresses);
       }
     }
@@ -638,7 +638,7 @@ export default class HDSegwitWallet extends Bitcoin {
       );
 
       const addressesInfo = Txs;
-      console.log({ addressesInfo });
+      // console.log({ addressesInfo });
 
       for (const dAccountType of accountTypes) {
         const derivativeAccounts = this.derivativeAccounts[dAccountType];
@@ -873,9 +873,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
       return { synched: true };
     } catch (err) {
-      console.log(
-        `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
-      );
+      // console.log(
+      //  `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+      //);
       throw new Error('Fetching balance-txn by addresses failed');
     }
   };
@@ -1187,7 +1187,7 @@ export default class HDSegwitWallet extends Bitcoin {
         recipientAddress,
         amount,
       });
-      console.log({ res });
+      // console.log({ res });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -1253,7 +1253,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
     this.feeRates = rates;
-    console.log({ feeRates: this.feeRates });
+    // console.log({ feeRates: this.feeRates });
     return {
       high: {
         averageTxFee: Math.round(
@@ -1399,7 +1399,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.balances = balances;
     this.transactions = transactions;
-    console.log({ balances, transactions });
+    // console.log({ balances, transactions });
     return { balances, transactions };
   };
 
@@ -1436,7 +1436,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
       inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
-    console.log({ inputUTXOs });
+    // console.log({ inputUTXOs });
 
     let confirmedBalance = 0;
     inputUTXOs.forEach((utxo) => {
@@ -1461,7 +1461,7 @@ export default class HDSegwitWallet extends Bitcoin {
       outputUTXOs,
       averageTxFees['medium'].feePerByte,
     );
-    console.log({ inputUTXOs, outputUTXOs, fee });
+    // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return { fee };
   };
@@ -1502,7 +1502,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
       inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
-    console.log({ inputUTXOs });
+    // console.log({ inputUTXOs });
 
     let confirmedBalance = 0;
     inputUTXOs.forEach((utxo) => {
@@ -1567,7 +1567,7 @@ export default class HDSegwitWallet extends Bitcoin {
       inputUTXOs = [...this.confirmedUTXOs, ...derivativeUTXOs];
     }
 
-    console.log('Input UTXOs:', inputUTXOs);
+    // console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0;
     inputUTXOs.forEach((utxo) => {
       confirmedBalance += utxo.value;
@@ -1580,11 +1580,11 @@ export default class HDSegwitWallet extends Bitcoin {
         value: recipient.amount,
       });
     }
-    console.log('Output UTXOs:', outputUTXOs);
+    // console.log('Output UTXOs:', outputUTXOs);
 
     const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
     let defaultFeePerByte, defaultEstimatedBlocks;
-    console.log({ averageTxFees });
+    // console.log({ averageTxFees });
     if (averageTxFees) {
       defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
       defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
@@ -1599,10 +1599,10 @@ export default class HDSegwitWallet extends Bitcoin {
     const defaultPriorityOutputs = assets.outputs;
     const defaultPriorityFee = assets.fee;
 
-    console.log('-------Transaction--------');
-    console.log('\tDynamic Fee', defaultPriorityFee);
-    console.log('\tInputs:', defaultPriorityInputs);
-    console.log('\tOutputs:', defaultPriorityOutputs);
+    // console.log('-------Transaction--------');
+    // console.log('\tDynamic Fee', defaultPriorityFee);
+    // console.log('\tInputs:', defaultPriorityInputs);
+    // console.log('\tOutputs:', defaultPriorityOutputs);
 
     let netAmount = 0;
     recipients.forEach((recipient) => {
@@ -1653,7 +1653,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
-    console.log({ txPrerequisites });
+    // console.log({ txPrerequisites });
     return { txPrerequisites };
   };
 
@@ -1675,7 +1675,7 @@ export default class HDSegwitWallet extends Bitcoin {
         inputs = txPrerequisites[txnPriority].inputs;
         outputs = txPrerequisites[txnPriority].outputs;
       }
-      console.log({ inputs, outputs });
+      // console.log({ inputs, outputs });
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
       );
@@ -1707,7 +1707,7 @@ export default class HDSegwitWallet extends Bitcoin {
     witnessScript?: any,
   ): bitcoinJS.TransactionBuilder => {
     try {
-      console.log('------ Transaction Signing ----------');
+      // console.log('------ Transaction Signing ----------');
       let vin = 0;
       for (const input of inputs) {
         const keyPair = this.getKeyPair(
@@ -1763,7 +1763,7 @@ export default class HDSegwitWallet extends Bitcoin {
           );
         }
         output.address = changeAddress;
-        console.log(`adding the change address: ${output.address}`);
+        // console.log(`adding the change address: ${output.address}`);
       }
     }
 

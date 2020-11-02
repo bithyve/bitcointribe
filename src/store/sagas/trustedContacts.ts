@@ -258,7 +258,7 @@ function* removeTrustedContactWorker({ payload }) {
             //     break;
             //   }
             // }
-            // // push if not already present in TC list
+            // push if not already present in TC list
             // if (!found) tcInfo.push(tcInfo[itr]);
             tcInfo[itr] = null; // Guardian position nullified
           } else tcInfo.splice(itr, 1);
@@ -1061,7 +1061,7 @@ function* syncTrustedChannelsWorker({ payload }) {
         );
         const tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
-        // // downgrade guardians and remove share
+        // downgrade guardians and remove share
         for (const guardianName of guardiansToRemove) {
           trustedContacts.tc.trustedContacts[guardianName].isWard = false;
           delete sharesUnderCustody[

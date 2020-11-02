@@ -382,9 +382,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       derivativeAccountDetails,
     } = this.state;
     // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-    // // console.log("instance setRecipientAddress", instance);
+    // console.log("instance setRecipientAddress", instance);
     // let isAddressValid = instance.isValidAddress(recipientAddress);
-    // //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
+    // console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
     // if (isAddressValid) {
     //   let item = {
     //     id: recipientAddress, // address serves as the id during manual addition

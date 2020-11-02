@@ -214,9 +214,9 @@ class HexaConfig {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
-    console.log({ env });
+    // console.log({ env });
 
-    console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
+    // console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
 
     this.RELAY = this.BH_SERVERS.RELAY;
     this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER;
@@ -229,10 +229,10 @@ class HexaConfig {
       10,
     );
 
-    console.log(this.HEALTH_STATUS.TIME_SLOTS);
-    console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
+    // console.log(this.HEALTH_STATUS.TIME_SLOTS);
+    // console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
 
-    console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
+    // console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
 
     this.BITCOIN_NODE = new Client({
