@@ -429,18 +429,19 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const externalAddresses = [];
     const internalAddresses = [];
+    const ownedAddresses = {};
     for (
       let itr = 0;
       itr < nextFreeAddressIndex + this.derivativeGapLimit;
       itr++
     ) {
-      externalAddresses.push(
-        this.getAddress(
-          false,
-          itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        ),
+      const address = this.getAddress(
+        false,
+        itr,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
       );
+      externalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     for (
@@ -448,25 +449,26 @@ export default class HDSegwitWallet extends Bitcoin {
       itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
       itr++
     ) {
-      internalAddresses.push(
-        this.getAddress(
-          true,
-          itr,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        ),
+      const address = this.getAddress(
+        true,
+        itr,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
       );
+      internalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     const usedAddresses = [...externalAddresses, ...internalAddresses];
     this.derivativeAccounts[accountType][accountNumber][
       'usedAddresses'
     ] = usedAddresses;
+
     // console.log({ derivativeAccUsedAddresses: usedAddresses });
 
     const res = await this.fetchBalanceTransactionsByAddresses(
       externalAddresses,
       internalAddresses,
-      usedAddresses,
+      ownedAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[accountType][accountNumber]
@@ -661,18 +663,20 @@ export default class HDSegwitWallet extends Bitcoin {
 
           const externalAddresses = [];
           const internalAddresses = [];
+          const ownedAddresses = {};
+
           for (
             let itr = 0;
             itr < nextFreeAddressIndex + this.derivativeGapLimit;
             itr++
           ) {
-            externalAddresses.push(
-              this.getAddress(
-                false,
-                itr,
-                this.derivativeAccounts[dAccountType][accountNumber].xpub,
-              ),
+            const address = this.getAddress(
+              false,
+              itr,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
             );
+            externalAddresses.push(address);
+            ownedAddresses[address] = true;
           }
 
           for (
@@ -680,13 +684,13 @@ export default class HDSegwitWallet extends Bitcoin {
             itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
             itr++
           ) {
-            internalAddresses.push(
-              this.getAddress(
-                true,
-                itr,
-                this.derivativeAccounts[dAccountType][accountNumber].xpub,
-              ),
+            const address = this.getAddress(
+              true,
+              itr,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
             );
+            internalAddresses.push(address);
+            ownedAddresses[address] = true;
           }
 
           const UTXOs = [];
@@ -753,11 +757,12 @@ export default class HDSegwitWallet extends Bitcoin {
               if (!txMap.has(tx.txid)) {
                 // check for duplicate tx (fetched against sending and then again for change address)
                 txMap.set(tx.txid, true);
+
                 this.categorizeTx(
                   tx,
-                  derivativeAccounts[accountNumber].usedAddresses,
+                  ownedAddresses,
                   dAccountType,
-                  derivativeAccounts[accountNumber].usedAddresses,
+                  ownedAddresses,
                 );
 
                 const transaction = {
@@ -1200,6 +1205,7 @@ export default class HDSegwitWallet extends Bitcoin {
     // ]);
     if (txid) {
       this.usedAddresses = [recipientAddress];
+      const ownedAddresses = { [recipientAddress]: true };
       // this.balances = { balance: amount * 1e8, unconfirmedBalance: 0 }; // assumption: we don't call testFaucet twice (spendable exception: 1st receive test-utxo)
       const {
         UTXOs,
@@ -1210,7 +1216,7 @@ export default class HDSegwitWallet extends Bitcoin {
       } = await this.fetchBalanceTransactionsByAddresses(
         this.usedAddresses,
         [],
-        this.usedAddresses,
+        ownedAddresses,
         this.nextFreeAddressIndex - 1,
         this.nextFreeChangeAddressIndex - 1,
         'Test Account',
@@ -1310,9 +1316,14 @@ export default class HDSegwitWallet extends Bitcoin {
       // WI helps with restoration
     }
 
+    const ownedAddresses = {}; // owned address mapping
+    // owned addresses are used for apt tx categorization and transfer amount calculation
+
     const externalAddresses = [];
     for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
-      externalAddresses.push(this.getAddress(false, itr));
+      const address = this.getAddress(false, itr);
+      externalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     const internalAddresses = [];
@@ -1321,7 +1332,9 @@ export default class HDSegwitWallet extends Bitcoin {
       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
       itr++
     ) {
-      internalAddresses.push(this.getAddress(true, itr));
+      const address = this.getAddress(true, itr);
+      internalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     this.usedAddresses = [...externalAddresses, ...internalAddresses];
@@ -1350,10 +1363,9 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
-    const ownedAddresses = [
-      ...this.usedAddresses,
-      ...batchedDerivativeAddresses,
-    ]; // owned addresses are used for apt tx categorization and transfer amount calculation
+    batchedDerivativeAddresses.forEach((derivativeAddress) => {
+      ownedAddresses[derivativeAddress] = true;
+    });
 
     const {
       UTXOs,
