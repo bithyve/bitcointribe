@@ -417,9 +417,14 @@ export default class SecureHDWallet extends Bitcoin {
     //   this.consumedAddresses.push(multiSig.address);
     // }
 
+    const ownedAddresses = {}; // owned address mapping
+    // owned addresses are used for apt tx categorization and transfer amount calculation
+
     const externalAddresses = [];
     for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
-      externalAddresses.push(this.createSecureMultiSig(itr).address);
+      const { address } = this.createSecureMultiSig(itr);
+      externalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     const internalAddresses = [];
@@ -428,7 +433,9 @@ export default class SecureHDWallet extends Bitcoin {
       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
       itr++
     ) {
-      internalAddresses.push(this.createSecureMultiSig(itr, true).address);
+      const { address } = this.createSecureMultiSig(itr, true);
+      internalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     this.usedAddresses = [...externalAddresses, ...internalAddresses];
@@ -457,10 +464,9 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    const ownedAddresses = [
-      ...this.usedAddresses,
-      ...batchedDerivativeAddresses,
-    ]; // owned addresses are used for apt tx categorization and transfer amount calculation
+    batchedDerivativeAddresses.forEach((derivativeAddress) => {
+      ownedAddresses[derivativeAddress] = true;
+    });
 
     const {
       UTXOs,
@@ -573,19 +579,19 @@ export default class SecureHDWallet extends Bitcoin {
 
     const externalAddresses = [];
     const internalAddresses = [];
-
+    const ownedAddresses = {};
     for (
       let itr = 0;
       itr < nextFreeAddressIndex + this.derivativeGapLimit;
       itr++
     ) {
-      externalAddresses.push(
-        this.createSecureMultiSig(
-          itr,
-          false,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        ).address,
+      const { address } = this.createSecureMultiSig(
+        itr,
+        false,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
       );
+      externalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     for (
@@ -593,13 +599,13 @@ export default class SecureHDWallet extends Bitcoin {
       itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
       itr++
     ) {
-      internalAddresses.push(
-        this.createSecureMultiSig(
-          itr,
-          true,
-          this.derivativeAccounts[accountType][accountNumber].xpub,
-        ).address,
+      const { address } = this.createSecureMultiSig(
+        itr,
+        true,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
       );
+      internalAddresses.push(address);
+      ownedAddresses[address] = true;
     }
 
     const usedAddresses = [...externalAddresses, ...internalAddresses];
@@ -610,7 +616,7 @@ export default class SecureHDWallet extends Bitcoin {
     const res = await this.fetchBalanceTransactionsByAddresses(
       externalAddresses,
       internalAddresses,
-      usedAddresses,
+      ownedAddresses,
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[accountType][accountNumber]
@@ -837,6 +843,11 @@ export default class SecureHDWallet extends Bitcoin {
             );
           }
 
+          const ownedAddresses = {};
+          derivativeAccounts[accountNumber].usedAddresses.forEach((address) => {
+            ownedAddresses[address] = true;
+          });
+
           const UTXOs = [];
           for (const addressSpecificUTXOs of Utxos) {
             for (const utxo of addressSpecificUTXOs) {
@@ -902,9 +913,9 @@ export default class SecureHDWallet extends Bitcoin {
                 txMap.set(tx.txid, true);
                 this.categorizeTx(
                   tx,
-                  derivativeAccounts[accountNumber].usedAddresses,
+                  ownedAddresses,
                   dAccountType,
-                  derivativeAccounts[accountNumber].usedAddresses,
+                  ownedAddresses,
                 );
 
                 const transaction = {
