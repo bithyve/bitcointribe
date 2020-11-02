@@ -51,6 +51,8 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
     );
   };
 
+  // TODO: It would probably be good to abstract this into its own component file
+  // so we can use it independently of the toggleable cover overlay.
   const Scanner: React.FC = () => {
     const cameraRef = useRef<RNCamera>();
 
