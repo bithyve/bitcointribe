@@ -162,9 +162,7 @@ export default function RecoveryCommunication(props) {
           selectedContactMode.info,
           smsInfoText + '\n' + numberDL,
         );
-        // props.navigation.navigate('ShareRecoveryOTP', {
-        //   OTP: REQUEST_DETAILS.OTP,
-        // });
+
         setTimeout(() => {
           props.navigation.navigate('RestoreSelectedContactsList');
         }, 1000);
@@ -201,9 +199,7 @@ export default function RecoveryCommunication(props) {
           'Keeper request',
           emailInfoText + '\n' + emailDL,
         );
-        // props.navigation.navigate('ShareRecoveryOTP', {
-        //   OTP: REQUEST_DETAILS.OTP,
-        // });
+
         setTimeout(() => {
           props.navigation.navigate('RestoreSelectedContactsList');
         }, 1000);
@@ -230,14 +226,6 @@ export default function RecoveryCommunication(props) {
             uploadedAt: scannedData.UPLOADED_AT,
             isQR: true,
           };
-
-          // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
-          //   Alert.alert(
-          //     'Invalid share',
-          //     "Following share doesn't belong to your wallet",
-          //   );
-          //   return;
-          // }
 
           if (
             Date.now() - recoveryRequest.uploadedAt >
@@ -440,7 +428,6 @@ export default function RecoveryCommunication(props) {
             <TouchableOpacity
               onPress={() => {
                 communicate(selectedContactMode);
-                // setTimeout(() => props.navigation.goBack(), 5);
               }}
               disabled={!REQUEST_DETAILS}
               style={{

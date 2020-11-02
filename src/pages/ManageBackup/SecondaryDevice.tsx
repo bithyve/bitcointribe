@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ActivityIndicator, AsyncStorage } from 'react-native';
-import BackupStyles from '../../pages/ManageBackup/Styles';
+import React from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import {
@@ -26,15 +26,15 @@ export default function SecondaryDeviceModelContents(props) {
     >
       <View
         style={{
-          ...BackupStyles.modalHeaderTitleView,
+          ...NavStyles.modalHeaderTitleView,
           paddingTop: hp('0.5%'),
           alignItems: 'center',
           marginLeft: 20,
         }}
       >
-        <Text style={BackupStyles.modalHeaderTitleText}>Scan QR Code</Text>
+        <Text style={NavStyles.modalHeaderTitleText}>Scan QR Code</Text>
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />

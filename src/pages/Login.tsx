@@ -70,21 +70,21 @@ const getRandomMessage = () => {
 };
 
 export default function Login(props) {
-  
+
   const initialMessage = getRandomMessage();
-  let [message, setMessage] = useState(initialMessage.heading);
-  let [subTextMessage1, setSubTextMessage1] = useState(initialMessage.text);
-  let [subTextMessage2, setSubTextMessage2] = useState(initialMessage.subText);
+  let [message] = useState(initialMessage.heading);
+  let [subTextMessage1] = useState(initialMessage.text);
+  let [subTextMessage2] = useState(initialMessage.subText);
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
   const [JailBrokenInfo, setJailBrokenInfo] = useState('');
-  const [passcodeFlag, setPasscodeFlag] = useState(true);
+  const [passcodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+  const [loaderBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(
+  const [ErrorBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
   const releaseCasesValue = useSelector(
@@ -117,6 +117,7 @@ export default function Login(props) {
   }, [passcode]);
 
   const dispatch = useDispatch();
+
   const { isAuthenticated, authenticationFailed } = useSelector(
     (state) => state.setupAndAuth,
   );
@@ -177,30 +178,6 @@ export default function Login(props) {
       });
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
 
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -210,7 +187,6 @@ export default function Login(props) {
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector((state) => state.preferences.isMigrated);
 
-  let timer;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -220,9 +196,7 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          // console.log('starting timer ', {LOADER_MESSAGE_TIME}, Date.now())
           timer = setTimeout(() => {
-            // console.log('timer complete moving to home ', {LOADER_MESSAGE_TIME}, Date.now())
             if (loaderBottomSheet.current) {
               loaderBottomSheet.current.snapTo(0);
             }
@@ -234,7 +208,7 @@ export default function Login(props) {
             });
           }, LOADER_MESSAGE_TIME);
         } else {
-          props.navigation.replace('RestoreAndRecoverWallet');
+          props.navigation.replace('WalletInitialization');
         }
       });
     }

@@ -25,14 +25,13 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
+import { initHealthCheck } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import Icons from '../../common/Icons';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import ModalHeader from '../../components/ModalHeader';
@@ -41,53 +40,45 @@ import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
 
 export default function ManageBackup(props) {
   const [
     PersonalCopyQRScannerBottomSheet,
-    setPersonalCopyQRScannerBottomSheet,
   ] = useState(React.createRef());
-  const [IsReshare, setIsReshare] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('Ugly');
+  const [, setIsReshare] = useState(false);
+  const [selectedTime] = useState('');
+  const [selectedStatus] = useState('Ugly');
   const [isNextStepDisable, setIsNextStepDisable] = useState(false);
   const [LoadCamera, setLoadCamera] = useState(false);
-  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+  const [ChangeBottomSheet] = useState(React.createRef());
+  const [ReshareBottomSheet] = useState(
     React.createRef(),
   );
-  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
+  const [ConfirmBottomSheet] = useState(
     React.createRef(),
   );
-  const [SelectTypeToReshare, setSelectTypeToReshare] = useState({});
+  const [SelectTypeToReshare] = useState({});
   const [
     SecondaryDeviceHistoryBottomSheet,
-    setSecondaryDeviceHistoryBottomSheet,
   ] = useState(React.createRef());
   const [
     PersonalCopyHistoryBottomSheet,
-    setPersonalCopyHistoryBottomSheet,
   ] = useState(React.createRef());
   const [
     SecurityQuestionHistoryBottomSheet,
-    setSecurityQuestionHistoryBottomSheet,
   ] = useState(React.createRef());
   const [
     WalletBackupAndRecoveryBottomSheet,
-    setWalletBackupAndRecoveryBottomSheet,
   ] = useState(React.createRef());
   const [
     CommunicationModeBottomSheet,
-    setCommunicationModeBottomSheet,
   ] = useState(React.createRef());
   const [
     RegenerateShareHelperBottomSheet,
-    setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
 
-  const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
+  const [secondaryDeviceHistory] = useState([
     {
       id: 1,
       title: 'Recovery Key Not Accessible',
@@ -128,7 +119,7 @@ export default function ManageBackup(props) {
   ]);
 
   const [selectedType, setSelectedType] = useState('');
-  const [contacts, setContacts] = useState([]);
+  const [, setContacts] = useState([]);
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
@@ -246,17 +237,6 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
-      // <WalletBackupAndRecoveryContents
-      //   onPressManageBackup={() => {
-      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-      //   }}
-      //   onSkip={() => {
-      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-      //   }}
-      //   onStartBackup={() => {
-      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-      //   }}
-      // />
       <ManageBackupHelpContents
         titleClicked={() => {
           if (WalletBackupAndRecoveryBottomSheet.current)
@@ -949,10 +929,6 @@ export default function ManageBackup(props) {
     }
   }, [health]);
 
-  // useEffect(() => {
-  //   if (health) setOverallHealth(health);
-  // }, [health]);
-
   useEffect(() => {
     if (overallHealth) {
       setIsNextStepDisable(false);
@@ -1331,33 +1307,6 @@ export default function ManageBackup(props) {
     }
   };
 
-  // useEffect(() => {
-  //   onContactsUpdate();
-  // }, [contacts]);
-
-  // const onContactsUpdate = async () => {
-  //   console.log({ contacts });
-  //   if (contacts.length) {
-  //     if (
-  //       contacts.findIndex((value) => value && value.type == 'contact1') != -1
-  //     ) {
-  //       pageData[1].personalInfo =
-  //         contacts[
-  //           contacts.findIndex((value) => value && value.type == 'contact1')
-  //         ];
-  //     }
-  //     if (
-  //       contacts.findIndex((value) => value && value.type == 'contact2') != -1
-  //     ) {
-  //       pageData[2].personalInfo =
-  //         contacts[
-  //           contacts.findIndex((value) => value && value.type == 'contact2')
-  //         ];
-  //     }
-  //   }
-  //   setPageData(pageData);
-  // };
-
   const getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
       item.toString() == 'never'
@@ -1716,26 +1665,6 @@ export default function ManageBackup(props) {
               />
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={{
-              marginLeft: 'auto',
-              marginRight: 10,
-              padding: 10,
-            }}
-            activeOpacity={1}
-            // onPress={() => {
-            //   RegenerateShareHelperBottomSheet.current.snapTo(1);
-            // }}
-          >
-            <Image
-              source={require('../../assets/images/icons/icon_settings1.png')}
-              style={{
-                width: wp('5%'),
-                height: wp('5%'),
-                resizeMode: 'contain',
-              }}
-            />
-          </TouchableOpacity> */}
         </View>
         {is_initiated ? (
           <View style={{ flex: 1 }}>
@@ -1744,7 +1673,6 @@ export default function ManageBackup(props) {
                 <RefreshControl
                   refreshing={healthLoading}
                   onRefresh={() => {
-                    // dispatch(checkMSharesHealth());
                     dispatch(syncLastSeensAndHealth());
                   }}
                 />
@@ -1799,7 +1727,7 @@ export default function ManageBackup(props) {
                 </View>
               </View>
               <View style={{ marginBottom: 10 }}>
-                {pageData.map((item, index) => {
+                {pageData.map((item) => {
                   return (
                     <View style={{}}>
                       <TouchableOpacity
@@ -2074,13 +2002,6 @@ export default function ManageBackup(props) {
 }
 
 const styles = StyleSheet.create({
-  shieldImage: {
-    width: wp('16%'),
-    height: wp('25%'),
-    resizeMode: 'contain',
-    marginLeft: 'auto',
-    marginRight: 20,
-  },
   manageBackupCard: {
     flex: 1,
     padding: 20,
@@ -2113,38 +2034,5 @@ const styles = StyleSheet.create({
     height: 14,
     resizeMode: 'contain',
     marginLeft: 'auto',
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
-  },
-  modalHeaderContainer: {
-    borderTopLeftRadius: 10,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    backgroundColor: Colors.blue,
-    borderLeftColor: Colors.blue,
-    borderRightColor: Colors.blue,
-    borderTopColor: Colors.blue,
-  },
-  healthOfAppText: {
-    color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(20),
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-  },
-  healthOfAppDivider: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: 1,
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-    marginBottom: hp('1%'),
   },
 });

@@ -10,11 +10,10 @@ const NavStyles = StyleSheet.create({
     borderColor: Colors.borderColor,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingRight: 10,
+    paddingHorizontal: 10,
     paddingBottom: 15,
     paddingTop: 10,
-    marginLeft: 20,
-    marginRight: 20,
+    marginHorizontal: 20,
     marginBottom: 15,
   },
 
@@ -22,6 +21,16 @@ const NavStyles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
+    textAlign: 'left',
+    marginHorizontal: 0,
+  },
+
+  modalHeaderInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: 10,
+    flexWrap: 'wrap',
   },
 
   modalHeaderSubheadingText: {
@@ -38,6 +47,21 @@ const NavStyles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 14,
+  },
+
+
+  // TODO: Legacy styles -- consider removing/refactoring
+  modalContainer: {
+    height: "100%",
+    width: "100%",
+  },
+
+  modalContentView: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20
   },
 });
 

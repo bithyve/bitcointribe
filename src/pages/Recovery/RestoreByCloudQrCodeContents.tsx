@@ -1,15 +1,13 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { View, Image, Text, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Image, Text, StyleSheet, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  widthPercentageToDP, heightPercentageToDP,
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
-import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   restoreShareFromQR,
@@ -20,8 +18,10 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
+import NavStyles from '../../common/Styles/NavStyles';
 
-export default function RestoreByCloudQrCodeContents(props) {
+export default function RestoreByCloudQRCodeContents(props) {
   const [qrData, setQrData] = useState('');
   const [qrDataArray, setQrDataArray] = useState([]);
   let [counter, setCounter] = useState(1);
@@ -82,7 +82,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           setProcessButtonText('Okay');
         }, 2);
         errorBottomSheetRef.current.snapTo(1);
-        // Alert.alert('Please scan ' + temp1 + ' QR code');
+
         return;
       }
     }
@@ -99,16 +99,9 @@ export default function RestoreByCloudQrCodeContents(props) {
           : counter == 9
           ? 8
           : counter + 'th';
-      // setTimeout(() => {
-      //   setErrorMessageHeader('Scan QR code');
-      //   setErrorMessage(
-      //     temp + ' QR code scanned, please scan the next one'
-      //   );
-      //   setProcessButtonText('Okay')
-      // }, 2);
-      // (ErrorBottomSheet as any).current.snapTo(1);
-      //Alert.alert(temp + ' QR code scanned, please scan the next one');
+
       Toast(temp + ' QR code scanned, please scan the next one');
+
       counter++;
       setCounter(counter);
       startNumberCounter++;
@@ -120,8 +113,8 @@ export default function RestoreByCloudQrCodeContents(props) {
       setCounter(1);
       setQrData('');
       setStartNumberCounter(1);
+
       props.onScanCompleted(shareCode);
-      props.onPressBack();
     }
   };
 
@@ -161,21 +154,15 @@ export default function RestoreByCloudQrCodeContents(props) {
   }
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={styles.rootContainer}>
       <ScrollView>
-        <View style={styles.modalHeaderTitleView}>
+        <View style={NavStyles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row', flex: 1 }}>
-            {/* <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
-            style={{ height: 30, width: 30 }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper> */}
             <View>
-              <Text style={styles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 Enter Recovery Key
               </Text>
-              <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+              <Text numberOfLines={2} style={NavStyles.modalHeaderInfoText}>
                 {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have
                 stored
               </Text>
@@ -191,14 +178,15 @@ export default function RestoreByCloudQrCodeContents(props) {
               <Image
                 source={require('../../assets/images/icons/icon_error_red.png')}
                 style={{
-                  width: wp('5%'),
-                  height: wp('5%'),
+                  width: widthPercentageToDP('5%'),
+                  height: widthPercentageToDP('5%'),
                   resizeMode: 'contain',
                 }}
               />
             </View>
           </View>
         </View>
+
         <View style={{ marginLeft: 30 }}>
           <Text
             style={{
@@ -230,29 +218,19 @@ export default function RestoreByCloudQrCodeContents(props) {
             QR code on the{'\n'}PDF you have
           </Text>
         </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <QrCodeModalContents
-            flag={true}
-            onQrScan={(qrData) => getQrCodeData(qrData)}
-            onClose={() => {}}
-            onPressQrScanner={() => {
-              props.navigation.navigate('QRScanner', {
-                onCodeScanned: getQrCodeData,
-              });
-            }}
-          />
-          {/* <QrScanner onScanQRCode={ async ( data ) => { setQrData( data ) } } /> */}
+
+        <View style={styles.qrScannerSection}>
+          <Text style={{ ...NavStyles.modalHeaderSubheadingText, fontSize: RFValue(15) }}>
+            Scan a Bitcoin address or any Hexa QR
+          </Text>
+
+          <CoveredQRCodeScanner onCodeScanned={getQrCodeData} />
         </View>
+
         <View
           style={{
-            marginBottom: hp('3%'),
-            marginTop: hp('1%'),
+            marginBottom: heightPercentageToDP('3%'),
+            marginTop: heightPercentageToDP('1%'),
             marginRight: 20,
           }}
         >
@@ -305,7 +283,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         ref={errorBottomSheetRef}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? heightPercentageToDP('35%') : heightPercentageToDP('40%'),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
@@ -314,44 +292,30 @@ export default function RestoreByCloudQrCodeContents(props) {
   );
 }
 const styles = StyleSheet.create({
-  modalContainer: {
+  rootContainer: {
+    width: '100%',
     height: '100%',
     backgroundColor: Colors.white,
-    width: '100%',
   },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('2%'),
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: hp('1.5%'),
+
+  qrScannerSection: {
+    flex: 1,
+    marginTop: 16,
+    paddingHorizontal: 16,
   },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18, 812),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  modalHeaderInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
-    fontFamily: Fonts.FiraSansRegular,
-    marginTop: hp('0.7%'),
-    flexWrap: 'wrap',
-  },
+
   qrModalImage: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: widthPercentageToDP('100%'),
+    height: widthPercentageToDP('100%'),
     borderRadius: 20,
-    marginTop: hp('5%'),
+    marginTop: heightPercentageToDP('5%'),
   },
+
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
   },
+
   statusIndicatorActiveView: {
     height: 5,
     width: 25,
@@ -360,6 +324,7 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     marginRight: 2,
   },
+
   statusIndicatorInactiveView: {
     width: 5,
     backgroundColor: Colors.lightBlue,

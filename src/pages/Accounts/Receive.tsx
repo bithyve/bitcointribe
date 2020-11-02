@@ -15,9 +15,9 @@ import {
   StatusBar,
   AsyncStorage,
   Alert,
-  InteractionManager,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -31,7 +31,7 @@ import ModalHeader from '../../components/ModalHeader';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import DeviceInfo from 'react-native-device-info';
-import { nameToInitials } from '../../common/CommonFunctions';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SendViaQR from '../../components/SendViaQR';
 import SendViaLink from '../../components/SendViaLink';
@@ -43,7 +43,6 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import BackupStyles from '../ManageBackup/Styles';
 import {
   updateEphemeralChannel,
   updateTrustedContactInfoLocally,
@@ -56,7 +55,6 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import config from '../../bitcoin/HexaConfig';
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import Loader from '../../components/loader';
 import TwoFASetupWarningModal from './TwoFASetupWarningModal';
 import idx from 'idx';
 import {
@@ -70,38 +68,35 @@ export default function Receive(props) {
   const [isOTPType, setIsOTPType] = useState(false);
   const [
     shareOtpWithTrustedContactBottomSheet,
-    setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
   const [OTP, setOTP] = useState('');
   const [renderTimer, setRenderTimer] = useState(false);
 
   const [
     SecureReceiveWarningBottomSheet,
-    setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
   //let [isLoading, setIsLoading] = useState(true);
-  const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
+  const [ReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
   const [
     AddContactAddressBookBookBottomSheet,
-    setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [amount, setAmount] = useState('');
   const [selectedContact, setSelectedContact] = useState(Object);
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
-  const [serviceType, setServiceType] = useState(
+  const [serviceType] = useState(
     props.navigation.getParam('serviceType')
       ? props.navigation.getParam('serviceType')
       : '',
   );
-  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  const [SendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
 
-  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+  const [SendViaQRBottomSheet] = useState(
     React.createRef(),
   );
   const getServiceType = props.navigation.state.params.getServiceType
@@ -115,14 +110,10 @@ export default function Receive(props) {
     ? props.navigation.state.params.carouselIndex
     : null;
 
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
-
   const dispatch = useDispatch();
   const [receiveLink, setReceiveLink] = useState('');
   const [receiveQR, setReceiveQR] = useState('');
-  const { loading, service } = useSelector(
+  const { service } = useSelector(
     (state) => state.accounts[serviceType],
   );
   const updateEphemeralChannelLoader = useSelector(
@@ -211,7 +202,7 @@ export default function Receive(props) {
     }
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -348,12 +339,12 @@ export default function Receive(props) {
           if (!trustedContact) return false;
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
           return presentContactName == selectedContactName;
@@ -378,7 +369,7 @@ export default function Receive(props) {
     if (selectedContact && selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -468,7 +459,7 @@ export default function Receive(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -518,7 +509,7 @@ export default function Receive(props) {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={(index) => {
+        onPressOk={() => {
           setTimeout(() => {
             setRenderTimer(false);
           }, 2);
@@ -657,8 +648,8 @@ export default function Receive(props) {
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View style={BackupStyles.modalContainer}>
-            <View style={BackupStyles.modalHeaderTitleView}>
+          <View style={NavStyles.modalContainer}>
+            <View style={NavStyles.modalHeaderTitleView}>
               <View
                 style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
               >
@@ -675,18 +666,18 @@ export default function Receive(props) {
                 <Image
                   source={
                     derivativeAccountDetails &&
-                    derivativeAccountDetails.type === DONATION_ACCOUNT
+                      derivativeAccountDetails.type === DONATION_ACCOUNT
                       ? require('../../assets/images/icons/icon_donation_hexa.png')
                       : serviceType == TEST_ACCOUNT
-                      ? require('../../assets/images/icons/icon_test.png')
-                      : serviceType == REGULAR_ACCOUNT
-                      ? require('../../assets/images/icons/icon_regular.png')
-                      : require('../../assets/images/icons/icon_secureaccount.png')
+                        ? require('../../assets/images/icons/icon_test.png')
+                        : serviceType == REGULAR_ACCOUNT
+                          ? require('../../assets/images/icons/icon_regular.png')
+                          : require('../../assets/images/icons/icon_secureaccount.png')
                   }
                   style={{ width: wp('10%'), height: wp('10%') }}
                 />
                 <View style={{ marginLeft: wp('2.5%') }}>
-                  <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
+                  <Text style={NavStyles.modalHeaderTitleText}>Receive</Text>
                   <Text
                     style={{
                       color: Colors.textColorGrey,
@@ -695,13 +686,13 @@ export default function Receive(props) {
                     }}
                   >
                     {derivativeAccountDetails &&
-                    derivativeAccountDetails.type === DONATION_ACCOUNT
+                      derivativeAccountDetails.type === DONATION_ACCOUNT
                       ? 'Donation Account'
                       : serviceType == TEST_ACCOUNT
-                      ? 'Test Account'
-                      : serviceType == REGULAR_ACCOUNT
-                      ? 'Checking Account'
-                      : 'Savings Account'}
+                        ? 'Test Account'
+                        : serviceType == REGULAR_ACCOUNT
+                          ? 'Checking Account'
+                          : 'Savings Account'}
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
@@ -770,64 +761,64 @@ export default function Receive(props) {
                             />
                           </View>
                         ) : (
-                          <View style={styles.selectedContactInitialsView}>
-                            <Text style={styles.selectedContactInitialsText}>
-                              {nameToInitials(
-                                selectedContact &&
-                                  selectedContact.firstName &&
-                                  selectedContact.lastName
-                                  ? selectedContact.firstName +
-                                      ' ' +
-                                      selectedContact.lastName
-                                  : selectedContact &&
+                            <View style={styles.selectedContactInitialsView}>
+                              <Text style={styles.selectedContactInitialsText}>
+                                {nameToInitials(
+                                  selectedContact &&
                                     selectedContact.firstName &&
-                                    !selectedContact.lastName
-                                  ? selectedContact.firstName
-                                  : selectedContact &&
-                                    !selectedContact.firstName &&
                                     selectedContact.lastName
-                                  ? selectedContact.lastName
-                                  : '',
-                              )}
-                            </Text>
-                          </View>
-                        )}
+                                    ? selectedContact.firstName +
+                                    ' ' +
+                                    selectedContact.lastName
+                                    : selectedContact &&
+                                      selectedContact.firstName &&
+                                      !selectedContact.lastName
+                                      ? selectedContact.firstName
+                                      : selectedContact &&
+                                        !selectedContact.firstName &&
+                                        selectedContact.lastName
+                                        ? selectedContact.lastName
+                                        : '',
+                                )}
+                              </Text>
+                            </View>
+                          )}
                         <View>
                           <Text style={styles.addingAsContactText}>
                             Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&
-                            selectedContact.firstName &&
-                            selectedContact.lastName
+                              selectedContact.firstName &&
+                              selectedContact.lastName
                               ? selectedContact.firstName +
-                                ' ' +
-                                selectedContact.lastName
+                              ' ' +
+                              selectedContact.lastName
                               : selectedContact &&
                                 selectedContact.firstName &&
                                 !selectedContact.lastName
-                              ? selectedContact.firstName
-                              : selectedContact &&
-                                !selectedContact.firstName &&
-                                selectedContact.lastName
-                              ? selectedContact.lastName
-                              : ''}
+                                ? selectedContact.firstName
+                                : selectedContact &&
+                                  !selectedContact.firstName &&
+                                  selectedContact.lastName
+                                  ? selectedContact.lastName
+                                  : ''}
                           </Text>
                           {selectedContact &&
-                          selectedContact.phoneNumbers &&
-                          selectedContact.phoneNumbers.length ? (
-                            <Text style={styles.selectedContactPhoneNumber}>
-                              {setPhoneNumber()}
-                              {/* {selectedContact.phoneNumbers[0].digits} */}
-                            </Text>
-                          ) : selectedContact &&
-                            selectedContact.emails &&
-                            selectedContact.emails.length ? (
-                            <Text style={styles.selectedContactEmail}>
-                              {selectedContact &&
-                                selectedContact.emails[0].email}
-                            </Text>
-                          ) : null}
+                            selectedContact.phoneNumbers &&
+                            selectedContact.phoneNumbers.length ? (
+                              <Text style={styles.selectedContactPhoneNumber}>
+                                {setPhoneNumber()}
+                                {/* {selectedContact.phoneNumbers[0].digits} */}
+                              </Text>
+                            ) : selectedContact &&
+                              selectedContact.emails &&
+                              selectedContact.emails.length ? (
+                                <Text style={styles.selectedContactEmail}>
+                                  {selectedContact &&
+                                    selectedContact.emails[0].email}
+                                </Text>
+                              ) : null}
                         </View>
                       </View>
                     </View>
@@ -908,7 +899,6 @@ export default function Receive(props) {
           <AddContactAddressBook
             isLoadContacts={isLoadContacts}
             modalTitle="Select a Contact"
-            modalRef={AddContactAddressBookBookBottomSheet}
             proceedButtonText={'Confirm & Proceed'}
             onPressContinue={(selectedContacts) =>
               onPressContinue(selectedContacts)
@@ -948,7 +938,7 @@ export default function Receive(props) {
         renderHeader={() => (
           <ModalHeader
             backgroundColor={Colors.white}
-            //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+          //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
           />
         )}
       />
@@ -978,10 +968,10 @@ export default function Receive(props) {
             infoText={
               receiveLink.includes('https://hexawallet.io')
                 ? `Click here to accept contact request from ${
-                    WALLET_SETUP.walletName
-                  } Hexa wallet - link will expire in ${
-                    config.TC_REQUEST_EXPIRY / (60000 * 60)
-                  } hours`
+                WALLET_SETUP.walletName
+                } Hexa wallet - link will expire in ${
+                config.TC_REQUEST_EXPIRY / (60000 * 60)
+                } hours`
                 : null
             }
             amount={amount === '' ? null : amount}
@@ -1058,23 +1048,23 @@ export default function Receive(props) {
         renderContent={() => (
           <TwoFASetupWarningModal
             onPressOk={() => onPressOkOf2FASetupWarning()}
-            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
           />
         )}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.borderColor}
             backgroundColor={Colors.white}
-            // onPressHeader={() => {
-            //   if (SecureReceiveWarningBottomSheet.current)
-            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-            // }}
+          // onPressHeader={() => {
+          //   if (SecureReceiveWarningBottomSheet.current)
+          //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+          // }}
           />
         )}
       />
 
       <BottomSheet
-        onCloseEnd={() => {}}
+        onCloseEnd={() => { }}
         enabledInnerScrolling={true}
         ref={shareOtpWithTrustedContactBottomSheet}
         snapPoints={[-30, hp('65%')]}
@@ -1086,34 +1076,7 @@ export default function Receive(props) {
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-    alignSelf: 'center',
-    width: '100%',
-    paddingBottom: hp('2%'),
-    elevation: 10,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1%'),
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: hp('1.5%'),
-  },
+
   textBoxView: {
     flexDirection: 'row',
     borderRadius: 10,
@@ -1292,11 +1255,5 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-  },
-  TwoFAWarningView: {
-    height: '100%',
-    alignItems: 'center',
-    marginTop: hp('2%'),
-    flex: 1,
   },
 });

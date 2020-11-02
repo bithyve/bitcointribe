@@ -59,7 +59,7 @@ export default function CustodianRequestRejectedModalContents(props) {
           }}
         >
           {/* <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressViewThrustedContacts()}
+            onPress={() => props.onPressViewTrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
