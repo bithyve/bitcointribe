@@ -255,7 +255,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <RequestModalContents
         onPressRequest={() => onPressRequest()}
-        onPressViaQr={() => { }}
+        onPressViaQr={() => {}}
       />
     );
   };
@@ -323,7 +323,7 @@ export default function RestoreSelectedContactsList(props) {
           setAnswer(text);
         }}
         onPressConfirm={() => submitRecoveryQuestion()}
-        onPressKnowMore={() => { }}
+        onPressKnowMore={() => {}}
         bottomSheetRef={recoveryQuestionBottomSheet}
       />
     );
@@ -491,9 +491,10 @@ export default function RestoreSelectedContactsList(props) {
         //   props.navigation.navigate('Home');
         // }, 4000);
 
-        setTimeout(() => {
-          dispatch(startupSync()); // delaying as checkMSharesHealth is also a DB inserting saga
-        }, 2000);
+        // setTimeout(() => {
+        //   dispatch(startupSync()); // delaying as checkMSharesHealth is also a DB inserting saga
+        // }, 2000); // auto-acc sync disabled
+        props.navigation.navigate('Home');
       }
     })();
   }, [SERVICES, walletImageChecked]);
@@ -810,13 +811,13 @@ export default function RestoreSelectedContactsList(props) {
                   </View>
                 </View>
               ) : (
-                    <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
-                      <Text>{SecondaryDeviceRS ? 'Received' : 'Receive'}</Text>
-                      <View style={styles.dotsView} />
-                      <View style={styles.dotsView} />
-                      <View style={styles.dotsView} />
-                    </View>
-                  )}
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <Text>{SecondaryDeviceRS ? 'Received' : 'Receive'}</Text>
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -878,17 +879,17 @@ export default function RestoreSelectedContactsList(props) {
                         </Text>
                       </Text>
                       {contact &&
-                        contact.communicationMode &&
-                        contact.communicationMode.length ? (
-                          <Text
-                            style={{
-                              ...styles.selectedContactName,
-                              fontSize: RFValue(11),
-                            }}
-                          >
-                            {contact.communicationMode[0].info}
-                          </Text>
-                        ) : null}
+                      contact.communicationMode &&
+                      contact.communicationMode.length ? (
+                        <Text
+                          style={{
+                            ...styles.selectedContactName,
+                            fontSize: RFValue(11),
+                          }}
+                        >
+                          {contact.communicationMode[0].info}
+                        </Text>
+                      ) : null}
                     </View>
                     {contact.status == 'received' ? (
                       <View
@@ -991,16 +992,16 @@ export default function RestoreSelectedContactsList(props) {
                         </View>
                       </View>
                     ) : (
-                            <TouchableOpacity
-                              onPress={() => { }}
-                              style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                            >
-                              <Text>{contact.status}</Text>
-                              <View style={styles.dotsView} />
-                              <View style={styles.dotsView} />
-                              <View style={styles.dotsView} />
-                            </TouchableOpacity>
-                          )}
+                      <TouchableOpacity
+                        onPress={() => {}}
+                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                      >
+                        <Text>{contact.status}</Text>
+                        <View style={styles.dotsView} />
+                        <View style={styles.dotsView} />
+                        <View style={styles.dotsView} />
+                      </TouchableOpacity>
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -1130,16 +1131,16 @@ export default function RestoreSelectedContactsList(props) {
                           </View>
                         </View>
                       ) : (
-                            <TouchableOpacity
-                              onPress={() => handleDocuments()}
-                              style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                            >
-                              <Text>{value.status}</Text>
-                              <View style={styles.dotsView} />
-                              <View style={styles.dotsView} />
-                              <View style={styles.dotsView} />
-                            </TouchableOpacity>
-                          )}
+                        <TouchableOpacity
+                          onPress={() => handleDocuments()}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <Text>{value.status}</Text>
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                        </TouchableOpacity>
+                      )}
                     </TouchableOpacity>
                   );
                 } else {
@@ -1215,8 +1216,8 @@ export default function RestoreSelectedContactsList(props) {
         renderHeader={RequestHeaderFunction}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
-        onCloseEnd={() => { }}
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         enabledGestureInteraction={false}
@@ -1246,7 +1247,7 @@ export default function RestoreSelectedContactsList(props) {
         renderHeader={renderRestoreByCloudQrCodeHeader}
       />
       <BottomSheet
-        onCloseEnd={() => { }}
+        onCloseEnd={() => {}}
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={loaderBottomSheet as any}
