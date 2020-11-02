@@ -224,10 +224,7 @@ export default function RestoreByCloudQRCodeContents(props) {
             Scan a Bitcoin address or any Hexa QR
           </Text>
 
-          <CoveredQRCodeScanner
-            containerStyle={styles.qrScannerContainer}
-            onCodeScanned={getQrCodeData}
-          />
+          <CoveredQRCodeScanner onCodeScanned={getQrCodeData} />
         </View>
 
         <View
@@ -305,13 +302,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 16,
     paddingHorizontal: 16,
-  },
-
-  qrScannerContainer: {
-    alignSelf: 'center',
-    marginBottom: 16,
-    width: widthPercentageToDP(90),
-    height: widthPercentageToDP(90),
   },
 
   qrModalImage: {
