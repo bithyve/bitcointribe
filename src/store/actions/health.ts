@@ -1,6 +1,7 @@
 // types and action creators: dispatched by components and sagas
 
 import { share } from "secrets.js-grempe";
+import { EphemeralDataElements } from "../../bitcoin/utilities/Interface";
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP';
 export const HEALTH_UPDATE = 'HEALTH_UPDATE';
@@ -36,7 +37,8 @@ export const ERROR_RECEIVING_HEALTH = "ERROR_RECEIVING_HEALTH";
 export const FETCH_WALLET_IMAGE_HEALTH = "FETCH_WALLET_IMAGE_HEALTH";
 export const RECOVER_WALLET_HEALTH = "RECOVER_WALLET_HEALTH";
 export const CLOUD_MSHARE = "CLOUD_MSHARE";
-
+export const S3_LOADING_KEEPER = "S3_LOADING_KEEPER";
+export const UPLOAD_ENC_MSHARE_KEEPER = "UPLOAD_ENC_MSHARE_KEEPER";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -161,14 +163,18 @@ export const updatedKeeperInfo = (info) =>{
 }
 
 export const downloadMShare = (
-  encryptedKey,
-  otp?,
-  downloadType?,
-  replaceIndex?,
+  payload: {
+    encryptedKey: string;
+    otp: string;
+    downloadType?: string;
+    replaceIndex?: string;
+    walletName?: string;
+  }
 ) => {
+  let { otp, encryptedKey, downloadType, replaceIndex, walletName } = payload;
   return {
     type: DOWNLOAD_MSHARE_HEALTH,
-    payload: { otp, encryptedKey, downloadType, replaceIndex },
+    payload: { otp, encryptedKey, downloadType, replaceIndex, walletName },
   };
 };
 
@@ -190,4 +196,28 @@ export const fetchWalletImage = () => {
 
 export const updateCloudMShare = (metaShare, replaceIndex?) => {
   return { type: CLOUD_MSHARE, payload: { metaShare, replaceIndex } };
+};
+
+export const switchS3LoaderKeeper = (beingLoaded) => {
+  // console.log("Called s3 Loading", new Date())
+  return { type: S3_LOADING_KEEPER, payload: { beingLoaded } };
+};
+
+export const uploadEncMShareKeeper = (
+  shareId: string,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
+  changingGuardian?: boolean,
+  previousGuardianName?: string,
+) => {
+  return {
+    type: UPLOAD_ENC_MSHARE_KEEPER,
+    payload: {
+      shareId,
+      contactInfo,
+      data,
+      changingGuardian,
+      previousGuardianName,
+    },
+  };
 };

@@ -330,7 +330,7 @@ class RestoreWithICloud extends Component<
     const {DECENTRALIZED_BACKUP} = this.props;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
     console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
-    this.props.downloadMShare(scannedData.encryptedKey, scannedData.otp, 'recovery', Object.keys(RECOVERY_SHARES).length);
+    this.props.downloadMShare({encryptedKey: scannedData.encryptedKey, otp: scannedData.otp, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length});
     //this.props.downloadShares(scannedData.uuid);
   }
 

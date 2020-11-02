@@ -128,7 +128,8 @@ import {
   recoverWalletHealthWatcher,
   downloadMetaShareHealthWatcher,
   cloudMetaShareHealthWatcher,
-  fetchWalletImageHealthWatcher
+  fetchWalletImageHealthWatcher,
+  uploadEncMetaShareKeeperWatcher
 } from './sagas/health';
 
 import { fromPrivateKey } from 'bip32';
@@ -250,8 +251,8 @@ const rootSaga = function* () {
     recoverWalletHealthWatcher,
     downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
-    fetchWalletImageHealthWatcher
-    
+    fetchWalletImageHealthWatcher,
+    uploadEncMetaShareKeeperWatcher
   ];
 
   yield all(

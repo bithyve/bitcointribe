@@ -20,7 +20,8 @@ import {
   DOWNLOADED_MSHARE_HEALTH,
   ERROR_RECEIVING_HEALTH,
   WALLET_RECOVERY_FAILED_HEALTH,
-  WALLET_IMAGE_HEALTH_CHECKED
+  WALLET_IMAGE_HEALTH_CHECKED,
+  S3_LOADING_KEEPER
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -32,6 +33,7 @@ const initialState: {
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
     updateEFChannelStatus: Boolean
+    uploadMetaShare: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -74,7 +76,8 @@ const initialState: {
     checkMSharesHealth: false,
     initLoader: false,
     updateMSharesHealth: false,
-    updateEFChannelStatus: false
+    updateEFChannelStatus: false,
+    uploadMetaShare: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -193,19 +196,19 @@ export default (state = initialState, action) => {
         keeperInfo: action.payload.info,
       };
 
-      case IS_LEVEL2_INITIALIZED:
+    case IS_LEVEL2_INITIALIZED:
       return {
         ...state,
         isLevel2Initialized: true,
       };
 
-      case SHARE_RECEIVED:
+    case SHARE_RECEIVED:
       return {
         ...state,
         metaShare: action.payload.metaShare,
       };
       
-      case DOWNLOADED_MSHARE_HEALTH:
+    case DOWNLOADED_MSHARE_HEALTH:
       return {
         ...state,
         downloadedMShare: {
@@ -217,29 +220,40 @@ export default (state = initialState, action) => {
         },
       };
 
-      case ERROR_RECEIVING_HEALTH:
+    case ERROR_RECEIVING_HEALTH:
       return {
         ...state,
         errorReceiving: action.payload.isFailed,
       };
       
-      case SERVICES_ENRICHED:
+    case SERVICES_ENRICHED:
       return {
         ...state,
         service: action.payload.services[S3_SERVICE],
         serviceEnriched: true,
       };
 
-      case WALLET_RECOVERY_FAILED_HEALTH:
+    case WALLET_RECOVERY_FAILED_HEALTH:
       return {
         ...state,
         walletRecoveryFailed: action.payload.isFailed,
       };
 
-      case WALLET_IMAGE_HEALTH_CHECKED:
+    case WALLET_IMAGE_HEALTH_CHECKED:
       return {
         ...state,
         walletImageChecked: action.payload.checked,
+      };
+
+    case S3_LOADING_KEEPER:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          [action.payload.beingLoaded]: !state.loading[
+            action.payload.beingLoaded
+          ],
+        },
       };
   }
   return state;

@@ -64,7 +64,7 @@ export const removeTrustedContact = (contactName, shareIndex?) => {
 };
 
 export const updateEphemeralChannel = (
-  contactInfo: { contactName: string; info: string },
+  contactInfo: { contactName: string; info: string, walletName?: string; },
   data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,

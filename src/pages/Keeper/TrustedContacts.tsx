@@ -15,7 +15,6 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 
 const TrustedContacts = (props) => {
   const [contacts, setContacts] = useState([]);
-  const index = props.index;
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
@@ -25,17 +24,7 @@ const TrustedContacts = (props) => {
   }, []);
 
   const onPressContinue = useCallback(() => {
-    if (contacts.length == 2) {
-      contacts[0].type = 'contact1';
-      contacts[1].type = 'contact2';
-    } else if (contacts.length == 1) {
-      if (index == 1) {
-        contacts[0].type = 'contact1';
-      } else if (index == 2) {
-        contacts[0].type = 'contact2';
-      }
-    }
-    props.onPressContinue(contacts, index);
+    props.onPressContinue(contacts);
   }, [contacts, props.onPressContinue]);
 
   const onPressSkip = () => {
@@ -55,8 +44,7 @@ const TrustedContacts = (props) => {
         name: `F&F request awaiting ${skippedContactsCount + 1}`,
       };
     }
-
-    props.onPressContinue([data], index);
+    props.onPressContinue([data]);
   };
 
   const renderContactList = useCallback(

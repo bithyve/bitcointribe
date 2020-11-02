@@ -392,7 +392,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               // checking for donationId to send note
               if (options && options.message) {
                 const rawMessage = options.message;
-                donationId = rawMessage.split(':').pop().trim();
+                donationId = rawMessage ? rawMessage.split(':').pop().trim() : '';
               }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
@@ -1127,7 +1127,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     console.log('Home::handleDeepLinking::URL: ' + url);
 
-    const splits = url.split('/');
+    const splits = url ? url.split('/') : [];
 
     if (splits[5] === 'sss') {
       const requester = splits[4];
@@ -1228,7 +1228,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       );
     }
 
-    if (url.includes('fastbitcoins')) {
+    if (url && url.includes('fastbitcoins')) {
       const userKey = url.substr(url.lastIndexOf('/') + 1);
       this.props.navigation.navigate('PairNewWallet', { userKey });
     }
@@ -1907,13 +1907,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: !this.state.notificationDataChange,
     });
 
-    if (value.info.includes('F&F request accepted by')) {
+    if (value.info && value.info.includes('F&F request accepted by')) {
       navigation.navigate('FriendsAndFamily');
       return;
     }
 
     if (value.type == 'release') {
-      RelayServices.fetchReleases(value.info.split(' ')[1])
+      RelayServices.fetchReleases(value.info ? value.info.split(' ')[1] : '' )
         .then(async (res) => {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
@@ -2021,7 +2021,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
           // );
-          if (element.body.split(' ')[1] == releaseCases.build) {
+          if (element.body && element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
             }

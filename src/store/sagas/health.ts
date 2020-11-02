@@ -26,6 +26,8 @@ import {
   RECOVER_WALLET_HEALTH,
   CLOUD_MSHARE,
   FETCH_WALLET_IMAGE_HEALTH,
+  switchS3LoaderKeeper,
+  UPLOAD_ENC_MSHARE_KEEPER,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -44,16 +46,19 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import KeeperService from '../../bitcoin/services/KeeperService';
-import { EphemeralDataElementsForKeeper, MetaShare, WalletImage } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements, EphemeralDataElementsForKeeper, MetaShare, ShareUploadables, TrustedDataElements, WalletImage } from '../../bitcoin/utilities/Interface';
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
 import moment from 'moment';
-import { updateTrustedContactInfoLocally } from '../actions/trustedContacts';
+import { updateEphemeralChannel, updateTrustedChannel, updateTrustedContactInfoLocally } from '../actions/trustedContacts';
 import crypto from 'crypto';
 import { Alert } from 'react-native';
+import { ErrorSending } from '../actions/sss';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -314,10 +319,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     share = payload.share;
   }
   
-  const shareUploadables = LevelHealth.encryptMetaShare(
-    share,
-    EFChannelData.uuid
-  );
+  const shareUploadables = LevelHealth.encryptMetaShare(share, EFChannelData.uuid);
 
   let Kp = new KeeperService();
   let res = yield call(
@@ -495,7 +497,7 @@ export const downloadShareWatcher = createWatcher(
 export function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3LoadingStatus('downloadMetaShare'));
 
-  const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
+  const { encryptedKey, otp, walletName, walletID } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
   const s3Service: S3Service = yield select((state) => state.health.service);
 
   const { DECENTRALIZED_BACKUP } = yield select(
@@ -527,6 +529,20 @@ export function* downloadMetaShareWorker({ payload }) {
   console.log({ res });
   if (res.status === 200) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
+    if (payload.downloadType !== 'recovery') {
+      let shareArray = [
+        {
+          walletId: walletID,
+          shareId: metaShare.shareId,
+          reshareVersion: metaShare.meta.reshareVersion,
+          updatedAt: moment(new Date()).valueOf(),
+          name: walletName,
+          shareType: 'contact',
+          status: "accessible",
+        }
+      ];
+      yield put(updateMSharesHealth(shareArray));
+    }
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
       //TODO: activate DNP Transportation Layer for Hexa Premium
@@ -910,4 +926,185 @@ function* fetchWalletImageWorker({ payload }) {
 export const fetchWalletImageHealthWatcher = createWatcher(
   fetchWalletImageWorker,
   FETCH_WALLET_IMAGE_HEALTH,
+);
+
+function* uploadEncMetaShareKeeperWorker({ payload }) {
+  // Transfer: User >>> Guardian
+  yield put(switchS3LoaderKeeper('uploadMetaShare'));
+
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+  if (!s3Service.levelhealth.metaShares.length) return;
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  const regularService: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    (state) => state.storage.database,
+  );
+  let shareIndex = 2
+  if(payload.shareId && s3Service.levelhealth.metaShares.length){
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    if(metaShare.findIndex(value => value.shareId == payload.shareId)> -1){
+      shareIndex = metaShare.findIndex(value => value.shareId == payload.shareId);
+    }
+  }
+
+  if (payload.changingGuardian) {
+    if (payload.contactInfo.contactName === 'secondary device') {
+      delete trustedContacts.tc.trustedContacts[
+        payload.contactInfo.contactName
+      ]; // removing secondary device's TC
+      const accountNumber =
+        regularService.hdWallet.trustedContactToDA[
+          payload.contactInfo.contactName
+        ];
+      if (accountNumber) {
+        delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+          accountNumber
+        ].contactDetails; // removing previous SDs xpub
+      }
+    }
+
+    yield call(s3Service.reshareMetaShare, shareIndex);
+    if (payload.previousGuardianName) {
+      trustedContacts.tc.trustedContacts[
+        payload.previousGuardianName
+      ].isGuardian = false;
+    }
+  } else {
+    // preventing re-uploads till expiry
+    if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareIndex]) {
+      if (
+        Date.now() -
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareIndex]
+            .UPLOADED_AT <
+        config.TC_REQUEST_EXPIRY
+      ) {
+        // re-upload after 10 minutes (removal sync w/ relayer)
+        yield put(switchS3LoaderKeeper('uploadMetaShare'));
+
+        return;
+      }
+    }
+  }
+
+  // TODO: reactivate DNP Transportation for Hexa Premium
+  // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+  // let dynamicNonPMDD;
+  // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
+
+  // const res = yield call(
+  //   s3Service.uploadShare,
+  //   shareIndex,
+  //   dynamicNonPMDD,
+  // );
+
+  const res = yield call(
+    s3Service.prepareShareUploadables,
+    shareIndex,
+    payload.contactInfo.contactName,
+  ); // contact injection (requires database insertion)
+
+  if (res.status === 200) {
+    const {
+      otp,
+      encryptedKey,
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    } = res.data;
+
+    const shareUploadables: ShareUploadables = {
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    };
+    const updatedSERVICES = {
+      ...SERVICES,
+      REGULAR_ACCOUNT: JSON.stringify(regularService),
+      S3_SERVICE: JSON.stringify(s3Service),
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_TRANSFER_DETAILS: {
+        ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+        [shareIndex]: {
+          OTP: otp,
+          ENCRYPTED_KEY: encryptedKey,
+          UPLOADED_AT: Date.now(),
+        },
+      },
+    };
+
+    // yield call(insertDBWorker, {
+    //   payload: {
+    //     DECENTRALIZED_BACKUP: updatedBackup,
+    //     SERVICES: updatedSERVICES,
+    //   },
+    // });
+
+    const updatedDB = {
+      DECENTRALIZED_BACKUP: updatedBackup,
+      SERVICES: updatedSERVICES,
+    };
+
+    const contact =
+      trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
+    if (contact && contact.symmetricKey) {
+      // has trusted channel
+      const data: TrustedDataElements = {
+        // won't include elements from payload.data
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+      yield put(
+        updateTrustedChannel(
+          payload.contactInfo,
+          data,
+          null,
+          shareUploadables,
+          updatedDB,
+        ),
+      );
+    } else {
+      // adding transfer details to he ephemeral data
+
+      const data: EphemeralDataElements = {
+        ...payload.data,
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+
+      yield put(
+        updateEphemeralChannel(
+          payload.contactInfo,
+          data,
+          null,
+          null,
+          null,
+          shareUploadables,
+          updatedDB,
+        ),
+      );
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(ErrorSending(true));
+    // Alert.alert('Upload Failed!', res.err);
+    console.log({ err: res.err });
+  }
+  yield put(switchS3LoaderKeeper('uploadMetaShare'));
+}
+
+export const uploadEncMetaShareKeeperWatcher = createWatcher(
+  uploadEncMetaShareKeeperWorker,
+  UPLOAD_ENC_MSHARE_KEEPER,
 );

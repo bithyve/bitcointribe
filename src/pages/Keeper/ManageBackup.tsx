@@ -59,6 +59,14 @@ interface ManageBackupStateTypes {
   isPrimaryKeeper: any;
   selectedShareId: string;
   isError: boolean;
+  selectedKeeper: {
+    shareType: string;
+    updatedAt: string;
+    status: string;
+    shareId: string;
+    reshareVersion: number;
+    name: string;
+  };
 }
 
 interface ManageBackupPropsTypes {
@@ -109,6 +117,7 @@ class ManageBackup extends Component<
       name: '',
     };
     this.state = {
+      selectedKeeper: obj,
       securityAtLevel: 0,
       selectedId: 0,
       isError: false,
@@ -344,16 +353,15 @@ class ManageBackup extends Component<
       shareType,
       keeperStatus,
       name,
-      id,
       shareId,
       updatedAt
     } = value;
     let navigationParams = {
-      selectedTime: this.getTime(updatedAt),
+      selectedTime: updatedAt ? this.getTime(updatedAt) : 'never',
       selectedStatus: keeperStatus,
       selectedTitle: name,
       isLevel2: this.state.isLevel2,
-      isPrimaryKeeper: id === 2 ? true : false,
+      isPrimaryKeeper: this.state.isPrimaryKeeper,
       selectedShareId: shareId,
     }
     if (shareType == 'device' || shareType == 'primaryKeeper') {
@@ -366,7 +374,6 @@ class ManageBackup extends Component<
       this.props.navigation.navigate('PersonalCopyHistoryKeeper', navigationParams);
     }
   }
-  
 
   render() {
     const {
@@ -736,6 +743,7 @@ class ManageBackup extends Component<
                               }}
                               onPress={() => {
                                 this.setState({
+                                  selectedKeeper: value.keeper1,
                                   selectedShareId: value.keeper1.shareId,
                                   isPrimaryKeeper:
                                     value.id === 2 ? true : false,
@@ -745,7 +753,6 @@ class ManageBackup extends Component<
                                     shareType: value.keeper1.shareType,
                                     keeperStatus: value.keeper1.status,
                                     name: value.keeper1.name,
-                                    id: value.id,
                                     shareId: value.keeper1.shareId,
                                     updatedAt: value.keeper1.updatedAt
                                   }
@@ -828,13 +835,12 @@ class ManageBackup extends Component<
                                 marginLeft: wp('4%'),
                               }}
                               onPress={() => {
-                                this.setState({ selectedShareId: value.keeper2.shareId, isLevel2: value.id == 2 ? true : false, isPrimaryKeeper: false, });
+                                this.setState({ selectedKeeper: value.keeper2, selectedShareId: value.keeper2.shareId, isLevel2: value.id == 2 ? true : false, isPrimaryKeeper: false, });
                                 if(value.keeper2.status == 'accessible'){
                                   let obj = {
                                     shareType: value.keeper2.shareType,
                                     keeperStatus: value.keeper2.status,
                                     name: value.keeper2.name,
-                                    id: value.id,
                                     shareId: value.keeper2.shareId,
                                     updatedAt: value.keeper2.updatedAt
                                   }
@@ -912,36 +918,15 @@ class ManageBackup extends Component<
           renderContent={() => (
             <KeeperTypeModalContents
               onPressSetup={(type, name) => {
-                if (type === 'contact') {
-                  navigation.navigate('TrustedContactHistoryKeeper', {
-                    selectedTime: this.getTime(new Date()),
-                    selectedStatus: 'Ugly',
-                    selectedTitle: name,
-                    isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId,
-                  });
+                let {selectedKeeper} = this.state
+                let obj = {
+                  shareType: selectedKeeper.shareType ? selectedKeeper.shareType : type,
+                  keeperStatus: selectedKeeper.status ? selectedKeeper.status : 'notAccessible',
+                  name: selectedKeeper.name ? selectedKeeper.name : name,
+                  shareId: selectedKeeper.shareId ? selectedKeeper.shareId : '',
+                  updatedAt: selectedKeeper.updatedAt ? selectedKeeper.updatedAt : 0
                 }
-                if (type === 'device') {
-                  navigation.navigate('KeeperDeviceHistory', {
-                    selectedTime: this.getTime(new Date()),
-                    selectedStatus: 'Ugly',
-                    selectedTitle: name,
-                    isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId,
-                  });
-                }
-                if (type === 'pdf') {
-                  navigation.navigate('PersonalCopyHistoryKeeper', {
-                    selectedTime: this.getTime(new Date()),
-                    selectedStatus: 'Ugly',
-                    selectedTitle: name,
-                    isLevel2: isLevel2,
-                    isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: this.state.selectedShareId,
-                  });
-                }
+                this.goToHistory(obj);
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
               }}
               onPressBack={() =>

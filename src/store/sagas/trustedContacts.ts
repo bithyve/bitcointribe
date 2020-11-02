@@ -39,9 +39,9 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import {
   calculateOverallHealth,
-  downloadMShare,
   updateWalletImage,
 } from '../actions/sss';
+import { downloadMShare } from "../actions/health";
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -55,7 +55,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
-import { downloadMetaShareWorker } from './sss';
+import { downloadMetaShareWorker } from './health';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import DeviceInfo from 'react-native-device-info';
@@ -131,7 +131,7 @@ function* approveTrustedContactWorker({ payload }) {
       };
       yield put(
         updateEphemeralChannel(
-          contactInfo,
+          {...contactInfo, walletName: contactsWalletName},
           data,
           true,
           trustedContacts,
@@ -472,7 +472,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       // yield delay(1000); // introducing delay in order to evade database insertion collision
-      yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp } });
+      yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
       Toast('You have been successfully added as a Keeper');
       yield put(trustedContactApproved(contactInfo.contactName, true));
     } else if (payload.uploadXpub) {
@@ -518,7 +518,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
 
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
-      downloadMShare(encryptedKey, otp);
+      downloadMShare({encryptedKey, otp});
     }
 
     yield put(ephemeralChannelFetched(contactInfo.contactName, data));
@@ -613,7 +613,7 @@ function* fetchTrustedChannelWorker({ payload }) {
         Toast('You have been successfully added as a Keeper');
         const { otp, encryptedKey } = data.shareTransferDetails;
         // yield delay(1000); // introducing delay in order to evade database insertion collision
-        yield put(downloadMShare(encryptedKey, otp));
+        yield put(downloadMShare({encryptedKey, otp, walletName: contactsWalletName}));
       }
     }
   } else {
