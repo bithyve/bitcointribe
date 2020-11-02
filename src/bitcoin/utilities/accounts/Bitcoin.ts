@@ -99,7 +99,7 @@ export default class Bitcoin {
   public fetchBalanceTransactionsByAddresses = async (
     externalAddresses: string[],
     internalAddresses: string[],
-    ownedAddresses: string[],
+    ownedAddresses: { [address: string]: boolean },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -141,6 +141,11 @@ export default class Bitcoin {
         balance: 0,
         unconfirmedBalance: 0,
       };
+
+      const externalAddressesMapping = {};
+      externalAddresses.forEach((address) => {
+        externalAddressesMapping[address] = true;
+      });
 
       const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
@@ -201,7 +206,7 @@ export default class Bitcoin {
               tx,
               ownedAddresses,
               accountType,
-              externalAddresses,
+              externalAddressesMapping,
             );
 
             if (tx.transactionType === 'Self') {
@@ -599,7 +604,7 @@ export default class Bitcoin {
       return data;
     } catch (err) {
       // console.log(
-       // `An error occurred while fetching transaction details from Esplora: ${err}`,
+      // `An error occurred while fetching transaction details from Esplora: ${err}`,
       //);
       // console.log('Switching to Blockcypher fallback');
       let data;
@@ -700,7 +705,6 @@ export default class Bitcoin {
       //     medium_fee_per_kb,
       //     low_fee_per_kb,
       //   } = chainInfo;
-
       //   const high = {
       //     feePerByte: Math.round(high_fee_per_kb / 1000),
       //     estimatedBlocks: 2,
@@ -713,7 +717,6 @@ export default class Bitcoin {
       //     feePerByte: Math.round(low_fee_per_kb / 1000),
       //     estimatedBlocks: 6,
       //   };
-
       //   const feeRatesByPriority = {
       //     high,
       //     medium,
@@ -834,9 +837,9 @@ export default class Bitcoin {
 
   public categorizeTx = (
     tx: any,
-    inUseAddresses: string[],
+    inUseAddresses: { [address: string]: boolean },
     accountType: string,
-    externalAddresses: string[],
+    externalAddresses: { [address: string]: boolean },
   ) => {
     const inputs = tx.vin || tx.inputs;
     const outputs = tx.Vout || tx.outputs;
@@ -855,7 +858,7 @@ export default class Bitcoin {
           ? input.addresses[0]
           : input.prevout.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if (inUseAddresses[address]) {
           value -= input.prevout ? input.prevout.value : input.output_value;
           selfSenderList.push(address);
         } else {
@@ -871,9 +874,10 @@ export default class Bitcoin {
           ? output.addresses[0]
           : output.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if (inUseAddresses[address]) {
           value += output.value;
-          if (this.ownedAddress(address, externalAddresses)) {
+          inUseAddresses[address];
+          if (externalAddresses[address]) {
             amountToSelf += output.value;
             selfRecipientList.push(address);
           }
@@ -904,15 +908,15 @@ export default class Bitcoin {
     return tx;
   };
 
-  private ownedAddress = (
-    address: string,
-    inUseAddresses: string[],
-  ): boolean => {
-    for (const addr of inUseAddresses) {
-      if (address === addr) {
-        return true;
-      }
-    }
-    return false;
-  };
+  // private ownedAddress = (
+  //   address: string,
+  //   inUseAddresses: string[],
+  // ): boolean => {
+  //   for (const addr of inUseAddresses) {
+  //     if (address === addr) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // };
 }

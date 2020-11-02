@@ -853,12 +853,14 @@ export default class TrustedContacts {
       for (const { shareId, updatedAt, reshareVersion } of updates) {
         for (let index = 0; index < metaShares.length; index++) {
           if (metaShares[index] && metaShares[index].shareId === shareId) {
-            const currentReshareVersion =
-              healthCheckStatus[index].reshareVersion !== undefined
-                ? healthCheckStatus[index].reshareVersion
-                : 0;
+            if (healthCheckStatus[index]) {
+              const currentReshareVersion =
+                healthCheckStatus[index].reshareVersion !== undefined
+                  ? healthCheckStatus[index].reshareVersion
+                  : 0;
 
-            if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+              if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+            }
 
             healthCheckStatus[index] = {
               shareId,
