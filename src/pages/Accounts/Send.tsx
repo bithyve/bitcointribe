@@ -11,13 +11,10 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
-  ImageBackground,
   FlatList,
   Alert,
   InteractionManager,
 } from 'react-native';
-import CardView from 'react-native-cardview';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -27,7 +24,6 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   SECURE_ACCOUNT,
@@ -36,12 +32,10 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   TrustedContactDerivativeAccountElements,
-  DonationDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -56,13 +50,13 @@ import SendHelpContents from '../../components/Helper/SendHelpContents';
 import Toast from '../../components/Toast';
 import config from '../../bitcoin/HexaConfig';
 import Loader from '../../components/loader';
-import QRCodeThumbnail from './QRCodeThumbnail';
 import ContactListSend from './ContactListSend';
 import AccountsListSend from './AccountsListSend';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
 import { setSendHelper, setTwoFASetup } from '../../store/actions/preferences';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 
 interface SendPropsTypes {
   navigation: any;
@@ -86,7 +80,6 @@ interface SendPropsTypes {
 interface SendStateTypes {
   trustedContacts: any[];
   isLoading: boolean;
-  openCameraFlag: boolean;
   serviceType: string;
   recipientAddress: string;
   isSendHelperDone: boolean;
@@ -108,7 +101,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     this.state = {
       trustedContacts: [],
       isLoading: true,
-      openCameraFlag: false,
       serviceType: this.props.navigation.getParam('serviceType')
         ? this.props.navigation.getParam('serviceType')
         : REGULAR_ACCOUNT,
@@ -450,7 +442,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       spendableBalance,
       derivativeAccountDetails,
     } = this.state;
-    //console.log('barcodes', barcodes);
+
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(
         barcodes.data.trim(),
@@ -509,8 +501,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             Toast('Invalid QR');
             break;
         }
-
-        this.setState({ openCameraFlag: false });
       } else {
         this.setState({ isInvalidAddress: true });
       }
@@ -528,12 +518,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     } = this.state;
 
     let isNavigate = true;
-    // console.log({ details: transfer[serviceType].transfer.details });
+
     if (
       transfer[serviceType].transfer.details &&
       transfer[serviceType].transfer.details.length === 0
     ) {
-      //  console.log('dispatching');
       this.props.addTransferDetails(serviceType, {
         selectedContact: item,
       });
@@ -731,7 +720,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const {
       trustedContacts,
       isLoading,
-      openCameraFlag,
       serviceType,
       recipientAddress,
       isSendHelperDone,
@@ -742,7 +730,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       getServiceType,
       carouselIndex,
     } = this.state;
-    const { clearTransfer, service, transfer, accounts } = this.props;
+    const { clearTransfer, service, transfer } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -793,13 +781,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
                       <Text style={styles.accountText}>
                         Choose a recipient
-                        {/* {this.state.derivativeAccountDetails
-                          ? 'Donation Account'
-                          : serviceType == TEST_ACCOUNT
-                          ? 'Test Account'
-                          : serviceType == REGULAR_ACCOUNT
-                          ? 'Checking Account'
-                          : 'Savings Account'} */}
                       </Text>
                     </View>
                     {serviceType == TEST_ACCOUNT ? (
@@ -817,10 +798,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     ) : null}
                   </View>
                 </View>
-                <QRCodeThumbnail
-                  isOpenCameraFlag={openCameraFlag}
-                  onQrScan={(qrData) => this.barcodeRecognized(qrData)}
-                />
+
+                <CoveredQRCodeScanner onCodeScanned={this.barcodeRecognized} />
+
                 <View style={styles.view1}>
                   <View style={styles.textBoxView}>
                     <TextInput
@@ -1038,7 +1018,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           snapPoints={[
             -50,
             hp('89%'),
-            // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
           ]}
           renderContent={() => (
             <SendHelpContents

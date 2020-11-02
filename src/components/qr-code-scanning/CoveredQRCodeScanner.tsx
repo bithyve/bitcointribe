@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { RNCamera } from 'react-native-camera';
 
 export type Props = {
@@ -33,7 +33,7 @@ const CameraFrameIndicators: React.FC = () => {
 
 const CoveredQRCodeScanner: React.FC<Props> = ({
   containerStyle = {},
-  coverImageSource = require('../assets/images/icons/iPhone-QR.png'),
+  coverImageSource = require('../../assets/images/icons/iPhone-QR.png'),
   onCodeScanned,
 }: Props) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -84,6 +84,10 @@ const styles = StyleSheet.create({
   rootContainer: {
     overflow: 'hidden',
     borderRadius: 20,
+    alignSelf: 'center',
+    marginBottom: 16,
+    width: widthPercentageToDP(90),
+    height: widthPercentageToDP(90),
   },
 });
 
