@@ -1347,9 +1347,9 @@ class SendToContact extends Component<
                   }}
                 >
                   {(!isConfirmDisabled &&
-                    accountsState[serviceType].accountsState.transfer) ||
+                    accountsState[serviceType].loading.transfer) ||
                     (isConfirmDisabled &&
-                      accountsState[serviceType].accountsState.transfer) ? (
+                      accountsState[serviceType].loading.transfer) ? (
                       <ActivityIndicator size="small" />
                     ) : (
                       <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
