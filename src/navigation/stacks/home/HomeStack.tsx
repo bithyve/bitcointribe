@@ -23,9 +23,7 @@ const HomeStack = createStackNavigator(
         header: null,
       },
     },
-    FriendsAndFamily: {
-      screen: FriendsAndFamilyScreen,
-    },
+    FriendsAndFamily: FriendsAndFamilyScreen,
     QRScanner: {
       screen: HomeQRScannerScreen,
       navigationOptions: {

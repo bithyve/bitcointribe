@@ -92,7 +92,7 @@ export default function FundingSourcesContainerScreen(props) {
               <Text style={NavStyles.modalHeaderTitleText}>
                 Funding Sources
               </Text>
-              <Text style={NavStyles.modalHeaderSubheadingText}>
+              <Text style={NavStyles.modalHeaderSubtitleText}>
                 View all your funding sources in one place
               </Text>
             </View>

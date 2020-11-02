@@ -43,7 +43,7 @@ export default function FundingSourceDetails(props) {
               <Text style={NavStyles.modalHeaderTitleText}>
                 Funding Sources Detail
               </Text>
-              <Text style={NavStyles.modalHeaderSubheadingText}>
+              <Text style={NavStyles.modalHeaderSubtitleText}>
                 Funding sources full details
               </Text>
             </View>

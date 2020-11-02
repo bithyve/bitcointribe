@@ -14,7 +14,7 @@ export const RELEASE_CASES_VALUE = 'RELEASE_CASES_VALUE';
 export const TEST_ACCOUNT_HELPER_DONE = 'TEST_ACCOUNT_HELPER_DONE';
 export const TRANSACTION_HELPER_DONE = 'TRANSACTION_HELPER_DONE';
 export const RECEIVE_HELPER_DONE = 'RECEIVE_HELPER_DONE';
-export const SEND_HELPER_DONE = 'SEND_HELPER_DONE';
+export const INITIAL_KNOW_MORE_SEND_SHEET_SHOWN = 'INITIAL_KNOW_MORE_SEND_SHEET_SHOWN';
 export const SAVING_WARNING = 'SAVING_WARNING';
 export const TWO_FA_SETUP = 'TWO_FA_SETUP';
 export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST';
@@ -84,12 +84,13 @@ export const setReceiveHelper = (data) => {
   };
 };
 
-export const setSendHelper = (data) => {
+
+export const initialKnowMoreSendSheetShown = () => {
   return {
-    type: SEND_HELPER_DONE,
-    payload: { isSendHelperDoneValue: data },
+    type: INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   };
 };
+
 
 export const setSavingWarning = (data) => {
   return {

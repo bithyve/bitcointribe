@@ -350,8 +350,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          if (this.helpBottomSheetRef.current)
-            this.helpBottomSheetRef.current?.snapTo(0);
+          this.helpBottomSheetRef.current?.snapTo(0);
         }}
       />
     );
@@ -361,8 +360,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     return (
       <AddressBookHelpContents
         titleClicked={() => {
-          if (this.helpBottomSheetRef.current)
-            this.helpBottomSheetRef.current?.snapTo(0);
+          this.helpBottomSheetRef.current?.snapTo(0);
         }}
       />
     );
@@ -747,6 +745,9 @@ class FriendsAndFamilyScreen extends PureComponent<
           ]}
           renderContent={this.renderHelpContent}
           renderHeader={this.renderHelpHeader}
+          onCloseEnd={() => {
+            this.setState({ isShowingKnowMoreSheet: false });
+          }}
         />
       </>
     );

@@ -221,7 +221,7 @@ export default function RestoreByCloudQRCodeContents(props) {
         </View>
 
         <View style={styles.qrScannerSection}>
-          <Text style={{ ...NavStyles.modalHeaderSubheadingText, fontSize: RFValue(15) }}>
+          <Text style={{ ...NavStyles.modalHeaderSubtitleText, fontSize: RFValue(15) }}>
             Scan a Bitcoin address or any Hexa QR
           </Text>
 
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
 
   qrScannerSection: {
     flex: 1,
-    marginTop: 16,
+    marginVertical: 16,
     paddingHorizontal: 16,
   },
 

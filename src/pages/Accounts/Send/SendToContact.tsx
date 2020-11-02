@@ -14,6 +14,7 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
@@ -24,7 +25,6 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ToggleSwitch from '../../../components/ToggleSwitch';
-import { nameToInitials } from '../../../common/CommonFunctions';
 import {
   transferST1,
   addTransferDetails,
@@ -34,7 +34,6 @@ import {
 } from '../../../store/actions/accounts';
 import { currencyKindSet } from '../../../store/actions/preferences';
 import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../../common/utilities';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -63,6 +62,9 @@ import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import SelectedRecipientListItem from '../../../components/send/SelectedRecipientListItem';
+import { RecipientDescribing, ContactRecipientDescribing, AccountRecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { sampleContactRecipients, sampleAccountRecipients } from './temporary-preview-data';
 
 const currencyCode = [
   'BRL',
@@ -76,7 +78,10 @@ const currencyCode = [
   'EUR',
 ];
 
+
 interface SendToContactPropsTypes {
+  selectedContactRecipients: ContactRecipientDescribing[],
+  selectedAccountRecipients: AccountRecipientDescribing[],
   navigation: any;
   accountsState: any;
   transferST1: any;
@@ -93,6 +98,7 @@ interface SendToContactPropsTypes {
 }
 
 interface SendToContactStateTypes {
+  selectedRecipients: RecipientDescribing[];
   RegularAccountBalance: any;
   SavingAccountBalance: any;
   isFromAddressBook: any;
@@ -125,10 +131,17 @@ interface SendToContactStateTypes {
 class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
-> {
+  > {
   constructor(props) {
     super(props);
+
     this.state = {
+      selectedRecipients: [
+        // ...this.props.selectedContactRecipients,
+        // ...this.props.selectedContactRecipients,
+        ...sampleContactRecipients,
+        ...sampleAccountRecipients,
+      ],
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
       isFromAddressBook: this.props.navigation.getParam('isFromAddressBook')
@@ -184,7 +197,7 @@ class SendToContact extends Component<
     if (selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       const contacts = {
@@ -203,9 +216,9 @@ class SendToContact extends Component<
         if (bitcoinAmount) {
           const currency = this.state.exchangeRates
             ? (
-                (parseInt(bitcoinAmount) / 1e8) *
-                this.state.exchangeRates[this.state.CurrencyCode].last
-              ).toFixed(2)
+              (parseInt(bitcoinAmount) / 1e8) *
+              this.state.exchangeRates[this.state.CurrencyCode].last
+            ).toFixed(2)
             : 0;
 
           this.setState({
@@ -281,7 +294,7 @@ class SendToContact extends Component<
       prevState.spendableBalance !== this.state.spendableBalance ||
       prevProps.accountsState[this.state.serviceType].transfer.details
         .length !==
-        this.props.accountsState[this.state.serviceType].transfer.details.length
+      this.props.accountsState[this.state.serviceType].transfer.details.length
     ) {
       this.amountCalculation();
     }
@@ -302,7 +315,7 @@ class SendToContact extends Component<
         this.state.selectedContact.lastName
           ? this.state.selectedContact.lastName
           : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       Object.keys(this.props.trustedContactsService.tc.trustedContacts).forEach(
@@ -329,7 +342,7 @@ class SendToContact extends Component<
 
         const toRemove =
           accountsState[serviceType].transfer.details[
-            accountsState[serviceType].transfer.details.length - 1
+          accountsState[serviceType].transfer.details.length - 1
           ];
 
         this.props.removeTransferDetails(serviceType, toRemove);
@@ -343,18 +356,18 @@ class SendToContact extends Component<
     const testBalance = accountsState[TEST_ACCOUNT].service
       ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance
       : // +  accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     let regularBalance = accountsState[REGULAR_ACCOUNT].service
       ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance
       : // +  accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -373,8 +386,8 @@ class SendToContact extends Component<
     let secureBalance = accountsState[SECURE_ACCOUNT].service
       ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
       : // + accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-        //      .unconfirmedBalance
-        0;
+      //      .unconfirmedBalance
+      0;
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
@@ -382,7 +395,7 @@ class SendToContact extends Component<
 
       const derivativeAccount =
         accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -447,7 +460,7 @@ class SendToContact extends Component<
             i
           ].selectedContact.hasOwnProperty('currencyAmount') &&
           selectedContact.id ==
-            accountsState[serviceType].transfer.details[i].selectedContact.id
+          accountsState[serviceType].transfer.details[i].selectedContact.id
         ) {
           removeTransferDetails(
             serviceType,
@@ -662,7 +675,7 @@ class SendToContact extends Component<
         if (config.EJECTED_ACCOUNTS.includes(selectedContact.id)) {
           if (
             instance.selectedContact.account_number ===
-              selectedContact.account_number &&
+            selectedContact.account_number &&
             instance.selectedContact.type === selectedContact.type
           ) {
             // skip (current donation instance), get added as currentRecipientInstance
@@ -705,7 +718,7 @@ class SendToContact extends Component<
           // recipient: trusted contact
           const contactName = `${item.selectedContact.firstName} ${
             item.selectedContact.lastName ? item.selectedContact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
           recipients.push({
@@ -792,10 +805,10 @@ class SendToContact extends Component<
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(spendableBalance)
       : prefersBitcoin
-      ? UsNumberFormat(spendableBalance)
-      : exchangeRates
-      ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-      : null;
+        ? UsNumberFormat(spendableBalance)
+        : exchangeRates
+          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          : null;
   };
 
   getIsMinimumAllowedStatus = () => {
@@ -809,6 +822,7 @@ class SendToContact extends Component<
 
   render() {
     const {
+      selectedRecipients,
       isFromAddressBook,
       isOpen,
       selectedContact,
@@ -837,14 +851,10 @@ class SendToContact extends Component<
     } = this.props;
 
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.white,
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: Colors.white }}>
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
         <View style={styles.modalHeaderTitleView}>
           <View style={styles.view}>
             <TouchableOpacity
@@ -864,13 +874,13 @@ class SendToContact extends Component<
             <Image
               source={
                 this.state.derivativeAccountDetails &&
-                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                  this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../../assets/images/icons/icon_donation_hexa.png')
                   : serviceType == TEST_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_test.png')
-                  : serviceType == REGULAR_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_regular.png')
-                  : require('../../../assets/images/icons/icon_secureaccount.png')
+                    ? require('../../../assets/images/icons/icon_test.png')
+                    : serviceType == REGULAR_ACCOUNT
+                      ? require('../../../assets/images/icons/icon_regular.png')
+                      : require('../../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -880,6 +890,7 @@ class SendToContact extends Component<
             </View>
           </View>
         </View>
+
         <View style={styles.availableToSpendView}>
           <TouchableOpacity
             activeOpacity={10}
@@ -897,15 +908,15 @@ class SendToContact extends Component<
               }}
             >
               {this.state.derivativeAccountDetails &&
-              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType == 'TEST_ACCOUNT'
-                ? 'Test Account'
-                : serviceType == 'SECURE_ACCOUNT'
-                ? 'Savings Account'
-                : serviceType == 'REGULAR_ACCOUNT'
-                ? 'Checking Account'
-                : ''}
+                  ? 'Test Account'
+                  : serviceType == 'SECURE_ACCOUNT'
+                    ? 'Savings Account'
+                    : serviceType == 'REGULAR_ACCOUNT'
+                      ? 'Checking Account'
+                      : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -914,8 +925,8 @@ class SendToContact extends Component<
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
                   : prefersBitcoin
-                  ? ' sats )'
-                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                    ? ' sats )'
+                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
             {isFromAddressBook && (
@@ -928,150 +939,31 @@ class SendToContact extends Component<
             )}
           </TouchableOpacity>
         </View>
-        <View style={{ width: wp('85%'), alignSelf: 'center' }}>
-          {accountsState[serviceType].transfer.details &&
-          accountsState[serviceType].transfer.details.length > 0 ? (
-            <ScrollView horizontal={true}>
-              {accountsState[serviceType].transfer.details.map((item) => {
-                //console.log('ITEM in list', item);
-                return (
-                  <View style={styles.view1}>
-                    <View style={{ flexDirection: 'row' }}>
-                      {item.selectedContact &&
-                      item.selectedContact.account_name ? (
-                        <Image
-                          source={
-                            item.selectedContact.account_name ===
-                            'Checking Account'
-                              ? require('../../../assets/images/icons/icon_regular.png')
-                              : item.selectedContact.account_name ===
-                                'Savings Account'
-                              ? require('../../../assets/images/icons/icon_secureaccount.png')
-                              : item.selectedContact.account_name ===
-                                'Test Account'
-                              ? require('../../../assets/images/icons/icon_test_white.png')
-                              : item.selectedContact.account_name ===
-                                'Donation Account'
-                              ? require('../../../assets/images/icons/icon_donation_account.png')
-                              : require('../../../assets/images/icons/icon_user.png')
-                          }
-                          style={styles.circleShapeView}
-                        />
-                      ) : item.selectedContact.image ? (
-                        <Image
-                          source={item.selectedContact.image}
-                          style={styles.circleShapeView}
-                        />
-                      ) : (
-                        <View
-                          style={{
-                            ...styles.circleShapeView,
-                            backgroundColor: Colors.shadowBlue,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          {item.selectedContact &&
-                          item.selectedContact.firstName ? (
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: 13,
-                                lineHeight: 13, //... One for top and one for bottom alignment
-                              }}
-                            >
-                              {item && item.selectedContact
-                                ? nameToInitials(
-                                    item.selectedContact.firstName ===
-                                      'F&F request' &&
-                                      item.selectedContact
-                                        .contactsWalletName !== undefined &&
-                                      item.selectedContact
-                                        .contactsWalletName !== ''
-                                      ? `${item.selectedContact.contactsWalletName}'s wallet`
-                                      : item.selectedContact.firstName &&
-                                        item.selectedContact.lastName
-                                      ? item.selectedContact.firstName +
-                                        ' ' +
-                                        item.selectedContact.lastName
-                                      : item.selectedContact.firstName &&
-                                        !item.selectedContact.lastName
-                                      ? item.selectedContact.firstName
-                                      : !item.selectedContact.firstName &&
-                                        item.selectedContact.lastName
-                                      ? item.selectedContact.lastName
-                                      : '',
-                                  )
-                                : ''}
-                            </Text>
-                          ) : item &&
-                            item.selectedContact &&
-                            item.selectedContact.id ? (
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: 18,
-                                lineHeight: 18, //... One for top and one for bottom alignment
-                              }}
-                            >
-                              @
-                            </Text>
-                          ) : (
-                            <Image
-                              source={require('../../../assets/images/icons/icon_user.png')}
-                              style={styles.circleShapeView}
-                            />
-                          )}
-                        </View>
-                      )}
-                      <TouchableOpacity
-                        style={styles.closeMarkStyle}
-                        onPress={() => {
-                          setTimeout(() => {
-                            this.setState({ removeItem: item });
-                          }, 2);
-                          (this.refs.RemoveBottomSheet as any).snapTo(1);
-                        }}
-                      >
-                        <AntDesign
-                          size={16}
-                          color={Colors.blue}
-                          name={'closecircle'}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <Text style={styles.name} numberOfLines={1}>
-                      {item.selectedContact.firstName === 'F&F request' &&
-                      item.selectedContact.contactsWalletName !== undefined &&
-                      item.selectedContact.contactsWalletName !== ''
-                        ? `${item.selectedContact.contactsWalletName}'s wallet`
-                        : item.selectedContact.name ||
-                          item.selectedContact.account_name ||
-                          item.selectedContact.id}
-                    </Text>
-                    <Text style={styles.amountText}>
-                      {prefersBitcoin
-                        ? `${
-                            item.bitcoinAmount
-                              ? item.bitcoinAmount
-                              : bitcoinAmount
-                          }` +
-                          `${serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
-                        : CurrencySymbol +
-                          ' ' +
-                          `${
-                            item.currencyAmount
-                              ? item.currencyAmount
-                              : currencyAmount
-                          }`}
-                    </Text>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          ) : null}
+
+        <View>
+          <FlatList
+            horizontal
+            contentContainerStyle={styles.selectedRecipientsListContentContainer}
+            data={selectedRecipients}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: -24, y: 0 }}
+            renderItem={({ item: recipient }: { item: RecipientDescribing }) => {
+              return (
+                <SelectedRecipientListItem
+                  containerStyle={{ marginHorizontal: 12 }}
+                  recipient={recipient}
+                  onRemove={() => {
+                    this.setState({ removeItem: recipient });
+                  }}
+                />
+              );
+            }}
+          />
         </View>
+
         <View style={styles.dividerView} />
+
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -1106,16 +998,16 @@ class SendToContact extends Component<
                           />
                         </View>
                       ) : (
-                        <Image
-                          style={{
-                            ...styles.textBoxImage,
-                          }}
-                          source={getCurrencyImageByRegion(
-                            CurrencyCode,
-                            'gray',
-                          )}
-                        />
-                      )}
+                          <Image
+                            style={{
+                              ...styles.textBoxImage,
+                            }}
+                            source={getCurrencyImageByRegion(
+                              CurrencyCode,
+                              'gray',
+                            )}
+                          />
+                        )}
                     </View>
                     <View style={styles.convertText} />
                     <TextInput
@@ -1171,12 +1063,13 @@ class SendToContact extends Component<
                       </Text>
                     )}
                   </TouchableOpacity>
-                  {/* {renderUSDInputText()} */}
+
                   {isInvalidBalance ? (
                     <View style={{ marginLeft: 'auto' }}>
                       <Text style={styles.errorText}>Insufficient balance</Text>
                     </View>
                   ) : null}
+
                   {this.getIsMinimumAllowedStatus() ? (
                     <View style={{ marginLeft: 'auto' }}>
                       <Text style={styles.errorText}>
@@ -1220,8 +1113,8 @@ class SendToContact extends Component<
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
                           : serviceType == TEST_ACCOUNT
-                          ? 'Converted amount in t-sats'
-                          : 'Converted amount in sats'
+                            ? 'Converted amount in t-sats'
+                            : 'Converted amount in sats'
                       }
                       editable={prefersBitcoin}
                       value={bitcoinAmount}
@@ -1360,12 +1253,12 @@ class SendToContact extends Component<
                 >
                   {(!isConfirmDisabled &&
                     accountsState[serviceType].loading.transfer) ||
-                  (isConfirmDisabled &&
-                    accountsState[serviceType].loading.transfer) ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
-                  )}
+                    (isConfirmDisabled &&
+                      accountsState[serviceType].loading.transfer) ? (
+                      <ActivityIndicator size="small" />
+                    ) : (
+                      <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                    )}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
@@ -1394,7 +1287,7 @@ class SendToContact extends Component<
                             if (
                               accountsState[serviceType].transfer.details[i]
                                 .selectedContact.account_number ===
-                                selectedContact.account_number &&
+                              selectedContact.account_number &&
                               accountsState[serviceType].transfer.details[i]
                                 .selectedContact.type === selectedContact.type
                             )
@@ -1434,6 +1327,7 @@ class SendToContact extends Component<
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
+
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1489,13 +1383,13 @@ class SendToContact extends Component<
               title={'Send Unsuccessful'}
               info={
                 'There seems to be a problem' +
-                '\n' +
-                accountsState[serviceType].transfer.stage1.failed
+                  '\n' +
+                  accountsState[serviceType].transfer.stage1.failed
                   ? accountsState[serviceType].transfer.stage1.err ===
                     'Insufficient balance'
                     ? 'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
                     : 'Something went wrong; ' +
-                      accountsState[serviceType].transfer.stage1.err
+                    accountsState[serviceType].transfer.stage1.err
                   : 'Something went wrong; error in transfer state'
               }
               userInfo={accountsState[serviceType].transfer.details}
@@ -1671,6 +1565,7 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     marginRight: -20,
   },
+
   availableToSpendView: {
     alignSelf: 'center',
     width: wp('90%'),
@@ -1680,6 +1575,7 @@ const styles = StyleSheet.create({
     paddingBottom: hp('1.5%'),
     paddingTop: hp('1%'),
   },
+
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue(10),
@@ -1687,11 +1583,13 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     textAlign: 'center',
   },
+
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansItalic,
   },
+
   textTsats: {
     color: Colors.textColorGrey,
     fontSize: RFValue(7),
@@ -1704,6 +1602,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginRight: 10,
   },
+
   modalHeaderTitleView: {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
@@ -1716,6 +1615,7 @@ const styles = StyleSheet.create({
     marginBottom: hp('0.5%'),
     width: wp('90%'),
   },
+
   textBoxView: {
     borderWidth: 0.5,
     borderRadius: 10,
@@ -1759,33 +1659,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
   },
+
   buttonText: {
     color: Colors.white,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
-  circleShapeView: {
-    width: wp('14%'),
-    height: wp('14%'),
-    borderRadius: wp('14%') / 2,
-    borderColor: Colors.white,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.7,
-    shadowColor: Colors.borderColor,
-    elevation: 10,
-  },
-  closeMarkStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    elevation: 10,
+
+  selectedRecipientsListContentContainer: {
+    paddingVertical: 24,
   },
 });

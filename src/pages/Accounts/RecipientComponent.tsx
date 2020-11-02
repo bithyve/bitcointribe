@@ -31,7 +31,7 @@ function RecipientComponent(props) {
 
 
   const getCorrectAmountCurrency = () => {
-    if (!prefersBTC === false) {
+    if (prefersBTC == false) {
       return (
         props.item.currencyAmount &&
         props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()
