@@ -6,12 +6,11 @@ import {
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
-import RestoreAndRecoverWallet from '../pages/RestoreAndRecoverWallet';
+import WalletInitializationScreen from '../pages/WalletInitializationScreen';
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList';
 import NewWalletName from '../pages/NewWalletName';
 import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
-import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import ReLogin from '../pages/ReLogin';
 import ManageBackup from '../pages/ManageBackup';
@@ -19,15 +18,11 @@ import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
 import SecondaryDevice from '../pages/ManageBackup/SecondaryDevice';
 import TrustedContacts from '../pages/ManageBackup/TrustedContacts';
-import Cloud from '../pages/ManageBackup/Cloud';
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
-import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
+import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
-import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
-import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
-import EmailModalContents from '../pages/EmailModalContents';
 import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
@@ -42,14 +37,12 @@ import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSucces
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
-import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
 import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory';
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
 import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
-import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
@@ -80,17 +73,16 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewWalletQuestion,
-    RestoreAndRecoverWallet,
+    WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
-    QuestionRecovery,
+    RecoveryQuestion: RecoveryQuestionScreen,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
-    RestoreWalletUsingDocuments,
     RestoreWalletByContacts,
     RecoveryCommunication,
-    ShareRecoveryOTP,
     NewOwnQuestions,
     NewRecoveryOwnQuestions,
+    QRScanner: QRScannerScreen,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -110,12 +102,10 @@ const SetupNavigator = createStackNavigator(
 const MODAL_ROUTES = [
   'SecondaryDevice',
   'TrustedContacts',
-  'Cloud',
   'CustodianRequestOTP',
   'CustodianRequestAccepted',
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
-  'RecoveryRequestOTP',
   'Intermediate',
 ];
 
@@ -138,7 +128,6 @@ const HomeNavigator = createStackNavigator(
     ManageBackup,
     SecondaryDevice,
     TrustedContacts,
-    Cloud,
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
@@ -151,10 +140,6 @@ const HomeNavigator = createStackNavigator(
       },
     },
     TwoFAToken,
-    RecoveryRequestOTP,
-    RestoreByCloudQrCodeContents,
-    EmailModalContents,
-    QRScanner: QRScannerScreen,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,
@@ -174,7 +159,6 @@ const HomeNavigator = createStackNavigator(
     SecurityQuestionHistory,
     SettingGetNewPin,
     ContactsListForAssociateContact,
-    LostTwoFA,
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,

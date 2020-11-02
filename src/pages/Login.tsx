@@ -208,7 +208,7 @@ export default function Login(props) {
             });
           }, LOADER_MESSAGE_TIME);
         } else {
-          props.navigation.replace('RestoreAndRecoverWallet');
+          props.navigation.replace('WalletInitialization');
         }
       });
     }

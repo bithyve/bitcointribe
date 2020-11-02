@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import { RNCamera } from 'react-native-camera';
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
-  coverImageSource?: NodeRequire;
+  coverImageSource?: ImageSourcePropType;
   onCodeScanned: (scanEvent) => void;
 };
 

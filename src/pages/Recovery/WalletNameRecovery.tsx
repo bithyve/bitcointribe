@@ -100,7 +100,7 @@ export default function WalletNameRecovery(props) {
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={() =>
-                props.navigation.navigate("QuestionRecovery", { walletName })
+                props.navigation.navigate("RecoveryQuestion", { walletName })
               }
               style={styles.buttonView}
             >

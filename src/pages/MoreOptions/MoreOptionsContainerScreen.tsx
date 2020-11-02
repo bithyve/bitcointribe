@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView, ImageSourcePropType } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import Colors from '../../common/Colors';
@@ -14,7 +14,7 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
 }
@@ -52,6 +52,8 @@ const menuOptions: MenuOption[] = [
   },
 ];
 
+const listItemKeyExtractor = (item: MenuOption) => item.title;
+
 const MoreOptionsContainerScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
@@ -69,6 +71,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({
       <View style={{ flex: 1 }}>
         <FlatList
           data={menuOptions}
+          keyExtractor={listItemKeyExtractor}
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: Colors.white }}>
               <View style={styles.separatorView} />

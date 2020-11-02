@@ -751,7 +751,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         <View style={styles.modalContentContainer}>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : ''}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             enabled
           >
             <ScrollView nestedScrollEnabled={true}>
