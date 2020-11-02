@@ -18,7 +18,7 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
-import CoveredQRCodeScanner from '../../components/CoveredQRCodeScanner';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 import NavStyles from '../../common/Styles/NavStyles';
 
 export default function RestoreByCloudQRCodeContents(props) {
