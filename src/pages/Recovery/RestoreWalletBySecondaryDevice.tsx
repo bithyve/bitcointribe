@@ -40,7 +40,7 @@ import ModalHeader from '../../components/ModalHeader';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import QRCode from 'react-native-qrcode-svg';
-
+import config from '../../bitcoin/HexaConfig';
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -61,13 +61,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-      JSON.stringify({
-        ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
-        type: 'recoveryQR',
-        ver: DeviceInfo.getVersion(),
-      }),
-    )
+        JSON.stringify({
+          ...REQUEST_DETAILS,
+          requester: WALLET_SETUP.walletName,
+          type: 'recoveryQR',
+          ver: DeviceInfo.getVersion(),
+        }),
+      )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
@@ -95,6 +95,49 @@ export default function RestoreWalletBySecondaryDevice(props) {
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorReceiving(null));
   }
+
+  const getQrCodeData = useCallback((qrData) => {
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'ReverseRecoveryQR':
+          const recoveryRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.UPLOADED_AT,
+            isQR: true,
+          };
+
+          if (
+            Date.now() - recoveryRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
+            Alert.alert(
+              `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
+              `Please ask your Guardian to initiate a new ${
+                recoveryRequest.isQR ? 'QR' : 'Link'
+              }`,
+            );
+          }
+
+          // downloadSecret(index, recoveryRequest.publicKey);
+
+          dispatch(
+            downloadMShare(recoveryRequest.publicKey, null, 'recovery', 0),
+          );
+
+          setTimeout(() => {
+            props.navigation.navigate('RestoreSelectedContactsList');
+          }, 1000);
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Toast('Invalid QR');
+    }
+  }, []);
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -133,7 +176,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
               props.navigation.goBack();
               // props.navigation.navigate('RestoreSelectedContactsList');
             }}
-            hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
@@ -152,7 +195,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <View style={{ flex: 2 }}>
             <HeaderTitle
               isKnowMoreButton={true}
-              onPressKnowMore={() => { }}
+              onPressKnowMore={() => {}}
               firstLineTitle={'Restore wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
@@ -167,8 +210,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-                <QRCode value={secondaryQR} size={hp('27%')} />
-              )}
+              <QRCode value={secondaryQR} size={hp('27%')} />
+            )}
             {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 
@@ -190,7 +233,9 @@ export default function RestoreWalletBySecondaryDevice(props) {
                 }}
                 disabled={!!META_SHARE}
                 style={{
-                  backgroundColor: Colors.blue,
+                  backgroundColor: !!META_SHARE
+                    ? Colors.lightBlue
+                    : Colors.blue,
                   borderRadius: 10,
                   width: wp('50%'),
                   height: wp('13%'),
@@ -206,6 +251,36 @@ export default function RestoreWalletBySecondaryDevice(props) {
                   }}
                 >
                   Yes, I have scanned
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate('QRScanner', {
+                    onCodeScanned: getQrCodeData,
+                  });
+                }}
+                disabled={!!META_SHARE}
+                style={{
+                  backgroundColor: !!META_SHARE
+                    ? Colors.lightBlue
+                    : Colors.blue,
+                  borderRadius: 10,
+                  marginTop: 10,
+                  width: wp('50%'),
+                  height: wp('13%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansMedium,
+                  }}
+                >
+                  Scan
                 </Text>
               </TouchableOpacity>
               {/* <Button
