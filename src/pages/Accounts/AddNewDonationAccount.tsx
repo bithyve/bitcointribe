@@ -92,8 +92,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
-      this.setState({ disableForm: false });
-      this.props.navigation.navigate('Accounts', {
+      this.props.navigation.navigate('AccountDetails', {
         serviceType,
         index: this.props.cardData.length - 1,
       });

@@ -818,7 +818,7 @@ const VoucherScanner = (props) => {
       return (
         <VoucherRedeemSuccess
           onPressRedeem={() => {
-            props.navigation.navigate('Accounts', {
+            props.navigation.navigate('AccountDetails', {
               serviceType:
                 selectedAccount.accountName === 'Test Account'
                   ? TEST_ACCOUNT

@@ -1133,7 +1133,7 @@ class SendConfirmation extends Component<
               (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
             this.props.clearTransfer(this.serviceType);
-            navigation.navigate('Accounts', {
+            navigation.navigate('AccountDetails', {
               serviceType: this.serviceType,
               index:
                 this.serviceType === TEST_ACCOUNT
@@ -1175,7 +1175,7 @@ class SendConfirmation extends Component<
                 //         : false,
                 //   })
 
-                navigation.navigate('Accounts', {
+                navigation.navigate('AccountDetails', {
                   serviceType: this.serviceType,
                   index: this.state.derivativeAccountDetails
                     ? 3
@@ -1196,7 +1196,7 @@ class SendConfirmation extends Component<
             // onPressHeader={() => {
             //   if (this.refs.SendSuccessBottomSheet as any)
             //     (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-            //   navigation.navigate('Accounts');
+            //   navigation.navigate('AccountDetails');
             // }}
             />
           )}
@@ -1227,7 +1227,7 @@ class SendConfirmation extends Component<
                 this.props.clearTransfer(this.serviceType);
                 if (this.refs.SendUnSuccessBottomSheet as any)
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-                navigation.navigate('Accounts');
+                navigation.navigate('AccountDetails');
               }}
               isUnSuccess={true}
             />

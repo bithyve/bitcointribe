@@ -90,7 +90,7 @@ export default function TwoFAToken(props) {
                 : false,
           }),
         );
-        props.navigation.navigate('Accounts');
+        props.navigation.navigate('AccountDetails');
       }}
       transactionId={transfer.txid}
       transactionDateTime={Date()}
@@ -178,7 +178,7 @@ export default function TwoFAToken(props) {
           dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
+          props.navigation.navigate('AccountDetails');
         }}
         isUnSuccess={true}
       />

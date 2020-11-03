@@ -110,7 +110,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
-      this.props.navigation.navigate('Accounts');
+      this.props.navigation.navigate('AccountDetails');
     }
   };
 
@@ -508,7 +508,7 @@ class AddNewAccount extends PureComponent<
                   accountNumber,
                   this.state.accountName,
                 );
-                this.props.navigation.navigate('Accounts');
+                this.props.navigation.navigate('AccountDetails');
               }
             }}
           >
