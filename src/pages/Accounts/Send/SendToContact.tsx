@@ -15,54 +15,54 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
+import Colors from '../../../common/Colors';
+import Fonts from '../../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../../components/ToggleSwitch';
-import { nameToInitials } from '../../common/CommonFunctions';
+import ToggleSwitch from '../../../components/ToggleSwitch';
+import { nameToInitials } from '../../../common/CommonFunctions';
 import {
   transferST1,
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
   setAverageTxFee,
-} from '../../store/actions/accounts';
-import { currencyKindSet } from '../../store/actions/preferences';
-import { syncTrustedChannels } from '../../store/actions/trustedContacts';
+} from '../../../store/actions/accounts';
+import { currencyKindSet } from '../../../store/actions/preferences';
+import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { UsNumberFormat } from '../../common/utilities';
+import { UsNumberFormat } from '../../../common/utilities';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../../components/ModalHeader';
-import RemoveSelectedTransaction from './RemoveSelectedTrasaction';
-import SendConfirmationContent from './SendConfirmationContent';
+import ModalHeader from '../../../components/ModalHeader';
+import RemoveSelectedTransaction from '../RemoveSelectedTrasaction';
+import SendConfirmationContent from '../SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../../common/constants/serviceTypes';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AccountSelectionModalContents from './AccountSelectionModalContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import FiatCurrencies from '../../common/FiatCurrencies';
+import AccountSelectionModalContents from '../AccountSelectionModalContents';
+import SmallHeaderModal from '../../../components/SmallHeaderModal';
+import BottomInfoBox from '../../../components/BottomInfoBox';
+import FiatCurrencies from '../../../common/FiatCurrencies';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
-import { getCurrencyImageName } from '../../common/CommonFunctions/index';
-import config from '../../bitcoin/HexaConfig';
+import { getCurrencyImageByRegion } from '../../../common/CommonFunctions/index';
+import { getCurrencyImageName } from '../../../common/CommonFunctions/index';
+import config from '../../../bitcoin/HexaConfig';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 
 const currencyCode = [
   'BRL',
@@ -849,12 +849,12 @@ class SendToContact extends Component<
               source={
                 this.state.derivativeAccountDetails &&
                   this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                  ? require('../../assets/images/icons/icon_donation_hexa.png')
+                  ? require('../../../assets/images/icons/icon_donation_hexa.png')
                   : serviceType == TEST_ACCOUNT
-                    ? require('../../assets/images/icons/icon_test.png')
+                    ? require('../../../assets/images/icons/icon_test.png')
                     : serviceType == REGULAR_ACCOUNT
-                      ? require('../../assets/images/icons/icon_regular.png')
-                      : require('../../assets/images/icons/icon_secureaccount.png')
+                      ? require('../../../assets/images/icons/icon_regular.png')
+                      : require('../../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -929,17 +929,17 @@ class SendToContact extends Component<
                               source={
                                 item.selectedContact.account_name ===
                                   'Checking Account'
-                                  ? require('../../assets/images/icons/icon_regular.png')
+                                  ? require('../../../assets/images/icons/icon_regular.png')
                                   : item.selectedContact.account_name ===
                                     'Savings Account'
-                                    ? require('../../assets/images/icons/icon_secureaccount.png')
+                                    ? require('../../../assets/images/icons/icon_secureaccount.png')
                                     : item.selectedContact.account_name ===
                                       'Test Account'
-                                      ? require('../../assets/images/icons/icon_test_white.png')
+                                      ? require('../../../assets/images/icons/icon_test_white.png')
                                       : item.selectedContact.account_name ===
                                         'Donation Account'
-                                        ? require('../../assets/images/icons/icon_donation_account.png')
-                                        : require('../../assets/images/icons/icon_user.png')
+                                        ? require('../../../assets/images/icons/icon_donation_account.png')
+                                        : require('../../../assets/images/icons/icon_user.png')
                               }
                               style={styles.circleShapeView}
                             />
@@ -1004,7 +1004,7 @@ class SendToContact extends Component<
                                       </Text>
                                     ) : (
                                       <Image
-                                        source={require('../../assets/images/icons/icon_user.png')}
+                                        source={require('../../../assets/images/icons/icon_user.png')}
                                         style={styles.circleShapeView}
                                       />
                                     )}
@@ -1102,10 +1102,7 @@ class SendToContact extends Component<
                             )}
                           />
                         )}
-                      {/* <Image
-            style={styles.textBoxImage}
-            source={require('../../assets/images/icons/dollar_grey.png')}
-          /> */}
+
                     </View>
                     <View style={styles.convertText} />
                     <TextInput
@@ -1192,7 +1189,7 @@ class SendToContact extends Component<
                     <View style={styles.amountInputImage}>
                       <Image
                         style={styles.textBoxImage}
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        source={require('../../../assets/images/icons/icon_bitcoin_gray.png')}
                       />
                     </View>
                     <View style={styles.enterAmountView} />
