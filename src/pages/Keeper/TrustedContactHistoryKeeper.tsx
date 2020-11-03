@@ -665,7 +665,7 @@ const TrustedContactHistoryKeeper = (props) => {
             keeperInfoTemp[i].publicKey = '';
             keeperInfoTemp[i].ephemeralAddress = '';
             keeperInfoTemp[i].type = 'contact';
-            keeperInfoTemp[i].data = chosenContact;
+            keeperInfoTemp[i].data = contact;
             break;
           }
           else {
@@ -685,7 +685,7 @@ const TrustedContactHistoryKeeper = (props) => {
           publicKey: '',
           ephemeralAddress: '',
           type: 'contact',
-          data: chosenContact
+          data: contact 
         }
         keeperInfo.push(obj);
       }
