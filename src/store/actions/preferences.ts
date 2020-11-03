@@ -23,6 +23,7 @@ export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS';
 export const CARD_DATA = 'CARD_DATA';
 export const CLOUD_BACKUP_DATA_STATUS = 'CLOUD_BACKUP_DATA_STATUS';
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN';
+export const IS_BACKUP_PROCESSING = 'IS_BACKUP_PROCESSING';
 
 export const setCurrencyCode = (data) => {
   return {
@@ -173,5 +174,12 @@ export const setCardData = (data) => {
   return {
     type: CARD_DATA,
     payload: { cardData: data },
+  };
+};
+
+export const setIsBackupProcessing = (data) => {
+  return {
+    type: IS_BACKUP_PROCESSING,
+    payload: { status: data },
   };
 };

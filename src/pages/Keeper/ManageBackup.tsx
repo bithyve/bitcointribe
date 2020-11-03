@@ -32,7 +32,7 @@ import {
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
-import { setCloudBackupStatus } from '../../store/actions/preferences';
+import { setCloudBackupStatus, setIsBackupProcessing } from '../../store/actions/preferences';
 import idx from 'idx';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
@@ -72,6 +72,8 @@ interface ManageBackupStateTypes {
 interface ManageBackupPropsTypes {
   navigation: any;
   setCloudBackupStatus: any;
+  setIsBackupProcessing: any;
+  isBackupProcessing: any;
   cloudBackupStatus: any;
   walletName: string;
   regularAccount: RegularAccount;
@@ -246,8 +248,12 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    let cloudObject = new CloudBackup({dataObject: data, callBack: this.setCloudBackupStatus, share});
-    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
+    if(!this.props.isBackupProcessing.status){
+      this.props.setIsBackupProcessing({ status: true });
+      let cloudObject = new CloudBackup({dataObject: data, callBack: this.setCloudBackupStatus, share});
+      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
+    }
+    
   };
 
   setCloudBackupStatus = (share) => {
@@ -260,6 +266,7 @@ class ManageBackup extends Component<
     ) {
       this.updateHealthForCloud(share);
     }
+    this.props.setIsBackupProcessing({ status: false });
   };
 
   updateHealthForCloud = (share?) => {
@@ -1004,6 +1011,8 @@ const mapStateToProps = (state) => {
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     cloudBackupStatus:
       idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+      isBackupProcessing:
+      idx(state, (_) => _.preferences.isBackupProcessing) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
@@ -1027,6 +1036,7 @@ export default withNavigationFocus(
     checkMSharesHealth,
     initLevelTwo,
     updateMSharesHealth,
+    setIsBackupProcessing
   })(ManageBackup),
 );
 

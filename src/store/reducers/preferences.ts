@@ -13,7 +13,8 @@ import {
   UPDATE_APPLICATION_STATUS, 
   UPDATE_LAST_SEEN,
   CLOUD_BACKUP_DATA_STATUS,
-  CARD_DATA
+  CARD_DATA,
+  IS_BACKUP_PROCESSING
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from '../constants';
@@ -38,7 +39,8 @@ const initialState = ip.freeze({
   applicationStatus: null,
   lastSeen: null,
   cloudBackupStatus: false,
-  cardData: null
+  cardData: null,
+  isBackupProcessing: false
 })
 
 export default (state = initialState, { type, payload }) => {
@@ -124,6 +126,12 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         cardData: payload.cardData,
       };
+
+      case IS_BACKUP_PROCESSING:
+        return {
+          ...state,
+          isBackupProcessing: payload.status,
+        };
     default:
       return state;
   }

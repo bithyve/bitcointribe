@@ -26,13 +26,13 @@ import {
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
-import QRCodeThumbnail from '../../pages/Accounts/QRCodeThumbnail';
 import idx from 'idx';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import DeviceInfo from 'react-native-device-info';
 import ConfirmSweepFunds from './ConfirmSweepFunds';
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 
 interface SweepFundUseExitKeyStateTypes {
   listData: any[];
@@ -140,10 +140,8 @@ SweepFundUseExitKeyPropsTypes,
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-        <QRCodeThumbnail
-                  isOpenCameraFlag={openCameraFlag}
-                  onQrScan={(qrData) => this.barcodeRecognized(qrData)}
-        />
+        <CoveredQRCodeScanner onCodeScanned={this.barcodeRecognized} />
+
         
           {listData.map((item, index) => {
             return (
