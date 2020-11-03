@@ -153,7 +153,7 @@ const ReceivingAddress = (props) => {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA set up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
+                "Please ensure that you have 2FA set up (preferably on your Keeper device). A 2FA code will be required to send bitcoin from the Savings Account."
               }
             />
 
