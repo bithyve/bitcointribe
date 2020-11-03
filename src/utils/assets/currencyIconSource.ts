@@ -1,18 +1,26 @@
-const currencyIconBasePath = '../../assets/images/currencySymbols/';
-const iconPrefixGray = 'currency_icon_gray_';
-const iconPrefixDark = 'currency_icon_dark_';
-const iconExtension = '.png';
-const validCurrencies = ['USD', 'GBP'];
+const iconPrefixGray = 'gray_';
+const iconPrefixDark = 'dark_';
+const defaultSymbol = 'blank';
 
-export default function getFormattedStringFromQRString(
+//Add all valid currencies and the location below
+
+const currencySymbols = {
+  dark_USD: require('../../assets/images/currencySymbols/currency_icon_dark_USD.png'),
+  gray_USD: require('../../assets/images/currencySymbols/currency_icon_gray_USD.png'),
+  dark_GBP: require('../../assets/images/currencySymbols/currency_icon_dark_GBP.png'),
+  gray_GBP: require('../../assets/images/currencySymbols/currency_icon_gray_GBP.png'),
+  dark_blank: require('../../assets/images/currencySymbols/currency_icon_dark_blank.png'),
+  gray_blank: require('../../assets/images/currencySymbols/currency_icon_gray_blank.png'),
+};
+
+export default function currencyIconSource(
   currencyCode: string | null,
   dark: boolean | false,
 ): string {
-  let imageName = 'blank';
-
   const iconPrefix = dark ? iconPrefixDark : iconPrefixGray;
 
-  if (validCurrencies.includes(currencyCode)) imageName = currencyCode;
-
-  return `${currencyIconBasePath}${iconPrefix}${imageName}${iconExtension}`;
+  return (
+    currencySymbols[iconPrefix + currencyCode] ||
+    currencySymbols[iconPrefix + defaultSymbol]
+  );
 }
