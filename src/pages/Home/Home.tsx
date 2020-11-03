@@ -96,6 +96,7 @@ import { Button } from 'react-native-elements';
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility';
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
@@ -652,6 +653,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
+    const { s3Service, initHealthCheck, navigation } = this.props;
+
     this.closeBottomSheet();
     this.updateAccountCardData();
     this.getBalances();
@@ -666,8 +669,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-    const { s3Service, initHealthCheck } = this.props;
     const { healthCheckInitialized } = s3Service.sss;
+
     if (!healthCheckInitialized) {
       initHealthCheck();
     }
@@ -677,6 +680,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal();
+
+    const unhandledDeepLinkURL = navigation.getParam('unhandledDeepLinkURL');
+
+    if (unhandledDeepLinkURL) {
+      navigation.setParams({ unhandledDeepLinkURL: null });
+      this.handleDeepLinking(unhandledDeepLinkURL);
+    }
   };
 
   getNewTransactionNotifications = async () => {
@@ -902,24 +912,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
-    this.props.navigation.popToTop();
-
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       this.openBottomSheet(kind, snapIndex);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
   }
 
   handleDeepLinkEvent = async ({ url }) => {
-    const { navigation, isFocused } = this.props;
-    // if user is in any other screen before opening
-    // deep link , we will navigate user to home first
-    if (!isFocused) {
-      navigation.navigate('Home');
-    }
-
     console.log('Home::handleDeepLinkEvent::URL: ', url);
 
-    this.handleDeepLinking(url);
+    const { navigation, isFocused } = this.props;
+
+    // If the user is on one of Home's nested routes, and a
+    // deep link is opened, we will navigate back to Home first.
+    if (!isFocused) {
+      navigation.dispatch(resetToHomeAction({
+        unhandledDeepLinkURL: url,
+      }));
+    } else {
+      this.handleDeepLinking(url);
+    }
   };
 
   handleDeepLinking = async (url: string | null) => {
@@ -1113,11 +1124,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.scheduleNotification();
         })
         .catch(() => {
-          // User has rejected permissions
-          //console.log(
-          // 'PERMISSION REQUEST :: notification permission rejected',
-          //  error,
-          //);
         });
     } else {
       this.createNotificationListeners();
