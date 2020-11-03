@@ -30,7 +30,7 @@ const HomeQRScannerScreen: React.FC<Props> = ({
   function handleBarcodeRecognized({ data: dataString }: { data: string }) {
     const onCodeScanned = navigation.getParam('onCodeScanned');
     if (typeof onCodeScanned === 'function') {
-      let data = getFormattedStringFromQRString(dataString)
+      let data = getFormattedStringFromQRString(dataString);
       onCodeScanned(data);
     }
 

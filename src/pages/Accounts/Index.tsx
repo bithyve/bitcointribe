@@ -1215,11 +1215,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 this.setState({ transactionItem: item });
                               }, 10);
                             }
-                            // props.navigation.navigate('TransactionDetails', {
-                            //   item,
-                            //   serviceType,
-                            //   getServiceType: getServiceType,
-                            // })
                           }
                           style={styles.transactionModalElementView}
                         >

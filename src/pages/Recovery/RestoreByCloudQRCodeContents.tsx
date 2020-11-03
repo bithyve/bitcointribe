@@ -20,6 +20,7 @@ import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 import NavStyles from '../../common/Styles/NavStyles';
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
 
 export default function RestoreByCloudQRCodeContents(props) {
   const [qrData, setQrData] = useState('');
@@ -36,7 +37,7 @@ export default function RestoreByCloudQRCodeContents(props) {
   );
   console.log('unableRecoverShareFromQR', unableRecoverShareFromQR);
 
-  const getQrCodeData = (qrData) => {
+  const handleQRDataScanned = (qrData) => {
     let tempArray = qrDataArray;
     let shareCode = qrData.substring(0, 2);
     if (shareCode !== 'e0' && shareCode !== 'c0') {
@@ -224,7 +225,9 @@ export default function RestoreByCloudQRCodeContents(props) {
             Scan a Bitcoin address or any Hexa QR
           </Text>
 
-          <CoveredQRCodeScanner onCodeScanned={getQrCodeData} />
+          <CoveredQRCodeScanner onCodeScanned={({ data: dataString }: { data: string }) => {
+            handleQRDataScanned(getFormattedStringFromQRString(dataString));
+          }} />
         </View>
 
         <View
