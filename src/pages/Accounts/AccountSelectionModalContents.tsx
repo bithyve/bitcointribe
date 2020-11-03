@@ -31,7 +31,7 @@ export default function AccountSelectionModalContents(props) {
 			isSelected: false
     },
   ]);
-    
+
   useEffect(()=>{
     accountData[0].accountBalance = RegularBalance;
     accountData[1].accountBalance = SavingBalance;
@@ -60,16 +60,16 @@ export default function AccountSelectionModalContents(props) {
         {accountData.map((item, index)=>{
         return <View style={{flexDirection: 'row', alignItems:'center', marginLeft: wp('2%'), marginTop: index==0 ? wp('4%') : wp('2%'), marginBottom: index==1 ? wp('4%') : wp('2%')}}>
           <View style={{width: wp('10%'), height: wp('10%'), justifyContent:'center', alignItems:'center', }}>
-            <RadioButton 
+            <RadioButton
               size={15}
               color={Colors.lightBlue}
               borderColor={Colors.borderColor}
               isChecked={item.isSelected}
-              onpress={() => onAccountSelection(item)} 
+              onpress={() => onAccountSelection(item)}
             />
           </View>
           <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => onAccountSelection(item)}  style={{flexDirection:'row', backgroundColor: Colors.backgroundColor1, width: wp('80%'), padding: wp('3%'), borderRadius: 10}}>
-            <View style={{width: wp('17%'), height: wp("17%"), backgroundColor: Colors.backgroundColor, borderRadius: wp('17%')/2, justifyContent:'center', alignItems:'center', borderWidth:2, borderColor: Colors.white, 
+            <View style={{width: wp('17%'), height: wp("17%"), backgroundColor: Colors.backgroundColor, borderRadius: wp('17%')/2, justifyContent:'center', alignItems:'center', borderWidth:2, borderColor: Colors.white,
             shadowOffset: {
               width: 0,
               height: item.isSelected ? 5 : 0,

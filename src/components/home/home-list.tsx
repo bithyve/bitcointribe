@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   View,
   Text,
@@ -27,18 +27,12 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useDispatch } from 'react-redux';
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
 
-const currencyCode = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
-];
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
@@ -62,13 +56,20 @@ const HomeList = ({
   Items,
   navigation,
   getIconByAccountType,
-  switchOn,
   accounts,
-  CurrencyCode,
   balances,
   exchangeRates,
   addNewDisable,
 }) => {
+  const dispatch = useDispatch();
+  const currencyCode = useCurrencyCode();
+  const currencyKind: CurrencyKind = useCurrencyKind();
+
+  const prefersBitcoin = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
+
   return (
     <View>
       {Items.item.map((value) => {
@@ -130,7 +131,7 @@ const HomeList = ({
           return (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Accounts', {
+                navigation.navigate('AccountDetails', {
                   serviceType: value.accountType,
                   index: value.id - 1,
                 });
@@ -205,21 +206,21 @@ const HomeList = ({
                         marginTop: hp('1%'),
                       }}
                     >
-                      {value.accountType === TEST_ACCOUNT || switchOn ? (
+                      {value.accountType === TEST_ACCOUNT || prefersBitcoin ? (
                         <Image
                           style={styles.cardBitCoinImage}
                           source={value.bitcoinicon}
                         />
-                      ) : currencyCode.includes(CurrencyCode) ? (
+                      ) : materialIconCurrencyCodes.includes(currencyCode) ? (
                         setCurrencyCodeToImage(
-                          getCurrencyImageName(CurrencyCode),
+                          getCurrencyImageName(currencyCode),
                           'light_blue',
                         )
                       ) : (
                         <Image
                           style={styles.cardBitCoinImage}
                           source={getCurrencyImageByRegion(
-                            CurrencyCode,
+                            currencyCode,
                             'light_blue',
                           )}
                         />
@@ -231,7 +232,7 @@ const HomeList = ({
                             : styles.cardAmountTextGrey
                         }
                       >
-                        {switchOn
+                        {prefersBitcoin
                           ? config.EJECTED_ACCOUNTS.includes(value.subType)
                             ? UsNumberFormat(value.amount)
                             : value.accountType === TEST_ACCOUNT
@@ -243,7 +244,7 @@ const HomeList = ({
                             exchangeRates
                           ? (
                               (value.amount / 1e8) *
-                              exchangeRates[CurrencyCode].last
+                              exchangeRates[currencyCode].last
                             ).toFixed(2)
                           : value.accountType === TEST_ACCOUNT
                           ? UsNumberFormat(balances.testBalance)
@@ -251,21 +252,21 @@ const HomeList = ({
                             exchangeRates
                           ? (
                               (balances.regularBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
+                              exchangeRates[currencyCode].last
                             ).toFixed(2)
                           : exchangeRates
                           ? (
                               (balances.secureBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
+                              exchangeRates[currencyCode].last
                             ).toFixed(2)
                           : value.amount}
                       </Text>
                       <Text style={styles.cardAmountUnitText}>
-                        {switchOn
+                        {prefersBitcoin
                           ? value.unit
                           : value.accountType === TEST_ACCOUNT
                           ? value.unit
-                          : CurrencyCode.toLocaleLowerCase()}
+                          : currencyCode.toLocaleLowerCase()}
                       </Text>
                     </View>
                   )}

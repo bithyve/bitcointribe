@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
+import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native';
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { RNCamera } from 'react-native-camera';
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
-  coverImageSource?: NodeRequire;
+  coverImageSource?: ImageSourcePropType;
   onCodeScanned: (scanEvent) => void;
 };
 
@@ -33,7 +33,7 @@ const CameraFrameIndicators: React.FC = () => {
 
 const CoveredQRCodeScanner: React.FC<Props> = ({
   containerStyle = {},
-  coverImageSource = require('../assets/images/icons/iPhone-QR.png'),
+  coverImageSource = require('../../assets/images/icons/iPhone-QR.png'),
   onCodeScanned,
 }: Props) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -51,6 +51,8 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
     );
   };
 
+  // TODO: It would probably be good to abstract this into its own component file
+  // so we can use it independently of the toggleable cover overlay.
   const Scanner: React.FC = () => {
     const cameraRef = useRef<RNCamera>();
 
@@ -84,6 +86,10 @@ const styles = StyleSheet.create({
   rootContainer: {
     overflow: 'hidden',
     borderRadius: 20,
+    alignSelf: 'center',
+    marginBottom: 16,
+    width: widthPercentageToDP(90),
+    height: widthPercentageToDP(90),
   },
 });
 

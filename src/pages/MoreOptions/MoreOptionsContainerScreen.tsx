@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView, ImageSourcePropType } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
+import openLink from '../../utils/OpenLink';
 
 export type Props = {
   navigation: any;
@@ -13,7 +14,7 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
 }
@@ -51,6 +52,8 @@ const menuOptions: MenuOption[] = [
   },
 ];
 
+const listItemKeyExtractor = (item: MenuOption) => item.title;
+
 const MoreOptionsContainerScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
@@ -63,21 +66,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({
     }
   }
 
-  function openLink(url: string) {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  }
-
   return (
     <SafeAreaView style={styles.modalContentContainer}>
       <View style={{ flex: 1 }}>
         <FlatList
           data={menuOptions}
+          keyExtractor={listItemKeyExtractor}
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: Colors.white }}>
               <View style={styles.separatorView} />

@@ -29,7 +29,7 @@ const SmallNavHeaderCloseButton: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   rootContainer: {
-    paddingLeft: 16,
+    paddingHorizontal: 20,
   },
 });
 

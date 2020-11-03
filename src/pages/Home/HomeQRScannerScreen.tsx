@@ -3,8 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
 import ListStyles from '../../common/Styles/ListStyles';
-import CoveredQRCodeScanner from '../../components/CoveredQRCodeScanner';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 
 // TODO: The patterns here are meant to be the starting point for the way other
 // other screens that render QRCode scanners should lay out their components and
@@ -42,10 +41,7 @@ const HomeQRScannerScreen: React.FC<Props> = ({
     <View style={styles.rootContainer}>
       <HeaderSection />
 
-      <CoveredQRCodeScanner
-        containerStyle={styles.scannerContainer}
-        onCodeScanned={handleBarcodeRecognized}
-      />
+      <CoveredQRCodeScanner onCodeScanned={handleBarcodeRecognized} />
 
       <BottomInfoBox
         style
@@ -63,12 +59,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  scannerContainer: {
-    alignSelf: 'center',
-    marginBottom: 16,
-    width: widthPercentageToDP(90),
-    height: widthPercentageToDP(90),
-  },
+  // scannerContainer: {
+  //   alignSelf: 'center',
+  //   marginBottom: 16,
+  //   width: widthPercentageToDP(90),
+  //   height: widthPercentageToDP(90),
+  // },
 });
 
 export default HomeQRScannerScreen;

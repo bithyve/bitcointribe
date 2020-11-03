@@ -11,11 +11,6 @@ export const nameToInitials = fullName => {
     ].charAt(0)}`;
 };
 
-export const validateEmail = email => {
-  let reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return reg.test(email);
-};
-
 export const getCurrencyImageName = (currencyCodeValue) => {
   switch (currencyCodeValue) {
     case 'BRL':
@@ -34,17 +29,15 @@ export const getCurrencyImageName = (currencyCodeValue) => {
     case 'INR':
       return 'currency-inr';
     case 'EUR':
-      return 'currency-eur';       
+      return 'currency-eur';
     default:
       break;
   }
 };
 
-
 export const isEmpty = (obj) => {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
 }
-//export const isPackageInstalled = NativeModules.CheckPackageInstallation.isPackageInstalled;
 
 export const APP_LIST = {
   "WhatsApp": {pkgName: "com.whatsapp", urlScheme: "whatsapp", urlParams: "app"}, // fa
@@ -191,7 +184,6 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
     }
     return require('../../assets/images/currencySymbols/icon_chf_gray.png');
   }
-
 };
 
 export const isEmptyObject = (obj) => {

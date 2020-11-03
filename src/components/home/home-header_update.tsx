@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
+import { useDispatch, useSelector } from 'react-redux';
+
 import ToggleSwitch from '../../components/ToggleSwitchSlim';
 const currencyCode = [
   'BRL',
@@ -32,6 +34,9 @@ const currencyCode = [
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import { currencyKindSet } from '../../store/actions/preferences';
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
@@ -54,16 +59,21 @@ const HomeHeader = ({
   onPressNotifications,
   notificationData,
   walletName,
-  switchOn,
   getCurrencyImageByRegion,
   balances,
   exchangeRates,
   CurrencyCode,
   navigation,
   currentLevel,
-  onSwitchToggle,
-  setCurrencyToggleValue,
 }) => {
+
+  const dispatch = useDispatch();
+  const currencyKind: CurrencyKind = useCurrencyKind();
+
+  const prefersBitcoin = useMemo(() => {
+    return currencyKind === CurrencyKind.BITCOIN;
+  }, [currencyKind]);
+
   const getMessage = (health, keeper) => {
     if(!health){
       return (
@@ -100,13 +110,12 @@ const HomeHeader = ({
       <View style={{ flexDirection: 'row' }}>
         <ToggleSwitch
           currencyCodeValue={CurrencyCode}
-          onpress={async () => {
-            onSwitchToggle(!switchOn);
-            let temp = !switchOn ? 'true' : '';
-            setCurrencyToggleValue(temp);
-            //await AsyncStorage.setItem('currencyToggleValue', temp);
+          onpress={() => {
+            dispatch(currencyKindSet(
+              prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+            ));
           }}
-          toggle={switchOn}
+          toggle={prefersBitcoin}
         />
         <TouchableOpacity
           onPress={onPressNotifications}
@@ -152,7 +161,7 @@ const HomeHeader = ({
               // marginBottom: wp('3%'),
             }}
           >
-            {switchOn ? (
+            {prefersBitcoin ? (
               <Image
                 style={{
                   ...CommonStyles.homepageAmountImage,
@@ -175,7 +184,7 @@ const HomeHeader = ({
               />
             )}
             <Text style={styles.homeHeaderAmountText}>
-              {switchOn
+              {prefersBitcoin
                 ? UsNumberFormat(balances.accumulativeBalance)
                 : exchangeRates
                 ? (
@@ -185,7 +194,7 @@ const HomeHeader = ({
                 : 0}
             </Text>
             <Text style={styles.homeHeaderAmountUnitText}>
-              {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+              {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
           {/* <MessageAsPerHealth

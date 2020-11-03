@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   SafeAreaView,
   StatusBar,
@@ -12,7 +11,6 @@ import {
   Alert,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -32,6 +30,8 @@ import {
   checkMSharesHealth,
 } from '../../store/actions/health';
 import Colors from '../../common/Colors';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -41,7 +41,7 @@ import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
 import moment from 'moment';
 import _ from 'underscore';
 import Toast from '../../components/Toast';
-import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -53,11 +53,11 @@ import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpCo
 import { State } from 'react-native-gesture-handler';
 
 const PersonalCopyHistory = (props) => {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
+  const [ErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [QrBottomSheet] = useState(React.createRef());
   const [QRModalHeader, setQRModalHeader] = useState('');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [blockReshare, setBlockReshare] = useState('');
@@ -96,7 +96,6 @@ const PersonalCopyHistory = (props) => {
   ]);
   const [
     PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
   ] = useState(React.createRef());
 
   const secureAccount: SecureAccount = useSelector(
@@ -120,7 +119,7 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
-  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(
+  const [mailOptionsBottomSheet] = useState(
     React.createRef(),
   );
 
@@ -332,13 +331,13 @@ const PersonalCopyHistory = (props) => {
   const renderPersonalCopyShareModalContent = useCallback(() => {
     return (
       <PersonalCopyShareModal
-        removeHighlightingFromCard={() => {}}
+        removeHighlightingFromCard={() => { }}
         selectedPersonalCopy={selectedPersonalCopy}
         personalCopyDetails={personalCopyDetails}
         onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
-        onPressShare={() => {}}
+        onPressShare={() => { }}
         onPressConfirm={async () => {
           let personalCopyDetails = JSON.parse(
             await AsyncStorage.getItem('personalCopyDetails'),
@@ -479,45 +478,7 @@ const PersonalCopyHistory = (props) => {
     );
   };
 
-  const renderMailOptionsHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-          }, 2);
-          (mailOptionsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
 
-  const renderMailOptionsContent = () => {
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity
-          style={{ flexDirection: 'column' }}
-          onPress={() => {}}
-        >
-          <Image
-            style={{}}
-            source={require('../../assets/images/icons/icon_email.png')}
-          />
-          <Text style={{}}>Default App</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ flexDirection: 'column' }}
-          onPress={() => {}}
-        >
-          <Image
-            style={{}}
-            source={require('../../assets/images/icons/openlink.png')}
-          />
-          <Text style={{}}>Default App</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -526,11 +487,7 @@ const PersonalCopyHistory = (props) => {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
+        style={NavStyles.modalHeaderTitleView}
       >
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
@@ -561,10 +518,10 @@ const PersonalCopyHistory = (props) => {
               source={require('../../assets/images/icons/note.png')}
             />
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 {'Personal Copy'}
               </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
+              <Text style={NavStyles.modalHeaderInfoText}>
                 Last backup{' '}
                 <Text
                   style={{
@@ -599,8 +556,8 @@ const PersonalCopyHistory = (props) => {
               source={
                 pcShared
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
@@ -665,7 +622,7 @@ const PersonalCopyHistory = (props) => {
           setQrBottomSheetsFlag(false);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onCloseStart={() => {}}
+        onCloseStart={() => { }}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
         snapPoints={[
@@ -690,21 +647,3 @@ const PersonalCopyHistory = (props) => {
 };
 
 export default PersonalCopyHistory;
-
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
-});

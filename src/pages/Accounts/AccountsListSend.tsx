@@ -5,7 +5,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import Fonts from './../../common/Fonts';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { UsNumberFormat } from '../../common/utilities';
 import CardView from 'react-native-cardview';
@@ -13,7 +12,6 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import config from '../../bitcoin/HexaConfig';
 
@@ -24,7 +22,6 @@ const AccountsListSend = ({
   checkedItem,
   fromAddNewAccount
 }) => {
-  // console.log("Items,", accounts);
   return (
     <TouchableOpacity
       style={styles.accountView}

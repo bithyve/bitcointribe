@@ -60,4 +60,11 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: 'white'
   },
+
+  cardIconImage: {
+    width: 12,
+    height: 14,
+    resizeMode: "contain",
+    marginLeft: "auto",
+  },
 });

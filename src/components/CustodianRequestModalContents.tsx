@@ -76,19 +76,15 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
             onPress={() => {
               props.onPressAcceptSecret();
             }}
             style={{ ...styles.successModalButtonView }}
           >
-            {props.loading && props.loading==true ? 
-              <ActivityIndicator size="small" />
-              : <Text style={styles.proceedButtonText}>Accept Secret</Text>
-            }
+            <Text style={styles.proceedButtonText}>Accept Secret</Text>
           </AppBottomSheetTouchableWrapper>
+
           <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
             onPress={() => props.onPressRejectSecret()}
             style={{
               height: wp("13%"),

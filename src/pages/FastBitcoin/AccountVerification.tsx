@@ -48,11 +48,11 @@ export default function AccountVerification(props) {
             }
           </Text>
         </View>
-          <CopyThisText 
+          <CopyThisText
             text={props.link}
             openLink={() => {
               props.openLinkVerification();
-            }} 
+            }}
           />
       </View>
     </View>

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   SafeAreaView,
   StatusBar,
@@ -12,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -32,7 +31,6 @@ import moment from 'moment';
 import _ from 'underscore';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
 import {
@@ -56,17 +54,16 @@ import {
 } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
-import SSS from '../../bitcoin/utilities/sss/SSS';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const SecondaryDeviceHistory = (props) => {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
+  const [ErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [QrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [blockReshare, setBlockReshare] = useState('');
   const SHARES_TRANSFER_DETAILS = useSelector(
@@ -99,10 +96,10 @@ const SecondaryDeviceHistory = (props) => {
   const testAccount: TestAccount = useSelector(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+  const [ReshareBottomSheet] = useState(
     React.createRef(),
   );
-  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [ChangeBottomSheet] = useState(React.createRef());
   const [guardianExists, setGuardianExists] = useState(false);
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
@@ -144,12 +141,11 @@ const SecondaryDeviceHistory = (props) => {
     //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     // },
   ]);
-  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+  const [secondaryDeviceBottomSheet] = useState(
     React.createRef(),
   );
   const [
     secondaryDeviceMessageBottomSheet,
-    setSecondaryDeviceMessageBottomSheet,
   ] = useState(React.createRef());
   const [isReshare, setIsReshare] = useState(false);
   const uploadMetaShare = useSelector(
@@ -258,7 +254,7 @@ const SecondaryDeviceHistory = (props) => {
         if (
           !SHARES_TRANSFER_DETAILS[0] ||
           Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
-            config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
           dispatch(uploadEncMShare(0, contactInfo, data));
@@ -269,7 +265,7 @@ const SecondaryDeviceHistory = (props) => {
           trustedContact.ephemeralChannel &&
           trustedContact.ephemeralChannel.initiatedAt &&
           Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-            config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
           dispatch(
@@ -511,9 +507,6 @@ const SecondaryDeviceHistory = (props) => {
         infoText={
           'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
-        onBackPress={() => {
-          (QrBottomSheet as any).current.snapTo(0);
-        }}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
@@ -702,14 +695,10 @@ const SecondaryDeviceHistory = (props) => {
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
+
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
+
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
@@ -738,10 +727,10 @@ const SecondaryDeviceHistory = (props) => {
               source={require('../../assets/images/icons/icon_secondarydevice.png')}
             />
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
               </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
+              <Text style={NavStyles.modalHeaderInfoText}>
                 Last backup{' '}
                 <Text
                   style={{
@@ -776,8 +765,8 @@ const SecondaryDeviceHistory = (props) => {
               source={
                 isReshare
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
@@ -857,7 +846,7 @@ const SecondaryDeviceHistory = (props) => {
           setQrBottomSheetsFlag(false);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onCloseStart={() => {}}
+        onCloseStart={() => { }}
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
@@ -905,21 +894,3 @@ const SecondaryDeviceHistory = (props) => {
 };
 
 export default SecondaryDeviceHistory;
-
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
-});

@@ -99,7 +99,7 @@ export default function TrustedContactRequest(props) {
             onFocus={() => {
               if (Platform.OS === 'ios') {
                 setOnBlurFocus(true);
-                props.bottomSheetRef.current?.snapTo(2);
+                props.bottomSheetRef.current?.expand();
               }
             }}
             onBlur={() => {
@@ -109,29 +109,12 @@ export default function TrustedContactRequest(props) {
             }}
             value={EmailId}
           />
-          {/* <View style={styles.separatorView} />
-          <Text
-            style={{
-              ...styles.countryCodeText,
-              color: EmailId ? Colors.textColorGrey : Colors.borderColor,
-            }}
-          >
-            @bithyve.com
-          </Text> */}
         </View>
       );
     } else if (props.inputType == 'phone') {
       return (
         <View style={styles.textboxView}>
-          {/* <Text
-            style={{
-              ...styles.countryCodeText,
-              color: PhoneNumber ? Colors.textColorGrey : Colors.borderColor,
-            }}
-          >
-            +91
-          </Text>
-          <View style={styles.separatorView} /> */}
+          <View style={styles.separatorView} />
           <TextInput
             keyboardType={'numeric'}
             returnKeyLabel="Done"
@@ -149,7 +132,7 @@ export default function TrustedContactRequest(props) {
             onFocus={() => {
               if (Platform.OS === 'ios') {
                 setOnBlurFocus(true);
-                props.bottomSheetRef.current?.snapTo(2);
+                props.bottomSheetRef.current?.expand();
               }
             }}
             onBlur={() => {
@@ -236,11 +219,7 @@ export default function TrustedContactRequest(props) {
                 }}
                 onFocus={() => {
                   if (Platform.OS == 'ios') {
-                    if (passcodeArray.length == 0 && i == 0) {
-                      props.bottomSheetRef.current?.snapTo(2);
-                    } else {
-                      props.bottomSheetRef.current?.snapTo(2);
-                    }
+                    props.bottomSheetRef.current?.expand();
                   }
                 }}
                 onBlur={() => {

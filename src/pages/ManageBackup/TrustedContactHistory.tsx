@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   SafeAreaView,
   StatusBar,
@@ -13,7 +12,7 @@ import {
   Keyboard,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -22,7 +21,6 @@ import { getIconByStatus } from './utils';
 import { useSelector } from 'react-redux';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -32,9 +30,7 @@ import TrustedContacts from './TrustedContacts';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
-import TrustedContactQr from './TrustedContactQr';
-import { nameToInitials } from '../../common/CommonFunctions';
-import { textWithoutEncoding, email } from 'react-native-communications';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import {
   uploadEncMShare,
   ErrorSending,
@@ -44,7 +40,6 @@ import {
 } from '../../store/actions/health';
 import { useDispatch } from 'react-redux';
 import SendShareModal from './SendShareModal';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -53,7 +48,6 @@ import {
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
-import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import {
   updateEphemeralChannel,
@@ -61,7 +55,6 @@ import {
 } from '../../store/actions/trustedContacts';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents';
-import idx from 'idx';
 import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
@@ -71,40 +64,39 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const TrustedContactHistory = (props) => {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
+  const [ErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
 
   const dispatch = useDispatch();
   const [selectedContactMode, setSelectedContactMode] = useState(null);
-  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [ChangeBottomSheet] = useState(React.createRef());
   const [changeContact, setChangeContact] = useState(false);
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+  const [ReshareBottomSheet] = useState(
     React.createRef(),
   );
-  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
+  const [ConfirmBottomSheet] = useState(
     React.createRef(),
   );
   const [OTP, setOTP] = useState('');
   const [renderTimer, setRenderTimer] = useState(false);
-  const [chosenContactIndex, setChosenContactIndex] = useState(1);
+  const [chosenContactIndex] = useState(1);
   const [chosenContact, setChosenContact] = useState(Object);
-  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
+  const [trustedContactsBottomSheet] = useState(
     React.createRef(),
   );
-  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  const [SendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
   const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
-  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+  const [SendViaQRBottomSheet] = useState(
     React.createRef(),
   );
-  const [shareBottomSheet, setshareBottomSheet] = useState(React.createRef());
+  const [shareBottomSheet] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
-    setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
   const [LoadContacts, setLoadContacts] = useState(false);
   let [SelectedContacts, setSelectedContacts] = useState([]);
@@ -183,9 +175,7 @@ const TrustedContactHistory = (props) => {
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
   );
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
+
   useEffect(() => {
     (async () => {
       let selectedContactModeTemp = await AsyncStorage.getItem(
@@ -205,7 +195,7 @@ const TrustedContactHistory = (props) => {
     if (chosenContact) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       const tcInstance = trustedContacts.tc.trustedContacts[contactName];
@@ -222,17 +212,12 @@ const TrustedContactHistory = (props) => {
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setSelectedContacts(selectedContacts);
-      // if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
-      //   setChosenContact(selectedContacts[0]);
-      // } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
-      //   setChosenContact(selectedContacts[1]);
-      // }
 
       if (index == 1 && selectedContacts[0]) {
         let tempContact = selectedContacts[0];
         const tcInstance =
           trustedContacts.tc.trustedContacts[
-            tempContact.name.toLowerCase().trim()
+          tempContact.name.toLowerCase().trim()
           ];
         if (tcInstance)
           tempContact.contactsWalletName = tcInstance.contactsWalletName;
@@ -243,7 +228,7 @@ const TrustedContactHistory = (props) => {
 
         const tcInstance =
           trustedContacts.tc.trustedContacts[
-            tempContact.name.toLowerCase().trim()
+          tempContact.name.toLowerCase().trim()
           ];
         if (tcInstance)
           tempContact.contactsWalletName = tcInstance.contactsWalletName;
@@ -273,23 +258,6 @@ const TrustedContactHistory = (props) => {
     [SelectedContacts, chosenContact],
   );
 
-  const isTrustedContact = useCallback(
-    (selectedContact) => {
-      const contactName = `${selectedContact.firstName} ${
-        selectedContact.lastName ? selectedContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim();
-
-      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-      if (trustedContact && trustedContact.symmetricKey) {
-        // Trusted channel exists
-        return true;
-      }
-      return false;
-    },
-    [trustedContacts],
-  );
 
   const renderTrustedContactsContent = useCallback(() => {
     return (
@@ -300,13 +268,6 @@ const TrustedContactHistory = (props) => {
         }}
         onPressContinue={async (selectedContacts, index) => {
           Keyboard.dismiss();
-          // const isTrustedC = await isTrustedContact(selectedContacts[0]);
-          // if (isTrustedC) {
-          //   Toast('Trusted Contact already exists');
-          // } else {
-          //   getContacts(selectedContacts, index);
-          // }
-
           getContacts(selectedContacts, index);
         }}
         index={index}
@@ -360,7 +321,7 @@ const TrustedContactHistory = (props) => {
   }, [updateHistory]);
 
   const onOTPShare = useCallback(
-    async (index) => {
+    async () => {
       updateAutoHighlightFlags();
       saveInTransitHistory();
       setActivateReshare(true);
@@ -373,9 +334,9 @@ const TrustedContactHistory = (props) => {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={(index) => {
+        onPressOk={() => {
           setRenderTimer(false);
-          onOTPShare(index);
+          onOTPShare();
           setOTP('');
           props.navigation.goBack();
         }}
@@ -466,67 +427,6 @@ const TrustedContactHistory = (props) => {
     dispatch(ErrorSending(null));
   }
 
-  // const communicate = async () => {
-  //   let selectedContactModeTmp =
-  //     index == 1 ? selectedContactMode[0] : selectedContactMode[1];
-  //   if (!SHARES_TRANSFER_DETAILS[index]) {
-  //     setTimeout(() => {
-  //       setErrorMessageHeader('Failed to share');
-  //       setErrorMessage(
-  //         'There was some error while sharing the Recovery Secret, please try again',
-  //       );
-  //     }, 2);
-  //     (ErrorBottomSheet as any).current.snapTo(1);
-  //     //Alert.alert('Failed to share');
-  //     return;
-  //   }
-  //   const deepLink =
-  //     `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
-  //     SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
-
-  //   switch (selectedContactModeTmp.type) {
-  //     case 'number':
-  //       textWithoutEncoding(selectedContactModeTmp.info, deepLink);
-  //       break;
-
-  //     case 'email':
-  //       email(
-  //         [selectedContactModeTmp.info],
-  //         null,
-  //         null,
-  //         'Guardian request',
-  //         deepLink,
-  //       );
-  //       break;
-  //     case 'qrcode':
-  //       (trustedContactQrBottomSheet as any).current.snapTo(1);
-  //       break;
-  //   }
-  //   if (selectedContactModeTmp.type != 'qrcode') {
-  //     let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP
-  //       ? SHARES_TRANSFER_DETAILS[index].OTP
-  //       : null;
-  //     setTimeout(() => {
-  //       setRenderTimer(true);
-  //       setOTP(otpTemp);
-  //       setChosenContactIndex(index);
-  //     }, 10);
-  //     (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (
-  //     !SHARES_TRANSFER_DETAILS[index] ||
-  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >   config.TC_REQUEST_EXPIRY;
-  //   )
-  //     dispatch(uploadEncMShare(index));
-  //   else {
-  //     //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-  //     //console.log(SHARES_TRANSFER_DETAILS[index]);
-  //   }
-  // }, [SHARES_TRANSFER_DETAILS[index]]);
-
   const onPressReshare = useCallback(async () => {
     (shareBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
@@ -606,35 +506,6 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
-  // const renderTrustedContactQrContents = useCallback(() => {
-  //   const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
-  //   if (!contactForTrustedQR) return;
-
-  //   return (
-  //     <TrustedContactQr
-  //       index={index}
-  //       contact={contactForTrustedQR}
-  //       onPressOk={() => {
-  //         onOTPShare(index);
-  //       }}
-  //       onPressBack={() => {
-  //         onOTPShare(index);
-  //         (trustedContactQrBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, [selectedTitle, contactForTrustedQR]);
-
-  // const renderTrustedContactQrHeader = useCallback(() => {
-  //   return (
-  //     <ModalHeader
-  //       onPressHeader={() => {
-  //         (trustedContactQrBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, []);
-
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {
       if (element.date) return element;
@@ -669,15 +540,6 @@ const TrustedContactHistory = (props) => {
     }
   }, [next]);
 
-  const makeFullName = (chosenContact) => {
-    return chosenContact.firstName && chosenContact.lastName
-      ? chosenContact.firstName + ' ' + chosenContact.lastName
-      : chosenContact.firstName && !chosenContact.lastName
-      ? chosenContact.firstName
-      : !chosenContact.firstName && chosenContact.lastName
-      ? chosenContact.lastName
-      : '';
-  };
 
   const getImageIcon = () => {
     if (chosenContact.name) {
@@ -717,21 +579,21 @@ const TrustedContactHistory = (props) => {
               }}
             >
               {chosenContact &&
-              chosenContact.firstName === 'F&F request' &&
-              chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ''
+                chosenContact.firstName === 'F&F request' &&
+                chosenContact.contactsWalletName !== undefined &&
+                chosenContact.contactsWalletName !== ''
                 ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
                 : chosenContact && chosenContact.name
-                ? nameToInitials(
+                  ? nameToInitials(
                     chosenContact.firstName && chosenContact.lastName
                       ? chosenContact.firstName + ' ' + chosenContact.lastName
                       : chosenContact.firstName && !chosenContact.lastName
-                      ? chosenContact.firstName
-                      : !chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.lastName
-                      : '',
+                        ? chosenContact.firstName
+                        : !chosenContact.firstName && chosenContact.lastName
+                          ? chosenContact.lastName
+                          : '',
                   )
-                : ''}
+                  : ''}
             </Text>
           </View>
         );
@@ -770,7 +632,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -804,11 +666,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const numberDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${numberEncPubKey}` +
@@ -831,11 +693,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const emailDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${emailEncPubKey}` +
@@ -855,11 +717,11 @@ const TrustedContactHistory = (props) => {
       const uploadedAt = symmetricKey
         ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
         : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-            .initiatedAt;
+          .initiatedAt;
 
       const otpDL =
         `https://hexawallet.io/${config.APP_STAGE}/${
-          symmetricKey ? 'atcg' : 'tcg'
+        symmetricKey ? 'atcg' : 'tcg'
         }` +
         `/${requester}` +
         `/${otpEncPubKey}` +
@@ -927,7 +789,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -987,7 +849,7 @@ const TrustedContactHistory = (props) => {
         if (previousGuardian) {
           previousGuardianName = `${previousGuardian.firstName} ${
             previousGuardian.lastName ? previousGuardian.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
         } else {
@@ -999,25 +861,25 @@ const TrustedContactHistory = (props) => {
         uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
       );
       updateTrustedContactsInfo(chosenContact);
-      onOTPShare(index); // enables reshare
+      onOTPShare(); // enables reshare
       setChangeContact(false);
     } else if (
       !SHARES_TRANSFER_DETAILS[index] ||
       Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
+      config.TC_REQUEST_EXPIRY
     ) {
       setTrustedLink('');
       setTrustedQR('');
       dispatch(uploadEncMShare(index, contactInfo, data));
       updateTrustedContactsInfo(chosenContact);
-      onOTPShare(index); // enables reshare
+      onOTPShare(); // enables reshare
     } else if (
       trustedContact &&
       !trustedContact.symmetricKey &&
       trustedContact.ephemeralChannel &&
       trustedContact.ephemeralChannel.initiatedAt &&
       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY &&
+      config.TC_REQUEST_EXPIRY &&
       !hasTrustedChannel
     ) {
       setTrustedLink('');
@@ -1045,7 +907,7 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       console.log({ contactName });
@@ -1097,21 +959,20 @@ const TrustedContactHistory = (props) => {
   ]);
 
   const SendShareModalFunction = useCallback(() => {
-    //console.log("chosenContact", chosenContact);
     if (!isEmpty(chosenContact)) {
       return (
         <SendShareModal
           contact={chosenContact ? chosenContact : null}
           index={index}
           textHeader={'Sharing Recovery Key with'}
-          onPressViaQr={(index) => {
+          onPressViaQr={() => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
             (shareBottomSheet as any).current.snapTo(0);
             // setChosenContactIndex(index);
           }}
-          onPressViaLink={(index) => {
+          onPressViaLink={() => {
             createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
@@ -1144,9 +1005,9 @@ const TrustedContactHistory = (props) => {
           contactEmail={''}
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
-          } Hexa wallet- link will expire in ${
+            } Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+            } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
@@ -1241,14 +1102,10 @@ const TrustedContactHistory = (props) => {
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
+
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
+
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
@@ -1269,20 +1126,20 @@ const TrustedContactHistory = (props) => {
           >
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 {chosenContact.firstName === 'F&F request' &&
-                chosenContact.contactsWalletName !== undefined &&
-                chosenContact.contactsWalletName !== ''
+                  chosenContact.contactsWalletName !== undefined &&
+                  chosenContact.contactsWalletName !== ''
                   ? `${chosenContact.contactsWalletName}'s wallet`
                   : chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.firstName + ' ' + chosenContact.lastName
-                  : chosenContact.firstName && !chosenContact.lastName
-                  ? chosenContact.firstName
-                  : !chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.lastName
-                  : 'Friends and Family'}
+                    ? chosenContact.firstName + ' ' + chosenContact.lastName
+                    : chosenContact.firstName && !chosenContact.lastName
+                      ? chosenContact.firstName
+                      : !chosenContact.firstName && chosenContact.lastName
+                        ? chosenContact.lastName
+                        : 'Friends and Family'}
               </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
+              <Text style={NavStyles.modalHeaderInfoText}>
                 Last backup{' '}
                 <Text
                   style={{
@@ -1317,8 +1174,8 @@ const TrustedContactHistory = (props) => {
               source={
                 shared || activateReshare
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
@@ -1490,26 +1347,3 @@ const TrustedContactHistory = (props) => {
 };
 
 export default TrustedContactHistory;
-
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
-  cardImage: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-  },
-});

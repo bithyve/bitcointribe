@@ -10,19 +10,16 @@ import {
   StatusBar,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import DeviceInfo from 'react-native-device-info';
-import BackupStyles from '../ManageBackup/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import BottomInfoBox from '../../components/BottomInfoBox';
 import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import NavStyles from '../../common/Styles/NavStyles';
 
 const NewTwoFASecret = props => {
   const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
@@ -30,25 +27,13 @@ const NewTwoFASecret = props => {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
 
-      <View style={{ ...BackupStyles.modalContainer, backgroundColor: Colors.white, marginTop: 10 }}>
+      <View style={{ ...NavStyles.modalContainer, backgroundColor: Colors.white, marginTop: 10 }}>
         <ScrollView style={styles.qrModalScrollView}>
-          <View style={BackupStyles.modalHeaderTitleView}>
+          <View style={NavStyles.modalHeaderTitleView}>
             <View
               style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
             >
-              {/* <TouchableOpacity
-                onPress={() => {
-                  props.navigation.goBack();
-                }}
-                style={{ height: 30, width: 30, justifyContent: 'center' }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity> */}
-              <Text style={BackupStyles.modalHeaderTitleText}>
+              <Text style={NavStyles.modalHeaderTitleText}>
                 2FA Key
               </Text>
               <AppBottomSheetTouchableWrapper
@@ -82,7 +67,8 @@ const NewTwoFASecret = props => {
               </AppBottomSheetTouchableWrapper>
             </View>
           </View>
-          <View style={BackupStyles.modalContentView}>
+
+          <View style={NavStyles.modalContentView}>
             {!receivingAddress ? (
               <View style={styles.loader}>
                 <ActivityIndicator size="large" />
@@ -92,6 +78,7 @@ const NewTwoFASecret = props => {
               )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
           </View>
+
           <View
             style={{
               marginBottom: 30,

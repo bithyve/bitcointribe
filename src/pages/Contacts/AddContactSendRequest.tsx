@@ -20,12 +20,12 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SendViaLink from '../../components/SendViaLink';
-import { nameToInitials } from '../../common/CommonFunctions';
+import { nameToInitials, isEmpty } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
@@ -33,13 +33,11 @@ import {
   updateTrustedContactInfoLocally,
 } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
   EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
-import Toast from '../../components/Toast';
 import TimerModalContents from './TimerModalContents';
 import {
   TRUSTED_CONTACTS,
@@ -55,16 +53,15 @@ export default function AddContactSendRequest(props) {
   const [isOTPType, setIsOTPType] = useState(false);
   const [
     shareOtpWithTrustedContactBottomSheet,
-    setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
   const [OTP, setOTP] = useState('');
-  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  const [SendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
-  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+  const [SendViaQRBottomSheet] = useState(
     React.createRef(),
   );
-  const [TimerModalBottomSheet, setTimerModalBottomSheet] = useState(
+  const [TimerModalBottomSheet] = useState(
     React.createRef(),
   );
   const [renderTimer, setRenderTimer] = useState(false);
@@ -80,7 +77,7 @@ export default function AddContactSendRequest(props) {
     ? props.navigation.getParam('SelectedContact')
     : [];
   console.log('SelectedContact', SelectedContact);
-  const [Contact, setContact] = useState(
+  const [Contact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
 
@@ -102,9 +99,7 @@ export default function AddContactSendRequest(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
+
   const updateTrustedContactsInfo = async (contact) => {
     let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
     if (tcInfo) {
@@ -114,13 +109,13 @@ export default function AddContactSendRequest(props) {
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
 
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-          }`
+            }`
             .toLowerCase()
             .trim();
 
@@ -146,7 +141,7 @@ export default function AddContactSendRequest(props) {
     if (Contact && Contact.firstName) {
       let contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -207,7 +202,7 @@ export default function AddContactSendRequest(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -235,7 +230,7 @@ export default function AddContactSendRequest(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -370,9 +365,9 @@ export default function AddContactSendRequest(props) {
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             WALLET_SETUP.walletName
-          } Hexa wallet - link will expire in ${
+            } Hexa wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+            } hours`}
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
@@ -475,7 +470,7 @@ export default function AddContactSendRequest(props) {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={(index) => {
+        onPressOk={() => {
           setRenderTimer(false);
           shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
           props.navigation.goBack();
@@ -501,7 +496,7 @@ export default function AddContactSendRequest(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.modalContainer}>
+      <View style={NavStyles.modalContainer}>
         <ShareContactRequest
         SelectedContact={Contact ? Contact : {}}
         navigation={props.navigation}
@@ -521,256 +516,7 @@ export default function AddContactSendRequest(props) {
                 (SendViaLinkBottomSheet as any).current.snapTo(1);
         }}
         />
-        {/* <View
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingRight: 10,
-            paddingBottom: hp('1.5%'),
-            paddingTop: hp('1%'),
-            marginLeft: 10,
-            marginRight: 10,
-            marginBottom: hp('1.5%'),
-          }}
-        >
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity
-              onPress={() => {
-                props.navigation.goBack();
-              }}
-              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  ...BackupStyles.modalHeaderTitleText,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Add a contact{' '}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                  paddingTop: 5,
-                }}
-              >
-                Send a Friends and Family request
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                createTrustedContact();
-                props.navigation.goBack();
-              }}
-              style={{
-                height: wp('8%'),
-                width: wp('18%'),
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: Colors.lightBlue,
-                justifyContent: 'center',
-                borderRadius: 8,
-                alignSelf: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Done
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                backgroundColor: Colors.backgroundColor1,
-                height: 90,
-                position: 'relative',
-                borderRadius: 10,
-              }}
-            >
-              <View style={{ marginLeft: 70 }}>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(11),
-                    marginLeft: 25,
-                    paddingTop: 5,
-                    paddingBottom: 3,
-                  }}
-                >
-                  Adding to Friends and Family:
-                </Text>
-                <Text style={styles.contactNameText}>
-                  {Contact.firstName && Contact.lastName
-                    ? Contact.firstName + ' ' + Contact.lastName
-                    : Contact.firstName && !Contact.lastName
-                    ? Contact.firstName
-                    : !Contact.firstName && Contact.lastName
-                    ? Contact.lastName
-                    : ''}
-                </Text>
-                {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {setPhoneNumber()}
-                  </Text>
-                ) : Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact.emails[0].email}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            {Contact.imageAvailable ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Image
-                  source={Contact.image}
-                  style={{ ...styles.contactProfileImage }}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
-                  )}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <View style={{ marginTop: 'auto' }}>
-          <View style={{ marginBottom: hp('1%') }}>
-            <BottomInfoBox
-              title={'Friends and Family request'}
-              infoText={
-                'Your contact will have to accept your request for you to add them'
-              }
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: Colors.blue,
-              height: 60,
-              borderRadius: 10,
-              marginLeft: 25,
-              marginRight: 25,
-              marginBottom: hp('4%'),
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: { width: 15, height: 15 },
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                createTrustedContact();
-                if (SendViaLinkBottomSheet.current)
-                  (SendViaLinkBottomSheet as any).current.snapTo(1);
-              }}
-              style={styles.buttonInnerView}
-            >
-              <Image
-                source={require('../../assets/images/icons/openlink.png')}
-                style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText}>Share</Text>
-            </TouchableOpacity>
-            <View
-              style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-            />
-            <TouchableOpacity
-              style={styles.buttonInnerView}
-              onPress={() => {
-                createTrustedContact();
-                if (SendViaQRBottomSheet.current)
-                  (SendViaQRBottomSheet as any).current.snapTo(1);
-              }}
-            >
-              <Image
-                source={require('../../assets/images/icons/qr-code.png')}
-                style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText}>QR</Text>
-            </TouchableOpacity>
-          </View>
-        </View> */}
+        
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
@@ -827,16 +573,6 @@ export default function AddContactSendRequest(props) {
   );
 }
 const styles = StyleSheet.create({
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
-  separatorView: {
-    marginLeft: 15,
-    marginRight: 15,
-    height: 2,
-    backgroundColor: Colors.backgroundColor,
-  },
   contactProfileView: {
     flexDirection: 'row',
     marginLeft: 20,
@@ -859,11 +595,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
-  contactIconImage: {
-    width: 20,
-    height: 20,
-    resizeMode: 'cover',
-  },
   buttonInnerView: {
     flexDirection: 'row',
     height: 40,
@@ -882,13 +613,5 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
-  },
-  commModeModalInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    marginLeft: 25,
-    marginRight: 25,
-    marginTop: hp('0.7%'),
   },
 });

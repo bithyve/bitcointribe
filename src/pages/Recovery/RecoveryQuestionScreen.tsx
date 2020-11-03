@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -27,7 +26,7 @@ import { initializeRecovery } from '../../store/actions/setupAndAuth';
 import commonStyle from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-export default function RecoveryQuestionModalContents(props) {
+export default function RecoveryQuestionScreen(props) {
   const walletName = props.navigation.getParam('walletName');
   const dispatch = useDispatch();
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -36,7 +35,7 @@ export default function RecoveryQuestionModalContents(props) {
     question: '',
   });
   const [answer, setAnswer] = useState('');
-  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
+  const [dropdownBoxList] = useState(QuestionList);
 
   const { insertedIntoDB } = useSelector(state => state.storage);
   useEffect(() => {
