@@ -59,7 +59,10 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { getCurrencyImageByRegion, isEmpty } from '../../common/CommonFunctions/index';
+import {
+  getCurrencyImageByRegion,
+  isEmpty,
+} from '../../common/CommonFunctions/index';
 import moment from 'moment';
 import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
@@ -82,7 +85,6 @@ import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
 import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
-
 
 interface AccountsStateTypes {
   carouselData: any;
@@ -707,7 +709,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   RenderItem = ({ item, index }) => {
-
     return (
       <ImageBackground
         source={item.backgroundImage}
@@ -1070,14 +1071,16 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={Colors.blue}
                 onpress={() => {
-                  const newValue = prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN;
+                  const newValue = prefersBitcoin
+                    ? CurrencyKind.FIAT
+                    : CurrencyKind.BITCOIN;
 
                   this.setState(
                     { prefersBitcoin: newValue == CurrencyKind.BITCOIN },
                     () => {
                       this.props.currencyKindSet(newValue);
-                    }
-                  )
+                    },
+                  );
                 }}
                 toggle={prefersBitcoin}
               />
@@ -1204,18 +1207,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       )}
                       renderItem={({ item, index }) => (
                         <TouchableOpacity
-                          onPress={
-                            () => {
-                              (this.refs
-                                .TransactionDetailsBottomSheet as any).snapTo(
-                                1,
-                              );
-                              this.checkNShowHelperModal();
-                              setTimeout(() => {
-                                this.setState({ transactionItem: item });
-                              }, 10);
-                            }
-                          }
+                          onPress={() => {
+                            (this.refs
+                              .TransactionDetailsBottomSheet as any).snapTo(1);
+                            this.checkNShowHelperModal();
+                            setTimeout(() => {
+                              this.setState({ transactionItem: item });
+                            }, 10);
+                          }}
                           style={styles.transactionModalElementView}
                         >
                           {index == 0 ? (
@@ -1415,14 +1414,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         Tran Fee : (~
                         {prefersBitcoin || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
-                              ? averageTxFees['medium'].averageTxFee
+                              ? averageTxFees['low'].averageTxFee
                               : 0) +
                             ' ' +
                             (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
                           : exchangeRates
                           ? (
                               ((averageTxFees
-                                ? averageTxFees['medium'].averageTxFee
+                                ? averageTxFees['low'].averageTxFee
                                 : 0) /
                                 1e8) *
                               exchangeRates[CurrencyCode].last
