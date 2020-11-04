@@ -10,6 +10,7 @@ import {
   Linking,
   Alert,
   Image,
+  BackHandler,
 } from 'react-native';
 import { Easing } from "react-native-reanimated";
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -200,6 +201,7 @@ interface HomePropsTypes {
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
+  
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
