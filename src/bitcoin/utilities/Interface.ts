@@ -293,6 +293,7 @@ export interface Contacts {
       address: string;
       data?: TrustedData[];
     };
+    lastSeen?: Number;
     trustedAddress?: string;
     trustedTestAddress?: string;
   };
