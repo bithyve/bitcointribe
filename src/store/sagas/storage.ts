@@ -119,7 +119,6 @@ function* servicesEnricherWorker({ payload }) {
     }
     let services;
     let migrated = false;
-    if (database.SERVICES) {
       const {
         REGULAR_ACCOUNT,
         TEST_ACCOUNT,
@@ -190,8 +189,7 @@ function* servicesEnricherWorker({ payload }) {
             : new TrustedContactsService(),
         };
       }
-      yield put(servicesEnriched(services));
-    }
+    yield put(servicesEnriched(services));
     if (migrated) {
       database.VERSION = DeviceInfo.getVersion();
       yield call(insertDBWorker, { payload: database });

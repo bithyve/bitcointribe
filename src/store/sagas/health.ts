@@ -529,20 +529,6 @@ export function* downloadMetaShareWorker({ payload }) {
   console.log({ res });
   if (res.status === 200) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
-    if (payload.downloadType !== 'recovery') {
-      let shareArray = [
-        {
-          walletId: walletID,
-          shareId: metaShare.shareId,
-          reshareVersion: metaShare.meta.reshareVersion,
-          updatedAt: moment(new Date()).valueOf(),
-          name: walletName,
-          shareType: 'contact',
-          status: "accessible",
-        }
-      ];
-      yield put(updateMSharesHealth(shareArray));
-    }
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
       //TODO: activate DNP Transportation Layer for Hexa Premium
@@ -572,6 +558,20 @@ export function* downloadMetaShareWorker({ payload }) {
         },
       });
 
+      if (payload.downloadType !== 'recovery') {
+        let shareArray = [
+          {
+            walletId: walletID,
+            shareId: metaShare.shareId,
+            reshareVersion: metaShare.meta.reshareVersion,
+            updatedAt: moment(new Date()).valueOf(),
+            name: walletName,
+            shareType: 'contact',
+            status: "accessible",
+          }
+        ];
+        yield put(updateMSharesHealth(shareArray));
+      }
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
       //yield put(updateMSharesHealth());
