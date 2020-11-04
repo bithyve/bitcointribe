@@ -777,8 +777,8 @@ export default class TrustedContacts {
       const { updated, updatedLastSeens } = res.data;
       // console.log({ updatedLastSeens });
       if (Object.keys(updatedLastSeens).length) {
-        for (const contact of Object.values(this.trustedContacts)) {
-          const { trustedChannel } = contact;
+        for (const contactName of Object.keys(this.trustedContacts)) {
+          const { trustedChannel } = this.trustedContacts[contactName];
           if (trustedChannel) {
             const { publicKey, lastSeen } = updatedLastSeens[
               trustedChannel.address
@@ -786,6 +786,7 @@ export default class TrustedContacts {
             trustedChannel.data.forEach((subChan: TrustedData) => {
               if (subChan.publicKey === publicKey) {
                 subChan.lastSeen = lastSeen;
+                this.trustedContacts[contactName].lastSeen = lastSeen;
               }
             });
           }
@@ -882,6 +883,7 @@ export default class TrustedContacts {
           trustedChannel.data.forEach((subChan: TrustedData) => {
             if (subChan.publicKey === publicKey) {
               subChan.lastSeen = lastSeen;
+              this.trustedContacts[contactName].lastSeen = lastSeen;
 
               // update health via channel
               if (lastSeen > 0) {
