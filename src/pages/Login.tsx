@@ -111,11 +111,16 @@ export default function Login(props) {
     [passcode],
   );
 
+  const hardwareBackPressCustom = useCallback(() => {
+    return true;
+  }, []);
+
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => true)
-    return () =>
-      BackHandler.removeEventListener('hardwareBackPress', () => true)
-  }, [])
+    BackHandler.addEventListener('hardwareBackPress', hardwareBackPressCustom)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', hardwareBackPressCustom)
+    };
+  }, []);
 
   useEffect(() => {
     if (passcode.length == 4) {

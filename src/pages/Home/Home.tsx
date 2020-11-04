@@ -655,7 +655,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    BackHandler.removeEventListener('hardwareBackPress', () => true)
     const { s3Service, initHealthCheck, navigation } = this.props;
 
     this.closeBottomSheet();
