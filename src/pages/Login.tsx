@@ -7,6 +7,7 @@ import {
   StatusBar,
   AsyncStorage,
   Platform,
+  BackHandler
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -28,7 +29,7 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 import { initMigration } from '../store/actions/preferences';
 
-const LOADER_MESSAGE_TIME = 3000;
+const LOADER_MESSAGE_TIME = 2500;
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
@@ -111,6 +112,12 @@ export default function Login(props) {
   );
 
   useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', () => true)
+    return () =>
+      BackHandler.removeEventListener('hardwareBackPress', () => true)
+  }, [])
+
+  useEffect(() => {
     if (passcode.length == 4) {
       setIsDisabledProceed(false);
     }
@@ -187,7 +194,6 @@ export default function Login(props) {
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector((state) => state.preferences.isMigrated);
 
-
   useEffect(() => {
     if (isAuthenticated) {
       // migrate async keys
@@ -196,7 +202,7 @@ export default function Login(props) {
       }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
-          timer = setTimeout(() => {
+          setTimeout(() => {
             if (loaderBottomSheet.current) {
               loaderBottomSheet.current.snapTo(0);
             }
