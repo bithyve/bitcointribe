@@ -10,9 +10,8 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import currencyIconSource from '../../utils/assets/currencyIconSource';
 
-
 export default function QuoteConfirmation(props) {
-  const iconURL = currencyIconSource(props.currencyCode, false)
+  const currencySymbol = currencyIconSource(props.currencyCode, false)
   return (
     <View style={styles.modalContentContainer}>
       <View>
@@ -49,7 +48,7 @@ export default function QuoteConfirmation(props) {
               >
                 <Image
                   style={styles.cardBitCoinImage}
-                  source={iconURL}
+                  source={currencySymbol}
                 />
                 <Text style={styles.cardAmountText}>{props.purchasedFor}</Text>
               </View>
@@ -102,7 +101,7 @@ export default function QuoteConfirmation(props) {
                     width: wp('3.5%'),
                     height: wp('3.5%'),
                   }}
-                  source={iconURL}
+                  source={currencySymbol}
                 />
                 <Text
                   style={{
