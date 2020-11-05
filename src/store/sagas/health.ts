@@ -757,7 +757,7 @@ function* recoverWalletWorker({ payload }) {
       };
       const payload = { SERVICES, DECENTRALIZED_BACKUP };
       yield call(insertDBWorker, { payload });
-      yield delay(2000); // seconds delay prior to Wallet Image check
+      //yield delay(2000); // seconds delay prior to Wallet Image check
       yield put(fetchWalletImage());
 
       yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
