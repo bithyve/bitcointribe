@@ -17,15 +17,18 @@ export interface Props {
   iconName: string;
   color: string;
   size: number;
+  style?: Record<string, unknown>;
 }
 
 const MaterialCurrencyCodeIcon: React.FC<Props> = ({
   iconName,
   color,
   size,
+  style = {},
 }: Props) => {
   return (
     <MaterialCommunityIcons
+      style={style}
       name={iconName}
       color={color}
       size={size}
