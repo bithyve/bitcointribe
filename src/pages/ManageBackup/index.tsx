@@ -40,43 +40,25 @@ import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
-import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
+import { walletCheckIn } from '../../store/actions/trustedContacts';
 
 export default function ManageBackup(props) {
-  const [
-    PersonalCopyQRScannerBottomSheet,
-  ] = useState(React.createRef());
+  const [PersonalCopyQRScannerBottomSheet] = useState(React.createRef());
   const [, setIsReshare] = useState(false);
   const [selectedTime] = useState('');
   const [selectedStatus] = useState('Ugly');
   const [isNextStepDisable, setIsNextStepDisable] = useState(false);
   const [LoadCamera, setLoadCamera] = useState(false);
   const [ChangeBottomSheet] = useState(React.createRef());
-  const [ReshareBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [ConfirmBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [ReshareBottomSheet] = useState(React.createRef());
+  const [ConfirmBottomSheet] = useState(React.createRef());
   const [SelectTypeToReshare] = useState({});
-  const [
-    SecondaryDeviceHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    PersonalCopyHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SecurityQuestionHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    WalletBackupAndRecoveryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    CommunicationModeBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    RegenerateShareHelperBottomSheet,
-  ] = useState(React.createRef());
+  const [SecondaryDeviceHistoryBottomSheet] = useState(React.createRef());
+  const [PersonalCopyHistoryBottomSheet] = useState(React.createRef());
+  const [SecurityQuestionHistoryBottomSheet] = useState(React.createRef());
+  const [WalletBackupAndRecoveryBottomSheet] = useState(React.createRef());
+  const [CommunicationModeBottomSheet] = useState(React.createRef());
+  const [RegenerateShareHelperBottomSheet] = useState(React.createRef());
 
   const [secondaryDeviceHistory] = useState([
     {
@@ -185,7 +167,7 @@ export default function ManageBackup(props) {
   const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
-    (state) => state.trustedContacts.loading.syncLastSeensAndHealth,
+    (state) => state.trustedContacts.loading.walletCheckIn,
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
@@ -829,7 +811,8 @@ export default function ManageBackup(props) {
     let focusListener = props.navigation.addListener('didFocus', () => {
       // setContactsFromAsync();
       // dispatch(checkMSharesHealth());
-      dispatch(syncLastSeensAndHealth());
+      const synchingContacts = true; // wallet-checkIn; health specific
+      dispatch(walletCheckIn(synchingContacts));
       // setAutoHighlightFlagsFromAsync();
     });
     return () => {
@@ -1673,7 +1656,8 @@ export default function ManageBackup(props) {
                 <RefreshControl
                   refreshing={healthLoading}
                   onRefresh={() => {
-                    dispatch(syncLastSeensAndHealth());
+                    const synchingContacts = true;
+                    dispatch(walletCheckIn(synchingContacts));
                   }}
                 />
               }

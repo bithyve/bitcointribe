@@ -43,13 +43,8 @@ import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents';
 
 import LoaderModal from '../../components/LoaderModal';
-import {
-  calculateExchangeRate,
-  startupSync,
-} from '../../store/actions/accounts';
-import axios from 'axios';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
-import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
+import { walletCheckIn } from '../../store/actions/trustedContacts';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -60,7 +55,6 @@ export default function RestoreSelectedContactsList(props) {
   const [walletNameOpenModal] = useState('close');
   const [openmodal, setOpenmodal] = useState('closed');
 
-
   const loaderBottomSheet = useRef<BottomSheet>();
   const requestBottomSheet = useRef<BottomSheet>();
   const walletNameBottomSheet = useRef<BottomSheet>();
@@ -68,7 +62,6 @@ export default function RestoreSelectedContactsList(props) {
   const recoveryQuestionBottomSheet = useRef<BottomSheet>();
   const ErrorBottomSheet = useRef<BottomSheet>();
   const RestoreByCloudQrCode = useRef<BottomSheet>();
-
 
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
@@ -100,28 +93,6 @@ export default function RestoreSelectedContactsList(props) {
   const [metaShares, setMetaShares] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        if (Date.now() - exchangeRates.lastFetched < 1800000) {
-          setExchangeRates(exchangeRates);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
     let temp = null;
     // onPullDown();
     let focusListener = props.navigation.addListener('didFocus', () => {
@@ -151,7 +122,6 @@ export default function RestoreSelectedContactsList(props) {
       (walletNameBottomSheet as any).current.snapTo(2);
     }
   }, [walletNameOpenModal]);
-
 
   const getSelectedContactList = async () => {
     let contactList = await AsyncStorage.getItem('selectedContacts');
@@ -235,8 +205,6 @@ export default function RestoreSelectedContactsList(props) {
     (walletNameBottomSheet.current as any).snapTo(0);
     return;
   }
-
-
 
   function renderSuccessContent() {
     return (
@@ -339,12 +307,10 @@ export default function RestoreSelectedContactsList(props) {
   useEffect(() => {
     (async () => {
       if (SERVICES && walletImageChecked) {
-        await AsyncStorage.setItem('walletExists', 'true');
-        await AsyncStorage.setItem('walletRecovered', 'true');
+        AsyncStorage.setItem('walletExists', 'true');
+        AsyncStorage.setItem('walletRecovered', 'true');
 
-        dispatch(calculateExchangeRate());
-        dispatch(syncLastSeensAndHealth());
-
+        dispatch(walletCheckIn());
         props.navigation.navigate('Home');
       }
     })();
@@ -459,11 +425,7 @@ export default function RestoreSelectedContactsList(props) {
   };
 
   function renderRestoreByCloudQrCodeContent() {
-    return (
-      <RestoreByCloudQRCodeContents
-        onScanCompleted={onScanCompleted}
-      />
-    );
+    return <RestoreByCloudQRCodeContents onScanCompleted={onScanCompleted} />;
   }
 
   function renderRestoreByCloudQrCodeHeader() {
@@ -810,9 +772,7 @@ export default function RestoreSelectedContactsList(props) {
         <View style={styles.separator} />
 
         <TouchableOpacity
-          onPress={
-            () => (RestoreByCloudQrCode as any).current.snapTo(1)
-          }
+          onPress={() => (RestoreByCloudQrCode as any).current.snapTo(1)}
         >
           <View
             style={{
