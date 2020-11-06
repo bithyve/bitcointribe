@@ -5,13 +5,18 @@ import {
   EphemeralData,
   EncryptedEphemeralData,
   ShareUploadables,
-  EphemeralDataForKeeper
+  EphemeralDataForKeeper,
+  EphemeralDataElements,
+  EncryptedTrustedData,
+  TrustedData
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
 import { ec as EC } from 'elliptic';
 import { BH_AXIOS } from '../../services/api';
 import { AxiosResponse } from 'axios';
+import TrustedContacts from './TrustedContacts';
+import LevelHealth from './LevelHealth/LevelHealth';
 var ec = new EC('curve25519');
 
 const { HEXA_ID } = config;
@@ -19,6 +24,13 @@ const { HEXA_ID } = config;
 export default class Keeper {
 
   public keepers: Keepers = {};
+  constructor(stateVars) {
+    this.initializeStateVars(stateVars);
+  }
+
+  public initializeStateVars = (stateVars) => {
+    this.keepers = stateVars && stateVars.keeper ? stateVars.keeper : {};
+  };
 
   public static cipherSpec: {
     algorithm: string;
@@ -73,33 +85,161 @@ export default class Keeper {
     return { data };
   };
 
-  // public initializeKeeper = (
-  //   uuid: string,
-  //   privateKey: string,
-  //   publicKey: string,
-  //   encKey: string,
-  //   ephemeralAddress: string
-  // ): boolean => {
+  public decodePublicKey = (publicKey: string) => {
+    const keyPair = ec.keyFromPublic(publicKey, 'hex');
+    return keyPair.getPublic();
+  };
 
-  //   // const keyPair = ec.genKeyPair();
-  //   // const publicKey = keyPair.getPublic('hex');
-  //   // const privateKey = keyPair.getPrivate('hex');
+  public static encryptPub = (
+    publicKey: string,
+    key: string,
+  ): { encryptedPub: string } => {
+    const encryptionKey = Keeper.getDerivedKey(key);
 
-  //   // const ephemeralAddress = crypto
-  //   //   .createHash('sha256')
-  //   //   .update(publicKey)
-  //   //   .digest('hex');
+    const cipher = crypto.createCipheriv(
+      Keeper.cipherSpec.algorithm,
+      encryptionKey,
+      Keeper.cipherSpec.iv,
+    );
 
-  //   this.keepers[shareId] = {
-  //     uuid: uuid,
-  //     privateKey,
-  //     publicKey,
-  //     encKey,
-  //     ephemeralChannel: { address: ephemeralAddress },
-  //   };
+    const prefix = 'hexa:';
+    let encryptedPub = cipher.update(prefix + publicKey, 'utf8', 'hex');
+    encryptedPub += cipher.final('hex');
 
-  //   return true;
-  // };
+    return { encryptedPub };
+  };
+
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => {
+    const decryptionKey = Keeper.getDerivedKey(key);
+
+    const decipher = crypto.createDecipheriv(
+      Keeper.cipherSpec.algorithm,
+      decryptionKey,
+      Keeper.cipherSpec.iv,
+    );
+
+    let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
+    decryptedPub += decipher.final('utf8');
+
+    if (decryptedPub.slice(0, 5) !== 'hexa:') {
+      throw new Error('PubKey decryption failed: invalid key');
+    }
+
+    return { decryptedPub: decryptedPub.slice(5) };
+  };
+
+  private static getDerivedKey = (psuedoKey: string): string => {
+    const hashRounds = 1048;
+    let key = psuedoKey;
+    for (let itr = 0; itr < hashRounds; itr++) {
+      const hash = crypto.createHash('sha512');
+      key = hash.update(key).digest('hex');
+    }
+    return key.slice(key.length - Keeper.cipherSpec.keyLength);
+  };
+
+  public initializeKeeper = (
+    shareId: string,
+    encKey: string,
+  ): { publicKey: string; ephemeralAddress: string } => {
+    if (this.keepers[shareId]) {
+      throw new Error(
+        'TC Init failed: initialization already exists against the supplied',
+      );
+    }
+
+    const keyPair = ec.genKeyPair();
+    const publicKey = keyPair.getPublic('hex');
+    const privateKey = keyPair.getPrivate('hex');
+
+    const ephemeralAddress = crypto
+      .createHash('sha256')
+      .update(publicKey)
+      .digest('hex');
+
+    let otp;
+    if (!encKey) {
+      // contact with no phone-number/email
+      otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+      encKey = LevelHealth.strechKey(otp);
+    }
+
+    this.keepers[shareId] = {
+      privateKey,
+      publicKey,
+      encKey,
+      otp,
+      ephemeralChannel: { address: ephemeralAddress },
+    };
+
+    return { publicKey, ephemeralAddress };
+  };
+
+  public finalizeKeeper = (
+    shareId: string,
+    encodedPublicKey: string,
+    encKey: string,
+    walletName?: string,
+    EfChannelAddress?: string,
+  ): {
+    channelAddress: string;
+    ephemeralAddress: string;
+    publicKey: string;
+  } => {
+    if (!this.keepers[shareId]) {
+      this.initializeKeeper(shareId, encKey); // case: trusted contact setup has been requested
+    }
+
+    if (
+      this.keepers[shareId].trustedChannel &&
+      this.keepers[shareId].trustedChannel.address
+    ) {
+      throw new Error(
+        'TC finalize failed: channel already exists with this keeper',
+      );
+    }
+
+    const { ephemeralChannel, privateKey } = this.keepers[shareId];
+    const keyPair = ec.keyFromPrivate(privateKey, 'hex');
+    const symmetricKey = keyPair
+      .derive(this.decodePublicKey(encodedPublicKey))
+      .toString(16); // ECDH
+
+    const channelAddress = crypto
+      .createHash('sha256')
+      .update(symmetricKey)
+      .digest('hex');
+
+    const ephemeralAddress = EfChannelAddress;
+    // crypto
+    //   .createHash('sha256')
+    //   .update(encodedPublicKey)
+    //   .digest('hex');
+
+    this.keepers[shareId] = {
+      ...this.keepers[shareId],
+      symmetricKey,
+      ephemeralChannel: {
+        ...ephemeralChannel,
+        address: ephemeralAddress,
+      },
+      trustedChannel: {
+        address: channelAddress,
+      },
+      keeperPubKey: encodedPublicKey,
+      walletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+    };
+    return {
+      channelAddress,
+      ephemeralAddress,
+      publicKey: keyPair.getPublic('hex'),
+    };
+  };
 
   public updateEphemeralChannelData = (
     shareId: string,
@@ -281,5 +421,318 @@ export default class Keeper {
     };
     this.updateEphemeralChannelData(shareId, decryptedEphemeralData.data);
     return decryptedEphemeralData;
+  };
+
+  public fetchEphemeralChannel = async (
+    shareId: string,
+    encKey: string,
+    approveTC?: Boolean,
+    publicKey?: string,
+  ): Promise<{
+    data: EphemeralDataElementsForKeeper;
+  }> => {
+    try {
+      let res: AxiosResponse;
+
+      if (!publicKey) {
+        if (!this.keepers[shareId]) {
+          throw new Error(`No contact exist with contact name: ${shareId}`);
+        }
+
+        const { ephemeralChannel } = this.keepers[shareId];
+
+        res = await BH_AXIOS.post('fetchEphemeralChannel', {
+          HEXA_ID,
+          address: ephemeralChannel.address,
+          identifier: this.keepers[shareId].publicKey,
+        });
+      } else {
+        // if publicKey; fetch data without any storage
+        const address = crypto
+          .createHash('sha256')
+          .update(publicKey)
+          .digest('hex');
+        res = await BH_AXIOS.post('fetchEphemeralChannel', {
+          HEXA_ID,
+          address,
+          identifier: `!${publicKey}`, // anti-counterparty's pub
+        });
+      }
+      let { data } = res.data;
+
+      if (!publicKey && data && Object.keys(data).length) {
+        data = this.processEphemeralChannelData(shareId, data, encKey);
+      }
+
+      if (!publicKey && approveTC) {
+        let contactsPublicKey;
+        this.keepers[shareId].ephemeralChannel.data.forEach(
+          (element: EphemeralDataElements) => {
+            if (
+              element.publicKey !== this.keepers[shareId].publicKey
+            ) {
+              contactsPublicKey = element.publicKey;
+            }
+          },
+        ); // only one element would contain the public key (uploaded by the counterparty)
+
+        if (!contactsPublicKey) {
+          // console.log(`Approval failed, ${contactName}'s public key missing`);
+          throw new Error(
+            `Approval failed, ${shareId}'s public key missing`,
+          );
+        }
+
+        this.finalizeKeeper(shareId, contactsPublicKey, encKey);
+      }
+
+      return { data };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
+  };
+
+  public updateTrustedChannelData = (
+    shareId: string,
+    newTrustedData: TrustedData,
+  ): { updatedTrustedData; overallTrustedData: TrustedData[] } => {
+    let trustedData: TrustedData[] = this.keepers[shareId]
+      .trustedChannel.data
+      ? [...this.keepers[shareId].trustedChannel.data]
+      : [];
+    let updatedTrustedData: TrustedData = newTrustedData;
+    if (trustedData.length) {
+      let updated = false;
+      for (let index = 0; index < trustedData.length; index++) {
+        if (trustedData[index].publicKey === newTrustedData.publicKey) {
+          trustedData[index].data = {
+            ...trustedData[index].data,
+            ...newTrustedData.data,
+          };
+          updated = true;
+          updatedTrustedData = trustedData[index];
+          break;
+        }
+      }
+
+      if (!updated) {
+        // counterparty's data reception for the first time
+        trustedData.push(newTrustedData);
+        // console.log({ newTrustedData });
+        // update counterparty's walletId and FCM
+
+        newTrustedData.data.walletID
+          ? (this.keepers[shareId].walletID =
+              newTrustedData.data.walletID)
+          : null;
+
+        if (newTrustedData.data.FCM)
+          this.keepers[shareId].FCMs
+            ? this.keepers[shareId].FCMs.push(
+                newTrustedData.data.FCM,
+              )
+            : (this.keepers[shareId].FCMs = [
+                newTrustedData.data.FCM,
+              ]);
+      }
+    } else {
+      trustedData = [newTrustedData];
+    }
+
+    // this.keepers[contactName].trustedChannel.data = trustedData; save post updation
+    return { updatedTrustedData, overallTrustedData: trustedData };
+  };
+
+  public processTrustedChannelData = (
+    contactName: string,
+    encryptedData: EncryptedTrustedData,
+    symmetricKey: string,
+  ): TrustedData => {
+    const data: TrustedDataElements = this.decryptData(
+      symmetricKey,
+      encryptedData.encryptedData,
+    ).data;
+
+    const decryptedTrustedData: TrustedData = {
+      publicKey: encryptedData.publicKey,
+      data,
+      encDataHash: crypto
+        .createHash('sha256')
+        .update(encryptedData.encryptedData)
+        .digest('hex'),
+      lastSeen: encryptedData.lastSeen,
+    };
+    const { overallTrustedData } = this.updateTrustedChannelData(
+      contactName,
+      decryptedTrustedData,
+    );
+    this.keepers[contactName].trustedChannel.data = overallTrustedData;
+    return decryptedTrustedData;
+  };
+
+  public updateTrustedChannel = async (
+    shareId: string,
+    dataElements: TrustedDataElements,
+    fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
+  ): Promise<
+    | {
+        updated: any;
+        data: any; //TrustedData;
+      }
+    | {
+        updated: any;
+        data?: undefined;
+      }
+  > => {
+    try {
+      if (!this.keepers[shareId]) {
+        throw new Error(`No contact exist with contact name: ${shareId}`);
+      }
+
+      if (
+        !this.keepers[shareId].trustedChannel &&
+        !this.keepers[shareId].trustedChannel.address
+      ) {
+        throw new Error(
+          `Secure channel not formed with the following contact: ${shareId}`,
+        );
+      }
+
+      const { trustedChannel, symmetricKey, publicKey } = this.keepers[
+        shareId
+      ];
+
+      const trustedData: TrustedData = {
+        publicKey,
+        data: dataElements,
+      };
+      const {
+        updatedTrustedData,
+        overallTrustedData,
+      } = this.updateTrustedChannelData(shareId, trustedData);
+
+      const { encryptedData } = this.encryptData(
+        symmetricKey,
+        updatedTrustedData.data,
+      );
+
+      const encryptedDataPacket: EncryptedTrustedData = {
+        publicKey,
+        encryptedData,
+        dataHash: crypto
+          .createHash('sha256')
+          .update(encryptedData)
+          .digest('hex'),
+        lastSeen: Date.now(),
+      };
+
+      let res: AxiosResponse;
+      if (shareUploadables && Object.keys(shareUploadables).length) {
+        res = await BH_AXIOS.post('updateShareAndTC', {
+          // EC update params
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+          // upload share params
+          share: shareUploadables.encryptedMetaShare,
+          messageId: shareUploadables.messageId,
+          encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+        });
+      } else {
+        res = await BH_AXIOS.post('updateTrustedChannel', {
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+        });
+      }
+
+      let { updated, data } = res.data;
+      if (!updated) throw new Error('Failed to update ephemeral space');
+      this.keepers[
+        shareId
+      ].trustedChannel.data = overallTrustedData; // save post updation
+
+      if (data) {
+        data = this.processTrustedChannelData(shareId, data, symmetricKey);
+        const { walletName } = data.data ? data.data : { walletName: null };
+        if (walletName) {
+          this.keepers[shareId] = {
+            ...this.keepers[shareId],
+            walletName: walletName,
+          };
+        }
+        return { updated, data };
+      }
+      return { updated };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
+  };
+
+  public fetchTrustedChannel = async (
+    shareId: string,
+    walletName?: string,
+  ): Promise<{
+    data: TrustedDataElements;
+  }> => {
+    try {
+      if (!this.keepers[shareId]) {
+        throw new Error(`No contact exist with contact name: ${shareId}`);
+      }
+
+      if (
+        !this.keepers[shareId].trustedChannel &&
+        !this.keepers[shareId].trustedChannel.address
+      ) {
+        throw new Error(
+          `Secure channel not formed with the following contact: ${shareId}`,
+        );
+      }
+
+      const { trustedChannel, symmetricKey, publicKey } = this.keepers[
+        shareId
+      ];
+
+      const res = await BH_AXIOS.post('fetchTrustedChannel', {
+        HEXA_ID,
+        address: trustedChannel.address,
+        identifier: publicKey,
+      });
+      // console.log({ res });
+
+      let { data } = res.data;
+      if (data) {
+        data = this.processTrustedChannelData(shareId, data, symmetricKey)
+          .data;
+        if (data.walletName) {
+          this.keepers[shareId] = {
+            ...this.keepers[shareId],
+            walletName: data.walletName,
+          };
+        }
+      }
+
+      if (walletName) {
+        this.keepers[shareId] = {
+          ...this.keepers[shareId],
+          walletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+        };
+      }
+
+      return {
+        data,
+      };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
   };
 }

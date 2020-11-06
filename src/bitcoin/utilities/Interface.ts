@@ -220,6 +220,7 @@ export interface EphemeralDataElements {
   };
   trustedAddress?: string;
   trustedTestAddress?: string;
+  restoreOf?: string;
 }
 
 export interface EphemeralData {
@@ -255,6 +256,10 @@ export interface TrustedDataElements {
   removeGuardian?: boolean;
   remove?: boolean;
   version?: string;
+  isPrimary?: boolean;
+  featuresList?: any;
+  xPub?: any;
+  securityQuestion?: any;
 }
 export interface TrustedData {
   publicKey: string;
@@ -316,15 +321,17 @@ export interface EncryptedImage {
 
 export interface Keepers {
   [shareId: string]: {
-    shareType: string;
-    privateKey: string;
-    publicKey: string;
-    encKey: string;
-    otp?: string;
+    shareType?: string;
+    privateKey?: string;
+    publicKey?: string;
+    shareTransferDetails?: {
+      otp: string;
+      encryptedKey: string;
+    };
     symmetricKey?: string;
     secondaryKey?: string;
-    contactsPubKey?: string;
-    contactsWalletName?: string;
+    keeperPubKey?: string;
+    walletName?: string;
     walletID?: string;
     FCMs?: string[];
     ephemeralChannel?: {
@@ -336,25 +343,27 @@ export interface Keepers {
       address: string;
       data?: TrustedData[];
     };
-    trustedAddress?: string;
-    trustedTestAddress?: string;
   }
 }
 
-// TRUSTED CONTACTS
+// TRUSTED Keeper
 export interface EphemeralDataElementsForKeeper {
   publicKey?: string;
   walletID?: string;
   hexaID?: string;
+  FCM?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
   shareTransferDetails?: {
     otp: string;
     encryptedKey: string;
   };
   xPub? : any;
   securityQuestion?: any;
-  secondaryMnemonics?: any;
   featuresList?: any;
-  twoFASecret?: any;
+  isPrimary?: boolean;
 }
 
 export interface EphemeralDataForKeeper {

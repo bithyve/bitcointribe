@@ -50,8 +50,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import KeeperService from '../../bitcoin/services/KeeperService';
-import { EphemeralDataElements, EphemeralDataElementsForKeeper, MetaShare, ShareUploadables, TrustedDataElements, WalletImage } from '../../bitcoin/utilities/Interface';
-import TrustedContacts from '../../bitcoin/utilities/TrustedContacts';
+import { EphemeralDataElements, MetaShare, ShareUploadables, TrustedDataElements, WalletImage } from '../../bitcoin/utilities/Interface';
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
 import moment from 'moment';
 import { updateEphemeralChannel, updateTrustedChannel, updateTrustedContactInfoLocally } from '../actions/trustedContacts';
@@ -276,6 +275,7 @@ export const updateSharesHealthWatcher = createWatcher(
 );
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
+  const fcmTokenValue = yield select((state) => state.preferences.fcmTokenValue);
   let featuresList = payload.featuresList;
   let type = payload.isPrimaryKeeper ? 'primaryKeeper' : payload.type;
   
@@ -284,6 +284,9 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let securityQuestion = yield select((state) => state.storage.database.WALLET_SETUP);
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
+  );
+  const keeper: KeeperService = yield select(
+    (state) => state.keeper.service,
   );
   let testXpub = s3ServiceTest.hdWallet.getTestXPub();
   let s3ServiceRegular: S3Service = yield select(
@@ -294,30 +297,45 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   let secureXpub = s3ServiceSecure.getXpubsForAccount();
-
-  const secondaryMnemonic = s3ServiceSecure.secureHDWallet.secondaryMnemonic;
-  const twoFASecret = s3ServiceSecure.secureHDWallet.twoFASetup.secret;
   let EFChannelData = JSON.parse(payload.scannedData);
+  let encKey;
+  if (EFChannelData.uuid) encKey = LevelHealth.strechKey(EFChannelData.uuid);
   let {otpEncryptedData, otp} = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData
-  let dataElements: EphemeralDataElementsForKeeper = {
-    publicKey: EFChannelData.publicKey,
-    hexaID: config.HEXA_ID,
-    walletID: s3Service.getWalletId().data.walletId,
-    shareTransferDetails: {
-      otp,
-      encryptedKey,
-    },
-    xPub: { testXpub, regularXpub, secureXpub },
-    securityQuestion: securityQuestion,
-    featuresList: featuresList,
-    secondaryMnemonics: payload.isPrimaryKeeper ? secondaryMnemonic : null,
-    twoFASecret: payload.isPrimaryKeeper ? twoFASecret : null
-  };
   let share  = s3Service.levelhealth.metaShares[1];
   if(payload.selectedShareId){
     share = payload.share;
   }
+  let walletID = s3Service.getWalletId().data.walletId;
+  let hexaPublicKey = '';
+  let trustedChannelAddress = '';
+  let EfChannelAddress = EFChannelData.ephemeralAddress;
+  const result = yield call(
+    keeper.finalizeKeeper,
+    share.shareId,
+    EFChannelData.publicKey,
+    encKey,
+    EFChannelData.walletName,
+    EfChannelAddress
+  );
+  if (result.status === 200) {
+    hexaPublicKey = result.data.publicKey;
+    trustedChannelAddress = result.data.channelAddress;
+    EfChannelAddress = result.data.ephemeralAddress
+  }
+  let dataElements: EphemeralDataElements = {
+    publicKey: EFChannelData.publicKey, //Keeper scanned public key
+    FCM: fcmTokenValue,
+    walletID,
+    shareTransferDetails: {
+      otp,
+      encryptedKey,
+    },
+    DHInfo:{
+      publicKey: hexaPublicKey,
+    },
+    trustedAddress: trustedChannelAddress,
+  };
   
   const shareUploadables = LevelHealth.encryptMetaShare(share, EFChannelData.uuid);
 
@@ -334,6 +352,30 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   );
   console.log("RES", res);
   if(res.status == 200){
+    // Create trusted channel 
+    const data: TrustedDataElements = {
+      xPub: { testXpub, regularXpub, secureXpub },
+      walletID,
+      FCM: fcmTokenValue,
+      walletName: EFChannelData.walletName,
+      version: DeviceInfo.getVersion(),
+      shareTransferDetails: {
+        otp,
+        encryptedKey,
+      },
+      isPrimary: payload.isPrimaryKeeper,
+      featuresList,
+      securityQuestion
+    };
+    const updateRes = yield call(
+      keeper.updateTrustedChannel,
+      share.shareId,
+      data,
+      false,
+    );
+
+    console.log('updateRes', updateRes);
+
     let shareArray = [
       {
         walletId: s3Service.getWalletId().data.walletId,
