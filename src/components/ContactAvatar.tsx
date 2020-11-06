@@ -1,51 +1,51 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Colors from '../common/Colors';
+import ImageStyles from '../common/Styles/ImageStyles';
 import { nameToInitials } from '../common/CommonFunctions';
 import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing';
 
 export type Props = {
   contact: ContactRecipientDescribing;
-  containerStyle: Record<string, unknown>;
+  containerStyle?: Record<string, unknown>;
+  contentContainerStyle?: Record<string, unknown>;
 };
 
 const ContactAvatar: React.FC<Props> = ({
   contact,
-  containerStyle,
+  containerStyle = {},
+  contentContainerStyle = {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageMedium,
+  },
 }: Props) => {
   if (contact.avatarImageSource) {
-    return <Image source={contact.avatarImageSource} style={containerStyle} />;
+    return (
+      <View style={containerStyle}>
+        <Image
+          source={contact.avatarImageSource}
+          style={contentContainerStyle}
+          resizeMode="contain"
+        />
+      </View>
+    );
   } else {
-    const displayedNameText = useMemo(() => {
-      if (
-        contact.displayedName === 'F&F request' &&
-        contact.contactsWalletName !== undefined &&
-        contact.contactsWalletName !== ''
-      ) {
-        return `${contact.contactsWalletName}'s wallet`;
-      } else {
-        return contact.displayedName;
-      }
-    }, [contact]);
-
-
     return (
       <View
         style={{
           backgroundColor: Colors.shadowBlue,
           alignItems: 'center',
           justifyContent: 'center',
-          ...containerStyle,
+          ...contentContainerStyle,
         }}
       >
         <Text
           style={{
             textAlign: 'center',
-            fontSize: 13,
-            lineHeight: 13, //... One for top and one for bottom alignment
+            fontSize: 14,
           }}
         >
-          {nameToInitials(displayedNameText)}
+          {nameToInitials(contact.displayedName)}
         </Text>
       </View>
     );

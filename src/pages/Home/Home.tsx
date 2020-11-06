@@ -34,7 +34,6 @@ import {
 import { connect } from 'react-redux';
 import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
-import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
@@ -2197,7 +2196,6 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    updateAddressBookLocally,
     setCardData,
   })(Home),
 );

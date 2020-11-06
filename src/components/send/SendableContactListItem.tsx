@@ -21,12 +21,8 @@ const SendableContactListItem: React.FC<Props> = ({
   containerStyle = {},
 }: Props) => {
   const displayedNameText = useMemo(() => {
-    if (
-      contact.displayedName === 'F&F request' &&
-      contact.contactsWalletName !== undefined &&
-      contact.contactsWalletName !== ''
-    ) {
-      return `${contact.contactsWalletName}'s wallet`;
+    if (contact.walletName !== null) {
+      return `${contact.walletName}'s wallet`;
     } else {
       return contact.displayedName;
     }
@@ -38,7 +34,6 @@ const SendableContactListItem: React.FC<Props> = ({
       <View style={styles.circledAvatarContainer}>
         <ContactAvatar
           contact={contact}
-          containerStyle={styles.circledAvatarContainer}
         />
 
         {isSelected && (

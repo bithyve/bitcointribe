@@ -16,3 +16,8 @@ export function colorForLastSeenActive(lastSeenActiveTime: Milliseconds) {
     return Colors.gray2;
   }
 }
+
+
+export function agoTextForLastSeen(lastSeenActiveTime: Milliseconds) {
+  return moment(lastSeenActiveTime).fromNow();
+}

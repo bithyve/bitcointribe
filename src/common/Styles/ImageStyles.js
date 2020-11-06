@@ -15,6 +15,11 @@ const ListStyles = StyleSheet.create({
     height: 44,
   },
 
+  thumbnailImageLarge: {
+    width: 54,
+    height: 54,
+  },
+
   reorderItemIconImage: {
     width: 44,
     height: 44,
@@ -28,11 +33,11 @@ const ListStyles = StyleSheet.create({
     justifyContent: 'center',
     shadowOffset: {
       width: 0,
-      height: 7,
+      height: 3,
     },
     shadowRadius: 10,
     shadowOpacity: 0.7,
-    shadowColor: Colors.gray4,
+    shadowColor: Colors.gray3,
     elevation: 10,
   },
 });

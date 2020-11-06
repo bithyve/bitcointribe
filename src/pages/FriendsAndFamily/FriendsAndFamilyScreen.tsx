@@ -18,7 +18,6 @@ import idx from 'idx';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   trustedChannelsSetupSync,
   removeTrustedContact,
@@ -30,7 +29,6 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
-import { nameToInitials } from '../../common/CommonFunctions';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
@@ -41,10 +39,32 @@ import config from '../../bitcoin/HexaConfig';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
-import CountDown from '../../components/CountDown';
 import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions';
+import { ListItem } from 'react-native-elements';
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent';
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
+import RecipientKind from '../../common/data/enums/RecipientKind';
+
+
+function makeContactDescription(data: any, trustKind: ContactTrustKind): ContactRecipientDescribing {
+  return {
+    id: data.id,
+    kind: RecipientKind.CONTACT,
+    displayedName: data.contactName,
+    walletName: data.contactsWalletName,
+    avatarImageSource: null,
+    availableBalance: 0,
+    initiatedAt: data.initiatedAt,
+    lastSeenActive: data.lastSeen,
+    trustKind: trustKind,
+    hasXPub: data.hasXpub,
+    hasTrustedAddress: data.hasTrustedAddress,
+    hasTrustedChannelWithUser: data.hasTrustedChannel,
+  };
+}
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -67,69 +87,8 @@ interface FriendsAndFamilyStateTypes {
   trustedContact: any[];
   OtherTrustedContact: any[];
   onRefresh: boolean;
-  updateList: boolean;
   isShowingKnowMoreSheet: boolean;
 }
-
-const makeFullName = (item) => {
-  return item.firstName == 'Secondary' && item.lastName == 'Device'
-    ? 'Keeper Device'
-    : item.firstName && item.lastName
-      ? item.firstName + ' ' + item.lastName
-      : item.firstName && !item.lastName
-        ? item.firstName
-        : !item.firstName && item.lastName
-          ? item.lastName
-          : '';
-};
-
-const getImageIcon = (item) => {
-  if (item) {
-    if (item.image && item.image.uri) {
-      return <Image source={item.image} style={styles.imageIconStyle} />;
-    } else {
-      if (
-        item.firstName === 'F&F request' &&
-        item.contactsWalletName !== undefined &&
-        item.contactsWalletName !== ''
-      ) {
-        return (
-          <View style={styles.imageIconViewStyle}>
-            <Text style={styles.imageIconText}>
-              {item
-                ? nameToInitials(
-                  item.contactsWalletName && item.contactsWalletName !== ''
-                    ? `${item.contactsWalletName}'s Wallet`
-                    : makeFullName(item),
-                )
-                : ''}
-            </Text>
-          </View>
-        );
-      } else {
-        return (
-          <View style={styles.imageIconViewStyle}>
-            <Text style={styles.imageIconText}>
-              {item
-                ? nameToInitials(
-                  item.firstName == 'Secondary' && item.lastName == 'Device'
-                    ? 'Keeper Device'
-                    : item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                )
-                : ''}
-            </Text>
-          </View>
-        );
-      }
-    }
-  }
-};
 
 class FriendsAndFamilyScreen extends PureComponent<
   FriendsAndFamilyPropTypes,
@@ -158,7 +117,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       IMKeeper: idx(props, (_) => _.addressBookData.IMKeeper) || [],
       OtherTrustedContact:
         idx(props, (_) => _.addressBookData.OtherTrustedContact) || [],
-      updateList: false,
       isShowingKnowMoreSheet: false,
     };
   }
@@ -366,201 +324,42 @@ class FriendsAndFamilyScreen extends PureComponent<
     );
   };
 
-  getImageIcon = (item) => {
-    if (item) {
-      if (item.image && item.image.uri) {
-        return (
-          <Image
-            source={item.image}
-            style={{
-              width: wp('12%'),
-              height: wp('12%'),
-              borderRadius: wp('12%') / 2,
-              resizeMode: 'contain',
-            }}
-          />
-        );
-      } else {
-        if (
-          item.firstName === 'F&F request' &&
-          item.contactsWalletName !== undefined &&
-          item.contactsWalletName !== ''
-        ) {
-          return (
-            <View style={styles.imageIconViewStyle}>
-              <Text style={styles.imageIconText}>
-                {item
-                  ? nameToInitials(
-                    item.contactsWalletName && item.contactsWalletName !== ''
-                      ? `${item.contactsWalletName}'s Wallet`
-                      : makeFullName(item),
-                  )
-                  : ''}
-              </Text>
-            </View>
-          );
-        } else {
-          return (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: Colors.shadowBlue,
-                width: wp('12%'),
-                height: wp('12%'),
-                borderRadius: wp('12%') / 2,
-              }}
-            >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 13,
-                  lineHeight: 13,
-                }}
-              >
-                {item
-                  ? nameToInitials(
-                    item.firstName == 'Secondary' && item.lastName == 'Device'
-                      ? 'Keeper Device'
-                      : item.firstName && item.lastName
-                        ? item.firstName + ' ' + item.lastName
-                        : item.firstName && !item.lastName
-                          ? item.firstName
-                          : !item.firstName && item.lastName
-                            ? item.lastName
-                            : '',
-                  )
-                  : ''}
-              </Text>
-            </View>
-          );
-        }
-      }
-    }
-  };
+  handleContactSelection(
+    backendContactInfo: unknown,
+    index: number,
+    contactType: string,
+  ) {
+    this.props.navigation.navigate('ContactDetails', {
+      contact: backendContactInfo,
+      index,
+      contactsType: contactType,
 
-  getElement = (contact, index, contactsType) => {
-    const { navigation } = this.props;
-    var minute =
-      config.TC_REQUEST_EXPIRY / 1000 -
-      (Date.now() - contact.initiatedAt) / 1000;
+      // TODO: Figure out what this is
+      shareIndex: backendContactInfo.shareIndex,
+    });
+  }
 
+  renderContactListItem = ({
+    backendContactInfo,
+    contactDescription,
+    index,
+    contactsType,
+  }: {
+    backendContactInfo: unknown,
+    contactDescription: ContactRecipientDescribing,
+    index: number,
+    contactsType: string
+  }) => {
     return (
-      <TouchableOpacity
-        key={contact.id}
-        onPress={() => {
-          navigation.navigate('ContactDetails', {
-            contactsType,
-            contact,
-            index,
-            shareIndex: contact.shareIndex,
-          });
-        }}
-        style={styles.selectedContactsView}
+      <ListItem
+        key={String(index)}
+        bottomDivider
+        onPress={() => this.handleContactSelection(backendContactInfo, index, contactsType)}
       >
-        {getImageIcon(contact)}
-        <View>
-          <Text style={styles.contactText}>
-            {contact.firstName === 'F&F request' &&
-              contact.contactsWalletName !== undefined &&
-              contact.contactsWalletName !== ''
-              ? `${contact.contactsWalletName}'s `
-              : contact.firstName && contact.firstName != 'Secondary'
-                ? contact.firstName + ' '
-                : contact.firstName && contact.firstName == 'Secondary'
-                  ? 'Keeper '
-                  : ''}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.firstName === 'F&F request' &&
-                contact.contactsWalletName !== undefined &&
-                contact.contactsWalletName !== ''
-                ? 'Wallet'
-                : contact.lastName && contact.lastName != 'Device'
-                  ? contact.lastName + ' '
-                  : contact.lastName && contact.lastName == 'Device'
-                    ? 'Device '
-                    : ''}
-            </Text>
-          </Text>
-          {contact.connectedVia ? (
-            <Text style={styles.phoneText}>
-              {contact.usesOTP
-                ? !contact.hasTrustedChannel
-                  ? 'OTP: ' + contact.connectedVia
-                  : ''
-                : contact.connectedVia}
-            </Text>
-          ) : null}
-        </View>
-        <View style={styles.getImageView}>
-          {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? (
-            <View>
-              {!(contact.hasXpub || contact.hasTrustedAddress) &&
-                (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                  !contact.hasTrustedChannel ? (
-                    <View
-                      style={{
-                        width: wp('15%'),
-                        height: wp('6%'),
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: Colors.borderColor,
-                        marginRight: 10,
-                        borderRadius: 5,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(10),
-                          fontFamily: Fonts.FiraSansRegular,
-                        }}
-                      >
-                        Expired
-                    </Text>
-                    </View>
-                  ) : (
-                    <CountDown
-                      onFinish={() =>
-                        this.setState({ updateList: !this.state.updateList })
-                      }
-                      id={index}
-                      size={12}
-                      until={minute}
-                      digitStyle={{
-                        backgroundColor: '#FFF',
-                        borderWidth: 0,
-                        borderColor: '#FFF',
-                        margin: -10,
-                      }}
-                      digitTxtStyle={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                      separatorStyle={{ color: Colors.textColorGrey }}
-                      timeToShow={['H', 'M', 'S']}
-                      timeLabels={{ h: null, m: null, s: null }}
-                      showSeparator
-                    />
-                  ))}
-            </View>
-          ) : null}
-          <View style={styles.xpubIconView}>
-            <Ionicons
-              name="ios-arrow-forward"
-              color={Colors.borderColor}
-              size={RFValue(15)}
-              style={{
-                marginLeft: 'auto',
-                alignSelf: 'center',
-              }}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
+        <FriendsAndFamilyContactListItemContent contact={contactDescription} />
+      </ListItem>
     );
-  };
+  }
 
   renderAddContactFriendsAndFamily = () => {
     const { navigation } = this.props;
@@ -618,7 +417,14 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   render() {
     const { trustedChannelsSetupSync } = this.props;
-    const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
+
+    const {
+      MyKeeper: contactsKeepingUser,
+      IMKeeper: contactsKeptByUser,
+      OtherTrustedContact: otherTrustedContacts,
+      onRefresh,
+    } = this.state;
+
     return (
       <>
         <ScrollView
@@ -632,55 +438,76 @@ class FriendsAndFamilyScreen extends PureComponent<
           }
           style={{ flex: 1, marginBottom: hp('6%') }}
         >
+
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
-              </Text>
+            </Text>
+
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {MyKeeper.length > 0 ? (
-                  MyKeeper.map((item, index) => {
-                    return this.getElement(item, index, 'My Keepers');
+                {contactsKeepingUser.length > 0 && (
+                  contactsKeepingUser.map((item, index) => {
+                    return this.renderContactListItem({
+                      backendContactInfo: item,
+                      contactDescription: makeContactDescription(item, ContactTrustKind.KEEPER_OF_USER),
+                      index,
+                      contactsType: "My Keepers",
+                    });
                   })
-                ) : (
+                ) || (
                     <View style={{ height: wp('22%') + 30 }} />
                   )}
               </View>
             </View>
           </View>
+
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
             <Text style={styles.pageInfoText}>
               Contacts whose wallets I can help restore
-              </Text>
+            </Text>
+
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {IMKeeper.length > 0 ? (
-                  IMKeeper.map((item, index) => {
-                    return this.getElement(item, index, "I'm Keeper of");
+                {contactsKeptByUser.length > 0 && (
+                  contactsKeptByUser.map((item, index) => {
+                    return this.renderContactListItem({
+                      backendContactInfo: item,
+                      contactDescription: makeContactDescription(item, ContactTrustKind.USER_IS_KEEPING),
+                      index,
+                      contactsType: "I'm Keeper of",
+                    });
                   })
-                ) : (
+                ) || (
                     <View style={{ height: wp('22%') + 30 }} />
                   )}
               </View>
             </View>
           </View>
+
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
               Contacts who I can pay directly
-              </Text>
+            </Text>
 
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {OtherTrustedContact.length > 0 ? (
-                  OtherTrustedContact.map((item, index) => {
-                    return this.getElement(item, index, 'Other Contacts');
+                {otherTrustedContacts.length > 0 && (
+                  otherTrustedContacts.map((item, index) => {
+                    return this.renderContactListItem({
+                      backendContactInfo: item,
+                      contactDescription: makeContactDescription(item, ContactTrustKind.OTHER),
+                      index,
+                      contactsType: 'Other Contacts',
+                    });
                   })
-                ) : (
+                ) || (
                     <View style={{ height: wp('22%') + 30 }} />
                   )}
+
                 <TouchableOpacity
                   onPress={() => {
                     setTimeout(() => {
@@ -708,9 +535,9 @@ class FriendsAndFamilyScreen extends PureComponent<
               </View>
             </View>
           </View>
-          {OtherTrustedContact.length == 0 &&
-            IMKeeper.length == 0 &&
-            MyKeeper.length == 0 && (
+          {otherTrustedContacts.length == 0 &&
+            contactsKeepingUser.length == 0 &&
+            contactsKeptByUser.length == 0 && (
               <BottomInfoBox
                 title={'Note'}
                 infoText={
