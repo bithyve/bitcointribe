@@ -1,5 +1,5 @@
 import {
-  EphemeralDataElementsForKeeper,
+  EphemeralDataElements,
   ShareUploadables,
   TrustedData,
   TrustedDataElements
@@ -121,7 +121,7 @@ export default class KeeperService {
     shareType: string,
     publicKey: string,
     ephemeralAddress: string,
-    dataElements: EphemeralDataElementsForKeeper,
+    dataElements: EphemeralDataElements,
     encKey: string,
     shareUploadables: ShareUploadables,
     fetch?: Boolean,
@@ -133,7 +133,7 @@ export default class KeeperService {
       | {
         updated: any;
         publicKey: string;
-        data: EphemeralDataElementsForKeeper;
+        data: EphemeralDataElements;
       }
       | {
         updated: any;
