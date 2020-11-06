@@ -686,7 +686,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { s3Service, initHealthCheck, navigation } = this.props;
+    const { navigation, s3Service, initializeHealthSetup } = this.props;
 
     this.closeBottomSheet();
     this.updateAccountCardData();
@@ -702,8 +702,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-
-    const { s3Service, initializeHealthSetup } = this.props;
     const { healthCheckInitialized } = s3Service.levelhealth;
     console.log("healthCheckInitialized", healthCheckInitialized);
     if (!healthCheckInitialized) {
