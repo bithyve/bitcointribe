@@ -62,9 +62,9 @@ import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
-import SelectedRecipientListItem from '../../../components/send/SelectedRecipientListItem';
-import { RecipientDescribing, ContactRecipientDescribing, AccountRecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing';
-import { sampleContactRecipients, sampleAccountRecipients } from './temporary-preview-data';
+import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
+import { RecipientDescribing, ContactRecipientDescribing, AccountRecipientDescribing, makeContactRecipientDescription, makeSubAccountRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
+
 
 const currencyCode = [
   'BRL',
@@ -80,8 +80,6 @@ const currencyCode = [
 
 
 interface SendToContactPropsTypes {
-  selectedContactRecipients: ContactRecipientDescribing[],
-  selectedAccountRecipients: AccountRecipientDescribing[],
   navigation: any;
   accountsState: any;
   transferST1: any;
@@ -98,7 +96,7 @@ interface SendToContactPropsTypes {
 }
 
 interface SendToContactStateTypes {
-  selectedRecipients: RecipientDescribing[];
+  selectedRecipients: any[];
   RegularAccountBalance: any;
   SavingAccountBalance: any;
   isFromAddressBook: any;
@@ -132,16 +130,19 @@ class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
   > {
+  removeItemBottomSheetRef = React.createRef<BottomSheet>();
+
   constructor(props) {
     super(props);
 
+    const accountKind = this.props.navigation.getParam('serviceType');
+
     this.state = {
-      selectedRecipients: [
-        // ...this.props.selectedContactRecipients,
-        // ...this.props.selectedContactRecipients,
-        ...sampleContactRecipients,
-        ...sampleAccountRecipients,
-      ],
+      selectedRecipients: this.props
+        .accountsState[accountKind]
+        .transfer
+        .details
+        .map(item => item.selectedContact),
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
       isFromAddressBook: this.props.navigation.getParam('isFromAddressBook')
@@ -150,7 +151,7 @@ class SendToContact extends Component<
       isOpen: false,
       exchangeRates: null,
       selectedContact: this.props.navigation.getParam('selectedContact'),
-      serviceType: this.props.navigation.getParam('serviceType'),
+      serviceType: accountKind,
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
       derivativeAccountDetails: this.props.navigation.getParam(
@@ -948,13 +949,36 @@ class SendToContact extends Component<
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentOffset={{ x: -24, y: 0 }}
-            renderItem={({ item: recipient }: { item: RecipientDescribing }) => {
+            renderItem={({ item, index }: { item: unknown, index: number }) => {
+              let recipient: RecipientDescribing;
+
+              // 🔑 This seems to be the way the backend is distinguishing between
+              // accounts and contacts.
+              if (item.account_name != null) {
+                // 🔑 This seems to be the way the backend is defining the "account kind".
+                const accountKind = {
+                  'Checking Account': REGULAR_ACCOUNT,
+                  'Savings Account': SECURE_ACCOUNT,
+                  'Test Account': TEST_ACCOUNT,
+                  'Donation Account': DONATION_ACCOUNT,
+                }[item.account_name || 'Checking Account'];
+
+                recipient = makeSubAccountRecipientDescription(item, accountKind);
+              } else {
+                recipient = makeContactRecipientDescription(item);
+              }
+
               return (
-                <SelectedRecipientListItem
+                <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
                   onRemove={() => {
-                    this.setState({ removeItem: recipient });
+                    this.setState(
+                      { removeItem: accountsState[serviceType].transfer.details[index] },
+                      () => {
+                        this.removeItemBottomSheetRef.current?.snapTo(1);
+                      }
+                    );
                   }}
                 />
               );
@@ -1331,12 +1355,10 @@ class SendToContact extends Component<
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
-          ref={'RemoveBottomSheet'}
+          ref={this.removeItemBottomSheetRef}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('50%'),
+            hp('50%'),
           ]}
           renderContent={() => {
             if (
@@ -1347,14 +1369,13 @@ class SendToContact extends Component<
                 <RemoveSelectedTransaction
                   selectedContact={removeItem}
                   onPressBack={() => {
-                    if (this.refs.RemoveBottomSheet)
-                      (this.refs.RemoveBottomSheet as any).snapTo(0);
+                    this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
                   onPressDone={() => {
                     setTimeout(() => {
                       removeTransferDetails(serviceType, removeItem);
                     }, 2);
-                    (this.refs.RemoveBottomSheet as any).snapTo(0);
+                    this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
                   serviceType={serviceType}
                 />

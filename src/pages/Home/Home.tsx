@@ -90,24 +90,9 @@ import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibili
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
-
-const getIconByAccountType = (type) => {
-  if (type == 'saving') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'regular' || type === REGULAR_ACCOUNT) {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'secure' || type === SECURE_ACCOUNT) {
-    return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type == 'test' || type === TEST_ACCOUNT) {
-    return require('../../assets/images/icons/icon_test.png');
-  } else if (type === DONATION_ACCOUNT) {
-    return require('../../assets/images/icons/icon_donation_hexa.png');
-  } else {
-    return require('../../assets/images/icons/icon_test.png');
-  }
-};
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
 export enum BottomSheetState {
   Closed,
@@ -2082,7 +2067,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 isBalanceLoading={isBalanceLoading}
                 Items={Items}
                 navigation={navigation}
-                getIconByAccountType={getIconByAccountType}
                 accounts={accounts}
                 addNewDisable={cardDataProps.length == 4 ? true : false}
                 balances={balances}

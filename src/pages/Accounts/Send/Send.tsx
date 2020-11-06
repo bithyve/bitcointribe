@@ -54,7 +54,7 @@ import RecipientSelectionStrip from '../../../components/send/RecipientSelection
 import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection';
 import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view';
 import { sampleContactRecipients, sampleAccountRecipients } from './temporary-preview-data';
-import { ContactRecipientDescribing, AccountRecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { ContactRecipientDescribing, AccountRecipientDescribing, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
 
 export enum SectionKind {
   SCAN_QR,
@@ -755,23 +755,27 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       serviceType,
       balances,
       accountData,
+      trustedContacts,
       selectedSubAccounts,
     } = this.state;
 
-    const trustedContacts = sampleContactRecipients;
-    const selectedContacts = [sampleContactRecipients[0]];
-
     const { accountsState } = this.props;
+    const selectedContacts = [sampleContactRecipients[0]];
 
     return (
       <View style={styles.rootContainer}>
         <KeyboardAwareSectionList
-          extraData={[selectedContacts, selectedSubAccounts]}
+          extraData={[
+            accountData,
+            trustedContacts,
+            selectedContacts,
+            selectedSubAccounts,
+          ]}
           showsVerticalScrollIndicator={false}
           sections={[
             {
               kind: SectionKind.SCAN_QR,
-              data: [this.barcodeRecognized],
+              data: [null],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
@@ -790,7 +794,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       containerStyle={{ margin: 0, padding: 0 }}
                       placeholder="Enter Address Manually"
                       accountKind={serviceType}
-
                     />
                   </View>
                 );
@@ -798,14 +801,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             },
             {
               kind: SectionKind.SELECT_CONTACTS,
-              data: [selectedContacts],
+              data: [null],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
                     {trustedContacts.length && (
                       <RecipientSelectionStrip
                         accountKind={serviceType}
-                        recipients={trustedContacts}
+                        recipients={trustedContacts.map(makeContactRecipientDescription)}
                         selectedRecipients={selectedContacts}
                         onRecipientSelected={this.onRecipientSelected}
                       />
@@ -824,7 +827,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             },
             {
               kind: SectionKind.SELECT_SUB_ACCOUNTS,
-              data: [accountData],
+              data: [null],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>

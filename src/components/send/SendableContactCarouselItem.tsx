@@ -15,7 +15,7 @@ export type Props = {
   containerStyle?: Record<string, unknown>;
 };
 
-const SendableContactListItem: React.FC<Props> = ({
+const SendableContactCarouselItem: React.FC<Props> = ({
   contact,
   isSelected,
   containerStyle = {},
@@ -32,9 +32,7 @@ const SendableContactListItem: React.FC<Props> = ({
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
 
       <View style={styles.circledAvatarContainer}>
-        <ContactAvatar
-          contact={contact}
-        />
+        <ContactAvatar contact={contact} />
 
         {isSelected && (
           <View style={{ ...styles.circledView, position: 'absolute' }}>
@@ -97,4 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SendableContactListItem;
+export default SendableContactCarouselItem;

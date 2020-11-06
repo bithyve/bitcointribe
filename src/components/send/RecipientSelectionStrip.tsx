@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import Colors from '../../common/Colors';
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
-import SendableContactListItem from './SendableContactListItem';
+import SendableContactCarouselItem from './SendableContactCarouselItem';
 import RecipientKind from '../../common/data/enums/RecipientKind';
 import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 
@@ -43,7 +43,7 @@ const RecipientSelectionStrip: React.FC<Props> = ({
         renderItem={({ item: recipient }: { item: RecipientDescribing }) => (
           <TouchableOpacity onPress={() => onRecipientSelected(recipient)}>
             {recipient.kind == RecipientKind.CONTACT && (
-              <SendableContactListItem
+              <SendableContactCarouselItem
                 containerStyle={{ marginHorizontal: 14 }}
                 contact={(recipient as ContactRecipientDescribing)}
                 isSelected={isSelected(recipient)}

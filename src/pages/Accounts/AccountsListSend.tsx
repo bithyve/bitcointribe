@@ -29,7 +29,7 @@ const AccountsListSend = ({
 
   const balance = useMemo(() => {
     if (accounts.id === REGULAR_ACCOUNT) {
-      balances.regularBalance;
+      return balances.regularBalance;
     } else if (accounts.id === SECURE_ACCOUNT) {
       return balances.secureBalance;
     } else if (

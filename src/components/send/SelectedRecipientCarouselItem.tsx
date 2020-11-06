@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import ImageStyles from '../../common/Styles/ImageStyles';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RecipientDescribing, ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
-import { RFValue } from 'react-native-responsive-fontsize';
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator';
 import RecipientKind from '../../common/data/enums/RecipientKind';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -18,7 +17,7 @@ export type Props = {
   containerStyle?: Record<string, unknown>;
 };
 
-const SelectedRecipientListItem: React.FC<Props> = ({
+const SelectedRecipientCarouselItem: React.FC<Props> = ({
   recipient,
   onRemove,
   containerStyle = {},
@@ -28,6 +27,7 @@ const SelectedRecipientListItem: React.FC<Props> = ({
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={styles.circledAvatarContainer}>
+
           <Image
             source={recipient.avatarImageSource}
             style={{ width: '100%', height: '100%' }}
@@ -105,4 +105,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SelectedRecipientListItem;
+export default SelectedRecipientCarouselItem;

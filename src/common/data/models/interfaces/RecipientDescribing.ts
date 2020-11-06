@@ -2,6 +2,7 @@ import { ImageSourcePropType } from "react-native";
 import RecipientKind from "../../enums/RecipientKind";
 import { Satoshis } from "../../typealiases/UnitAliases";
 import ContactTrustKind from "../../enums/ContactTrustKind";
+import getAvatarForSubAccountKind from "../../../../utils/accounts/GetAvatarForSubAccountKind";
 
 export interface RecipientDescribing {
   id: string;
@@ -36,5 +37,40 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {
+}
 
+export function makeSubAccountRecipientDescription(
+  data: unknown,
+  accountKind: string
+): AccountRecipientDescribing {
+  return {
+    id: data.id,
+    kind: RecipientKind.SUB_ACCOUNT,
+    displayedName: data.account_name,
+    avatarImageSource: getAvatarForSubAccountKind(accountKind),
+    availableBalance: data.bitcoinAmount || data.amount || 0,
+    initiatedAt: data.initiatedAt,
+  };
+}
+
+
+
+export function makeContactRecipientDescription(
+  data: unknown,
+  trustKind: ContactTrustKind = ContactTrustKind.OTHER,
+): ContactRecipientDescribing {
+  return {
+    id: data.id,
+    kind: RecipientKind.CONTACT,
+    displayedName: data.contactName,
+    walletName: data.contactsWalletName,
+    avatarImageSource: null,
+    availableBalance: data.bitcoinAmount || data.amount || 0,
+    initiatedAt: data.initiatedAt,
+    lastSeenActive: data.lastSeen,
+    trustKind,
+    hasXPub: data.hasXpub,
+    hasTrustedAddress: data.hasTrustedAddress,
+    hasTrustedChannelWithUser: data.hasTrustedChannel,
+  };
 }

@@ -44,27 +44,9 @@ import { NavigationStackOptions } from 'react-navigation-stack';
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions';
 import { ListItem } from 'react-native-elements';
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent';
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
+import { ContactRecipientDescribing, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing';
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
-import RecipientKind from '../../common/data/enums/RecipientKind';
 
-
-function makeContactDescription(data: any, trustKind: ContactTrustKind): ContactRecipientDescribing {
-  return {
-    id: data.id,
-    kind: RecipientKind.CONTACT,
-    displayedName: data.contactName,
-    walletName: data.contactsWalletName,
-    avatarImageSource: null,
-    availableBalance: 0,
-    initiatedAt: data.initiatedAt,
-    lastSeenActive: data.lastSeen,
-    trustKind: trustKind,
-    hasXPub: data.hasXpub,
-    hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser: data.hasTrustedChannel,
-  };
-}
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -451,7 +433,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   contactsKeepingUser.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactDescription(item, ContactTrustKind.KEEPER_OF_USER),
+                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.KEEPER_OF_USER),
                       index,
                       contactsType: "My Keepers",
                     });
@@ -475,7 +457,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   contactsKeptByUser.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactDescription(item, ContactTrustKind.USER_IS_KEEPING),
+                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.USER_IS_KEEPING),
                       index,
                       contactsType: "I'm Keeper of",
                     });
@@ -499,7 +481,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   otherTrustedContacts.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactDescription(item, ContactTrustKind.OTHER),
+                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.OTHER),
                       index,
                       contactsType: 'Other Contacts',
                     });
