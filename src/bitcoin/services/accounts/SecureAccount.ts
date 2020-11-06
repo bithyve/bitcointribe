@@ -14,31 +14,31 @@ export default class SecureAccount {
     const { secureHDWallet } = JSON.parse(json);
     const {
       primaryMnemonic,
-      secondaryMnemonic,
+      // secondaryMnemonic,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
-      secondaryXpriv,
+      // secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
       receivingAddress,
       transactions,
       confirmedUTXOs,
-      twoFASetup,
+      // twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       feeRates,
     }: {
       primaryMnemonic: string;
-      secondaryMnemonic: string;
+      // secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-      secondaryXpriv?: string;
+      // secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -55,10 +55,10 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      twoFASetup: {
-        qrData: string;
-        secret: string;
-      };
+      // twoFASetup: {
+      //   qrData: string;
+      //   secret: string;
+      // };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -66,19 +66,19 @@ export default class SecureAccount {
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
-      secondaryMnemonic,
+      // secondaryMnemonic,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
-      secondaryXpriv,
+      // secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
       receivingAddress,
       transactions,
       confirmedUTXOs,
-      twoFASetup,
+      // twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -91,12 +91,12 @@ export default class SecureAccount {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
-      secondaryMnemonic: string;
+      // secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-      secondaryXpriv?: string;
+      // secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -113,10 +113,10 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      twoFASetup: {
-        qrData: string;
-        secret: string;
-      };
+      // twoFASetup: {
+      //   qrData: string;
+      //   secret: string;
+      // };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -280,49 +280,49 @@ export default class SecureAccount {
     }
   };
 
-  public resetTwoFA = async (
-    secondaryMnemonic: string,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          qrData: any;
-          secret: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
-      };
-    } catch (err) {
-      return { status: 306, err: err.message, message: ErrMap[306] };
-    }
-  };
+  // public resetTwoFA = async (
+  //   secondaryMnemonic: string,
+  // ): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         qrData: any;
+  //         secret: any;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
+  //     };
+  //   } catch (err) {
+  //     return { status: 306, err: err.message, message: ErrMap[306] };
+  //   }
+  // };
 
-  public removeSecondaryMnemonic = (): { removed: Boolean } =>
-    this.secureHDWallet.removeSecondaryMnemonic();
+  // public removeSecondaryMnemonic = (): { removed: Boolean } =>
+  //   this.secureHDWallet.removeSecondaryMnemonic();
 
-  public removeTwoFADetails = (): { removed: Boolean } =>
-    this.secureHDWallet.removeTwoFADetails();
+  // public removeTwoFADetails = (): { removed: Boolean } =>
+  //   this.secureHDWallet.removeTwoFADetails();
 
-  public isSecondaryMnemonic = (secondaryMnemonic: string) =>
-    this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
+  // public isSecondaryMnemonic = (secondaryMnemonic: string) =>
+  //   this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
 
-  public restoreSecondaryMnemonic = (
-    secondaryMnemonic: string,
-  ): {
-    restored: boolean;
-  } => this.secureHDWallet.restoreSecondaryMnemonic(secondaryMnemonic);
+  // public restoreSecondaryMnemonic = (
+  //   secondaryMnemonic: string,
+  // ): {
+  //   restored: boolean;
+  // } => this.secureHDWallet.restoreSecondaryMnemonic(secondaryMnemonic);
 
   public getSecondaryXpub = ():
     | {
@@ -652,19 +652,19 @@ export default class SecureAccount {
     }
   };
 
-  public generateSecondaryXpriv = (
-    secondaryMnemonic: string,
-  ): { generated: Boolean } => {
-    try {
-      const generated = this.secureHDWallet.generateSecondaryXpriv(
-        secondaryMnemonic,
-      );
-      return { generated };
-    } catch (err) {
-      // console.log({ err });
-      return { generated: false };
-    }
-  };
+  // public generateSecondaryXpriv = (
+  //   secondaryMnemonic: string,
+  // ): { generated: Boolean } => {
+  //   try {
+  //     const generated = this.secureHDWallet.generateSecondaryXpriv(
+  //       secondaryMnemonic,
+  //     );
+  //     return { generated };
+  //   } catch (err) {
+  //     // console.log({ err });
+  //     return { generated: false };
+  //   }
+  // };
 
   public calculateSendMaxFee = (
     numberOfRecipients,
@@ -919,7 +919,7 @@ export default class SecureAccount {
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
 
-      this.secureHDWallet.removeSecondaryXpriv();
+      // this.secureHDWallet.removeSecondaryXpriv();
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
       return { status: 107, err: err.message, message: ErrMap[107] };
@@ -1025,7 +1025,7 @@ export default class SecureAccount {
     return this.secureHDWallet.getSecureXpubs()
   };
 
-  public getSecondaryMnemonics = () => {
-    return this.secureHDWallet.getSecondaryMnemonic()
-  };
+  // public getSecondaryMnemonics = () => {
+  //   return this.secureHDWallet.getSecondaryMnemonic()
+  // };
 }

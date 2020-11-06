@@ -111,18 +111,18 @@ function* generateMetaSharesWorker() {
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
 
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
-  if (!secondaryMnemonic || !twoFASecret) {
-    throw new Error('secure assets missing; staticNonPMDD');
-  }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
+  // const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  // const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
+  // if (!secondaryMnemonic || !twoFASecret) {
+  //   throw new Error('secure assets missing; staticNonPMDD');
+  // }
+  // const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
-    secondaryMnemonic,
-    twoFASecret,
-    secondaryXpub: secondary,
-    bhXpub: bh,
+    secondaryMnemonic: '',
+    twoFASecret: '',
+    secondaryXpub: '',
+    bhXpub: '',
   };
 
   const appVersion = DeviceInfo.getVersion();
@@ -672,17 +672,17 @@ function* generatePersonalCopyWorker({ payload }) {
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  if (!secondaryMnemonic) {
-    throw new Error(
-      'Personal copies generation failed; secondary mnemonic missing',
-    );
-  }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
+  // const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  // if (!secondaryMnemonic) {
+  //   throw new Error(
+  //     'Personal copies generation failed; secondary mnemonic missing',
+  //   );
+  // }
+  // const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
   const secureAssets = {
-    secondaryMnemonic,
-    secondaryXpub: secondary,
-    bhXpub: bh,
+    secondaryMnemonic: '',
+    secondaryXpub: '',
+    bhXpub: '',
   };
 
   const pdfData = {
@@ -774,14 +774,14 @@ function* generatePersonalCopyWorker({ payload }) {
 
     // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
     const blockPCShare = yield call(AsyncStorage.getItem, 'blockPCShare');
-    if (blockPCShare) {
-      if (secureAccount.secureHDWallet.secondaryMnemonic) {
-        const { removed } = secureAccount.removeSecondaryMnemonic();
-        if (!removed) {
-          console.log('Failed to remove the secondary mnemonic');
-        }
-      }
-    }
+    // if (blockPCShare) {
+    //   if (secureAccount.secureHDWallet.secondaryMnemonic) {
+    //     const { removed } = secureAccount.removeSecondaryMnemonic();
+    //     if (!removed) {
+    //       console.log('Failed to remove the secondary mnemonic');
+    //     }
+    //   }
+    // }
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
@@ -1278,21 +1278,21 @@ function* overallHealthWorker({ payload }) {
       );
 
       // remove sec-mne once health approaches 100 (disable PC share)
-      if (secureAccount.secureHDWallet.secondaryMnemonic) {
-        const { removed } = secureAccount.removeSecondaryMnemonic();
-        if (removed) {
-          const { SERVICES } = yield select((state) => state.storage.database);
-          const updatedSERVICES = {
-            ...SERVICES,
-            SECURE_ACCOUNT: JSON.stringify(secureAccount),
-          };
+      // if (secureAccount.secureHDWallet.secondaryMnemonic) {
+      //   const { removed } = secureAccount.removeSecondaryMnemonic();
+      //   if (removed) {
+      //     const { SERVICES } = yield select((state) => state.storage.database);
+      //     const updatedSERVICES = {
+      //       ...SERVICES,
+      //       SECURE_ACCOUNT: JSON.stringify(secureAccount),
+      //     };
 
-          yield call(insertDBWorker, {
-            payload: { SERVICES: updatedSERVICES },
-          });
-          yield call(AsyncStorage.setItem, 'blockPCShare', 'true');
-        }
-      }
+      //     yield call(insertDBWorker, {
+      //       payload: { SERVICES: updatedSERVICES },
+      //     });
+      //     yield call(AsyncStorage.setItem, 'blockPCShare', 'true');
+      //   }
+      // }
     }
 
     yield put(updateShareHistory(overallHealth));

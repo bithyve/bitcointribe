@@ -42,7 +42,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import {
   addTransferDetails,
   clearTransfer,
-  removeTwoFA,
+  // removeTwoFA,
   setAverageTxFee,
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
@@ -55,13 +55,16 @@ import AccountsListSend from './AccountsListSend';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
-import { setSendHelper, setTwoFASetup } from '../../store/actions/preferences';
+import { 
+  setSendHelper, 
+  // setTwoFASetup 
+} from '../../store/actions/preferences';
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
 
 interface SendPropsTypes {
   navigation: any;
   addTransferDetails: any;
-  removeTwoFA: any;
+  // removeTwoFA: any;
   clearTransfer: any;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
@@ -71,8 +74,8 @@ interface SendPropsTypes {
   trustedContactsInfo: any;
   isSendHelperDoneValue: any;
   setSendHelper: any;
-  isTwoFASetupDone: any;
-  setTwoFASetup: any;
+  // isTwoFASetupDone: any;
+  // setTwoFASetup: any;
   averageTxFees: any;
   setAverageTxFee: any;
 }
@@ -149,9 +152,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     this.props.clearTransfer(this.state.serviceType);
     this.getAccountBalances();
 
-    if (this.state.serviceType === SECURE_ACCOUNT) {
-      this.twoFASetupMethod();
-    }
+    // if (this.state.serviceType === SECURE_ACCOUNT) {
+    //   this.twoFASetupMethod();
+    // }
 
     this.checkNShowHelperModal();
     this.setRecipientAddress();
@@ -570,21 +573,21 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
-  twoFASetupMethod = async () => {
-    const { service, isTwoFASetupDone } = this.props; //(await AsyncStorage.getItem('twoFASetup')
-    if (
-      !isTwoFASetupDone &&
-      service[this.state.serviceType].service.secureHDWallet.twoFASetup
-    ) {
-      this.props.navigation.navigate('TwoFASetup', {
-        twoFASetup:
-          service[this.state.serviceType].service.secureHDWallet.twoFASetup,
-      });
-      this.props.removeTwoFA();
-      this.props.setSendHelper(true);
-      //await AsyncStorage.setItem('twoFASetup', 'true');
-    }
-  };
+  // twoFASetupMethod = async () => {
+  //   const { service, isTwoFASetupDone } = this.props; //(await AsyncStorage.getItem('twoFASetup')
+  //   if (
+  //     !isTwoFASetupDone &&
+  //     service[this.state.serviceType].service.secureHDWallet.twoFASetup
+  //   ) {
+  //     this.props.navigation.navigate('TwoFASetup', {
+  //       twoFASetup:
+  //         service[this.state.serviceType].service.secureHDWallet.twoFASetup,
+  //     });
+  //     this.props.removeTwoFA();
+  //     this.props.setSendHelper(true);
+  //     //await AsyncStorage.setItem('twoFASetup', 'true');
+  //   }
+  // };
 
   storeAverageTxFees = async () => {
     const { service } = this.props;
@@ -1067,18 +1070,18 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.preferences.isSendHelperDoneValue,
     ),
-    isTwoFASetupDone: idx(state, (_) => _.preferences.isTwoFASetupDone),
+    // isTwoFASetupDone: idx(state, (_) => _.preferences.isTwoFASetupDone),
     averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
   };
 };
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    removeTwoFA,
+    // removeTwoFA,
     addTransferDetails,
     clearTransfer,
     setSendHelper,
-    setTwoFASetup,
+    // setTwoFASetup,
     setAverageTxFee,
   })(Send),
 );

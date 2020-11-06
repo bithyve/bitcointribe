@@ -91,10 +91,11 @@ const PersonalCopyHistory = (props) => {
       const blockPCShare = await AsyncStorage.getItem('blockPCShare');
       if (blockPCShare) {
         setBlockReshare(blockPCShare);
-      } else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-        AsyncStorage.setItem('blockPCShare', 'true');
-        setBlockReshare(blockPCShare);
-      }
+      } 
+      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+      //   AsyncStorage.setItem('blockPCShare', 'true');
+      //   setBlockReshare(blockPCShare);
+      // }
     })();
   }, []);
 

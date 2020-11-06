@@ -440,15 +440,15 @@ export default (state = initialState, action) => {
         },
       };
 
-    case TWO_FA_RESETTED:
-      return {
-        ...state,
-        additional: {
-          secure: {
-            twoFAResetted: action.payload.resetted,
-          },
-        },
-      };
+    // case TWO_FA_RESETTED:
+    //   return {
+    //     ...state,
+    //     additional: {
+    //       secure: {
+    //         twoFAResetted: action.payload.resetted,
+    //       },
+    //     },
+    //   };
 
     case AVERAGE_TX_FEE:
       return {

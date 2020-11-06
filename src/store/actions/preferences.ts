@@ -100,12 +100,12 @@ export const setSavingWarning = (data) => {
   };
 };
 
-export const setTwoFASetup = (data) => {
-  return {
-    type: TWO_FA_SETUP,
-    payload: { isTwoFASetupDone: data },
-  };
-};
+// export const setTwoFASetup = (data) => {
+//   return {
+//     type: TWO_FA_SETUP,
+//     payload: { isTwoFASetupDone: data },
+//   };
+// };
 
 const updatePereferenceRequest = createAction(UPDATE_APP_PREFERENCE);
 export const updatePreference = (payload) => (dispatch) =>

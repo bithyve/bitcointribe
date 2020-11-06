@@ -52,6 +52,7 @@ import {
   updateMSharesHealth,
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
+import ApproveSetup from './ApproveSetup';
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -164,6 +165,7 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
+    // (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1)
     this.modifyLevelData();
   };
 
@@ -1054,6 +1056,26 @@ class ManageBackup extends Component<
               onPressHeader={() =>
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
+            />
+          )}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'ApprovePrimaryKeeperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('70'),
+          ]}
+          renderContent={() => (
+            <ApproveSetup
+              onPressContinue={() => (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0)}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() => (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0)}
             />
           )}
         />

@@ -342,10 +342,11 @@ const SecondaryDeviceHistory = (props) => {
       const blockPCShare = await AsyncStorage.getItem('blockPCShare');
       if (blockPCShare) {
         setBlockReshare(blockPCShare);
-      } else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-        AsyncStorage.setItem('blockPCShare', 'true');
-        setBlockReshare(blockPCShare);
-      }
+      } 
+      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+      //   AsyncStorage.setItem('blockPCShare', 'true');
+      //   setBlockReshare(blockPCShare);
+      // }
     })();
   }, []);
 
@@ -518,19 +519,19 @@ const SecondaryDeviceHistory = (props) => {
                 qrData.encryptedExitKey,
               );
               if (res.status === 200) {
-                isValid = secureAccount.isSecondaryMnemonic(
-                  res.data.decryptedStaticNonPMDD.secondaryMnemonic,
-                );
+                // isValid = secureAccount.isSecondaryMnemonic(
+                //   res.data.decryptedStaticNonPMDD.secondaryMnemonic,
+                // );
               } else {
                 Alert.alert('Reshare failed', 'Unable to decrypt the exit key');
               }
             } else {
-              isValid = secureAccount.isSecondaryMnemonic(qrData);
+              // isValid = secureAccount.isSecondaryMnemonic(qrData);
             }
           } catch (err) {
             // parsing fails during secondary mnemonic from PDF
             console.log({ err });
-            isValid = secureAccount.isSecondaryMnemonic(qrData);
+            // isValid = secureAccount.isSecondaryMnemonic(qrData);
           }
 
           if (isValid) {
