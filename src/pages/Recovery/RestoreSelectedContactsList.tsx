@@ -43,10 +43,8 @@ import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents';
 
 import LoaderModal from '../../components/LoaderModal';
-import { startupSync } from '../../store/actions/accounts';
-import axios from 'axios';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
-import { syncLastSeensAndHealth } from '../../store/actions/trustedContacts';
+import { walletCheckIn } from '../../store/actions/trustedContacts';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -309,11 +307,10 @@ export default function RestoreSelectedContactsList(props) {
   useEffect(() => {
     (async () => {
       if (SERVICES && walletImageChecked) {
-        await AsyncStorage.setItem('walletExists', 'true');
-        await AsyncStorage.setItem('walletRecovered', 'true');
+        AsyncStorage.setItem('walletExists', 'true');
+        AsyncStorage.setItem('walletRecovered', 'true');
 
-        dispatch(syncLastSeensAndHealth());
-
+        dispatch(walletCheckIn());
         props.navigation.navigate('Home');
       }
     })();

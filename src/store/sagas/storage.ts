@@ -21,7 +21,7 @@ import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
 import { updateWalletImage } from '../actions/sss';
 import { startupSync } from '../actions/accounts';
-import { syncLastSeensAndHealth } from '../actions/trustedContacts';
+import { walletCheckIn } from '../actions/trustedContacts';
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -47,7 +47,7 @@ function* fetchDBWorker() {
 
       if (yield call(AsyncStorage.getItem, 'walletExists')) {
         // actions post DB fetch
-        yield put(syncLastSeensAndHealth());
+        yield put(walletCheckIn());
         yield put(updateWalletImage());
         yield put(startupSync());
       }

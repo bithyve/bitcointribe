@@ -12,7 +12,7 @@ import {
   Image,
   BackHandler,
 } from 'react-native';
-import { Easing } from "react-native-reanimated";
+import { Easing } from 'react-native-reanimated';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
@@ -32,11 +32,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
-import {
-  downloadMShare,
-  initHealthCheck,
-  uploadRequestedShare,
-} from '../../store/actions/sss';
+import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
 import {
@@ -52,10 +48,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications';
 import { storeFbtcData } from '../../store/actions/fbtc';
-import {
-  setCurrencyCode,
-  setCardData,
-} from '../../store/actions/preferences';
+import { setCurrencyCode, setCardData } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import Toast from '../../components/Toast';
@@ -100,7 +93,6 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
-
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
@@ -176,7 +168,6 @@ interface HomePropsTypes {
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
   s3Service: any;
-  initHealthCheck: any;
   overallHealth: any;
   fetchDerivativeAccBalTx: any;
   addTransferDetails: any;
@@ -201,7 +192,6 @@ interface HomePropsTypes {
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
-  
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -274,7 +264,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.openBottomSheetOnLaunch(BottomSheetKind.NOTIFICATIONS_LIST);
   };
-
 
   processQRData = async (qrData) => {
     const { accounts, addTransferDetails, navigation } = this.props;
@@ -385,7 +374,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             () => {
               navigation.goBack();
 
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -410,7 +402,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -433,7 +428,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -457,7 +455,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -476,7 +477,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               trustedContactRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
           break;
@@ -569,8 +573,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                  ? 'User Checking Account'
-                  : 'User Savings Account',
+                ? 'User Checking Account'
+                : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
             bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
@@ -616,18 +620,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
     // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        //repeatInterval: 'hour',
-      });
+    await firebase.notifications().scheduleNotification(notification, {
+      fireDate: date.getTime(),
+      //repeatInterval: 'hour',
+    });
 
-    firebase
-      .notifications()
-      .getScheduledNotifications();
+    firebase.notifications().getScheduledNotifications();
   };
-
 
   onAppStateChange = async (nextAppState) => {
     const { appState } = this.state;
@@ -651,11 +650,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
-    const { s3Service, initHealthCheck, navigation } = this.props;
+    const { s3Service, navigation } = this.props;
 
     this.closeBottomSheet();
     this.updateAccountCardData();
@@ -669,13 +668,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bootStrapNotifications();
     this.setUpFocusListener();
     this.getNewTransactionNotifications();
-
-    // health check
-    const { healthCheckInitialized } = s3Service.sss;
-
-    if (!healthCheckInitialized) {
-      initHealthCheck();
-    }
 
     Linking.addEventListener('url', this.handleDeepLinkEvent);
     Linking.getInitialURL().then(this.handleDeepLinking);
@@ -784,16 +776,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
     date.setSeconds(date.getSeconds() + 1);
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-      });
+    await firebase.notifications().scheduleNotification(notification, {
+      fireDate: date.getTime(),
+    });
 
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then(() => { });
+      .then(() => {});
   };
 
   componentDidUpdate = (prevProps) => {
@@ -874,12 +864,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const userKey = this.props.navigation.getParam('userKey');
 
     if (custodyRequest) {
-      this.setState(
-        { custodyRequest },
-        () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.CUSTODIAN_REQUEST);
-        },
-      );
+      this.setState({ custodyRequest }, () => {
+        this.openBottomSheetOnLaunch(BottomSheetKind.CUSTODIAN_REQUEST);
+      });
     } else if (recoveryRequest || trustedContactRequest) {
       this.setState(
         {
@@ -887,7 +874,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           trustedContactRequest,
         },
         () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1,
+          );
         },
       );
     } else if (userKey) {
@@ -913,7 +903,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.cleanupListeners();
   }
 
-  openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
+  openBottomSheetOnLaunch(
+    kind: BottomSheetKind,
+    snapIndex: number | null = null,
+  ) {
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       this.openBottomSheet(kind, snapIndex);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
@@ -927,16 +920,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
     if (!isFocused) {
-      navigation.dispatch(resetToHomeAction({
-        unhandledDeepLinkURL: url,
-      }));
+      navigation.dispatch(
+        resetToHomeAction({
+          unhandledDeepLinkURL: url,
+        }),
+      );
     } else {
       this.handleDeepLinking(url);
     }
   };
 
   handleDeepLinking = async (url: string | null) => {
-    if (url == null) { return; }
+    if (url == null) {
+      return;
+    }
 
     console.log('Home::handleDeepLinking::URL: ' + url);
 
@@ -969,7 +966,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest: null,
           },
           () => {
-            this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+              1,
+            );
           },
         );
       }
@@ -978,7 +978,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+            splits[3]
           }`,
         );
       } else {
@@ -1013,8 +1013,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             recoveryRequest: null,
           },
           () => {
-            this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
-          }
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+              1,
+            );
+          },
         );
       }
     } else if (splits[4] === 'rk') {
@@ -1032,7 +1035,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           trustedContactRequest: null,
         },
         () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1,
+          );
         },
       );
     } else if (splits[4] === 'rrk') {
@@ -1125,8 +1131,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.storeFCMToken();
           this.scheduleNotification();
         })
-        .catch(() => {
-        });
+        .catch(() => {});
     } else {
       this.createNotificationListeners();
       this.storeFCMToken();
@@ -1205,7 +1210,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .notifications()
       .getInitialNotification();
     if (notificationOpen) {
-
       this.props.fetchNotifications();
       this.onNotificationOpen(notificationOpen.notification);
     }
@@ -1270,7 +1274,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1281,14 +1285,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1307,8 +1311,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     // secure derivative accounts
@@ -1317,7 +1321,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1416,7 +1420,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet();
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   handleBottomTabSelection = (tab: BottomTab) => {
     this.setState({ selectedBottomTab: tab });
@@ -1518,7 +1522,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                      }`
+                    }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1627,9 +1631,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } else {
           this.bottomSheetRef.current?.snapTo(snapIndex);
         }
-      }
+      },
     );
-  }
+  };
 
   onBottomSheetClosed() {
     this.setState({
@@ -1692,8 +1696,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1752,9 +1756,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -1819,14 +1823,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
         return [
           -50,
-          heightPercentageToDP(Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65),
+          heightPercentageToDP(
+            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+          ),
           heightPercentageToDP(95),
         ];
 
       case BottomSheetKind.ERROR:
         return [
           -50,
-          heightPercentageToDP(Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35),
+          heightPercentageToDP(
+            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+          ),
         ];
 
       case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
@@ -1846,10 +1854,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       case BottomSheetKind.TAB_BAR_ADD_MENU:
         return (
           <>
-            <BottomSheetHeader
-              title="Add"
-              onPress={this.closeBottomSheet}
-            />
+            <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
 
             <AddModalContents
               onPressElements={(type) => {
@@ -1861,7 +1866,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       isLoadContacts: true,
                     },
                     () => {
-                      this.openBottomSheet(BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK);
+                      this.openBottomSheet(
+                        BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK,
+                      );
                     },
                   );
                 }
@@ -2117,7 +2124,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           onSelect={this.handleBottomTabSelection}
           selectedTab={selectedBottomTab}
           tabBarZIndex={
-            (this.state.currentBottomSheetKind == BottomSheetKind.TAB_BAR_ADD_MENU || null) ? 1 : 0
+            this.state.currentBottomSheetKind ==
+              BottomSheetKind.TAB_BAR_ADD_MENU || null
+              ? 1
+              : 0
           }
         />
 
@@ -2131,9 +2141,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             handleComponent={defaultBottomSheetConfigs.handleComponent}
             onChange={this.handleBottomSheetPositionChange}
           >
-            <BottomSheetView>
-              {this.renderBottomSheetContent()}
-            </BottomSheetView>
+            <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
           </BottomSheet>
         )}
       </ImageBackground>
@@ -2180,7 +2188,6 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    initHealthCheck,
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
