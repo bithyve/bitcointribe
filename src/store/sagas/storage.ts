@@ -20,7 +20,7 @@ import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
 import { updateWalletImage } from '../actions/sss';
-import { calculateExchangeRate, startupSync } from '../actions/accounts';
+import { startupSync } from '../actions/accounts';
 import { syncLastSeensAndHealth } from '../actions/trustedContacts';
 // import { timer } from '../../utils'
 
@@ -49,7 +49,6 @@ function* fetchDBWorker() {
         // actions post DB fetch
         yield put(syncLastSeensAndHealth());
         yield put(updateWalletImage());
-        yield put(calculateExchangeRate());
         yield put(startupSync());
       }
     } else {
