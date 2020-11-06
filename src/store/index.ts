@@ -16,6 +16,7 @@ import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from 'redux-persist';
 import preferencesReducer from './reducers/preferences';
 import loaders from './reducers/loaders';
+import keeper from './reducers/keeper';
 
 const config = {
   key: 'root', // key is required
@@ -260,6 +261,7 @@ const rootReducer = combineReducers({
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,
+  keeper,
 });
 
 

@@ -22,6 +22,7 @@ import semver from 'semver';
 import { updateWalletImage } from '../actions/sss';
 import { calculateExchangeRate, startupSync } from '../actions/accounts';
 import { syncLastSeensAndHealth } from '../actions/trustedContacts';
+import KeeperService from '../../bitcoin/services/KeeperService';
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -125,6 +126,7 @@ function* servicesEnricherWorker({ payload }) {
         SECURE_ACCOUNT,
         S3_SERVICE,
         TRUSTED_CONTACTS,
+        KEEPERS_INFO
       } = database.SERVICES;
 
       if (!database.VERSION) {
@@ -146,6 +148,7 @@ function* servicesEnricherWorker({ payload }) {
             SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
             S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
             TRUSTED_CONTACTS: new TrustedContactsService(),
+            KEEPERS_INFO: new KeeperService(),
           };
           // hydrating new/missing async storage variables
           yield call(
@@ -165,6 +168,9 @@ function* servicesEnricherWorker({ payload }) {
             TRUSTED_CONTACTS: TRUSTED_CONTACTS
               ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
               : new TrustedContactsService(),
+            KEEPERS_INFO: KEEPERS_INFO
+              ? KeeperService.fromJSON(KEEPERS_INFO)
+              : new KeeperService(),
           };
         }
 
@@ -187,6 +193,9 @@ function* servicesEnricherWorker({ payload }) {
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
             ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
             : new TrustedContactsService(),
+          KEEPERS_INFO: KEEPERS_INFO
+            ? KeeperService.fromJSON(KEEPERS_INFO)
+            : new KeeperService(),
         };
       }
     yield put(servicesEnriched(services));

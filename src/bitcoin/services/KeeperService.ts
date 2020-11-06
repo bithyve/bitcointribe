@@ -1,58 +1,120 @@
 import {
   EphemeralDataElementsForKeeper,
-  ShareUploadables
+  ShareUploadables,
+  TrustedData,
+  TrustedDataElements
 } from '../utilities/Interface';
 import config from '../HexaConfig';
 import Keeper from '../utilities/Keeper';
 
 export default class KeeperService {
+  public static fromJSON = (json: string) => {
+    const { tc } = JSON.parse(json);
+    const {
+      keeper,
+    }: {
+      keeper: Keeper;
+    } = tc;
+
+    return new KeeperService({
+      keeper,
+    });
+  };
 
   public keeper: Keeper;
-
-  constructor() {
-    this.keeper = new Keeper();
+  constructor(stateVars?) {
+    this.keeper = new Keeper(stateVars);
   }
 
-  // public initializeKeeper = (
-  //   uuid: string,
-  //   privateKey: string,
-  //   publicKey: string,
-  //   encKey: string,
-  //   ephemeralAddress: string
-  // ):
-  //   | {
-  //     status: number;
-  //     result: boolean;
-  //     err?: undefined;
-  //     message?: undefined;
-  //   }
-  //   | {
-  //     status: number;
-  //     err: any;
-  //     message: string;
-  //     result?: undefined;
-  //   } => {
-  //   try {
+  public static encryptPub = (
+    publicKey: string,
+    key: string,
+  ): { encryptedPub: string } => Keeper.encryptPub(publicKey, key);
 
-  //     // Use this to add data to service for later use. This data will come from QR.
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       result: this.keeper.initializeKeeper(
-  //         uuid,
-  //         privateKey,
-  //         publicKey,
-  //         encKey,
-  //         ephemeralAddress
-  //       ),
-  //     };
-  //   } catch (err) {
-  //     return {
-  //       status: 0o1,
-  //       err: err.message,
-  //       message: 'Failed to setup keeper',
-  //     };
-  //   }
-  // };
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => Keeper.decryptPub(encryptedPub, key);
+
+  public initializeKeeper = (
+    shareId: string,
+    encKey: string,
+  ):
+    | {
+        status: number;
+        data: {
+          publicKey: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.keeper.initializeKeeper(
+          shareId.trim(),
+          encKey,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to setup keeper',
+      };
+    }
+  };
+
+  public finalizeKeeper = (
+    shareId: string,
+    encodedPublicKey: string,
+    encKey: string,
+    walletName?: string,
+    EfChannelAddress?: string,
+  ):
+    | {
+        status: number;
+        data: {
+          channelAddress: string;
+          ephemeralAddress: string;
+          publicKey: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.keeper.finalizeKeeper(
+          shareId.trim(),
+          encodedPublicKey,
+          encKey,
+          walletName,
+          EfChannelAddress,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to finalize keeper',
+      };
+    }
+  };
 
   public updateEphemeralChannel = async (
     shareId: string,
@@ -109,6 +171,52 @@ export default class KeeperService {
         status: 0o1,
         err: err.message,
         message: 'Failed to update ephemeral channel',
+      };
+    }
+  };
+
+  public updateTrustedChannel = async (
+    shareId: string,
+    dataElements: TrustedDataElements,
+    fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
+  ): Promise<
+    | {
+        status: number;
+        data:
+          | {
+              updated: any;
+              data: TrustedData;
+            }
+          | {
+              updated: any;
+              data?: undefined;
+            };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.keeper.updateTrustedChannel(
+          shareId.trim(),
+          dataElements,
+          fetch,
+          shareUploadables,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update contact',
       };
     }
   };
