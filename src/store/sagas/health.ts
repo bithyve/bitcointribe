@@ -115,21 +115,12 @@ function* generateMetaSharesWorker({ payload }) {
   const { answer } = yield select(
     (state) => state.storage.database.WALLET_SETUP.security,
   );
-  const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
-  if (!secondaryMnemonic || !twoFASecret) {
-    throw new Error('secure assets missing; staticNonPMDD');
-  }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
-    secondaryMnemonic,
-    twoFASecret,
-    secondaryXpub: secondary,
-    bhXpub: bh,
+    secondaryMnemonic:'',
+    twoFASecret: '',
+    secondaryXpub: '',
+    bhXpub: '',
   };
 
   let serviceCall = null;
