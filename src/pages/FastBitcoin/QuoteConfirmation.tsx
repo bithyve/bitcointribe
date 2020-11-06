@@ -8,8 +8,10 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import currencyIconSource from '../../utils/assets/currencyIconSource';
 
 export default function QuoteConfirmation(props) {
+  const currencySymbol = currencyIconSource(props.currencyCode, false)
   return (
     <View style={styles.modalContentContainer}>
       <View>
@@ -46,7 +48,7 @@ export default function QuoteConfirmation(props) {
               >
                 <Image
                   style={styles.cardBitCoinImage}
-                  source={require('../../assets/images/icons/dollar_grey.png')}
+                  source={currencySymbol}
                 />
                 <Text style={styles.cardAmountText}>{props.purchasedFor}</Text>
               </View>
@@ -99,7 +101,7 @@ export default function QuoteConfirmation(props) {
                     width: wp('3.5%'),
                     height: wp('3.5%'),
                   }}
-                  source={require('../../assets/images/icons/dollar_grey.png')}
+                  source={currencySymbol}
                 />
                 <Text
                   style={{

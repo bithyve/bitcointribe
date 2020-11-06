@@ -12,6 +12,7 @@ import {
   NativeModules,
   PermissionsAndroid,
   Image,
+  BackHandler,
 } from 'react-native';
 import { Easing } from "react-native-reanimated";
 import { heightPercentageToDP } from 'react-native-responsive-screen';
@@ -112,6 +113,7 @@ import { Button } from 'react-native-elements';
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility';
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
@@ -228,6 +230,7 @@ interface HomePropsTypes {
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
+  
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -597,8 +600,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
+                  ? 'User Checking Account'
+                  : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
             bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
@@ -679,10 +682,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
+    const { s3Service, initHealthCheck, navigation } = this.props;
+
     this.closeBottomSheet();
     this.updateAccountCardData();
     this.getBalances();
@@ -710,6 +715,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal();
+
+    const unhandledDeepLinkURL = navigation.getParam('unhandledDeepLinkURL');
+
+    if (unhandledDeepLinkURL) {
+      navigation.setParams({ unhandledDeepLinkURL: null });
+      this.handleDeepLinking(unhandledDeepLinkURL);
+    }
   };
 
   cloudData = async (kpInfo? , level?, share?) => {
@@ -883,7 +895,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
       });
 
-      firebase
+    firebase
       .notifications()
       .getScheduledNotifications()
       .then(() => { });
@@ -1015,24 +1027,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
-    this.props.navigation.popToTop();
-
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       this.openBottomSheet(kind, snapIndex);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
   }
 
   handleDeepLinkEvent = async ({ url }) => {
-    const { navigation, isFocused } = this.props;
-    // if user is in any other screen before opening
-    // deep link , we will navigate user to home first
-    if (!isFocused) {
-      navigation.navigate('Home');
-    }
-
     console.log('Home::handleDeepLinkEvent::URL: ', url);
 
-    this.handleDeepLinking(url);
+    const { navigation, isFocused } = this.props;
+
+    // If the user is on one of Home's nested routes, and a
+    // deep link is opened, we will navigate back to Home first.
+    if (!isFocused) {
+      navigation.dispatch(resetToHomeAction({
+        unhandledDeepLinkURL: url,
+      }));
+    } else {
+      this.handleDeepLinking(url);
+    }
   };
 
   handleDeepLinking = async (url: string | null) => {
@@ -1078,7 +1091,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1226,11 +1239,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.scheduleNotification();
         })
         .catch(() => {
-          // User has rejected permissions
-          //console.log(
-          // 'PERMISSION REQUEST :: notification permission rejected',
-          //  error,
-          //);
         });
     } else {
       this.createNotificationListeners();
@@ -1375,7 +1383,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1386,14 +1394,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1412,8 +1420,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     // secure derivative accounts
@@ -1422,7 +1430,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1521,7 +1529,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet();
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     this.setState({ selectedBottomTab: tab });
@@ -1624,7 +1632,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1798,8 +1806,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1916,9 +1924,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2003,6 +2011,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   renderBottomSheetContent() {
+    const { UNDER_CUSTODY, navigation } = this.props;
+    const { custodyRequest } = this.state;
+
     switch (this.state.currentBottomSheetKind) {
       case BottomSheetKind.TAB_BAR_ADD_MENU:
         return (
@@ -2015,7 +2026,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <AddModalContents
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
-                  this.props.navigation.navigate('VoucherScanner');
+                  navigation.navigate('VoucherScanner');
                 } else if (type == 'addContact') {
                   this.setState(
                     {
@@ -2032,9 +2043,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         );
 
       case BottomSheetKind.CUSTODIAN_REQUEST:
-        const { custodyRequest } = this.state;
-        const { UNDER_CUSTODY, navigation } = this.props;
-
         return (
           <CustodianRequestModalContents
             userName={custodyRequest.requester}
@@ -2230,7 +2238,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               paddingTop: 36,
               alignItems: 'flex-start',
             }}
-            // contentInset={{ top: 0, left: 20, bottom: 0, right: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cardData}

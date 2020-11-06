@@ -1491,7 +1491,7 @@ export default class SecureHDWallet extends Bitcoin {
     const { fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
-      averageTxFees['medium'].feePerByte,
+      averageTxFees['low'].feePerByte,
     );
     // console.log({ inputUTXOs, outputUTXOs, fee });
 
