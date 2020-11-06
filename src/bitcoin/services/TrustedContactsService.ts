@@ -295,7 +295,7 @@ export default class TrustedContactsService {
     }
   };
 
-  public syncLastSeensAndHealth = async (
+  public walletCheckIn = async (
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
@@ -313,6 +313,7 @@ export default class TrustedContactsService {
             encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
+          exchangeRates: { [currency: string]: Number };
         };
         err?: undefined;
         message?: undefined;
@@ -327,7 +328,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.syncLastSeensAndHealth(
+        data: await this.tc.walletCheckIn(
           metaShares,
           healthCheckStatus,
           metaSharesUnderCustody,
