@@ -33,11 +33,10 @@ const NavStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
 
-  modalHeaderSubheadingText: {
+  modalHeaderSubtitleText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 10,
+    fontSize: RFValue(12),
   },
 
   modalNavHeaderContainer: {

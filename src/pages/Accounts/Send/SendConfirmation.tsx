@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
@@ -14,8 +13,8 @@ import {
   Platform,
   Keyboard,
 } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
+import Colors from '../../../common/Colors';
+import Fonts from '../../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,
@@ -30,39 +29,35 @@ import {
   syncViaXpubAgent,
   fetchDerivativeAccBalTx,
   alternateTransferST2,
-} from '../../store/actions/accounts';
-import { UsNumberFormat, timeConvertNear30 } from '../../common/utilities';
+} from '../../../store/actions/accounts';
+import { UsNumberFormat, timeConvertNear30 } from '../../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
-import Slider from 'react-native-slider';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import ModalHeader from '../../components/ModalHeader';
-import SendConfirmationContent from './SendConfirmationContent';
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import ModalHeader from '../../../components/ModalHeader';
+import SendConfirmationContent from '../SendConfirmationContent';
+import { createRandomString } from '../../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   DONATION_ACCOUNT,
-} from '../../common/constants/serviceTypes';
-import RelayServices from '../../bitcoin/services/RelayService';
+} from '../../../common/constants/serviceTypes';
+import RelayServices from '../../../bitcoin/services/RelayService';
 import {
   INotification,
   notificationTag,
   notificationType,
-} from '../../bitcoin/utilities/Interface';
+} from '../../../bitcoin/utilities/Interface';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
 import DeviceInfo from 'react-native-device-info';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import RecipientSendConfirmation from './RecipientSendConfirmation';
-import RadioButton from '../../components/RadioButton';
-import CustomPriorityContent from './CustomPriorityContent';
-import Toast from '../../components/Toast';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import TestAccountHelperModalContents from '../../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../../components/SmallHeaderModal';
+import RecipientSendConfirmation from '../RecipientSendConfirmation';
+import RadioButton from '../../../components/RadioButton';
+import CustomPriorityContent from '../CustomPriorityContent';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 
 interface SendConfirmationStateTypes {
   CurrencyCode: string;
@@ -195,18 +190,6 @@ class SendConfirmation extends Component<
     }
   };
 
-  // updateDescription = async (txid, description) => {
-  //   let descriptionHistory = {};
-  //   let storedHistory = await AsyncStorage.getItem('descriptionHistory');
-
-  //   if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
-  //   descriptionHistory[txid] = description;
-
-  //   await AsyncStorage.setItem(
-  //     'descriptionHistory',
-  //     JSON.stringify(descriptionHistory),
-  //   );
-  // };
 
   sendNotifications = () => {
     let { WALLET_SETUP, trustedContactsService } = this.props;
@@ -267,9 +250,7 @@ class SendConfirmation extends Component<
       }
 
       this.sendNotifications();
-      // if (transfer.details[0].note) { // retired in app notes
-      //   this.updateDescription(transfer.txid, transfer.details[0].note);
-      // }
+
       this.storeTrustedContactsHistory(transfer.details);
       if (this.state.derivativeAccountDetails) {
         if (this.state.derivativeAccountDetails.type === DONATION_ACCOUNT)
@@ -506,7 +487,6 @@ class SendConfirmation extends Component<
     const {
       CurrencyCode,
       totalAmount,
-      sliderValue,
       isConfirmDisabled,
       SelectedContactId,
       transfer,
@@ -539,12 +519,12 @@ class SendConfirmation extends Component<
               source={
                 this.state.derivativeAccountDetails &&
                 this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                  ? require('../../assets/images/icons/icon_donation_account.png')
+                  ? require('../../../assets/images/icons/icon_donation_account.png')
                   : this.serviceType == TEST_ACCOUNT
-                  ? require('../../assets/images/icons/icon_test.png')
+                  ? require('../../../assets/images/icons/icon_test.png')
                   : this.serviceType == REGULAR_ACCOUNT
-                  ? require('../../assets/images/icons/icon_regular.png')
-                  : require('../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../../assets/images/icons/icon_regular.png')
+                  : require('../../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -651,7 +631,7 @@ class SendConfirmation extends Component<
                         resizeMode: 'contain',
                         marginLeft: 'auto',
                       }}
-                      source={require('../../assets/images/icons/icon_check.png')}
+                      source={require('../../../assets/images/icons/icon_check.png')}
                     />
                   </View>
                 </View>
@@ -690,7 +670,7 @@ class SendConfirmation extends Component<
                 <View style={styles.amountInputImage}>
                   <Image
                     style={styles.textBoxImage}
-                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                    source={require('../../../assets/images/icons/icon_bitcoin_gray.png')}
                   />
                 </View>
                 <View style={styles.totalAmountView} />
@@ -1260,7 +1240,7 @@ class SendConfirmation extends Component<
           renderContent={() => (
             <TestAccountHelperModalContents
               topButtonText={'Note'}
-              // image={require('../../assets/images/icons/regular.png')}
+              // image={require('../../../assets/images/icons/regular.png')}
               boldPara={''}
               helperInfo={
                 'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'

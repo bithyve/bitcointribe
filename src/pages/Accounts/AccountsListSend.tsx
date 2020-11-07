@@ -20,12 +20,16 @@ const AccountsListSend = ({
   accounts,
   onSelectContact,
   checkedItem,
-  fromAddNewAccount
+
+  // TODO: This component shouldn't be concerned about the screen it came from.
+  // (And a screen called "AddNewAccount" probably shouldn't be trying to use something
+  // called "AccountsListSend" 😃).
+  fromAddNewAccount,
 }) => {
 
   const balance = useMemo(() => {
     if (accounts.id === REGULAR_ACCOUNT) {
-      balances.regularBalance;
+      return balances.regularBalance;
     } else if (accounts.id === SECURE_ACCOUNT) {
       return balances.secureBalance;
     } else if (
