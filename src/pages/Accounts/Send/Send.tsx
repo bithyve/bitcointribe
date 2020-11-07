@@ -794,6 +794,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       containerStyle={{ margin: 0, padding: 0 }}
                       placeholder="Enter Address Manually"
                       accountKind={serviceType}
+                      onAddressSubmitted={(address) => {
+                        this.setState({ recipientAddress: address });
+                      }}
                     />
                   </View>
                 );
