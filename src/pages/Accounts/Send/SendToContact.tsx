@@ -636,7 +636,7 @@ class SendToContact extends Component<
     }
   };
 
-  handleTrasferST1 = () => {
+  handleTransferST1 = () => {
     const {
       selectedContact,
       bitcoinAmount,
@@ -740,7 +740,9 @@ class SendToContact extends Component<
 
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
+
     clearTransfer(serviceType, 'stage1');
+
     if (
       accountsState[serviceType].transfer.details &&
       accountsState[serviceType].transfer.details.length
@@ -781,7 +783,7 @@ class SendToContact extends Component<
       });
     }
     setTimeout(() => {
-      this.handleTrasferST1();
+      this.handleTransferST1();
     }, 10);
   };
 
@@ -961,11 +963,6 @@ class SendToContact extends Component<
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
                   amount={prefersBitcoin ? bitcoinAmount : currencyAmount}
-                  currencyType={serviceType == TEST_ACCOUNT
-                    ? ' t-sats'
-                    : prefersBitcoin
-                      ? ' sats'
-                      : " " + CurrencyCode.toLocaleLowerCase()}
                   onRemove={() => {
                     this.setState(
                       { removeItem: accountsState[serviceType].transfer.details[index] },
@@ -1278,6 +1275,7 @@ class SendToContact extends Component<
                       <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
                     )}
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={{
                     ...styles.confirmButtonView,
@@ -1321,7 +1319,6 @@ class SendToContact extends Component<
                           }
                         }
                       }
-                      console.log("addTransferDetails ADDDDDDDD",selectedContact)
                       addTransferDetails(serviceType, {
                         selectedContact,
                         bitcoinAmount,

@@ -33,9 +33,15 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
   }, [accountKind, accountsState]);
 
 
+  // TODO: Every text change shouldn't be treated as a "submit".
+  // We're doing this because `Send` is calling `setRecipientAddress` on
+  // every change and inspecting it to take an action once an actionable
+  // address is interpreted. We should probably move that logic into this component
+  // and avoid re-rendering the entire send screen on text changes.
   function handleTextChange(newValue: string) {
     setRecipientAddress(newValue);
-    if(!isAddressInvalid){
+
+    if (isAddressInvalid == false) {
       onAddressSubmitted(newValue);
     }
   }
