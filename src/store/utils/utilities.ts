@@ -75,7 +75,7 @@ export const serviceGenerator = async (
   const secureAcc = new SecureAccount(primaryMnemonic);
   if (!metaShares) {
     console.log('New setup: secure account');
-    res = await secureAcc.setupSecureAccount2(); // executed once (during initial wallet creation)
+    res = await secureAcc.setupSecureAccount(); // executed once (during initial wallet creation)
   } else {
     if (!secondaryXpub)
       throw new Error('Failed to extract secondary Xpub from metaShare ');
@@ -160,7 +160,7 @@ export const serviceGenerator2 = async (
   const secureAcc = new SecureAccount(primaryMnemonic);
   if (!metaShares) {
     console.log('New setup: secure account');
-    // res = await secureAcc.setupSecureAccount(); // executed once (during initial wallet creation)
+    res = await secureAcc.setupSecureAccount2(); // executed once (during initial wallet creation)
   } else {
     if (!secondaryXpub)
       throw new Error('Failed to extract secondary Xpub from metaShare ');

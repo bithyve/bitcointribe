@@ -929,7 +929,7 @@ function* syncLastSeensAndHealthWorker({ payload }) {
   if (Object.keys(trustedContacts.tc.trustedContacts).length) {
     const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
 
-    const { metaShares, healthCheckStatus } = s3Service.sss;
+    const { metaShares, healthCheckStatus } = s3Service.levelhealth; // Fixing error old code is => s3Service.sss
     const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
 
     const res = yield call(

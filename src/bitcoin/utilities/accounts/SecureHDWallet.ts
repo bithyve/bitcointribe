@@ -34,9 +34,9 @@ export default class SecureHDWallet extends Bitcoin {
   public secondaryMnemonic: string;
   public secondaryXpriv: string;
   public xpubs: {
-    primary: string;
-    secondary: string;
-    bh: string;
+    primary?: string;
+    secondary?: string;
+    bh?: string;
   };
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -146,10 +146,10 @@ export default class SecureHDWallet extends Bitcoin {
     this.derivativeGapLimit = this.gapLimit / 2;
     this.primaryXpriv =
       stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
-    // this.secondaryXpriv =
-    //   stateVars && stateVars.secondaryXpriv
-    //     ? stateVars.secondaryXpriv
-    //     : undefined;
+    this.secondaryXpriv =
+      stateVars && stateVars.secondaryXpriv
+        ? stateVars.secondaryXpriv
+        : undefined;
     this.xpubs = stateVars && stateVars.xpubs ? stateVars.xpubs : undefined;
     this.balances =
       stateVars && stateVars.balances ? stateVars.balances : this.balances;
@@ -243,9 +243,8 @@ export default class SecureHDWallet extends Bitcoin {
     return receivingAddress;
   };
 
-  public getSecondaryID = (
-    // secondaryMnemonic: string,
-  ): { secondaryID: string } => {
+  public getSecondaryID = (): // secondaryMnemonic: string,
+  { secondaryID: string } => {
     // if (!secondaryMnemonic) {
     //   throw new Error(
     //     'SecondaryID generation failed; missing secondary mnemonic',
@@ -254,8 +253,9 @@ export default class SecureHDWallet extends Bitcoin {
     const hash = crypto.createHash('sha256');
     // const seed = bip39.mnemonicToSeedSync(secondaryMnemonic);
     // hash.update(seed);
-    return { secondaryID: ''
-      // hash.digest('hex') 
+    return {
+      secondaryID: '',
+      // hash.digest('hex')
     };
   };
 
@@ -304,16 +304,17 @@ export default class SecureHDWallet extends Bitcoin {
     return {
       primary: this.xpubs.primary,
       secondary: this.xpubs.secondary,
-      bh: this.xpubs.bh
-    }
+      bh: this.xpubs.bh,
+    };
   };
 
   public getSecureXpubs2 = (): {
     primary: string;
   } => {
+    console.log('this.xpubs', this.xpubs);
     return {
-      primary: this.xpubs.primary
-    }
+      primary: this.xpubs.primary,
+    };
   };
 
   public getAccountId = (): { accountId: string } => {
@@ -1228,7 +1229,11 @@ export default class SecureHDWallet extends Bitcoin {
           donee,
           subject,
           description,
-          xpubs: [xpub, this.xpubs.secondary ? this.xpubs.secondary :'', this.xpubs.bh ? this.xpubs.bh : ''],
+          xpubs: [
+            xpub,
+            this.xpubs.secondary ? this.xpubs.secondary : '',
+            this.xpubs.bh ? this.xpubs.bh : '',
+          ],
           xpubId,
           configuration,
         },
@@ -1304,7 +1309,7 @@ export default class SecureHDWallet extends Bitcoin {
     // }
     // console.log({ res });
     // const { setupSuccessful, setupData } = res.data;
-      const { prepared } = this.prepareSecureAccount2();
+    const { prepared } = this.prepareSecureAccount2();
   };
 
   public updateDonationPreferences = async (
@@ -1969,12 +1974,13 @@ export default class SecureHDWallet extends Bitcoin {
       //   secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
       // }
 
-      this.xpubs.primary = primaryXpub;
+      this.xpubs = { ...this.xpubs, primary: primaryXpub };
 
       return {
         prepared: true,
       };
     } catch (err) {
+      console.log('prepareSecureAccount2 err', err);
       return {
         prepared: false,
       };
@@ -2031,9 +2037,9 @@ export default class SecureHDWallet extends Bitcoin {
             itr,
             internal,
           ),
-          // secondaryPriv: this.secondaryXpriv
-          //   ? this.deriveChildXKey(this.secondaryXpriv, itr)
-          //   : null,
+          secondaryPriv: this.secondaryXpriv
+            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            : null,
           childIndex: itr,
         };
       }
@@ -2045,9 +2051,9 @@ export default class SecureHDWallet extends Bitcoin {
         return {
           multiSig,
           primaryPriv: this.derivePrimaryChildXKey(this.primaryXpriv, itr),
-          // secondaryPriv: this.secondaryXpriv
-          //   ? this.deriveChildXKey(this.secondaryXpriv, itr)
-          //   : null,
+          secondaryPriv: this.secondaryXpriv
+            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            : null,
           childIndex: itr,
         };
       }
@@ -2086,9 +2092,9 @@ export default class SecureHDWallet extends Bitcoin {
                     derivativeInstance.xpriv,
                     itr,
                   ),
-                  // secondaryPriv: this.secondaryXpriv
-                  //   ? this.deriveChildXKey(this.secondaryXpriv, itr)
-                  //   : null,
+                  secondaryPriv: this.secondaryXpriv
+                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    : null,
                   childIndex: itr,
                 };
               }
@@ -2115,9 +2121,9 @@ export default class SecureHDWallet extends Bitcoin {
                     itr,
                     true,
                   ),
-                  // secondaryPriv: this.secondaryXpriv
-                  //   ? this.deriveChildXKey(this.secondaryXpriv, itr)
-                  //   : null,
+                  secondaryPriv: this.secondaryXpriv
+                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    : null,
                   childIndex: itr,
                 };
               }
@@ -2224,25 +2230,30 @@ export default class SecureHDWallet extends Bitcoin {
         this.deriveDerivativeChildXKey(derivativeXpub, childIndex, internal),
       );
 
-    const childRecoveryPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.secondary, childIndex),
-    );
-    const childBHPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.bh, childIndex),
-    );
+    // const childRecoveryPub = this.getPub(
+    //   this.deriveChildXKey(this.xpubs.secondary, childIndex),
+    // );
+    // const childBHPub = this.getPub(
+    //   this.deriveChildXKey(this.xpubs.bh, childIndex),
+    // );
 
     // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
     // for generating ga_recovery based recoverable multiSigs
-    const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
-    // console.log({ pubs });
-    const multiSig = this.generateMultiSig(2, pubs);
+    // const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
+    // // console.log({ pubs });
+    // const multiSig = this.generateMultiSig(2, pubs);
 
     const construct = {
       scripts: {
-        redeem: multiSig.p2sh.redeem.output.toString('hex'),
-        witness: multiSig.p2wsh.redeem.output.toString('hex'),
+        redeem: '',
+        witness: ''
       },
-      address: multiSig.address,
+      address: ''
+      // scripts: {
+      //   redeem: multiSig.p2sh.redeem.output.toString('hex'),
+      //   witness: multiSig.p2wsh.redeem.output.toString('hex'),
+      // },
+      // address: multiSig.address,
     };
 
     return construct;

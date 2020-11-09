@@ -96,7 +96,7 @@ export default class SecureAccount {
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-      // secondaryXpriv?: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;

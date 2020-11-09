@@ -324,6 +324,7 @@ export interface Keepers {
     shareType?: string;
     privateKey?: string;
     publicKey?: string;
+    encKey: string;
     shareTransferDetails?: {
       otp: string;
       encryptedKey: string;
