@@ -147,11 +147,10 @@ export default class Bitcoin {
       const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
         for (const utxo of addressSpecificUTXOs) {
-          const { value, Address, status, vout, txid } = utxo;
+          const { value, Address, status, txid } = utxo;
 
           UTXOs.push({
             txId: txid,
-            vout,
             value,
             address: Address,
             status,
@@ -204,7 +203,7 @@ export default class Bitcoin {
               txid: tx.txid,
               confirmations:
                 accountType === 'Test Account' &&
-                tx.transactionType === 'Received' &&
+                tx.TransactionType === 'Received' &&
                 addressInfo.Address === externalAddresses[0] &&
                 tx.NumberofConfirmations < 1
                   ? '-'
