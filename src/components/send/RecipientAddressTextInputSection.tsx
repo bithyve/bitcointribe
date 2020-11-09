@@ -35,6 +35,9 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
 
   function handleTextChange(newValue: string) {
     setRecipientAddress(newValue);
+    if(!isAddressInvalid){
+      onAddressSubmitted(newValue);
+    }
   }
 
   return (
@@ -63,7 +66,6 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
         <TouchableOpacity
           onPress={() => {
             handleTextChange(SAMPLE_ADDRESS);
-            onAddressSubmitted(SAMPLE_ADDRESS);
           }}
           style={{ padding: 6, marginLeft: 'auto' }}
         >
