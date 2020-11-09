@@ -62,15 +62,15 @@ export function makeContactRecipientDescription(
   return {
     id: data.id,
     kind: RecipientKind.CONTACT,
-    displayedName: data.contactName,
-    walletName: data.contactsWalletName,
-    avatarImageSource: null,
+    displayedName: data.contactName || data.displayedName,
+    walletName: data.contactsWalletName || data.walletName,
+    avatarImageSource: data.imageAvailable ? data.rawImage : data.avatarImageSource,
     availableBalance: data.bitcoinAmount || data.amount || 0,
     initiatedAt: data.initiatedAt,
-    lastSeenActive: data.lastSeen,
+    lastSeenActive: data.lastSeen || data.lastSeenActive,
     trustKind,
     hasXPub: data.hasXpub,
     hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser: data.hasTrustedChannel,
+    hasTrustedChannelWithUser: data.hasTrustedChannel || data.hasTrustedChannelWithUser,
   };
 }
