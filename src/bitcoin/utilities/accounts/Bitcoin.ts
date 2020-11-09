@@ -122,16 +122,18 @@ export default class Bitcoin {
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
           {
-            addresses: [...externalAddresses, ...internalAddresses],
+            External: externalAddresses,
+            Internal: internalAddresses,
           },
         );
       } else {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
           {
-            addresses: [...externalAddresses, ...internalAddresses],
+            External: externalAddresses,
+            Internal: internalAddresses,
           },
         );
       }
@@ -141,11 +143,6 @@ export default class Bitcoin {
         balance: 0,
         unconfirmedBalance: 0,
       };
-
-      const externalAddressesMapping = {};
-      externalAddresses.forEach((address) => {
-        externalAddressesMapping[address] = true;
-      });
 
       const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
@@ -202,81 +199,37 @@ export default class Bitcoin {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
-            this.categorizeTx(
-              tx,
-              ownedAddresses,
-              accountType,
-              externalAddressesMapping,
-            );
 
-            if (tx.transactionType === 'Self') {
-              const outgoingTx = {
-                txid: tx.txid,
-                confirmations: tx.NumberofConfirmations,
-                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                fee: tx.fee,
-                date: tx.Status.block_time
-                  ? new Date(tx.Status.block_time * 1000).toUTCString()
-                  : new Date(Date.now()).toUTCString(),
-                transactionType: 'Sent',
-                amount: tx.sentAmount,
-                accountType: tx.accountType,
-                primaryAccType,
-                recipientAddresses: tx.recipientAddresses,
-                blockTime: tx.Status.block_time, // only available when tx is confirmed
-              };
+            const transaction = {
+              txid: tx.txid,
+              confirmations:
+                accountType === 'Test Account' &&
+                tx.transactionType === 'Received' &&
+                addressInfo.Address === externalAddresses[0] &&
+                tx.NumberofConfirmations < 1
+                  ? '-'
+                  : tx.NumberofConfirmations,
+              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+              fee: tx.fee,
+              date: tx.Status.block_time
+                ? new Date(tx.Status.block_time * 1000).toUTCString()
+                : new Date(Date.now()).toUTCString(),
+              transactionType: tx.TransactionType,
+              amount: tx.Amount,
+              accountType:
+                accountType === TRUSTED_CONTACTS
+                  ? contactName
+                      .split(' ')
+                      .map((word) => word[0].toUpperCase() + word.substring(1))
+                      .join(' ')
+                  : accountType,
+              primaryAccType,
+              recipientAddresses: tx.RecipientAddresses,
+              senderAddresses: tx.SenderAddresses,
+              blockTime: tx.Status.block_time, // only available when tx is confirmed
+            };
 
-              const incomingTx = {
-                txid: tx.txid,
-                confirmations: tx.NumberofConfirmations,
-                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                fee: tx.fee,
-                date: tx.Status.block_time
-                  ? new Date(tx.Status.block_time * 1000).toUTCString()
-                  : new Date(Date.now()).toUTCString(),
-                transactionType: 'Received',
-                amount: tx.receivedAmount,
-                accountType: tx.accountType,
-                primaryAccType,
-                senderAddresses: tx.senderAddresses,
-                blockTime: tx.Status.block_time, // only available when tx is confirmed
-              };
-              // console.log({ outgoingTx, incomingTx });
-              transactions.transactionDetails.push(...[outgoingTx, incomingTx]);
-            } else {
-              const transaction = {
-                txid: tx.txid,
-                confirmations:
-                  accountType === 'Test Account' &&
-                  tx.transactionType === 'Received' &&
-                  addressInfo.Address === externalAddresses[0] &&
-                  tx.NumberofConfirmations < 1
-                    ? '-'
-                    : tx.NumberofConfirmations,
-                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                fee: tx.fee,
-                date: tx.Status.block_time
-                  ? new Date(tx.Status.block_time * 1000).toUTCString()
-                  : new Date(Date.now()).toUTCString(),
-                transactionType: tx.transactionType,
-                amount: tx.amount,
-                accountType:
-                  tx.accountType === TRUSTED_CONTACTS
-                    ? contactName
-                        .split(' ')
-                        .map(
-                          (word) => word[0].toUpperCase() + word.substring(1),
-                        )
-                        .join(' ')
-                    : tx.accountType,
-                primaryAccType,
-                recipientAddresses: tx.recipientAddresses,
-                senderAddresses: tx.senderAddresses,
-                blockTime: tx.Status.block_time, // only available when tx is confirmed
-              };
-
-              transactions.transactionDetails.push(transaction);
-            }
+            transactions.transactionDetails.push(transaction);
           }
         });
 
