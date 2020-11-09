@@ -112,6 +112,46 @@ export default class LevelHealth {
     return { metaShare, encryptedDynamicNonPMDD, messageId };
   };
 
+  public static downloadSMShare = async (
+    encryptedKey: string,
+    otp?: string,
+  ): Promise<
+    | {
+        status: number;
+        metaShare: MetaShare;
+        messageId: string;
+      }
+    | {
+        status: number;
+        metaShare: MetaShare;
+        messageId: string;
+      }
+  > => {
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
+    const messageId: string = LevelHealth.getMessageId(
+      key,
+      config.MSG_ID_LENGTH,
+    );
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('downloadSecondaryShare', {
+        HEXA_ID,
+        messageId,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { share } = res.data;
+    const metaShare = LevelHealth.decryptMetaShare(share, key)
+      .decryptedMetaShare;
+    return { status: 200, metaShare, messageId };
+  };
+
   public static downloadDynamicNonPMDD = async (
     walletID: string,
   ): Promise<{

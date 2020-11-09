@@ -130,6 +130,10 @@ import {
   uploadEncMetaShareKeeperWatcher
 } from './sagas/health';
 
+import {
+  fetchKeeperTrustedChannelWatcher
+} from './sagas/keeper';
+
 import { fromPrivateKey } from 'bip32';
 import reducer from './reducers/fbtc';
 
@@ -231,7 +235,10 @@ const rootSaga = function* () {
     downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
     fetchWalletImageHealthWatcher,
-    uploadEncMetaShareKeeperWatcher
+    uploadEncMetaShareKeeperWatcher,
+
+    // Keeper saga
+    fetchKeeperTrustedChannelWatcher
   ];
 
   yield all(

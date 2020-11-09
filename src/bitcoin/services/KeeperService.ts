@@ -220,4 +220,40 @@ export default class KeeperService {
       };
     }
   };
+
+  public fetchTrustedChannel = async (
+    shareId: string,
+    walletName?: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          data: TrustedDataElements;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.keeper.fetchTrustedChannel(
+          shareId.trim(),
+          walletName,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch from contact',
+      };
+    }
+  };
 }
