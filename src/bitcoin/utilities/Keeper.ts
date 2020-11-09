@@ -29,7 +29,7 @@ export default class Keeper {
   }
 
   public initializeStateVars = (stateVars) => {
-    this.keepers = stateVars && stateVars.keeper ? stateVars.keeper : {};
+    this.keepers = stateVars && stateVars.keepers ? stateVars.keepers : {};
   };
 
   public static cipherSpec: {
@@ -172,8 +172,10 @@ export default class Keeper {
     this.keepers[shareId] = {
       privateKey,
       publicKey,
-      encKey,
-      otp,
+      shareTransferDetails: {
+        encryptedKey: encKey,
+        otp,
+      },
       ephemeralChannel: { address: ephemeralAddress },
     };
 
@@ -285,7 +287,7 @@ export default class Keeper {
     shareType: string,
     publicKey: string,
     ephemeralAddress: string,
-    dataElements: EphemeralDataElementsForKeeper,
+    dataElements: EphemeralDataElements,
     encKey: string,
     shareUploadables: ShareUploadables,
     fetch?: Boolean,
@@ -294,7 +296,7 @@ export default class Keeper {
     | {
       updated: any;
       publicKey: string;
-      data: EphemeralDataElementsForKeeper;
+      data: EphemeralDataElements;
     }
     | {
       updated: any;
@@ -308,7 +310,7 @@ export default class Keeper {
         shareType,
         privateKey,
         publicKey,
-        encKey,
+        shareTransferDetails: dataElements.shareTransferDetails ? dataElements.shareTransferDetails : {},
         ephemeralChannel: { address: ephemeralAddress },
       };
 

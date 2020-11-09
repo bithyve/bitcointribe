@@ -5,6 +5,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { take, fork } from 'redux-saga/effects';
 import { AsyncStorage, Alert } from 'react-native';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import KeeperService from '../../bitcoin/services/KeeperService';
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -110,6 +111,7 @@ export const serviceGenerator2 = async (
   secureAcc: SecureAccount;
   s3Service: S3Service;
   trustedContacts: TrustedContactsService;
+  keepersInfo: KeeperService
 }> => {
   // Regular account
   let primaryMnemonic = mnemonic ? mnemonic : undefined;
@@ -176,12 +178,16 @@ export const serviceGenerator2 = async (
   // Trusted Contacts Service
   const trustedContacts = new TrustedContactsService();
 
+  // Trusted Contacts Service
+  const keepersInfo = new KeeperService();
+
   return {
     regularAcc,
     testAcc,
     secureAcc,
     s3Service,
     trustedContacts,
+    keepersInfo
   };
 };
 

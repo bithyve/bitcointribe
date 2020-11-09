@@ -9,12 +9,12 @@ import Keeper from '../utilities/Keeper';
 
 export default class KeeperService {
   public static fromJSON = (json: string) => {
-    const { tc } = JSON.parse(json);
+    const { keeper } = JSON.parse(json);
     const {
-      keeper,
+      keepers,
     }: {
-      keeper: Keeper;
-    } = tc;
+      keepers: Keeper;
+    } = keeper;
 
     return new KeeperService({
       keeper,

@@ -61,7 +61,6 @@ import {
 import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
-  setCurrencyToggleValue,
   setCloudBackupStatus,
   setCardData
 } from '../../store/actions/preferences';
