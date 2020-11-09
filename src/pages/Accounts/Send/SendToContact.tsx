@@ -841,7 +841,6 @@ class SendToContact extends Component<
       clearTransfer,
       addTransferDetails,
     } = this.props;
-
     return (
       <View style={{ flex: 1, backgroundColor: Colors.white }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -942,7 +941,6 @@ class SendToContact extends Component<
             contentOffset={{ x: -24, y: 0 }}
             renderItem={({ item, index }: { item: unknown, index: number }) => {
               let recipient: RecipientDescribing;
-
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.account_name != null) {
@@ -953,7 +951,6 @@ class SendToContact extends Component<
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
                 }[item.account_name || 'Checking Account'];
-
                 recipient = makeSubAccountRecipientDescription(item, accountKind);
               } else {
                 recipient = makeContactRecipientDescription(item);
@@ -963,6 +960,12 @@ class SendToContact extends Component<
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
+                  amount={prefersBitcoin ? bitcoinAmount : currencyAmount}
+                  currencyType={serviceType == TEST_ACCOUNT
+                    ? ' t-sats'
+                    : prefersBitcoin
+                      ? ' sats'
+                      : " " + CurrencyCode.toLocaleLowerCase()}
                   onRemove={() => {
                     this.setState(
                       { removeItem: accountsState[serviceType].transfer.details[index] },
@@ -1318,6 +1321,7 @@ class SendToContact extends Component<
                           }
                         }
                       }
+                      console.log("addTransferDetails ADDDDDDDD",selectedContact)
                       addTransferDetails(serviceType, {
                         selectedContact,
                         bitcoinAmount,

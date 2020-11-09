@@ -45,7 +45,7 @@ const ContactAvatar: React.FC<Props> = ({
             fontSize: 14,
           }}
         >
-          {nameToInitials(contact.displayedName)}
+          {nameToInitials(contact.displayedName ? contact.displayedName : '')}
         </Text>
       </View>
     );

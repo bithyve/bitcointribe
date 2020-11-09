@@ -406,7 +406,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { type } = accountsState[serviceType].service.addressDiff(
       recipientAddress.trim(),
     );
-    console.log("type", type);
 
     if (type) {
       let item;
@@ -806,7 +805,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               kind: SectionKind.SELECT_CONTACTS,
               data: [null],
               renderItem: () => {
-                console.log("Trusted Contact", trustedContacts)
                 return (
                   <View style={styles.viewSectionContainer}>
                     {trustedContacts.length && (
