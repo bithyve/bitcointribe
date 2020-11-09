@@ -193,12 +193,9 @@ class SendToContact extends Component<
       spendableBalance,
       selectedContact,
     } = this.state;
-
     // syncs trusted channel for TC and takes appropriate action
-    if (selectedContact.firstName) {
-      const contactName = `${selectedContact.firstName} ${
-        selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+    if (selectedContact.displayedName) {
+      const contactName = `${selectedContact.displayedName}`
         .toLowerCase()
         .trim();
       const contacts = {
@@ -309,14 +306,10 @@ class SendToContact extends Component<
 
     if (
       prevProps.trustedContactsService !== this.props.trustedContactsService &&
-      this.state.selectedContact.firstName
+      this.state.selectedContact.displayedName
     ) {
       let contactRemoved = true;
-      const selectedContactName = `${this.state.selectedContact.firstName} ${
-        this.state.selectedContact.lastName
-          ? this.state.selectedContact.lastName
-          : ''
-        }`
+      const selectedContactName = `${this.state.selectedContact.displayedName}`
         .toLowerCase()
         .trim();
       Object.keys(this.props.trustedContactsService.tc.trustedContacts).forEach(
@@ -328,7 +321,7 @@ class SendToContact extends Component<
       if (contactRemoved) {
         Alert.alert(
           'F&F contact removed',
-          `You no longer seem to be a F&F contact for ${this.state.selectedContact.firstName}`,
+          `You no longer seem to be a F&F contact for ${this.state.selectedContact.displayedName}`,
           [
             {
               text: 'Okay',
@@ -717,9 +710,7 @@ class SendToContact extends Component<
           });
         } else {
           // recipient: trusted contact
-          const contactName = `${item.selectedContact.firstName} ${
-            item.selectedContact.lastName ? item.selectedContact.lastName : ''
-            }`
+          const contactName = `${item.selectedContact.displayedName}`
             .toLowerCase()
             .trim();
           recipients.push({

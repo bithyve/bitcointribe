@@ -21,7 +21,7 @@ const SendableContactCarouselItem: React.FC<Props> = ({
   containerStyle = {},
 }: Props) => {
   const displayedNameText = useMemo(() => {
-    if (contact.walletName !== null) {
+    if (contact.walletName) {
       return `${contact.walletName}'s wallet`;
     } else {
       return contact.displayedName;
