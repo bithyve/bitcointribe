@@ -156,6 +156,17 @@ export default class SecureAccount {
     }
   };
 
+  public setupSecureAccount2 = async () => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.setupSecureAccount2(),
+      };
+    } catch (err) {
+      return { status: 301, err: err.message, message: ErrMap[301] };
+    }
+  };
+
   public importSecureAccount = async (
     secondaryXpub: string,
     bhXpub?: string,
@@ -1023,6 +1034,10 @@ export default class SecureAccount {
 
   public getXpubsForAccount = () => {
     return this.secureHDWallet.getSecureXpubs()
+  };
+
+  public getXpubsForAccount2 = () => {
+    return this.secureHDWallet.getSecureXpubs2()
   };
 
   // public getSecondaryMnemonics = () => {

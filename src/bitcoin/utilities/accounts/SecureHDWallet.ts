@@ -308,6 +308,14 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public getSecureXpubs2 = (): {
+    primary: string;
+  } => {
+    return {
+      primary: this.xpubs.primary
+    }
+  };
+
   public getAccountId = (): { accountId: string } => {
     const mutliSig = this.createSecureMultiSig(0);
     const { address } = mutliSig; // getting the first receiving address
@@ -1279,6 +1287,26 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public setupSecureAccount2 = async () => {
+    // invoked once per wallet (during initial setup)
+    let res: AxiosResponse;
+    // this.secondaryMnemonic = bip39.generateMnemonic(256);
+    // const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
+    // try {
+    //   res = await SIGNING_AXIOS.post('setupSecureAccount', {
+    //     HEXA_ID,
+    //     walletID: this.walletID,
+    //     secondaryID,
+    //   });
+    // } catch (err) {
+    //   if (err.response) throw new Error(err.response.data.err);
+    //   if (err.code) throw new Error(err.code);
+    // }
+    // console.log({ res });
+    // const { setupSuccessful, setupData } = res.data;
+      const { prepared } = this.prepareSecureAccount2();
+  };
+
   public updateDonationPreferences = async (
     accountNumber: number,
     preferences: {
@@ -1908,6 +1936,40 @@ export default class SecureHDWallet extends Bitcoin {
         secondary: secondaryXpub,
         bh: bhXpub,
       };
+
+      return {
+        prepared: true,
+      };
+    } catch (err) {
+      return {
+        prepared: false,
+      };
+    }
+  };
+
+  public prepareSecureAccount2 = (): { prepared: boolean } => {
+    try {
+      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`;
+      const primaryXpub = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+      );
+      this.primaryXpriv = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+        true,
+      );
+
+      // if (!secondaryXpub) {
+      //   if (!this.secondaryMnemonic)
+      //     throw new Error(
+      //       'SecondaryXpub required; secondary mnemonic missing ',
+      //     );
+      //   const path = this.derivePath(bhXpub);
+      //   secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
+      // }
+
+      this.xpubs.primary = primaryXpub;
 
       return {
         prepared: true,

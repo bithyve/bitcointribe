@@ -287,7 +287,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let s3ServiceSecure: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
-  // let secureXpub = s3ServiceSecure.getXpubsForAccount();
+  let secureXpub = s3ServiceSecure.getXpubsForAccount2();
   let EFChannelData = JSON.parse(payload.scannedData);
   let encKey;
   if (EFChannelData.uuid) encKey = LevelHealth.strechKey(EFChannelData.uuid);
@@ -345,7 +345,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   if(res.status == 200){
     // Create trusted channel 
     const data: TrustedDataElements = {
-      xPub: { testXpub, regularXpub, secureXpub:{} },
+      xPub: { testXpub, regularXpub, secureXpub: secureXpub },
       walletID,
       FCM: fcmTokenValue,
       walletName: EFChannelData.walletName,
