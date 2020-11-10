@@ -16,18 +16,16 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 
 export type Props = {
   recipient: RecipientDescribing;
-  amount: string;
   onRemove: () => void;
   containerStyle?: Record<string, unknown>;
 };
 
 const SelectedRecipientCarouselItem: React.FC<Props> = ({
   recipient,
-  amount,
   onRemove,
   containerStyle = {},
 }: Props) => {
-  const amountText = useFormattedAmountText(Number(amount) || 0);
+ // const amountText = useFormattedAmountText(Number(amount) || 0);
   const unitText = useFormattedUnitText();
 
   return (
@@ -47,7 +45,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
 
         <View>
           <Text style={styles.titleText}>{recipient.displayedName}</Text>
-          <Text style={styles.amountText}>{amountText} {unitText}</Text>
+          <Text style={styles.amountText}>{recipient.availableBalance} {unitText}</Text>
         </View>
       </View>
 

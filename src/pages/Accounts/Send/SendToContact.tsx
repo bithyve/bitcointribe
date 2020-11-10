@@ -141,8 +141,7 @@ class SendToContact extends Component<
       selectedRecipients: this.props
         .accountsState[accountKind]
         .transfer
-        .details
-        .map(item => item.selectedContact),
+        .details,
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
       isFromAddressBook: this.props.navigation.getParam('isFromAddressBook')
@@ -185,7 +184,6 @@ class SendToContact extends Component<
 
   componentDidMount = () => {
     const { accountsState, trustedContactsService } = this.props;
-
     const {
       bitcoinAmount,
       averageTxFees,
@@ -297,6 +295,12 @@ class SendToContact extends Component<
       this.amountCalculation();
     }
 
+   if ( prevProps.accountsState[this.state.serviceType].transfer.details
+        .length !==
+      this.props.accountsState[this.state.serviceType].transfer.details.length)
+    {
+      this.setState({ selectedRecipients: this.props.accountsState[this.state.serviceType].transfer.details, bitcoinAmount: '', currencyAmount: ''});
+    }
     if (
       prevProps.accountsState[this.state.serviceType].transfer !==
       this.props.accountsState[this.state.serviceType].transfer
@@ -544,7 +548,7 @@ class SendToContact extends Component<
       if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         this.setState({ isInvalidBalance: true, isConfirmDisabled: true });
       } else
-        this.setState({ isConfirmDisabled: false, isInvalidBalance: false });
+        this.setState({ isConfirmDisabled: false, isInvalidBalance: false});
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!accountsState[serviceType].transfer.details.length) {
@@ -943,26 +947,29 @@ class SendToContact extends Component<
             contentOffset={{ x: -24, y: 0 }}
             renderItem={({ item, index }: { item: unknown, index: number }) => {
               let recipient: RecipientDescribing;
+              let newItem = {
+                ...item.selectedContact,
+                bitcoinAmount: prefersBitcoin ? item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount : item.currencyAmount ? item.currencyAmount : currencyAmount,
+                }
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
-              if (item.account_name != null) {
+              if (item.selectedContact.account_name != null) {
                 // 🔑 This seems to be the way the backend is defining the "account kind".
                 const accountKind = {
                   'Checking Account': REGULAR_ACCOUNT,
                   'Savings Account': SECURE_ACCOUNT,
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
-                }[item.account_name || 'Checking Account'];
-                recipient = makeSubAccountRecipientDescription(item, accountKind);
+                }[item.selectedContact.account_name || 'Checking Account'];
+                recipient = makeSubAccountRecipientDescription(newItem, accountKind);
               } else {
-                recipient = makeContactRecipientDescription(item);
+                recipient = makeContactRecipientDescription(newItem);
               }
 
               return (
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
-                  amount={prefersBitcoin ? bitcoinAmount : currencyAmount}
                   onRemove={() => {
                     this.setState(
                       { removeItem: accountsState[serviceType].transfer.details[index] },

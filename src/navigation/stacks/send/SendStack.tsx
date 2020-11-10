@@ -24,6 +24,10 @@ const SendStack = createStackNavigator(
     },
     SendConfirmation: {
       screen: SendConfirmationScreen,
+      navigationOptions: {
+        gesturesEnabled: false,
+        header: null,
+      },
     },
   },
   {
