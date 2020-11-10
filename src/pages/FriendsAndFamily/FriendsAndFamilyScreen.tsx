@@ -44,9 +44,11 @@ import { NavigationStackOptions } from 'react-navigation-stack';
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions';
 import { ListItem } from 'react-native-elements';
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent';
-import { ContactRecipientDescribing, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing';
+import {
+  ContactRecipientDescribing,
+  makeContactRecipientDescription,
+} from '../../common/data/models/interfaces/RecipientDescribing';
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
-
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -75,7 +77,7 @@ interface FriendsAndFamilyStateTypes {
 class FriendsAndFamilyScreen extends PureComponent<
   FriendsAndFamilyPropTypes,
   FriendsAndFamilyStateTypes
-  > {
+> {
   static navigationOptions = makeNavigationOptions;
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
@@ -109,7 +111,9 @@ class FriendsAndFamilyScreen extends PureComponent<
       this.updateAddressBook();
     });
 
-    this.props.navigation.setParams({ toggleKnowMoreSheet: this.toggleKnowMoreSheet });
+    this.props.navigation.setParams({
+      toggleKnowMoreSheet: this.toggleKnowMoreSheet,
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -149,16 +153,13 @@ class FriendsAndFamilyScreen extends PureComponent<
   toggleKnowMoreSheet = () => {
     const shouldShow = !this.state.isShowingKnowMoreSheet;
 
-    this.setState(
-      { isShowingKnowMoreSheet: shouldShow },
-      () => {
-        if (shouldShow) {
-          this.helpBottomSheetRef.current?.snapTo(1);
-        } else {
-          this.helpBottomSheetRef.current?.snapTo(0);
-        }
+    this.setState({ isShowingKnowMoreSheet: shouldShow }, () => {
+      if (shouldShow) {
+        this.helpBottomSheetRef.current?.snapTo(1);
+      } else {
+        this.helpBottomSheetRef.current?.snapTo(0);
       }
-    );
+    });
   };
 
   updateAddressBook = async () => {
@@ -175,7 +176,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -208,7 +209,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             otp,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           let usesOTP = false;
           if (!connectedVia && otp) {
@@ -251,11 +252,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           };
           trustedContacts.push(element);
           if (element.isGuardian) {
-            const isRemovable =
-              Date.now() - element.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                !element.hasTrustedChannel
-                ? true
-                : false; // expired guardians are removable
+            const isRemovable = !element.hasTrustedChannel ? true : false; // un-confirmed guardians are removable
             myKeepers.push({ ...element, isRemovable });
           }
           if (element.isWard) {
@@ -327,21 +324,23 @@ class FriendsAndFamilyScreen extends PureComponent<
     index,
     contactsType,
   }: {
-    backendContactInfo: unknown,
-    contactDescription: ContactRecipientDescribing,
-    index: number,
-    contactsType: string
+    backendContactInfo: unknown;
+    contactDescription: ContactRecipientDescribing;
+    index: number;
+    contactsType: string;
   }) => {
     return (
       <ListItem
         key={String(index)}
         bottomDivider
-        onPress={() => this.handleContactSelection(backendContactInfo, index, contactsType)}
+        onPress={() =>
+          this.handleContactSelection(backendContactInfo, index, contactsType)
+        }
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
       </ListItem>
     );
-  }
+  };
 
   renderAddContactFriendsAndFamily = () => {
     const { navigation } = this.props;
@@ -392,9 +391,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   renderAddContactAddressBookHeader = () => {
-    return (
-      <ModalHeader />
-    );
+    return <ModalHeader />;
   };
 
   render() {
@@ -420,7 +417,6 @@ class FriendsAndFamilyScreen extends PureComponent<
           }
           style={{ flex: 1, marginBottom: hp('6%') }}
         >
-
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
@@ -429,18 +425,18 @@ class FriendsAndFamilyScreen extends PureComponent<
 
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {contactsKeepingUser.length > 0 && (
+                {(contactsKeepingUser.length > 0 &&
                   contactsKeepingUser.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.KEEPER_OF_USER),
+                      contactDescription: makeContactRecipientDescription(
+                        item,
+                        ContactTrustKind.KEEPER_OF_USER,
+                      ),
                       index,
-                      contactsType: "My Keepers",
+                      contactsType: 'My Keepers',
                     });
-                  })
-                ) || (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                  })) || <View style={{ height: wp('22%') + 30 }} />}
               </View>
             </View>
           </View>
@@ -453,18 +449,18 @@ class FriendsAndFamilyScreen extends PureComponent<
 
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {contactsKeptByUser.length > 0 && (
+                {(contactsKeptByUser.length > 0 &&
                   contactsKeptByUser.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.USER_IS_KEEPING),
+                      contactDescription: makeContactRecipientDescription(
+                        item,
+                        ContactTrustKind.USER_IS_KEEPING,
+                      ),
                       index,
                       contactsType: "I'm Keeper of",
                     });
-                  })
-                ) || (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                  })) || <View style={{ height: wp('22%') + 30 }} />}
               </View>
             </View>
           </View>
@@ -477,18 +473,18 @@ class FriendsAndFamilyScreen extends PureComponent<
 
             <View style={{ marginBottom: 15 }}>
               <View style={{ height: 'auto' }}>
-                {otherTrustedContacts.length > 0 && (
+                {(otherTrustedContacts.length > 0 &&
                   otherTrustedContacts.map((item, index) => {
                     return this.renderContactListItem({
                       backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(item, ContactTrustKind.OTHER),
+                      contactDescription: makeContactRecipientDescription(
+                        item,
+                        ContactTrustKind.OTHER,
+                      ),
                       index,
                       contactsType: 'Other Contacts',
                     });
-                  })
-                ) || (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                  })) || <View style={{ height: wp('22%') + 30 }} />}
 
                 <TouchableOpacity
                   onPress={() => {
@@ -663,19 +659,18 @@ const styles = StyleSheet.create({
   },
 });
 
-
-function makeNavigationOptions({ navigation }): NavigationScreenConfig<NavigationStackOptions, any> {
+function makeNavigationOptions({
+  navigation,
+}): NavigationScreenConfig<NavigationStackOptions, any> {
   return {
     ...defaultStackScreenNavigationOptions,
 
-    title: "Friends and Family",
+    title: 'Friends and Family',
 
     headerRight: () => {
       return (
-        <KnowMoreButton
-          onpress={navigation.getParam('toggleKnowMoreSheet')}
-        />
+        <KnowMoreButton onpress={navigation.getParam('toggleKnowMoreSheet')} />
       );
     },
   };
-};
+}

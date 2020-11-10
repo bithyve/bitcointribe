@@ -7,6 +7,7 @@ import {
   Text,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import ContactList from '../../components/ContactList';
 import Toast from '../../components/Toast';
@@ -29,6 +30,9 @@ const ContactsListForAssociateContact = (props) => {
   const [approvingContact, setApprovingContact] = useState('');
   const isGuardian = props.navigation.getParam('isGuardian');
   const dispatch = useDispatch();
+  const { approvingTrustedContact } = useSelector(
+    (state) => state.trustedContacts.loading,
+  );
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
@@ -139,6 +143,7 @@ const ContactsListForAssociateContact = (props) => {
           </View>
 
           <AppBottomSheetTouchableWrapper
+            disabled={approvingTrustedContact}
             onPress={() => {
               let { skippedContactsCount } = trustedContacts.tc;
               let data;
@@ -164,21 +169,27 @@ const ContactsListForAssociateContact = (props) => {
               width: wp('22%'),
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: Colors.blue,
+              backgroundColor: approvingTrustedContact
+                ? Colors.lightBlue
+                : Colors.blue,
               justifyContent: 'center',
               borderRadius: 8,
               alignSelf: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              Skip
-            </Text>
+            {approvingTrustedContact ? (
+              <ActivityIndicator size={'small'} />
+            ) : (
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Skip
+              </Text>
+            )}
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
