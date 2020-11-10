@@ -147,10 +147,11 @@ export default class Bitcoin {
       const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
         for (const utxo of addressSpecificUTXOs) {
-          const { value, Address, status, txid } = utxo;
+          const { value, Address, status, vout, txid } = utxo;
 
           UTXOs.push({
             txId: txid,
+            vout,
             value,
             address: Address,
             status,
