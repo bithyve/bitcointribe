@@ -4,6 +4,10 @@ import { Milliseconds } from "../../common/data/typealiases/UnitAliases";
 
 
 export function colorForLastSeenActive(lastSeenActiveTime: Milliseconds) {
+  if (!lastSeenActiveTime) {
+    return Colors.gray2;
+  }
+
   const startDate = moment(lastSeenActiveTime);
   const endDate = moment(Date.now());
   const daysSince = endDate.diff(startDate, 'days');
