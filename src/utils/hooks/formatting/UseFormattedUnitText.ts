@@ -6,7 +6,7 @@ import useCurrencyKind from "../state-selectors/UseCurrencyKind";
 
 
 export default function useFormattedUnitText(
-  bitcoinUnit: BitcoinUnit,
+  bitcoinUnit: BitcoinUnit = BitcoinUnit.SATS,
 ): string {
   const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();

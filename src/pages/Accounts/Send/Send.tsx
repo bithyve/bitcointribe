@@ -53,7 +53,6 @@ import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import RecipientSelectionStrip from '../../../components/send/RecipientSelectionStrip';
 import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection';
 import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view';
-import { sampleContactRecipients, sampleAccountRecipients } from './temporary-preview-data';
 import { ContactRecipientDescribing, AccountRecipientDescribing, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
 
 export enum SectionKind {
@@ -167,8 +166,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       ],
       getServiceType: this.props.navigation.getParam('getServiceType') || null,
       carouselIndex: this.props.navigation.getParam('carouselIndex') || null,
-      selectedContacts: [sampleContactRecipients[0]],
-      selectedSubAccounts: [sampleAccountRecipients[0]],
+      selectedContacts: [],
+      selectedSubAccounts: [],
     };
   }
 
@@ -528,8 +527,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             Toast('Invalid QR');
             break;
         }
-      } else {
-        this.setState({ isInvalidAddress: true });
       }
     }
   };
@@ -704,12 +701,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             contactName.toLowerCase().trim()
           ];
 
-          let hasTrustedAddress = false;
-          if (serviceType === TEST_ACCOUNT)
-            hasTrustedAddress = !!trustedTestAddress;
-          else hasTrustedAddress = !!trustedAddress;
+          const hasTrustedAddress = Boolean(
+            serviceType === TEST_ACCOUNT ? trustedTestAddress : trustedAddress
+          );
 
           const isGuardian = index < 3 ? true : false;
+
           if (hasXpub || hasTrustedAddress) {
             // sendable
             sendableTrustedContacts.push({
@@ -755,11 +752,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       balances,
       accountData,
       trustedContacts,
+      selectedContacts,
       selectedSubAccounts,
     } = this.state;
 
     const { accountsState } = this.props;
-    const selectedContacts = [sampleContactRecipients[0]];
 
     return (
       <View style={styles.rootContainer}>
