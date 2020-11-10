@@ -21,7 +21,6 @@ const RecipientSelectionStrip: React.FC<Props> = ({
   onRecipientSelected,
 }: Props) => {
   const accountsState = useAccountsState();
-
   const selectedRecipientIDs = useMemo(() => {
     return selectedRecipients.map(recipient => recipient.id);
   }, [selectedRecipients]);
