@@ -62,7 +62,7 @@ export function makeContactRecipientDescription(
   return {
     id: data.id,
     kind: RecipientKind.CONTACT,
-    displayedName: data.contactName || data.displayedName,
+    displayedName: data.contactName || data.displayedName || data.contactsWalletName || data.walletName,
     walletName: data.contactsWalletName || data.walletName,
     avatarImageSource: data.imageAvailable ? data.rawImage : data.avatarImageSource,
     availableBalance: data.bitcoinAmount || data.amount || 0,

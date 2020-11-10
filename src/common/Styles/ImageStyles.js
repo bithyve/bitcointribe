@@ -36,8 +36,8 @@ const ListStyles = StyleSheet.create({
       height: 3,
     },
     shadowRadius: 10,
-    shadowOpacity: 0.7,
-    shadowColor: Colors.gray3,
+    shadowOpacity: 0.37,
+    shadowColor: Colors.gray2,
     elevation: 10,
   },
 });
