@@ -4,6 +4,7 @@ import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
 import TransactionGroup from '../../enums/TransactionGroup';
 import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
+import { ImageSourcePropType } from 'react-native';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultTitle: string;
@@ -15,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string;
-  kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
+  kind: SubAccountKind = SubAccountKind.SERVICE;
   serviceAccountKind: ServiceAccountKind;
   isPrimarySubAccount: boolean;
   balance: number;
@@ -24,11 +25,11 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Account with Trusted Contacts";
+  defaultDescription: string;
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource: NodeRequire;
+  avatarImageSource: ImageSourcePropType;
 
   transactionIDs: string[];
   transactionGroup: TransactionGroup;
@@ -65,7 +66,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
 }
 
 
-function getAvatarImageSource(serviceAccountKind: ServiceAccountKind): NodeRequire {
+function getAvatarImageSource(serviceAccountKind: ServiceAccountKind): ImageSourcePropType {
   switch (serviceAccountKind) {
     case ServiceAccountKind.FAST_BITCOINS:
       return require('../../../../assets/images/icons/icon_fastbitcoins_hex_dark.png');

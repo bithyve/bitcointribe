@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import { ListItem, Icon, Avatar } from 'react-native-elements';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
@@ -9,7 +9,7 @@ export type Props = {
   subAccountInfo: SubAccountDescribing;
 };
 
-export function imageSourceForAccountKind(accountKind: SubAccountKind): NodeRequire {
+export function imageSourceForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
   switch (accountKind) {
     case SubAccountKind.REGULAR:
       return require('../../assets/images/icons/icon_checking_circled.png');

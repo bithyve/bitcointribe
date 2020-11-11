@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
@@ -29,7 +29,7 @@ const HeaderSection: React.FC<HeaderProps> = ({
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const secondarySubAccounts = useSecondarySubAccountsForShell(accountShell);
 
-  const secondarySubAccountBadgeIcons: NodeRequire[] = useMemo(() => {
+  const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo(() => {
     return secondarySubAccounts.map(subAccount => subAccount.avatarImageSource);
   }, [secondarySubAccounts])
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
 import SubAccountOptionCard from '../../../components/accounts/SubAccountOptionCard';

@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, SectionList } from 'react-native';
+import { View, Text, StyleSheet, SectionList } from 'react-native';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import { Button } from 'react-native-elements';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
 import ButtonStyles from '../../../common/Styles/Buttons';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
