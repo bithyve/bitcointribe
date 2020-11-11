@@ -41,6 +41,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import {
+  switchLoader,
   fetchBalance,
   fetchTransactions,
   getTestcoins,
@@ -118,14 +119,13 @@ interface AccountsPropsTypes {
   fetchBalance: any;
   fetchTransactions: any;
   getTestcoins: any;
+  switchLoader: any;
   fetchBalanceTx: any;
   syncViaXpubAgent: any;
   fetchDerivativeAccXpub: any;
   fetchDerivativeAccBalTx: any;
   fetchDerivativeAccAddress: any;
   service: any;
-  // balanceTxLoading: any;
-  // derivativeBalanceTxLoading: any;
   accounts: any;
   FBTCAccountData: any;
   currencyCode: any;
@@ -143,8 +143,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   sliderWidth: any;
   currencyCode: any;
   wallet: any;
-  // balanceTxLoading: any;
-  // derivativeBalanceTxLoading: any;
   carousel: any;
   constructor(props) {
     super(props);
@@ -219,20 +217,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   }
 
   componentDidMount = () => {
+    
     let { serviceType } = this.state;
     let { accounts } = this.props;
-    // accounts[serviceType].loading.balanceTx = false
-    console.log('acc is Regular or secure ', {serviceType, loader: this.state.showLoader})
+    // setting these properties to true if they are false. true should be the starting state for these
+    // properties else the account refresh can get stuck with loader displaying all the time
+    if (accounts[serviceType].loading.balanceTx) this.props.switchLoader(serviceType, 'balanceTx');
+    if(accounts[serviceType].loading.derivativeBalanceTx) this.props.switchLoader(serviceType, 'derivativeBalanceTx');
+
     this.updateCarouselData();
-    // this.setState({ spendableBalance: this.props.navigation.state.params
-    //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
     this.getBalance();
   
-    // this should specifically be false at startup
-    // this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
-    // this.derivativeBalanceTxLoading = 
-    //   accounts[serviceType].loading.derivativeBalanceTx;
     const service = accounts[serviceType].service;
     this.wallet =
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
@@ -469,26 +465,33 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       const { derivativeAccountDetails } = presentCarouselData;
       // console.log({ derivativeAccountDetails });
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
-      {console.log('acc is donation ', {serviceType, loader: this.state.showLoader})
-        this.props.syncViaXpubAgent(
+      {
+        let { accounts } = this.props;
+        console.log('acc is donation ', {serviceType, loader: this.state.showLoader})
+      console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
+      this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
         );}
       else
       {
-        console.log('acc is not donation ', {serviceType, loader: this.state.showLoader})
-        this.props.fetchDerivativeAccBalTx(
+        let { accounts } = this.props;
+        console.log('acc is NOT donation ', {serviceType, loader: this.state.showLoader})
+        console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
+    this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
         );}
     } else {
       {
+        let { accounts } = this.props;
         console.log('acc is Regular or secure ', {serviceType, loader: this.state.showLoader})
+        console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
         this.props.fetchBalanceTx(serviceType, {
-        loader: true,
-        syncTrustedDerivative:
+          loader: true,
+          syncTrustedDerivative:
           serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
             ? true
             : false,
@@ -502,10 +505,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     const service = accounts[serviceType].service;
     const instance = service.hdWallet || service.secureHDWallet;
     const storedAverageTxFees = this.props.averageTxFees;
-    // const storedAverageTxFees = JSON.parse(
-    //   await AsyncStorage.getItem('storedAverageTxFees'),
-    // );
-    // console.log({ storedAverageTxFees });
 
     const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
       ? 'MAINNET'
@@ -518,19 +517,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         return;
       }
     }
-    // console.log('Fetching average fee...', network);
+    
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
     this.props.setAverageTxFee({
       ...storedAverageTxFees,
       [network]: { averageTxFees, lastFetched: Date.now() },
     });
-    // await AsyncStorage.setItem(
-    //   'storedAverageTxFees',
-    //   JSON.stringify({
-    //     serviceType: { averageTxFees, lastFetched: Date.now() },
-    //   }),
-    // );
   };
 
   setCurrencyCodeFromAsync = async () => {
@@ -559,12 +552,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.accounts[this.state.serviceType].service
     ) {
       this.getBalance();
-      // this.balanceTxLoading = this.props.accounts[
-      //   this.state.serviceType
-      // ].loading.balanceTx;
-      // this.derivativeBalanceTxLoading = this.props.accounts[
-      //   this.state.serviceType
-      // ].loading.derivativeBalanceTx;
     }
 
     if (prevState.serviceType !== this.state.serviceType) {
@@ -1103,8 +1090,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               refreshControl={
                 <RefreshControl
                   refreshing={
-                    accounts[serviceType].loading.balanceTx ||
-                    accounts[serviceType].loading.derivativeBalanceTx
+                    accounts[serviceType].loading.balanceTx
                   }
                   onRefresh={this.refreshAccountBalance}
                 />
@@ -1943,6 +1929,7 @@ export default withNavigationFocus(
     fetchBalance,
     fetchTransactions,
     getTestcoins,
+    switchLoader,
     fetchBalanceTx,
     syncViaXpubAgent,
     fetchDerivativeAccXpub,
