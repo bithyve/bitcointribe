@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, Text, Linking } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import FormStyles from '../../../../common/Styles/Forms';
 import ButtonStyles from '../../../../common/Styles/Buttons';
 import Colors from '../../../../common/Colors';
@@ -9,7 +9,7 @@ import { Input, Button, /* CheckBox */ } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
-import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
+import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions';
 import SubAccountDescribing, { DonationSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -67,7 +67,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
   }, []);
 
   useAccountShellCreationCompletionEffect(() => {
-    navigation.dispatch(goHomeAction);
+    console.log('dispatching resetToHomeAction');
+    navigation.dispatch(resetToHomeAction());
     // TODO: Navigate to account details screen with the ID for this account shell
   });
 

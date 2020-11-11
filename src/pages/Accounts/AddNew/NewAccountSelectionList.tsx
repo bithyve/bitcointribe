@@ -8,7 +8,7 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
 import { addNewAccountShell } from '../../../store/actions/accounts';
 import { useDispatch } from "react-redux";
-import { goHomeAction } from '../../../navigation/actions/NavigationActions';
+import { resetToHomeAction } from '../../../navigation/actions/NavigationActions';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
@@ -51,7 +51,8 @@ const NewAccountSelectionList: React.FC<Props> = ({
   navigation,
 }: Props) => {
   useAccountShellCreationCompletionEffect(() => {
-    navigation.dispatch(goHomeAction);
+    console.log('dispatching resetToHomeAction');
+    navigation.dispatch(resetToHomeAction());
   });
 
   const dispatch = useDispatch();

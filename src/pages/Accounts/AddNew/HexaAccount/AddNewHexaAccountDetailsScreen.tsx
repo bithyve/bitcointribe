@@ -7,7 +7,7 @@ import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
-import { goHomeAction } from '../../../../navigation/actions/NavigationActions';
+import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions';
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces';
 
 export type Props = {
@@ -60,8 +60,8 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ({
   // TODO: We need a bit more design clarity about what to do after new
   // account creation succeeds or fails.
   useAccountShellCreationCompletionEffect(() => {
-    console.log('dispatching go home action');
-    navigation.dispatch(goHomeAction);
+    console.log('dispatching resetToHomeAction');
+    navigation.dispatch(resetToHomeAction());
   });
 
   function handleProceedButtonPress() {

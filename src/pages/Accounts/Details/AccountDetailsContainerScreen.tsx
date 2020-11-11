@@ -87,7 +87,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
   }
 
   function navigateToAccountSettings() {
-    navigation.navigate('AccountSettingsRoot', {
+    navigation.navigate('SubAccountSettings', {
       accountShellID,
     });
   }
