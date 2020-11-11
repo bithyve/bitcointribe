@@ -4,7 +4,7 @@ import TransactionDescribing from '../../../../common/data/models/Transactions/I
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import sampleTransactions from '../../Details/SampleTransactions';
 import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../../common/Styles/Buttons';
+import ButtonStyles from '../../../../common/Styles/ButtonStyles';
 import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';

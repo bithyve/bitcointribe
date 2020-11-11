@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements';
-import ListStyles from '../../../common/Styles/Lists';
+import { StyleSheet, Image } from 'react-native';
+import { ListItem } from 'react-native-elements';
+import ListStyles from '../../../common/Styles/ListStyles';
+import ImageStyles from '../../../common/Styles/ImageStyles';
 import AccountVisibility from '../../../common/data/enums/AccountVisibility';
 
 export type Props = {
@@ -49,13 +50,10 @@ const VisibilityOptionsListItemContent: React.FC<Props> = ({
 
   return (
     <>
-      <Avatar
+      <Image
         source={avatarImageSource}
-        imageProps={{
-          resizeMode: "contain",
-        }}
-        size="small"
-        containerStyle={styles.avatarImageContainer}
+        style={styles.avatarImage}
+        resizeMode="contain"
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -78,7 +76,8 @@ const VisibilityOptionsListItemContent: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  avatarImageContainer: {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageSmall,
     marginRight: 14,
   },
 

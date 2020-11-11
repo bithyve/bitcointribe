@@ -1,42 +1,25 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Image, ImageSourcePropType } from 'react-native';
-import { ListItem, Icon, Avatar } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
-import ListStyles from '../../common/Styles/Lists';
+import ListStyles from '../../common/Styles/ListStyles';
+import ImageStyles from '../../common/Styles/ImageStyles';
 
 export type Props = {
   subAccountInfo: SubAccountDescribing;
 };
 
-export function imageSourceForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
-  switch (accountKind) {
-    case SubAccountKind.REGULAR:
-      return require('../../assets/images/icons/icon_checking_circled.png');
-    default:
-      // TODO: Get image assets for other possible account kinds
-      return require('../../assets/images/icons/icon_checking_circled.png');
-  }
-}
 
 const DestinationAccountShellListItemContent: React.FC<Props> = ({
   subAccountInfo,
 }: Props) => {
-
-  const accountKindImageSource = useMemo(() => {
-    return imageSourceForAccountKind(subAccountInfo.kind);
-  }, [subAccountInfo.kind]);
-
   return (
     <>
-      <Avatar
-        rounded
-        source={accountKindImageSource}
-        containerStyle={styles.accountKindImage}
-        size="medium"
-        imageProps={{
-          resizeMode: 'cover',
-        }}
+      <Image
+        source={subAccountInfo.avatarImageSource}
+        style={styles.avatarImage}
+        resizeMode="contain"
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -59,8 +42,10 @@ const DestinationAccountShellListItemContent: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  accountKindImage: {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageMedium,
     marginRight: 14,
+    borderRadius: 9999,
   },
 
   titleSection: {
