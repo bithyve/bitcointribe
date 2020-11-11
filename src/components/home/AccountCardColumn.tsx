@@ -29,6 +29,7 @@ const AccountCardColumn: React.FC<Props> = ({
       {cardData.map((accountShell) => {
         return (
           <TouchableOpacity
+            key={accountShell.id}
             style={styles.cardContainer}
             onPress={() => onAccountCardSelected(accountShell)}
             onLongPress={() => onCardLongPressed(accountShell)}
