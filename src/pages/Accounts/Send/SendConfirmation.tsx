@@ -422,6 +422,12 @@ class SendConfirmation extends Component<
   };
 
   getServiceTypeAccount = () => {
+    const { derivativeAccountDetails } = this.state;
+    if (derivativeAccountDetails) {
+      if (derivativeAccountDetails.type === 'DONATION_ACCOUNT')
+        return 'Donation Account';
+    }
+
     if (this.serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
     } else if (this.serviceType == 'SECURE_ACCOUNT') {
