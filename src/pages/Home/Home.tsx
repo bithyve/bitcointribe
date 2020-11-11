@@ -2064,7 +2064,6 @@ const styles = StyleSheet.create({
   accountCardsContainer: {
     flex: 7,
     marginTop: 30,
-    paddingLeft: 20,
     paddingTop: 16,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

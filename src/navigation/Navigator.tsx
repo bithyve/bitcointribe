@@ -62,7 +62,6 @@ import NewOwnQuestions from '../pages/NewOwnQuestions';
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import HomeStack from './stacks/home/HomeStack';
 import SendStack from './stacks/send/SendStack';
-import AddNewAccountStack from './stacks/accounts/AddNewAccountStack';
 import AccountDetailsStack from './stacks/accounts/AccountDetailsStack';
 
 
@@ -131,9 +130,9 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    AddNewAccount: {
-      screen: AddNewAccountStack,
-    },
+    // AddNewAccount: {
+    //   screen: AddNewAccountStack,
+    // },
     Send: {
       screen: SendStack,
       navigationOptions: {

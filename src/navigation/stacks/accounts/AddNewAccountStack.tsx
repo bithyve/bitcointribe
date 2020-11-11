@@ -3,9 +3,9 @@ import { createStackNavigator } from "react-navigation-stack";
 import NewAccountSelectionList from "../../../pages/Accounts/AddNew/NewAccountSelectionList";
 import AddNewHexaAccountDetailsScreen from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen";
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-import NavStyles from '../../../common/Styles/NavStyles';
-import { goHomeAction } from '../../actions/NavigationActions';
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 
 
 const AddNewAccountStack = createStackNavigator(
@@ -16,7 +16,7 @@ const AddNewAccountStack = createStackNavigator(
         return {
           title: "Add New Account",
           headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.dispatch(goHomeAction) }} />;
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop(); }} />;
           },
         };
       },
@@ -38,7 +38,7 @@ const AddNewAccountStack = createStackNavigator(
     initialRouteName: 'AccountSelectionList',
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },
