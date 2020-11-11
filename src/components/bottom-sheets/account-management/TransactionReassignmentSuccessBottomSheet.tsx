@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
 import { Button } from 'react-native-elements';
 import Colors from '../../../common/Colors';
-import ButtonStyles from '../../../common/Styles/Buttons';
+import ButtonStyles from '../../../common/Styles/ButtonStyles';
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
 
 

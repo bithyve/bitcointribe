@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Easing } from 'react-native-reanimated';
-import ButtonStyles from '../../common/Styles/Buttons';
+import ButtonStyles from '../../common/Styles/ButtonStyles';
 import AccountShell from '../../common/data/models/AccountShell';
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
 import HomeAccountCardsDraggableList from '../../components/home/HomeAccountCardsDraggableList';

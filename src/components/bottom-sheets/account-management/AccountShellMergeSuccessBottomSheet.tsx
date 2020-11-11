@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
 import { Avatar, Button, ListItem } from 'react-native-elements';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
-import ButtonStyles from '../../../common/Styles/Buttons';
-import ListStyles from '../../../common/Styles/Lists';
+import ButtonStyles from '../../../common/Styles/ButtonStyles';
+import ImageStyles from '../../../common/Styles/ImageStyles';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
 import AccountShell from '../../../common/data/models/AccountShell';
@@ -29,13 +29,10 @@ const AccountShellItem: React.FC<ItemProps> = ({
 
   return (
     <ListItem>
-      <Avatar
+      <Image
         source={primarySubAccount.avatarImageSource}
-        imageProps={{
-          resizeMode: "contain",
-        }}
-        size="large"
-        containerStyle={styles.avatarImageContainer}
+        style={styles.avatarImage}
+        resizeMode="contain"
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -153,8 +150,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
 
-  avatarImageContainer: {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageLarge,
     marginRight: 4,
+    borderRadius: 9999,
   },
 
   titleSection: {

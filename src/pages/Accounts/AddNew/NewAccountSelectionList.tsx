@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SectionList } from 'react-native';
 import NewAccountOptionsSection from './NewAccountOptionsSection';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../common/Styles/Buttons';
+import ButtonStyles from '../../../common/Styles/ButtonStyles';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
 import { addNewAccountShell } from '../../../store/actions/accounts';

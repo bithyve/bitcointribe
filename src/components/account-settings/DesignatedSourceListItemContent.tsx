@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
-import ListStyles from '../../common/Styles/Lists';
+import ListStyles from '../../common/Styles/ListStyles';
+import ImageStyles from '../../common/Styles/ImageStyles';
 
 export type Props = {
   subAccountInfo: SubAccountDescribing;
@@ -11,23 +12,12 @@ export type Props = {
 const DesignatedSourceListItemContent: React.FC<Props> = ({
   subAccountInfo,
 }: Props) => {
-
-  const avatarImageSource = useMemo(() => {
-    // TODO: Figure out how each designated-source sub-account will have an avatar
-    // that corresponds to it.
-    return require('../../assets/images/icons/icon_bitcoin_dark.png');
-  }, [subAccountInfo.kind]);
-
   return (
     <>
-      <Avatar
-        rounded
-        source={avatarImageSource}
-        imageProps={{
-          resizeMode: "cover",
-        }}
-        size="medium"
-        containerStyle={styles.avatarImageContainer}
+      <Image
+        source={subAccountInfo.avatarImageSource}
+        style={styles.avatarImage}
+        resizeMode="contain"
       />
 
       <ListItem.Content style={styles.titleSection}>
@@ -50,8 +40,10 @@ const DesignatedSourceListItemContent: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  avatarImageContainer: {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageMedium,
     marginRight: 14,
+    borderRadius: 9999,
   },
 
   titleSection: {

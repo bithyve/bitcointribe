@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import FormStyles from '../../../../common/Styles/Forms';
-import ButtonStyles from '../../../../common/Styles/Buttons';
-import ListStyles from '../../../../common/Styles/Lists';
+import FormStyles from '../../../../common/Styles/FormStyles';
+import ButtonStyles from '../../../../common/Styles/ButtonStyles';
+import ListStyles from '../../../../common/Styles/ListStyles';
 import { Input, Button } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';

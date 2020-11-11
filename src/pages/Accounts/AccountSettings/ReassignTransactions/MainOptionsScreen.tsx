@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, FlatList, ImageSourcePropType } from 'react-native';
-import { Avatar, ListItem } from 'react-native-elements';
-import ListStyles from '../../../../common/Styles/Lists';
+import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native';
+import { ListItem } from 'react-native-elements';
+import ListStyles from '../../../../common/Styles/ListStyles';
+import ImageStyles from '../../../../common/Styles/ImageStyles';
 
 export type Props = {
   navigation: any;
@@ -51,12 +52,10 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ({
         bottomDivider
         onPress={() => { handleListItemPressed(listItem) }}
       >
-        <Avatar
+        <Image
           source={listItem.imageSource}
-          size="small"
-          imageProps={{
-            resizeMode: 'contain',
-          }}
+          style={ImageStyles.thumbnailImageSmall}
+          resizeMode="contain"
         />
 
         <ListItem.Content style={ListStyles.listItemContentContainer}>
