@@ -48,7 +48,6 @@ import {
   fetchDerivativeAccXpub,
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
-  setAverageTxFee,
   syncViaXpubAgent,
 } from '../../store/actions/accounts';
 import {
@@ -134,7 +133,6 @@ interface AccountsPropsTypes {
   isTestHelperDoneValue: any;
   setTransactionHelper: any;
   isTransactionHelperDoneValue: any;
-  setAverageTxFee: any;
   currencyKind: CurrencyKind;
   currencyKindSet: (kind: CurrencyKind) => void;
 }
@@ -234,7 +232,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
         ? service.secureHDWallet
         : service.hdWallet;
-    this.setAverageTransactionFees();
+    this.getAverageTxFees(); // sets the averageTx fee
     this.checkFastBitcoin();
 
     // if (this.wallet.transactions.transactionDetails.length) {
@@ -490,43 +488,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  setAverageTransactionFees = async () => {
-    let { serviceType } = this.state;
-    let { accounts } = this.props;
-    const service = accounts[serviceType].service;
-    const instance = service.hdWallet || service.secureHDWallet;
-    const storedAverageTxFees = this.props.averageTxFees;
-    // const storedAverageTxFees = JSON.parse(
-    //   await AsyncStorage.getItem('storedAverageTxFees'),
-    // );
-    // console.log({ storedAverageTxFees });
-
-    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
-      ? 'MAINNET'
-      : 'TESTNET';
-    if (storedAverageTxFees && storedAverageTxFees[network]) {
-      const { averageTxFees, lastFetched } = storedAverageTxFees[network];
-      if (Date.now() - lastFetched < 1800000 && instance.feeRates) {
-        // maintaining a half an hour difference b/w fetches
-        this.setState({ averageTxFees: averageTxFees });
-        return;
-      }
-    }
-    // console.log('Fetching average fee...', network);
-    const averageTxFees = await instance.averageTransactionFee();
-    this.setState({ averageTxFees: averageTxFees });
-    this.props.setAverageTxFee({
-      ...storedAverageTxFees,
-      [network]: { averageTxFees, lastFetched: Date.now() },
-    });
-    // await AsyncStorage.setItem(
-    //   'storedAverageTxFees',
-    //   JSON.stringify({
-    //     serviceType: { averageTxFees, lastFetched: Date.now() },
-    //   }),
-    // );
-  };
-
   setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = this.props.currencyCode;
     this.setState({
@@ -562,7 +523,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
 
     if (prevState.serviceType !== this.state.serviceType) {
-      this.setAverageTransactionFees();
+      this.getAverageTxFees();
     }
 
     if (prevProps.accounts !== this.props.accounts) {
@@ -985,10 +946,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     )
       ? 'MAINNET'
       : 'TESTNET';
-    const averageTxFees = idx(
-      this.props.averageTxFees,
-      (_) => _[network].averageTxFees,
-    );
+    const averageTxFees = idx(this.state.averageTxFees, (_) => _[network]);
+    this.setState({ averageTxFees });
     return averageTxFees;
   };
 
@@ -1009,11 +968,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactions,
       spendableBalance,
       carouselData,
+      averageTxFees,
     } = this.state;
 
     const { exchangeRates, accounts } = this.props;
 
-    const averageTxFees = this.getAverageTxFees();
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -1945,7 +1904,6 @@ export default withNavigationFocus(
     currencyKindSet,
     setTestAccountHelperDone,
     setTransactionHelper,
-    setAverageTxFee,
   })(Accounts),
 );
 
