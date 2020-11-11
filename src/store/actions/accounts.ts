@@ -59,7 +59,7 @@ export const fetchBalanceTx = (
 export const transferST1 = (
   serviceType,
   recipients,
-  averageTxFees?,
+  averageTxFees,
   derivativeAccountDetails?: { type: string; number: number },
 ) => {
   return {
@@ -227,10 +227,10 @@ export const fetchDerivativeAccBalTx = (
   };
 };
 
-export const setAverageTxFee = (data) => {
+export const setAverageTxFee = (averageTxFees) => {
   return {
     type: AVERAGE_TX_FEE,
-    payload: { averageTxFees: data },
+    payload: { averageTxFees },
   };
 };
 

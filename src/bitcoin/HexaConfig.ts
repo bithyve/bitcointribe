@@ -26,6 +26,7 @@ class HexaConfig {
     10,
   );
   public GAP_LIMIT: number = parseInt(Config.BIT_GAP_LIMIT.trim(), 10);
+  public DERIVATIVE_GAP_LIMIT: number = 5;
   public CIPHER_SPEC: {
     algorithm: string;
     salt: string;

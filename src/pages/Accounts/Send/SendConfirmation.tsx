@@ -72,7 +72,6 @@ interface SendConfirmationStateTypes {
   customFeePerByte: string;
   customEstimatedBlock: number;
   customFeePerByteErr: string;
-  averageTxFees: any;
   customTxPrerequisites: any;
   derivativeAccountDetails: { type: string; number: number };
 }
@@ -91,7 +90,6 @@ interface SendConfirmationPropsTypes {
   transferST2: any;
   currencyCode: any;
   currencyKind: CurrencyKind;
-  averageTxFees: any;
 }
 class SendConfirmation extends Component<
   SendConfirmationPropsTypes,
@@ -140,7 +138,6 @@ class SendConfirmation extends Component<
       customFeePerByte: '',
       customFeePerByteErr: '',
       customEstimatedBlock: 0,
-      averageTxFees: this.props.averageTxFees,
       customTxPrerequisites: null,
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
@@ -189,7 +186,6 @@ class SendConfirmation extends Component<
       this.setState({ loading: this.props.accounts[this.serviceType].loading });
     }
   };
-
 
   sendNotifications = () => {
     let { WALLET_SETUP, trustedContactsService } = this.props;
@@ -426,6 +422,12 @@ class SendConfirmation extends Component<
   };
 
   getServiceTypeAccount = () => {
+    const { derivativeAccountDetails } = this.state;
+    if (derivativeAccountDetails) {
+      if (derivativeAccountDetails.type === 'DONATION_ACCOUNT')
+        return 'Donation Account';
+    }
+
     if (this.serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
     } else if (this.serviceType == 'SECURE_ACCOUNT') {

@@ -128,7 +128,7 @@ export default class HDSegwitWallet extends Bitcoin {
         : 0;
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
-    this.derivativeGapLimit = this.gapLimit / 2;
+    this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT;
     this.balances =
       stateVars && stateVars.balances ? stateVars.balances : this.balances;
     this.receivingAddress =
@@ -1253,38 +1253,6 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public averageTransactionFee = async () => {
-    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
-    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
-
-    const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
-    this.feeRates = rates;
-    // console.log({ feeRates: this.feeRates });
-    return {
-      high: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['high'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['high'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
-      },
-      medium: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['medium'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['medium'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
-      },
-      low: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['low'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['low'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
-      },
-    };
-  };
-
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync;
@@ -1320,18 +1288,14 @@ export default class HDSegwitWallet extends Bitcoin {
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = [];
-    for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
+    for (let itr = 0; itr <= this.nextFreeAddressIndex; itr++) {
       const address = this.getAddress(false, itr);
       externalAddresses.push(address);
       ownedAddresses[address] = true;
     }
 
     const internalAddresses = [];
-    for (
-      let itr = 0;
-      itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-      itr++
-    ) {
+    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex; itr++) {
       const address = this.getAddress(true, itr);
       internalAddresses.push(address);
       ownedAddresses[address] = true;
@@ -1536,7 +1500,7 @@ export default class HDSegwitWallet extends Bitcoin {
       address: string;
       amount: number;
     }[],
-    averageTxFees?: any,
+    averageTxFees: any,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -1595,16 +1559,11 @@ export default class HDSegwitWallet extends Bitcoin {
     // console.log('Output UTXOs:', outputUTXOs);
 
     const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
-    let defaultFeePerByte, defaultEstimatedBlocks;
     // console.log({ averageTxFees });
-    if (averageTxFees) {
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    } else {
-      const averageTxFees = await this.averageTransactionFee();
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    }
+
+    const defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+    const defaultEstimatedBlocks =
+      averageTxFees[defaultTxPriority].estimatedBlocks;
 
     const assets = coinselect(inputUTXOs, outputUTXOs, defaultFeePerByte);
     const defaultPriorityInputs = assets.inputs;

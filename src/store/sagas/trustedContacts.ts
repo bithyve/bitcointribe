@@ -59,7 +59,7 @@ import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import DeviceInfo from 'react-native-device-info';
-import { exchangeRatesCalculated } from '../actions/accounts';
+import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -922,6 +922,10 @@ function* walletCheckInWorker({ payload }) {
   const storedExchangeRates = yield select(
     (state) => state.accounts.exchangeRates,
   );
+  const storedAverageTxFees = yield select(
+    (state) => state.accounts.averageTxFees,
+  );
+
   const DECENTRALIZED_BACKUP = yield select(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
@@ -952,11 +956,15 @@ function* walletCheckInWorker({ payload }) {
   );
   console.log({ res });
   if (res.status === 200) {
-    const { updationInfo, exchangeRates } = res.data;
+    const { updationInfo, exchangeRates, averageTxFees } = res.data;
 
     if (!exchangeRates) console.log('Failed to fetch exchange rates');
     if (JSON.stringify(exchangeRates) !== JSON.stringify(storedExchangeRates))
       yield put(exchangeRatesCalculated(exchangeRates));
+
+    if (!averageTxFees) console.log('Failed to fetch fee rates');
+    if (JSON.stringify(averageTxFees) !== JSON.stringify(storedAverageTxFees))
+      yield put(setAverageTxFee(averageTxFees));
 
     let shareRemoved = false;
     if (updationInfo) {
