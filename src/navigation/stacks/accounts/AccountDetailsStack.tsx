@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
 import XPubSourceKind from '../../../common/data/enums/XPubSourceKind';
-import AccountSettingsEditDisplayPropertiesScreen from "../../../pages/Accounts/AccountSettings/EditDisplayPropertiesScreen";
+import AccountSettingsEditDisplayPropertiesScreen from "../../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen";
 import AccountSettingsMainScreen from "../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen";
 import ReassignTransactionsMainOptionsScreen from "../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
 import ReassignAllTransactionsSelectTransactionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
@@ -12,13 +12,23 @@ import ReassignTransactionsSelectDestinationScreen from '../../../pages/Accounts
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
 import AccountSettingsEditVisibilityScreen from '../../../pages/Accounts/AccountSettings/EditVisibilityScreen';
 import AccountSettingsMergeAccountShellsScreen from '../../../pages/Accounts/AccountSettings/MergeAccountShellsScreen';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
+import SendStack from '../send/SendStack';
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 
-const AccountSettingsStack = createStackNavigator(
+
+const SubAccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      navigationOptions: {
-        title: "Account Settings",
+      navigationOptions: ({ navigation }) => {
+        return {
+          title: "Account Settings",
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+          },
+        };
       },
     },
     EditDisplayProperties: {
@@ -69,6 +79,17 @@ const AccountSettingsStack = createStackNavigator(
       },
     },
   },
+  {
+    initialRouteName: 'AccountSettingsMain',
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop(); }} />;
+        },
+      };
+    },
+  },
 );
 
 
@@ -77,6 +98,12 @@ const AccountDetailsStack = createStackNavigator(
     AccountDetailsRoot: {
       screen: AccountDetailsContainerScreen,
       navigationOptions: AccountDetailsContainerScreen.navigationOptions,
+    },
+    Send: {
+      screen: SendStack,
+      navigationOptions: {
+        header: null,
+      },
     },
     TransactionsList: {
       screen: TransactionsListContainerScreen,
@@ -90,8 +117,8 @@ const AccountDetailsStack = createStackNavigator(
         title: "Transaction Details",
       },
     },
-    AccountSettingsRoot: {
-      screen: AccountSettingsStack,
+    SubAccountSettings: {
+      screen: SubAccountSettingsStack,
       navigationOptions: {
         header: null,
       },
@@ -100,6 +127,14 @@ const AccountDetailsStack = createStackNavigator(
   {
     mode: 'modal',
     initialRouteName: 'AccountDetailsRoot',
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop(); }} />;
+        },
+      };
+    },
   },
 );
 

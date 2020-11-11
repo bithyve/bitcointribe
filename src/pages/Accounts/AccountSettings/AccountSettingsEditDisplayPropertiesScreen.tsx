@@ -16,7 +16,7 @@ export type Props = {
   navigation: any;
 };
 
-const AccountSettingsDisplayPropertiesScreen: React.FC<Props> = ({
+const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const accountShell = useAccountShellFromNavigation(navigation);
@@ -141,4 +141,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default AccountSettingsDisplayPropertiesScreen;
+export default AccountSettingsEditDisplayPropertiesScreen;

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import AccountShell from '../../common/data/models/AccountShell';
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
 import AccountCardColumn from './AccountCardColumn';
@@ -106,9 +106,5 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  rootContainer: {
-  }
-});
 
 export default HomeAccountCardsGrid;
