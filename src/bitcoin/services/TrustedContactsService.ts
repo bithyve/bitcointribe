@@ -314,6 +314,7 @@ export default class TrustedContactsService {
             err?: string;
           }>;
           exchangeRates: { [currency: string]: Number };
+          averageTxFees;
         };
         err?: undefined;
         message?: undefined;

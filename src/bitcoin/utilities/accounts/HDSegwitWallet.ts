@@ -1253,38 +1253,6 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public averageTransactionFee = async () => {
-    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
-    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
-
-    const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
-    this.feeRates = rates;
-    // console.log({ feeRates: this.feeRates });
-    return {
-      high: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['high'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['high'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
-      },
-      medium: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['medium'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['medium'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
-      },
-      low: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['low'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['low'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
-      },
-    };
-  };
-
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync;
@@ -1536,7 +1504,7 @@ export default class HDSegwitWallet extends Bitcoin {
       address: string;
       amount: number;
     }[],
-    averageTxFees?: any,
+    averageTxFees: any,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -1595,16 +1563,11 @@ export default class HDSegwitWallet extends Bitcoin {
     // console.log('Output UTXOs:', outputUTXOs);
 
     const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
-    let defaultFeePerByte, defaultEstimatedBlocks;
     // console.log({ averageTxFees });
-    if (averageTxFees) {
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    } else {
-      const averageTxFees = await this.averageTransactionFee();
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    }
+
+    const defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+    const defaultEstimatedBlocks =
+      averageTxFees[defaultTxPriority].estimatedBlocks;
 
     const assets = coinselect(inputUTXOs, outputUTXOs, defaultFeePerByte);
     const defaultPriorityInputs = assets.inputs;

@@ -815,6 +815,7 @@ export default class TrustedContacts {
       err?: string;
     }>;
     exchangeRates: { [currency: string]: Number };
+    averageTxFees: any;
   }> => {
     const channelsToUpdate = {};
     for (const contact of Object.values(this.trustedContacts)) {
@@ -843,7 +844,12 @@ export default class TrustedContacts {
       toUpdate, // share under-custody update
     });
 
-    const { updated, updatedLastSeens, exchangeRates } = res.data; // LS data & exchange rates
+    const {
+      updated,
+      updatedLastSeens,
+      exchangeRates,
+      averageTxFees,
+    } = res.data; // LS data & exchange rates
     const { updationInfo } = res.data; // share under-custody update info
     const updates: Array<{
       shareId: string;
@@ -908,7 +914,13 @@ export default class TrustedContacts {
       }
     }
 
-    return { updated, healthCheckStatus, updationInfo, exchangeRates };
+    return {
+      updated,
+      healthCheckStatus,
+      updationInfo,
+      exchangeRates,
+      averageTxFees,
+    };
   };
 
   public syncTrustedChannels = async (
