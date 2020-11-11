@@ -128,7 +128,7 @@ export default class HDSegwitWallet extends Bitcoin {
         : 0;
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
-    this.derivativeGapLimit = this.gapLimit / 2;
+    this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT;
     this.balances =
       stateVars && stateVars.balances ? stateVars.balances : this.balances;
     this.receivingAddress =
@@ -1288,18 +1288,14 @@ export default class HDSegwitWallet extends Bitcoin {
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = [];
-    for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
+    for (let itr = 0; itr <= this.nextFreeAddressIndex; itr++) {
       const address = this.getAddress(false, itr);
       externalAddresses.push(address);
       ownedAddresses[address] = true;
     }
 
     const internalAddresses = [];
-    for (
-      let itr = 0;
-      itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-      itr++
-    ) {
+    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex; itr++) {
       const address = this.getAddress(true, itr);
       internalAddresses.push(address);
       ownedAddresses[address] = true;
