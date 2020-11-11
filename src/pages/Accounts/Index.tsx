@@ -119,6 +119,7 @@ interface AccountsPropsTypes {
   getTestcoins: any;
   fetchBalanceTx: any;
   syncViaXpubAgent: any;
+  averageTxFees: any;
   fetchDerivativeAccXpub: any;
   fetchDerivativeAccBalTx: any;
   fetchDerivativeAccAddress: any;
@@ -946,7 +947,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     )
       ? 'MAINNET'
       : 'TESTNET';
-    const averageTxFees = idx(this.state.averageTxFees, (_) => _[network]);
+    const averageTxFees = idx(this.props.averageTxFees, (_) => _[network]);
     this.setState({ averageTxFees });
     return averageTxFees;
   };
