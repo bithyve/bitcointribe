@@ -64,11 +64,11 @@ import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
 import {
   RecipientDescribing,
-  ContactRecipientDescribing,
-  AccountRecipientDescribing,
   makeContactRecipientDescription,
   makeSubAccountRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+
 
 const currencyCode = [
   'BRL',
@@ -212,7 +212,7 @@ class SendToContact extends Component<
         if (bitcoinAmount) {
           const currency = this.state.exchangeRates
             ? (
-              (parseInt(bitcoinAmount) / 1e8) *
+              (parseInt(bitcoinAmount) / SATOSHIS_IN_BTC) *
               this.state.exchangeRates[this.state.CurrencyCode].last
             ).toFixed(2)
             : 0;
@@ -475,14 +475,14 @@ class SendToContact extends Component<
     let temp = value;
     if (prefersBitcoin) {
       let result = exchangeRates
-        ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+        ? ((value / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
         : 0;
       this.setState({ bitcoinAmount: temp, currencyAmount: result.toString() });
     } else {
       let currency = exchangeRates
         ? value / exchangeRates[CurrencyCode].last
         : 0;
-      currency = currency < 1 ? currency * 1e8 : currency;
+      currency = currency < 1 ? currency * SATOSHIS_IN_BTC : currency;
       this.setState({
         currencyAmount: temp,
         bitcoinAmount: currency.toFixed(0),
@@ -784,7 +784,7 @@ class SendToContact extends Component<
       : prefersBitcoin
         ? UsNumberFormat(spendableBalance)
         : exchangeRates
-          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          ? ((spendableBalance / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
           : null;
   };
 

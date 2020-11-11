@@ -55,14 +55,13 @@ import idx from 'idx';
 import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../../components/SmallHeaderModal';
-import RecipientSendConfirmation from '../RecipientSendConfirmation';
 import RadioButton from '../../../components/RadioButton';
 import CustomPriorityContent from '../CustomPriorityContent';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
-import SendableContactCarouselItem from '../../../components/send/SendableContactCarouselItem';
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -469,7 +468,7 @@ class SendConfirmation extends Component<
     ) {
       return UsNumberFormat(value);
     } else if (exchangeRates !== undefined) {
-      return ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2);
+      return ((value / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2);
     } else {
       return null;
     }
@@ -574,13 +573,13 @@ class SendConfirmation extends Component<
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : prefersBitcoin
-                    ? UsNumberFormat(this.spendableBalance)
-                    : exchangeRates
-                      ? (
-                        (this.spendableBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                      : null}
+                  ? UsNumberFormat(this.spendableBalance)
+                  : exchangeRates
+                  ? (
+                      (this.spendableBalance / SATOSHIS_IN_BTC) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                  : null}
               </Text>
               <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
@@ -705,13 +704,13 @@ class SendConfirmation extends Component<
                   {this.serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(totalAmount)
                     : prefersBitcoin
-                      ? UsNumberFormat(totalAmount)
-                      : exchangeRates
-                        ? (
-                          (totalAmount / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)
-                        : null}
+                    ? UsNumberFormat(totalAmount)
+                    : exchangeRates
+                    ? (
+                        (totalAmount / SATOSHIS_IN_BTC) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : null}
                 </Text>
                 <Text style={styles.amountUnitText}>
                   {this.serviceType == TEST_ACCOUNT
