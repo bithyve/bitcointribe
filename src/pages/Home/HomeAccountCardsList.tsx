@@ -13,6 +13,7 @@ import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/U
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
+  contentContainerStyle?: Record<string, unknown>;
   onCardSelected: (selectedAccount: AccountShell) => void;
   onAddNewSelected: () => void;
   onEditModeChanged?: (isActive: boolean) => void;
@@ -45,6 +46,7 @@ const EditModeBottomSheetHeader: React.FC = () => {
 
 const HomeAccountCardsList: React.FC<Props> = ({
   containerStyle = {},
+  contentContainerStyle = {},
   onCardSelected,
   onAddNewSelected,
   onEditModeChanged = (_) => { },
@@ -104,6 +106,7 @@ const HomeAccountCardsList: React.FC<Props> = ({
         onCardLongPressed={handleGridCardLongPress}
         onAccountSelected={onCardSelected}
         onAddNewSelected={onAddNewSelected}
+        contentContainerStyle={contentContainerStyle}
       />
     </View>
   );

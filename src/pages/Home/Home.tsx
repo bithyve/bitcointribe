@@ -1950,7 +1950,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         </View>
 
         <HomeAccountCardsList
-          containerStyle={styles.accountCardsContainer}
+          containerStyle={styles.accountCardsSectionContainer}
+          contentContainerStyle={{
+            paddingTop: 36,
+            paddingLeft: 14,
+          }}
           onAddNewSelected={this.navigateToAddNewAccountScreen}
           onCardSelected={this.handleAccountCardSelection}
         />
@@ -2061,16 +2065,14 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
-  accountCardsContainer: {
+  accountCardsSectionContainer: {
     flex: 7,
     marginTop: 30,
-    paddingTop: 16,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
-    justifyContent: 'center',
   },
 
   floatingFriendsAndFamilyButtonContainer: {
