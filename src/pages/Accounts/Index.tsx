@@ -241,12 +241,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.setAverageTransactionFees();
     this.checkFastBitcoin();
 
-    // if (this.wallet.transactions.transactionDetails.length) {
-    //   this.wallet.transactions.transactionDetails.sort(function (left, right) {
-    //     return moment.utc(right.date).unix() - moment.utc(left.date).unix();
-    //   });
-    // }
-
     this.setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       this.setState({ is_initiated: true });
