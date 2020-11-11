@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, ImageSourcePropType } from 'react-native';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
@@ -18,7 +18,7 @@ export type Props = {
 };
 
 
-function badgeImageForAccountKind(accountKind: SubAccountKind): NodeRequire {
+function badgeImageForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
   switch (accountKind) {
     case SubAccountKind.TEST:
       return require('../../assets/images/icons/icon_test_white.png');
@@ -33,7 +33,7 @@ function badgeImageForAccountKind(accountKind: SubAccountKind): NodeRequire {
   }
 }
 
-function backgroundImageForAccountKind(accountKind: SubAccountKind): NodeRequire {
+function backgroundImageForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
   switch (accountKind) {
     case SubAccountKind.TEST:
       return require('../../assets/images/carouselImages/test_account_background.png');

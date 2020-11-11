@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, FlatList } from 'react-native';
+import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import ListStyles from '../../../../common/Styles/Lists';
 
@@ -10,7 +10,7 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: NodeRequire;
+  imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
 }
