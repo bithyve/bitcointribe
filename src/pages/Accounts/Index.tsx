@@ -124,8 +124,8 @@ interface AccountsPropsTypes {
   fetchDerivativeAccBalTx: any;
   fetchDerivativeAccAddress: any;
   service: any;
-  balanceTxLoading: any;
-  derivativeBalanceTxLoading: any;
+  // balanceTxLoading: any;
+  // derivativeBalanceTxLoading: any;
   accounts: any;
   FBTCAccountData: any;
   currencyCode: any;
@@ -143,8 +143,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   sliderWidth: any;
   currencyCode: any;
   wallet: any;
-  balanceTxLoading: any;
-  derivativeBalanceTxLoading: any;
+  // balanceTxLoading: any;
+  // derivativeBalanceTxLoading: any;
   carousel: any;
   constructor(props) {
     super(props);
@@ -221,14 +221,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   componentDidMount = () => {
     let { serviceType } = this.state;
     let { accounts } = this.props;
+    // accounts[serviceType].loading.balanceTx = false
+    console.log('acc is Regular or secure ', {serviceType, loader: this.state.showLoader})
     this.updateCarouselData();
     // this.setState({ spendableBalance: this.props.navigation.state.params
     //   ? this.props.navigation.getParam('spendableBalance') : 0})
 
     this.getBalance();
-    this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
-    this.derivativeBalanceTxLoading =
-      accounts[serviceType].loading.derivativeBalanceTx;
+  
+    // this should specifically be false at startup
+    // this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
+    // this.derivativeBalanceTxLoading = 
+    //   accounts[serviceType].loading.derivativeBalanceTx;
     const service = accounts[serviceType].service;
     this.wallet =
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
@@ -246,11 +250,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       this.setState({ is_initiated: true });
+      console.log('currencyCode interaction manager completed!')
     });
 
     if (this.state.showLoader) {
+      console.log('showLoader ', this.state.showLoader)
       // after all interactions are done , loader need to be removed
       InteractionManager.runAfterInteractions(() => {
+        console.log('Loader interaction manager completed!')
         this.setState({ showLoader: false });
         return;
       });
@@ -468,25 +475,30 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       const { derivativeAccountDetails } = presentCarouselData;
       // console.log({ derivativeAccountDetails });
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+      {console.log('acc is donation ', {serviceType, loader: this.state.showLoader})
         this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
-        );
+        );}
       else
+      {
+        console.log('acc is not donation ', {serviceType, loader: this.state.showLoader})
         this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
-        );
+        );}
     } else {
-      this.props.fetchBalanceTx(serviceType, {
+      {
+        console.log('acc is Regular or secure ', {serviceType, loader: this.state.showLoader})
+        this.props.fetchBalanceTx(serviceType, {
         loader: true,
         syncTrustedDerivative:
           serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
             ? true
             : false,
-      });
+      });}
     }
   };
 
@@ -553,12 +565,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.accounts[this.state.serviceType].service
     ) {
       this.getBalance();
-      this.balanceTxLoading = this.props.accounts[
-        this.state.serviceType
-      ].loading.balanceTx;
-      this.derivativeBalanceTxLoading = this.props.accounts[
-        this.state.serviceType
-      ].loading.derivativeBalanceTx;
+      // this.balanceTxLoading = this.props.accounts[
+      //   this.state.serviceType
+      // ].loading.balanceTx;
+      // this.derivativeBalanceTxLoading = this.props.accounts[
+      //   this.state.serviceType
+      // ].loading.derivativeBalanceTx;
     }
 
     if (prevState.serviceType !== this.state.serviceType) {
