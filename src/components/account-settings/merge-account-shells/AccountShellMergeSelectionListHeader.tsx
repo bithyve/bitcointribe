@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements';
-import ListStyles from '../../../common/Styles/Lists';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { ListItem } from 'react-native-elements';
+import ListStyles from '../../../common/Styles/ListStyles';
+import ImageStyles from '../../../common/Styles/ImageStyles';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import AccountShell from '../../../common/data/models/AccountShell';
@@ -21,13 +22,11 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({
     <View style={styles.rootContainer}>
 
       <ListItem pad={4} containerStyle={{ marginBottom: 36 }}>
-        <Avatar
+
+        <Image
           source={primarySubAccount.avatarImageSource}
-          imageProps={{
-            resizeMode: "contain",
-          }}
-          size="large"
-          containerStyle={styles.avatarImageContainer}
+          style={styles.avatarImage}
+          resizeMode="contain"
         />
 
         <ListItem.Content>
@@ -84,8 +83,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMediumItalic,
   },
 
-  avatarImageContainer: {
-    marginRight: 4,
+  avatarImage: {
+    ...ImageStyles.thumbnailImageXLarge,
+    marginRight: 8,
   },
 });
 

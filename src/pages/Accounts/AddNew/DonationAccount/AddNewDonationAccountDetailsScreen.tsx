@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import FormStyles from '../../../../common/Styles/Forms';
-import ButtonStyles from '../../../../common/Styles/Buttons';
+import FormStyles from '../../../../common/Styles/FormStyles';
+import ButtonStyles from '../../../../common/Styles/ButtonStyles';
 import Colors from '../../../../common/Colors';
 import Fonts from '../../../../common/Fonts';
-import ListStyles from '../../../../common/Styles/Lists';
+import ListStyles from '../../../../common/Styles/ListStyles';
 import { Input, Button, /* CheckBox */ } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native';
 import { ListItem } from 'react-native-elements';
-import ListStyles from '../../../../common/Styles/Lists';
+import ListStyles from '../../../../common/Styles/ListStyles';
+import ImageStyles from '../../../../common/Styles/ImageStyles';
 
 export type Props = {
   navigation: any;
@@ -45,7 +46,7 @@ const PanAccountSettingsContainerScreen: React.FC<Props> = () => {
       >
         <Image
           source={menuOption.imageSource}
-          style={ListStyles.thumbnailImageMedium}
+          style={ImageStyles.thumbnailImageMedium}
           resizeMode="contain"
         />
 

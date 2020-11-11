@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, FlatList, ImageSourcePropType } from 'react-native';
-import { Avatar, ListItem } from 'react-native-elements';
+import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native';
+import { ListItem } from 'react-native-elements';
 import ListStyles from '../../../common/Styles/ListStyles';
 
 export type Props = {
@@ -68,9 +68,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ({
         bottomDivider
         onPress={() => { handleListItemPressed(listItem) }}
       >
-        <Avatar
+        <Image
           source={listItem.imageSource}
-          size={"small"}
+          style={ListStyles.thumbnailImageSmall}
+          resizeMode="contain"
         />
 
         <ListItem.Content style={ListStyles.listItemContentContainer}>

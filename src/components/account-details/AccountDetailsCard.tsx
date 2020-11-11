@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ImageBackground, Image, ImageSourcePropType } f
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
-import ButtonStyles from '../../common/Styles/Buttons';
+import ButtonStyles from '../../common/Styles/ButtonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
 import { Button } from 'react-native-elements';

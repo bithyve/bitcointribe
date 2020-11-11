@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../../common/Styles/Buttons';
+import ButtonStyles from '../../../../common/Styles/ButtonStyles';
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
 import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';

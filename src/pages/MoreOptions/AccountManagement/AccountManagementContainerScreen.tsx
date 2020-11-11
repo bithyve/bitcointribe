@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useDispatch } from "react-redux";
 import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../common/Styles/Buttons';
+import ButtonStyles from '../../../common/Styles/ButtonStyles';
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells';
 import AccountShell from '../../../common/data/models/AccountShell';
 import { accountShellsOrderUpdated } from '../../../store/actions/accounts';
