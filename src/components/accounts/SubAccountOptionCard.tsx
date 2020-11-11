@@ -68,7 +68,10 @@ const SubAccountOptionCard: React.FC<Props> = ({
         containerStyle={cardContainerStyle}
         wrapperStyle={styles.cardContentWrapper}
       >
-        <Card.Image style={styles.image} source={subAccountInfo.avatarImageSource} />
+        <Image
+          style={styles.image}
+          source={subAccountInfo.avatarImageSource}
+        />
 
         <View style={styles.descriptionTextContainer}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
@@ -100,8 +103,8 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     marginBottom: 8,
   },
 
