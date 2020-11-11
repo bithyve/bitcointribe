@@ -50,6 +50,7 @@ import {
   fetchDerivativeAccAddress,
   syncViaXpubAgent,
 } from '../../store/actions/accounts';
+import { setAutoAccountSync } from '../../store/actions/loaders';
 import {
   setTestAccountHelperDone,
   setTransactionHelper,
@@ -118,6 +119,7 @@ interface AccountsPropsTypes {
   fetchTransactions: any;
   getTestcoins: any;
   fetchBalanceTx: any;
+  setAutoAccountSync: any;
   syncViaXpubAgent: any;
   averageTxFees: any;
   fetchDerivativeAccXpub: any;
@@ -128,6 +130,7 @@ interface AccountsPropsTypes {
   derivativeBalanceTxLoading: any;
   accounts: any;
   FBTCAccountData: any;
+  autoAccountSync: any;
   currencyCode: any;
   currencyToggleValue: any;
   setTestAccountHelperDone: any;
@@ -259,6 +262,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     } else {
       return;
     }
+
+    setTimeout(() => {
+      this.autoAccountRefresh();
+    }, 2);
   };
 
   updateCarouselData = (dontSlide?) => {
@@ -478,6 +485,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
         );
+
+      this.props.setAutoAccountSync(derivativeAccountDetails.type);
     } else {
       this.props.fetchBalanceTx(serviceType, {
         loader: true,
@@ -486,6 +495,27 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             ? true
             : false,
       });
+      this.props.setAutoAccountSync(serviceType);
+    }
+  };
+
+  autoAccountRefresh = () => {
+    // refreshes the account once per-session (non-carousel swipe)
+    const { presentCarouselData, serviceType } = this.state;
+    let accountType;
+    if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
+      accountType = presentCarouselData.derivativeAccountDetails.type;
+    } else {
+      accountType = serviceType;
+    }
+    console.log({ accountType, presentCarouselData });
+    const { autoAccountSync } = this.props;
+    if (autoAccountSync && autoAccountSync[accountType])
+      // already synched
+      return;
+    else {
+      this.refreshAccountBalance();
+      this.props.setAutoAccountSync(accountType);
     }
   };
 
@@ -1889,6 +1919,7 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.isTransactionHelperDoneValue,
     ),
     averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
+    autoAccountSync: idx(state, (_) => _.loaders.autoAccountSync),
   };
 };
 
@@ -1905,6 +1936,7 @@ export default withNavigationFocus(
     currencyKindSet,
     setTestAccountHelperDone,
     setTransactionHelper,
+    setAutoAccountSync,
   })(Accounts),
 );
 
