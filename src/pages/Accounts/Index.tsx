@@ -244,7 +244,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     });
 
     if (this.state.showLoader) {
-      console.log('showLoader ', this.state.showLoader)
       // after all interactions are done , loader need to be removed
       InteractionManager.runAfterInteractions(() => {
         console.log('Loader interaction manager completed!')
@@ -463,12 +462,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     const { presentCarouselData, serviceType } = this.state;
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
-      // console.log({ derivativeAccountDetails });
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
       {
         let { accounts } = this.props;
-        console.log('acc is donation ', {serviceType, loader: this.state.showLoader})
-      console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
       this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
@@ -477,8 +473,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       else
       {
         let { accounts } = this.props;
-        console.log('acc is NOT donation ', {serviceType, loader: this.state.showLoader})
-        console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
     this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
@@ -487,8 +481,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     } else {
       {
         let { accounts } = this.props;
-        console.log('acc is Regular or secure ', {serviceType, loader: this.state.showLoader})
-        console.log({showLoader: this.state.showLoader, serviceType, loading:accounts[serviceType].loading })
         this.props.fetchBalanceTx(serviceType, {
           loader: true,
           syncTrustedDerivative:
@@ -588,7 +580,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   getServiceType = (serviceType, index?) => {
     if (!serviceType) return;
-    //console.log("presentCarouselData getServiceType", this.state.presentCarouselData, index, this.state.carouselData);
 
     if (this.carousel.current as any)
       (this.carousel.current as any).snapToItem(index, true, false);
