@@ -507,7 +507,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     } else {
       accountType = serviceType;
     }
-    console.log({ accountType, presentCarouselData });
     const { autoAccountSync } = this.props;
     if (autoAccountSync && autoAccountSync[accountType])
       // already synched
@@ -518,7 +517,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  
+
   setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = this.props.currencyCode;
     this.setState({
