@@ -458,36 +458,34 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
+
+
+
   refreshAccountBalance = () => {
     const { presentCarouselData, serviceType } = this.state;
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
+      
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
-      {
-        let { accounts } = this.props;
-      this.props.syncViaXpubAgent(
+        this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
-        );}
-      else
-      {
-        let { accounts } = this.props;
-    this.props.fetchDerivativeAccBalTx(
+        );
+      else  
+        this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
-        );}
+        );
     } else {
-      {
-        let { accounts } = this.props;
         this.props.fetchBalanceTx(serviceType, {
           loader: true,
           syncTrustedDerivative:
           serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
             ? true
             : false,
-      });}
+      })
     }
   };
 
