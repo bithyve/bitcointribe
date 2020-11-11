@@ -9,6 +9,7 @@ export type Props = {
   onCardLongPressed: (accountShell: AccountShell) => void;
   onAccountSelected: (accountShell: AccountShell) => void;
   onAddNewSelected: () => void;
+  contentContainerStyle?: Record<string, unknown>;
 };
 
 type RenderItemProps = {
@@ -30,6 +31,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
   onCardLongPressed,
   onAccountSelected,
   onAddNewSelected,
+  contentContainerStyle = {},
 }: Props) => {
 
   const columnData: Array<AccountShell[]> = useMemo(() => {
@@ -76,7 +78,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
   return (
     <FlatList
       horizontal
-      contentContainerStyle={{ paddingLeft: 14 }}
+      contentContainerStyle={contentContainerStyle}
       showsHorizontalScrollIndicator={false}
       data={[...columnData, 'Flag for Add Button']}
       keyExtractor={keyExtractor}
