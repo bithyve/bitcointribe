@@ -1,26 +1,9 @@
 import SubAccountKind from "../../common/data/enums/SubAccountKind";
 import ServiceAccountKind from "../../common/data/enums/ServiceAccountKind";
-
-// TODO: Deprecate this in favor of calling `getIconByAccountKind` with a
-// a strongly-typed `AccountKind`.
-export function getIconByAccountType(type: string): NodeRequire {
-  if (type === 'saving') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type === 'regular') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type === 'secure') {
-    return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type === 'test') {
-    return require('../../assets/images/icons/icon_test.png');
-  } else if (type === 'Donation Account') {
-    return require('../../assets/images/icons/icon_donation_hexa.png');
-  } else {
-    return require('../../assets/images/icons/icon_test.png');
-  }
-};
+import { ImageSourcePropType } from "react-native";
 
 
-export function iconForAccountKind(kind: SubAccountKind): NodeRequire {
+export function iconForAccountKind(kind: SubAccountKind): ImageSourcePropType {
   switch (kind) {
     case SubAccountKind.TEST:
       return require('../../assets/images/icons/icon_test.png');
@@ -42,7 +25,7 @@ export function iconForAccountKind(kind: SubAccountKind): NodeRequire {
 }
 
 
-export function iconForServiceAccountKind(kind: ServiceAccountKind): NodeRequire {
+export function iconForServiceAccountKind(kind: ServiceAccountKind): ImageSourcePropType {
   switch (kind) {
     case ServiceAccountKind.FAST_BITCOINS:
       return require('../../assets/images/icons/fastbitcoin.png');

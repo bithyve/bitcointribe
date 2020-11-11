@@ -2,6 +2,7 @@ import SubAccountKind from "../../enums/SubAccountKind";
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
 import TransactionGroup from "../../enums/TransactionGroup";
 import AccountVisibility from "../../enums/AccountVisibility";
+import { ImageSourcePropType } from "react-native";
 
 
 interface SubAccountDescribing {
@@ -43,7 +44,7 @@ interface SubAccountDescribing {
    */
   isTFAEnabled: boolean;
 
-  avatarImageSource: NodeRequire;
+  avatarImageSource: ImageSourcePropType;
 
   transactionGroup: TransactionGroup;
   transactionIDs: string[];
@@ -74,7 +75,7 @@ export type SubAccountDescribingConstructorProps = {
   balance?: number;
   visibility?: AccountVisibility;
   isTFAEnabled?: boolean;
-  avatarImageSource?: NodeRequire;
+  avatarImageSource?: ImageSourcePropType;
   secondaryAccountUUIDs?: string[];
   transactionGroup?: TransactionGroup;
   transactionIDs?: string[];

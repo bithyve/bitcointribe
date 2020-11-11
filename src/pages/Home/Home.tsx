@@ -94,36 +94,6 @@ import AccountShell from '../../common/data/models/AccountShell';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
-export const isCompatible = async (method: string, version: string) => {
-  if (!semver.valid(version)) {
-    // handling exceptions: off standard versioning
-    if (version === '0.9') version = '0.9.0';
-    else if (version === '1.0') version = '1.0.0';
-  }
-
-  if (version && semver.gt(version, DeviceInfo.getVersion())) {
-    // checking compatibility via Relay
-    const res = await RelayServices.checkCompatibility(method, version);
-    if (res.status !== 200) {
-      console.log('Failed to check compatibility');
-      return true;
-    }
-
-    const { compatible, alternatives } = res.data;
-    if (!compatible) {
-      if (alternatives) {
-        if (alternatives.update)
-          Alert.alert('Update your app inorder to process this link/QR');
-        else if (alternatives.message) Alert.alert(alternatives.message);
-      } else {
-        Alert.alert('Incompatible link/QR, updating your app might help');
-      }
-      return false;
-    }
-    return true;
-  }
-  return true;
-};
 
 export enum BottomSheetState {
   Closed,

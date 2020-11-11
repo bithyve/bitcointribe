@@ -3,6 +3,7 @@ import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
 import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
+import { ImageSourcePropType } from 'react-native';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -22,7 +23,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource: NodeRequire;
+  avatarImageSource: ImageSourcePropType;
 
   transactionIDs: string[];
   transactionGroup: TransactionGroup;
@@ -50,8 +51,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;
 
-    // TODO: Define some way to generate this from the address book avatar,
-    // of fall back to the contact's initials.
+    // TODO: Define some way to generate this from the address book avatar.
     this.avatarImageSource = require('../../../../../assets/images/icons/icon_hexa.png');
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, TouchableOpacity, Text } from 'react-native';
+import { View, Image, TouchableOpacity, Text, ImageSourcePropType } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
@@ -25,10 +25,10 @@ export type Props = {
   */
   isNotImage?: boolean;
 
-  activeOnImage?: NodeRequire;
-  activeOffImage?: NodeRequire;
-  inactiveOnImage?: NodeRequire;
-  inactiveOffImage?: NodeRequire;
+  activeOnImage?: ImageSourcePropType;
+  activeOffImage?: ImageSourcePropType;
+  inactiveOnImage?: ImageSourcePropType;
+  inactiveOffImage?: ImageSourcePropType;
 
   onpress: () => void;
 };
