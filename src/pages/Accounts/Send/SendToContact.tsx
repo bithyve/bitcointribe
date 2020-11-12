@@ -54,6 +54,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import { config } from 'react-native-firebase';
 import { currencyKindSet } from '../../../store/actions/preferences';
+import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../../components/MaterialCurrencyCodeIcon';
 import { getCurrencyImageByRegion } from '../../../common/CommonFunctions';
 import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwitch';
