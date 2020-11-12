@@ -19,7 +19,6 @@ import { getIconByStatus, verifyPersonalCopyAccess } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
-  checkMSharesHealth,
   personalCopyShared,
   generatePersonalCopy,
   personalCopyGenerated,
@@ -29,9 +28,7 @@ import {
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import NavStyles from '../../common/Styles/NavStyles';
-import CommonStyles from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
@@ -48,7 +45,6 @@ import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
-import { State } from 'react-native-gesture-handler';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet] = useState(React.createRef());
@@ -117,7 +113,7 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
-  const [mailOptionsBottomSheet] = useState(
+  const [] = useState(
     React.createRef(),
   );
 
