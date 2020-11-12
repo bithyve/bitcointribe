@@ -1555,9 +1555,9 @@ export default function ManageBackup(props) {
           ? 'Confirm by logging on the Keeper Device'
           : item.status == 'Good'
           ? 'The Recovery Key is accessible'
-          : 'Use one of your other device with Hexa';
+          : 'Use one of your other devices with Hexa';
       } else {
-        return 'Use one of your other device with Hexa';
+        return 'Use one of your other devices with Hexa';
       }
     }
     if (item.type == 'contact1') {
