@@ -15,10 +15,9 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 
 export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SERVICE;
   serviceAccountKind: ServiceAccountKind;
-  isPrimarySubAccount: boolean;
   balance: number;
 
   visibility: AccountVisibility;
@@ -35,7 +34,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   transactionGroup: TransactionGroup;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
@@ -45,7 +44,6 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     transactionIDs = [],
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
@@ -58,7 +56,6 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.isTFAEnabled = isTFAEnabled;
     this.visibility = visibility;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;
 
     this.avatarImageSource = getAvatarImageSource(serviceAccountKind);

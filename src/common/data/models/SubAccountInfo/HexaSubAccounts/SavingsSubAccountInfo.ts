@@ -9,9 +9,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SECURE;
-  isPrimarySubAccount: boolean;
   balance: number;
   visibility: AccountVisibility;
   isTFAEnabled: boolean = true;
@@ -27,14 +26,13 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   transactionGroup: TransactionGroup = TransactionGroup.MULTI_SIG_PUBLIC;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Savings Account",
     balance = 0,
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
-    isPrimarySubAccount = false,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -43,6 +41,5 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
   }
 }

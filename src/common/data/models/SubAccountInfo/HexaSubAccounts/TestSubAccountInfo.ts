@@ -1,6 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
-import BitcoinUnit from '../../../enums/BitcoinUnit';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import TransactionGroup from '../../../enums/TransactionGroup';
 import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
@@ -9,9 +8,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TEST;
-  isPrimarySubAccount: boolean;
   balance: number;
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -27,7 +25,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   transactionGroup: TransactionGroup = TransactionGroup.TESTNET;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Test Account",
     balance = 0,
     customDisplayName = null,
@@ -35,7 +33,6 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    isPrimarySubAccount = false,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -45,6 +42,5 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
   }
 }

@@ -9,9 +9,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class FullyImportedWalletSubAccountInfo implements ImportedWalletSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
-  isPrimarySubAccount: boolean;
   balance: number;
 
   visibility: AccountVisibility;
@@ -28,7 +27,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Full Import",
     balance = 0,
     customDisplayName = null,
@@ -36,7 +35,6 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    isPrimarySubAccount = false,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -46,6 +44,5 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
   }
 }

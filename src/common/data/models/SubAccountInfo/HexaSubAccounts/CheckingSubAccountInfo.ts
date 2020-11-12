@@ -9,9 +9,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class CheckingSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.REGULAR;
-  isPrimarySubAccount: boolean;
   balance: number;
   visibility: AccountVisibility;
   isTFAEnabled: boolean = false;
@@ -27,14 +26,13 @@ export default class CheckingSubAccountInfo implements HexaSubAccountDescribing 
   transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Checking Account",
     balance = 0,
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactionIDs = [],
-    isPrimarySubAccount = false,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -43,6 +41,5 @@ export default class CheckingSubAccountInfo implements HexaSubAccountDescribing 
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
   }
 }

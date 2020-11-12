@@ -44,9 +44,10 @@ export default class AccountShell {
     this.id = uuidV4();
 
     this.primarySubAccount = primarySubAccount;
-    primarySubAccount.accountShellID = this.id;
+    this.primarySubAccount.accountShellID = this.id;
 
     this.secondarySubAccounts = secondarySubAccounts;
+    this.secondarySubAccounts.forEach(s => s.accountShellID = this.id);
 
     this.displayOrder = displayOrder;
     this.unit = unit;
@@ -78,8 +79,6 @@ export default class AccountShell {
 
   static setPrimarySubAccount(shell: AccountShell, subAccount: SubAccountDescribing) {
     subAccount.accountShellID = shell.id;
-    subAccount.isPrimarySubAccount = true;
-
     shell.primarySubAccount = subAccount;
   }
 }

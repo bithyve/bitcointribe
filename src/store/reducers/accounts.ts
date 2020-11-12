@@ -122,8 +122,7 @@ export type AccountsState = {
   // sure it's really a concern of the "Accounts state".
   exchangeRates?: any;
 
-  activeAccountShells: AccountShell[];
-  archivedAccountShells: AccountShell[];
+  accountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
   // up account data from `activeAccounts` using a UUID.
@@ -168,30 +167,23 @@ const initialState: AccountsState = {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
-  activeAccountShells: [
+  accountShells: [
     new AccountShell({
-      primarySubAccount: new TestSubAccountInfo({
-        isPrimarySubAccount: true,
-      }),
+      primarySubAccount: new TestSubAccountInfo({}),
       unit: BitcoinUnit.TSATS,
       displayOrder: 1,
     }),
     new AccountShell({
-      primarySubAccount: new CheckingSubAccountInfo({
-        isPrimarySubAccount: true,
-      }),
+      primarySubAccount: new CheckingSubAccountInfo({}),
       unit: BitcoinUnit.SATS,
       displayOrder: 2,
     }),
     new AccountShell({
-      primarySubAccount: new SavingsSubAccountInfo({
-        isPrimarySubAccount: true,
-      }),
+      primarySubAccount: new SavingsSubAccountInfo({}),
       unit: BitcoinUnit.SATS,
       displayOrder: 3,
     }),
   ],
-  archivedAccountShells: [],
 
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
@@ -576,7 +568,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         ...state,
         isGeneratingNewAccountShell: false,
         hasNewAccountShellGenerationSucceeded: true,
-        activeAccountShells: state.activeAccountShells.concat(action.payload),
+        accountShells: state.accountShells.concat(action.payload),
       };
 
 
@@ -695,7 +687,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case ACCOUNT_SHELLS_ORDER_UPDATED:
       return {
         ...state,
-        activeAccountShells: action.payload,
+        accountShells: action.payload,
       };
 
     default:
