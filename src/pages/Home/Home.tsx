@@ -64,7 +64,7 @@ import {
   setCloudBackupStatus,
   setCardData
 } from '../../store/actions/preferences';
-import { getCurrencyImageByRegion, CloudData } from '../../common/CommonFunctions/index';
+import { getCurrencyImageByRegion, CloudData, getKeeperInfoFromShareId } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import Toast from '../../components/Toast';
 import firebase from 'react-native-firebase';
@@ -113,7 +113,7 @@ import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibili
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
-
+import { fetchKeeperTrustedChannel } from '../../store/actions/keeper';
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
 
 
@@ -195,7 +195,16 @@ interface HomePropsTypes {
   s3Service: any;
   initializeHealthSetup: any;
   overallHealth: any;
-  levelHealth: any[];
+  levelHealth: {
+    levelInfo: {
+      shareType: string;
+      updatedAt: string;
+      status: string;
+      shareId: string;
+      reshareVersion?: number;
+      name?: string;
+    }[];
+  }[];
   currentLevel: number;
   keeperInfo: any[];
   fetchDerivativeAccBalTx: any;
@@ -226,6 +235,7 @@ interface HomePropsTypes {
   cardDataProps: any;
   isLevel2Initialized: Boolean;
   isLevel3Initialized: Boolean;
+  fetchKeeperTrustedChannel: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -1337,7 +1347,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = [];
     }
     let readStatus = true;
-    if (content.notificationType == 'release') {
+    if (content.notificationType == 'release' || content.notificationType == 'secureXpub') {
       let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
@@ -1760,7 +1770,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     );
 
     const { notificationData } = this.state;
-    const { navigation } = this.props;
+    const { navigation, s3Service, fetchKeeperTrustedChannel, levelHealth } = this.props;
     let tempNotificationData = notificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
@@ -1820,6 +1830,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (value.type == 'contact') {
       this.closeBottomSheet();
     }
+    if (value.type == 'secureXpub') {
+      let shareId = s3Service.levelhealth.metaShares[1].shareId;
+      let share = getKeeperInfoFromShareId(levelHealth, shareId);
+      fetchKeeperTrustedChannel(shareId, value.type, share.name);
+    }
+
   };
 
   updateHealthForCloud = (share?) =>{
@@ -2377,7 +2393,8 @@ export default withNavigationFocus(
     updateLastSeen,
     setCloudBackupStatus,
     updateMSharesHealth,
-    setCardData
+    setCardData,
+    fetchKeeperTrustedChannel
   })(Home),
 );
 

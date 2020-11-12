@@ -38,21 +38,7 @@ export interface DecentralizedBackup {
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
-  PK_SHARE?: {
-    encryptedSecret: string;
-    shareId: string;
-    meta?: {
-      version: string;
-      validator: string;
-      index: number;
-      walletId: string;
-      tag: string;
-      timestamp: string;
-      reshareVersion: number;
-      guardian?: string;
-    };
-    encryptedStaticNonPMDD?: string;
-  }
+  PK_SHARE?: MetaShare
 }
 
 export interface ServicesJSON {

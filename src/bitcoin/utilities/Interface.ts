@@ -178,6 +178,7 @@ export interface DerivativeAccounts {
 
 export enum notificationType {
   contact = 'contact',
+  approveKeeper = 'approveKeeper' 
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -370,4 +371,15 @@ export interface EphemeralDataElementsForKeeper {
 export interface EphemeralDataForKeeper {
   publicKey: string;
   data: EphemeralDataElementsForKeeper;
+}
+
+export interface LevelHealth {
+  levelInfo: {
+    shareType: string;
+    updatedAt: string;
+    status: string;
+    shareId: string;
+    reshareVersion?: number;
+    name?: string;
+  }[];
 }

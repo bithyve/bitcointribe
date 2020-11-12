@@ -302,9 +302,9 @@ export default class SecureHDWallet extends Bitcoin {
     bh: string;
   } => {
     return {
-      primary: this.xpubs.primary,
-      secondary: this.xpubs.secondary,
-      bh: this.xpubs.bh,
+      primary: this.xpubs && this.xpubs.primary ? this.xpubs.primary : '',
+      secondary: this.xpubs && this.xpubs.secondary ? this.xpubs.secondary : '',
+      bh: this.xpubs && this.xpubs.bh ? this.xpubs.bh : '',
     };
   };
 
@@ -315,6 +315,23 @@ export default class SecureHDWallet extends Bitcoin {
     return {
       primary: this.xpubs.primary,
     };
+  };
+
+  public setSecureXpubs = (
+    secondary: string,
+    bh: string,
+  ): {
+    primary?: string;
+    secondary?: string;
+    bh?: string;
+  } => {
+
+    this.xpubs = {
+      ...this.xpubs,
+      secondary: secondary,
+      bh,
+    };
+    return this.xpubs;
   };
 
   public getAccountId = (): { accountId: string } => {
@@ -2246,9 +2263,9 @@ export default class SecureHDWallet extends Bitcoin {
     const construct = {
       scripts: {
         redeem: '',
-        witness: ''
+        witness: '',
       },
-      address: ''
+      address: '',
       // scripts: {
       //   redeem: multiSig.p2sh.redeem.output.toString('hex'),
       //   witness: multiSig.p2wsh.redeem.output.toString('hex'),

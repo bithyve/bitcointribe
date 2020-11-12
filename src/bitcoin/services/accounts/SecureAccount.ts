@@ -1033,11 +1033,22 @@ export default class SecureAccount {
   };
 
   public getXpubsForAccount = () => {
-    return this.secureHDWallet.getSecureXpubs()
+    return this.secureHDWallet.getSecureXpubs();
   };
 
   public getXpubsForAccount2 = () => {
-    return this.secureHDWallet.getSecureXpubs2()
+    return this.secureHDWallet.getSecureXpubs2();
+  };
+
+  public setSecureXpubsAccount = (
+    secondary: string,
+    bh: string,
+  ): {
+    primary?: string;
+    secondary?: string;
+    bh?: string;
+  } => {
+    return this.secureHDWallet.setSecureXpubs(secondary, bh);
   };
 
   // public getSecondaryMnemonics = () => {

@@ -33,6 +33,7 @@ function* initSetupWorker({ payload }) {
     secureAcc,
     s3Service,
     trustedContacts,
+    keepersInfo
   } = yield call(serviceGenerator2, security.answer);
 
   const initialDatabase: Database = {
@@ -42,6 +43,7 @@ function* initSetupWorker({ payload }) {
       SHARES_TRANSFER_DETAILS: {},
       UNDER_CUSTODY: {},
       DYNAMIC_NONPMDD: {},
+      // PK_SHARE: {}
     },
     SERVICES: {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),
@@ -49,6 +51,7 @@ function* initSetupWorker({ payload }) {
       SECURE_ACCOUNT: JSON.stringify(secureAcc),
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      KEEPERS_INFO: JSON.stringify(keepersInfo),
     },
     VERSION: DeviceInfo.getVersion(),
   };

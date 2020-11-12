@@ -39,6 +39,7 @@ export const RECOVER_WALLET_HEALTH = "RECOVER_WALLET_HEALTH";
 export const CLOUD_MSHARE = "CLOUD_MSHARE";
 export const S3_LOADING_KEEPER = "S3_LOADING_KEEPER";
 export const UPLOAD_ENC_MSHARE_KEEPER = "UPLOAD_ENC_MSHARE_KEEPER";
+export const SEND_APPROVAL_REQUEST = 'SEND_APPROVAL_REQUEST';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -220,4 +221,8 @@ export const uploadEncMShareKeeper = (
       previousGuardianName,
     },
   };
+};
+
+export const sendApprovalRequest = (shareID) => {
+  return { type: SEND_APPROVAL_REQUEST, payload: { shareID } };
 };

@@ -89,6 +89,7 @@ import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3 } from '../actions/accounts';
 import RelayServices from '../../bitcoin/services/RelayService';
+import KeeperService from '../../bitcoin/services/KeeperService';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -196,6 +197,9 @@ function* uploadEncMetaShareWorker({ payload }) {
   if (!s3Service.levelhealth.metaShares.length) return;
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
+  );
+  const keepersInfo: KeeperService = yield select(
+    (state) => state.keeper.service,
   );
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
@@ -318,6 +322,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       REGULAR_ACCOUNT: JSON.stringify(regularService),
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      KEEPERS_INFO: JSON.stringify(keepersInfo),
     };
 
     const updatedBackup = {

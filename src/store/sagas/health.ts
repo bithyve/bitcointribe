@@ -33,6 +33,7 @@ import {
   FETCH_WALLET_IMAGE_HEALTH,
   switchS3LoaderKeeper,
   UPLOAD_ENC_MSHARE_KEEPER,
+  SEND_APPROVAL_REQUEST,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -57,7 +58,10 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import KeeperService from '../../bitcoin/services/KeeperService';
 import {
   EphemeralDataElements,
+  INotification,
   MetaShare,
+  notificationTag,
+  notificationType,
   ShareUploadables,
   TrustedDataElements,
   WalletImage,
@@ -73,6 +77,7 @@ import crypto from 'crypto';
 import { Alert } from 'react-native';
 import { ErrorSending } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import RelayServices from '../../bitcoin/services/RelayService';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -321,7 +326,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let s3ServiceSecure: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
-  let secureXpub = s3ServiceSecure.getXpubsForAccount2();
+  let secureXpub = s3ServiceSecure.getXpubsForAccount();
   let EFChannelData = JSON.parse(payload.scannedData);
   let encKey;
   if (EFChannelData.uuid) encKey = LevelHealth.strechKey(EFChannelData.uuid);
@@ -378,7 +383,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       EFChannelData.uuid,
       shareUploadables,
     );
-    console.log('RES', res);
     if (res.status == 200) {
       // Create trusted channel
       const data: TrustedDataElements = {
@@ -827,6 +831,7 @@ function* recoverWalletWorker({ payload }) {
         SHARES_TRANSFER_DETAILS: {},
         UNDER_CUSTODY: {},
         DYNAMIC_NONPMDD: {},
+        PK_SHARE: {}
       };
       console.log({ DECENTRALIZED_BACKUP });
 
@@ -836,7 +841,7 @@ function* recoverWalletWorker({ payload }) {
         SECURE_ACCOUNT: JSON.stringify(secureAcc),
         S3_SERVICE: JSON.stringify(s3Service),
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-        KEEPERS_INFO: JSON.stringify(trustedContacts),
+        KEEPERS_INFO: JSON.stringify(keepersInfo),
       };
       const payload = { SERVICES, DECENTRALIZED_BACKUP };
       yield call(insertDBWorker, { payload });
@@ -1023,6 +1028,9 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
+  const keepersInfo: KeeperService = yield select(
+    (state) => state.keeper.service,
+  );
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -1113,6 +1121,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
       REGULAR_ACCOUNT: JSON.stringify(regularService),
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      KEEPERS_INFO: JSON.stringify(keepersInfo),
     };
 
     const updatedBackup = {
@@ -1194,4 +1203,36 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
 export const uploadEncMetaShareKeeperWatcher = createWatcher(
   uploadEncMetaShareKeeperWorker,
   UPLOAD_ENC_MSHARE_KEEPER,
+);
+
+function* sendApprovalRequestWorker({ payload }) {
+  yield put(switchS3LoaderKeeper('approvalRequest'));
+  let { shareID } = payload;
+  const keepersInfo: {
+    shareId: string;
+    name: string;
+    uuid: string;
+    publicKey: string;
+    ephemeralAddress: string;
+    type: string;
+    data?: any;
+  }[] = yield select((state) => state.health.keeperInfo);
+  let index = keepersInfo.findIndex(value=>value.type == "primaryKeeper");
+  if(index>-1){
+    const notification: INotification = {
+      notificationType: notificationType.approveKeeper,
+      title: "Approval Request for Keeper",
+      body: "Approval Keeper setup",
+      data: JSON.stringify({shareID}),
+      tag: notificationTag.IMP,
+      date: new Date()
+    }
+    let res = yield call(RelayServices.sendKeeperNotifications, [keepersInfo[index].uuid], notification);
+  }
+  yield put(switchS3LoaderKeeper('approvalRequest'));
+}
+
+export const sendApprovalRequestWatcher = createWatcher(
+  sendApprovalRequestWorker,
+  SEND_APPROVAL_REQUEST,
 );

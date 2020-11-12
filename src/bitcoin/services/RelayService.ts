@@ -203,4 +203,22 @@ export default class RelayServices {
       };
     }
   };
+
+  public static sendKeeperNotifications = async (
+    receivers: string[],
+    notification: INotification,
+  ) => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.sendKeeperNotifications(receivers, notification),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to deliver notifications',
+      };
+    }
+  };
 }

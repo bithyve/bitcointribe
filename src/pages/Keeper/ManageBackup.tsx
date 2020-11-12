@@ -50,6 +50,7 @@ import {
   checkMSharesHealth,
   initLevelTwo,
   updateMSharesHealth,
+  sendApprovalRequest
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 import ApproveSetup from './ApproveSetup';
@@ -95,6 +96,7 @@ interface ManageBackupPropsTypes {
   s3Service: any;
   updateMSharesHealth: any;
   keeperInfo: any[];
+  sendApprovalRequest: any;
 }
 
 class ManageBackup extends Component<
@@ -165,7 +167,6 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
-    // (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1)
     this.modifyLevelData();
   };
 
@@ -413,6 +414,11 @@ class ManageBackup extends Component<
       );
     }
   };
+
+  sendApprovalRequestToPK = (shareId) =>{
+    this.props.sendApprovalRequest(shareId);
+    (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+  }
 
   render() {
     const {
@@ -801,9 +807,8 @@ class ManageBackup extends Component<
                                       .SetupPrimaryKeeperBottomSheet as any).snapTo(
                                       1,
                                     );
-                                  else
-                                    (this.refs
-                                      .keeperTypeBottomSheet as any).snapTo(1);
+                                  // (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                  else this.sendApprovalRequestToPK(value.keeper1.shareId);
                                 }
                               }}
                             >
@@ -909,8 +914,7 @@ class ManageBackup extends Component<
                                   this.goToHistory(obj);
                                   return;
                                 } else {
-                                  (this.refs
-                                    .keeperTypeBottomSheet as any).snapTo(1);
+                                  this.sendApprovalRequestToPK(value.keeper2.shareId);
                                 }
                               }}
                             >
@@ -1070,12 +1074,18 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <ApproveSetup
-              onPressContinue={() => (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0)}
+              onPressContinue={() => {
+                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
             />
           )}
           renderHeader={() => (
             <SmallHeaderModal
-              onPressHeader={() => (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0)}
+              onPressHeader={() => {
+                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
+              }}
             />
           )}
         />
@@ -1120,6 +1130,7 @@ export default withNavigationFocus(
     initLevelTwo,
     updateMSharesHealth,
     setIsBackupProcessing,
+    sendApprovalRequest
   })(ManageBackup),
 );
 

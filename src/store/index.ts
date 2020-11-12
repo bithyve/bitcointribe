@@ -127,7 +127,8 @@ import {
   downloadMetaShareHealthWatcher,
   cloudMetaShareHealthWatcher,
   fetchWalletImageHealthWatcher,
-  uploadEncMetaShareKeeperWatcher
+  uploadEncMetaShareKeeperWatcher,
+  sendApprovalRequestWatcher
 } from './sagas/health';
 
 import {
@@ -236,6 +237,7 @@ const rootSaga = function* () {
     cloudMetaShareHealthWatcher,
     fetchWalletImageHealthWatcher,
     uploadEncMetaShareKeeperWatcher,
+    sendApprovalRequestWatcher,
 
     // Keeper saga
     fetchKeeperTrustedChannelWatcher

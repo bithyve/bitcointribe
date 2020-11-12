@@ -34,6 +34,7 @@ const initialState: {
     updateMSharesHealth: Boolean;
     updateEFChannelStatus: Boolean
     uploadMetaShare: Boolean;
+    approvalRequest: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -68,7 +69,7 @@ const initialState: {
   downloadedMShare: {
     [otp: string]: { status: Boolean; err?: String };
   };
-  errorReceiving: boolean,
+  errorReceiving: Boolean,
 } = {
   service: null,
   loading: {
@@ -78,6 +79,7 @@ const initialState: {
     updateMSharesHealth: false,
     updateEFChannelStatus: false,
     uploadMetaShare: false,
+    approvalRequest: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

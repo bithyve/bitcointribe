@@ -17,7 +17,7 @@ export default class KeeperService {
     } = keeper;
 
     return new KeeperService({
-      keeper,
+      keepers,
     });
   };
 
@@ -256,4 +256,5 @@ export default class KeeperService {
       };
     }
   };
+
 }

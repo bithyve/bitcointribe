@@ -1,4 +1,5 @@
 import { AsyncStorage, NativeModules } from "react-native";
+import { LevelHealth } from "../../bitcoin/utilities/Interface";
 import SSS from "../../bitcoin/utilities/sss/SSS";
 import { decrypt, encrypt } from "../encryption";
 
@@ -188,4 +189,22 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
 
 export const isEmptyObject = (obj) => {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+}
+
+export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealth[], shareId: string) : {
+  shareType: string;
+  updatedAt: string;
+  status: string;
+  shareId: string;
+  reshareVersion?: number;
+  name?: string;
+} =>{
+  let index;
+  for (let i = 0; i < levelHealthVar.length; i++) {
+    const element = levelHealthVar[i];
+    index = element.levelInfo.findIndex(value=>value.shareId == shareId);
+    if(index>-1){
+      return element.levelInfo[index];
+    }
+  }
 }
