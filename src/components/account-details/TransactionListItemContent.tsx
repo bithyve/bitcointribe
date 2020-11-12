@@ -7,7 +7,7 @@ import moment from 'moment';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
+import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -45,8 +45,6 @@ const TransactionListItemContent: React.FC<Props> = ({
     return moment(transaction.timestamp).format('DD MMMM YYYY');
   }, [transaction.transactionKind]);
 
-  const formattedAmountText = useFormattedAmountText(transaction.amount);
-
   return (
     <>
       <Icon
@@ -63,11 +61,14 @@ const TransactionListItemContent: React.FC<Props> = ({
       </ListItem.Content>
 
       <ListItem.Content style={styles.amountSection}>
-        <Image
-          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-          style={styles.bitcoinImage}
+        <LabeledBalanceDisplay
+          balance={transaction.amount}
+          amountTextStyle={amountTextStyle}
+          currencyImageStyle={styles.bitcoinImage}
+          iconSpacing={2}
+          bitcoinIconColor='gray'
+          textColor='gray'
         />
-        <ListItem.Title style={amountTextStyle}>{formattedAmountText}</ListItem.Title>
       </ListItem.Content>
     </>
   );
@@ -97,7 +98,6 @@ const styles = StyleSheet.create({
     height: 12,
     resizeMode: 'contain',
     alignSelf: 'center',
-    marginRight: 5,
   },
 
   amountSection: {
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+    marginLeft: 16,
   },
 
   amountText: {
