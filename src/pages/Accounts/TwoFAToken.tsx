@@ -266,6 +266,8 @@ export default function TwoFAToken(props) {
                     this.textInput.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
 
               <TextInput
@@ -290,6 +292,8 @@ export default function TwoFAToken(props) {
                     this.textInput.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
 
               <TextInput
@@ -314,6 +318,8 @@ export default function TwoFAToken(props) {
                     this.textInput2.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
 
               <TextInput
@@ -338,6 +344,8 @@ export default function TwoFAToken(props) {
                     this.textInput3.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
 
               <TextInput
@@ -362,6 +370,8 @@ export default function TwoFAToken(props) {
                     this.textInput4.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
               <TextInput
                 maxLength={1}
@@ -384,6 +394,8 @@ export default function TwoFAToken(props) {
                     this.textInput5.focus();
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
             </View>
           </View>

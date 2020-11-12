@@ -461,6 +461,8 @@ export default function AddContactAddressBook(props) {
               keyboardType={
                 Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
+              autoCorrect={false}
+              autoFocus={false}
               placeholder="Search"
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={(nameKeyword) => filterContacts(nameKeyword)}

@@ -1068,6 +1068,8 @@ class SendToContact extends Component<
                           }, 10);
                         }
                       }}
+                      autoCorrect={false}
+                      autoCompleteType="off"
                     />
                     {!prefersBitcoin && (
                       <Text
@@ -1161,6 +1163,8 @@ class SendToContact extends Component<
                           }, 10);
                         }
                       }}
+                      autoCorrect={false}
+                      autoCompleteType="off"
                     />
                     {prefersBitcoin && (
                       <Text
@@ -1248,6 +1252,8 @@ class SendToContact extends Component<
                     onBlur={() => {
                       this.setState({ InputStyleNote: styles.textBoxView });
                     }}
+                    autoCorrect={false}
+                    autoCompleteType="off"
                   />
                 </View>
               ) : null}

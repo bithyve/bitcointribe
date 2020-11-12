@@ -726,6 +726,9 @@ export default function Receive(props) {
                     keyboardType={'numeric'}
                     onChangeText={(value) => setAmount(value)}
                     placeholderTextColor={Colors.borderColor}
+                    autoCorrect={false}
+                    autoFocus={false}
+                    autoCompleteType="off"
                   />
                 </View>
 

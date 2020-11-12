@@ -469,6 +469,9 @@ export default function ContactList(props) {
           keyboardType={
             Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
           }
+          autoCorrect={false}
+          autoFocus={false}
+          autoCompleteType="off"
           placeholder="Search"
           placeholderTextColor={Colors.textColorGrey}
           onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
