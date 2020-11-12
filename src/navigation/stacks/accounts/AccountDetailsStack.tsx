@@ -4,7 +4,7 @@ import XPubSourceKind from '../../../common/data/enums/XPubSourceKind';
 import AccountSettingsEditDisplayPropertiesScreen from "../../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen";
 import AccountSettingsMainScreen from "../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen";
 import ReassignTransactionsMainOptionsScreen from "../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
-import ReassignAllTransactionsSelectTransactionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectTransactionsScreen';
+import SelectReassignableTransactionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectReassignableTransactionsScreen';
 import AccountDetailsContainerScreen from "../../../pages/Accounts/Details/AccountDetailsContainerScreen";
 import TransactionDetailsContainerScreen from "../../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
 import TransactionsListContainerScreen from "../../../pages/Accounts/Transactions/TransactionsListScreenContainer";
@@ -43,8 +43,8 @@ const SubAccountSettingsStack = createStackNavigator(
         title: "Reassign Transactions",
       },
     },
-    ReassignAllTransactionsSelectTransactions: {
-      screen: ReassignAllTransactionsSelectTransactionsScreen,
+    SelectReassignableTransactions: {
+      screen: SelectReassignableTransactionsScreen,
       navigationOptions: {
         title: "Reassign Transactions",
       },

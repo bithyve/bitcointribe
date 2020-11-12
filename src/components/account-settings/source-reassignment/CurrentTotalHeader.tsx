@@ -7,6 +7,7 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { RFValue } from 'react-native-responsive-fontsize';
 import AccountShell from '../../../common/data/models/AccountShell';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 
 export type Props = {
   accountShell: AccountShell;
@@ -22,7 +23,10 @@ const CurrentTotalHeader: React.FC<Props> = ({
   }, [selectedSources]);
 
   const formattedAmountText = useFormattedAmountText(totalAmount);
-  const formattedUnitText = useFormattedUnitText(accountShell);
+  const formattedUnitText = useFormattedUnitText({
+    bitcoinUnit: accountShell.unit,
+    currencyKind: CurrencyKind.BITCOIN
+  });
 
   const countDescriptionText = useMemo(() => {
     const count = selectedSources.length;

@@ -8,12 +8,13 @@ import ButtonStyles from '../../../../common/Styles/ButtonStyles';
 import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
+import CurrencyKind from '../../../../common/data/enums/CurrencyKind';
 
 export type Props = {
   navigation: any;
 };
 
-const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
+const SelectReassignableTransactionsScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const accountShell = useAccountShellFromNavigation(navigation);
@@ -60,6 +61,7 @@ const ReassignAllTransactionsSelectTransactionsScreen: React.FC<Props> = ({
 
       <View>
         <TransactionsList
+          currencyKind={CurrencyKind.BITCOIN}
           selectableTransactions={selectableTransactions}
           selectedTransactionIDs={selectedTransactionIDs}
           onTransactionSelected={handleTransactionSelection}
@@ -94,4 +96,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReassignAllTransactionsSelectTransactionsScreen;
+export default SelectReassignableTransactionsScreen;

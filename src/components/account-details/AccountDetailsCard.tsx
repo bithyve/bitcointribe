@@ -5,7 +5,7 @@ import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import ButtonStyles from '../../common/Styles/ButtonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay';
 import { Button } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccountShell from '../../common/data/models/AccountShell';
@@ -113,7 +113,7 @@ const AccountDetailsCard: React.FC<Props> = ({
           unitTextStyle={styles.balanceUnitText}
           currencyImageStyle={styles.balanceCurrencyIcon}
           bitcoinIconColor='light'
-          textColor='white'
+          textColor={Colors.white}
         />
 
         <KnowMoreButton />
@@ -227,13 +227,11 @@ const styles = StyleSheet.create({
   },
 
   balanceAmountText: {
-    color: Colors.white,
     fontFamily: Fonts.OpenSans,
     fontSize: 21,
   },
 
   balanceUnitText: {
-    color: Colors.white,
     fontSize: 13,
     fontFamily: Fonts.FiraSansRegular,
   },

@@ -1,21 +1,23 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
-import { Satoshis } from '../../common/data/enums/UnitAliases';
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
+import Colors from '../common/Colors';
+import Fonts from '../common/Fonts';
+import CurrencyKind from '../common/data/enums/CurrencyKind';
+import useCurrencyCode from '../utils/hooks/state-selectors/UseCurrencyCode';
+import useCurrencyKind from '../utils/hooks/state-selectors/UseCurrencyKind';
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from './MaterialCurrencyCodeIcon';
+import { getCurrencyImageByRegion } from '../common/CommonFunctions';
+import useFormattedAmountText from '../utils/hooks/formatting/UseFormattedAmountText';
+import useFormattedUnitText from '../utils/hooks/formatting/UseFormattedUnitText';
+import { Satoshis } from '../common/data/enums/UnitAliases';
+import BitcoinUnit from '../common/data/enums/BitcoinUnit';
+import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin';
 
 export type Props = {
   balance: Satoshis,
   bitcoinUnit?: BitcoinUnit;
+  currencyKind?: CurrencyKind;
   textColor?: string;
   bitcoinIconColor?: 'gray' | 'dark' | 'light',
   iconSpacing?: number;
@@ -33,6 +35,7 @@ export type Props = {
 const LabeledBalanceDisplay: React.FC<Props> = ({
   balance,
   bitcoinUnit = BitcoinUnit.SATS,
+  currencyKind = useCurrencyKind(),
   iconSpacing = 4,
   textColor = Colors.currencyGray,
   bitcoinIconColor = 'gray',
@@ -41,26 +44,31 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
   amountTextStyle = {},
   unitTextStyle = {},
 }: Props) => {
-  const currencyKind = useCurrencyKind();
   const fiatCurrencyCode = useCurrencyCode();
 
-  const prefersBitcoin: boolean = useMemo(() => {
+  const prefersBitcoin = useMemo(() => {
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
-  const formattedBalanceText = useFormattedAmountText(balance);
-  const formattedUnitText = useFormattedUnitText(bitcoinUnit);
+  const amountToDisplay = useMemo(() => {
+    const divisor = bitcoinUnit == BitcoinUnit.SATS ? 1 : SATOSHIS_IN_BTC;
+
+    return balance / divisor;
+  }, [balance, bitcoinUnit]);
+
+  const formattedBalanceText = useFormattedAmountText(amountToDisplay);
+  const formattedUnitText = useFormattedUnitText({ bitcoinUnit, currencyKind });
 
   const bitcoinIconSource = useMemo(() => {
     switch (bitcoinIconColor) {
       case 'dark':
-        return require('../../assets/images/currencySymbols/icon_bitcoin_dark.png');
+        return require('../assets/images/currencySymbols/icon_bitcoin_dark.png');
       case 'light':
-        return require('../../assets/images/currencySymbols/icon_bitcoin_light.png');
+        return require('../assets/images/currencySymbols/icon_bitcoin_light.png');
       case 'gray':
-        return require('../../assets/images/currencySymbols/icon_bitcoin_gray.png');
+        return require('../assets/images/currencySymbols/icon_bitcoin_gray.png');
       default:
-        return require('../../assets/images/currencySymbols/icon_bitcoin_gray.png');
+        return require('../assets/images/currencySymbols/icon_bitcoin_gray.png');
     }
   }, [bitcoinIconColor]);
 
