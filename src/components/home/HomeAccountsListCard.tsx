@@ -1,14 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
-import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import CardView from 'react-native-cardview';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay';
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import TransactionKind from '../../common/data/enums/TransactionKind';
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
@@ -7,14 +7,21 @@ import moment from 'moment';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 
 export type Props = {
   transaction: TransactionDescribing;
+  bitcoinUnit?: BitcoinUnit;
+  currencyKind?: CurrencyKind | null;
 };
 
 const TransactionListItemContent: React.FC<Props> = ({
   transaction,
+  bitcoinUnit = BitcoinUnit.SATS,
+  currencyKind = useCurrencyKind(),
 }: Props) => {
   const transactionKindIconName = useMemo(() => {
     switch (transaction.transactionKind) {
@@ -63,6 +70,8 @@ const TransactionListItemContent: React.FC<Props> = ({
       <ListItem.Content style={styles.amountSection}>
         <LabeledBalanceDisplay
           balance={transaction.amount}
+          bitcoinUnit={bitcoinUnit}
+          currencyKind={currencyKind}
           amountTextStyle={amountTextStyle}
           currencyImageStyle={styles.bitcoinImage}
           iconSpacing={2}

@@ -13,7 +13,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import config from '../../bitcoin/HexaConfig';
-import LabeledBalanceDisplay from '../../components/accounts/LabeledBalanceDisplay';
+import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay';
 
 const AccountsListSend = ({
   balances,

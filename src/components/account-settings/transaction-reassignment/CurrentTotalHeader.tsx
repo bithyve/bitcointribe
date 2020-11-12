@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText';
-import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText';
 import { RFValue } from 'react-native-responsive-fontsize';
 import AccountShell from '../../../common/data/models/AccountShell';
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit';
 
 export type Props = {
   accountShell: AccountShell;
@@ -19,16 +18,25 @@ const CurrentTotalHeader: React.FC<Props> = ({
   selectedTransactions,
 }: Props) => {
   const totalAmount = useMemo(() => {
-    return selectedTransactions.reduce((accumulated, current) => accumulated + current.amount, 0);
+    return selectedTransactions.reduce(
+      (accumulated, current) => accumulated + current.amount,
+      0
+    );
   }, [selectedTransactions]);
 
   const formattedAmountText = useFormattedAmountText(totalAmount);
-  const formattedUnitText = useFormattedUnitText(accountShell.unit);
 
   const countDescriptionText = useMemo(() => {
     const count = selectedTransactions.length;
     return `${count} transaction${count == 1 ? '' : 's'} selected`;
   }, [selectedTransactions]);
+
+  const formattedUnitText = useMemo(() => {
+    const prefix = accountShell.unit === BitcoinUnit.SATS ? 'Sat' : 'T-Sat';
+    const suffix = totalAmount == 1 ? '' : 's';
+
+    return `${prefix}${suffix}`;
+  }, [accountShell.unit, totalAmount]);
 
 
   return (
@@ -68,9 +76,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     color: Colors.blue,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: 11,
+    fontSize: RFValue(11),
+    marginBottom: 5,
   },
-
 
   countDescriptionSection: {
     flexDirection: 'row',
@@ -96,8 +104,8 @@ const styles = StyleSheet.create({
   },
 
   currencyIcon: {
-    width: 20,
-    height: 20,
+    width: 21,
+    height: 21,
   },
 
   dividerLine: {
@@ -114,10 +122,10 @@ const styles = StyleSheet.create({
   },
 
   unitText: {
+    fontFamily: Fonts.OpenSans,
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
   },
-
 });
 
 export default CurrentTotalHeader;

@@ -19,7 +19,7 @@ const listItems: OptionsListItem[] = [
   {
     title: 'Transactions',
     subtitle: `Reassign any of your incoming and outgoing transactions`,
-    screenName: 'ReassignAllTransactionsSelectTransactions',
+    screenName: 'SelectReassignableTransactions',
     imageSource: require('../../../../assets/images/icons/icon_transactions_circle.png'),
   },
   {
