@@ -12,9 +12,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 
 export default class DonationSubAccountInfo implements DonationSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.DONATION;
-  isPrimarySubAccount: boolean;
   balance: number;
 
   visibility: AccountVisibility;
@@ -39,7 +38,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   transactionGroup: TransactionGroup;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Donation Account",
     balance = 0,
     customDisplayName = null,
@@ -49,7 +48,6 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
@@ -62,7 +60,6 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;
   }
 }

@@ -6,11 +6,10 @@ import { ImageSourcePropType } from "react-native";
 
 
 interface SubAccountDescribing {
-  id: string;
-  accountShellID: string;
+  readonly id: string;
+  accountShellID: string | null;
 
-  kind: SubAccountKind;
-  isPrimarySubAccount: boolean;
+  readonly kind: SubAccountKind;
 
   /**
    * Balance in Satoshis.
@@ -60,16 +59,15 @@ export interface DonationSubAccountDescribing extends HexaSubAccountDescribing {
 
 export interface ExternalServiceSubAccountDescribing extends
   SubAccountDescribing {
-  serviceAccountKind: ServiceAccountKind;
+  readonly serviceAccountKind: ServiceAccountKind;
 }
 
 export interface ImportedWalletSubAccountDescribing extends SubAccountDescribing {}
 
 
 export type SubAccountDescribingConstructorProps = {
-  accountShellID?: string;
+  accountShellID?: string | null;
   defaultTitle?: string;
-  isPrimarySubAccount?: boolean;
   customDisplayName?: string | null;
   customDescription?: string | null;
   balance?: number;

@@ -10,9 +10,8 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TrustedContactsSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
-  accountShellID: string;
+  accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
-  isPrimarySubAccount: boolean;
   balance: number;
 
   visibility: AccountVisibility;
@@ -29,7 +28,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   transactionGroup: TransactionGroup;
 
   constructor({
-    accountShellID,
+    accountShellID = null,
     defaultTitle = "Joint Account",
     balance = 0,
     customDisplayName = null,
@@ -37,7 +36,6 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    isPrimarySubAccount = false,
     transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
@@ -48,7 +46,6 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
     this.transactionIDs = transactionIDs;
-    this.isPrimarySubAccount = isPrimarySubAccount;
     this.transactionGroup = transactionGroup;
 
     // TODO: Define some way to generate this from the address book avatar.

@@ -13,19 +13,15 @@ import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo
 // TODO: Remove these after testing UI.
 const sampleSources: SubAccountDescribing[] = [
   new CheckingSubAccountInfo({
-    isPrimarySubAccount: true,
     balance: 23583,
   }),
   new SavingsSubAccountInfo({
-    isPrimarySubAccount: true,
     balance: 99121,
   }),
   new CheckingSubAccountInfo({
-    isPrimarySubAccount: true,
     balance: 11,
   }),
   new SavingsSubAccountInfo({
-    isPrimarySubAccount: true,
     balance: 82308,
   }),
 ];

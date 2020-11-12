@@ -14,23 +14,14 @@ export default function useNewAccountChoices(): Record<string, SubAccountDescrib
   return useMemo(() => {
     return {
       hexaAccounts: [
-        new TestSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
-        new SavingsSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
-        new CheckingSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
-        new TrustedContactsSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
+        new TestSubAccountInfo({}),
+        new SavingsSubAccountInfo({}),
+        new CheckingSubAccountInfo({}),
+        new TrustedContactsSubAccountInfo({}),
 
         new DonationSubAccountInfo({
           doneeName: 'Sample Donee',
           causeName: 'Bitcoin Development Fund',
-          isPrimarySubAccount: true,
         }),
       ],
 
@@ -39,29 +30,22 @@ export default function useNewAccountChoices(): Record<string, SubAccountDescrib
           defaultTitle: "Swan Bitcoin",
           defaultDescription: "Stack Sats with Swan",
           serviceAccountKind: ServiceAccountKind.SWAN,
-          isPrimarySubAccount: true,
         }),
         new ExternalServiceSubAccountInfo({
           defaultTitle: "FastBitcoins.com",
           defaultDescription: "Use FastBitcoin Vouchers",
           serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
-          isPrimarySubAccount: true,
         }),
         new ExternalServiceSubAccountInfo({
           defaultTitle: "Whirlpool Account",
           defaultDescription: "Powered by Samurai",
           serviceAccountKind: ServiceAccountKind.WHIRLPOOL,
-          isPrimarySubAccount: true,
         }),
       ],
 
       importedWalletAccounts: [
-        new WatchOnlyImportedWalletSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
-        new FullyImportedWalletSubAccountInfo({
-          isPrimarySubAccount: true,
-        }),
+        new WatchOnlyImportedWalletSubAccountInfo({}),
+        new FullyImportedWalletSubAccountInfo({}),
       ],
     };
   }, []);

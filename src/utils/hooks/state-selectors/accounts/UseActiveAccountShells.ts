@@ -8,6 +8,6 @@ export default function useActiveAccountShells(): AccountShell[] {
   const accountsState = useAccountsState();
 
   return useMemo(() => {
-    return accountsState.activeAccountShells || [];
-  }, [accountsState.activeAccountShells]);
+    return accountsState.accountShells || [];
+  }, [accountsState.accountShells]);
 }

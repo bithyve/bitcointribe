@@ -7,23 +7,17 @@ import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo
 import TestSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
 import { AccountsState } from '../../../../store/reducers/accounts';
 
-const sampleShells: AccountShell[] = [
+const sampleShellsForTestingTransactionReassignment: AccountShell[] = [
   new AccountShell({
-    primarySubAccount: new CheckingSubAccountInfo({
-      isPrimarySubAccount: true,
-    }),
+    primarySubAccount: new CheckingSubAccountInfo({}),
     unit: BitcoinUnit.SATS,
   }),
   new AccountShell({
-    primarySubAccount: new SavingsSubAccountInfo({
-      isPrimarySubAccount: true,
-    }),
+    primarySubAccount: new SavingsSubAccountInfo({}),
     unit: BitcoinUnit.SATS,
   }),
   new AccountShell({
-    primarySubAccount: new TestSubAccountInfo({
-      isPrimarySubAccount: true,
-    }),
+    primarySubAccount: new TestSubAccountInfo({}),
     unit: BitcoinUnit.TSATS,
   }),
 ];
@@ -34,8 +28,8 @@ function useAccountShellsInGroup(transactionGroup: TransactionGroup): AccountShe
     const accountsState: AccountsState = state.accounts;
 
     return accountsState
-      .activeAccountShells
-      .concat(sampleShells)
+      .accountShells
+      // .concat(sampleShellsForTestingTransactionReassignment)
       .filter(accountShell => AccountShell.getTransactionGroup(accountShell) === transactionGroup);
   });
 }
