@@ -6,7 +6,7 @@ import ContactAvatar from '../ContactAvatar';
 import ListStyles from '../../common/Styles/ListStyles';
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CountDown from '../CountDown';
+import CountDown from 'react-native-countdown-component';
 import HexaConfig from '../../bitcoin/HexaConfig';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -42,15 +42,16 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ({
     }
   }, [contact]);
 
+
   const hasExpirationBadge = useMemo(() => {
-    // TODO: Figure out what this logic is supposed to mean.
+    // TODO: Establish more clarity about what this logic is supposed to mean.
     return (
       (
         contact.hasTrustedChannelWithUser == false
-        || contact.trustKind == ContactTrustKind.USER_IS_KEEPING
+        || contact.trustKind != ContactTrustKind.USER_IS_KEEPING
       ) &&
       (
-        contact.hasXPub == false ||
+        contact.hasXPub ||
         contact.hasTrustedAddress
       ) == false
     );
