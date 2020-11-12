@@ -8,7 +8,7 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
+import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
@@ -78,8 +78,9 @@ const BodySection: React.FC<BodyProps> = ({
         {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
       </Text>
 
-      <AccountBalanceDisplay
-        accountShell={accountShell}
+      <LabeledBalanceDisplay
+        balance={AccountShell.getTotalBalance(accountShell)}
+        bitcoinUnit={accountShell.unit}
         containerStyle={styles.balanceRow}
         amountTextStyle={balanceTextStyle}
       />

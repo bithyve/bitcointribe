@@ -5,7 +5,7 @@ import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
 import ButtonStyles from '../../common/Styles/ButtonStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import AccountBalanceDisplay from '../accounts/AccountBalanceDisplay';
+import LabeledBalanceDisplay from '../accounts/LabeledBalanceDisplay';
 import { Button } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccountShell from '../../common/data/models/AccountShell';
@@ -16,22 +16,6 @@ export type Props = {
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
 };
-
-
-function badgeImageForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
-  switch (accountKind) {
-    case SubAccountKind.TEST:
-      return require('../../assets/images/icons/icon_test_white.png');
-    case SubAccountKind.REGULAR:
-      return require('../../assets/images/icons/icon_regular_account.png');
-    case SubAccountKind.SECURE:
-      return require('../../assets/images/icons/icon_secureaccount_white.png');
-    case SubAccountKind.DONATION:
-      return require('../../assets/images/icons/icon_donation_account.png');
-    default:
-      return require('../../assets/images/icons/accounts.png');
-  }
-}
 
 function backgroundImageForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
   switch (accountKind) {
@@ -62,7 +46,6 @@ function shadowColorForAccountKind(accountKind: SubAccountKind): string {
       return Colors.borderColor;
   }
 }
-
 
 const AccountDetailsCard: React.FC<Props> = ({
   accountShell,
@@ -123,12 +106,14 @@ const AccountDetailsCard: React.FC<Props> = ({
   const FooterSection: React.FC = () => {
     return (
       <View style={styles.footerSection}>
-        <AccountBalanceDisplay
-          accountShell={accountShell}
+        <LabeledBalanceDisplay
+          balance={AccountShell.getTotalBalance(accountShell)}
+          bitcoinUnit={accountShell.unit}
           amountTextStyle={styles.balanceAmountText}
           unitTextStyle={styles.balanceUnitText}
           currencyImageStyle={styles.balanceCurrencyIcon}
-          currencyImageSource={require('../../assets/images/icons/icon_bitcoin_light.png')}
+          bitcoinIconColor='light'
+          textColor='white'
         />
 
         <KnowMoreButton />
@@ -251,6 +236,12 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 13,
     fontFamily: Fonts.FiraSansRegular,
+  },
+
+  balanceCurrencyIcon: {
+    width: 16,
+    height: 16,
+    resizeMode: 'contain',
   },
 
   settingsButtonContainer: {
