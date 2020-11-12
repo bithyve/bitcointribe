@@ -36,16 +36,15 @@ export default function KeeperTypeModalContents(props) {
     name: '',
   });
 
-  const [isLevel2, setIsLevel2] = useState(props.isLevel2 ? props.isLevel2 : false)
+  const [selectedLevelId, setSelectedLevelId] = useState(props.selectedLevelId ? props.selectedLevelId : false)
   const onKeeperSelect = (value) => {
     if (value.type != SelectedKeeperType.type) {
       setSelectedKeeperType(value);
     }
   };
   useEffect(() => {
-    console.log("props.isLevel2", props.isLevel2)
-      setIsLevel2(props.isLevel2)
-  }, [props.isLevel2]);
+      setSelectedLevelId(props.selectedLevelId)
+  }, [props.selectedLevelId]);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -70,7 +69,7 @@ export default function KeeperTypeModalContents(props) {
           }}
         >
           {keeperTypesData.map((value) => {
-            if(isLevel2 && value.type === 'pdf'){return;}
+            if(selectedLevelId == 2 && value.type === 'pdf'){return;}
             return (
               <AppBottomSheetTouchableWrapper
                 activeOpacity={10}

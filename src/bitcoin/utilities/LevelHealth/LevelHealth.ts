@@ -824,6 +824,7 @@ export default class LevelHealth {
     success: boolean;
     message: string;
   }> => {
+    console.log('INIT_LEVEL_TWO LH', SecurityQuestionHealth)
     let levelInfo = [];
     if (this.metaShares.length) {
       levelInfo[0] = {
@@ -1179,6 +1180,7 @@ export default class LevelHealth {
     });
 
     let index = 0;
+    let metaShareArray = [];
     let metaShare: MetaShare;
     for (const encryptedSecret of this.encryptedSecrets) {
       if (index === 1) {
@@ -1212,10 +1214,10 @@ export default class LevelHealth {
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         };
       }
-
-      this.metaShares.push(metaShare);
+      metaShareArray.push(metaShare);
       index++;
     }
+    this.metaShares = metaShareArray;
     
      if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
       this.metaShares = [];
@@ -1318,6 +1320,7 @@ export default class LevelHealth {
   } => {
     const key = LevelHealth.getDerivedKey(answer);
     const shareIDs = [];
+    const encryptedSecretsTmp = [];
     for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(
         LevelHealth.cipherSpec.algorithm,
@@ -1326,10 +1329,11 @@ export default class LevelHealth {
       );
       let encrypted = cipher.update(secret, 'utf8', 'hex');
       encrypted += cipher.final('hex');
-      this.encryptedSecrets.push(encrypted);
+      encryptedSecretsTmp.push(encrypted);
       shareIDs.push(LevelHealth.getShareId(encrypted));
     }
-    this.shareIDs = shareIDs.slice(0, 3); // preserving just the online(relay-transmitted) shareIDs
+    this.encryptedSecrets = encryptedSecretsTmp;
+    this.shareIDs = shareIDs; // preserving just the online(relay-transmitted) shareIDs
     return { encryptedSecrets: this.encryptedSecrets };
   };
 

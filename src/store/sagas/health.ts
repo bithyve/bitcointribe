@@ -150,7 +150,6 @@ function* generateMetaSharesWorker({ payload }) {
     serviceCall = s3Service.generateLevel1Shares;
   } else if (level == 3) {
     serviceCall = s3Service.generateLevel2Shares;
-    yield put(updateLevelThreeMetaShareStatus(true));
   }
   if (serviceCall != null) {
     const res = yield call(
@@ -170,6 +169,15 @@ function* generateMetaSharesWorker({ payload }) {
           yield put(initLevelTwo());
         }
         yield put(updateLevelTwoMetaShareStatus(true));
+      }
+      if (level == 3) {
+        let isLevel3Initialized = yield select(
+          (state) => state.health.isLevel3Initialized,
+        );
+        if (!isLevel3Initialized) {
+          yield put(initLevelTwo());
+        }
+        yield put(updateLevelThreeMetaShareStatus(true));
       }
       let s3Service: S3Service = yield select((state) => state.health.service);
       const { SERVICES } = yield select((state) => state.storage.database);
@@ -310,28 +318,33 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let type = payload.isPrimaryKeeper ? 'primaryKeeper' : payload.type;
 
   yield put(updateMSharesLoader(true));
-  let s3Service: S3Service = yield select((state) => state.health.service);
+  const keeper: KeeperService = yield select((state) => state.keeper.service);
+  
   let securityQuestion = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
+  let s3Service: S3Service = yield select((state) => state.health.service);
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
-  const keeper: KeeperService = yield select((state) => state.keeper.service);
-  let testXpub = s3ServiceTest.hdWallet.getTestXPub();
   let s3ServiceRegular: S3Service = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
-  let regularXpub = s3ServiceRegular.hdWallet.getXpub();
   let s3ServiceSecure: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
+  // All acoount Xpubs
+  let testXpub = s3ServiceTest.hdWallet.getTestXPub();
+  let regularXpub = s3ServiceRegular.hdWallet.getXpub();
   let secureXpub = s3ServiceSecure.getXpubsForAccount();
+
   let EFChannelData = JSON.parse(payload.scannedData);
+
   let encKey;
   if (EFChannelData.uuid) encKey = LevelHealth.strechKey(EFChannelData.uuid);
   let { otpEncryptedData, otp } = LevelHealth.encryptViaOTP(EFChannelData.uuid);
   const encryptedKey = otpEncryptedData;
+
   let share = s3Service.levelhealth.metaShares[1];
   if (payload.selectedShareId) {
     share = payload.share;
@@ -472,9 +485,11 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 );
 
 function* updateHealthLevel2Worker() {
+  console.log('INIT_LEVEL_TWO workes')
   let isLevel2Initialized = yield select(
     (state) => state.health.isLevel2Initialized,
   );
+  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized)
   if (!isLevel2Initialized) {
     let s3Service: S3Service = yield select((state) => state.health.service);
     let Health = yield select((state) => state.health.levelHealth);
@@ -484,6 +499,7 @@ function* updateHealthLevel2Worker() {
       s3Service.updateHealthLevel2,
       SecurityQuestionHealth,
     );
+    console.log('INIT_LEVEL_TWO res', res)
     if (res.data.success) {
       // Update Health to reducer
       yield put(checkMSharesHealth());

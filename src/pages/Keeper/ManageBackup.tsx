@@ -50,7 +50,7 @@ import {
   checkMSharesHealth,
   initLevelTwo,
   updateMSharesHealth,
-  sendApprovalRequest
+  sendApprovalRequest,
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 import ApproveSetup from './ApproveSetup';
@@ -58,7 +58,6 @@ import ApproveSetup from './ApproveSetup';
 interface ManageBackupStateTypes {
   levelData: any[];
   selectedId: any;
-  isLevel2: boolean;
   securityAtLevel: any;
   encryptedCloudDataJson: any;
   isPrimaryKeeper: any;
@@ -72,6 +71,7 @@ interface ManageBackupStateTypes {
     reshareVersion: number;
     name: string;
   };
+  selectedLevelId: number;
 }
 
 interface ManageBackupPropsTypes {
@@ -159,10 +159,10 @@ class ManageBackup extends Component<
           id: 3,
         },
       ],
-      isLevel2: false,
       isPrimaryKeeper: false,
       selectedShareId: '',
       encryptedCloudDataJson: [],
+      selectedLevelId: 0,
     };
   }
 
@@ -215,11 +215,6 @@ class ManageBackup extends Component<
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
-    if (value === 2) {
-      this.setState({ isLevel2: true });
-    } else {
-      this.setState({ isLevel2: false });
-    }
   };
 
   getTime = (item) => {
@@ -391,14 +386,14 @@ class ManageBackup extends Component<
   };
 
   goToHistory = (value) => {
-    let { shareType, keeperStatus, name, shareId, updatedAt } = value;
+    let { shareType, keeperStatus, name, shareId, updatedAt, id } = value;
     let navigationParams = {
       selectedTime: updatedAt ? this.getTime(updatedAt) : 'never',
       selectedStatus: keeperStatus,
       selectedTitle: name,
-      isLevel2: this.state.isLevel2,
       isPrimaryKeeper: this.state.isPrimaryKeeper,
       selectedShareId: shareId,
+      selectedLevelId: id,
     };
     if (shareType == 'device' || shareType == 'primaryKeeper') {
       this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
@@ -415,19 +410,19 @@ class ManageBackup extends Component<
     }
   };
 
-  sendApprovalRequestToPK = (shareId) =>{
+  sendApprovalRequestToPK = (shareId) => {
     this.props.sendApprovalRequest(shareId);
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
-  }
+  };
 
   render() {
     const {
       levelData,
       selectedId,
-      isLevel2,
       securityAtLevel,
       isPrimaryKeeper,
       isError,
+      selectedLevelId,
     } = this.state;
     const { navigation, healthLoading, checkMSharesHealth } = this.props;
     return (
@@ -502,472 +497,493 @@ class ManageBackup extends Component<
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
             {levelData.map((value) => {
               return (
-                <View
-                  style={{
-                    borderRadius: 10,
-                    marginTop: wp('7%'),
-                    backgroundColor:
-                      value.status == 'good' || value.status == 'bad'
-                        ? Colors.blue
-                        : Colors.backgroundColor,
-                    shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
-                    shadowColor: Colors.borderColor,
-                    shadowOpacity:
-                      selectedId && selectedId == value.id ? 10 : 0,
-                    shadowOffset: { width: 5, height: 5 },
-                    elevation:
-                      selectedId == value.id || selectedId == 0 ? 10 : 0,
-                    opacity:
-                      selectedId == value.id || selectedId == 0 ? 1 : 0.3,
-                  }}
-                >
-                  <View style={styles.cardView}>
-                    <View style={{ flexDirection: 'row' }}>
-                      {value.status == 'good' || value.status == 'bad' ? (
-                        <View
-                          style={{
-                            ...styles.cardHealthImageView,
-                            elevation:
-                              selectedId == value.id || selectedId == 0
-                                ? 10
-                                : 0,
-                            backgroundColor:
-                              value.status == 'good'
-                                ? Colors.green
-                                : Colors.red,
-                          }}
-                        >
-                          {value.status == 'good' ? (
-                            <Image
-                              source={require('../../assets/images/icons/check_white.png')}
-                              style={{
-                                ...styles.cardHealthImage,
-                                width: wp('4%'),
-                              }}
-                            />
-                          ) : (
-                            <Image
-                              source={require('../../assets/images/icons/icon_error_white.png')}
-                              style={styles.cardHealthImage}
-                            />
-                          )}
-                        </View>
-                      ) : (
-                        <Image
-                          source={require('../../assets/images/icons/icon_setup.png')}
-                          style={{
-                            borderRadius: wp('7%') / 2,
-                            width: wp('7%'),
-                            height: wp('7%'),
-                          }}
-                        />
-                      )}
-                      <TouchableOpacity
-                        style={{
-                          ...styles.cardButtonView,
-                          backgroundColor:
-                            value.status == 'notSetup'
-                              ? Colors.white
-                              : Colors.deepBlue,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            ...styles.cardButtonText,
-                            color:
-                              value.status == 'notSetup'
-                                ? Colors.textColorGrey
-                                : Colors.white,
-                          }}
-                        >
-                          Know More
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
-                      <View style={{ justifyContent: 'center' }}>
-                        <Text
-                          style={{
-                            ...styles.levelText,
-                            color:
-                              value.status == 'notSetup'
-                                ? Colors.textColorGrey
-                                : Colors.white,
-                          }}
-                        >
-                          Level {value.id}
-                        </Text>
-                        <Text
-                          style={{
-                            ...styles.levelInfoText,
-                            color:
-                              value.status == 'notSetup'
-                                ? Colors.textColorGrey
-                                : Colors.white,
-                          }}
-                        >
-                          {value.status == 'notSetup'
-                            ? value.status == 'good'
-                              ? value.infoGreen
-                              : value.infoRed
-                            : value.infoGray}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        activeOpacity={10}
-                        onPress={() => this.selectId(value.id)}
-                        style={styles.manageButton}
-                      >
-                        <Text
-                          style={{
-                            ...styles.manageButtonText,
-                            padding: 10,
-                            color:
-                              value.status == 'notSetup'
-                                ? Colors.black
-                                : Colors.white,
-                          }}
-                          onPress={() => this.selectId(value.id)}
-                        >
-                          {value.status == 'notSetup' ? 'Setup' : 'Manage'}
-                        </Text>
-                        <AntDesign
-                          name={
-                            selectedId && selectedId == value.id
-                              ? 'arrowup'
-                              : 'arrowright'
-                          }
-                          color={
-                            value.status == 'notSetup'
-                              ? Colors.black
-                              : Colors.white
-                          }
-                          size={12}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  {selectedId == value.id ? (
-                    <View>
-                      <View
-                        style={{ backgroundColor: Colors.white, height: 0.5 }}
-                      />
-                      <View style={styles.cardView}>
-                        <View style={{ width: wp('40%') }}>
-                          <Text
-                            numberOfLines={2}
+                <TouchableOpacity onPress={() => this.selectId(value.id)}>
+                  <View
+                    style={{
+                      borderRadius: 10,
+                      marginTop: wp('7%'),
+                      backgroundColor:
+                        value.status == 'good' || value.status == 'bad'
+                          ? Colors.blue
+                          : Colors.backgroundColor,
+                      shadowRadius:
+                        selectedId && selectedId == value.id ? 10 : 0,
+                      shadowColor: Colors.borderColor,
+                      shadowOpacity:
+                        selectedId && selectedId == value.id ? 10 : 0,
+                      shadowOffset: { width: 5, height: 5 },
+                      elevation:
+                        selectedId == value.id || selectedId == 0 ? 10 : 0,
+                      opacity:
+                        selectedId == value.id || selectedId == 0 ? 1 : 0.3,
+                    }}
+                  >
+                    <View style={styles.cardView}>
+                      <View style={{ flexDirection: 'row' }}>
+                        {value.status == 'good' || value.status == 'bad' ? (
+                          <View
                             style={{
+                              ...styles.cardHealthImageView,
+                              elevation:
+                                selectedId == value.id || selectedId == 0
+                                  ? 10
+                                  : 0,
+                              backgroundColor:
+                                value.status == 'good'
+                                  ? Colors.green
+                                  : Colors.red,
+                            }}
+                          >
+                            {value.status == 'good' ? (
+                              <Image
+                                source={require('../../assets/images/icons/check_white.png')}
+                                style={{
+                                  ...styles.cardHealthImage,
+                                  width: wp('4%'),
+                                }}
+                              />
+                            ) : (
+                              <Image
+                                source={require('../../assets/images/icons/icon_error_white.png')}
+                                style={styles.cardHealthImage}
+                              />
+                            )}
+                          </View>
+                        ) : (
+                          <Image
+                            source={require('../../assets/images/icons/icon_setup.png')}
+                            style={{
+                              borderRadius: wp('7%') / 2,
+                              width: wp('7%'),
+                              height: wp('7%'),
+                            }}
+                          />
+                        )}
+                        <TouchableOpacity
+                          style={{
+                            ...styles.cardButtonView,
+                            backgroundColor:
+                              value.status == 'notSetup'
+                                ? Colors.white
+                                : Colors.deepBlue,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              ...styles.cardButtonText,
                               color:
                                 value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
                             }}
                           >
-                            Lorem ipsum dolor sit amet, consetetur
+                            Know More
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
+                        <View style={{ justifyContent: 'center' }}>
+                          <Text
+                            style={{
+                              ...styles.levelText,
+                              color:
+                                value.status == 'notSetup'
+                                  ? Colors.textColorGrey
+                                  : Colors.white,
+                            }}
+                          >
+                            Level {value.id}
+                          </Text>
+                          <Text
+                            style={{
+                              ...styles.levelInfoText,
+                              color:
+                                value.status == 'notSetup'
+                                  ? Colors.textColorGrey
+                                  : Colors.white,
+                            }}
+                          >
+                            {value.status == 'good'
+                              ? value.infoGreen
+                              : value.status == 'bad'
+                              ? value.infoRed
+                              : value.infoGray}
                           </Text>
                         </View>
-                        {value.id == 1 ? (
-                          <View
-                            style={{ flexDirection: 'row', marginTop: 'auto' }}
+                        <TouchableOpacity
+                          activeOpacity={10}
+                          onPress={() => this.selectId(value.id)}
+                          style={styles.manageButton}
+                        >
+                          <Text
+                            style={{
+                              ...styles.manageButtonText,
+                              color:
+                                value.status == 'notSetup'
+                                  ? Colors.black
+                                  : Colors.white,
+                            }}
+                            onPress={() => this.selectId(value.id)}
                           >
-                            <TouchableOpacity
+                            {value.status == 'notSetup' ? 'Setup' : 'Manage'}
+                          </Text>
+                          <AntDesign
+                            name={
+                              selectedId && selectedId == value.id
+                                ? 'arrowup'
+                                : 'arrowright'
+                            }
+                            color={
+                              value.status == 'notSetup'
+                                ? Colors.black
+                                : Colors.white
+                            }
+                            size={12}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    {selectedId == value.id ? (
+                      <View>
+                        <View
+                          style={{ backgroundColor: Colors.white, height: 0.5 }}
+                        />
+                        <View style={styles.cardView}>
+                          <View style={{ width: wp('40%') }}>
+                            <Text
+                              numberOfLines={2}
                               style={{
-                                ...styles.appBackupButton,
-                                borderColor:
-                                  value.keeper1.status == 'accessible'
-                                    ? Colors.deepBlue
-                                    : Colors.red,
-                                borderWidth:
-                                  value.keeper1.status == 'accessible' ? 0 : 1,
+                                color:
+                                  value.status == 'notSetup'
+                                    ? Colors.textColorGrey
+                                    : Colors.white,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
                               }}
-                              onPress={() => {
-                                if (!this.props.cloudBackupStatus.status) {
-                                  this.cloudData();
+                            >
+                              Lorem ipsum dolor sit amet, consetetur
+                            </Text>
+                          </View>
+                          {value.id == 1 ? (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                marginTop: 'auto',
+                              }}
+                            >
+                              <TouchableOpacity
+                                style={{
+                                  ...styles.appBackupButton,
+                                  borderColor:
+                                    value.keeper1.status == 'accessible'
+                                      ? Colors.deepBlue
+                                      : Colors.red,
+                                  borderWidth:
+                                    value.keeper1.status == 'accessible'
+                                      ? 0
+                                      : 1,
+                                }}
+                                onPress={() => {
+                                  if (!this.props.cloudBackupStatus.status) {
+                                    this.cloudData();
+                                  }
+                                }}
+                              >
+                                <Image
+                                  source={require('../../assets/images/icons/reset.png')}
+                                  style={styles.resetImage}
+                                />
+                                <Text
+                                  style={{
+                                    ...styles.cardButtonText,
+                                    fontSize: RFValue(11),
+                                  }}
+                                >
+                                  {value.keeper1.status == 'accessible'
+                                    ? 'Data Backed-Up'
+                                    : 'Add Backup'}
+                                </Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={{
+                                  ...styles.appBackupButton,
+                                  width: wp('41%'),
+                                  borderColor:
+                                    value.keeper2.status == 'accessible'
+                                      ? value.status == 'notSetup'
+                                        ? Colors.white
+                                        : Colors.deepBlue
+                                      : Colors.red,
+                                  borderWidth:
+                                    value.keeper2.status == 'accessible'
+                                      ? 0
+                                      : 0.5,
+                                  marginLeft: 'auto',
+                                }}
+                                onPress={() =>
+                                  navigation.navigate(
+                                    'SecurityQuestionHistoryKeeper',
+                                    {
+                                      selectedTime: this.getTime(new Date()),
+                                      selectedStatus: 'Ugly',
+                                    },
+                                  )
                                 }
-                              }}
-                            >
-                              <Image
-                                source={require('../../assets/images/icons/reset.png')}
-                                style={styles.resetImage}
-                              />
-                              <Text
-                                style={{
-                                  ...styles.cardButtonText,
-                                  fontSize: RFValue(11),
-                                }}
                               >
-                                {value.keeper1.status == 'accessible'
-                                  ? 'Data Backed-Up'
-                                  : 'Add Backup'}
-                              </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
+                                <ImageBackground
+                                  source={require('../../assets/images/icons/questionMark.png')}
+                                  style={{
+                                    ...styles.resetImage,
+                                    position: 'relative',
+                                  }}
+                                >
+                                  {value.keeper2.status == 'notAccessible' ? (
+                                    <View
+                                      style={{
+                                        backgroundColor: Colors.red,
+                                        width: wp('1%'),
+                                        height: wp('1%'),
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 0,
+                                        borderRadius: wp('1%') / 2,
+                                      }}
+                                    />
+                                  ) : null}
+                                </ImageBackground>
+                                <Text
+                                  style={{
+                                    ...styles.cardButtonText,
+                                    fontSize: RFValue(11),
+                                  }}
+                                >
+                                  Security Question
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          ) : (
+                            <View
                               style={{
-                                ...styles.appBackupButton,
-                                width: wp('41%'),
-                                borderColor:
-                                  value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'
-                                      ? Colors.white
-                                      : Colors.deepBlue
-                                    : Colors.red,
-                                borderWidth:
-                                  value.keeper2.status == 'accessible'
-                                    ? 0
-                                    : 0.5,
-                                marginLeft: 'auto',
+                                flexDirection: 'row',
+                                marginTop: 'auto',
                               }}
-                              onPress={() =>
-                                navigation.navigate(
-                                  'SecurityQuestionHistoryKeeper',
-                                  {
-                                    selectedTime: this.getTime(new Date()),
-                                    selectedStatus: 'Ugly',
-                                  },
-                                )
-                              }
                             >
-                              <ImageBackground
-                                source={require('../../assets/images/icons/questionMark.png')}
+                              <TouchableOpacity
                                 style={{
-                                  ...styles.resetImage,
-                                  position: 'relative',
+                                  ...styles.appBackupButton,
+                                  backgroundColor:
+                                    value.status == 'notSetup'
+                                      ? Colors.white
+                                      : Colors.deepBlue,
+                                  width: 'auto',
+                                  paddingLeft: wp('3%'),
+                                  paddingRight: wp('3%'),
+                                  borderColor:
+                                    value.keeper1.status == 'accessible'
+                                      ? value.status == 'notSetup'
+                                        ? Colors.white
+                                        : Colors.deepBlue
+                                      : Colors.red,
+                                  borderWidth:
+                                    value.keeper1.status == 'accessible'
+                                      ? 0
+                                      : 1,
+                                }}
+                                onPress={() => {
+                                  this.setState({
+                                    selectedKeeper: value.keeper1,
+                                    selectedShareId: value.keeper1.shareId,
+                                    isPrimaryKeeper:
+                                      value.id === 2 ? true : false,
+                                    selectedLevelId: value.id,
+                                  });
+                                  if (value.keeper1.status == 'accessible') {
+                                    let obj = {
+                                      shareType: value.keeper1.shareType,
+                                      keeperStatus: value.keeper1.status,
+                                      name: value.keeper1.name,
+                                      shareId: value.keeper1.shareId,
+                                      updatedAt: value.keeper1.updatedAt,
+                                      id: value.id,
+                                    };
+                                    this.goToHistory(obj);
+                                    return;
+                                  } else {
+                                    if (value.id === 2)
+                                      (this.refs
+                                        .SetupPrimaryKeeperBottomSheet as any).snapTo(
+                                        1,
+                                      );
+                                    // (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                    else
+                                      this.sendApprovalRequestToPK(
+                                        value.keeper1.shareId,
+                                      );
+                                  }
                                 }}
                               >
-                                {value.keeper2.status == 'notAccessible' ? (
+                                {value.keeper1.status == 'accessible' &&
+                                (value.keeper1.shareType == 'device' ||
+                                  value.keeper1.shareType ==
+                                    'primaryKeeper') ? (
+                                  <Image
+                                    source={
+                                      value.keeper1.shareType == 'device' ||
+                                      value.keeper1.shareType == 'primaryKeeper'
+                                        ? require('../../assets/images/icons/icon_ipad_blue.png')
+                                        : require('../../assets/images/icons/pexels-photo.png')
+                                    }
+                                    style={{
+                                      width: wp('6%'),
+                                      height: wp('6%'),
+                                      resizeMode: 'contain',
+                                      borderRadius: wp('6%') / 2,
+                                    }}
+                                  />
+                                ) : value.keeper1.shareType == 'contact' &&
+                                  value.keeper1.updatedAt ? (
+                                  <Image
+                                    source={
+                                      value.keeper1.data &&
+                                      value.keeper1.data.imageAvailable
+                                        ? value.keeper1.data.image
+                                        : require('../../assets/images/icons/pexels-photo.png')
+                                    }
+                                    style={{
+                                      width: wp('6%'),
+                                      height: wp('6%'),
+                                      resizeMode: 'contain',
+                                      borderRadius: wp('6%') / 2,
+                                    }}
+                                  />
+                                ) : (
                                   <View
                                     style={{
                                       backgroundColor: Colors.red,
-                                      width: wp('1%'),
-                                      height: wp('1%'),
-                                      position: 'absolute',
-                                      top: 0,
-                                      right: 0,
-                                      borderRadius: wp('1%') / 2,
+                                      width: wp('2%'),
+                                      height: wp('2%'),
+                                      borderRadius: wp('2%') / 2,
                                     }}
                                   />
-                                ) : null}
-                              </ImageBackground>
-                              <Text
+                                )}
+                                <Text
+                                  style={{
+                                    ...styles.cardButtonText,
+                                    color:
+                                      value.status == 'notSetup'
+                                        ? Colors.textColorGrey
+                                        : Colors.white,
+                                    fontSize: RFValue(11),
+                                    marginLeft: wp('3%'),
+                                  }}
+                                >
+                                  {value.status == 'good' ||
+                                  (value.status == 'bad' && value.keeper1.name)
+                                    ? value.keeper1.name
+                                    : value.id == 2
+                                    ? 'Add Primary Keeper'
+                                    : 'Add Keeper'}
+                                </Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
                                 style={{
-                                  ...styles.cardButtonText,
-                                  fontSize: RFValue(11),
-                                }}
-                              >
-                                Security Question
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        ) : (
-                          <View
-                            style={{ flexDirection: 'row', marginTop: 'auto' }}
-                          >
-                            <TouchableOpacity
-                              style={{
-                                ...styles.appBackupButton,
-                                backgroundColor:
-                                  value.status == 'notSetup'
-                                    ? Colors.white
-                                    : Colors.deepBlue,
-                                width: 'auto',
-                                paddingLeft: wp('3%'),
-                                paddingRight: wp('3%'),
-                                borderColor:
-                                  value.keeper1.status == 'accessible'
-                                    ? value.status == 'notSetup'
+                                  ...styles.appBackupButton,
+                                  backgroundColor:
+                                    value.status == 'notSetup'
                                       ? Colors.white
-                                      : Colors.deepBlue
-                                    : Colors.red,
-                                borderWidth:
-                                  value.keeper1.status == 'accessible' ? 0 : 1,
-                              }}
-                              onPress={() => {
-                                this.setState({
-                                  selectedKeeper: value.keeper1,
-                                  selectedShareId: value.keeper1.shareId,
-                                  isPrimaryKeeper:
-                                    value.id === 2 ? true : false,
-                                });
-                                if (value.keeper1.status == 'accessible') {
-                                  let obj = {
-                                    shareType: value.keeper1.shareType,
-                                    keeperStatus: value.keeper1.status,
-                                    name: value.keeper1.name,
-                                    shareId: value.keeper1.shareId,
-                                    updatedAt: value.keeper1.updatedAt,
-                                  };
-                                  this.goToHistory(obj);
-                                  return;
-                                } else {
-                                  if (value.id === 2)
-                                    (this.refs
-                                      .SetupPrimaryKeeperBottomSheet as any).snapTo(
-                                      1,
+                                      : Colors.deepBlue,
+                                  width: 'auto',
+                                  paddingLeft: wp('3%'),
+                                  paddingRight: wp('3%'),
+                                  borderColor:
+                                    value.keeper2.status == 'accessible'
+                                      ? value.status == 'notSetup'
+                                        ? Colors.white
+                                        : Colors.deepBlue
+                                      : Colors.red,
+                                  borderWidth:
+                                    value.keeper2.status == 'accessible'
+                                      ? 0
+                                      : 0.5,
+                                  marginLeft: wp('4%'),
+                                }}
+                                onPress={() => {
+                                  this.setState({
+                                    selectedKeeper: value.keeper2,
+                                    selectedShareId: value.keeper2.shareId,
+                                    isPrimaryKeeper: false,
+                                    selectedLevelId: value.id,
+                                  });
+                                  if (value.keeper2.status == 'accessible') {
+                                    let obj = {
+                                      shareType: value.keeper2.shareType,
+                                      keeperStatus: value.keeper2.status,
+                                      name: value.keeper2.name,
+                                      shareId: value.keeper2.shareId,
+                                      updatedAt: value.keeper2.updatedAt,
+                                      id: value.id,
+                                    };
+                                    this.goToHistory(obj);
+                                    return;
+                                  } else {
+                                    this.sendApprovalRequestToPK(
+                                      value.keeper2.shareId,
                                     );
-                                  // (this.refs.keeperTypeBottomSheet as any).snapTo(1);
-                                  else this.sendApprovalRequestToPK(value.keeper1.shareId);
-                                }
-                              }}
-                            >
-                              {value.keeper1.status == 'accessible' &&
-                              (value.keeper1.shareType == 'device' ||
-                                value.keeper1.shareType == 'primaryKeeper') ? (
-                                <Image
-                                  source={
-                                    value.keeper1.shareType == 'device' ||
-                                    value.keeper1.shareType == 'primaryKeeper'
-                                      ? require('../../assets/images/icons/icon_ipad_blue.png')
-                                      : require('../../assets/images/icons/pexels-photo.png')
                                   }
-                                  style={{
-                                    width: wp('6%'),
-                                    height: wp('6%'),
-                                    resizeMode: 'contain',
-                                    borderRadius: wp('6%') / 2,
-                                  }}
-                                />
-                              ) : value.keeper1.shareType == 'contact' &&
-                                value.keeper1.updatedAt ? (
-                                <Image
-                                  source={
-                                    value.keeper1.data &&
-                                    value.keeper1.data.imageAvailable
-                                      ? value.keeper1.data.image
-                                      : require('../../assets/images/icons/pexels-photo.png')
-                                  }
-                                  style={{
-                                    width: wp('6%'),
-                                    height: wp('6%'),
-                                    resizeMode: 'contain',
-                                    borderRadius: wp('6%') / 2,
-                                  }}
-                                />
-                              ) : (
-                                <View
-                                  style={{
-                                    backgroundColor: Colors.red,
-                                    width: wp('2%'),
-                                    height: wp('2%'),
-                                    borderRadius: wp('2%') / 2,
-                                  }}
-                                />
-                              )}
-                              <Text
-                                style={{
-                                  ...styles.cardButtonText,
-                                  color:
-                                    value.status == 'notSetup'
-                                      ? Colors.textColorGrey
-                                      : Colors.white,
-                                  fontSize: RFValue(11),
-                                  marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.status == 'good' ||
-                                (value.status == 'bad' && value.keeper1.name)
-                                  ? value.keeper1.name
-                                  : value.id == 2
-                                  ? 'Add Primary Keeper'
-                                  : 'Add Keeper'}
-                              </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={{
-                                ...styles.appBackupButton,
-                                backgroundColor:
-                                  value.status == 'notSetup'
-                                    ? Colors.white
-                                    : Colors.deepBlue,
-                                width: 'auto',
-                                paddingLeft: wp('3%'),
-                                paddingRight: wp('3%'),
-                                borderColor:
-                                  value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'
-                                      ? Colors.white
-                                      : Colors.deepBlue
-                                    : Colors.red,
-                                borderWidth:
-                                  value.keeper2.status == 'accessible'
-                                    ? 0
-                                    : 0.5,
-                                marginLeft: wp('4%'),
-                              }}
-                              onPress={() => {
-                                this.setState({
-                                  selectedKeeper: value.keeper2,
-                                  selectedShareId: value.keeper2.shareId,
-                                  isLevel2: value.id == 2 ? true : false,
-                                  isPrimaryKeeper: false,
-                                });
-                                if (value.keeper2.status == 'accessible') {
-                                  let obj = {
-                                    shareType: value.keeper2.shareType,
-                                    keeperStatus: value.keeper2.status,
-                                    name: value.keeper2.name,
-                                    shareId: value.keeper2.shareId,
-                                    updatedAt: value.keeper2.updatedAt,
-                                  };
-                                  this.goToHistory(obj);
-                                  return;
-                                } else {
-                                  this.sendApprovalRequestToPK(value.keeper2.shareId);
-                                }
-                              }}
-                            >
-                              {value.keeper2.status == 'accessible' &&
-                              (value.keeper2.shareType == 'device' ||
-                                value.keeper2.shareType == 'contact') ? (
-                                <Image
-                                  source={
-                                    value.keeper2.shareType == 'device'
-                                      ? require('../../assets/images/icons/icon_ipad_blue.png')
-                                      : require('../../assets/images/icons/pexels-photo.png')
-                                  }
+                                {value.keeper2.status == 'accessible' &&
+                                (value.keeper2.shareType == 'device' ||
+                                  value.keeper2.shareType == 'contact') ? (
+                                  <Image
+                                    source={
+                                      value.keeper2.shareType == 'device'
+                                        ? require('../../assets/images/icons/icon_ipad_blue.png')
+                                        : require('../../assets/images/icons/pexels-photo.png')
+                                    }
+                                    style={{
+                                      width: wp('6%'),
+                                      height: wp('6%'),
+                                      resizeMode: 'contain',
+                                      borderRadius: wp('6%') / 2,
+                                    }}
+                                  />
+                                ) : (
+                                  <View
+                                    style={{
+                                      backgroundColor: Colors.red,
+                                      width: wp('2%'),
+                                      height: wp('2%'),
+                                      borderRadius: wp('2%') / 2,
+                                    }}
+                                  />
+                                )}
+                                <Text
                                   style={{
-                                    width: wp('6%'),
-                                    height: wp('6%'),
-                                    resizeMode: 'contain',
-                                    borderRadius: wp('6%') / 2,
+                                    ...styles.cardButtonText,
+                                    fontSize: RFValue(11),
+                                    color:
+                                      value.status == 'notSetup'
+                                        ? Colors.textColorGrey
+                                        : Colors.white,
+                                    marginLeft: wp('3%'),
                                   }}
-                                />
-                              ) : (
-                                <View
-                                  style={{
-                                    backgroundColor: Colors.red,
-                                    width: wp('2%'),
-                                    height: wp('2%'),
-                                    borderRadius: wp('2%') / 2,
-                                  }}
-                                />
-                              )}
-                              <Text
-                                style={{
-                                  ...styles.cardButtonText,
-                                  fontSize: RFValue(11),
-                                  color:
-                                    value.status == 'notSetup'
-                                      ? Colors.textColorGrey
-                                      : Colors.white,
-                                  marginLeft: wp('3%'),
-                                }}
-                              >
-                                {(value.status == 'bad' ||
-                                  value.status == 'good') &&
-                                value.keeper2.name
-                                  ? value.keeper2.name
-                                  : 'Add Keeper'}
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        )}
+                                >
+                                  {(value.status == 'bad' ||
+                                    value.status == 'good') &&
+                                  value.keeper2.name
+                                    ? value.keeper2.name
+                                    : 'Add Keeper'}
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  ) : null}
-                </View>
+                    ) : null}
+                  </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -984,7 +1000,7 @@ class ManageBackup extends Component<
           renderContent={() => (
             <KeeperTypeModalContents
               onPressSetup={(type, name) => {
-                let { selectedKeeper } = this.state;
+                let { selectedKeeper, selectedLevelId } = this.state;
                 let obj = {
                   shareType: selectedKeeper.shareType
                     ? selectedKeeper.shareType
@@ -997,6 +1013,7 @@ class ManageBackup extends Component<
                   updatedAt: selectedKeeper.updatedAt
                     ? selectedKeeper.updatedAt
                     : 0,
+                  id: selectedLevelId,
                 };
                 this.goToHistory(obj);
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -1004,7 +1021,7 @@ class ManageBackup extends Component<
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
               }
-              isLevel2={isLevel2}
+              selectedLevelId={selectedLevelId}
             />
           )}
           renderHeader={() => (
@@ -1130,7 +1147,7 @@ export default withNavigationFocus(
     initLevelTwo,
     updateMSharesHealth,
     setIsBackupProcessing,
-    sendApprovalRequest
+    sendApprovalRequest,
   })(ManageBackup),
 );
 
@@ -1243,7 +1260,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    marginRight: 3,
+    marginRight: 5,
   },
   appBackupButton: {
     flexDirection: 'row',

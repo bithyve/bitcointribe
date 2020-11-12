@@ -43,6 +43,7 @@ interface KeeperFeaturesPropsTypes {
   s3Service: any;
   updateMSharesHealth: any;
   isLevelTwoMetaShareCreated: Boolean;
+  isLevelThreeMetaShareCreated: Boolean;
   generateMetaShare: any;
   initLevelTwo: any;
   isLevel2Initialized: Boolean;
@@ -117,9 +118,12 @@ class KeeperFeatures extends Component<
   };
 
   setUpKeeper = async () => {
+    let level = this.props.navigation.state.params.selectedLevelId;
     this.setState({ setUpLoader: true });
-    if (!this.props.isLevelTwoMetaShareCreated)
-      await this.props.generateMetaShare(2);
+    if (!this.props.isLevelTwoMetaShareCreated && !this.props.isLevel2Initialized  && level == 2)
+      await this.props.generateMetaShare(level);
+    if(!this.props.isLevelThreeMetaShareCreated && !this.props.isLevel3Initialized && level == 3)
+      await this.props.generateMetaShare(level);
     this.setState({ setupKeeperClicked: true });
   };
 
@@ -130,8 +134,6 @@ class KeeperFeatures extends Component<
       navigation,
       createAndUploadOnEFChannel,
       metaShare,
-      keeperInfo,
-      levelHealth,
     } = this.props;
     let { selectedIds, levelData } = this.state;
     let shareId = navigation.state.params.selectedShareId;
@@ -153,6 +155,16 @@ class KeeperFeatures extends Component<
         share =
           metaShare[metaShare.findIndex((value) => value.shareId == shareId)];
       }
+      if (
+        isLevel3Initialized &&
+        isLevel2Initialized &&
+        shareId &&
+        metaShare.findIndex((value) => value.shareId == shareId) > -1
+      ) {
+        share =
+          metaShare[metaShare.findIndex((value) => value.shareId == shareId)];
+      }
+      console.log('share', share, metaShare)
       createAndUploadOnEFChannel(
         navigation.state.params.qrScannedData,
         featuresList,
@@ -161,8 +173,8 @@ class KeeperFeatures extends Component<
         share,
         'device',
       );
+      navigation.replace('ManageBackupKeeper');
     }
-    navigation.replace('ManageBackupKeeper');
   };
 
   render() {
@@ -394,6 +406,10 @@ const mapStateToProps = (state) => {
     isLevelTwoMetaShareCreated: idx(
       state,
       (_) => _.health.isLevelTwoMetaShareCreated,
+    ),
+    isLevelThreeMetaShareCreated: idx(
+      state,
+      (_) => _.health.isLevelThreeMetaShareCreated,
     ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     updateMSharesHealthStatus: idx(state, (_) => _.health.updateMSharesHealth),

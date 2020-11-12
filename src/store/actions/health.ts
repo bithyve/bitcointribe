@@ -152,6 +152,7 @@ export const updateLevelThreeMetaShareStatus = (beingLoaded) => {
 };
 
 export const initLevelTwo = () => {
+  console.log('INIT_LEVEL_TWO')
   return { type: INIT_LEVEL_TWO };
 };
 
