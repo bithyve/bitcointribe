@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
   ScrollView,
@@ -16,7 +15,6 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import openLink from '../../utils/OpenLink';
 
 export default function ManageBackupHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -68,7 +66,7 @@ export default function ManageBackupHelpContents(props) {
             recover the wallet if it’s lost. The sixth item is your Security
             Question, used for different purposes
           </Text>
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
             onPress={() => {
               scrollViewRef.current?.scrollTo({
@@ -83,7 +81,7 @@ export default function ManageBackupHelpContents(props) {
               color={Colors.white}
               size={40}
             />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View
             style={{
               ...styles.separatorViewDotted,
@@ -112,7 +110,7 @@ export default function ManageBackupHelpContents(props) {
             safely backed up. Red requires immediate action. Yellow requires you
             to act when possible. Green shows your Recovery Keys are available
           </Text>
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
             onPress={() => {
               scrollViewRef.current?.scrollTo({
@@ -127,7 +125,7 @@ export default function ManageBackupHelpContents(props) {
               color={Colors.white}
               size={40}
             />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View
             style={{
               ...styles.separatorViewDotted,

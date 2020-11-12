@@ -774,14 +774,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
                 } else if (item.accountType == 'Checking Account') {
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
-                      1,
-                    );
-                } else if (item.accountType == 'Donation Account') {
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(1);
+                } else if (item.derivativeAccountDetails && item.derivativeAccountDetails.type == DONATION_ACCOUNT) {
                   if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                      1,
-                    );
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(1);
                 }
               }}
             >
@@ -1109,11 +1105,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   if (this.refs.TestAccountHelperBottomSheet as any)
                     (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
-                      0,
-                    );
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(0);
                   if (this.refs.SecureAccountHelperBottomSheet as any)
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
+                  if (this.refs.DonationAccountHelperBottomSheet as any)
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(0);
                 }}
               >
                 <View>
@@ -1860,9 +1856,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               <DonationAccountHelpContents
                 titleClicked={() => {
                   if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                      0,
-                    );
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(0);
                 }}
               />
             )}

@@ -1,10 +1,5 @@
-import React from 'react';
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import React, { useRef } from 'react';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -14,67 +9,109 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function DonationAccountHelpContents(props) {
+  const scrollViewRef = useRef<ScrollView>();
 
   return (
     <View style={styles.modalContainer}>
       <AppBottomSheetTouchableWrapper
-        style={{ justifyContent: 'center', alignItems: 'center' }}
+        style={styles.viewStyle}
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text
-          style={styles.headerText}
-        >
-          Donation Account
-        </Text>
+        <Text style={styles.headerText}>Donation Account</Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
+      ref={scrollViewRef}
         style={{
           flex: 1,
           backgroundColor: Colors.blue,
         }}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('85%')}
         decelerationRate="fast"
       >
         <View style={styles.ElementView}>
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('5%'),
+              marginTop: wp('4%'),
             }}
           >
-            A Donation Account lets you collect donation for a cause or a charity. 
-            All the funds collected will show in this account 
-            It provides you with the tools you need to start collecting donations from 
-            across the world in a permission less way without incurring any middleman cost. 
-            Simply copy the link anywhere and start collecting donations
+            Use this Account to collect donations for causes you are passionate
+            about
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={styles.viewStyle}>
             <Image
-              source={require('../../assets/images/icons/donation_account_info.png')}
+              source={require('../../assets/images/icons/donationHelper.png')}
               style={styles.helperImage}
             />
           </View>
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('5%'),
+              marginBottom: wp('4%'),
             }}
           >
-            It provides you with the tools you need to start collecting donations from across the world 
-            in a permission less way without incurring any middleman cost. Simply copy the link anywhere 
-            and start collecting donations
+            2 Factor Authentication ensures that the donations you receive are
+            safely stored in your wallet
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('85%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={styles.viewStyle}>
             <View
               style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
+                ...styles.separatorViewDotted,
+                ...styles.separatorView,
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('4%'),
+            }}
+          >
+            Easily share your wallet address across platforms like chats, social
+            media and your website
+          </Text>
+          <View style={styles.viewStyle}>
+            <Image
+              source={require('../../assets/images/icons/donationHelper2.png')}
+              style={styles.helperImage}
+            />
+          </View>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginBottom: wp('4%'),
+            }}
+          >
+            Your donors simply have to scan a QR code to donate sats or bitcoin
+          </Text>
+          <View style={styles.viewStyle}>
+            <View
+              style={{
+                ...styles.separatorViewDotted,
                 ...styles.separatorView,
               }}
             />
@@ -155,5 +192,15 @@ const styles = StyleSheet.create({
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
     marginBottom: wp('15%'),
+  },
+  viewStyle: { 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  separatorViewDotted: {
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
   },
 });
