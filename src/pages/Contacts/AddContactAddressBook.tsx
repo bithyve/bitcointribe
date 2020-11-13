@@ -35,6 +35,7 @@ import Toast from '../../components/Toast';
 
 export default function AddContactAddressBook(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
+  const [searchName, setSearchName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
@@ -193,6 +194,7 @@ export default function AddContactAddressBook(props) {
   }, []);
 
   const filterContacts = (keyword) => {
+    console.log("filterContacts keyword", keyword)
     if (contactData.length > 0) {
       if (!keyword.length) {
         setFilterContactData(contactData);
@@ -469,7 +471,13 @@ export default function AddContactAddressBook(props) {
               autoFocus={false}
               placeholder="Search"
               placeholderTextColor={Colors.textColorGrey}
-              onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+              onChangeText={(nameKeyword) => {
+                nameKeyword = nameKeyword.replace(/[^A-Za-z0-9]/g, '');
+                setSearchName(nameKeyword);
+                filterContacts(nameKeyword)
+              }
+              }
+              value={searchName}
             />
           </View>
           <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
