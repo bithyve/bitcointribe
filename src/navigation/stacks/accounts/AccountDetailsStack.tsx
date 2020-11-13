@@ -95,10 +95,7 @@ const SubAccountSettingsStack = createStackNavigator(
 
 const AccountDetailsStack = createStackNavigator(
   {
-    AccountDetailsRoot: {
-      screen: AccountDetailsContainerScreen,
-      // navigationOptions: AccountDetailsContainerScreen.navigationOptions,
-    },
+    AccountDetailsRoot: AccountDetailsContainerScreen,
     Send: {
       screen: SendStack,
       navigationOptions: {
