@@ -14,7 +14,6 @@ export function colorForLastSeenActive(lastSeenActiveTime: Milliseconds) {
   const endTime = moment(Date.now());
   const minutesSince = endTime.diff(startTime, 'minutes');
 
-  console.log({minutesSince, LAST_SEEN_AWAY_DURATION, LAST_SEEN_ACTIVE_DURATION})
   if (minutesSince < LAST_SEEN_ACTIVE_DURATION) {
     return Colors.green;
   } else if (minutesSince < LAST_SEEN_AWAY_DURATION) {
