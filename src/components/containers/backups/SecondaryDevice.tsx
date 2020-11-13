@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, Image, Platform } from "react-native";
 import Fonts from "../../../common/Fonts";
-import BackupStyles from "./Styles";
+import NavStyles from '../../../common/Styles/NavStyles';
+import CommonStyles from '../../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -12,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { uploadEncMShare, ErrorSending } from "../../../store/actions/sss";
 import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
-import DeviceInfo from "react-native-device-info";
+import DeviceInfo, { getVersion } from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
 import QRCode from "react-native-qrcode-svg";
 
@@ -53,9 +54,6 @@ const SecondaryDevice = props => {
     }
   })
 
-
-
-
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -94,13 +92,13 @@ const SecondaryDevice = props => {
   }
 
   return (
-    <View style={BackupStyles.modalContainer}>
-      <View style={BackupStyles.modalHeaderTitleView}>
+    <View style={NavStyles.modalContainer}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>
+          <Text style={NavStyles.modalHeaderTitleText}>
             Keeper Device
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
+          <Text style={NavStyles.modalHeaderInfoText}>
             Last backup{" "}
             <Text
               style={{
@@ -113,11 +111,11 @@ const SecondaryDevice = props => {
           </Text>
         </View>
         <Image
-          style={BackupStyles.cardIconImage}
+          style={CommonStyles.cardIconImage}
           source={props.getIconByStatus(selectedStatus)}
         />
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         {loading.uploadMetaShare || !secondaryQR ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" />

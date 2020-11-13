@@ -1,30 +1,56 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Fonts from './../../common/Fonts';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { UsNumberFormat } from '../../common/utilities';
 import CardView from 'react-native-cardview';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import config from '../../bitcoin/HexaConfig';
+import AccountBalanceDisplay from '../../components/accounts/AccountBalanceDisplay';
 
 const AccountsListSend = ({
   balances,
   accounts,
   onSelectContact,
   checkedItem,
-  fromAddNewAccount
+
+  // TODO: This component shouldn't be concerned about the screen it came from.
+  // (And a screen called "AddNewAccount" probably shouldn't be trying to use something
+  // called "AccountsListSend" 😃).
+  fromAddNewAccount,
 }) => {
-  // console.log("Items,", accounts);
+
+  const balance = useMemo(() => {
+    if (accounts.id === REGULAR_ACCOUNT) {
+      return balances.regularBalance;
+    } else if (accounts.id === SECURE_ACCOUNT) {
+      return balances.secureBalance;
+    } else if (
+      config.EJECTED_ACCOUNTS.includes(accounts.id) &&
+      balances.additionalBalances
+    ) {
+      return balances.additionalBalances[
+        accounts.type + accounts.id + accounts.account_number
+      ];
+    } else {
+      return 0;
+    }
+  }, [accounts]);
+
+  const balanceTextStyle = useMemo(() => {
+    return {
+      ...styles.accountBalance,
+      color: checkedItem ? Colors.white : Colors.borderColor,
+    };
+  }, [accounts]);
+
   return (
     <TouchableOpacity
       style={styles.accountView}
@@ -51,26 +77,16 @@ const AccountsListSend = ({
           >
             {accounts.account_name}
           </Text>
-          {!fromAddNewAccount ? <Text
-            style={{
-              ...styles.accountBalance,
-              color: checkedItem ? Colors.white : Colors.borderColor,
-            }}
-          >
-            {accounts.id === REGULAR_ACCOUNT
-              ? '$' + UsNumberFormat(balances.regularBalance)
-              : accounts.id === SECURE_ACCOUNT
-              ? '$' + UsNumberFormat(balances.secureBalance)
-              : config.EJECTED_ACCOUNTS.includes(accounts.id) &&
-                balances.additionalBalances
-              ? '$' +
-                UsNumberFormat(
-                  balances.additionalBalances[
-                    accounts.type + accounts.id + accounts.account_number
-                  ],
-                )
-              : 0}
-          </Text> : null}
+
+          {!fromAddNewAccount && (
+            <AccountBalanceDisplay
+              balance={balance}
+              currencyImageStyle={balanceTextStyle}
+              amountTextStyle={balanceTextStyle}
+              unitTextStyle={balanceTextStyle}
+            />
+          )}
+
           <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
             <TouchableOpacity
               onPress={() => onSelectContact(accounts)}

@@ -1,34 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  ActivityIndicator,
   Image,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Alert,
   ScrollView,
-  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 const SecondaryDeviceHealthCheck = props => {
@@ -43,7 +30,7 @@ const SecondaryDeviceHealthCheck = props => {
 
   return (
     <View style={{ height: '100%', backgroundColor: Colors.backgroundColor }}>
-      <View style={styles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
@@ -54,8 +41,8 @@ const SecondaryDeviceHealthCheck = props => {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper>
           <View>
-            <Text style={BackupStyles.modalHeaderTitleText}>{props.title}</Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
+            <Text style={NavStyles.modalHeaderTitleText}>{props.title}</Text>
+            <Text style={NavStyles.modalHeaderInfoText}>
               Last backup{' '}
               <Text
                 style={{
@@ -69,7 +56,7 @@ const SecondaryDeviceHealthCheck = props => {
             </Text>
           </View>
           <Image
-            style={BackupStyles.cardIconImage}
+            style={CommonStyles.cardIconImage}
             source={getIconByStatus(props.status)}
           />
         </View>
@@ -101,16 +88,7 @@ const SecondaryDeviceHealthCheck = props => {
                 >
                   {value.title}
                 </Text>
-                {/* <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp('0.5%'),
-                  }}
-                >
-                  Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit
-                </Text> */}
+
                 <Text
                   style={{
                     color: Colors.textColorGrey,
@@ -160,32 +138,19 @@ const SecondaryDeviceHealthCheck = props => {
                   {value.date}
                 </Text>
               </View>
-              {/* <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(8),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                Lorem ipsum dolor Lorem dolor sit amet, consectetur{' '}
-                <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                  dolor sit
-                </Text>
-              </Text> */}
             </AppBottomSheetTouchableWrapper>
           );
         })}
       </ScrollView>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: hp('25%'),
-            backgroundColor: Colors.white,
-          }}
-        >
-          {props.reshareInfo ? 
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: hp('25%'),
+          backgroundColor: Colors.white,
+        }}
+      >
+        {props.reshareInfo ?
           <Text
             style={{
               marginTop: hp('1%'),
@@ -205,80 +170,61 @@ const SecondaryDeviceHealthCheck = props => {
               Reshare
             </Text>
           </Text>
-          : null }
+          : null}
 
-          {props.changeInfo ? <Text
-            style={{
-              marginTop: hp('1%'),
-              marginBottom: hp('1%'),
-              color: Colors.textColorGrey,
-              fontSize: RFValue(10),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            {props.changeInfo}
-            <Text
-              onPress={() => {
-                props.onPressChange();
-              }}
-              style={{ color: Colors.blue, textDecorationLine: 'underline' }}
-            >
-              Change Source
-            </Text>
-          </Text>
-          : null }
-
-          <AppBottomSheetTouchableWrapper
+        {props.changeInfo ? <Text
+          style={{
+            marginTop: hp('1%'),
+            marginBottom: hp('1%'),
+            color: Colors.textColorGrey,
+            fontSize: RFValue(10),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+        >
+          {props.changeInfo}
+          <Text
             onPress={() => {
-              props.onPressConfirm();
+              props.onPressChange();
             }}
+            style={{ color: Colors.blue, textDecorationLine: 'underline' }}
+          >
+            Change Source
+            </Text>
+        </Text>
+          : null}
+
+        <AppBottomSheetTouchableWrapper
+          onPress={() => {
+            props.onPressConfirm();
+          }}
+          style={{
+            backgroundColor: Colors.blue,
+            height: wp('13%'),
+            width: wp('40%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+            marginTop: hp('3%'),
+            marginBottom: hp('3%'),
+            elevation: 10,
+            shadowColor: Colors.shadowBlue,
+            shadowOpacity: 1,
+            shadowOffset: { width: 15, height: 15 },
+          }}
+        >
+          <Text
             style={{
-              backgroundColor: Colors.blue,
-              height: wp('13%'),
-              width: wp('40%'),
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-              marginTop: hp('3%'),
-              marginBottom: hp('3%'),
-              elevation: 10,
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: { width: 15, height: 15 },
+              color: Colors.white,
+              fontSize: RFValue(10),
+              fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            <Text
-              style={{
-                color: Colors.white,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansMedium,
-              }}
-            >
-              Confirm
+            Confirm
             </Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
+        </AppBottomSheetTouchableWrapper>
+      </View>
     </View>
   );
 };
 
 export default SecondaryDeviceHealthCheck;
-
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 15,
-  },
-});

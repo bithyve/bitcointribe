@@ -620,7 +620,7 @@ export default class BaseAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees?: any,
+    averageTxFees: any,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {

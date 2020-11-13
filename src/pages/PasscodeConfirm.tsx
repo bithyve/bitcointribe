@@ -24,7 +24,7 @@ export default function PasscodeConfirm( props ) {
   const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
   const [ passcodeFlag, setPasscodeFlag ] = useState( true );
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 );
- 
+
   function onPressNumber( text ) {
     let tmpPasscode = passcode;
     let tmpConfirmPasscode = confirmPasscode;
@@ -38,7 +38,7 @@ export default function PasscodeConfirm( props ) {
       else if( passcode.length == 4 && passcodeFlag){
         setPasscodeFlag( false );
         setConfirmPasscodeFlag( 1 );
-        setPasscode( passcode );  
+        setPasscode( passcode );
       }
       if ( passcode && text == "x" ) {
         let passcodeTemp = passcode.slice( 0, -1 )
@@ -60,7 +60,7 @@ export default function PasscodeConfirm( props ) {
       else if ( !confirmPasscode && text == "x" ) {
         setPasscodeFlag( true );
         setConfirmPasscodeFlag( 0 );
-        setConfirmPasscode( confirmPasscode );  
+        setConfirmPasscode( confirmPasscode );
       }
     }
   }
@@ -83,7 +83,7 @@ export default function PasscodeConfirm( props ) {
 
   const dispatch = useDispatch();
   const { hasCreds } = useSelector( state => state.setupAndAuth );
-  if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
+  if ( hasCreds ) props.navigation.replace( "WalletInitialization" );
 
   return (
     <SafeAreaView style={ { flex: 1 } }>

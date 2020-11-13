@@ -20,7 +20,7 @@ export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC';
 export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
 export const SYNC_LAST_SEENS = 'SYNC_LAST_SEENS';
-export const SYNC_LAST_SEENS_AND_HEALTH = 'SYNC_LAST_SEENS_AND_HEALTH';
+export const WALLET_CHECK_IN = 'WALLET_CHECK_IN';
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS';
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC';
 
@@ -136,9 +136,10 @@ export const syncLastSeens = () => {
   };
 };
 
-export const syncLastSeensAndHealth = () => {
+export const walletCheckIn = (synchingContacts?: Boolean) => {
   return {
-    type: SYNC_LAST_SEENS_AND_HEALTH,
+    type: WALLET_CHECK_IN,
+    payload: { synchingContacts },
   };
 };
 

@@ -99,7 +99,7 @@ export default class Bitcoin {
   public fetchBalanceTransactionsByAddresses = async (
     externalAddresses: string[],
     internalAddresses: string[],
-    ownedAddresses: string[],
+    ownedAddresses: { [address: string]: boolean },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -141,6 +141,11 @@ export default class Bitcoin {
         balance: 0,
         unconfirmedBalance: 0,
       };
+
+      const externalAddressesMapping = {};
+      externalAddresses.forEach((address) => {
+        externalAddressesMapping[address] = true;
+      });
 
       const UTXOs = [];
       for (const addressSpecificUTXOs of Utxos) {
@@ -201,7 +206,7 @@ export default class Bitcoin {
               tx,
               ownedAddresses,
               accountType,
-              externalAddresses,
+              externalAddressesMapping,
             );
 
             if (tx.transactionType === 'Self') {
@@ -599,7 +604,7 @@ export default class Bitcoin {
       return data;
     } catch (err) {
       // console.log(
-       // `An error occurred while fetching transaction details from Esplora: ${err}`,
+      // `An error occurred while fetching transaction details from Esplora: ${err}`,
       //);
       // console.log('Switching to Blockcypher fallback');
       let data;
@@ -618,111 +623,6 @@ export default class Bitcoin {
         //);
         throw new Error('fetch transaction detaisl failed');
       }
-    }
-  };
-
-  public feeRatesPerByte = async (): Promise<{
-    feeRatesByPriority: {
-      high: { feePerByte: number; estimatedBlocks: number };
-      medium: { feePerByte: number; estimatedBlocks: number };
-      low: { feePerByte: number; estimatedBlocks: number };
-    };
-    rates: any;
-  }> => {
-    try {
-      let rates;
-      if (this.network === bitcoinJS.networks.testnet) {
-        const res: AxiosResponse = await bitcoinAxios.get(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
-        );
-        rates = res.data;
-      } else {
-        const res: AxiosResponse = await bitcoinAxios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
-        );
-        rates = res.data;
-      }
-
-      // high fee: 30 minutes
-      const highFeePerByte =
-        rates['2'] - rates['3'] >= 10
-          ? 0.4 * rates['2'] + 0.6 * rates['3']
-          : rates['3'];
-
-      const high = {
-        feePerByte: Math.round(highFeePerByte),
-        estimatedBlocks: 3,
-      }; // high: within 3 blocks
-
-      // medium fee: 2 hours
-      let mediumFeePerByte;
-      if (rates['6'] - rates['10'] >= 10) {
-        if (rates['10'] - rates['20'] <= 10) {
-          mediumFeePerByte = 0.6 * rates['10'] + 0.2 * rates['6'];
-        } else {
-          mediumFeePerByte =
-            0.1 * rates['20'] + 0.5 * rates['10'] + 0.2 * rates['6'];
-        }
-      } else {
-        if (rates['10'] - rates['20'] <= 10) {
-          mediumFeePerByte = 0.85 * rates['10'];
-        } else {
-          mediumFeePerByte = 0.2 * rates['20'] + 0.7 * rates['10'];
-        }
-      }
-
-      const medium = {
-        feePerByte: Math.round(mediumFeePerByte),
-        estimatedBlocks: 12,
-      }; // medium: within 12 blocks
-
-      //low fee: 6 hours
-      const lowFeePerByte = 0.7 * rates['25'] + 0.3 * rates['144'];
-
-      const low = {
-        feePerByte: Math.round(lowFeePerByte),
-        estimatedBlocks: 36,
-      }; // low: within 36 blocks
-
-      const feeRatesByPriority = {
-        high,
-        medium,
-        low,
-      };
-
-      return { feeRatesByPriority, rates };
-    } catch (err) {
-      // console.log(`Fee rates fetching failed @Bitcoin core: ${err}`);
-      // try {
-      //   const chainInfo = await this.fetchChainInfo();
-      //   const {
-      //     high_fee_per_kb,
-      //     medium_fee_per_kb,
-      //     low_fee_per_kb,
-      //   } = chainInfo;
-
-      //   const high = {
-      //     feePerByte: Math.round(high_fee_per_kb / 1000),
-      //     estimatedBlocks: 2,
-      //   };
-      //   const medium = {
-      //     feePerByte: Math.round(medium_fee_per_kb / 1000),
-      //     estimatedBlocks: 4,
-      //   };
-      //   const low = {
-      //     feePerByte: Math.round(low_fee_per_kb / 1000),
-      //     estimatedBlocks: 6,
-      //   };
-
-      //   const feeRatesByPriority = {
-      //     high,
-      //     medium,
-      //     low,
-      //   };
-      //   return feeRatesByPriority;
-      // } catch (err) {
-      //   throw new Error('Falied to fetch feeRates');
-      // }
     }
   };
 
@@ -834,9 +734,9 @@ export default class Bitcoin {
 
   public categorizeTx = (
     tx: any,
-    inUseAddresses: string[],
+    inUseAddresses: { [address: string]: boolean },
     accountType: string,
-    externalAddresses: string[],
+    externalAddresses: { [address: string]: boolean },
   ) => {
     const inputs = tx.vin || tx.inputs;
     const outputs = tx.Vout || tx.outputs;
@@ -855,7 +755,7 @@ export default class Bitcoin {
           ? input.addresses[0]
           : input.prevout.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if (inUseAddresses[address]) {
           value -= input.prevout ? input.prevout.value : input.output_value;
           selfSenderList.push(address);
         } else {
@@ -871,9 +771,10 @@ export default class Bitcoin {
           ? output.addresses[0]
           : output.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if (inUseAddresses[address]) {
           value += output.value;
-          if (this.ownedAddress(address, externalAddresses)) {
+          inUseAddresses[address];
+          if (externalAddresses[address]) {
             amountToSelf += output.value;
             selfRecipientList.push(address);
           }
@@ -904,15 +805,15 @@ export default class Bitcoin {
     return tx;
   };
 
-  private ownedAddress = (
-    address: string,
-    inUseAddresses: string[],
-  ): boolean => {
-    for (const addr of inUseAddresses) {
-      if (address === addr) {
-        return true;
-      }
-    }
-    return false;
-  };
+  // private ownedAddress = (
+  //   address: string,
+  //   inUseAddresses: string[],
+  // ): boolean => {
+  //   for (const addr of inUseAddresses) {
+  //     if (address === addr) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // };
 }

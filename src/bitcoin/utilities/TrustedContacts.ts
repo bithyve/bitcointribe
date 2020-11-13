@@ -777,8 +777,8 @@ export default class TrustedContacts {
       const { updated, updatedLastSeens } = res.data;
       // console.log({ updatedLastSeens });
       if (Object.keys(updatedLastSeens).length) {
-        for (const contact of Object.values(this.trustedContacts)) {
-          const { trustedChannel } = contact;
+        for (const contactName of Object.keys(this.trustedContacts)) {
+          const { trustedChannel } = this.trustedContacts[contactName];
           if (trustedChannel) {
             const { publicKey, lastSeen } = updatedLastSeens[
               trustedChannel.address
@@ -786,6 +786,7 @@ export default class TrustedContacts {
             trustedChannel.data.forEach((subChan: TrustedData) => {
               if (subChan.publicKey === publicKey) {
                 subChan.lastSeen = lastSeen;
+                this.trustedContacts[contactName].lastSeen = lastSeen;
               }
             });
           }
@@ -798,7 +799,7 @@ export default class TrustedContacts {
     }
   };
 
-  public syncLastSeensAndHealth = async (
+  public walletCheckIn = async (
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
@@ -813,6 +814,8 @@ export default class TrustedContacts {
       encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
       err?: string;
     }>;
+    exchangeRates: { [currency: string]: Number };
+    averageTxFees: any;
   }> => {
     const channelsToUpdate = {};
     for (const contact of Object.values(this.trustedContacts)) {
@@ -831,15 +834,22 @@ export default class TrustedContacts {
       });
     }
 
-    const res = await BH_AXIOS.post('syncLastSeensAndHealth', {
+    const res = await BH_AXIOS.post('walletCheckIn', {
       HEXA_ID,
-      walletID: metaShares[0].meta.walletId,
-      shareIDs: metaShares.map((metaShare) => metaShare.shareId), // legacy HC
+      walletID: metaShares ? metaShares[0].meta.walletId : null,
+      shareIDs: metaShares
+        ? metaShares.map((metaShare) => metaShare.shareId)
+        : null, // legacy HC
       channelsToUpdate, // LS update
       toUpdate, // share under-custody update
     });
 
-    const { updated, updatedLastSeens } = res.data; // LS data
+    const {
+      updated,
+      updatedLastSeens,
+      exchangeRates,
+      averageTxFees,
+    } = res.data; // LS data & exchange rates
     const { updationInfo } = res.data; // share under-custody update info
     const updates: Array<{
       shareId: string;
@@ -849,16 +859,18 @@ export default class TrustedContacts {
     // console.log({ updatedLastSeens, updates, updationInfo });
 
     // synching health: legacy
-    if (updates.length) {
+    if (metaShares && updates.length) {
       for (const { shareId, updatedAt, reshareVersion } of updates) {
         for (let index = 0; index < metaShares.length; index++) {
           if (metaShares[index] && metaShares[index].shareId === shareId) {
-            const currentReshareVersion =
-              healthCheckStatus[index].reshareVersion !== undefined
-                ? healthCheckStatus[index].reshareVersion
-                : 0;
+            if (healthCheckStatus[index]) {
+              const currentReshareVersion =
+                healthCheckStatus[index].reshareVersion !== undefined
+                  ? healthCheckStatus[index].reshareVersion
+                  : 0;
 
-            if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+              if (reshareVersion < currentReshareVersion) continue; // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
+            }
 
             healthCheckStatus[index] = {
               shareId,
@@ -880,9 +892,10 @@ export default class TrustedContacts {
           trustedChannel.data.forEach((subChan: TrustedData) => {
             if (subChan.publicKey === publicKey) {
               subChan.lastSeen = lastSeen;
+              this.trustedContacts[contactName].lastSeen = lastSeen;
 
               // update health via channel
-              if (lastSeen > 0) {
+              if (lastSeen > 0 && metaShares) {
                 for (let index = 0; index < metaShares.length; index++) {
                   if (metaShares[index].meta.guardian === contactName) {
                     healthCheckStatus[index] = {
@@ -901,7 +914,13 @@ export default class TrustedContacts {
       }
     }
 
-    return { updated, healthCheckStatus, updationInfo };
+    return {
+      updated,
+      healthCheckStatus,
+      updationInfo,
+      exchangeRates,
+      averageTxFees,
+    };
   };
 
   public syncTrustedChannels = async (

@@ -26,7 +26,7 @@ export default function VoucherRedeemSuccess(props) {
             style={{
               fontSize: RFValue(25),
               fontFamily: Fonts.FiraSansRegular,
-              color: Colors.black1,
+              color: Colors.gray5,
             }}
           >
             {props.accountName}

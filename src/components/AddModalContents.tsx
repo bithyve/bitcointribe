@@ -18,31 +18,14 @@ export default function AddModalContents(props) {
       info: 'Redeem a FastBitcoins voucher',
       type: 'buyBitcoins',
     },
-    // {
-    // 	title: `Pair with FastBitcoins account`,
-    // 	image: require( '../assets/images/icons/icon_fastbicoin.png' ),
-    // 	info: 'If you have completed your registration',
-    // 	type:'pairAccount'
-    // },
     {
       title: 'Add a Contact',
       image: require('../assets/images/icons/icon_addcontact.png'),
       info: 'Add contacts from your Address Book',
       type: 'addContact',
     },
-    // {
-    // 	title: 'Add Account',
-    // 	image: require( '../assets/images/icons/icon_addaccount.png' ),
-    // 	info: 'Add an account to your wallet, Select from options',
-    // 	type:'addAccount'
-    // },
-    // {
-    // 	title: 'Import Wallet',
-    // 	image: require( '../assets/images/icons/icon_importwallet.png' ),
-    // 	info: 'Import a non-Hexa wallet as an account',
-    // 	type:'importWallet'
-    // },
   ]);
+
   return (
     <View style={styles.modalContentContainer}>
       <View style={{ marginBottom: hp('13%') }}>

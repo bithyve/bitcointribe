@@ -6,22 +6,16 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  FlatList,
   TextInput,
   Platform,
-  AsyncStorage,
-  Linking,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../common/Colors';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -29,9 +23,7 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AccountsListSend from './AccountsListSend';
 import ModalHeader from '../../components/ModalHeader';
 import { ScrollView } from 'react-native-gesture-handler';
 import CheckBox from '../../components/CheckBox';
@@ -42,6 +34,7 @@ import {
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
+import openLink from '../../utils/OpenLink';
 
 interface AddNewAccountStateTypes {
   selectedAccount: any;
@@ -62,29 +55,6 @@ interface AddNewAccountPropsTypes {
   fetchDerivativeAccAddress: any;
   cardData: any;
 }
-const accountData = [
-  {
-    id: REGULAR_ACCOUNT,
-    account_name: 'Checking Account',
-    type: REGULAR_ACCOUNT,
-    checked: false,
-    image: require('../../assets/images/icons/icon_regular_account.png'),
-  },
-  {
-    id: SECURE_ACCOUNT,
-    account_name: 'Savings Account',
-    type: SECURE_ACCOUNT,
-    checked: false,
-    image: require('../../assets/images/icons/icon_secureaccount_white.png'),
-  },
-  {
-    id: DONATION_ACCOUNT,
-    account_name: 'Donation Account',
-    type: DONATION_ACCOUNT,
-    checked: false,
-    image: require('../../assets/images/icons/icon_donation_hexa.png'), //icon_donation_white
-  },
-];
 class AddNewAccount extends PureComponent<
   AddNewAccountPropsTypes,
   AddNewAccountStateTypes
@@ -122,8 +92,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
-      this.setState({ disableForm: false });
-      this.props.navigation.navigate('Accounts', {
+      this.props.navigation.navigate('AccountDetails', {
         serviceType,
         index: this.props.cardData.length - 1,
       });
@@ -176,8 +145,9 @@ class AddNewAccount extends PureComponent<
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
       ].derivativeAccounts;
 
-      if (derivativeAccounts[dervAccount])
+      if (derivativeAccounts[dervAccount]) {
         instanceCount += derivativeAccounts[dervAccount].instance.using;
+      }
     }
 
     // const accountName = `${
@@ -223,16 +193,6 @@ class AddNewAccount extends PureComponent<
         }}
       />
     );
-  };
-
-  openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
-    });
   };
 
   render() {
@@ -375,7 +335,7 @@ class AddNewAccount extends PureComponent<
                   By clicking proceed you agree to our{' '}
                   <Text
                     onPress={() => {
-                      this.openLink(
+                      openLink(
                         'https://hexawallet.io/donee-terms-conditions/',
                       );
                     }}

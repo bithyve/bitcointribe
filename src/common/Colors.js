@@ -4,6 +4,7 @@ const Colors = {
   shadowBlue: "#DDECF5",
   textColorGrey: "#6C6C6C",
   backgroundColor: "#F5F5F5",
+  secondaryBackgroundColor: "#E0E0E0",
   lightBlue: "#77B9EB",
   blue: "#006CB4",
   green: '#70C1B3',
@@ -15,11 +16,17 @@ const Colors = {
   shadowYellow: '#fff2cc',
   lightRed:"#FF78614D",
   backgroundColor1: "#FCFCFC",
-  black1: '#3A3A3C',
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
-  greyTextColor: '#656565'
+
+  // Grayscale
+  gray1: '#d0d0d0',
+  gray2: '#A3A3A3',
+  gray3: '#8B8B8B',
+  gray4: '#6C6C6C',
+  gray5: '#3A3A3C',
+  gray6: '#2F2F2F',
 };
 
 export default Colors;

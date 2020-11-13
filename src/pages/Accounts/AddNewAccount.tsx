@@ -9,9 +9,6 @@ import {
   FlatList,
   TextInput,
   Platform,
-  AsyncStorage,
-  Linking,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
@@ -42,6 +39,7 @@ import {
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
+import openLink from '../../utils/OpenLink';
 
 interface AddNewAccountStateTypes {
   selectedAccount: any;
@@ -112,7 +110,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
-      this.props.navigation.navigate('Accounts');
+      this.props.navigation.navigate('AccountDetails');
     }
   };
 
@@ -204,16 +202,6 @@ class AddNewAccount extends PureComponent<
         }}
       />
     );
-  };
-
-  openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
-    });
   };
 
   renderAccountDetailModalContent = () => {
@@ -313,7 +301,7 @@ class AddNewAccount extends PureComponent<
                 By clicking proceed you agree to our{' '}
                 <Text
                   onPress={() => {
-                    this.openLink(
+                    openLink(
                       'https://hexawallet.io/donee-terms-conditions/',
                     );
                   }}
@@ -520,7 +508,7 @@ class AddNewAccount extends PureComponent<
                   accountNumber,
                   this.state.accountName,
                 );
-                this.props.navigation.navigate('Accounts');
+                this.props.navigation.navigate('AccountDetails');
               }
             }}
           >

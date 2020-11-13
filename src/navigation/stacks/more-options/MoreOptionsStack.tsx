@@ -8,6 +8,7 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import NavStyles from '../../../common/Styles/NavStyles';
 import WalletSettingsStack from './WalletSettingsStack';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
 
 
 const MoreOptionsStack = createStackNavigator(
@@ -26,7 +27,7 @@ const MoreOptionsStack = createStackNavigator(
     FriendsAndFamily: {
       screen: FriendsAndFamilyScreen,
       navigationOptions: {
-        header: null,
+        title: "Friends and Family",
       },
     },
     FundingSources: {
@@ -49,7 +50,7 @@ const MoreOptionsStack = createStackNavigator(
     initialRouteName: 'MoreOptionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },

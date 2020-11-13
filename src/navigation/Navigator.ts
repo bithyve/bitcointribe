@@ -6,32 +6,23 @@ import {
 import Launch from '../pages/Launch';
 import Login from '../pages/Login';
 import PasscodeConfirm from '../pages/PasscodeConfirm';
-import RestoreAndRecoverWallet from '../pages/RestoreAndRecoverWallet';
+import WalletInitializationScreen from '../pages/WalletInitializationScreen';
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList';
 import NewWalletName from '../pages/NewWalletName';
 import NewWalletQuestion from '../pages/NewWalletQuestion';
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice';
-import RestoreWalletUsingDocuments from '../pages/Recovery/RestoreWalletUsingDocuments';
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts';
 import ReLogin from '../pages/ReLogin';
-import Accounts from '../pages/Accounts/Index';
 import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
 import SecondaryDevice from '../pages/ManageBackup/SecondaryDevice';
 import TrustedContacts from '../pages/ManageBackup/TrustedContacts';
-import Cloud from '../pages/ManageBackup/Cloud';
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
-import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
+import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
-import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
-import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
-import EmailModalContents from '../pages/EmailModalContents';
-import Buy from '../pages/Accounts/Buy';
-import Sell from '../pages/Accounts/Sell';
 import QRScannerScreen from '../pages/QRScannerScreen';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
@@ -45,16 +36,13 @@ import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGeneration
 import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
-import Confirmation from '../pages/Accounts/Confirmation';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
-import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
 import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory';
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
 import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
-import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
@@ -64,10 +52,8 @@ import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
-import SendToContact from '../pages/Accounts/SendToContact';
-import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
-import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
+import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import Intermediate from '../pages/Intermediate';
@@ -76,6 +62,8 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions';
 import AddNewAccount from '../pages/Accounts/AddNewAccount';
 import AddNewDonationAccount from '../pages/Accounts/AddNewDonationAccount';
 import HomeStack from './stacks/home/HomeStack';
+import AccountDetailsStack from './stacks/account-details/AccountDetailsStack';
+import SendStack from './stacks/send/SendStack';
 
 
 const SetupNavigator = createStackNavigator(
@@ -85,17 +73,16 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewWalletQuestion,
-    RestoreAndRecoverWallet,
+    WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
-    QuestionRecovery,
+    RecoveryQuestion: RecoveryQuestionScreen,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
-    RestoreWalletUsingDocuments,
     RestoreWalletByContacts,
     RecoveryCommunication,
-    ShareRecoveryOTP,
     NewOwnQuestions,
     NewRecoveryOwnQuestions,
+    QRScanner: QRScannerScreen,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -115,13 +102,10 @@ const SetupNavigator = createStackNavigator(
 const MODAL_ROUTES = [
   'SecondaryDevice',
   'TrustedContacts',
-  'Cloud',
   'CustodianRequestOTP',
   'CustodianRequestAccepted',
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
-  'RecoveryRequestOTP',
-  'Confirmation',
   'Intermediate',
 ];
 
@@ -138,36 +122,24 @@ const HomeNavigator = createStackNavigator(
       },
     },
     Intermediate,
-    Accounts,
+    AccountDetails: {
+      screen: AccountDetailsStack,
+    },
     ManageBackup,
     SecondaryDevice,
     TrustedContacts,
-    Cloud,
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
     AddNewAccount,
     AddNewDonationAccount,
     Send: {
-      screen: Send,
+      screen: SendStack,
       navigationOptions: {
         gesturesEnabled: false,
       },
     },
-    SendToContact: {
-      screen: SendToContact,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    SendConfirmation,
     TwoFAToken,
-    RecoveryRequestOTP,
-    RestoreByCloudQrCodeContents,
-    EmailModalContents,
-    Buy,
-    Sell,
-    QRScanner: QRScannerScreen,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,
@@ -180,7 +152,6 @@ const HomeNavigator = createStackNavigator(
     WalletCreationSuccess,
     SecureScan,
     GoogleAuthenticatorOTP,
-    Confirmation,
     TwoFASetup,
     SecondaryDeviceHistory,
     TrustedContactHistory,
@@ -188,7 +159,6 @@ const HomeNavigator = createStackNavigator(
     SecurityQuestionHistory,
     SettingGetNewPin,
     ContactsListForAssociateContact,
-    LostTwoFA,
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
@@ -197,7 +167,7 @@ const HomeNavigator = createStackNavigator(
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
-    ContactDetailsNew,
+    ContactDetails,
     Receive,
     PairNewWallet,
     NewOwnQuestions,
@@ -216,16 +186,26 @@ const HomeNavigator = createStackNavigator(
   },
   {
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: ({ navigation }) => ({
-      header: null,
-    }),
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        header: null,
+        headerTitleContainerStyle: {
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+        },
+      };
+    },
     transitionConfig: (transitionProps, prevTransitionProps) => {
+
+      // 📝 Override the default presentation mode for screens that we
+      // want to present modally
       const isModal = MODAL_ROUTES.some(
         (screenName) =>
           screenName === transitionProps.scene.route.routeName ||
           (prevTransitionProps &&
             screenName === prevTransitionProps.scene.route.routeName),
       );
+
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
         prevTransitionProps,

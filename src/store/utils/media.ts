@@ -36,4 +36,4 @@ export const socialMediaType = ( packageName: any ) => {
         default:
             return "Other"
     }
-};   
+};
