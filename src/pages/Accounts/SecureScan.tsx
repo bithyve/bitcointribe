@@ -11,7 +11,8 @@ import {
   Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+import NavStyles from '../../common/Styles/NavStyles';
+import CommonStyles from '../../common/Styles/Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -110,9 +111,9 @@ const SecureScan = props => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+      <View style={CommonStyles.headerContainer}>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
+          style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             if (getServiceType) {
               getServiceType(serviceType, carouselIndex);
@@ -121,27 +122,27 @@ const SecureScan = props => {
           }}
           hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={BackupStyles.modalHeaderTitleView}>
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('1%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>
+          <Text style={NavStyles.modalHeaderTitleText}>
             Activate Secure Account
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
+          <Text style={NavStyles.modalHeaderInfoText}>
             Please scan the following QR on your authenticator app like Google
             Authenticator
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
+          <Text style={NavStyles.modalHeaderInfoText}>
             The authenticator app should be{'\n'}installed on another device
             like your Keeper Device
           </Text>
         </View>
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         {loading.uploadMetaShare || !secondaryQR ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" />

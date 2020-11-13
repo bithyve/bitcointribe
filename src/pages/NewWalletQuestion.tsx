@@ -33,18 +33,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import {
-  getTestcoins,
-  calculateExchangeRate,
-  accountsSynched,
-} from '../store/actions/accounts';
-import {
-  TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../common/constants/serviceTypes';
+import { getTestcoins } from '../store/actions/accounts';
+import { TEST_ACCOUNT } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
+import { walletCheckIn } from '../store/actions/trustedContacts';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -54,7 +47,7 @@ export default function NewWalletQuestion(props) {
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
+  const [dropdownBoxList] = useState(QuestionList);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
     question: '',
@@ -75,105 +68,12 @@ export default function NewWalletQuestion(props) {
   let [tempAns, setTempAns] = useState('');
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
-  const { isInitialized, loading } = useSelector((state) => state.setupAndAuth);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(
-    React.createRef(),
-  );
+  const { isInitialized } = useSelector((state) => state.setupAndAuth);
+  const [loaderBottomSheet] = useState(React.createRef());
+  const [confirmAnswerTextInput] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector((state) => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
-
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
-  // useEffect(() => {
-  //   const testBalance = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-  //     accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-  //     : 0;
-  //   const secureBalance = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-  //     accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-  //       .unconfirmedBalance
-  //     : 0;
-  //   const accumulativeBalance = regularBalance + secureBalance;
-
-  //   const testTransactions = accounts[TEST_ACCOUNT].service
-  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-  //     : [];
-  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
-  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-  //       .transactionDetails
-  //     : [];
-
-  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
-  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-  //       .transactionDetails
-  //     : [];
-  //   const accumulativeTransactions = [
-  //     ...testTransactions,
-  //     ...regularTransactions,
-  //     ...secureTransactions,
-  //   ];
-
-  //   setBalances({
-  //     testBalance,
-  //     regularBalance,
-  //     secureBalance,
-  //     accumulativeBalance,
-  //   });
-  //   setTransactions(accumulativeTransactions);
-  // }, [accounts]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining a half an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-  //         const { balances } = testAccService.hdWallet;
-  //         const netBalance = testAccService
-  //           ? balances.balance + balances.unconfirmedBalance
-  //           : 0;
-  //         if (!netBalance) {
-  //           console.log('Getting Testcoins');
-  //           dispatch(getTestcoins(TEST_ACCOUNT));
-  //         }
-  //       }
-  //   })();
-  // }, [testAccService]);
 
   useEffect(() => {
     (async () => {
@@ -188,13 +88,6 @@ export default function NewWalletQuestion(props) {
       }
     })();
   }, [testAccService]);
-
-  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
-  useEffect(() => {
-    if (!exchangeRates) {
-      dispatch(calculateExchangeRate());
-    }
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -230,6 +123,7 @@ export default function NewWalletQuestion(props) {
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
+      dispatch(walletCheckIn()); // fetches exchange rates
       props.navigation.navigate('HomeNav');
     }
   }, [isInitialized]);
@@ -354,7 +248,7 @@ export default function NewWalletQuestion(props) {
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
                 onPress={() => {
-                  props.navigation.navigate('RestoreAndRecoverWallet');
+                  props.navigation.navigate('WalletInitialization');
                 }}
               >
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -489,7 +383,6 @@ export default function NewWalletQuestion(props) {
                           : 'visible-password'
                       }
                       onChangeText={(text) => {
-
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -581,11 +474,10 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={(text) => {
-
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={(event) => setConfirm()}
+                      onSubmitEditing={() => setConfirm()}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
@@ -647,16 +539,20 @@ export default function NewWalletQuestion(props) {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{
-              flexDirection: 'row',
-               marginLeft: 25,
-               marginRight: 25,
-               paddingBottom: 10,
-               paddingTop: 10,
-            }}
-            onPress={()=> props.navigation.navigate('NewOwnQuestions',{
-              walletName,
-            })}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                marginLeft: 25,
+                marginRight: 25,
+                paddingBottom: 10,
+                paddingTop: 10,
+              }}
+              onPress={() =>
+                props.navigation.navigate('NewOwnQuestions', {
+                  walletName,
+                })
+              }
+            >
               <Text
                 style={{
                   fontFamily: Fonts.FiraSansMediumItalic,
@@ -665,9 +561,11 @@ export default function NewWalletQuestion(props) {
                   fontSize: RFValue(12),
                   color: Colors.blue,
                 }}
-                onPress={()=> props.navigation.navigate('NewOwnQuestions',{
-                  walletName,
-                })}
+                onPress={() =>
+                  props.navigation.navigate('NewOwnQuestions', {
+                    walletName,
+                  })
+                }
               >
                 Or choose your own question
               </Text>

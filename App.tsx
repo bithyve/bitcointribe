@@ -1,124 +1,135 @@
-console.disableYellowBox = true;
-import React, { Component, useState, useEffect } from 'react';
+
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Navigator from './src/navigation/Navigator';
-import { store, Provider } from './src/store';
+import { Provider } from 'react-redux';
+import makeStore from './src/store';
 import NoInternetModalContents from './src/components/NoInternetModalContents';
-import BottomSheet from 'reanimated-bottom-sheet';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import { useDispatch } from 'react-redux';
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info';
 import { setApiHeaders } from './src/services/api';
 import firebase from 'react-native-firebase';
-import { NavigationState } from 'react-navigation';
-import { AsyncStorage } from 'react-native';
-import ModalHeader from './src/components/ModalHeader';
+import { updatePreference } from './src/store/actions/preferences';
+import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState';
+import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs';
+import getActiveRouteName from './src/utils/navigation/GetActiveRouteName';
+import { LogBox } from 'react-native';
 
-const prefix = 'hexa://';
+LogBox.ignoreAllLogs(true);
 
-class App extends Component {
-  private NoInternetBottomSheet: React.RefObject<any>;
+export const URI_PREFIX = 'hexa://';
 
-  constructor(props) {
-    super(props);
+async function configureAPIHeaders() {
+  const version = await getVersion();
+  const buildNumber = await getBuildId();
+
+  setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
+};
+
+
+export default function AppWrapper() {
+
+  // Creates and holds an instance of the store so only children in the `Provider`'s
+  // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
+  const store = makeStore();
+
+  useEffect(() => {
+    configureAPIHeaders();
     firebase.analytics().setAnalyticsCollectionEnabled(true);
-    this.NoInternetBottomSheet = React.createRef();
-  }
+  }, []);
 
-  componentWillMount = () => {
-    this.getAppVersion();
-  };
-
-  getAppVersion = async () => {
-    let version = await getVersion();
-    let buildNumber = await getBuildId();
-    setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
-  };
-
-  getActiveRouteName(navigationState: NavigationState) {
-    if (!navigationState) {
-      return null;
-    }
-    const route = navigationState.routes[navigationState.index];
-    // Dive into nested navigators
-    if (route.routes) {
-      return this.getActiveRouteName(route);
-    }
-    return route.routeName;
-  }
-
-  componentWillUnmount = async () => {
-    await AsyncStorage.setItem('isInternetModalCome', JSON.stringify(false));
-  };
-
-  render() {
-    return (
-      <Provider store={store} uriPrefix={prefix}>
-        <Navigator
-          onNavigationStateChange={async (prevState, currentState) => {
-            const currentScreen = this.getActiveRouteName(currentState);
-            const prevScreen = this.getActiveRouteName(prevState);
-            let isInternetModalCome = JSON.parse(
-              await AsyncStorage.getItem('isInternetModalCome'),
-            );
-            if (
-              currentScreen != 'Login' &&
-              currentScreen != 'Home' &&
-              currentScreen != 'Launch' &&
-              currentScreen != 'ReLogin' &&
-              !isInternetModalCome
-            ) {
-              NetInfo.addEventListener((state) => {
-                setTimeout(() => {
-                  if (state.isInternetReachable === null) {
-                    return;
-                  }
-                  if (state.isInternetReachable) {
-                    (this.NoInternetBottomSheet as any).current.snapTo(0);
-                  } else {
-                    (this.NoInternetBottomSheet as any).current.snapTo(1);
-                  }
-                }, 1000);
-              });
-            }
-            if (prevScreen !== currentScreen) {
-              firebase.analytics().setCurrentScreen(currentScreen);
-            }
-          }}
-        />
-        <BottomSheet
-          onCloseEnd={() => {}}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.NoInternetBottomSheet}
-          snapPoints={[-50, hp('60%')]}
-          renderContent={() => (
-            <NoInternetModalContents
-              onPressTryAgain={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
-              }}
-              onPressIgnore={async () => {
-                await AsyncStorage.setItem(
-                  'isInternetModalCome',
-                  JSON.stringify(true),
-                );
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-            // onPressHeader={() => {
-            //     (this.NoInternetBottomSheet as any).current.snapTo(0);
-            //   }}
-            />
-          )}
-        />
-      </Provider>
-    );
-  }
+  return (
+    <Provider store={store} uriPrefix={URI_PREFIX}>
+      <BottomSheetModalProvider>
+        <AppContent />
+      </BottomSheetModalProvider>
+    </Provider>
+  );
 }
 
-export default App;
+function AppContent() {
+  const dispatch = useDispatch();
+  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal();
+
+  const preferencesState = usePreferencesState();
+  const [previousScreenName, setPreviousScreenName] = useState<string | null>();
+  const [currentScreenName, setCurrentScreenName] = useState<string | null>();
+
+  const canShowNoInternetWarning = useMemo(() => {
+    return (
+      currentScreenName != 'Login' &&
+      currentScreenName != 'Launch' &&
+      currentScreenName != 'ReLogin' &&
+      preferencesState.hasShownNoInternetWarning === false
+    );
+  }, [previousScreenName, currentScreenName, preferencesState.hasShownNoInternetWarning]);
+
+  async function resetInternetWarningFlag() {
+    await dispatch(updatePreference({
+      key: 'hasShownNoInternetWarning',
+      value: false,
+    }));
+  }
+
+  const showNoInternetWarning = useCallback(() => {
+    presentBottomSheet(
+      <NoInternetModalContents
+        onPressTryAgain={() => {
+          dismissBottomSheet();
+        }}
+        onPressIgnore={() => {
+          resetInternetWarningFlag();
+          dismissBottomSheet();
+        }}
+      />,
+      defaultBottomSheetConfigs,
+    );
+  }, [presentBottomSheet, dismissBottomSheet]);
+
+  function setupInternetWarningListener() {
+    return NetInfo.addEventListener((state) => {
+      if (
+        state.isInternetReachable == null ||
+        canShowNoInternetWarning == false
+      ) {
+        return;
+      }
+
+      if (state.isInternetReachable) {
+        dismissBottomSheet();
+      } else {
+        showNoInternetWarning();
+      }
+    });
+  }
+
+  useEffect(() => {
+    return () => {
+      // reset when the app component unmounts
+      resetInternetWarningFlag();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = setupInternetWarningListener();
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
+  return (
+    <Navigator
+      onNavigationStateChange={async (prevState, currentState) => {
+        setPreviousScreenName(getActiveRouteName(prevState));
+        setCurrentScreenName(getActiveRouteName(currentState));
+
+        if (previousScreenName !== currentScreenName) {
+          firebase.analytics().setCurrentScreen(currentScreenName);
+        }
+      }}
+    />
+  );
+}

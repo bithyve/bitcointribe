@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
-  StatusBar,
   Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -16,17 +13,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import commonStyle from '../../common/Styles/Styles';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { nameToInitials } from '../../common/CommonFunctions';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ScrollView } from 'react-native-gesture-handler';
 import RecipientComponent from './RecipientComponent';
 import DeviceInfo from 'react-native-device-info';
 
 export default function SendConfirmationContent(props) {
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [SelectedContactId, setSelectedContactId] = useState(0);
 
   const renderContacts = (item) => {

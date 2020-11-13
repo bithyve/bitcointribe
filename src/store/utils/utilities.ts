@@ -24,7 +24,7 @@ export const serviceGenerator = async (
   res = regularAcc.getMnemonic();
   if (res.status !== 200) throw new Error('Regular account gen failed');
   primaryMnemonic = res.data.mnemonic;
-  console.log({ primaryMnemonic });
+
   // Test account
   const testAcc = new TestAccount(primaryMnemonic);
 

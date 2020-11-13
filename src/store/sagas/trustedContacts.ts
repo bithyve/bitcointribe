@@ -20,7 +20,7 @@ import {
   updateTrustedContactInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
-  SYNC_LAST_SEENS_AND_HEALTH,
+  WALLET_CHECK_IN,
   POST_RECOVERY_CHANNEL_SYNC,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
@@ -59,6 +59,7 @@ import { downloadMetaShareWorker } from './sss';
 import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import DeviceInfo from 'react-native-device-info';
+import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -910,14 +911,21 @@ export const syncLastSeensWatcher = createWatcher(
   SYNC_LAST_SEENS,
 );
 
-function* syncLastSeensAndHealthWorker({ payload }) {
-  yield put(switchTCLoading('syncLastSeensAndHealth'));
+function* walletCheckInWorker({ payload }) {
+  // syncs last seen, health & exchange rates
 
-  // updates and fetches last seen for all trusted channels
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  let s3Service: S3Service = yield select((state) => state.sss.service);
+
+  const storedExchangeRates = yield select(
+    (state) => state.accounts.exchangeRates,
+  );
+  const storedAverageTxFees = yield select(
+    (state) => state.accounts.averageTxFees,
+  );
+
   const DECENTRALIZED_BACKUP = yield select(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
@@ -926,108 +934,124 @@ function* syncLastSeensAndHealthWorker({ payload }) {
     (tag) => underCustody[tag].META_SHARE,
   );
 
-  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
-    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+  const { synchingContacts } = payload;
+  if (
+    synchingContacts &&
+    !Object.keys(trustedContacts.tc.trustedContacts).length
+  )
+    return; // aborting checkIn if walletSync is specifically done in context of trusted-contacts
 
-    const { metaShares, healthCheckStatus } = s3Service.sss;
-    const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
+  yield put(switchTCLoading('walletCheckIn'));
+  console.log('Wallet Check-In in progress...');
+  const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
 
-    const res = yield call(
-      trustedContacts.syncLastSeensAndHealth,
-      metaShares.slice(0, 3),
-      healthCheckStatus,
-      metaSharesUnderCustody,
-    );
-    console.log({ res });
-    if (res.status === 200) {
-      const { updationInfo } = res.data;
-      let shareRemoved = false;
+  const { metaShares, healthCheckStatus } = s3Service.sss;
+  const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
 
-      if (updationInfo) {
-        // removing shares under-custody based on reshare-version@HealthSchema
-        Object.keys(underCustody).forEach((tag) => {
-          for (let info of updationInfo) {
-            if (info.updated) {
-              // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-              //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-              //   if (info.encryptedDynamicNonPMDD)
-              //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-              //       info.encryptedDynamicNonPMDD;
-              // }
-            } else {
-              if (info.removeShare) {
-                if (
-                  info.walletId === underCustody[tag].META_SHARE.meta.walletId
-                ) {
-                  delete underCustody[tag];
-                  shareRemoved = true;
-                  for (const contactName of Object.keys(
-                    trustedContacts.tc.trustedContacts,
-                  )) {
-                    const contact =
-                      trustedContacts.tc.trustedContacts[contactName];
-                    if (contact.walletID === info.walletId) {
-                      contact.isWard = false;
-                    }
+  const res = yield call(
+    trustedContacts.walletCheckIn,
+    metaShares.length ? metaShares.slice(0, 3) : null, // metaShares is null during wallet-setup
+    metaShares.length ? healthCheckStatus : {},
+    metaSharesUnderCustody,
+  );
+  console.log({ res });
+  if (res.status === 200) {
+    const { updationInfo, exchangeRates, averageTxFees } = res.data;
+
+    if (!exchangeRates) console.log('Failed to fetch exchange rates');
+    if (JSON.stringify(exchangeRates) !== JSON.stringify(storedExchangeRates))
+      yield put(exchangeRatesCalculated(exchangeRates));
+
+    if (!averageTxFees) console.log('Failed to fetch fee rates');
+    if (JSON.stringify(averageTxFees) !== JSON.stringify(storedAverageTxFees))
+      yield put(setAverageTxFee(averageTxFees));
+
+    let shareRemoved = false;
+    if (updationInfo) {
+      // removing shares under-custody based on reshare-version@HealthSchema
+      Object.keys(underCustody).forEach((tag) => {
+        for (let info of updationInfo) {
+          if (info.updated) {
+            // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+            //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+            //   if (info.encryptedDynamicNonPMDD)
+            //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+            //       info.encryptedDynamicNonPMDD;
+            // }
+          } else {
+            if (info.removeShare) {
+              if (
+                info.walletId === underCustody[tag].META_SHARE.meta.walletId
+              ) {
+                delete underCustody[tag];
+                shareRemoved = true;
+                for (const contactName of Object.keys(
+                  trustedContacts.tc.trustedContacts,
+                )) {
+                  const contact =
+                    trustedContacts.tc.trustedContacts[contactName];
+                  if (contact.walletID === info.walletId) {
+                    contact.isWard = false;
                   }
                 }
               }
             }
           }
-        });
-      }
-
-      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
-      const { healthCheckStatus } = res.data;
-      const postSyncHCStatus = JSON.stringify({ healthCheckStatus });
-
-      if (
-        preSyncTC !== postSyncTC ||
-        preSyncHCStatus !== postSyncHCStatus ||
-        shareRemoved
-      ) {
-        let dbPayload = {};
-        const { SERVICES } = yield select((state) => state.storage.database);
-        let updatedSERVICES = {
-          ...SERVICES,
-          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-        };
-
-        if (preSyncHCStatus !== postSyncHCStatus) {
-          s3Service.sss.healthCheckStatus = healthCheckStatus;
-          updatedSERVICES = {
-            ...updatedSERVICES,
-            S3_SERVICE: JSON.stringify(s3Service),
-          };
         }
-        dbPayload = {
-          SERVICES: updatedSERVICES,
-        };
-
-        console.log({ shareRemoved });
-        if (shareRemoved) {
-          const updatedBackup = {
-            ...DECENTRALIZED_BACKUP,
-            UNDER_CUSTODY: underCustody,
-          };
-          dbPayload = { ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup };
-        }
-
-        yield call(insertDBWorker, {
-          payload: dbPayload,
-        });
-      }
-    } else {
-      console.log('Failed to sync last seens', res.err);
+      });
     }
+
+    const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+    const { healthCheckStatus } = res.data;
+    const postSyncHCStatus = JSON.stringify({ healthCheckStatus });
+
+    if (
+      preSyncTC !== postSyncTC ||
+      preSyncHCStatus !== postSyncHCStatus ||
+      shareRemoved
+    ) {
+      let dbPayload = {};
+      const { SERVICES } = yield select((state) => state.storage.database);
+      let updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      };
+
+      if (preSyncHCStatus !== postSyncHCStatus) {
+        s3Service.sss.healthCheckStatus = healthCheckStatus;
+        updatedSERVICES = {
+          ...updatedSERVICES,
+          S3_SERVICE: JSON.stringify(s3Service),
+        };
+      }
+      dbPayload = {
+        SERVICES: updatedSERVICES,
+      };
+
+      console.log({ shareRemoved });
+      if (shareRemoved) {
+        const updatedBackup = {
+          ...DECENTRALIZED_BACKUP,
+          UNDER_CUSTODY: underCustody,
+        };
+        dbPayload = { ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup };
+      }
+
+      yield call(insertDBWorker, {
+        payload: dbPayload,
+      });
+    }
+  } else {
+    console.log('Check-In failed', res.err);
   }
-  yield put(calculateOverallHealth(s3Service));
-  yield put(switchTCLoading('syncLastSeensAndHealth'));
+
+  if (metaShares.length) yield put(calculateOverallHealth(s3Service));
+  yield put(switchTCLoading('walletCheckIn'));
 }
 
-export const syncLastSeensAndHealthWatcher = createWatcher(
-  syncLastSeensAndHealthWorker,
-  SYNC_LAST_SEENS_AND_HEALTH,
+export const walletCheckInWatcher = createWatcher(
+  walletCheckInWorker,
+  WALLET_CHECK_IN,
 );
 
 function* syncTrustedChannelsWorker({ payload }) {

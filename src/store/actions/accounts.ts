@@ -16,7 +16,7 @@ export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT';
-export const EXCHANGE_RATE = 'EXCHANGE_RATE';
+// export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
 export const RUN_TEST = 'RUN_TEST';
@@ -34,7 +34,7 @@ export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore?},
+  options?: { loader?; fetchTransactionsSync?; restore? },
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -59,7 +59,7 @@ export const fetchBalanceTx = (
 export const transferST1 = (
   serviceType,
   recipients,
-  averageTxFees?,
+  averageTxFees,
   derivativeAccountDetails?: { type: string; number: number },
 ) => {
   return {
@@ -175,9 +175,9 @@ export const removeTwoFA = () => {
     type: REMOVE_TWO_FA,
   };
 };
-export const calculateExchangeRate = () => {
-  return { type: EXCHANGE_RATE };
-};
+// export const calculateExchangeRate = () => {
+//   return { type: EXCHANGE_RATE };
+// };
 
 export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
   return {
@@ -227,10 +227,10 @@ export const fetchDerivativeAccBalTx = (
   };
 };
 
-export const setAverageTxFee = (data) => {
+export const setAverageTxFee = (averageTxFees) => {
   return {
     type: AVERAGE_TX_FEE,
-    payload: { averageTxFees: data },
+    payload: { averageTxFees },
   };
 };
 

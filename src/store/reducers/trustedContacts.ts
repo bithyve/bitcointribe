@@ -45,7 +45,7 @@ const initialState: {
     updateTrustedChannel: Boolean;
     trustedChannelsSetupSync: Boolean;
     approvingTrustedContact: Boolean;
-    syncLastSeensAndHealth: Boolean;
+    walletCheckIn: Boolean;
   };
   addressBook: any;
   trustedContactsInfo: any;
@@ -62,7 +62,7 @@ const initialState: {
     updateTrustedChannel: false,
     trustedChannelsSetupSync: false,
     approvingTrustedContact: false,
-    syncLastSeensAndHealth: false,
+    walletCheckIn: false,
   },
   addressBook: null,
   trustedContactsInfo: null,

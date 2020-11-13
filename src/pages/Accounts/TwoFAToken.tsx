@@ -90,7 +90,7 @@ export default function TwoFAToken(props) {
                 : false,
           }),
         );
-        props.navigation.navigate('Accounts');
+        props.navigation.navigate('AccountDetails');
       }}
       transactionId={transfer.txid}
       transactionDateTime={Date()}
@@ -178,7 +178,7 @@ export default function TwoFAToken(props) {
           dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
+          props.navigation.navigate('AccountDetails');
         }}
         isUnSuccess={true}
       />
@@ -450,21 +450,7 @@ export default function TwoFAToken(props) {
             </TouchableOpacity>
           </View>
         </View>
-        {/* <View
-          style={{
-            alignItems: 'center',
-            marginBottom: 200,
-            marginTop: 200,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.navigate('LostTwoFA');
-            }}
-          >
-            <Text>I am having problems with my 2FA</Text>
-          </TouchableOpacity>
-        </View> */}
+
         <BottomSheet
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo(0);

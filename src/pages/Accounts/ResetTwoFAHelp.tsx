@@ -72,7 +72,7 @@ const ResetTwoFAHelp = (props) => {
         twoFASetup: service.secureHDWallet.twoFASetup,
         onPressBack: () => {
           dispatch(clearTransfer(SECURE_ACCOUNT));
-          props.navigation.navigate('Accounts', {
+          props.navigation.navigate('AccountDetails', {
             serviceType: SECURE_ACCOUNT,
             index: 2,
           });

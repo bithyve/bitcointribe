@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Image,
   Text,
   StyleSheet,
-  Linking,
+  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import {
@@ -15,20 +15,11 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import openLink from '../../utils/OpenLink';
 
 export default function SendHelpContents(props) {
-  const scrollViewRef = useRef();
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
+  const scrollViewRef = useRef<ScrollView>();
 
   return (
     <View style={styles.modalContainer}>
@@ -73,7 +64,7 @@ export default function SendHelpContents(props) {
             Bitcoin transactions can not be reversed or cancelled. For this reason, it is recommended that you scan a QR code instead of keying in characters
           </Text>
           <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
+            scrollViewRef.current?.scrollTo({ x: 0, y: hp('80%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
           </TouchableOpacity>

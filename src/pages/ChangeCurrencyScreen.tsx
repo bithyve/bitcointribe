@@ -11,7 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import Currencies from '../common/Currencies';
+import FiatCurrencies from '../common/FiatCurrencies';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrencyCode } from '../store/actions/preferences';
 
 export default function ChangeCurrencyScreen(props) {
-  const [currencyList] = useState(Currencies);
+  const [currencyList] = useState(FiatCurrencies);
   const CurrencyCode = useSelector((state) => state.preferences.currencyCode);
   const dispatch = useDispatch();
 

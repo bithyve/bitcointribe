@@ -5,6 +5,7 @@ import SmallNavHeaderBackButton from "../../../components/navigation/SmallNavHea
 import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import AllTransactionsDetailsContainerScreen from '../../../pages/Transactions/AllTransactionsDetailsContainerScreen';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
 
 
 const AllTransactionsStack = createStackNavigator(
@@ -31,7 +32,7 @@ const AllTransactionsStack = createStackNavigator(
     initialRouteName: 'AllTransactionsRoot',
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
         },

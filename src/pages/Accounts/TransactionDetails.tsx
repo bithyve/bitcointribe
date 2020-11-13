@@ -1,16 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  TouchableWithoutFeedback,
-  AsyncStorage,
-  Linking,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -18,19 +11,16 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ContactList from '../../components/ContactList';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
 import {
-  SECURE_ACCOUNT,
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import openLink from '../../utils/OpenLink';
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
@@ -92,16 +82,6 @@ export default function TransactionDetails(props) {
         </View>
       );
     }
-  };
-
-  const openLink = (url) => {
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        //console.log("Don't know how to open URI: " + url);
-      }
-    });
   };
 
   return (

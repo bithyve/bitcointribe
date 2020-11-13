@@ -1,21 +1,17 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {  } from 'react';
 import {
   View,
-  TouchableOpacity,
   Text,
-  Image,
   ActivityIndicator,
 } from 'react-native';
-import BackupStyles from '../ManageBackup/Styles';
+import NavStyles from '../../common/Styles/NavStyles';
 import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useSelector } from 'react-redux';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import QRCode from 'react-native-qrcode-svg';
@@ -32,25 +28,18 @@ export default function RecoveryTrustedQR(props) {
         width: '100%',
       }}
     >
-      <View
-        style={{
-          ...BackupStyles.modalHeaderTitleView,
-          marginLeft: 10,
-          marginRight: 10,
-          marginTop: 5,
-        }}
-      >
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row' }}>
           <View
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
-            <Text style={BackupStyles.modalHeaderTitleText}>
+            <Text style={NavStyles.modalHeaderTitleText}>
               contact QR code
             </Text>
           </View>
         </View>
       </View>
-      <View style={BackupStyles.modalContentView}>
+      <View style={NavStyles.modalContentView}>
         {!props.trustedQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />
