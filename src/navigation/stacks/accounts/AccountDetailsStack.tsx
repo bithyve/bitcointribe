@@ -97,7 +97,7 @@ const AccountDetailsStack = createStackNavigator(
   {
     AccountDetailsRoot: {
       screen: AccountDetailsContainerScreen,
-      navigationOptions: AccountDetailsContainerScreen.navigationOptions,
+      // navigationOptions: AccountDetailsContainerScreen.navigationOptions,
     },
     Send: {
       screen: SendStack,
