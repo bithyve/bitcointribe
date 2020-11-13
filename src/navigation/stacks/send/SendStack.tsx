@@ -11,21 +11,16 @@ const SendStack = createStackNavigator(
   {
     SendRoot: {
       screen: SendScreen,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
     },
     SendToContact: {
       screen: SendToContactScreen,
       navigationOptions: {
-        gesturesEnabled: false,
         header: null,
       },
     },
     SendConfirmation: {
       screen: SendConfirmationScreen,
       navigationOptions: {
-        gesturesEnabled: false,
         header: null,
       },
     },

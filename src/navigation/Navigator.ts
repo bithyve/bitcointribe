@@ -135,9 +135,6 @@ const HomeNavigator = createStackNavigator(
     AddNewDonationAccount,
     Send: {
       screen: SendStack,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
     },
     TwoFAToken,
     HealthCheck,
