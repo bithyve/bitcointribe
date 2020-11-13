@@ -211,7 +211,6 @@ class HexaConfig {
   );
 
   constructor(env: string) {
-    console.log('***-*** Creating a new one')
     this.ENVIRONMENT = env;
     // console.log({ env });
 
