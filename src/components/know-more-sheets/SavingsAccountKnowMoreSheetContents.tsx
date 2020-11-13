@@ -12,7 +12,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import openLink from '../../utils/OpenLink';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function SavingsAccountHelpContents(props) {
+export default function SavingsAccountKnowMoreSheetContents(props) {
   const scrollViewRef = useRef<ScrollView>();
 
   return (
