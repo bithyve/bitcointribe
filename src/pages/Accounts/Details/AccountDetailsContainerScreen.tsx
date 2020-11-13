@@ -11,18 +11,16 @@ import sampleTransactions from './SampleTransactions';
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import KnowMoreBottomSheet, { KnowMoreBottomSheetHandle } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet';
-import { Easing } from 'react-native-reanimated';
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect';
 import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet';
-import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle';
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
-import BottomSheetBackground from '../../../components/bottom-sheets/BottomSheetBackground';
 import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellMergeCompletionEffect';
 import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet';
 import AccountShell from '../../../common/data/models/AccountShell';
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
 
 export type Props = {
   navigation: any;
@@ -49,13 +47,6 @@ const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> = ({
   );
 };
 
-const defaultBottomSheetConfigs = {
-  initialSnapIndex: 1,
-  animationDuration: 500,
-  animationEasing: Easing.out(Easing.exp),
-  handleComponent: BottomSheetHandle,
-  dismissOnOverlayPress: true,
-};
 
 const AccountDetailsContainerScreen: React.FC<Props> = ({
   navigation,
@@ -71,8 +62,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
   // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
   const accountTransactions = sampleTransactions;
 
-  // const { top: topSafeArea, bottom: bottomSafeArea } = useSafeArea();
-  const { present, dismiss } = useBottomSheetModal();
+  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal();
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
     navigation.navigate('TransactionDetails', {
@@ -92,28 +82,22 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
     });
   }
 
-  const ConfirmationMessageBottomSheetBackground = () => {
-    return (
-      <BottomSheetBackground isVisible onPress={dismiss} />
-    );
-  };
-
   const showKnowMoreSheet = useCallback(() => {
-    present(
-      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismiss} />,
+    presentBottomSheet(
+      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismissBottomSheet} />,
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [0, '95%'],
         handleComponent: KnowMoreBottomSheetHandle,
       },
     );
-  }, [present]);
+  }, [presentBottomSheet, dismissBottomSheet]);
 
   const showReassignmentConfirmationBottomSheet = useCallback((destinationID) => {
-    present(
+    presentBottomSheet(
       <TransactionReassignmentSuccessBottomSheet
         onViewAccountDetailsPressed={() => {
-          dismiss();
+          dismissBottomSheet();
           navigation.dispatch(resetStackToAccountDetails({
             accountShellID: destinationID,
           }));
@@ -122,21 +106,20 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [0, '40%'],
-        overlayComponent: ConfirmationMessageBottomSheetBackground,
       },
     );
-  }, [present, dismiss]);
+  }, [presentBottomSheet, dismissBottomSheet]);
 
   const showMergeConfirmationBottomSheet = useCallback(({
     source,
     destination,
   }) => {
-    present(
+    presentBottomSheet(
       <AccountShellMergeSuccessBottomSheet
         sourceAccountShell={source}
         destinationAccountShell={destination}
         onViewAccountDetailsPressed={() => {
-          dismiss();
+          dismissBottomSheet();
           navigation.dispatch(resetStackToAccountDetails({
             accountShellID: destination.id,
           }));
@@ -145,10 +128,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [0, '67%'],
-        overlayComponent: ConfirmationMessageBottomSheetBackground,
       },
     );
-  }, [present, dismiss]);
+  }, [presentBottomSheet, dismissBottomSheet]);
 
 
   useTransactionReassignmentCompletedEffect({

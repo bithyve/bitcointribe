@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import AccountShell from '../../../../common/data/models/AccountShell';
-import useAccountShellsInGroup from './UseAccountShellsInGroup';
+import useAccountShellsInTransactionGroup from './UseAccountShellsInTransactionGroup';
 
 
 /**
@@ -8,11 +8,11 @@ import useAccountShellsInGroup from './UseAccountShellsInGroup';
  * another account shell's transactions during reassignment, or for merging.
  */
 function useCompatibleAccountShells(accountShell: AccountShell): AccountShell[] {
-  const accountShellsInGroup = useAccountShellsInGroup(AccountShell.getTransactionGroup(accountShell));
+  const accountShellsInGroup = useAccountShellsInTransactionGroup(AccountShell.getTransactionGroup(accountShell));
 
   return useMemo(() => {
     return accountShellsInGroup.filter(shell => shell.id !== accountShell.id);
-  }, [useAccountShellsInGroup]);
+  }, [useAccountShellsInTransactionGroup]);
 }
 
 export default useCompatibleAccountShells;

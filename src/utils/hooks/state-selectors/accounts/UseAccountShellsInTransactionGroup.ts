@@ -23,7 +23,7 @@ const sampleShellsForTestingTransactionReassignment: AccountShell[] = [
 ];
 
 
-function useAccountShellsInGroup(transactionGroup: TransactionGroup): AccountShell[] {
+function useAccountShellsInTransactionGroup(transactionGroup: TransactionGroup): AccountShell[] {
   return useSelector(state => {
     const accountsState: AccountsState = state.accounts;
 
@@ -34,4 +34,4 @@ function useAccountShellsInGroup(transactionGroup: TransactionGroup): AccountShe
   });
 }
 
-export default useAccountShellsInGroup;
+export default useAccountShellsInTransactionGroup;

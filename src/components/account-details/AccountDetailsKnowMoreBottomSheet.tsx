@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import TestAccountHelpContents from '../Helper/TestAccountHelpContents';
+import TestAccountKnowMoreSheetContents from '../know-more-sheets/TestAccountKnowMoreSheetContents';
 import Colors from '../../common/Colors';
-import SavingsAccountHelpContents from '../Helper/SavingsAccountHelpContents';
-import CheckingAccountHelpContents from '../Helper/CheckingAccountHelpContents';
-import DonationAccountHelpContents from '../Helper/DonationAccountHelpContents';
+import SavingsAccountKnowMoreSheetContents from '../know-more-sheets/SavingsAccountKnowMoreSheetContents';
+import CheckingAccountKnowMoreSheetContents from '../know-more-sheets/CheckingAccountKnowMoreSheetContents';
+import DonationAccountKnowMoreSheetContents from '../know-more-sheets/DonationAccountKnowMoreSheetContents';
 import BottomSheetHandle from '../bottom-sheets/BottomSheetHandle';
 
 export type Props = {
@@ -24,13 +24,13 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
   const BottomSheetContent = () => {
     switch (accountKind) {
       case SubAccountKind.TEST:
-        return <TestAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
+        return <TestAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
       case SubAccountKind.SECURE:
-        return <SavingsAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
+        return <SavingsAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
       case SubAccountKind.REGULAR:
-        return <CheckingAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
+        return <CheckingAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
       case SubAccountKind.DONATION:
-        return <DonationAccountHelpContents titleClicked={onClose} containerStyle={styles.contentContainer} />;
+        return <DonationAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer} />;
       default:
         return null;
     }

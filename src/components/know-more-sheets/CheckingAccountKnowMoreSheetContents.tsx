@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -8,24 +8,25 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
-export default function DonationAccountHelpContents(props) {
+export default function CheckingAccountKnowMoreSheetContents(props) {
   const scrollViewRef = useRef<ScrollView>();
 
   return (
     <View style={{ ...styles.modalContainer, ...props.containerStyle }}>
       <AppBottomSheetTouchableWrapper
-        style={styles.viewStyle}
+        style={{ justifyContent: 'center', alignItems: 'center' }}
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text style={styles.headerText}>Donation Account</Text>
+        <Text style={styles.headerText}>Checking Account</Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
-      ref={scrollViewRef}
+        ref={scrollViewRef}
         style={{
           flex: 1,
           backgroundColor: Colors.blue,
@@ -37,33 +38,34 @@ export default function DonationAccountHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('4%'),
+              marginTop: wp('5%'),
             }}
           >
-            Your supporters can donate to your causes anonymously.
+            Store some sats here not all. Use these stored sats to transact or send to your friends and family.
           </Text>
-          <View style={styles.viewStyle}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
-              source={require('../../assets/images/icons/donationHelper.png')}
+              source={require('../../assets/images/icons/checking_account_info_1.png')}
               style={styles.helperImage}
             />
           </View>
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('4%'),
+              marginBottom: wp('5%'),
             }}
           >
-            Source sats and bitcoin from around the world without hassle or worrying about the tech involved.
+            Use the Savings Account to store bigger quantities of sats.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
             onPress={() => {
-              scrollViewRef.current?.scrollTo({
-                x: 0,
-                y: hp('85%'),
-                animated: true,
-              });
+              scrollViewRef.current &&
+                scrollViewRef.current.scrollTo({
+                  x: 0,
+                  y: hp('85%'),
+                  animated: true,
+                });
             }}
           >
             <FontAwesome
@@ -72,10 +74,13 @@ export default function DonationAccountHelpContents(props) {
               size={40}
             />
           </AppBottomSheetTouchableWrapper>
-          <View style={styles.viewStyle}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
-                ...styles.separatorViewDotted,
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
                 ...styles.separatorView,
               }}
             />
@@ -86,34 +91,79 @@ export default function DonationAccountHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('4%'),
+              marginTop: wp('5%'),
             }}
           >
-            Easily share your wallet address across platforms like chats, social
-            media and your website
+            The Checking Account is a single signature account and the Savings Account is a 2 of 3 multi-signature account.
           </Text>
-          <View style={styles.viewStyle}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
-              source={require('../../assets/images/icons/donationHelper2.png')}
+              source={require('../../assets/images/icons/checking_account_info_1.png')}
               style={styles.helperImage}
             />
           </View>
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('4%'),
+              marginBottom: wp('5%'),
             }}
           >
-            Your donors simply have to scan a QR code to donate sats or bitcoin
+            Correspondingly, transactions are cheaper from the Checking Account compared the the Savings Account.
           </Text>
-          <View style={styles.viewStyle}>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current &&
+              scrollViewRef.current.scrollTo({
+                x: 0,
+                y: hp('170%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
-                ...styles.separatorViewDotted,
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
                 ...styles.separatorView,
               }}
             />
           </View>
+        </View>
+
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('5%'),
+            }}
+          >
+            Caution! The Checking Account does not require 2 Factor Authentication for spending sats. Someone having your phone’s, and your Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account.
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/test_account_info_2.png')}
+              style={styles.helperImage}
+            />
+          </View>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('5%'),
+              paddingBottom: hp('6%'),
+            }}
+          >
+            Note that due to the security built into the accounts, it is cheaper transacting from the Checking Account compared to the Savings account.
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -172,7 +222,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('89%'),
+    height: hp('85%'),
     justifyContent: 'space-between',
   },
   separatorView: {
@@ -190,15 +240,5 @@ const styles = StyleSheet.create({
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
     marginBottom: wp('15%'),
-  },
-  viewStyle: {
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  separatorViewDotted: {
-    borderStyle: 'dotted',
-    borderWidth: 1,
-    borderRadius: 1,
-    borderColor: Colors.white,
   },
 });
