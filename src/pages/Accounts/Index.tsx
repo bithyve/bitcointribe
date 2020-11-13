@@ -1004,8 +1004,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       carouselData,
       averageTxFees,
     } = this.state;
-    console.log("accounts[serviceType].loading.balanceTx",this.props.accounts[serviceType].loading.balanceTx);
-
     const { exchangeRates, accounts } = this.props;
 
     return (

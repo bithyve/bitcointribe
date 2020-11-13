@@ -35,6 +35,7 @@ import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
 import openLink from '../../utils/OpenLink';
+import Loader from '../../components/loader';
 
 interface AddNewAccountStateTypes {
   selectedAccount: any;
@@ -45,6 +46,7 @@ interface AddNewAccountStateTypes {
   modelButtonIsValid: boolean;
   is2FAEnable: boolean;
   disableForm: boolean;
+  showLoader: boolean;
 }
 
 interface AddNewAccountPropsTypes {
@@ -72,6 +74,7 @@ class AddNewAccount extends PureComponent<
       modelButtonIsValid: true,
       is2FAEnable: false,
       disableForm: false,
+      showLoader: false,
     };
     this.item = {
       id: DONATION_ACCOUNT,
@@ -92,6 +95,7 @@ class AddNewAccount extends PureComponent<
       !prevProps.accounts[serviceType].donationAccount.settedup &&
       this.props.accounts[serviceType].donationAccount.settedup
     ) {
+      this.setState({showLoader: false});
       this.props.navigation.navigate('AccountDetails', {
         serviceType,
         index: this.props.cardData.length - 1,
@@ -197,6 +201,7 @@ class AddNewAccount extends PureComponent<
 
   render() {
     const { navigation } = this.props;
+    const { showLoader } = this.state;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.white }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -366,7 +371,7 @@ class AddNewAccount extends PureComponent<
                     this.state.modelButtonIsValid || this.state.disableForm
                   }
                   onPress={() => {
-                    this.setState({ disableForm: true });
+                    this.setState({ showLoader : true, disableForm: true });
                     this.initiateDonationAccount();
                   }}
                 >
@@ -379,6 +384,7 @@ class AddNewAccount extends PureComponent<
               </View>
             </View>
           </ScrollView>
+          {showLoader ? <Loader loader={true}/> : null}
         </View>
       </View>
     );
