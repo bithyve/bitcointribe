@@ -4,8 +4,6 @@ import {
   Image,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SendHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -63,11 +62,11 @@ export default function SendHelpContents(props) {
           >
             Bitcoin transactions can not be reversed or cancelled. For this reason, it is recommended that you scan a QR code instead of keying in characters
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('80%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View
             style={{
               borderStyle: 'dotted',

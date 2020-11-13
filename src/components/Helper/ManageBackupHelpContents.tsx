@@ -4,7 +4,6 @@ import {
   Image,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,6 +14,7 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ManageBackupHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
