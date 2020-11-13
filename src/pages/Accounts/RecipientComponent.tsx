@@ -170,7 +170,7 @@ function RecipientComponent(props) {
             </Text>
           ) : null}
         </View>
-        <Ionicons
+       {props.item && props.item.note ? <Ionicons
           style={{ marginLeft: 'auto', marginRight: 10 }}
           name={
             props.SelectedContactId == props.item.selectedContact.id
@@ -179,7 +179,7 @@ function RecipientComponent(props) {
           }
           size={20}
           color={Colors.borderColor}
-        />
+        /> : null}
       </View>
       {props.SelectedContactId == props.item.selectedContact.id && (
         <View
