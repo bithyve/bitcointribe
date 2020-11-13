@@ -5,7 +5,7 @@ import ButtonStyles from '../../../../common/Styles/ButtonStyles';
 import Colors from '../../../../common/Colors';
 import Fonts from '../../../../common/Fonts';
 import ListStyles from '../../../../common/Styles/ListStyles';
-import { Input, Button, /* CheckBox */ } from 'react-native-elements';
+import { Input, Button, CheckBox } from 'react-native-elements';
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts';
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
@@ -14,7 +14,6 @@ import SubAccountDescribing, { DonationSubAccountDescribing } from '../../../../
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import openLink from '../../../../utils/OpenLink';
-import CheckBox from '../../../../components/CheckBox';
 
 
 export type Props = {
@@ -134,23 +133,15 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
           <View style={styles.tfaSelectionFieldContentContainer}>
             <Text style={styles.smallInfoLabelText}>Enable 2-Factor Authentication</Text>
 
-            {/* TODO: Enable this after upgrading RN past 0.59 (See: https://github.com/react-native-elements/react-native-elements/issues/2156) */}
-            {/* <CheckBox
-              size={26}
-              containerStyle={{ borderRadius: 5, borderColor: Colors.borderColor }}
+            <CheckBox
+              checkedIcon="check-square"
+              uncheckedIcon="square-o"
+              size={28}
+
               checkedColor={Colors.darkGreen}
+              uncheckedColor={Colors.white}
               checked={isTFAEnabled}
               onIconPress={() => setIsTFAEnabled(!isTFAEnabled)}
-            /> */}
-
-            <CheckBox
-              size={26}
-              imageSize={20}
-              borderRadius={5}
-              color={Colors.lightBlue}
-              borderColor={Colors.borderColor}
-              isChecked={isTFAEnabled}
-              onpress={() => setIsTFAEnabled(!isTFAEnabled)}
             />
           </View>
         </TouchableOpacity>
