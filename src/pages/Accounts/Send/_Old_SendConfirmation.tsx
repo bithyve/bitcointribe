@@ -58,21 +58,11 @@ import RadioButton from '../../../components/RadioButton'
 import CustomPriorityContent from '../CustomPriorityContent'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import Loader from '../../../components/loader'
-import {
-  RecipientDescribing,
-  makeSubAccountRecipientDescription,
-  makeContactRecipientDescription,
-} from '../../../common/data/models/interfaces/RecipientDescribing'
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { processRecipients } from '../../../store/sagas/accounts'
-import { AccountsState } from '../../../store/reducers/accounts'
-import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
-import { getAccountIcon, getAccountTitle } from './utils'
-import config from '../../../bitcoin/HexaConfig'
-import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
-import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount'
+import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
+import { makeAccountRecipientDescriptionFromUnknownData, makeContactRecipientDescription } from '../../../utils/sending/RecipientFactories'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -184,6 +174,7 @@ class SendConfirmation extends Component<
       selectedRecipients: accounts[ this.serviceType ].transfer.details,
       loading: accounts[ this.serviceType ].loading,
     } )
+
     this.onChangeInTransfer()
     this.setCurrencyCodeFromAsync()
   };
@@ -263,6 +254,7 @@ class SendConfirmation extends Component<
 
   onChangeInTransfer = () => {
     const { transfer } = this.state
+
     if ( transfer.details ) {
       let totalAmount = 0
       transfer.details.map( ( item ) => {
@@ -294,6 +286,29 @@ class SendConfirmation extends Component<
       this.sendNotifications()
       this.storeTrustedContactsHistory( transfer.details )
 
+      if ( this.state.derivativeAccountDetails ) {
+        if ( this.state.derivativeAccountDetails.type === DONATION_ACCOUNT )
+          this.props.syncViaXpubAgent(
+            this.serviceType,
+            this.state.derivativeAccountDetails.type,
+            this.state.derivativeAccountDetails.number,
+          )
+        else
+          this.props.fetchDerivativeAccBalTx(
+            this.serviceType,
+            this.state.derivativeAccountDetails.type,
+            this.state.derivativeAccountDetails.number,
+          )
+      } else {
+        this.props.fetchBalanceTx( this.serviceType, {
+          loader: true,
+          syncTrustedDerivative:
+            this.serviceType === REGULAR_ACCOUNT ||
+            this.serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        } )
+      }
       this.setState( {
         showLoader: false
       } )
@@ -301,15 +316,19 @@ class SendConfirmation extends Component<
       setTimeout( () => {
         ( this.refs.SendSuccessBottomSheet as any ).snapTo( 1 )
       }, 10 )
+
     } else if ( !transfer.txid && transfer.executed === 'ST2' ) {
-      this.setState( {
-        showLoader: false
-      } )
+      // 📝 The idea seems to be that this code is reached when an "ST2" send has failed.
+
       this.props.navigation.navigate( 'TwoFAToken', {
         serviceType: this.serviceType,
         recipientAddress: '',
         onTransactionSuccess: this.onTransactionSuccess,
       } )
+
+      // presentBottomSheet(
+      //   // <OTPAuthenticationSheet
+      // )
     }
   };
 
@@ -385,42 +404,6 @@ class SendConfirmation extends Component<
       outputs = transfer.stage1.txPrerequisites[ 'low' ].outputs.filter(
         ( output ) => output.address,
       )
-    }
-
-    const selectedRecipients = this.state.selectedRecipients
-    if( !this.feeIntelAbsent && this.isSendMax ){
-      // custom fee w/ send max
-      const { fee } = service.calculateSendMaxFee(
-        this.recipients.length,
-        parseInt( feePerByte ),
-        this.state.derivativeAccountDetails,
-      )
-
-      // upper bound: default low
-      if( fee > transfer.stage1.txPrerequisites[ 'low' ].fee ){
-        this.setState( {
-          customFee: '',
-          customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
-        } )
-        return
-      }
-
-      const recipientToBeModified = this.recipients[ this.recipients.length - 1 ]
-
-      // deduct the previous(default low) fee and add the custom fee
-      if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
-      else recipientToBeModified.amount += transfer.stage1.txPrerequisites[ 'low' ].fee
-      recipientToBeModified.amount -= fee
-      this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
-
-      outputs.forEach( ( output )=>{
-        if( output.address === recipientToBeModified.address )
-          output.value = recipientToBeModified.amount
-      } )
-
-      selectedRecipients.forEach( ( recipient: any ) => {
-        if( recipient.selectedContact.id === recipientToBeModified.address ) recipient.bitcoinAmount = recipientToBeModified.amount
-      } )
     }
 
     const customTxPrerequisites = service.calculateCustomFee(
@@ -761,7 +744,7 @@ class SendConfirmation extends Component<
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if ( selectedContactData.account_name != null ) {
-                recipient = makeSubAccountRecipientDescription(
+                recipient = makeAccountRecipientDescriptionFromUnknownData(
                   selectedContactData,
                   accountKind,
                 )
@@ -990,8 +973,7 @@ class SendConfirmation extends Component<
                   </Text>
                 </View>
               </View>
-              )}
-            </View> }
+            </View>}
 
             {this.state.customFee !== '' && (
               <View

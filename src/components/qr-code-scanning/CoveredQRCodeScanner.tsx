@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react'
-import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native'
+import { View, StyleSheet, ImageBackground, ImageSourcePropType } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RNCamera } from 'react-native-camera'
+import { RNCamera, BarCodeReadEvent } from 'react-native-camera'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
   coverImageSource?: ImageSourcePropType;
-  onCodeScanned: ( scanEvent ) => void;
+  onCodeScanned: ( event: BarCodeReadEvent ) => void;
 };
 
 // TODO: Make the styling here a bit more readable 🙂.
@@ -81,8 +81,8 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
           style={{
             flex: 1,
           }}
-          onBarCodeRead={( data ) => {
-            onCodeScanned( data )
+          onBarCodeRead={( event: BarCodeReadEvent ) => {
+            onCodeScanned( event )
             setIsCameraOpen( false )
           }}
           captureAudio={false}

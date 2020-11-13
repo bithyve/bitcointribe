@@ -7,12 +7,10 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import {
   widthPercentageToDP as wp,
@@ -22,7 +20,6 @@ import Colors from '../../common/Colors';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import QRModal from './QRModal';
@@ -37,19 +34,23 @@ import {
 } from '../../store/actions/accounts';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
-const ResetTwoFAHelp = (props) => {
-  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+export type Props = {
+  navigation: any;
+};
+
+const SubAccountTFAHelpScreen = ({
+  navigation,
+}: Props) => {
+  const [QrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [QRModalHeader, setQRModalHeader] = useState('');
   const [
     ResetTwoFASuccessBottomSheet,
-    setResetTwoFASuccessBottomSheet,
   ] = useState(React.createRef());
   const [successMessage, setSuccessMessage] = useState('');
   const [successMessageHeader, setSuccessMessageHeader] = useState('');
   const [
     ServerNotRespondingBottomSheet,
-    setServerNotRespondingBottomSheet,
   ] = useState(React.createRef());
 
   const additional = useSelector((state) => state.accounts.additional);
@@ -95,6 +96,7 @@ const ResetTwoFAHelp = (props) => {
     (async () => {
       if (generatedSecureXPriv) {
         dispatch(clearTransfer(SECURE_ACCOUNT));
+
         props.navigation.navigate('Send', {
           serviceType: SECURE_ACCOUNT,
           sweepSecure: true,
@@ -103,6 +105,7 @@ const ResetTwoFAHelp = (props) => {
             service.secureHDWallet.balances.unconfirmedBalance,
         });
         dispatch(secondaryXprivGenerated(null));
+
       } else if (generatedSecureXPriv === false) {
         setTimeout(() => {
           setSuccessMessageHeader('Invalid Exit Key');
@@ -491,4 +494,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ResetTwoFAHelp;
+export default SubAccountTFAHelpScreen;

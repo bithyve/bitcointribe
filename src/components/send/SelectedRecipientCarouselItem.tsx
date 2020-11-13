@@ -12,10 +12,12 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import ContactAvatar from '../ContactAvatar';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { Satoshis } from '../../common/data/typealiases/UnitAliases';
 
 
 export type Props = {
   recipient: RecipientDescribing;
+  designatedAmount: Satoshis;
   onRemove: () => void;
   currencyCode?: string;
   containerStyle?: Record<string, unknown>;
@@ -23,6 +25,7 @@ export type Props = {
 
 const SelectedRecipientCarouselItem: React.FC<Props> = ({
   recipient,
+  designatedAmount,
   onRemove,
   currencyCode = '',
   containerStyle = {},
@@ -59,7 +62,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {recipient.availableBalance} {unitText}
+            {designatedAmount} {unitText}
           </Text>
         </View>
       </View>

@@ -10,11 +10,13 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { Satoshis } from '../../common/data/typealiases/UnitAliases';
 
 
 export type Props = {
   recipient: RecipientDescribing;
   accountKind: string;
+  designatedAmount: Satoshis;
   containerStyle?: Record<string, unknown>;
 };
 
@@ -22,6 +24,7 @@ export type Props = {
 const ConfirmedRecipientCarouselItem: React.FC<Props> = ({
   recipient,
   accountKind,
+  designatedAmount,
   containerStyle = {},
 }: Props) => {
   const unitText = useFormattedUnitText({
@@ -50,7 +53,7 @@ const ConfirmedRecipientCarouselItem: React.FC<Props> = ({
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {recipient.availableBalance} {unitText}
+          {designatedAmount} {unitText}
         </Text>
       </View>
     </View>

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
-import { Card, Overlay } from 'react-native-elements'
+import { View, StyleSheet, Image } from 'react-native'
+import { Card } from 'react-native-elements'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import CardStyles from '../../common/Styles/Cards.js'

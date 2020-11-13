@@ -66,7 +66,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
 export const sampleAccountRecipients: AccountRecipientDescribing[] = [
   {
     id: '1',
-    kind: RecipientKind.SUB_ACCOUNT,
+    kind: RecipientKind.ACCOUNT_SHELL,
     displayedName: 'Savings Account',
     avatarImageSource: require( '../../../assets/images/icons/icon_regular_account.png' ),
     availableBalance: 342000,
@@ -74,7 +74,7 @@ export const sampleAccountRecipients: AccountRecipientDescribing[] = [
   },
   {
     id: '2',
-    kind: RecipientKind.SUB_ACCOUNT,
+    kind: RecipientKind.ACCOUNT_SHELL,
     displayedName: 'Checking Account',
     avatarImageSource: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
     availableBalance: 15642294,

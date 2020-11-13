@@ -144,7 +144,7 @@ export type AccountsState = {
 
   averageTxFees: any;
 
-  // TODO: How does this differ from ANY added account? (See `activeAccounts`)
+  // TODO: How does this differ from ANY added account?
   // Perhaps we should consolidate the items here into that array?
   additional?: {
     regular?: any;

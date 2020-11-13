@@ -14,5 +14,5 @@
     "mergeable",
     "uuidv"
   ],
-  "typescript.tsdk": "${workspaceFolder}/node_modules/typescript/lib",
+  "typescript.tsdk": "/Users/briansipple/Projects/BitHyve/hexa/node_modules/typescript/lib",
 }

@@ -4,7 +4,7 @@ import * as bip32 from 'bip32'
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
-import { TransactionDetails, Transactions } from '../Interface'
+import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
 import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
@@ -540,19 +540,21 @@ export default class Bitcoin {
 
   public addressDiff = (
     scannedStr: string,
-  ): {
-    type: string;
-  } => {
+  ): { type: ScannedAddressKind | null } => {
     if ( this.isPaymentURI( scannedStr ) ) {
       const { address } = this.decodePaymentURI( scannedStr )
-      if ( this.isValidAddress( address ) ) return {
-        type: 'paymentURI'
+
+      if ( this.isValidAddress( address ) ) {
+        return {
+          type: ScannedAddressKind.PAYMENT_URI
+        }
       }
     } else if ( this.isValidAddress( scannedStr ) ) {
       return {
-        type: 'address'
+        type: ScannedAddressKind.ADDRESS
       }
     }
+
     return {
       type: null
     }

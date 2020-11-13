@@ -11,6 +11,7 @@ import accountsReducer from './reducers/accounts'
 import sssReducer from './reducers/sss'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
+import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
@@ -106,7 +107,6 @@ import {
 } from './sagas/notifications'
 
 import {
-  initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
   fetchTrustedChannelWatcher,
   fetchEphemeralChannelWatcher,
@@ -213,7 +213,6 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
@@ -259,6 +258,7 @@ const rootReducer = combineReducers( {
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
+  sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,

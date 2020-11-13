@@ -54,7 +54,7 @@ export enum SectionKind {
   SCAN_QR,
   ENTER_ADDRESS,
   SELECT_CONTACTS,
-  SELECT_SUB_ACCOUNTS,
+  SELECT_ACCOUNT_SHELLS,
 }
 
 const sectionListItemKeyExtractor = ( index ) => String( index )
@@ -81,6 +81,7 @@ interface SendPropsTypes {
   trustedContactsService: TrustedContactsService;
   accountsState: any; // TODO: Strongly type this
   trustedContactsInfo: any;
+  hasCompletedTFASetup: boolean;
   hasShownInitialKnowMoreSendSheet: boolean;
   initialKnowMoreSendSheetShown: Function;
 }
@@ -189,7 +190,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         .map( ( object ) => object.selectedContact )
 
       this.setState( {
-        selectedContacts 
+        selectedContacts
       } )
     }
 
@@ -209,7 +210,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const shouldShow = !this.state.isShowingKnowMoreSheet
 
     this.setState( {
-      isShowingKnowMoreSheet: shouldShow 
+      isShowingKnowMoreSheet: shouldShow
     }, () => {
       if ( shouldShow ) {
         this.knowMoreBottomSheetRef.current?.snapTo( 1 )
@@ -267,7 +268,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             account_name: getAccountTitle( serviceType, derivativeAccountDetails ),
             type: serviceType,
             checked: false,
-            image: getAccountIcon( serviceType, derivativeAccountDetails ) 
+            image: getAccountIcon( serviceType, derivativeAccountDetails )
           }
           additionalAccountData.push( accInstance )
         }
@@ -542,7 +543,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         selectedContact: recipient,
       } )
       this.setState( {
-        recipientAddress: '' 
+        recipientAddress: ''
       } )
       const accountShellID = this.props.navigation.getParam( 'accountShellID' )
 
@@ -577,7 +578,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           selectedContact: recipient,
         } )
         this.setState( {
-          recipientAddress: '' 
+          recipientAddress: ''
         } )
         const accountShellID = this.props.navigation.getParam( 'accountShellID' )
 
@@ -696,7 +697,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           return 0
         } )
         this.setState( {
-          trustedContacts: sortedTrustedContacts 
+          trustedContacts: sortedTrustedContacts
         } )
       }
     }
@@ -747,13 +748,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   <View style={styles.viewSectionContainer}>
                     <RecipientAddressTextInputSection
                       containerStyle={{
-                        margin: 0, padding: 0 
+                        margin: 0, padding: 0
                       }}
                       placeholder="Enter Address Manually"
                       accountKind={serviceType}
                       onAddressSubmitted={( address ) => {
                         this.setState( {
-                          recipientAddress: address 
+                          recipientAddress: address
                         } )
                       }}
                     />
@@ -899,7 +900,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           snapPoints={[ -50, heightPercentageToDP( '89%' ) ]}
           onCloseEnd={() => {
             this.setState( {
-              isShowingKnowMoreSheet: false 
+              isShowingKnowMoreSheet: false
             }, () => {
               this.props.initialKnowMoreSendSheetShown()
             } )
@@ -935,6 +936,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.trustedContactsInfo,
     ),
+    hasCompletedTFASetup: idx( state, ( _ ) => _.preferences.hasCompletedTFASetup ),
     hasShownInitialKnowMoreSendSheet: idx(
       state,
       ( _ ) => _.preferences.hasShownInitialKnowMoreSendSheet,
@@ -1029,15 +1031,15 @@ function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<Naviga
         <View style={styles.navHeaderTitleContainer}>
           <Image
             source={
-              getAccountIcon( accountKind, derivativeAccountDetails ) 
+              getAccountIcon( accountKind, derivativeAccountDetails )
             }
             style={{
-              width: 40, height: 40 
+              width: 40, height: 40
             }}
           />
 
           <View style={{
-            marginLeft: 16 
+            marginLeft: 16
           }}>
             <Text style={NavStyles.modalHeaderTitleText}>Send</Text>
             <Text style={NavStyles.modalHeaderSubtitleText}>

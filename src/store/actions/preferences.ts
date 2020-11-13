@@ -115,6 +115,14 @@ export const setSavingWarning = ( data ) => {
   }
 }
 
+export const setTwoFASetup = ( data ) => {
+  return {
+    type: TWO_FA_SETUP,
+    payload: {
+      hasCompletedTFASetup: data
+    },
+  }
+}
 
 const updatePereferenceRequest = createAction( UPDATE_APP_PREFERENCE )
 export const updatePreference = ( payload ) => ( dispatch ) =>

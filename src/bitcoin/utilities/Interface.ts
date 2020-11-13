@@ -426,3 +426,8 @@ export interface VersionHistory {
   title: string;
   date: Date;
 }
+
+export enum ScannedAddressKind {
+  ADDRESS = 'address',
+  PAYMENT_URI = 'paymentURI',
+}

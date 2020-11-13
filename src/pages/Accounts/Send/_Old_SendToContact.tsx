@@ -43,7 +43,6 @@ import {
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
-  WYRE,
 } from '../../../common/constants/serviceTypes'
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
@@ -74,9 +73,6 @@ import Loader from '../../../components/loader'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { UsNumberFormat } from '../../../common/utilities'
 import config from '../../../bitcoin/HexaConfig'
-import { getAccountIcon, getAccountTitle } from './utils'
-import BaseAccount from '../../../bitcoin/utilities/accounts/BaseAccount'
-import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -212,7 +208,7 @@ class SendToContact extends Component<
       },
       () => {
         if ( bitcoinAmount ) {
-          const currency = this.state.exchangeRates && this.state.exchangeRates[ this.state.CurrencyCode ]
+          const currency = this.state.exchangeRates
             ? (
               ( parseInt( bitcoinAmount ) / SATOSHIS_IN_BTC ) *
                 this.state.exchangeRates[ this.state.CurrencyCode ].last
@@ -492,7 +488,7 @@ class SendToContact extends Component<
 
     const temp = value
     if ( prefersBitcoin ) {
-      const result = exchangeRates && exchangeRates[ CurrencyCode ]
+      const result = exchangeRates
         ? (
           ( value / SATOSHIS_IN_BTC ) *
             exchangeRates[ CurrencyCode ].last
@@ -502,7 +498,7 @@ class SendToContact extends Component<
         bitcoinAmount: temp, currencyAmount: result.toString()
       } )
     } else {
-      let currency = exchangeRates && exchangeRates[ CurrencyCode ]
+      let currency = exchangeRates
         ? value / exchangeRates[ CurrencyCode ].last
         : 0
       currency = currency < 1 ? currency * SATOSHIS_IN_BTC : currency
@@ -757,44 +753,16 @@ class SendToContact extends Component<
     this.setState( {
       recipients: recipients
     } )
-
-
-    if( averageTxFees ){
-      transferST1(
-        serviceType,
-        recipients,
-        averageTxFees,
-        this.state.derivativeAccountDetails,
-      )
-    } else {
-      // custom fee-fallback (missing txn fee intel)
-      const {
-        sweepSecure,
-        spendableBalance,
-        averageTxFees,
-        isSendMax,
-        derivativeAccountDetails,
-        donationId,
-      } = this.state
-
-      const accountShellID = this.props.navigation.getParam( 'accountShellID' )
-      this.props.navigation.navigate( 'SendConfirmation', {
-        accountShellID,
-        serviceType,
-        sweepSecure,
-        spendableBalance,
-        recipients,
-        averageTxFees,
-        isSendMax,
-        derivativeAccountDetails,
-        donationId,
-        feeIntelAbsent: true,
-      } )
-    }
+    transferST1(
+      serviceType,
+      recipients,
+      averageTxFees,
+      this.state.derivativeAccountDetails,
+    )
   };
 
   onConfirm = () => {
-
+    console.log( 'INSIDE onconfirm' )
     const {
       clearTransfer,
       accountsState,
@@ -864,7 +832,7 @@ class SendToContact extends Component<
       ? UsNumberFormat( spendableBalance )
       : prefersBitcoin
         ? UsNumberFormat( spendableBalance )
-        : exchangeRates && exchangeRates[ CurrencyCode ]
+        : exchangeRates
           ? (
             ( spendableBalance / SATOSHIS_IN_BTC ) *
           exchangeRates[ CurrencyCode ].last
@@ -911,9 +879,6 @@ class SendToContact extends Component<
       clearTransfer,
       addTransferDetails,
     } = this.props
-
-
-
     return (
       <View style={{
         flex: 1, backgroundColor: Colors.white
@@ -942,7 +907,16 @@ class SendToContact extends Component<
               />
             </TouchableOpacity>
             <Image
-              source={ getAccountIcon( serviceType, this.state.derivativeAccountDetails ) }
+              source={
+                this.state.derivativeAccountDetails &&
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                  ? require( '../../../assets/images/icons/icon_donation_hexa.png' )
+                  : serviceType == TEST_ACCOUNT
+                    ? require( '../../../assets/images/icons/icon_test.png' )
+                    : serviceType == REGULAR_ACCOUNT
+                      ? require( '../../../assets/images/icons/icon_regular.png' )
+                      : require( '../../../assets/images/icons/icon_secureaccount.png' )
+              }
               style={{
                 width: wp( '10%' ), height: wp( '10%' )
               }}
@@ -974,7 +948,16 @@ class SendToContact extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {getAccountTitle( serviceType, this.state.derivativeAccountDetails )}
+              {this.state.derivativeAccountDetails &&
+              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                ? 'Donation Account'
+                : serviceType == 'TEST_ACCOUNT'
+                  ? 'Test Account'
+                  : serviceType == 'SECURE_ACCOUNT'
+                    ? 'Savings Account'
+                    : serviceType == 'REGULAR_ACCOUNT'
+                      ? 'Checking Account'
+                      : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -1036,7 +1019,6 @@ class SendToContact extends Component<
                 'Savings Account': SECURE_ACCOUNT,
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
-                'Wyre': WYRE,
               }[ item.selectedContact.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
@@ -1048,10 +1030,9 @@ class SendToContact extends Component<
                   'Savings Account': SECURE_ACCOUNT,
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
-                  'Wyre': WYRE,
                 }[ item.selectedContact.account_name || 'Checking Account' ]
 
-                recipient = makeSubAccountRecipientDescription(
+                recipient = makeAccountRecipientDescriptionFromUnknownData(
                   newItem,
                   accountKind,
                 )

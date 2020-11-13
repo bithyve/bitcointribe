@@ -6,6 +6,7 @@ import {
 } from 'react-navigation-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
+import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
@@ -22,8 +23,7 @@ import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import TwoFAToken from '../pages/Accounts/TwoFAToken'
-import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
+import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import QRScannerScreen from '../pages/QRScannerScreen'
 import HealthCheck from '../pages/HealthCheck'
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck'
@@ -45,7 +45,6 @@ import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHisto
 import SettingGetNewPin from '../pages/SettingGetNewPin'
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage'
-import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp'
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret'
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds'
 import UpdateApp from '../pages/UpdateApp'
@@ -103,7 +102,6 @@ const MODAL_ROUTES = [
   'TrustedContacts',
   'CustodianRequestOTP',
   'CustodianRequestAccepted',
-  'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'Intermediate',
 ]
@@ -129,10 +127,6 @@ const HomeNavigator = createStackNavigator(
     TrustedContacts,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    Send: {
-      screen: SendStack,
-    },
-    TwoFAToken,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,
@@ -151,7 +145,6 @@ const HomeNavigator = createStackNavigator(
     SecurityQuestionHistory,
     SettingGetNewPin,
     ContactsListForAssociateContact,
-    ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
     SendRequest,

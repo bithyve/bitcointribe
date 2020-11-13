@@ -1,7 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
 import {
-  INITIALIZE_TRUSTED_CONTACT,
-  trustedContactInitialized,
   APPROVE_TRUSTED_CONTACT,
   trustedContactApproved,
   UPDATE_EPHEMERAL_CHANNEL,
@@ -66,37 +64,6 @@ const sendNotification = ( recipient, notification ) => {
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
 }
 
-function* initializedTrustedContactWorker( { payload } ) {
-  const service: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
-  )
-
-  const { contactName, encKey } = payload
-  const res = yield call( service.initializeContact, contactName, encKey )
-  if ( res.status === 200 ) {
-    const { publicKey } = res.data
-    yield put( trustedContactInitialized( contactName, publicKey ) )
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES 
-      } 
-    } )
-  } else {
-    console.log( res.err )
-  }
-}
-
-export const initializedTrustedContactWatcher = createWatcher(
-  initializedTrustedContactWorker,
-  INITIALIZE_TRUSTED_CONTACT,
-)
-
 function* approveTrustedContactWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
@@ -144,8 +111,8 @@ function* approveTrustedContactWorker( { payload } ) {
       }
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     }
   } else {
@@ -219,15 +186,15 @@ function* removeTrustedContactWorker( { payload } ) {
       autoHighlightFlags = JSON.parse( autoHighlightFlags )
       if ( shareIndex === 0 )
         autoHighlightFlags = {
-          ...autoHighlightFlags, secondaryDevice: false 
+          ...autoHighlightFlags, secondaryDevice: false
         }
       else if ( shareIndex === 1 )
         autoHighlightFlags = {
-          ...autoHighlightFlags, trustedContact1: false 
+          ...autoHighlightFlags, trustedContact1: false
         }
       else if ( shareIndex === 2 )
         autoHighlightFlags = {
-          ...autoHighlightFlags, trustedContact2: false 
+          ...autoHighlightFlags, trustedContact2: false
         }
 
       AsyncStorage.setItem(
@@ -290,7 +257,7 @@ function* removeTrustedContactWorker( { payload } ) {
     TRUSTED_CONTACTS: JSON.stringify( trustedContactsService ),
   }
   dbPayload = {
-    SERVICES: updatedSERVICES 
+    SERVICES: updatedSERVICES
   }
 
   if ( isGuardian ) {
@@ -299,7 +266,7 @@ function* removeTrustedContactWorker( { payload } ) {
       SHARES_TRANSFER_DETAILS: shareTransferDetails,
     }
     dbPayload = {
-      ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup 
+      ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
     }
   }
 
@@ -377,7 +344,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
   }
 
   console.log( {
-    res 
+    res
   } )
   if ( res.status === 200 ) {
     const ephData: EphemeralDataElements = res.data.data
@@ -385,7 +352,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
       // using trusted details on TC approval
       const { trusted } = ephData.paymentDetails
       yield put( paymentDetailsFetched( {
-        ...trusted 
+        ...trusted
       } ) )
     }
 
@@ -485,8 +452,8 @@ function* updateEphemeralChannelWorker( { payload } ) {
     } else {
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     }
 
@@ -496,8 +463,8 @@ function* updateEphemeralChannelWorker( { payload } ) {
       // yield delay(1000); // introducing delay in order to evade database insertion collision
       yield call( downloadMetaShareWorker, {
         payload: {
-          encryptedKey, otp 
-        } 
+          encryptedKey, otp
+        }
       } )
       Toast( 'You have been successfully added as a Keeper' )
       yield put( trustedContactApproved( contactInfo.contactName, true ) )
@@ -537,7 +504,7 @@ function* fetchEphemeralChannelWorker( { payload } ) {
         // using alternate details on TC rejection
         const { alternate } = data.paymentDetails
         yield put( paymentDetailsFetched( {
-          ...alternate 
+          ...alternate
         } ) )
       }
 
@@ -557,8 +524,8 @@ function* fetchEphemeralChannelWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     console.log( res.err )
@@ -600,15 +567,15 @@ function* updateTrustedChannelWorker( { payload } ) {
         payload: {
           ...payload.updatedDB,
           SERVICES: {
-            ...payload.updatedDB.SERVICES, ...updatedSERVICES 
+            ...payload.updatedDB.SERVICES, ...updatedSERVICES
           },
         },
       } )
     } else {
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     }
   } else {
@@ -636,7 +603,7 @@ function* fetchTrustedChannelWorker( { payload } ) {
   )
 
   console.log( {
-    res 
+    res
   } )
   if ( res.status === 200 ) {
     const data: TrustedDataElements = res.data.data
@@ -648,8 +615,8 @@ function* fetchTrustedChannelWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
 
     if ( action === trustedChannelActions.downloadShare ) {
@@ -744,7 +711,7 @@ export function* trustedChannelsSetupSyncWorker() {
           contactName,
         )
         console.log( {
-          res 
+          res
         } )
         if ( res.status === 200 ) {
           console.log( 'Attempted a fetch from TC with: ', contactName )
@@ -902,7 +869,7 @@ export function* trustedChannelsSetupSyncWorker() {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
+        SERVICES: updatedSERVICES
       },
     } )
 
@@ -942,7 +909,7 @@ function* walletCheckInWorker( { payload } ) {
     ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
   )
   const underCustody = {
-    ...DECENTRALIZED_BACKUP.UNDER_CUSTODY 
+    ...DECENTRALIZED_BACKUP.UNDER_CUSTODY
   }
   const metaSharesUnderCustody = Object.keys( underCustody ).map(
     ( tag ) => underCustody[ tag ].META_SHARE,
@@ -963,7 +930,7 @@ function* walletCheckInWorker( { payload } ) {
 
   const { metaShares, healthCheckStatus } = s3Service.sss
   const preSyncHCStatus = JSON.stringify( {
-    healthCheckStatus 
+    healthCheckStatus
   } )
 
   const res = yield call(
@@ -974,7 +941,7 @@ function* walletCheckInWorker( { payload } ) {
     metaSharesUnderCustody,
   )
   console.log( {
-    res 
+    res
   } )
   if ( res.status === 200 ) {
     const { updationInfo, exchangeRates, averageTxFees } = res.data
@@ -1030,7 +997,7 @@ function* walletCheckInWorker( { payload } ) {
     const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
     const { healthCheckStatus } = res.data
     const postSyncHCStatus = JSON.stringify( {
-      healthCheckStatus 
+      healthCheckStatus
     } )
 
     if (
@@ -1058,7 +1025,7 @@ function* walletCheckInWorker( { payload } ) {
       }
 
       console.log( {
-        shareRemoved 
+        shareRemoved
       } )
       if ( shareRemoved ) {
         const updatedBackup = {
@@ -1066,7 +1033,7 @@ function* walletCheckInWorker( { payload } ) {
           UNDER_CUSTODY: underCustody,
         }
         dbPayload = {
-          ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup 
+          ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
         }
       }
 
@@ -1100,7 +1067,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
   )
 
   const sharesUnderCustody = {
-    ...DECENTRALIZED_BACKUP.UNDER_CUSTODY 
+    ...DECENTRALIZED_BACKUP.UNDER_CUSTODY
   }
 
   const { contacts } = payload
@@ -1110,7 +1077,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
 
     const res = yield call( trustedContacts.syncTrustedChannels, contacts )
     console.log( {
-      res 
+      res
     } )
 
     if ( res.status === 200 && res.data && res.data.synched ) {
@@ -1190,7 +1157,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
           }
         }
         payload = {
-          SERVICES: updatedSERVICES 
+          SERVICES: updatedSERVICES
         }
 
         if ( guardiansToRemove.length ) {
@@ -1199,7 +1166,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
             UNDER_CUSTODY: sharesUnderCustody,
           }
           payload = {
-            ...payload, DECENTRALIZED_BACKUP: updatedBackup 
+            ...payload, DECENTRALIZED_BACKUP: updatedBackup
           }
         }
 
@@ -1240,8 +1207,8 @@ function* postRecoveryChannelSyncWorker( {} ) {
 
   yield call( insertDBWorker, {
     payload: {
-      SERVICES: updatedSERVICES 
-    } 
+      SERVICES: updatedSERVICES
+    }
   } )
 }
 

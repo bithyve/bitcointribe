@@ -68,10 +68,11 @@ interface FriendsAndFamilyPropTypes {
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
-  MyKeeper: any[];
-  IMKeeper: any[];
-  trustedContact: any[];
-  OtherTrustedContact: any[];
+  loading: boolean;
+  myKeepers: ContactRecipientDescribing[];
+  contactsKeptByUser: ContactRecipientDescribing[];
+  trustedContacts: ContactRecipientDescribing[];
+  otherTrustedContacts: ContactRecipientDescribing[];
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
@@ -98,11 +99,12 @@ class FriendsAndFamilyScreen extends PureComponent<
       onRefresh: false,
       isLoadContacts: false,
       selectedContact: [],
-      trustedContact: idx( props, ( _ ) => _.addressBookData.trustedContact ) || [],
-      MyKeeper: idx( props, ( _ ) => _.addressBookData.MyKeeper ) || [],
-      IMKeeper: idx( props, ( _ ) => _.addressBookData.IMKeeper ) || [],
-      OtherTrustedContact:
-        idx( props, ( _ ) => _.addressBookData.OtherTrustedContact ) || [],
+      loading: true,
+      trustedContacts: idx( props, ( _ ) => _.addressBookData.trustedContacts ) || [],
+      myKeepers: idx( props, ( _ ) => _.addressBookData.MyKeeper ) || [],
+      contactsKeptByUser: idx( props, ( _ ) => _.addressBookData.contactsKeptByUser ) || [],
+      otherTrustedContacts:
+        idx( props, ( _ ) => _.addressBookData.otherTrustedContacts ) || [],
       isShowingKnowMoreSheet: false,
       showLoader: false
     }
@@ -134,7 +136,11 @@ class FriendsAndFamilyScreen extends PureComponent<
     ) {
       this.updateAddressBook()
     }
-   
+    if ( this.state.trustedContacts ) {
+      this.setState( {
+        loading: false,
+      } )
+    }
     if (
       prevProps.trustedChannelsSetupSyncing !==
       this.props.trustedChannelsSetupSyncing
@@ -165,10 +171,12 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   updateAddressBook = async () => {
     const { regularAccount, trustedContactsService } = this.props
+
     const { trustedContactsInfo } = this.props
     const myKeepers = []
-    const imKeepers = []
-    const otherTrustedContact = []
+    const contactsKeptByUser = []
+    const otherTrustedContacts = []
+
     if ( trustedContactsInfo ) {
       if ( trustedContactsInfo.length ) {
         const trustedContacts = []
@@ -264,27 +272,28 @@ class FriendsAndFamilyScreen extends PureComponent<
             } )
           }
           if ( element.isWard ) {
-            imKeepers.push( element )
+            contactsKeptByUser.push( element )
           }
           if ( !element.isWard && !element.isGuardian ) {
-            otherTrustedContact.push( {
+            otherTrustedContacts.push( {
               ...element, isRemovable: true
             } )
           }
         }
+
         this.setState(
           {
-            MyKeeper: myKeepers,
-            IMKeeper: imKeepers,
-            OtherTrustedContact: otherTrustedContact,
-            trustedContact: trustedContacts,
+            myKeepers: myKeepers,
+            contactsKeptByUser,
+            otherTrustedContacts,
+            trustedContacts,
           },
           () =>
             this.props.updateAddressBookLocally( {
               MyKeeper: myKeepers,
-              IMKeeper: imKeepers,
-              OtherTrustedContact: otherTrustedContact,
-              trustedContact: trustedContacts,
+              contactsKeptByUser,
+              otherTrustedContacts,
+              trustedContacts,
             } ),
         )
       }
@@ -411,9 +420,9 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { trustedChannelsSetupSync } = this.props
 
     const {
-      MyKeeper: contactsKeepingUser,
-      IMKeeper: contactsKeptByUser,
-      OtherTrustedContact: otherTrustedContacts,
+      myKeepers: contactsKeepingUser,
+      contactsKeptByUser: contactsKeptByUser,
+      otherTrustedContacts: otherTrustedContacts,
       onRefresh,
       showLoader
     } = this.state
@@ -605,6 +614,7 @@ const mapStateToProps = ( state ) => {
     state,
     ( _ ) => _.trustedContacts.trustedContactsInfo,
   )
+
   return {
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
@@ -616,6 +626,7 @@ const mapStateToProps = ( state ) => {
     trustedContactsInfo,
   }
 }
+
 export default connect( mapStateToProps, {
   trustedChannelsSetupSync,
   updateAddressBookLocally,

@@ -17,8 +17,9 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
-import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/serviceTypes'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { makeAccountRecipientDescriptionFromUnknownData, makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
 export default function SendConfirmationContent( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
@@ -47,7 +48,7 @@ export default function SendConfirmationContent( props ) {
     // 🔑 This seems to be the way the backend is distinguishing between
     // accounts and contacts.
     if ( selectedContactData.account_name != null ) {
-      recipient = makeSubAccountRecipientDescription(
+      recipient = makeAccountRecipientDescriptionFromUnknownData(
         selectedContactData,
         accountKind,
       )
@@ -66,7 +67,7 @@ export default function SendConfirmationContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white 
+      height: '100%', backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -77,14 +78,14 @@ export default function SendConfirmationContent( props ) {
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1%' ) 
+          ...styles.modalInfoText, marginTop: wp( '1%' )
         }}>
           {props.info}
         </Text>
       </View>
 
       <ScrollView style={{
-        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' ) 
+        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' )
       }}>
         {props.userInfo.map( ( item ) => renderContacts( item ) )}
       </ScrollView>
@@ -99,7 +100,7 @@ export default function SendConfirmationContent( props ) {
           }}
         >
           <Text style={{
-            ...styles.modalInfoText 
+            ...styles.modalInfoText
           }}>
             {props.infoText ? props.infoText : ''}
           </Text>
@@ -119,11 +120,11 @@ export default function SendConfirmationContent( props ) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{
-            ...styles.successModalButtonView 
+            ...styles.successModalButtonView
           }}
         >
           <Text style={styles.proceedButtonText}
-          onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
+            onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper
@@ -136,7 +137,7 @@ export default function SendConfirmationContent( props ) {
             }}
           >
             <Text style={{
-              ...styles.proceedButtonText, color: Colors.blue 
+              ...styles.proceedButtonText, color: Colors.blue
             }}>
               {props.cancelButtonText}
             </Text>
@@ -232,7 +233,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
@@ -273,7 +274,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   contactNameText: {
