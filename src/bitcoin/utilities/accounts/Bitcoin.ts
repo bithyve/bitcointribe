@@ -202,38 +202,76 @@ export default class Bitcoin {
               // check for duplicate tx (fetched against sending and  then again for change address)
               txMap.set(tx.txid, true);
 
-              const transaction = {
-                txid: tx.txid,
-                confirmations:
-                  accountType === 'Test Account' &&
-                  tx.TransactionType === 'Received' &&
-                  addressInfo.Address === externalAddresses[0] &&
-                  tx.NumberofConfirmations < 1
-                    ? '-'
-                    : tx.NumberofConfirmations,
-                status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                fee: tx.fee,
-                date: tx.Status.block_time
-                  ? new Date(tx.Status.block_time * 1000).toUTCString()
-                  : new Date(Date.now()).toUTCString(),
-                transactionType: tx.TransactionType,
-                amount: tx.Amount,
-                accountType:
-                  accountType === TRUSTED_CONTACTS
-                    ? contactName
-                        .split(' ')
-                        .map(
-                          (word) => word[0].toUpperCase() + word.substring(1),
-                        )
-                        .join(' ')
-                    : accountType,
-                primaryAccType,
-                recipientAddresses: tx.RecipientAddresses,
-                senderAddresses: tx.SenderAddresses,
-                blockTime: tx.Status.block_time, // only available when tx is confirmed
-              };
+              if (tx.transactionType === 'Self') {
+                const outgoingTx = {
+                  txid: tx.txid,
+                  confirmations: tx.NumberofConfirmations,
+                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                  fee: tx.fee,
+                  date: tx.Status.block_time
+                    ? new Date(tx.Status.block_time * 1000).toUTCString()
+                    : new Date(Date.now()).toUTCString(),
+                  transactionType: 'Sent',
+                  amount: tx.SentAmount,
+                  accountType: tx.accountType,
+                  primaryAccType,
+                  recipientAddresses: tx.RecipientAddresses,
+                  blockTime: tx.Status.block_time, // only available when tx is confirmed
+                };
 
-              transactions.transactionDetails.push(transaction);
+                const incomingTx = {
+                  txid: tx.txid,
+                  confirmations: tx.NumberofConfirmations,
+                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                  fee: tx.fee,
+                  date: tx.Status.block_time
+                    ? new Date(tx.Status.block_time * 1000).toUTCString()
+                    : new Date(Date.now()).toUTCString(),
+                  transactionType: 'Received',
+                  amount: tx.ReceivedAmount,
+                  accountType: tx.accountType,
+                  primaryAccType,
+                  senderAddresses: tx.SenderAddresses,
+                  blockTime: tx.Status.block_time, // only available when tx is confirmed
+                };
+                // console.log({ outgoingTx, incomingTx });
+                transactions.transactionDetails.push(
+                  ...[outgoingTx, incomingTx],
+                );
+              } else {
+                const transaction = {
+                  txid: tx.txid,
+                  confirmations:
+                    accountType === 'Test Account' &&
+                    tx.TransactionType === 'Received' &&
+                    addressInfo.Address === externalAddresses[0] &&
+                    tx.NumberofConfirmations < 1
+                      ? '-'
+                      : tx.NumberofConfirmations,
+                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                  fee: tx.fee,
+                  date: tx.Status.block_time
+                    ? new Date(tx.Status.block_time * 1000).toUTCString()
+                    : new Date(Date.now()).toUTCString(),
+                  transactionType: tx.TransactionType,
+                  amount: tx.Amount,
+                  accountType:
+                    accountType === TRUSTED_CONTACTS
+                      ? contactName
+                          .split(' ')
+                          .map(
+                            (word) => word[0].toUpperCase() + word.substring(1),
+                          )
+                          .join(' ')
+                      : accountType,
+                  primaryAccType,
+                  recipientAddresses: tx.RecipientAddresses,
+                  senderAddresses: tx.SenderAddresses,
+                  blockTime: tx.Status.block_time, // only available when tx is confirmed
+                };
+
+                transactions.transactionDetails.push(transaction);
+              }
             }
           });
 
