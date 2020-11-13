@@ -111,6 +111,8 @@ interface AccountsStateTypes {
   spendableBalance: any;
   providedBalance: any;
   prefersBitcoin: boolean;
+  showRefreshLoader: boolean;
+
 }
 
 interface AccountsPropsTypes {
@@ -210,6 +212,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactionItem: {},
       isHelperDone: true,
       showLoader: true,
+      showRefreshLoader: false,
       netBalance: 0,
       providedBalance: 0,
       spendableBalance: 0,
@@ -469,6 +472,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   refreshAccountBalance = () => {
     const { presentCarouselData, serviceType } = this.state;
+    this.setState({showRefreshLoader: true});
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
       
@@ -548,6 +552,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
     if (prevState.serviceType !== this.state.serviceType) {
       this.getAverageTxFees();
+    }
+
+    if(prevProps.accounts[this.state.serviceType].loading.balanceTx !== this.props.accounts[this.state.serviceType].loading.balanceTx){
+      if(!this.props.accounts[this.state.serviceType].loading.balanceTx){
+        this.setState({showRefreshLoader: false});
+      }
     }
 
     if (prevProps.accounts !== this.props.accounts) {
@@ -979,6 +989,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       serviceType,
       carouselInitIndex,
       showLoader,
+      showRefreshLoader,
       transactionLoading,
       isTestHelperDone,
       isSecureAccountHelperDone,
@@ -993,6 +1004,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       carouselData,
       averageTxFees,
     } = this.state;
+    console.log("accounts[serviceType].loading.balanceTx",this.props.accounts[serviceType].loading.balanceTx);
 
     const { exchangeRates, accounts } = this.props;
 
@@ -1477,7 +1489,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null}
             </ScrollView>
-            {showLoader ? <Loader /> : null}
+            {showLoader ? <Loader loader={true}/> : showRefreshLoader ? <Loader/> : null}
           </View>
         ) : (
           <ScrollView

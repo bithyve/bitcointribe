@@ -376,7 +376,7 @@ export default function FundingSourcesContainerScreen(props) {
         </ScrollView>
       ) : null}
       {
-        loading ? <Loader /> : null
+        loading ? <Loader loader={true}/> : null
       }
       <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
