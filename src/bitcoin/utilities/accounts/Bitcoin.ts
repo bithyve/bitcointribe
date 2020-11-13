@@ -120,25 +120,27 @@ export default class Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
+      const accountToAddressMapping = {
+        ['mono-id']: {
+          External: externalAddresses,
+          Internal: internalAddresses,
+        },
+      };
+
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-          {
-            External: externalAddresses,
-            Internal: internalAddresses,
-          },
+          accountToAddressMapping,
         );
       } else {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-          {
-            External: externalAddresses,
-            Internal: internalAddresses,
-          },
+          accountToAddressMapping,
         );
       }
 
-      const { Utxos, Txs } = res.data;
+      const accountToResponseMapping = res.data;
+      const { Utxos, Txs } = accountToResponseMapping['mono-id'];
       let balances = {
         balance: 0,
         unconfirmedBalance: 0,
