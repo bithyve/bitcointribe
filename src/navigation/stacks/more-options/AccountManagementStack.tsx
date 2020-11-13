@@ -1,10 +1,11 @@
 import React from 'react';
-import NavStyles from '../../../common/Styles/NavStyles';
 import { createStackNavigator } from 'react-navigation-stack';
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
 import AccountManagementContainerScreen from '../../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen';
 import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen';
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton';
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
 
 
 const PanAccountSettingsStack = createStackNavigator(
@@ -24,7 +25,7 @@ const PanAccountSettingsStack = createStackNavigator(
   {
     defaultNavigationOptions: () => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
       };
     },
   },
@@ -39,7 +40,7 @@ const AccountManagementStack = createStackNavigator(
         return {
           title: "Account Management",
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
           },
           headerRight: () => {
             return (
@@ -59,9 +60,10 @@ const AccountManagementStack = createStackNavigator(
     },
   },
   {
+    mode: 'modal',
     defaultNavigationOptions: () => {
       return {
-        headerTitleStyle: NavStyles.modalHeaderTitleText,
+        ...defaultStackScreenNavigationOptions,
       };
     },
   },

@@ -21,6 +21,8 @@ import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-e
 import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet';
 import AccountShell from '../../../common/data/models/AccountShell';
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
+import { NavigationScreenConfig } from 'react-navigation';
+import { NavigationStackOptions } from 'react-navigation-stack';
 
 export type Props = {
   navigation: any;
@@ -223,14 +225,15 @@ const styles = StyleSheet.create({
   },
 });
 
-AccountDetailsContainerScreen.navigationOptions = ({ }) => {
+
+AccountDetailsContainerScreen.navigationOptions = ({ navigation }): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
-    header: ({ navigation }) => {
+    header() {
       const { accountShellID } = navigation.state.params;
 
       return <NavHeader
         accountShellID={accountShellID}
-        onBackPressed={() => navigation.goBack()}
+        onBackPressed={() => navigation.pop() }
       />;
     },
   };
