@@ -40,6 +40,7 @@ export const CLOUD_MSHARE = "CLOUD_MSHARE";
 export const S3_LOADING_KEEPER = "S3_LOADING_KEEPER";
 export const UPLOAD_ENC_MSHARE_KEEPER = "UPLOAD_ENC_MSHARE_KEEPER";
 export const SEND_APPROVAL_REQUEST = 'SEND_APPROVAL_REQUEST';
+export const UPLOAD_SECONDARY_SHARE = 'UPLOAD_SECONDARY_SHARE';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -131,11 +132,12 @@ export const createAndUploadOnEFChannel = (
   isPrimaryKeeper,
   selectedShareId,
   share,
-  type
+  type,
+  isReshare
 ) => {
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
-    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type },
+    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare },
   };
 };
 
@@ -224,6 +226,10 @@ export const uploadEncMShareKeeper = (
   };
 };
 
-export const sendApprovalRequest = (shareID) => {
-  return { type: SEND_APPROVAL_REQUEST, payload: { shareID } };
+export const sendApprovalRequest = (shareID, PkShareId) => {
+  return { type: SEND_APPROVAL_REQUEST, payload: { shareID, PkShareId } };
 };
+
+export const uploadSecondaryShare = () => {
+  return { type: UPLOAD_SECONDARY_SHARE };
+}

@@ -21,19 +21,25 @@ const HistoryHeaderComponent = (props) => {
             style={{ width: wp('5%'), height: wp('2%') }}
           />
         </TouchableOpacity>
-        <View style={styles.headerImageView}>
-          <Image
-            style={styles.headerImage}
-            source={props.headerImage}
-          />
-        </View>
+        {props.imageIcon ? (
+          props.imageIcon()
+        ) : (
+          <View style={styles.headerImageView}>
+            <Image style={styles.headerImage} source={props.headerImage} />
+          </View>
+        )}
         <View style={styles.headerInfoView}>
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.infoText}>
-              Last backup <Text style={{fontFamily: Fonts.FiraSansMediumItalic}}>{props.selectedTime.replace('approximately', '').trim()}</Text>
+              Last backup{' '}
+              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                {props.selectedTime.replace('approximately', '').trim()}
+              </Text>
             </Text>
             <Text style={styles.titleText}>{props.selectedTitle}</Text>
-            <Text style={{...styles.infoText, fontSize: RFValue(10)}}>{props.moreInfo}</Text>
+            <Text style={{ ...styles.infoText, fontSize: RFValue(10) }}>
+              {props.moreInfo}
+            </Text>
           </View>
         </View>
       </View>
@@ -95,5 +101,5 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     marginLeft: wp('4%'),
-  }
+  },
 });

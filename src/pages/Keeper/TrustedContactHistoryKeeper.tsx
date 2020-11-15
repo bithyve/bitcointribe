@@ -27,7 +27,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import HistoryPageComponent from '../../components/HistoryPageComponent';
+import HistoryPageComponent from './HistoryPageComponent';
 import TrustedContacts from './TrustedContacts';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
@@ -38,7 +38,7 @@ import {
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
-  checkMSharesHealth
+  checkMSharesHealth,
 } from '../../store/actions/health';
 import { useDispatch } from 'react-redux';
 import SendShareModal from './SendShareModal';
@@ -65,6 +65,7 @@ import {
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { isEmptyObject } from '../../common/CommonFunctions/index';
+import HistoryHeaderComponent from './HistoryHeaderComponent';
 
 const TrustedContactHistoryKeeper = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -78,13 +79,19 @@ const TrustedContactHistoryKeeper = (props) => {
   const [selectedContactMode, setSelectedContactMode] = useState(null);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
   const [changeContact, setChangeContact] = useState(false);
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
-  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(React.createRef());
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
+    React.createRef(),
+  );
   const [OTP, setOTP] = useState('');
   const [renderTimer, setRenderTimer] = useState(false);
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
-  const [chosenContact, setChosenContact] = useState(Object);
-  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(React.createRef());
+  const [chosenContact, setChosenContact] = useState(props.navigation.state.params.selectedContact);
+  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
+    React.createRef(),
+  );
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
@@ -124,6 +131,7 @@ const TrustedContactHistoryKeeper = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+  const selectedContact = props.navigation.getParam('selectedContact');
   const [isOTPType, setIsOTPType] = useState(false);
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
@@ -165,6 +173,10 @@ const TrustedContactHistoryKeeper = (props) => {
   const s3Service = useSelector((state) => state.health.service);
   const keeperInfo = useSelector((state) => state.health.keeperInfo);
 
+  useEffect(()=>{
+    setChosenContact(selectedContact);
+  },[selectedContact])
+
   useEffect(() => {
     (async () => {
       let selectedContactModeTemp = await AsyncStorage.getItem(
@@ -198,14 +210,20 @@ const TrustedContactHistoryKeeper = (props) => {
 
   const setContactInfo = useCallback(async () => {
     let keeperInfoTemp: any[] = keeperInfo;
-    if(keeperInfoTemp.length>0){
-      let keeperInfoIndex = keeperInfoTemp.findIndex(value=>value.shareId == selectedShareId);
-      if(keeperInfoIndex > -1){
+    if (keeperInfoTemp.length > 0) {
+      let keeperInfoIndex = keeperInfoTemp.findIndex(
+        (value) => value.shareId == selectedShareId,
+      );
+      if (keeperInfoIndex > -1) {
         setSelectedContacts(keeperInfoTemp[keeperInfoIndex].data);
         const selectedContacts = trustedContactsInfo.slice(1, 3);
         let tempContact = selectedContacts[0];
-        const tcInstance = trustedContacts.tc.trustedContacts[tempContact.name.toLowerCase().trim()];
-        if (tcInstance) tempContact.contactsWalletName = tcInstance.contactsWalletName;
+        const tcInstance =
+          trustedContacts.tc.trustedContacts[
+            tempContact.name.toLowerCase().trim()
+          ];
+        if (tcInstance)
+          tempContact.contactsWalletName = tcInstance.contactsWalletName;
         setChosenContact(tempContact);
       }
     }
@@ -288,7 +306,7 @@ const TrustedContactHistoryKeeper = (props) => {
       setShared(true);
       dispatch(checkMSharesHealth());
     },
-    [ saveInTransitHistory, chosenContact],
+    [saveInTransitHistory, chosenContact],
   );
 
   const renderShareOtpWithTrustedContactContent = useCallback(() => {
@@ -447,37 +465,20 @@ const TrustedContactHistoryKeeper = (props) => {
     if (chosenContact.name) {
       if (chosenContact.imageAvailable) {
         return (
-          <Image
-            source={chosenContact.image}
-            style={{
-              width: wp('9%'),
-              height: wp('9%'),
-              resizeMode: 'contain',
-              alignSelf: 'center',
-              marginRight: 8,
-              borderRadius: wp('9%') / 2,
-            }}
-          />
+          <View style={styles.imageBackground}>
+            <Image
+              source={chosenContact.image}
+              style={styles.contactImage}
+            />
+          </View>
         );
       } else {
         return (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: Colors.shadowBlue,
-              width: wp('10%'),
-              height: wp('10%'),
-              alignSelf: 'center',
-              marginRight: 8,
-              borderRadius: wp('10%') / 2,
-            }}
-          >
+          <View style={styles.imageBackground}>
             <Text
               style={{
                 textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 13, //... One for top and one for bottom alignment
+                fontSize: RFValue(16),
               }}
             >
               {chosenContact &&
@@ -503,13 +504,7 @@ const TrustedContactHistoryKeeper = (props) => {
     }
     return (
       <Image
-        style={{
-          width: wp('9%'),
-          height: wp('9%'),
-          resizeMode: 'contain',
-          alignSelf: 'center',
-          marginRight: 8,
-        }}
+        style={styles.contactImageAvatar}
         source={require('../../assets/images/icons/icon_user.png')}
       />
     );
@@ -650,16 +645,16 @@ const TrustedContactHistoryKeeper = (props) => {
           reshareVersion: 0,
           updatedAt: moment(new Date()).valueOf(),
           name: contact.name,
-          shareType: 'contact'
-        }
+          shareType: 'contact',
+        },
       ];
       dispatch(updateMSharesHealth(shareArray));
       let keeperInfoTemp = keeperInfo;
       let flag = false;
-      if(keeperInfoTemp.length>0){
+      if (keeperInfoTemp.length > 0) {
         for (let i = 0; i < keeperInfoTemp.length; i++) {
           const element = keeperInfoTemp[i];
-          if(element.shareId == selectedShareId){
+          if (element.shareId == selectedShareId) {
             keeperInfoTemp[i].name = contact.name;
             keeperInfoTemp[i].uuid = contact.id;
             keeperInfoTemp[i].publicKey = '';
@@ -667,17 +662,15 @@ const TrustedContactHistoryKeeper = (props) => {
             keeperInfoTemp[i].type = 'contact';
             keeperInfoTemp[i].data = contact;
             break;
-          }
-          else {
+          } else {
             flag = true;
             break;
           }
         }
-      }
-      else{
+      } else {
         flag = true;
       }
-      if(flag){
+      if (flag) {
         let obj = {
           shareId: selectedShareId,
           name: contact.name,
@@ -685,8 +678,8 @@ const TrustedContactHistoryKeeper = (props) => {
           publicKey: '',
           ephemeralAddress: '',
           type: 'contact',
-          data: contact 
-        }
+          data: contact,
+        };
         keeperInfo.push(obj);
       }
       dispatch(updatedKeeperInfo(keeperInfo));
@@ -978,112 +971,39 @@ const TrustedContactHistoryKeeper = (props) => {
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.goBack();
-            }}
-            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginRight: 10,
-            }}
-          >
-            {getImageIcon()}
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.firstName === 'F&F request' &&
-                chosenContact.contactsWalletName !== undefined &&
-                chosenContact.contactsWalletName !== ''
-                  ? `${chosenContact.contactsWalletName}'s wallet`
-                  : chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.firstName + ' ' + chosenContact.lastName
-                  : chosenContact.firstName && !chosenContact.lastName
-                  ? chosenContact.firstName
-                  : !chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.lastName
-                  : 'Friends and Family'}
-              </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
-                Last backup{' '}
-                <Text
-                  style={{
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {' '}
-                  {props.navigation.state.params.selectedTime}
-                </Text>
-              </Text>
-            </View>
-            <KnowMoreButton
-              onpress={() => (HelpBottomSheet as any).current.snapTo(1)}
-              containerStyle={styles.knowMoreButton}
-              textStyle={{}}
-            />
-            <Image
-              style={{
-                width: shared ? 14 : 17,
-                height: shared ? 16 : 17,
-                resizeMode: 'contain',
-                marginLeft: 'auto',
-                alignSelf: 'center',
-              }}
-              source={
-                shared
-                  ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
-                  : require('../../assets/images/icons/icon_error_gray.png')
-              }
-            />
-          </View>
-        </View>
-      </View>
+      <HistoryHeaderComponent
+        onPressBack={() => props.navigation.goBack()}
+        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTime={props.navigation.state.params.selectedTime}
+        selectedStatus={props.navigation.state.params.selectedStatus}
+        moreInfo={props.navigation.state.params.selectedTitle}
+        headerImage={require('../../assets/images/icons/icon_secondarydevice.png')}
+        imageIcon={getImageIcon}
+      />
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           type={'contact'}
-          IsReshare={shared}
-          onPressContinue={() => {
+          IsReshare={
+            props.navigation.state.params.selectedStatus == 'notAccessible'
+              ? false
+              : true
+          }
+          data={sortedHistory(trustedContactHistory)}
+          confirmButtonText={'Confirm'}
+          onPressChange={() => {
+            (ChangeBottomSheet as any).current.snapTo(1);
+          }}
+          onPressConfirm={() => {
             setTimeout(() => {
               setLoadContacts(true);
             }, 2);
             (trustedContactsBottomSheet as any).current.snapTo(1);
           }}
-          data={sortedHistory(trustedContactHistory)}
-          reshareInfo={
-            shared && !guardianExists
-              ? 'Want to send the Recovery Key again to the same contact? '
-              : null
-          }
-          changeInfo={
-            shared
-              ? 'Want to send the Recovery Key to another contact? '
-              : null
-          }
-          onPressChange={() => {
-            (ChangeBottomSheet as any).current.snapTo(1);
-          }}
-          onPressConfirm={() => {
-            (ConfirmBottomSheet as any).current.snapTo(1);
-          }}
           onPressReshare={() => {
             (ReshareBottomSheet as any).current.snapTo(1);
           }}
+          reshareButtonText={'Restore Keeper'}
+          changeButtonText={'Change Keeper'}
         />
       </View>
       <BottomSheet
@@ -1214,24 +1134,37 @@ const TrustedContactHistoryKeeper = (props) => {
 export default TrustedContactHistoryKeeper;
 
 const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
+  imageBackground: {
+    backgroundColor: Colors.shadowBlue,
+    height: wp('15%'),
+    width: wp('15%'),
+    borderRadius: wp('15%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 2.5,
+    shadowColor: Colors.textColorGrey,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
+    marginLeft: wp('4%'),
   },
-  knowMoreButton: {
-    marginTop: 'auto',
-    marginBottom: 'auto',
-    marginRight: 10,
+  contactImageAvatar: {
+    width: wp('15%'),
+    height: wp('15%'),
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginRight: 8,
+    shadowColor: Colors.textColorGrey,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
+  contactImage: {
+    height: wp('14%'),
+    width: wp('14%'),
+    resizeMode: 'cover',
+    alignSelf: 'center',
+    borderRadius: wp('14%') / 2,
+  }
 });

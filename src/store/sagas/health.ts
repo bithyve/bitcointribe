@@ -34,6 +34,7 @@ import {
   switchS3LoaderKeeper,
   UPLOAD_ENC_MSHARE_KEEPER,
   SEND_APPROVAL_REQUEST,
+  UPLOAD_SECONDARY_SHARE,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -59,6 +60,7 @@ import KeeperService from '../../bitcoin/services/KeeperService';
 import {
   EphemeralDataElements,
   INotification,
+  Keepers,
   MetaShare,
   notificationTag,
   notificationType,
@@ -311,19 +313,43 @@ export const updateSharesHealthWatcher = createWatcher(
 );
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
+  let {
+    isReshare,
+    featuresList,
+    isPrimaryKeeper,
+    scannedData,
+    selectedShareId,
+  } = payload;
   const fcmTokenValue = yield select(
     (state) => state.preferences.fcmTokenValue,
   );
-  let featuresList = payload.featuresList;
-  let type = payload.isPrimaryKeeper ? 'primaryKeeper' : payload.type;
+  let type = isPrimaryKeeper ? 'primaryKeeper' : payload.type;
 
   yield put(updateMSharesLoader(true));
   const keeper: KeeperService = yield select((state) => state.keeper.service);
-  
+
   let securityQuestion = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
+  let { DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database,
+  );
   let s3Service: S3Service = yield select((state) => state.health.service);
+  if (isReshare) {
+    let shareIndex = 1;
+    if (payload.shareId && s3Service.levelhealth.metaShares.length) {
+      let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+      if (
+        metaShare.findIndex((value) => value.shareId == payload.shareId) > -1
+      ) {
+        shareIndex = metaShare.findIndex(
+          (value) => value.shareId == payload.shareId,
+        );
+      }
+    }
+    yield call(s3Service.reshareMetaShare, shareIndex);
+  }
+
   let s3ServiceTest: S3Service = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
@@ -338,27 +364,30 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let regularXpub = s3ServiceRegular.hdWallet.getXpub();
   let secureXpub = s3ServiceSecure.getXpubsForAccount();
 
-  let EFChannelData = JSON.parse(payload.scannedData);
+  let ScannedData = JSON.parse(scannedData);
 
   let encKey;
-  if (EFChannelData.uuid) encKey = LevelHealth.strechKey(EFChannelData.uuid);
-  let { otpEncryptedData, otp } = LevelHealth.encryptViaOTP(EFChannelData.uuid);
+  if (ScannedData.uuid) encKey = LevelHealth.strechKey(ScannedData.uuid);
+  let { otpEncryptedData, otp } = LevelHealth.encryptViaOTP(ScannedData.uuid);
   const encryptedKey = otpEncryptedData;
 
   let share = s3Service.levelhealth.metaShares[1];
-  if (payload.selectedShareId) {
+  if (selectedShareId) {
     share = payload.share;
   }
   let walletID = s3Service.getWalletId().data.walletId;
   let hexaPublicKey = '';
   let trustedChannelAddress = '';
-  let EfChannelAddress = EFChannelData.ephemeralAddress;
+  let EfChannelAddress = ScannedData.ephemeralAddress;
   const result = yield call(
     keeper.finalizeKeeper,
     share.shareId,
-    EFChannelData.publicKey,
+    ScannedData.publicKey,
     encKey,
-    EFChannelData.walletName,
+    ScannedData.uuid,
+    featuresList,
+    isPrimaryKeeper,
+    ScannedData.walletName,
     EfChannelAddress,
   );
   if (result.status === 200) {
@@ -367,7 +396,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     EfChannelAddress = result.data.ephemeralAddress;
 
     let dataElements: EphemeralDataElements = {
-      publicKey: EFChannelData.publicKey, //Keeper scanned public key
+      publicKey: ScannedData.publicKey, //Keeper scanned public key
       FCM: fcmTokenValue,
       walletID,
       shareTransferDetails: {
@@ -380,9 +409,11 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       trustedAddress: trustedChannelAddress,
     };
 
+    if (isReshare) dataElements.restoreOf = walletID;
+
     const shareUploadables = LevelHealth.encryptMetaShare(
       share,
-      EFChannelData.uuid,
+      ScannedData.uuid,
     );
 
     let Kp = new KeeperService();
@@ -390,10 +421,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       Kp.updateEphemeralChannel,
       share.shareId,
       type,
-      EFChannelData.publicKey,
-      EFChannelData.ephemeralAddress,
+      ScannedData.publicKey,
+      ScannedData.ephemeralAddress,
       dataElements,
-      EFChannelData.uuid,
+      ScannedData.uuid,
       shareUploadables,
     );
     if (res.status == 200) {
@@ -402,13 +433,13 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         xPub: { testXpub, regularXpub, secureXpub: secureXpub },
         walletID,
         FCM: fcmTokenValue,
-        walletName: EFChannelData.walletName,
+        walletName: ScannedData.walletName,
         version: DeviceInfo.getVersion(),
         shareTransferDetails: {
           otp,
           encryptedKey,
         },
-        isPrimary: payload.isPrimaryKeeper,
+        isPrimary: isPrimaryKeeper,
         featuresList,
         securityQuestion,
       };
@@ -419,15 +450,16 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         false,
       );
       if (updateRes.status == 200) {
-        console.log('updateRes', updateRes);
-
+        if(isReshare){
+          yield call(uploadSecondaryShareWorker, {payload: {encryptedKey: dataElements.shareTransferDetails.encryptedKey, metaShare: DECENTRALIZED_BACKUP.PK_SHARE, otp: dataElements.shareTransferDetails.otp}});
+        }
         let shareArray = [
           {
             walletId: s3Service.getWalletId().data.walletId,
             shareId: share.shareId,
             reshareVersion: 0,
             updatedAt: moment(new Date()).valueOf(),
-            name: EFChannelData.walletName,
+            name: ScannedData.walletName,
             shareType: type,
           },
         ];
@@ -438,10 +470,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           for (let i = 0; i < keeperInfo.length; i++) {
             const element = keeperInfo[i];
             if (element.shareId == share.shareId) {
-              keeperInfo[i].name = EFChannelData.walletName;
-              keeperInfo[i].uuid = EFChannelData.uuid;
-              keeperInfo[i].publicKey = EFChannelData.publicKey;
-              keeperInfo[i].ephemeralAddress = EFChannelData.ephemeralAddress;
+              keeperInfo[i].name = ScannedData.walletName;
+              keeperInfo[i].uuid = ScannedData.uuid;
+              keeperInfo[i].publicKey = ScannedData.publicKey;
+              keeperInfo[i].ephemeralAddress = ScannedData.ephemeralAddress;
               keeperInfo[i].type = type;
               break;
             } else {
@@ -455,10 +487,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         if (flag) {
           let obj = {
             shareId: share.shareId,
-            name: EFChannelData.walletName,
-            uuid: EFChannelData.uuid,
-            publicKey: EFChannelData.publicKey,
-            ephemeralAddress: EFChannelData.ephemeralAddress,
+            name: ScannedData.walletName,
+            uuid: ScannedData.uuid,
+            publicKey: ScannedData.publicKey,
+            ephemeralAddress: ScannedData.ephemeralAddress,
             type,
           };
           keeperInfo.push(obj);
@@ -470,6 +502,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
+          S3_SERVICE: JSON.stringify(s3Service),
           KEEPERS_INFO: JSON.stringify(keepers),
         };
         yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
@@ -484,12 +517,31 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
   CREATE_N_UPLOAD_ON_EF_CHANNEL,
 );
 
+function* uploadSecondaryShareWorker({ payload }) {
+  let { encryptedKey, metaShare, otp } = payload;
+  const keeper: KeeperService = yield select((state) => state.keeper.service);
+  const result = yield call(
+    keeper.uploadSecondaryShare,
+    encryptedKey,
+    metaShare,
+    otp
+  );
+  if (result.status === 200) {
+  }
+  yield put(updateMSharesLoader(false));
+}
+
+export const uploadSecondaryShareWatcher = createWatcher(
+  uploadSecondaryShareWorker,
+  UPLOAD_SECONDARY_SHARE,
+);
+
 function* updateHealthLevel2Worker() {
-  console.log('INIT_LEVEL_TWO workes')
+  console.log('INIT_LEVEL_TWO workes');
   let isLevel2Initialized = yield select(
     (state) => state.health.isLevel2Initialized,
   );
-  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized)
+  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized);
   if (!isLevel2Initialized) {
     let s3Service: S3Service = yield select((state) => state.health.service);
     let Health = yield select((state) => state.health.levelHealth);
@@ -499,7 +551,7 @@ function* updateHealthLevel2Worker() {
       s3Service.updateHealthLevel2,
       SecurityQuestionHealth,
     );
-    console.log('INIT_LEVEL_TWO res', res)
+    console.log('INIT_LEVEL_TWO res', res);
     if (res.data.success) {
       // Update Health to reducer
       yield put(checkMSharesHealth());
@@ -816,14 +868,13 @@ function* recoverWalletWorker({ payload }) {
         secureAcc,
         s3Service,
         trustedContacts,
-        keepersInfo
+        keepersInfo,
       } = yield call(
         serviceGenerator2,
         security.answer,
         mnemonic,
         restorationShares,
       );
-
 
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};
@@ -847,7 +898,7 @@ function* recoverWalletWorker({ payload }) {
         SHARES_TRANSFER_DETAILS: {},
         UNDER_CUSTODY: {},
         DYNAMIC_NONPMDD: {},
-        PK_SHARE: {}
+        PK_SHARE: {},
       };
       console.log({ DECENTRALIZED_BACKUP });
 
@@ -1039,7 +1090,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   // Transfer: User >>> Guardian
   yield put(switchS3LoaderKeeper('uploadMetaShare'));
 
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.health.service);
   if (!s3Service.levelhealth.metaShares.length) return;
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
@@ -1223,27 +1274,23 @@ export const uploadEncMetaShareKeeperWatcher = createWatcher(
 
 function* sendApprovalRequestWorker({ payload }) {
   yield put(switchS3LoaderKeeper('approvalRequest'));
-  let { shareID } = payload;
-  const keepersInfo: {
-    shareId: string;
-    name: string;
-    uuid: string;
-    publicKey: string;
-    ephemeralAddress: string;
-    type: string;
-    data?: any;
-  }[] = yield select((state) => state.health.keeperInfo);
-  let index = keepersInfo.findIndex(value=>value.type == "primaryKeeper");
-  if(index>-1){
+  let { shareID, PkShareId } = payload;
+  let keeper = yield select((state) => state.keeper.service);
+  let keeperInfo: Keepers = keeper.keeper.keepers[PkShareId];
+  if (keeperInfo.keeperUUID) {
     const notification: INotification = {
       notificationType: notificationType.approveKeeper,
-      title: "Approval Request for Keeper",
-      body: "Approval Keeper setup",
-      data: JSON.stringify({shareID}),
+      title: 'Approval Request for Keeper',
+      body: 'Approval Keeper setup',
+      data: JSON.stringify({ shareID }),
       tag: notificationTag.IMP,
-      date: new Date()
-    }
-    let res = yield call(RelayServices.sendKeeperNotifications, [keepersInfo[index].uuid], notification);
+      date: new Date(),
+    };
+    let res = yield call(
+      RelayServices.sendKeeperNotifications,
+      [keeperInfo.keeperUUID],
+      notification,
+    );
   }
   yield put(switchS3LoaderKeeper('approvalRequest'));
 }

@@ -325,7 +325,6 @@ export interface Keepers {
     shareType?: string;
     privateKey?: string;
     publicKey?: string;
-    // encKey: string;
     shareTransferDetails?: {
       otp?: string;
       encryptedKey?: string;
@@ -345,6 +344,9 @@ export interface Keepers {
       address: string;
       data?: TrustedData[];
     };
+    keeperUUID?: string;
+    keeperFeatureList?: any[],
+    isPrimary?: Boolean
   }
 }
 

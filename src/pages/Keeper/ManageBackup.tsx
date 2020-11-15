@@ -21,16 +21,13 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import {
-  approveTrustedContact,
   fetchEphemeralChannel,
-  clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
 import {
   setCloudBackupStatus,
@@ -61,7 +58,6 @@ interface ManageBackupStateTypes {
   securityAtLevel: any;
   encryptedCloudDataJson: any;
   isPrimaryKeeper: any;
-  selectedShareId: string;
   isError: boolean;
   selectedKeeper: {
     shareType: string;
@@ -70,6 +66,7 @@ interface ManageBackupStateTypes {
     shareId: string;
     reshareVersion: number;
     name: string;
+    data: any,
   };
   selectedLevelId: number;
 }
@@ -97,6 +94,7 @@ interface ManageBackupPropsTypes {
   updateMSharesHealth: any;
   keeperInfo: any[];
   sendApprovalRequest: any;
+  service: any;
 }
 
 class ManageBackup extends Component<
@@ -160,7 +158,6 @@ class ManageBackup extends Component<
         },
       ],
       isPrimaryKeeper: false,
-      selectedShareId: '',
       encryptedCloudDataJson: [],
       selectedLevelId: 0,
     };
@@ -394,6 +391,8 @@ class ManageBackup extends Component<
       isPrimaryKeeper: this.state.isPrimaryKeeper,
       selectedShareId: shareId,
       selectedLevelId: id,
+      selectedContact: this.state.selectedKeeper.data,
+      selectedKeeper: this.state.selectedKeeper
     };
     if (shareType == 'device' || shareType == 'primaryKeeper') {
       this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
@@ -411,7 +410,7 @@ class ManageBackup extends Component<
   };
 
   sendApprovalRequestToPK = (shareId) => {
-    this.props.sendApprovalRequest(shareId);
+    this.props.sendApprovalRequest(shareId, this.state.levelData[1].keeper1.shareId);
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
   };
 
@@ -793,7 +792,6 @@ class ManageBackup extends Component<
                                 onPress={() => {
                                   this.setState({
                                     selectedKeeper: value.keeper1,
-                                    selectedShareId: value.keeper1.shareId,
                                     isPrimaryKeeper:
                                       value.id === 2 ? true : false,
                                     selectedLevelId: value.id,
@@ -815,7 +813,6 @@ class ManageBackup extends Component<
                                         .SetupPrimaryKeeperBottomSheet as any).snapTo(
                                         1,
                                       );
-                                    // (this.refs.keeperTypeBottomSheet as any).snapTo(1);
                                     else
                                       this.sendApprovalRequestToPK(
                                         value.keeper1.shareId,
@@ -842,7 +839,7 @@ class ManageBackup extends Component<
                                     }}
                                   />
                                 ) : value.keeper1.shareType == 'contact' &&
-                                  value.keeper1.updatedAt ? (
+                                  value.keeper1.updatedAt != 0 ? (
                                   <Image
                                     source={
                                       value.keeper1.data &&
@@ -911,7 +908,6 @@ class ManageBackup extends Component<
                                 onPress={() => {
                                   this.setState({
                                     selectedKeeper: value.keeper2,
-                                    selectedShareId: value.keeper2.shareId,
                                     isPrimaryKeeper: false,
                                     selectedLevelId: value.id,
                                   });
@@ -935,11 +931,29 @@ class ManageBackup extends Component<
                               >
                                 {value.keeper2.status == 'accessible' &&
                                 (value.keeper2.shareType == 'device' ||
-                                  value.keeper2.shareType == 'contact') ? (
+                                  value.keeper2.shareType ==
+                                    'primaryKeeper') ? (
                                   <Image
                                     source={
-                                      value.keeper2.shareType == 'device'
+                                      value.keeper2.shareType == 'device' ||
+                                      value.keeper2.shareType == 'primaryKeeper'
                                         ? require('../../assets/images/icons/icon_ipad_blue.png')
+                                        : require('../../assets/images/icons/pexels-photo.png')
+                                    }
+                                    style={{
+                                      width: wp('6%'),
+                                      height: wp('6%'),
+                                      resizeMode: 'contain',
+                                      borderRadius: wp('6%') / 2,
+                                    }}
+                                  />
+                                ) : value.keeper2.shareType == 'contact' &&
+                                  value.keeper2.updatedAt != 0 ? (
+                                  <Image
+                                    source={
+                                      value.keeper2.data &&
+                                      value.keeper2.data.imageAvailable
+                                        ? value.keeper2.data.image
                                         : require('../../assets/images/icons/pexels-photo.png')
                                     }
                                     style={{
@@ -1057,7 +1071,7 @@ class ManageBackup extends Component<
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
               onPressContinue={() => {
-                const { levelData, selectedShareId } = this.state;
+                const { levelData, selectedLevelId, selectedKeeper } = this.state;
                 let PKStatus = levelData[1].keeper1.keeper1Done
                   ? 'accessed'
                   : 'notAccessed';
@@ -1067,7 +1081,9 @@ class ManageBackup extends Component<
                   selectedTitle: 'Primary Keeper',
                   isPrimaryKeeper: true,
                   isSetUp: true,
-                  selectedShareId,
+                  selectedShareId: selectedKeeper.shareId,
+                  selectedLevelId,
+                  selectedContact: this.state.selectedKeeper.data
                 });
               }}
             />
@@ -1135,6 +1151,7 @@ const mapStateToProps = (state) => {
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
+    service: idx(state, (_) => _.keeper.service)
   };
 };
 

@@ -8,7 +8,9 @@ import {
   EphemeralDataForKeeper,
   EphemeralDataElements,
   EncryptedTrustedData,
-  TrustedData
+  TrustedData,
+  EncDynamicNonPMDD,
+  MetaShare
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -186,6 +188,9 @@ export default class Keeper {
     shareId: string,
     encodedPublicKey: string,
     encKey: string,
+    keeperUUID?: string,
+    keeperFeatureList?: any[],
+    isPrimary?: Boolean,
     walletName?: string,
     EfChannelAddress?: string,
   ): {
@@ -235,6 +240,9 @@ export default class Keeper {
       },
       keeperPubKey: encodedPublicKey,
       walletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+      keeperUUID,
+      keeperFeatureList,
+      isPrimary,
     };
     return {
       channelAddress,
@@ -735,6 +743,42 @@ export default class Keeper {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
       throw new Error(err.message);
+    }
+  };
+
+  public uploadSecondaryShare = async (
+    encryptedKey: string,
+    metaShare: MetaShare,
+    otp?: string,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
+  ): Promise<{ success: boolean }> => {
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
+    const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
+      metaShare,
+      key,
+    );
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('uploadSecondaryShare', {
+        HEXA_ID,
+        share: encryptedMetaShare,
+        messageId,
+        encryptedDynamicNonPMDD,
+      });
+
+      const { success } = res.data;
+      if (!success) {
+        throw new Error('Unable to upload share');
+      }
+      return { success };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      return { success: false };
     }
   };
 }

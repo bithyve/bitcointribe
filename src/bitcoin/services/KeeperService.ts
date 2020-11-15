@@ -1,5 +1,7 @@
 import {
+  EncDynamicNonPMDD,
   EphemeralDataElements,
+  MetaShare,
   ShareUploadables,
   TrustedData,
   TrustedDataElements
@@ -77,6 +79,9 @@ export default class KeeperService {
     shareId: string,
     encodedPublicKey: string,
     encKey: string,
+    keeperUUID: string,
+    keeperFeatureList: any[],
+    isPrimary: Boolean,
     walletName?: string,
     EfChannelAddress?: string,
   ):
@@ -103,6 +108,9 @@ export default class KeeperService {
           shareId.trim(),
           encodedPublicKey,
           encKey,
+          keeperUUID,
+          keeperFeatureList,
+          isPrimary,
           walletName,
           EfChannelAddress,
         ),
@@ -253,6 +261,44 @@ export default class KeeperService {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
+      };
+    }
+  };
+
+  public uploadSecondaryShare = async (
+    encryptedKey: string,
+    metaShare: MetaShare,
+    otp?: string,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
+  ): Promise<
+  | {
+      status: number;
+      data: { success: boolean; };
+      err?: undefined;
+      message?: undefined;
+    }
+  | {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
+>  => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.keeper.uploadSecondaryShare(
+          encryptedKey,
+          metaShare,
+          otp,
+          encryptedDynamicNonPMDD,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch from Keeper',
       };
     }
   };

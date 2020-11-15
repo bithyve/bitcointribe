@@ -172,6 +172,7 @@ class KeeperFeatures extends Component<
         shareId,
         share,
         'device',
+        navigation.getParam('isReshare')
       );
       navigation.replace('ManageBackupKeeper');
     }

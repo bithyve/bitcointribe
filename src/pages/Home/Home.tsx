@@ -1831,6 +1831,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.closeBottomSheet();
     }
     if (value.type == 'secureXpub') {
+      this.bottomSheetRef.current?.close();
       let shareId = s3Service.levelhealth.metaShares[1].shareId;
       let share = getKeeperInfoFromShareId(levelHealth, shareId);
       fetchKeeperTrustedChannel(shareId, value.type, share.name);
