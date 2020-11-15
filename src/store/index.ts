@@ -38,7 +38,6 @@ import {
 } from './sagas/setupAndAuth';
 
 import {
-  fetchBalanceWatcher,
   fetchTransactionsWatcher,
   transferST1Watcher,
   transferST2Watcher,
@@ -53,7 +52,6 @@ import {
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
-  syncDerivativeAccountsWatcher,
   startupSyncWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
@@ -127,7 +125,6 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchBalanceWatcher,
     fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
     transferST1Watcher,
@@ -143,7 +140,6 @@ const rootSaga = function* () {
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
-    syncDerivativeAccountsWatcher,
     syncViaXpubAgentWatcher,
     startupSyncWatcher,
     setupDonationAccountWatcher,

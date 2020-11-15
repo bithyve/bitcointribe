@@ -42,7 +42,6 @@ import {
 } from '../../common/constants/serviceTypes';
 import {
   switchLoader,
-  fetchBalance,
   fetchTransactions,
   getTestcoins,
   fetchBalanceTx,
@@ -117,7 +116,6 @@ interface AccountsStateTypes {
 interface AccountsPropsTypes {
   navigation: any;
   exchangeRates: any;
-  fetchBalance: any;
   fetchTransactions: any;
   getTestcoins: any;
   switchLoader: any;
@@ -220,7 +218,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   }
 
   componentDidMount = () => {
-    
+
     let { serviceType } = this.state;
     let { accounts } = this.props;
     // setting these properties to true if they are false. true should be the starting state for these
@@ -231,7 +229,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.updateCarouselData();
 
     this.getBalance();
-  
+
     const service = accounts[serviceType].service;
     this.wallet =
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
@@ -472,14 +470,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     const { presentCarouselData, serviceType } = this.state;
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
-      
+
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
         this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
         );
-      else  
+      else
         this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
@@ -1917,7 +1915,6 @@ const mapStateToProps = (state) => {
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    fetchBalance,
     fetchTransactions,
     getTestcoins,
     switchLoader,
