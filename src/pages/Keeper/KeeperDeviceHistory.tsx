@@ -1,39 +1,28 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  Image,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
   AsyncStorage,
   Platform,
-  Alert,
 } from 'react-native';
-import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { getIconByStatus, getIconByStatusForKeeper } from './utils';
 import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
-import HistoryPageComponent from '../../components/HistoryPageComponent';
+import HistoryPageComponent from './HistoryPageComponent';
 import moment from 'moment';
-import _ from 'underscore';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
-import KnowMoreButton from '../../components/KnowMoreButton';
-
 import QRModal from '../Accounts/QRModal';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
 import ApproveSetup from './ApproveSetup';
+import HistoryHeaderComponent from './HistoryHeaderComponent';
 
 const KeeperDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -42,9 +31,10 @@ const KeeperDeviceHistory = (props) => {
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
+  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(
+    React.createRef(),
+  );
   const [qrScannedData, setQrScannedData] = useState('');
-
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -85,7 +75,6 @@ const KeeperDeviceHistory = (props) => {
     // },
   ]);
 
-
   const sortedHistory = (history) => {
     const currentHistory = history.filter((element) => {
       if (element.date) return element;
@@ -119,7 +108,7 @@ const KeeperDeviceHistory = (props) => {
 
   useEffect(() => {
     (async () => {
-      if(props.navigation.state.params.isSetUp){
+      if (props.navigation.state.params.isSetUp) {
         (QrBottomSheet as any).current.snapTo(1);
       }
       const shareHistory = JSON.parse(
@@ -160,7 +149,7 @@ const KeeperDeviceHistory = (props) => {
   const renderQrContent = useCallback(() => {
     return (
       <QRModal
-        // isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={true}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -174,15 +163,19 @@ const KeeperDeviceHistory = (props) => {
         onQrScan={(qrData) => {
           try {
             setQrScannedData(qrData);
-            if(qrData){
-            // if(!props.navigation.state.params.isPrimaryKeeper){
-            //   (ApproveSetupBottomSheet as any).current.snapTo(1);  
-            // }
-            // else{
-              props.navigation.navigate('KeeperFeatures', {qrScannedData: qrData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
-            //}
-          (QrBottomSheet as any).current.snapTo(0);
-        }
+            if (qrData) {
+              // if(!props.navigation.state.params.isPrimaryKeeper){
+              //   (ApproveSetupBottomSheet as any).current.snapTo(1);
+              // }
+              // else{
+              props.navigation.navigate('KeeperFeatures', {
+                qrScannedData: qrData,
+                isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper,
+                selectedShareId: props.navigation.state.params.selectedShareId,
+              });
+              //}
+              (QrBottomSheet as any).current.snapTo(0);
+            }
           } catch (err) {
             console.log({ err });
           }
@@ -198,11 +191,16 @@ const KeeperDeviceHistory = (props) => {
           }, 2);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        // onPressContinue={()=>{
-        //   // let qrScannedData = '{"uuid": "2d5ea54f8126f0b027e62a06","publicKey": "21943cd77af9e8a0c7bed20b105349b76ceb22f5599afd8e24926da729302b44","ephemeralAddress": "250780490291b3efbc6f1cc22403eb82db19aadf143081fd4319c7b5481dd6bf","walletName":"Gallexy"}';
-        //    let qrScannedData = '{"uuid": "bcc7887f2a833bebcfd242d4","publicKey": "7a790e056f2eb609053de8b8fae7f4a7a5528bf06a0caf79e1e0e167e8df651b","ephemeralAddress": "47952058e2c10a7e45b5352a98e52caac9d3b1d6fd45a5ae1912cb5efc0a0584","walletName":"Gal"}';
-        //    props.navigation.navigate('KeeperFeatures', {qrScannedData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId });
-        // }}
+        onPressContinue={() => {
+          let qrScannedData =
+            '{"uuid": "8efc4e323c6bffd3f5b8b4a0","publicKey": "7094b9fdd64c11ce6a0512dc0125407480e134ecfb553c1e5d066361a91871c1","ephemeralAddress": "5b469f001b3a06090141a681f267a31ed19e922cf77d1a5de7a369422d5fbf4q","walletName":"Gal2"}';
+          props.navigation.navigate('KeeperFeatures', {
+            qrScannedData,
+            isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper,
+            selectedShareId: props.navigation.state.params.selectedShareId,
+            selectedLevelId: props.navigation.state.params.selectedLevelId,
+          });
+        }}
       />
     );
   }, [QrBottomSheetsFlag]);
@@ -249,99 +247,30 @@ const KeeperDeviceHistory = (props) => {
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.goBack();
-            }}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginRight: 10,
-            }}
-          >
-            <Image
-              style={{
-                width: wp('9%'),
-                height: wp('9%'),
-                resizeMode: 'contain',
-                alignSelf: 'center',
-                marginRight: 8,
-              }}
-              source={require('../../assets/images/icons/icon_secondarydevice.png')}
-            />
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
-                {props.navigation.state.params.selectedTitle}
-              </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
-                Last backup{' '}
-                <Text
-                  style={{
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {' '}
-                  {props.navigation.state.params.selectedTime}
-                </Text>
-              </Text>
-            </View>
-            <KnowMoreButton
-              onpress={() => {
-                (HelpBottomSheet as any).current.snapTo(1);
-              }}
-              containerStyle={{
-                marginTop: 'auto',
-                marginBottom: 'auto',
-                marginRight: 10,
-              }}
-              textStyle={{}}
-            />
-            <Image
-              style={{
-                width: 17,
-                height: 17,
-                resizeMode: 'contain',
-                marginLeft: 'auto',
-                alignSelf: 'center',
-              }}
-              source={getIconByStatusForKeeper(props.navigation.state.params.selectedStatus)}
-            />
-          </View>
-        </View>
-      </View>
+      <HistoryHeaderComponent
+        onPressBack={() => props.navigation.goBack()}
+        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTime={props.navigation.state.params.selectedTime}
+        selectedStatus={props.navigation.state.params.selectedStatus}
+        moreInfo={props.navigation.state.params.selectedTitle}
+        headerImage={require('../../assets/images/icons/icon_secondarydevice.png')}
+      />
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           type={'secondaryDevice'}
-         // IsReshare={isReshare}
-          data={sortedHistory(secondaryDeviceHistory)}
-          // reshareInfo={
-          //   isReshare
-          //     ? 'Want to send the Recovery Key again to the same destination? '
-          //     : null
-          // }
-          onPressReshare={async () => {
-            
-            (QrBottomSheet.current as any).snapTo(1);
-           
-          }}
+          IsReshare
           onPressConfirm={() => {
+            (QrBottomSheet.current as any).snapTo(1);
           }}
-          onPressContinue={() => {
-            (QrBottomSheet as any).current.snapTo(1);
+          data={sortedHistory(secondaryDeviceHistory)}
+          confirmButtonText={'Confirm'}
+          reshareButtonText={'Restore Keeper'}
+          changeButtonText={'Change Keeper'}
+          onPressReshare={async () => {
+            (QrBottomSheet.current as any).snapTo(1);
+          }}
+          onPressChange={() => {
+            // props.navigation.navigate('NewOwnQuestions');
           }}
         />
       </View>
@@ -386,55 +315,40 @@ const KeeperDeviceHistory = (props) => {
         renderHeader={renderHelpHeader}
       />
       <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ApproveSetupBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('70%'),
-          ]}
-          renderContent={() => (
-            <ApproveSetup
-              onPressContinue={() =>{
-                if(ApproveSetupBottomSheet as any)
-                (ApproveSetupBottomSheet as any).current.snapTo(0)
+        enabledInnerScrolling={true}
+        ref={ApproveSetupBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('70%'),
+        ]}
+        renderContent={() => (
+          <ApproveSetup
+            onPressContinue={() => {
+              if (ApproveSetupBottomSheet as any)
+                (ApproveSetupBottomSheet as any).current.snapTo(0);
 
-                props.navigation.navigate('KeeperFeatures', {qrScannedData: qrData, isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper, selectedShareId: props.navigation.state.params.selectedShareId});
-              }
-              }
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              backgroundColor={Colors.backgroundColor1}
-              onPressHeader={() =>
-                {if(ApproveSetupBottomSheet as any)
-                (ApproveSetupBottomSheet as any).current.snapTo(0)}
-              }
-            />
-          )}
-        />
+              props.navigation.navigate('KeeperFeatures', {
+                qrScannedData,
+                isPrimaryKeeper: props.navigation.state.params.isPrimaryKeeper,
+                selectedShareId: props.navigation.state.params.selectedShareId,
+              });
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            backgroundColor={Colors.backgroundColor1}
+            onPressHeader={() => {
+              if (ApproveSetupBottomSheet as any)
+                (ApproveSetupBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
+      />
     </View>
   );
 };
 
 export default KeeperDeviceHistory;
 
-const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
-});
+const styles = StyleSheet.create({});

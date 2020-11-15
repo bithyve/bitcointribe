@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Image,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import {
@@ -14,6 +13,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 const HistoryPageComponent = (props) => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -29,80 +29,40 @@ const HistoryPageComponent = (props) => {
     <View style={{ flex: 1 }}>
       {props.data && props.data.length ? (
         <View style={{ flex: 1 }}>
-          <ScrollView style={{}}>
+          <ScrollView>
             {props.data.map((value) => {
-              if (SelectedOption == value.id) {
-                return (
-                  <TouchableOpacity
-                    key={value.id}
-                    onPress={() => SelectOption(value.id)}
-                    style={{
-                      margin: wp('3%'),
-                      backgroundColor: Colors.white,
-                      borderRadius: 10,
-                      height: wp('20%'),
-                      width: wp('90%'),
-                      justifyContent: 'center',
-                      paddingLeft: wp('3%'),
-                      paddingRight: wp('3%'),
-                      alignSelf: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                    >
-                      {value.title}
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(9),
-                        fontFamily: Fonts.FiraSansRegular,
-                        marginTop: hp('0.3%'),
-                      }}
-                    >
-                      {value.date}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }
               return (
                 <TouchableOpacity
                   key={value.id}
                   onPress={() => SelectOption(value.id)}
-                  style={{
-                    margin: wp('3%'),
-                    backgroundColor: Colors.white,
-                    borderRadius: 10,
-                    height: wp('15%'),
-                    width: wp('85%'),
-                    justifyContent: 'center',
-                    paddingLeft: wp('3%'),
-                    paddingRight: wp('3%'),
-                    alignSelf: 'center',
-                  }}
+                  style={
+                    SelectedOption == value.id
+                      ? styles.selectedHistoryCard
+                      : styles.historyCard
+                  }
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={
+                      SelectedOption == value.id
+                        ? { flexDirection: 'column' }
+                        : { flexDirection: 'row', alignItems: 'center' }
+                    }
+                  >
                     <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
+                      style={
+                        SelectedOption == value.id
+                          ? styles.selectedHistoryCardTitleText
+                          : styles.historyCardTitleText
+                      }
                     >
                       {value.title}
                     </Text>
                     <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(9),
-                        fontFamily: Fonts.FiraSansRegular,
-                        marginLeft: 'auto',
-                      }}
+                      style={
+                        SelectedOption == value.id
+                          ? styles.selectedHistoryCardDateText
+                          : styles.historyCardDateText
+                      }
                     >
                       {value.date}
                     </Text>
@@ -111,128 +71,51 @@ const HistoryPageComponent = (props) => {
               );
             })}
           </ScrollView>
-          {props.data.length <= 1 ? (
-            <View style={{ backgroundColor: Colors.backgroundColor }}>
-              <View
-                style={{
-                  margin: 15,
-                  backgroundColor: Colors.white,
-                  padding: 10,
-                  paddingTop: 20,
-                  borderRadius: 7,
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.black,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Recovery Key History
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  The history of your Recovery Key will appear here
-                </Text>
-              </View>
-            </View>
-          ) : null}
+          {props.data.length <= 1 && (
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={
+                props.infoBoxTitle ? props.infoBoxTitle : 'Recovery Key History'
+              }
+              infoText={
+                props.infoBoxInfo
+                  ? props.infoBoxInfo
+                  : 'The history of your Recovery Key will appear here'
+              }
+            />
+          )}
         </View>
       ) : (
         <View style={{ flex: 1 }}>
           <ScrollView>
-            {[1, 2, 3, 4].map((value) => {
+            {[1, 2, 3, 4].map(() => {
               return (
-                <View
-                  style={{
-                    margin: wp('3%'),
-                    backgroundColor: Colors.white,
-                    borderRadius: 10,
-                    height: wp('20%'),
-                    width: wp('90%'),
-                    paddingLeft: wp('3%'),
-                    paddingRight: wp('3%'),
-                    alignSelf: 'center',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
+                <View style={styles.waterMarkCard}>
                   <View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('4%'),
-                        width: wp('40%'),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('4%'),
-                        width: wp('30%'),
-                        marginTop: 5,
-                        borderRadius: 10,
-                      }}
-                    />
+                    <View style={styles.waterMarkCardTextOne} />
+                    <View style={styles.waterMarkCardTextTwo} />
                   </View>
                 </View>
               );
             })}
           </ScrollView>
           <View style={{ backgroundColor: Colors.backgroundColor }}>
-            <View
-              style={{
-                margin: 15,
-                backgroundColor: Colors.white,
-                padding: 10,
-                paddingTop: 20,
-                borderRadius: 7,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                No history
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                The history of your Recovery Key will appear here
-              </Text>
-            </View>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={props.infoBoxTitle ? props.infoBoxTitle : 'No history'}
+              infoText={
+                props.infoBoxInfo
+                  ? props.infoBoxInfo
+                  : 'The history of your Recovery Key will appear here'
+              }
+            />
           </View>
         </View>
       )}
-      <View
-        style={{
-          height: hp('18%'),
-          flexDirection: 'row',
-          marginTop: 'auto',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginLeft: wp('8%'),
-          marginRight: wp('8%'),
-        }}
-      >
+      <View style={styles.bottomButtonView}>
         <TouchableOpacity
           onPress={() => {
-            props.onPressConfirm();
+            props.IsReshare ? props.onPressReshare() : props.onPressConfirm();
           }}
           style={styles.successModalButtonView}
         >
@@ -242,12 +125,16 @@ const HistoryPageComponent = (props) => {
               color: Colors.white,
             }}
           >
-            Confirm Question
+            {props.IsReshare
+              ? props.reshareButtonText
+              : props.confirmButtonText}
           </Text>
         </TouchableOpacity>
+        {props.IsReshare && (
           <TouchableOpacity
-            onPress={() => props.onPressChangeQuestion()}
+            onPress={() => props.onPressChange()}
             style={{
+              marginLeft: 10,
               height: wp('13%'),
               width: wp('40%'),
               justifyContent: 'center',
@@ -260,9 +147,10 @@ const HistoryPageComponent = (props) => {
                 color: Colors.blue,
               }}
             >
-              Change Question
+              {props.changeButtonText}
             </Text>
           </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -271,31 +159,6 @@ const HistoryPageComponent = (props) => {
 export default HistoryPageComponent;
 
 const styles = StyleSheet.create({
-  bottomButtonInnerView: {
-    flexDirection: 'row',
-    backgroundColor: Colors.blue,
-    height: 60,
-    borderRadius: 10,
-    marginLeft: 25,
-    marginRight: 25,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  buttonInnerView: {
-    flexDirection: 'row',
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: wp('30%'),
-  },
   successModalButtonView: {
     height: wp('13%'),
     width: wp('40%'),
@@ -313,5 +176,83 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  selectedHistoryCard: {
+    margin: wp('3%'),
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    height: wp('20%'),
+    width: wp('90%'),
+    justifyContent: 'center',
+    paddingLeft: wp('3%'),
+    paddingRight: wp('3%'),
+    alignSelf: 'center',
+  },
+  selectedHistoryCardTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  selectedHistoryCardDateText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: hp('0.3%'),
+  },
+  historyCard: {
+    margin: wp('3%'),
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    height: wp('15%'),
+    width: wp('85%'),
+    justifyContent: 'center',
+    paddingLeft: wp('3%'),
+    paddingRight: wp('3%'),
+    alignSelf: 'center',
+  },
+  historyCardTitleText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  historyCardDateText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 'auto',
+  },
+  waterMarkCard: {
+    margin: wp('3%'),
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    height: wp('20%'),
+    width: wp('90%'),
+    paddingLeft: wp('3%'),
+    paddingRight: wp('3%'),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  waterMarkCardTextOne: {
+    backgroundColor: Colors.backgroundColor,
+    height: wp('4%'),
+    width: wp('40%'),
+    borderRadius: 10,
+  },
+  waterMarkCardTextTwo: {
+    backgroundColor: Colors.backgroundColor,
+    height: wp('4%'),
+    width: wp('30%'),
+    marginTop: 5,
+    borderRadius: 10,
+  },
+  bottomButtonView: {
+    height: hp('18%'),
+    flexDirection: 'row',
+    marginTop: 'auto',
+    alignItems: 'center',
+    marginLeft: wp('8%'),
+    marginRight: wp('8%'),
   },
 });
