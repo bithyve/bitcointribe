@@ -927,7 +927,7 @@ class SendToContact extends Component<
             contentContainerStyle={
               styles.selectedRecipientsListContentContainer
             }
-            data={selectedRecipients}
+            data={Array.from(selectedRecipients).reverse()}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentOffset={{ x: -24, y: 0 }}
