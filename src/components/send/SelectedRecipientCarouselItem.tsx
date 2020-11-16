@@ -30,7 +30,8 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
 
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.contentContainer}>
+
         <View style={styles.circledAvatarContainer}>
 
           <ContactAvatar contact={recipient} />
@@ -44,8 +45,20 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
         </View>
 
         <View>
-          <Text style={styles.titleText}>{recipient.displayedName}</Text>
-          <Text style={styles.amountText}>{recipient.availableBalance} {unitText}</Text>
+          <Text
+            style={styles.titleText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {recipient.displayedName}
+          </Text>
+          <Text
+            style={styles.amountText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {recipient.availableBalance} {unitText}
+          </Text>
         </View>
       </View>
 
@@ -79,6 +92,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowColor: Colors.gray5,
     elevation: 10,
+  },
+
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+    width: '100%',
   },
 
   circledAvatarContainer: {
