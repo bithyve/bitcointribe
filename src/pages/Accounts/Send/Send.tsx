@@ -790,6 +790,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       // the list of `selectedSubAccounts`.
                       <View style={styles.iconBackView}>
                         <FlatList
+                          horizontal
                           data={accountData}
                           alwaysBounceHorizontal
                           showsHorizontalScrollIndicator={false}

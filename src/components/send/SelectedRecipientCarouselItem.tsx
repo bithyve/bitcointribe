@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ImageStyles from '../../common/Styles/ImageStyles';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
 import Colors from '../../common/Colors';
@@ -10,7 +10,6 @@ import RecipientKind from '../../common/data/enums/RecipientKind';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import ContactAvatar from '../ContactAvatar';
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 
 
@@ -25,7 +24,6 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
   onRemove,
   containerStyle = {},
 }: Props) => {
- // const amountText = useFormattedAmountText(Number(amount) || 0);
   const unitText = useFormattedUnitText();
 
   return (
@@ -44,7 +42,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
           )}
         </View>
 
-        <View>
+        <View style={styles.textContentContainer}>
           <Text
             style={styles.titleText}
             numberOfLines={1}
@@ -97,7 +95,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    overflow: 'hidden',
     width: '100%',
   },
 
@@ -105,6 +102,11 @@ const styles = StyleSheet.create({
     ...ImageStyles.thumbnailImageMedium,
     ...ImageStyles.circledAvatarContainer,
     marginRight: 8,
+  },
+
+  textContentContainer: {
+    flex: 1,
+    overflow: 'hidden',
   },
 
   titleText: {

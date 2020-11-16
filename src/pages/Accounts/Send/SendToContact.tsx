@@ -38,7 +38,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../../components/ModalHeader';
-import RemoveSelectedTransaction from '../RemoveSelectedTrasaction';
+import RemoveSelectedTransaction from '../RemoveSelectedTransaction';
 import SendConfirmationContent from '../SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
