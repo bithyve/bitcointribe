@@ -24,7 +24,7 @@ export default function SendConfirmationContent(props) {
   const renderContacts = (item) => {
     return (
       <RecipientComponent
-        item={item}
+        recipient={item.selectedContact}
         onPressElement={() => {
           if (item.note) {
             if (SelectedContactId == item.selectedContact.id)
@@ -32,8 +32,7 @@ export default function SendConfirmationContent(props) {
             else setSelectedContactId(item.selectedContact.id);
           }
         }}
-        SelectedContactId={SelectedContactId}
-        serviceType={props.serviceType}
+        selectedContactId={String(SelectedContactId)}
       />
     );
   };
