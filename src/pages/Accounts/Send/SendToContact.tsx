@@ -38,7 +38,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../../components/ModalHeader';
-import RemoveSelectedTransaction from '../RemoveSelectedTransaction';
+import RemoveSelectedRecipient from '../RemoveSelectedRecipient';
 import SendConfirmationContent from '../SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
@@ -949,7 +949,10 @@ class SendToContact extends Component<
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.selectedContact.account_name != null) {
+
                 // 🔑 This seems to be the way the backend is defining the "account kind".
+                // This should be refactored to leverage the new accounts structure
+                // in https://github.com/bithyve/hexa/tree/feature/account-management
                 const accountKind = {
                   'Checking Account': REGULAR_ACCOUNT,
                   'Savings Account': SECURE_ACCOUNT,
@@ -970,10 +973,12 @@ class SendToContact extends Component<
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
                   onRemove={() => {
+                    let indexInTransferArray = selectedRecipients.length - (index + 1);
+
                     this.setState(
                       {
                         removeItem:
-                          accountsState[serviceType].transfer.details[index],
+                          accountsState[serviceType].transfer.details[indexInTransferArray],
                       },
                       () => {
                         this.removeItemBottomSheetRef.current?.snapTo(1);
@@ -1364,8 +1369,8 @@ class SendToContact extends Component<
               removeItem.constructor === Object
             ) {
               return (
-                <RemoveSelectedTransaction
-                  selectedContact={removeItem}
+                <RemoveSelectedRecipient
+                  selectedContact={removeItem.selectedContact}
                   onPressBack={() => {
                     this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
