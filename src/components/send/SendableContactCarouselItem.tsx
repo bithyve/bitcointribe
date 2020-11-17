@@ -11,13 +11,13 @@ import LastSeenActiveIndicator from '../LastSeenActiveIndicator';
 
 export type Props = {
   contact: ContactRecipientDescribing;
-  isSelected: boolean;
+  isSelected?: boolean;
   containerStyle?: Record<string, unknown>;
 };
 
 const SendableContactCarouselItem: React.FC<Props> = ({
   contact,
-  isSelected,
+  isSelected = false,
   containerStyle = {},
 }: Props) => {
   const displayedNameText = useMemo(() => {

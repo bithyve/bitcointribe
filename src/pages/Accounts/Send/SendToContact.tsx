@@ -38,7 +38,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../../components/ModalHeader';
-import RemoveSelectedTransaction from '../RemoveSelectedTrasaction';
+import RemoveSelectedTransaction from '../RemoveSelectedTransaction';
 import SendConfirmationContent from '../SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
@@ -927,12 +927,15 @@ class SendToContact extends Component<
             contentContainerStyle={
               styles.selectedRecipientsListContentContainer
             }
-            data={selectedRecipients}
+            data={Array.from(selectedRecipients).reverse()}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentOffset={{ x: -24, y: 0 }}
             renderItem={({ item, index }: { item: unknown; index: number }) => {
+              // TODO: This should already be computed
+              // ahead of time in the data passed to this screen.
               let recipient: RecipientDescribing;
+
               let newItem = {
                 ...item.selectedContact,
                 bitcoinAmount: prefersBitcoin
@@ -953,6 +956,7 @@ class SendToContact extends Component<
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
                 }[item.selectedContact.account_name || 'Checking Account'];
+
                 recipient = makeSubAccountRecipientDescription(
                   newItem,
                   accountKind,
@@ -1371,7 +1375,7 @@ class SendToContact extends Component<
                     }, 2);
                     this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
-                  serviceType={serviceType}
+                  accountKind={serviceType}
                 />
               );
             }
@@ -1424,6 +1428,7 @@ class SendToContact extends Component<
                 this.props.navigation.navigate('AccountDetails');
               }}
               isUnSuccess={true}
+              accountKind={serviceType}
             />
           )}
           renderHeader={() => <ModalHeader />}

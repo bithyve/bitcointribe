@@ -196,7 +196,7 @@ export default function ContactList(props) {
   }, []);
 
   const filterContacts = (keyword) => {
-    console.log('contactData.length', contactData);
+    // console.log('contactData.length', contactData);
     if (contactData.length > 0) {
       if (!keyword.length) {
         setFilterContactData(contactData);

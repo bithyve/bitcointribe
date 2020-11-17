@@ -11,75 +11,79 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import RecipientComponent from './RecipientComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function RemoveSelectedTrasaction(props) {
+export default function RemoveSelectedTransaction(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
-  const contactInfo = props.selectedContact ? props.selectedContact : {};
-  //console.log("props.serviceType", props.serviceType);
+  const contactInfo = props.selectedContact || {};
+
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View
-          style={{
-            ...styles.successModalHeaderView,
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-          }}
-        >
-          <Text style={styles.modalTitleText}>Remove Recipient</Text>
-          <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-          This will remove the recipient form Send
-          </Text>
-        </View>
+        style={{
+          ...styles.successModalHeaderView,
+          marginRight: wp('6%'),
+          marginLeft: wp('6%'),
+        }}
+      >
+        <Text style={styles.modalTitleText}>Remove Recipient</Text>
+        <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
+          This will remove the recipient from Send
+        </Text>
+      </View>
+
+      {contactInfo && (
         <ScrollView>
-        <RecipientComponent
-          item={contactInfo}
-          onPressElement={() => {
-            if (contactInfo.note) {
-              if (SelectedContactId == contactInfo.selectedContact.id)
-                setSelectedContactId(0);
-              else setSelectedContactId(contactInfo.selectedContact.id);
-            }
-          }}
-          SelectedContactId={SelectedContactId}
-          serviceType={props.serviceType}
-        />
+          <RecipientComponent
+            recipient={contactInfo.selectedContact}
+            onPressElement={() => {
+              if (contactInfo.note) {
+                if (SelectedContactId == contactInfo.id)
+                  setSelectedContactId(0);
+                else setSelectedContactId(contactInfo.id);
+              }
+            }}
+            selectedContactId={String(SelectedContactId)}
+            accountKind={props.accountKind}
+          />
         </ScrollView>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'center',
-            marginBottom: hp('2%'),
+      )}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 'auto',
+          alignItems: 'center',
+          marginBottom: hp('2%'),
+        }}
+      >
+        <AppBottomSheetTouchableWrapper
+          disabled={props.loading}
+          onPress={() => {
+            props.onPressDone();
           }}
+          style={{ ...styles.successModalButtonView }}
         >
-          <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
-            onPress={() => {
-              props.onPressDone();
-            }}
-            style={{ ...styles.successModalButtonView }}
-          >
-            {props.loading && props.loading == true ? (
-              <ActivityIndicator size="small" />
-            ) : (
+          {props.loading && props.loading == true ? (
+            <ActivityIndicator size="small" />
+          ) : (
               <Text style={styles.proceedButtonText}>Remove</Text>
             )}
-          </AppBottomSheetTouchableWrapper>
-          <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
-            onPress={() => props.onPressBack()}
-            style={{
-              height: wp('13%'),
-              width: wp('35%'),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Back
+        </AppBottomSheetTouchableWrapper>
+        <AppBottomSheetTouchableWrapper
+          disabled={props.loading}
+          onPress={() => props.onPressBack()}
+          style={{
+            height: wp('13%'),
+            width: wp('35%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+            Back
             </Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
+        </AppBottomSheetTouchableWrapper>
+      </View>
     </View>
   );
 }
