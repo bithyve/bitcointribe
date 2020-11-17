@@ -20,7 +20,9 @@ const SendableContactCarouselItem: React.FC<Props> = ({
   containerStyle = {},
 }: Props) => {
   const displayedNameText = useMemo(() => {
-    return `${contact.displayedName}`;
+    if (contact.displayedName.includes('F&F request'))
+      return `${contact.walletName}`;
+    else return `${contact.displayedName}`;
   }, [contact]);
 
   return (
