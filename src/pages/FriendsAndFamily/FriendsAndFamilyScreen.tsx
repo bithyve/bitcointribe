@@ -207,6 +207,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             trustedAddress,
             contactsWalletName,
             otp,
+            lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ];
@@ -248,6 +249,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             shareIndex,
             hasTrustedChannel,
             contactsWalletName,
+            lastSeen,
             ...contactInfo,
           };
           trustedContacts.push(element);
