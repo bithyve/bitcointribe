@@ -42,6 +42,7 @@ export default function RemoveSelectedTransaction(props) {
               }
             }}
             selectedContactId={String(SelectedContactId)}
+            accountKind={props.accountKind}
           />
         </ScrollView>
 

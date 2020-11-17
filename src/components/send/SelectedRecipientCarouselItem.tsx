@@ -24,7 +24,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
   onRemove,
   containerStyle = {},
 }: Props) => {
-  const unitText = useFormattedUnitText();
+  const unitText = useFormattedUnitText({});
 
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
@@ -50,6 +50,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
           >
             {recipient.displayedName}
           </Text>
+
           <Text
             style={styles.amountText}
             numberOfLines={1}

@@ -33,6 +33,7 @@ export default function SendConfirmationContent(props) {
           }
         }}
         selectedContactId={String(SelectedContactId)}
+        accountKind={props.accountKind}
       />
     );
   };
@@ -51,9 +52,11 @@ export default function SendConfirmationContent(props) {
           {props.info}
         </Text>
       </View>
+
       <ScrollView style={{ marginTop: hp('1.5%'), marginBottom: hp('2%') }}>
         {props.userInfo.map((item) => renderContacts(item))}
       </ScrollView>
+
       {props.infoText && (
         <View
           style={{

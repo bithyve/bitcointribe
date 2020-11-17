@@ -64,7 +64,7 @@ export function makeContactRecipientDescription(
     kind: RecipientKind.CONTACT,
     displayedName: data.contactName || data.displayedName || data.contactsWalletName || data.walletName,
     walletName: data.contactsWalletName || data.walletName,
-    avatarImageSource: data.imageAvailable ? data.rawImage : data.avatarImageSource,
+    avatarImageSource: data.avatarImageSource || require('../../../../assets/images/icons/icon_user.png'),
     availableBalance: data.bitcoinAmount || data.amount || 0,
     initiatedAt: data.initiatedAt,
     lastSeenActive: data.lastSeen || data.lastSeenActive,
