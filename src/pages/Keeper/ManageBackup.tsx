@@ -1074,17 +1074,18 @@ class ManageBackup extends Component<
                 const { levelData, selectedLevelId, selectedKeeper } = this.state;
                 let PKStatus = levelData[1].keeper1.keeper1Done
                   ? 'accessed'
-                  : 'notAccessed';
-                this.props.navigation.navigate('KeeperDeviceHistory', {
-                  selectedTime: this.getTime(new Date()),
-                  selectedStatus: PKStatus,
-                  selectedTitle: 'Primary Keeper',
-                  isPrimaryKeeper: true,
-                  isSetUp: true,
-                  selectedShareId: selectedKeeper.shareId,
-                  selectedLevelId,
-                  selectedContact: this.state.selectedKeeper.data
-                });
+                  : 'notAccessible';
+                  let navigationParams = {
+                    selectedTime: this.getTime(new Date()),
+                    selectedStatus: PKStatus,
+                    selectedTitle: 'Primary Keeper',
+                    isPrimaryKeeper: true,
+                    isSetUp: true,
+                    selectedShareId: selectedKeeper.shareId,
+                    selectedLevelId,
+                    selectedContact: this.state.selectedKeeper.data
+                  }
+                this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
               }}
             />
           )}
