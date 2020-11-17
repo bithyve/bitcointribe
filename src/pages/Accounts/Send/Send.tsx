@@ -660,7 +660,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           if (hasXpub || hasTrustedAddress) {
             // sendable
             sendableTrustedContacts.push({
-              contactName,
+              contactName:
+                contactInfo.firstName === 'F&F request' && contactsWalletName
+                  ? contactsWalletName
+                  : contactName,
               connectedVia,
               hasXpub,
               hasTrustedAddress,
