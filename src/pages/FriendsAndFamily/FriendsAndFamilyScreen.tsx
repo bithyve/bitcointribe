@@ -238,7 +238,10 @@ class FriendsAndFamilyScreen extends PureComponent<
             : false;
 
           const element = {
-            contactName,
+            contactName:
+              contactInfo.firstName === 'F&F request' && contactsWalletName
+                ? contactsWalletName
+                : contactName,
             connectedVia,
             usesOTP,
             hasXpub,
