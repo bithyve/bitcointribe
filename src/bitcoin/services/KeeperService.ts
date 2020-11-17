@@ -224,7 +224,7 @@ export default class KeeperService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to update contact',
+        message: 'Failed to update keeper',
       };
     }
   };

@@ -25,6 +25,7 @@ export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE';
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE';
 export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
 export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED';
+export const IS_LEVEL3_INITIALIZED = 'IS_LEVEL3_INITIALIZED';
 export const KEEPER_INFO = 'KEEPER_INFO';
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const WALLET_RECOVERY_FAILED_HEALTH = 'WALLET_RECOVERY_FAILED_HEALTH';
@@ -153,13 +154,16 @@ export const updateLevelThreeMetaShareStatus = (beingLoaded) => {
   return { type: IS_LEVEL_THREE_METASHARE, payload: { beingLoaded } };
 };
 
-export const initLevelTwo = () => {
-  console.log('INIT_LEVEL_TWO')
-  return { type: INIT_LEVEL_TWO };
+export const initLevelTwo = (level) => {
+  return { type: INIT_LEVEL_TWO, payload: { level } };
 };
 
 export const isLevel2InitializedStatus = () => {
   return { type: IS_LEVEL2_INITIALIZED };
+};
+
+export const isLevel3InitializedStatus = () => {
+  return { type: IS_LEVEL3_INITIALIZED };
 };
 
 export const updatedKeeperInfo = (info) =>{

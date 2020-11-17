@@ -21,7 +21,8 @@ import {
   ERROR_RECEIVING_HEALTH,
   WALLET_RECOVERY_FAILED_HEALTH,
   WALLET_IMAGE_HEALTH_CHECKED,
-  S3_LOADING_KEEPER
+  S3_LOADING_KEEPER,
+  IS_LEVEL3_INITIALIZED
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -202,6 +203,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLevel2Initialized: true,
+      };
+    
+    case IS_LEVEL3_INITIALIZED:
+      return {
+        ...state,
+        isLevel3Initialized: true,
       };
 
     case SHARE_RECEIVED:

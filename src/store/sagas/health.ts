@@ -35,6 +35,7 @@ import {
   UPLOAD_ENC_MSHARE_KEEPER,
   SEND_APPROVAL_REQUEST,
   UPLOAD_SECONDARY_SHARE,
+  isLevel3InitializedStatus,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -168,7 +169,7 @@ function* generateMetaSharesWorker({ payload }) {
           (state) => state.health.isLevel2Initialized,
         );
         if (!isLevel2Initialized) {
-          yield put(initLevelTwo());
+          yield put(initLevelTwo(level));
         }
         yield put(updateLevelTwoMetaShareStatus(true));
       }
@@ -177,7 +178,7 @@ function* generateMetaSharesWorker({ payload }) {
           (state) => state.health.isLevel3Initialized,
         );
         if (!isLevel3Initialized) {
-          yield put(initLevelTwo());
+          yield put(initLevelTwo(level));
         }
         yield put(updateLevelThreeMetaShareStatus(true));
       }
@@ -337,13 +338,13 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
   let s3Service: S3Service = yield select((state) => state.health.service);
   if (isReshare) {
     let shareIndex = 1;
-    if (payload.shareId && s3Service.levelhealth.metaShares.length) {
+    if (selectedShareId && s3Service.levelhealth.metaShares.length) {
       let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
       if (
-        metaShare.findIndex((value) => value.shareId == payload.shareId) > -1
+        metaShare.findIndex((value) => value.shareId == selectedShareId) > -1
       ) {
         shareIndex = metaShare.findIndex(
-          (value) => value.shareId == payload.shareId,
+          (value) => value.shareId == selectedShareId,
         );
       }
     }
@@ -416,9 +417,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       ScannedData.uuid,
     );
 
-    let Kp = new KeeperService();
     let res = yield call(
-      Kp.updateEphemeralChannel,
+      keeper.updateEphemeralChannel,
       share.shareId,
       type,
       ScannedData.publicKey,
@@ -427,6 +427,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       ScannedData.uuid,
       shareUploadables,
     );
+    console.log('updateEphemeralChannel saga res', res);
     if (res.status == 200) {
       // Create trusted channel
       const data: TrustedDataElements = {
@@ -536,13 +537,19 @@ export const uploadSecondaryShareWatcher = createWatcher(
   UPLOAD_SECONDARY_SHARE,
 );
 
-function* updateHealthLevel2Worker() {
+function* updateHealthLevel2Worker({ payload }) {
+  let { level } = payload;
   console.log('INIT_LEVEL_TWO workes');
-  let isLevel2Initialized = yield select(
-    (state) => state.health.isLevel2Initialized,
+  let isLevelInitialized = yield select(
+    (state) => state.health.isLevel3Initialized,
   );
-  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevel2Initialized);
-  if (!isLevel2Initialized) {
+  if(level == 2){
+    isLevelInitialized = yield select(
+      (state) => state.health.isLevel2Initialized,
+    );
+  }
+  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevelInitialized);
+  if (!isLevelInitialized) {
     let s3Service: S3Service = yield select((state) => state.health.service);
     let Health = yield select((state) => state.health.levelHealth);
     let SecurityQuestionHealth = Health[0].levelInfo[1];
@@ -555,7 +562,8 @@ function* updateHealthLevel2Worker() {
     if (res.data.success) {
       // Update Health to reducer
       yield put(checkMSharesHealth());
-      yield put(isLevel2InitializedStatus());
+      if(level == 2) yield put(isLevel2InitializedStatus());
+      if(level == 3) yield put(isLevel3InitializedStatus());
     }
     yield put(initLoader(false));
   }
