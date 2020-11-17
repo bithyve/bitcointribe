@@ -1,12 +1,10 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
@@ -16,28 +14,29 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import { TEST_ACCOUNT, REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 import ContactAvatar from '../../components/ContactAvatar';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 
 export type Props = {
   recipient: RecipientDescribing;
-  onPressElement: () => void;
+  onPressElement?: () => void;
   selectedContactId: string;
+  accountKind?: string;
 };
 
 function RecipientComponent({
   recipient,
-  onPressElement,
+  onPressElement = () => {},
   selectedContactId,
+  accountKind = REGULAR_ACCOUNT,
 }: Props) {
-  const unitText = useFormattedUnitText();
+  const unitText = useFormattedUnitText({
+    bitcoinUnit: accountKind == TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
+  });
 
   return (
     <TouchableOpacity
