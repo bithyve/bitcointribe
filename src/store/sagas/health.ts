@@ -36,6 +36,8 @@ import {
   SEND_APPROVAL_REQUEST,
   UPLOAD_SECONDARY_SHARE,
   isLevel3InitializedStatus,
+  GENERATE_PDF,
+  pdfGenerated,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -81,6 +83,7 @@ import { Alert } from 'react-native';
 import { ErrorSending } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
+import generatePDFKeeper from '../utils/generatePDFKeeper';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -1306,4 +1309,137 @@ function* sendApprovalRequestWorker({ payload }) {
 export const sendApprovalRequestWatcher = createWatcher(
   sendApprovalRequestWorker,
   SEND_APPROVAL_REQUEST,
+);
+
+function* generatePDFWorker({ payload }) {
+  // yield put(switchS3Loader('generatePDF'));
+  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
+  //const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+  // const res = yield call(s3Service.createQR, shareIndex);
+  // if (res.status !== 200) {
+  //   console.log({ err: res.err });
+  //   return;
+  // }
+  const secureAccount: SecureAccount = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+  const qrData = {
+    secondaryMnemonic: '',
+    secondaryXpub: '',
+    bhXpub: '',
+  };
+
+  const pdfData = {
+    qrData: qrData
+  };
+
+  const { security, walletName } = yield select(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  try {
+    const pdfPath = yield call(
+      generatePDFKeeper,
+      pdfData,
+      `Hexa_Recovery_Key_${walletName}.pdf`,
+      `Hexa Recovery Key for ${walletName}'s Wallet`
+    );
+
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+    // console.log('/sagas/sss ', {personalCopyDetails})
+    if (!personalCopyDetails) {
+      personalCopyDetails = {
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: false,
+          sharingDetails: {},
+        },
+      };
+    } else {
+      personalCopyDetails = JSON.parse(personalCopyDetails);
+      const originalSharedStatus = personalCopyDetails[
+        selectedPersonalCopy.type
+      ]
+        ? personalCopyDetails[selectedPersonalCopy.type].shared
+        : false;
+      const originalSharingDetails =
+        personalCopyDetails[selectedPersonalCopy.type] &&
+        personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails
+          : {};
+      personalCopyDetails = {
+        ...personalCopyDetails,
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: !!originalSharedStatus,
+          sharingDetails: originalSharingDetails,
+        },
+      };
+    }
+    // console.log('/sagas/sss ', {personalCopyDetails})
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(personalCopyDetails),
+    );
+
+    // reset PDF health (if present) post reshare
+    let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    // console.log('/sagas/sss ', {storedPDFHealth})
+    if (storedPDFHealth) {
+      const { pdfHealth } = s3Service.levelhealth;
+      storedPDFHealth = JSON.parse(storedPDFHealth);
+      storedPDFHealth = {
+        ...storedPDFHealth,
+       // [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
+      };
+      // console.log('/sagas/sss ', {storedPDFHealth})
+      yield call(
+        AsyncStorage.setItem,
+        'PDF Health',
+        JSON.stringify(storedPDFHealth),
+      );
+    }
+
+    yield put(pdfGenerated(true));
+
+    // if (Object.keys(personalCopyDetails).length == 2) {
+    //   // remove sec-mne once both the personal copies are generated
+    //   const { removed } = secureAccount.removeSecondaryMnemonic();
+    //   if (!removed) console.log('Failed to remove sec-mne');
+    // }
+
+    // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
+    const blockPCShare = yield call(AsyncStorage.getItem, 'blockPCShare');
+    // if (blockPCShare) {
+    //   if (secureAccount.secureHDWallet.secondaryMnemonic) {
+    //     const { removed } = secureAccount.removeSecondaryMnemonic();
+    //     if (!removed) {
+    //       console.log('Failed to remove the secondary mnemonic');
+    //     }
+    //   }
+    // }
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      SECURE_ACCOUNT: JSON.stringify(secureAccount),
+      S3_SERVICE: JSON.stringify(s3Service),
+    };
+
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } catch (err) {
+    console.log({ err });
+    yield put(pdfGenerated(false));
+  }
+  //yield put(switchS3Loader('generatePDF'));
+}
+
+export const generatePDFWatcher = createWatcher(
+  generatePDFWorker,
+  GENERATE_PDF,
 );

@@ -22,7 +22,8 @@ import {
   WALLET_RECOVERY_FAILED_HEALTH,
   WALLET_IMAGE_HEALTH_CHECKED,
   S3_LOADING_KEEPER,
-  IS_LEVEL3_INITIALIZED
+  IS_LEVEL3_INITIALIZED,
+  PDF_GENERATED
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -262,6 +263,14 @@ export default (state = initialState, action) => {
           [action.payload.beingLoaded]: !state.loading[
             action.payload.beingLoaded
           ],
+        },
+      };
+
+      case PDF_GENERATED:
+      return {
+        ...state,
+        pdfGenerated: {
+          ...action.payload.generated,
         },
       };
   }
