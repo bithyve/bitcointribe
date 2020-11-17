@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -10,10 +10,39 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import RecipientComponent from './RecipientComponent';
 import { ScrollView } from 'react-native-gesture-handler';
+import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing';
 
-export default function RemoveSelectedTransaction(props) {
+export default function RemoveSelectedRecipient(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
-  const contactInfo = props.selectedContact || {};
+
+  const recipient = useMemo(() => {
+    const selectedContactData = props.selectedContact;
+
+    // TODO: This should already be computed
+    // ahead of time in the data passed to this screen.
+    let recipient: RecipientDescribing;
+
+    // 🔑 This seems to be the way the backend is defining the "account kind".
+    // This should be refactored to leverage the new accounts structure
+    // in https://github.com/bithyve/hexa/tree/feature/account-management
+    const accountKind = {
+      'Checking Account': REGULAR_ACCOUNT,
+      'Savings Account': SECURE_ACCOUNT,
+      'Test Account': TEST_ACCOUNT,
+      'Donation Account': DONATION_ACCOUNT,
+    }[item.account_name || 'Checking Account'];
+
+    if (selectedContactData.account_name != null) {
+      recipient = makeSubAccountRecipientDescription(
+        selectedContactData,
+        accountKind,
+      );
+    } else {
+      recipient = makeContactRecipientDescription(selectedContactData);
+    }
+
+    return recipient;
+  }, [props.selectedContact]);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -30,15 +59,15 @@ export default function RemoveSelectedTransaction(props) {
         </Text>
       </View>
 
-      {contactInfo && (
+      {props.selectedContact && (
         <ScrollView>
           <RecipientComponent
-            recipient={contactInfo.selectedContact}
+            recipient={recipient}
             onPressElement={() => {
-              if (contactInfo.note) {
-                if (SelectedContactId == contactInfo.id)
+              if (props.selectedContact.note) {
+                if (SelectedContactId == props.selectedContact.id)
                   setSelectedContactId(0);
-                else setSelectedContactId(contactInfo.id);
+                else setSelectedContactId(props.selectedContact.id);
               }
             }}
             selectedContactId={String(SelectedContactId)}

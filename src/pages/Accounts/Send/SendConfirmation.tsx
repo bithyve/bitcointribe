@@ -653,6 +653,8 @@ class SendConfirmation extends Component<
                 let recipient: RecipientDescribing;
 
                 // 🔑 This seems to be the way the backend is defining the "account kind".
+                // This should be refactored to leverage the new accounts structure
+                // in https://github.com/bithyve/hexa/tree/feature/account-management
                 const accountKind = {
                   'Checking Account': REGULAR_ACCOUNT,
                   'Savings Account': SECURE_ACCOUNT,
