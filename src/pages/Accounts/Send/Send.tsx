@@ -118,11 +118,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   constructor(props) {
     super(props);
 
+    const accountKind = this.props.navigation.getParam('serviceType') || REGULAR_ACCOUNT;
+
     this.state = {
       trustedContacts: [],
       isShowingKnowMoreSheet: false,
-      serviceType:
-        this.props.navigation.getParam('serviceType') || REGULAR_ACCOUNT,
+      serviceType: accountKind,
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
@@ -188,6 +189,18 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.accountsState !== this.props.accountsState) {
       this.getAccountBalances();
+
+      const accountKind = this.state.serviceType;
+      const selectedRecipients = this.props.accountsState[accountKind].transfer.details;
+
+      const selectedContacts = selectedRecipients.filter((data) => {
+        // TODO: This seems to be the way the backend is distinguishing between
+        // an "account" recipient and a "contact" recipient. There should be a way
+        // to refactor this around leveraging the `RecipientKind` enum.
+        return data.selectedContact?.account_name == null;
+      });
+
+      this.setState({ selectedContacts });
     }
 
     if (
