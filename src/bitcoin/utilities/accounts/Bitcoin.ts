@@ -215,7 +215,7 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Sent',
                   amount: tx.SentAmount,
-                  accountType: tx.accountType,
+                  accountType,
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -231,7 +231,7 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Received',
                   amount: tx.ReceivedAmount,
-                  accountType: tx.accountType,
+                  accountType,
                   primaryAccType,
                   senderAddresses: tx.SenderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed

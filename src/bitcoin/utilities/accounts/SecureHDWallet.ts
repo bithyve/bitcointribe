@@ -624,31 +624,21 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].lastBalTxSync = latestSyncTime;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].newTransactions = newTransactions;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].confirmedUTXOs = confirmedUTXOs;
-    this.derivativeAccounts[accountType][accountNumber].balances = balances;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].transactions = transactions;
-    this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
-      res.nextFreeAddressIndex;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].nextFreeChangeAddressIndex = res.nextFreeChangeAddressIndex;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].receivingAddress = this.createSecureMultiSig(
-      res.nextFreeAddressIndex,
-      false,
-      this.derivativeAccounts[accountType][accountNumber].xpub,
-    ).address;
+    this.derivativeAccounts[accountType][accountNumber] = {
+      ...this.derivativeAccounts[accountType][accountNumber],
+      lastBalTxSync: latestSyncTime,
+      newTransactions,
+      confirmedUTXOs,
+      balances,
+      transactions,
+      nextFreeAddressIndex: res.nextFreeAddressIndex,
+      nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
+      receivingAddress: this.createSecureMultiSig(
+        res.nextFreeAddressIndex,
+        false,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
+      ).address,
+    };
 
     return { balances, transactions };
   };
@@ -883,9 +873,9 @@ export default class SecureHDWallet extends Bitcoin {
                       tx.TransactionType === 'Sent'
                         ? tx.Amount + tx.fee
                         : tx.Amount,
-                    accountType: tx.accountType,
+                    accountType: dAccountType,
                     primaryAccType:
-                      tx.accountType === SUB_PRIMARY_ACCOUNT
+                      dAccountType === SUB_PRIMARY_ACCOUNT
                         ? 'Savings Account'
                         : null,
                     recipientAddresses: tx.RecipientAddresses,
@@ -944,34 +934,21 @@ export default class SecureHDWallet extends Bitcoin {
             }
           }
 
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].lastBalTxSync = latestSyncTime;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].newTransactions = newTransactions;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].confirmedUTXOs = confirmedUTXOs;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].balances = balances;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].transactions = transactions;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].nextFreeChangeAddressIndex = lastUsedChangeAddressIndex + 1;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].receivingAddress = this.createSecureMultiSig(
-            lastUsedAddressIndex + 1,
-            false,
-            this.derivativeAccounts[dAccountType][accountNumber].xpub,
-          ).address;
+          this.derivativeAccounts[dAccountType][accountNumber] = {
+            ...this.derivativeAccounts[dAccountType][accountNumber],
+            lastBalTxSync: latestSyncTime,
+            newTransactions,
+            confirmedUTXOs,
+            balances,
+            transactions,
+            nextFreeAddressIndex: lastUsedAddressIndex + 1,
+            nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+            receivingAddress: this.createSecureMultiSig(
+              lastUsedAddressIndex + 1,
+              false,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
+            ).address,
+          };
         }
       }
 
