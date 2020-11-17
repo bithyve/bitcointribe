@@ -1,11 +1,9 @@
 import React, { Component, createRef, ReactElement } from 'react';
 import { View, Image, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP,
 } from 'react-native-responsive-screen';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
@@ -266,16 +264,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               accType === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType === REGULAR_ACCOUNT
-                ? 'Checking Account'
-                : 'Savings Account',
+                  ? 'Checking Account'
+                  : 'Savings Account',
             type: serviceType,
             checked: false,
             image:
               accType === DONATION_ACCOUNT
                 ? require('../../../assets/images/icons/icon_donation_account.png')
                 : serviceType === REGULAR_ACCOUNT
-                ? require('../../../assets/images/icons/icon_regular_account.png')
-                : require('../../../assets/images/icons/icon_secureaccount_white.png'),
+                  ? require('../../../assets/images/icons/icon_regular_account.png')
+                  : require('../../../assets/images/icons/icon_secureaccount_white.png'),
           };
           additionalAccountData.push(accInstance);
         }
@@ -293,17 +291,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     const testBalance = accountsState[TEST_ACCOUNT].service
       ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let regularBalance = accountsState[REGULAR_ACCOUNT].service
       ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accountsState[REGULAR_ACCOUNT].service.hdWallet.balances
-          .unconfirmedBalance
+      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances
+        .unconfirmedBalance
       : 0;
     let secureBalance = accountsState[SECURE_ACCOUNT].service
       ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     let derivativeBalance = 0;
@@ -315,7 +313,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
             accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-              dAccountType
+            dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
@@ -559,7 +557,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             if (config.EJECTED_ACCOUNTS.includes(recipient.id)) {
               if (
                 recipient.account_number ===
-                  contact.selectedContact.account_number &&
+                contact.selectedContact.account_number &&
                 recipient.type === contact.selectedContact.type
               ) {
                 return (isNavigate = false);
@@ -619,7 +617,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -662,7 +660,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-          ];
+            ];
 
           const hasTrustedAddress = Boolean(
             serviceType === TEST_ACCOUNT ? trustedTestAddress : trustedAddress,
@@ -740,6 +738,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   <View style={styles.viewSectionContainer}>
                     <CoveredQRCodeScanner
                       onCodeScanned={this.barcodeRecognized}
+                      containerStyle={styles.qrScannerContainer}
                     />
                   </View>
                 );
@@ -769,24 +768,26 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
-                    {(trustedContacts.length && (
-                      <RecipientSelectionStrip
-                        accountKind={serviceType}
-                        recipients={trustedContacts.map(
-                          makeContactRecipientDescription,
+                    <View style={styles.viewSectionContentContainer}>
+                      {(trustedContacts.length && (
+                        <RecipientSelectionStrip
+                          accountKind={serviceType}
+                          recipients={trustedContacts.map(
+                            makeContactRecipientDescription,
+                          )}
+                          selectedRecipients={selectedContacts}
+                          onRecipientSelected={this.onRecipientSelected}
+                        />
+                      )) || (
+                          <BottomInfoBox
+                            containerStyle={styles.infoBoxContainer}
+                            title={'You have not added any Contacts'}
+                            infoText={
+                              'Add a Contact to send them sats without having to scan an address'
+                            }
+                          />
                         )}
-                        selectedRecipients={selectedContacts}
-                        onRecipientSelected={this.onRecipientSelected}
-                      />
-                    )) || (
-                      <BottomInfoBox
-                        containerStyle={styles.infoBoxContainer}
-                        title={'You have not added any Contacts'}
-                        infoText={
-                          'Add a Contact to send them sats without having to scan an address'
-                        }
-                      />
-                    )}
+                    </View>
                   </View>
                 );
               },
@@ -797,86 +798,88 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
-                    {serviceType != TEST_ACCOUNT && (
-                      // TODO: Refactor this screen so we can use the `RecipientSelectionStrip`
-                      // component here and just pass in a dynamic list of sub-accounts, alongside
-                      // the list of `selectedSubAccounts`.
-                      <View style={styles.iconBackView}>
-                        <FlatList
-                          horizontal
-                          data={accountData}
-                          alwaysBounceHorizontal
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          renderItem={(Items) => {
-                            let checked = false;
-                            for (
-                              let i = 0;
-                              i <
-                              accountsState[serviceType].transfer.details
-                                .length;
-                              i++
-                            ) {
-                              const element =
-                                accountsState[serviceType].transfer.details[i]
-                                  .selectedContact;
+                    <View style={styles.viewSectionContentContainer}>
+                      {serviceType != TEST_ACCOUNT && (
+                        // TODO: Refactor this screen so we can use the `RecipientSelectionStrip`
+                        // component here and just pass in a dynamic list of sub-accounts, alongside
+                        // the list of `selectedSubAccounts`.
+                        <View style={styles.iconBackView}>
+                          <FlatList
+                            horizontal
+                            data={accountData}
+                            alwaysBounceHorizontal
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                            renderItem={(Items) => {
+                              let checked = false;
+                              for (
+                                let i = 0;
+                                i <
+                                accountsState[serviceType].transfer.details
+                                  .length;
+                                i++
+                              ) {
+                                const element =
+                                  accountsState[serviceType].transfer.details[i]
+                                    .selectedContact;
 
-                              if (element.id == Items.item.id) {
-                                if (
-                                  config.EJECTED_ACCOUNTS.includes(element.id)
-                                ) {
+                                if (element.id == Items.item.id) {
                                   if (
-                                    element.account_number ===
-                                      Items.item.account_number &&
-                                    element.type === Items.item.type
+                                    config.EJECTED_ACCOUNTS.includes(element.id)
                                   ) {
+                                    if (
+                                      element.account_number ===
+                                      Items.item.account_number &&
+                                      element.type === Items.item.type
+                                    ) {
+                                      checked = true;
+                                    }
+                                  } else {
                                     checked = true;
                                   }
-                                } else {
-                                  checked = true;
                                 }
                               }
-                            }
 
-                            const { derivativeAccountDetails } = this.state;
+                              const { derivativeAccountDetails } = this.state;
 
-                            if (
-                              Items.item.type != serviceType ||
-                              config.EJECTED_ACCOUNTS.includes(Items.item.id) ||
-                              derivativeAccountDetails
-                            ) {
                               if (
-                                derivativeAccountDetails &&
-                                derivativeAccountDetails.type ===
-                                  Items.item.id &&
-                                serviceType === Items.item.type &&
-                                derivativeAccountDetails.number ===
-                                  Items.item.account_number
+                                Items.item.type != serviceType ||
+                                config.EJECTED_ACCOUNTS.includes(Items.item.id) ||
+                                derivativeAccountDetails
                               ) {
-                                return;
-                              } else {
-                                return (
-                                  <AccountsListSend
-                                    fromAddNewAccount={false}
-                                    accounts={Items.item}
-                                    balances={balances}
-                                    checkedItem={checked}
-                                    onSelectContact={this.onRecipientSelected}
-                                  />
-                                );
+                                if (
+                                  derivativeAccountDetails &&
+                                  derivativeAccountDetails.type ===
+                                  Items.item.id &&
+                                  serviceType === Items.item.type &&
+                                  derivativeAccountDetails.number ===
+                                  Items.item.account_number
+                                ) {
+                                  return;
+                                } else {
+                                  return (
+                                    <AccountsListSend
+                                      fromAddNewAccount={false}
+                                      accounts={Items.item}
+                                      balances={balances}
+                                      checkedItem={checked}
+                                      onSelectContact={this.onRecipientSelected}
+                                    />
+                                  );
+                                }
                               }
-                            }
-                          }}
-                          extraData={{
-                            details:
-                              accountsState[serviceType].transfer.details,
-                            balances,
-                            selectedSubAccounts,
-                          }}
+                            }}
+                            extraData={{
+                              details:
+                                accountsState[serviceType].transfer.details,
+                              balances,
+                              selectedSubAccounts,
+                            }}
                           //keyExtractor={(item, index) => index.toString()}
-                        />
-                      </View>
-                    )}
+                          />
+                        </View>
+                      )}
+                    </View>
                   </View>
                 );
               },
@@ -892,7 +895,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.knowMoreBottomSheetRef}
-          snapPoints={[-50, hp('89%')]}
+          snapPoints={[-50, heightPercentageToDP('89%')]}
           onCloseEnd={() => {
             this.setState({ isShowingKnowMoreSheet: false }, () => {
               this.props.initialKnowMoreSendSheetShown();
@@ -948,6 +951,8 @@ export default withNavigationFocus(
   })(Send),
 );
 
+const qrScannerHeight = heightPercentageToDP(35);
+
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
@@ -960,8 +965,25 @@ const styles = StyleSheet.create({
   },
 
   viewSectionContainer: {
-    paddingHorizontal: 20,
-    marginVertical: 24,
+    marginBottom: 16,
+  },
+
+  viewSectionContentContainer: {
+    paddingHorizontal: 22,
+  },
+
+  listSectionHeading: {
+    ...HeadingStyles.listSectionHeading,
+    marginBottom: 9,
+    paddingHorizontal: 28,
+    fontSize: RFValue(13),
+  },
+
+  qrScannerContainer: {
+    width: '100%',
+    maxWidth: qrScannerHeight * (1.31),
+    height: qrScannerHeight,
+    marginBottom: 9,
   },
 
   // Undo the info box component's coupling to margin
@@ -975,34 +997,6 @@ const styles = StyleSheet.create({
   iconBackView: {
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor,
-  },
-
-  icon: {
-    height: 20,
-    width: 20,
-    justifyContent: 'center',
-    marginLeft: 'auto',
-  },
-
-  listSectionHeading: {
-    ...HeadingStyles.listSectionHeading,
-    fontSize: RFValue(13),
-  },
-
-  textBoxView: {
-    flexDirection: 'row',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    height: wp('13%'),
-  },
-
-  textBox: {
-    flex: 1,
-    paddingLeft: 20,
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
   },
 });
 
@@ -1045,13 +1039,13 @@ function makeNavigationOptions({
           <Image
             source={
               derivativeAccountDetails &&
-              derivativeAccountDetails.type === DONATION_ACCOUNT
+                derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? require('../../../assets/images/icons/icon_donation_hexa.png')
                 : accountKind == TEST_ACCOUNT
-                ? require('../../../assets/images/icons/icon_test.png')
-                : accountKind == REGULAR_ACCOUNT
-                ? require('../../../assets/images/icons/icon_regular.png')
-                : require('../../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../../assets/images/icons/icon_test.png')
+                  : accountKind == REGULAR_ACCOUNT
+                    ? require('../../../assets/images/icons/icon_regular.png')
+                    : require('../../../assets/images/icons/icon_secureaccount.png')
             }
             style={{ width: 40, height: 40 }}
           />
