@@ -42,7 +42,7 @@ const ConfirmedRecipientCarouselItem: React.FC<Props> = ({
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {recipient.displayedName || "No Name"}
+          {recipient.displayedName}
         </Text>
 
         <Text
