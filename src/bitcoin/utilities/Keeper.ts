@@ -316,6 +316,7 @@ export default class Keeper {
       }
   > => {
     try {
+      console.log("this.keepers[shareId] before",this.keepers[shareId]);
       this.keepers[shareId] = {
         ...this.keepers[shareId],
         shareType,
@@ -325,8 +326,9 @@ export default class Keeper {
           : {},
         ephemeralChannel: { address: ephemeralAddress },
       };
-
-      dataElements.publicKey = publicKey;
+      
+      //dataElements.publicKey = publicKey;
+      console.log("this.keepers[shareId] after",this.keepers[shareId]);
 
       const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(
         shareId,
@@ -616,7 +618,7 @@ export default class Keeper {
       }
 
       const { trustedChannel, symmetricKey, publicKey } = this.keepers[shareId];
-
+      console.log("trustedChannel, symmetricKey, publicKey",trustedChannel, symmetricKey, publicKey)
       const trustedData: TrustedData = {
         publicKey,
         data: dataElements,
