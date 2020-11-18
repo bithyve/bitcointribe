@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1002970291557-n9ifs1lr6eimukhtefi1i10r11165gn2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa",
+            "certificate_hash": "0095cf73ef5b533a837e514356d34a39ebfde58b"
+          }
+        },
+        {
           "client_id": "1002970291557-87oei73o8ugti65l88at49206ief6g1l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -75,6 +83,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1002970291557-bu8s15276k041el2odek4kcrkuvhqqet.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.development",
+            "certificate_hash": "0095cf73ef5b533a837e514356d34a39ebfde58b"
+          }
+        },
+        {
           "client_id": "1002970291557-s8533s9jf73ltddcqqpr6ahd8tcbis3e.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -134,6 +150,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1002970291557-j6i4859u9af7d9heai4bd69818rin5r5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.staging",
+            "certificate_hash": "0095cf73ef5b533a837e514356d34a39ebfde58b"
+          }
+        },
         {
           "client_id": "1002970291557-iqkmrcos90unftiphh5r194mdi0sjc0m.apps.googleusercontent.com",
           "client_type": 1,
