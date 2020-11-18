@@ -422,13 +422,14 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         share,
         ScannedData.uuid,
       );
+      console.log('ScannedData.publicKey', ScannedData.publicKey,dataElements);
 
       let res = yield call(
         keeper.updateEphemeralChannel,
         share.shareId,
         type,
-        ScannedData.publicKey,
-        ScannedData.ephemeralAddress,
+        hexaPublicKey,
+        EfChannelAddress,
         dataElements,
         ScannedData.uuid,
         shareUploadables,
