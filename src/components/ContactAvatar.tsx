@@ -23,7 +23,7 @@ const ContactAvatar: React.FC<Props> = ({
     return (
       <View style={containerStyle}>
         <Image
-          source={contact.avatarImageSource.uri}
+          source={contact.avatarImageSource}
           style={contentContainerStyle}
           resizeMode="contain"
         />

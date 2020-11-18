@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -10,76 +10,109 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import RecipientComponent from './RecipientComponent';
 import { ScrollView } from 'react-native-gesture-handler';
+import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing';
 
-export default function RemoveSelectedTrasaction(props) {
+export default function RemoveSelectedRecipient(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
-  const contactInfo = props.selectedContact ? props.selectedContact : {};
-  //console.log("props.serviceType", props.serviceType);
+
+  const recipient = useMemo(() => {
+    const selectedContactData = props.selectedContact;
+
+    // TODO: This should already be computed
+    // ahead of time in the data passed to this screen.
+    let recipient: RecipientDescribing;
+
+    // 🔑 This seems to be the way the backend is defining the "account kind".
+    // This should be refactored to leverage the new accounts structure
+    // in https://github.com/bithyve/hexa/tree/feature/account-management
+    const accountKind = {
+      'Checking Account': REGULAR_ACCOUNT,
+      'Savings Account': SECURE_ACCOUNT,
+      'Test Account': TEST_ACCOUNT,
+      'Donation Account': DONATION_ACCOUNT,
+    }[item.account_name || 'Checking Account'];
+
+    if (selectedContactData.account_name != null) {
+      recipient = makeSubAccountRecipientDescription(
+        selectedContactData,
+        accountKind,
+      );
+    } else {
+      recipient = makeContactRecipientDescription(selectedContactData);
+    }
+
+    return recipient;
+  }, [props.selectedContact]);
+
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View
-          style={{
-            ...styles.successModalHeaderView,
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-          }}
-        >
-          <Text style={styles.modalTitleText}>Remove Recipient</Text>
-          <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-          This will remove the recipient form Send
-          </Text>
-        </View>
+        style={{
+          ...styles.successModalHeaderView,
+          marginRight: wp('6%'),
+          marginLeft: wp('6%'),
+        }}
+      >
+        <Text style={styles.modalTitleText}>Remove Recipient</Text>
+        <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
+          This will remove the recipient from Send
+        </Text>
+      </View>
+
+      {props.selectedContact && (
         <ScrollView>
-        <RecipientComponent
-          item={contactInfo}
-          onPressElement={() => {
-            if (contactInfo.note) {
-              if (SelectedContactId == contactInfo.selectedContact.id)
-                setSelectedContactId(0);
-              else setSelectedContactId(contactInfo.selectedContact.id);
-            }
-          }}
-          SelectedContactId={SelectedContactId}
-          serviceType={props.serviceType}
-        />
+          <RecipientComponent
+            recipient={recipient}
+            onPressElement={() => {
+              if (props.selectedContact.note) {
+                if (SelectedContactId == props.selectedContact.id)
+                  setSelectedContactId(0);
+                else setSelectedContactId(props.selectedContact.id);
+              }
+            }}
+            selectedContactId={String(SelectedContactId)}
+            accountKind={props.accountKind}
+          />
         </ScrollView>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'center',
-            marginBottom: hp('2%'),
+      )}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 'auto',
+          alignItems: 'center',
+          marginBottom: hp('2%'),
+        }}
+      >
+        <AppBottomSheetTouchableWrapper
+          disabled={props.loading}
+          onPress={() => {
+            props.onPressDone();
           }}
+          style={{ ...styles.successModalButtonView }}
         >
-          <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
-            onPress={() => {
-              props.onPressDone();
-            }}
-            style={{ ...styles.successModalButtonView }}
-          >
-            {props.loading && props.loading == true ? (
-              <ActivityIndicator size="small" />
-            ) : (
+          {props.loading && props.loading == true ? (
+            <ActivityIndicator size="small" />
+          ) : (
               <Text style={styles.proceedButtonText}>Remove</Text>
             )}
-          </AppBottomSheetTouchableWrapper>
-          <AppBottomSheetTouchableWrapper
-            disabled={props.loading}
-            onPress={() => props.onPressBack()}
-            style={{
-              height: wp('13%'),
-              width: wp('35%'),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Back
+        </AppBottomSheetTouchableWrapper>
+        <AppBottomSheetTouchableWrapper
+          disabled={props.loading}
+          onPress={() => props.onPressBack()}
+          style={{
+            height: wp('13%'),
+            width: wp('35%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+            Back
             </Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
+        </AppBottomSheetTouchableWrapper>
+      </View>
     </View>
   );
 }

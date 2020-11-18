@@ -169,18 +169,17 @@ export default function TwoFAToken(props) {
         cancelButtonText={'Back'}
         isCancel={true}
         onPressOk={() => {
-          //dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-          //dispatch(clearTransfer(serviceType));
           dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
           props.navigation.navigate('AccountDetails');
         }}
         isUnSuccess={true}
+        accountKind={serviceType}
       />
     );
   };
