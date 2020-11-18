@@ -11,6 +11,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import RecipientComponent from './RecipientComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing';
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function RemoveSelectedRecipient(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
@@ -30,7 +31,7 @@ export default function RemoveSelectedRecipient(props) {
       'Savings Account': SECURE_ACCOUNT,
       'Test Account': TEST_ACCOUNT,
       'Donation Account': DONATION_ACCOUNT,
-    }[item.account_name || 'Checking Account'];
+    }[selectedContactData.account_name || 'Checking Account'];
 
     if (selectedContactData.account_name != null) {
       recipient = makeSubAccountRecipientDescription(
