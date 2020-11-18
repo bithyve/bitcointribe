@@ -324,9 +324,11 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       isPrimaryKeeper,
       scannedData,
       selectedShareId,
+      level
     } = payload;
+    console.log("level", level);
     let s3Service: S3Service = yield select((state) => state.health.service);
-    let share = s3Service.levelhealth.metaShares[1];
+    let share = level == 2 ? s3Service.levelhealth.metaShares[1] : s3Service.levelhealth.metaShares[3];
     if (selectedShareId) {
       share = payload.share;
     }

@@ -136,11 +136,12 @@ export const createAndUploadOnEFChannel = (
   selectedShareId,
   share,
   type,
-  isReshare
+  isReshare,
+  level
 ) => {
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
-    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare },
+    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare, level },
   };
 };
 

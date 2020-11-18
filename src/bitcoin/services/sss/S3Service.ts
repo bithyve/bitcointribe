@@ -657,7 +657,6 @@ export default class S3Service {
       }
   > => {
     try {
-      console.log('INIT_LEVEL_TWO', SecurityQuestionHealth)
       return {
         status: config.STATUS.SUCCESS,
         data: await this.levelhealth.updateHealthLevel2(SecurityQuestionHealth, level),

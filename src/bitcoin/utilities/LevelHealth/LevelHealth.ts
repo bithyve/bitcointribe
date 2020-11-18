@@ -849,7 +849,6 @@ export default class LevelHealth {
         };
         levelInfo.push(obj);
       }
-      console.log('INIT_LEVEL_TWO levelInfo', levelInfo );
       let res: AxiosResponse;
       try {
         res = await BH_AXIOS.post('updateHealthLevel2', {

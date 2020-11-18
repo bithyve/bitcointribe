@@ -235,7 +235,11 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData =
-            '{"uuid":"d50988154ffb7a29d4fc2b85","publicKey": "0aec6830d694ffff16d11779e225674c81ab20c80d7654df787d57f7d1d27f2e","ephemeralAddress": "28d00da7d810cb14c874f362c08973bb61e396416a155d426c93d991d5e8939d","walletName":"2ndKeeper"}';
+            '{"uuid":"9a990ada25210951b80b58e4","publicKey": "34725dc940660b3921c91d46c1bbb3f07d05c50150d4b550345684d8da2005b1","ephemeralAddress": "5166e49a9ae74493e4c4a4f6e5850f6c8aa1edb4bfb0195996236cb09485515b","walletName":"lastKeeper"}';
+            console.log("jasfdkjh",isPrimaryKeeper,
+            selectedLevelId,);
+            console.log("jasfdkjh",isPrimaryKeeper,
+            selectedShareId,);
           props.navigation.navigate('KeeperFeatures', {
             isReshare,
             qrScannedData,
