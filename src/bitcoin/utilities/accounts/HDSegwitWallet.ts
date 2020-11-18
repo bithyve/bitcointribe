@@ -680,26 +680,29 @@ export default class HDSegwitWallet extends Bitcoin {
 
           const UTXOs = [];
           if (Utxos)
-            for (const utxo of Utxos) {
-              const { value, Address, status, vout, txid } = utxo;
+            for (const addressSpecificUTXOs of Utxos) {
+              for (const utxo of addressSpecificUTXOs) {
+                const { value, Address, status, vout, txid } = utxo;
 
-              if (addressInUse.includes(Address)) {
-                UTXOs.push({
-                  txId: txid,
-                  vout,
-                  value,
-                  address: Address,
-                  status,
-                });
+                if (addressInUse.includes(Address)) {
+                  UTXOs.push({
+                    txId: txid,
+                    vout,
+                    value,
+                    address: Address,
+                    status,
+                  });
 
-                if (status.confirmed) balances.balance += value;
-                else if (internalAddresses.includes(Address))
-                  balances.balance += value;
-                else balances.unconfirmedBalance += value;
+                  if (status.confirmed) balances.balance += value;
+                  else if (internalAddresses.includes(Address))
+                    balances.balance += value;
+                  else balances.unconfirmedBalance += value;
+                }
               }
             }
 
           const confirmedUTXOs = [];
+
           for (const utxo of UTXOs) {
             if (utxo.status) {
               if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
