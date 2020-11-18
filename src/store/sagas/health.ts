@@ -510,14 +510,11 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             keeperInfo.push(obj);
           }
           yield put(updatedKeeperInfo(keeperInfo));
-          const keepers: KeeperService = yield select(
-            (state) => state.keeper.service,
-          );
           const { SERVICES } = yield select((state) => state.storage.database);
           const updatedSERVICES = {
             ...SERVICES,
             S3_SERVICE: JSON.stringify(s3Service),
-            KEEPERS_INFO: JSON.stringify(keepers),
+            KEEPERS_INFO: JSON.stringify(keeper),
           };
           yield call(insertDBWorker, {
             payload: { SERVICES: updatedSERVICES },
