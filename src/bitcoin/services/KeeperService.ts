@@ -211,10 +211,14 @@ export default class KeeperService {
       }
   > => {
     try {
+      console.log('shareId', shareId);
+      console.log('dataElements', dataElements);
+      console.log('fetch', fetch);
+
       return {
         status: config.STATUS.SUCCESS,
         data: await this.keeper.updateTrustedChannel(
-          shareId.trim(),
+          shareId,
           dataElements,
           fetch,
           shareUploadables,
