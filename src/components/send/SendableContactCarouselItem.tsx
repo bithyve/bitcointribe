@@ -4,10 +4,9 @@ import ContactAvatar from '../ContactAvatar';
 import ImageStyles from '../../common/Styles/ImageStyles';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
 import Colors from '../../common/Colors';
-;import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 import Entypo from 'react-native-vector-icons/Entypo';
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator';
-
 
 export type Props = {
   contact: ContactRecipientDescribing;
@@ -21,16 +20,13 @@ const SendableContactCarouselItem: React.FC<Props> = ({
   containerStyle = {},
 }: Props) => {
   const displayedNameText = useMemo(() => {
-    if (contact.walletName) {
-      return `${contact.walletName}'s wallet`;
-    } else {
-      return contact.displayedName;
-    }
+    if (contact.displayedName.includes('F&F request'))
+      return `${contact.walletName}`;
+    else return `${contact.displayedName}`;
   }, [contact]);
 
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
-
       <View style={styles.circledAvatarContainer}>
         <ContactAvatar contact={contact} />
 
@@ -72,7 +68,8 @@ const styles = StyleSheet.create({
   circledView: {
     ...ImageStyles.thumbnailImageMedium,
     borderRadius: 9999,
-    justifyContent: 'center', alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   contactNameText: {
