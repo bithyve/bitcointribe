@@ -820,7 +820,7 @@ export default class LevelHealth {
     };
   };
 
-  public updateHealthLevel2 = async (SecurityQuestionHealth): Promise<{
+  public updateHealthLevel2 = async (SecurityQuestionHealth, _level): Promise<{
     success: boolean;
     message: string;
   }> => {
@@ -855,7 +855,7 @@ export default class LevelHealth {
         res = await BH_AXIOS.post('updateHealthLevel2', {
           HEXA_ID,
           walletID: this.walletId,
-          level: 2,
+          level: _level,
           levelInfo,
         });
         console.log('INIT_LEVEL_TWO axios res', res );

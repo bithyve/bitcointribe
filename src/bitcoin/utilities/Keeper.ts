@@ -179,7 +179,6 @@ export default class Keeper {
       },
       ephemeralChannel: { address: ephemeralAddress },
     };
-
     return { publicKey, ephemeralAddress };
   };
 
@@ -210,7 +209,6 @@ export default class Keeper {
       //     'TC finalize failed: channel already exists with this keeper',
       //   );
       // }
-
       const { ephemeralChannel, privateKey } = this.keepers[shareId];
       const keyPair = ec.keyFromPrivate(privateKey, 'hex');
       const symmetricKey = keyPair
@@ -319,8 +317,8 @@ export default class Keeper {
   > => {
     try {
       this.keepers[shareId] = {
+        ...this.keepers[shareId],
         shareType,
-        privateKey,
         publicKey,
         shareTransferDetails: dataElements.shareTransferDetails
           ? dataElements.shareTransferDetails

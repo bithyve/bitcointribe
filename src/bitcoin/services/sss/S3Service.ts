@@ -640,7 +640,7 @@ export default class S3Service {
     }
   };
 
-  public updateHealthLevel2 = async (SecurityQuestionHealth): Promise<
+  public updateHealthLevel2 = async (SecurityQuestionHealth, level): Promise<
     | {
         status: number;
         data: {
@@ -660,7 +660,7 @@ export default class S3Service {
       console.log('INIT_LEVEL_TWO', SecurityQuestionHealth)
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.levelhealth.updateHealthLevel2(SecurityQuestionHealth),
+        data: await this.levelhealth.updateHealthLevel2(SecurityQuestionHealth, level),
       };
     } catch (err) {
       return { status: 513, err: err.message, message: ErrMap[513] };

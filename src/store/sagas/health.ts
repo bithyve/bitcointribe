@@ -414,7 +414,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         },
         trustedAddress: trustedChannelAddress,
       };
-
       if (isReshare) dataElements.restoreOf = walletID;
 
       const shareUploadables = LevelHealth.encryptMetaShare(
@@ -449,14 +448,12 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           featuresList,
           securityQuestion,
         };
-        console.log('data saga res', data);
         const updateRes = yield call(
           keeper.updateTrustedChannel,
           share.shareId,
           data,
           false,
         );
-        console.log('updateRes saga res', updateRes);
         if (updateRes.status == 200) {
           if (isReshare) {
             yield call(uploadSecondaryShareWorker, {
@@ -575,8 +572,8 @@ function* updateHealthLevel2Worker({ payload }) {
     const res = yield call(
       s3Service.updateHealthLevel2,
       SecurityQuestionHealth,
+      level
     );
-    console.log('INIT_LEVEL_TWO res', res);
     if (res.data.success) {
       // Update Health to reducer
       yield put(checkMSharesHealth());
