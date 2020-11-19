@@ -41,10 +41,7 @@ const HomeQRScannerScreen: React.FC<Props> = ({
     <View style={styles.rootContainer}>
       <HeaderSection />
 
-      <CoveredQRCodeScanner
-        onCodeScanned={handleBarcodeRecognized}
-        containerStyle={{ marginBottom: 16 }}
-      />
+      <CoveredQRCodeScanner onCodeScanned={handleBarcodeRecognized} />
 
       <BottomInfoBox
         style

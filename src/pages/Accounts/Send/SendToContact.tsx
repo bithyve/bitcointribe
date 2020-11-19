@@ -408,8 +408,14 @@ class SendToContact extends Component<
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
           if (derivativeAccount[accountNumber].balances) {
             secureBalance += derivativeAccount[accountNumber].balances.balance;
+            // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
@@ -940,21 +946,20 @@ class SendToContact extends Component<
                     ? item.currencyAmount
                     : currencyAmount,
               };
-
-              // 🔑 This seems to be the way the backend is defining the "account kind".
-              // This should be refactored to leverage the new accounts structure
-              // in https://github.com/bithyve/hexa/tree/feature/account-management
-              const accountKind = {
-                'Checking Account': REGULAR_ACCOUNT,
-                'Savings Account': SECURE_ACCOUNT,
-                'Test Account': TEST_ACCOUNT,
-                'Donation Account': DONATION_ACCOUNT,
-              }[item.selectedContact.account_name || 'Checking Account'];
-
-
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.selectedContact.account_name != null) {
+
+                // 🔑 This seems to be the way the backend is defining the "account kind".
+                // This should be refactored to leverage the new accounts structure
+                // in https://github.com/bithyve/hexa/tree/feature/account-management
+                const accountKind = {
+                  'Checking Account': REGULAR_ACCOUNT,
+                  'Savings Account': SECURE_ACCOUNT,
+                  'Test Account': TEST_ACCOUNT,
+                  'Donation Account': DONATION_ACCOUNT,
+                }[item.selectedContact.account_name || 'Checking Account'];
+
                 recipient = makeSubAccountRecipientDescription(
                   newItem,
                   accountKind,

@@ -18,17 +18,3 @@ export const resetToHomeAction = (params = {}) => {
     ],
   });
 };
-
-
-export const resetStackToAccountDetails = (params) => {
-  return StackActions.reset({
-    index: 1,
-    actions: [
-      NavigationActions.navigate({ routeName: 'Home' }),
-      NavigationActions.navigate({
-        routeName: 'AccountDetails',
-        params,
-      }),
-    ],
-  });
-};

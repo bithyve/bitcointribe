@@ -62,15 +62,14 @@ import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
 import SendableContactCarouselItem from '../../../components/send/SendableContactCarouselItem';
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
 
 interface SendConfirmationStateTypes {
-  selectedRecipients: unknown[];
   CurrencyCode: string;
   totalAmount: any;
   sliderValue: any;
   sliderValueText: string;
   exchangeRates: any;
+  SelectedContactId: any;
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
@@ -133,12 +132,12 @@ class SendConfirmation extends Component<
     this.viewRef = React.createRef();
 
     this.state = {
-      selectedRecipients: [],
       CurrencyCode: 'USD',
       totalAmount: 0,
       sliderValue: 0,
       sliderValueText: 'Low Fee',
       exchangeRates: this.props.exchangeRates,
+      SelectedContactId: 0,
       transfer: {},
       loading: {},
       isConfirmDisabled: false,
@@ -163,7 +162,6 @@ class SendConfirmation extends Component<
     }
     this.setState({
       transfer: accounts[this.serviceType].transfer,
-      selectedRecipients: accounts[this.serviceType].transfer.details,
       loading: accounts[this.serviceType].loading,
     });
     this.onChangeInTransfer();
@@ -498,8 +496,8 @@ class SendConfirmation extends Component<
       CurrencyCode,
       totalAmount,
       isConfirmDisabled,
+      SelectedContactId,
       transfer,
-      selectedRecipients,
     } = this.state;
     const { navigation, exchangeRates, currencyKind } = this.props;
     const prefersBitcoin = currencyKind === CurrencyKind.BITCOIN;
@@ -644,16 +642,11 @@ class SendConfirmation extends Component<
             <FlatList
               horizontal
               contentContainerStyle={{ paddingVertical: 16 }}
-              // data={this.recipients}
-              data={selectedRecipients}
+              data={this.recipients}
               keyExtractor={ (item) => item.id }
               showsHorizontalScrollIndicator={false}
               contentOffset={{ x: -14, y: 0 }}
               renderItem={({ item }: { item: unknown }) => {
-                const selectedContactData = {
-                  ...item.selectedContact,
-                  amount: item.selectedContact.bitcoinAmount || item.bitcoinAmount, // https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605722649345500?thread_ts=1605718686.340700&cid=CEBLWDEKH
-                };
 
                 // TODO: This should already be computed
                 // ahead of time in the data passed to this screen.
@@ -667,17 +660,15 @@ class SendConfirmation extends Component<
                   'Savings Account': SECURE_ACCOUNT,
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
-                }[selectedContactData.account_name || 'Checking Account'];
+                }[item.account_name || 'Checking Account'];
 
-                // 🔑 This seems to be the way the backend is distinguishing between
-                // accounts and contacts.
-                if (selectedContactData.account_name != null) {
+                if (item.account_name != null) {
                   recipient = makeSubAccountRecipientDescription(
-                    selectedContactData,
+                    item,
                     accountKind,
                   );
                 } else {
-                  recipient = makeContactRecipientDescription(selectedContactData);
+                  recipient = makeContactRecipientDescription(item);
                 }
 
                 return (
@@ -1029,18 +1020,16 @@ class SendConfirmation extends Component<
               (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
             this.props.clearTransfer(this.serviceType);
-
-            navigation.dispatch(resetStackToAccountDetails({
+            navigation.navigate('AccountDetails', {
               serviceType: this.serviceType,
-              index: this.state.derivativeAccountDetails
-                ? 3
-                : this.serviceType === TEST_ACCOUNT
+              index:
+                this.serviceType === TEST_ACCOUNT
                   ? 0
                   : this.serviceType === REGULAR_ACCOUNT
                     ? 1
                     : 2,
               spendableBalance: this.spendableBalance - totalAmount,
-            }));
+            });
           }}
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1064,7 +1053,7 @@ class SendConfirmation extends Component<
 
                 this.props.clearTransfer(this.serviceType);
 
-                navigation.dispatch(resetStackToAccountDetails({
+                navigation.navigate('AccountDetails', {
                   serviceType: this.serviceType,
                   index: this.state.derivativeAccountDetails
                     ? 3
@@ -1074,7 +1063,7 @@ class SendConfirmation extends Component<
                         ? 1
                         : 2,
                   spendableBalance: this.spendableBalance - totalAmount,
-                }));
+                });
               }}
               isSuccess={true}
               accountKind={this.serviceType}
@@ -1138,10 +1127,16 @@ class SendConfirmation extends Component<
           renderContent={() => (
             <TestAccountHelperModalContents
               topButtonText={'Note'}
+              // image={require('../../../assets/images/icons/regular.png')}
               boldPara={''}
               helperInfo={
                 'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
               }
+            // continueButtonText={'Ok, got it'}
+            // onPressContinue={() => {
+            //   if (KnowMoreBottomSheet.current)
+            //     (KnowMoreBottomSheet as any).current.snapTo(0);
+            // }}
             />
           )}
           renderHeader={() => (
