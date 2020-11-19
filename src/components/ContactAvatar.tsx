@@ -4,6 +4,7 @@ import Colors from '../common/Colors';
 import ImageStyles from '../common/Styles/ImageStyles';
 import { nameToInitials } from '../common/CommonFunctions';
 import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing';
+import RecipientKind from '../common/data/enums/RecipientKind';
 
 export type Props = {
   contact: ContactRecipientDescribing;
@@ -45,7 +46,9 @@ const ContactAvatar: React.FC<Props> = ({
             fontSize: 14,
           }}
         >
-          {nameToInitials(contact.displayedName ? contact.displayedName : '')}
+          {nameToInitials(
+            contact.kind == RecipientKind.ADDRESS ? '@' : (contact.displayedName || '')
+          )}
         </Text>
       </View>
     );
