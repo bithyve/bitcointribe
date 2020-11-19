@@ -881,6 +881,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     Linking.removeEventListener('url', this.handleDeepLinkEvent);
 
     clearTimeout(this.openBottomSheetOnLaunchTimeout);
+    if (this.firebaseNotificationListener) {
+      this.firebaseNotificationListener();
+    }
   }
 
   componentWillUnmount() {

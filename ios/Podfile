@@ -5,6 +5,14 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 require_relative '../node_modules/react-native-unimodules/cocoapods.rb'
 
 platform :ios, '10.0'
+
+pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios/RNFirebase.podspec'
+  # # Required by RNFirebase
+pod 'Firebase/Core', '~> 5.20.1'
+pod 'Firebase/Messaging', '~> 5.20.1'
+
+
+
 def all_pods
     config = use_native_modules!
     use_react_native!(:path => config["reactNativePath"])

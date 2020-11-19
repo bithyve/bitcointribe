@@ -97,7 +97,7 @@ export function* fetchNotificationsWorker() {
   const res = yield call(RelayServices.fetchNotifications, data.walletId);
   if (res.status === 200) {
     const { notifications, DHInfos } = res.data;
-    console.log({ notifications });
+    console.log('notifications saga output ',{ notifications });
     yield call(AsyncStorage.setItem, 'DHInfos', JSON.stringify(DHInfos));
     yield put(notificationsFetched(notifications));
   } else {
