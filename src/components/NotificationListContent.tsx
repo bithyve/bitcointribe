@@ -50,7 +50,7 @@ export default function NotificationListContent(props) {
                   >
                     <Image
                       source={
-                        value.type == 'release'
+                        value.type == 'release_dev'
                           ? require('../assets/images/icons/icon_hexa.png')
                           : require('../assets/images/icons/icon_receive.png')
                       }

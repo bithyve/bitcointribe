@@ -1143,6 +1143,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationArrives = async (notification) => {
+    console.log({ notification });
     this.props.fetchNotifications();
     const { title, body } = notification;
     const deviceTrayNotification = new firebase.notifications.Notification()
@@ -1215,7 +1216,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = [];
     }
     let readStatus = true;
-    if (content.notificationType == 'release') {
+    if (content.notificationType == 'release_dev') {
       let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
@@ -1674,7 +1675,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    if (value.type == 'release') {
+    if (value.type == 'release_dev') {
       RelayServices.fetchReleases(value.info.split(' ')[1])
         .then(async (res) => {
           if (res.data.releases.length) {
@@ -1717,7 +1718,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
-        if (element.notificationType == 'release') {
+        if (element.notificationType == 'release_dev') {
           let releaseCases = this.props.releaseCasesValue;
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
@@ -1744,7 +1745,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (value) => value.notificationId == element.notificationId,
               )
             ];
-          if (element.notificationType == 'release') {
+          if (element.notificationType == 'release_dev') {
             readStatus = readStatus;
           } else {
             readStatus = temp.read;
