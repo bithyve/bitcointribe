@@ -163,7 +163,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     });
     this.updateAccountData();
-    this.props.clearTransfer(this.state.serviceType);
     this.getAccountBalances();
     console.log({ avgTxFee: this.state.averageTxFees });
     if (this.state.serviceType === SECURE_ACCOUNT) {
@@ -195,7 +194,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         // TODO: This seems to be the way the backend is distinguishing between
         // an "account" recipient and a "contact" recipient. There should be a way
         // to refactor this around leveraging the `RecipientKind` enum.
-        return data.selectedContact?.account_name == null;
+
+        return data.selectedContact.hasOwnProperty('account_name') == false;
       });
 
       this.setState({ selectedContacts });
