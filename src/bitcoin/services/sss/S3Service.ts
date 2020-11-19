@@ -551,7 +551,7 @@ export default class S3Service {
     try {
       const { shares } = this.levelhealth.generateLevel2Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets,tag, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag, version, level);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
       return { status: 510, err: err.message, message: ErrMap[510] };

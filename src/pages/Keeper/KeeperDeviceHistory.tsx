@@ -157,7 +157,7 @@ const KeeperDeviceHistory = (props) => {
 
   useEffect(() => {
     (async () => {
-      if (props.navigation.state.params.isSetUp) {
+      if (props.navigation.state.params.selectedStatus == 'notAccessible') {
         (QrBottomSheet as any).current.snapTo(1);
       }
       const shareHistory = JSON.parse(
@@ -215,6 +215,7 @@ const KeeperDeviceHistory = (props) => {
                 qrScannedData: qrData,
                 isPrimaryKeeper: isPrimaryKeeper,
                 selectedShareId: selectedShareId,
+                selectedLevelId
               });
               (QrBottomSheet as any).current.snapTo(0);
             }
@@ -234,12 +235,9 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
+          // {uuid: "92a0e2795e4c15457132b4c8", publicKey: "4b27442515663b9c0ca010d1a115c90964cb5a337c7eb226cc21135372df53b7", privateKey: "06775349cac054531aa02a8838f3594412c6a22b71276c8156077e4c09233a73", ephemeralAddress: "6a0742396fc552374a5992547ae905e97bf238ce86e11ce1e0a6e1eb91877006", isSignUp: true, …}
           let qrScannedData =
-            '{"uuid":"9a990ada25210951b80b58e4","publicKey": "34725dc940660b3921c91d46c1bbb3f07d05c50150d4b550345684d8da2005b1","ephemeralAddress": "5166e49a9ae74493e4c4a4f6e5850f6c8aa1edb4bfb0195996236cb09485515b","walletName":"lastKeeper"}';
-            console.log("jasfdkjh",isPrimaryKeeper,
-            selectedLevelId,);
-            console.log("jasfdkjh",isPrimaryKeeper,
-            selectedShareId,);
+            '{"uuid":"92a0e2795e4c15457132b4c8","publicKey": "4b27442515663b9c0ca010d1a115c90964cb5a337c7eb226cc21135372df53b7","ephemeralAddress": "6a0742396fc552374a5992547ae905e97bf238ce86e11ce1e0a6e1eb91877006","walletName":"Sam"}';
           props.navigation.navigate('KeeperFeatures', {
             isReshare,
             qrScannedData,

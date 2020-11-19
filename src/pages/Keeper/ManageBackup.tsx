@@ -69,6 +69,8 @@ interface ManageBackupStateTypes {
     data: any,
   };
   selectedLevelId: number;
+  selectedKeeperType: string;
+  selectedKeeperName: string;
 }
 
 interface ManageBackupPropsTypes {
@@ -160,6 +162,8 @@ class ManageBackup extends Component<
       isPrimaryKeeper: false,
       encryptedCloudDataJson: [],
       selectedLevelId: 0,
+      selectedKeeperType: '',
+      selectedKeeperName: '',
     };
   }
 
@@ -308,6 +312,7 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
+    console.log('service keeper', this.props.service);
     if (prevProps.levelHealth != this.props.levelHealth) {
       this.modifyLevelData();
     }
@@ -409,8 +414,8 @@ class ManageBackup extends Component<
     }
   };
 
-  sendApprovalRequestToPK = (shareId) => {
-    this.props.sendApprovalRequest(shareId, this.state.levelData[1].keeper1.shareId);
+  sendApprovalRequestToPK = () => {
+    this.props.sendApprovalRequest(this.state.selectedKeeper.shareId, this.state.levelData[1].keeper1.shareId);
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
   };
 
@@ -814,9 +819,7 @@ class ManageBackup extends Component<
                                         1,
                                       );
                                     else
-                                      this.sendApprovalRequestToPK(
-                                        value.keeper1.shareId,
-                                      );
+                                      (this.refs.keeperTypeBottomSheet as any).snapTo(1);
                                   }
                                 }}
                               >
@@ -923,9 +926,7 @@ class ManageBackup extends Component<
                                     this.goToHistory(obj);
                                     return;
                                   } else {
-                                    this.sendApprovalRequestToPK(
-                                      value.keeper2.shareId,
-                                    );
+                                    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
                                   }
                                 }}
                               >
@@ -1014,22 +1015,8 @@ class ManageBackup extends Component<
           renderContent={() => (
             <KeeperTypeModalContents
               onPressSetup={(type, name) => {
-                let { selectedKeeper, selectedLevelId } = this.state;
-                let obj = {
-                  shareType: selectedKeeper.shareType
-                    ? selectedKeeper.shareType
-                    : type,
-                  keeperStatus: selectedKeeper.status
-                    ? selectedKeeper.status
-                    : 'notAccessible',
-                  name: selectedKeeper.name ? selectedKeeper.name : name,
-                  shareId: selectedKeeper.shareId ? selectedKeeper.shareId : '',
-                  updatedAt: selectedKeeper.updatedAt
-                    ? selectedKeeper.updatedAt
-                    : 0,
-                  id: selectedLevelId,
-                };
-                this.goToHistory(obj);
+                this.setState({selectedKeeperType: type, selectedKeeperName: name})
+                this.sendApprovalRequestToPK();
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
               }}
               onPressBack={() =>
@@ -1109,8 +1096,20 @@ class ManageBackup extends Component<
           renderContent={() => (
             <ApproveSetup
               onPressContinue={() => {
-                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
-                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
+                let { selectedKeeper, selectedLevelId, selectedKeeperType, selectedKeeperName } = this.state;
+                let obj = {
+                  shareType: selectedKeeper.shareType ? selectedKeeper.shareType : selectedKeeperType,
+                  keeperStatus: selectedKeeper.status
+                    ? selectedKeeper.status
+                    : 'notAccessible',
+                  name: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
+                  shareId: selectedKeeper.shareId ? selectedKeeper.shareId : '',
+                  updatedAt: selectedKeeper.updatedAt
+                    ? selectedKeeper.updatedAt
+                    : 0,
+                  id: selectedLevelId,
+                };
+                this.goToHistory(obj);
               }}
             />
           )}

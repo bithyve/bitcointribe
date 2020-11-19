@@ -371,8 +371,7 @@ export default class Keeper {
         // }
 
         if (shareUploadables && Object.keys(shareUploadables).length) {
-          console.log('updateShareAndEC');
-          res = await BH_AXIOS.post('updateShareAndEC', {
+          let obj = {
             // EC update params
             HEXA_ID,
             address: this.keepers[shareId].ephemeralChannel.address,
@@ -382,7 +381,9 @@ export default class Keeper {
             share: shareUploadables.encryptedMetaShare,
             messageId: shareUploadables.messageId,
             encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
-          });
+          }
+          console.log('updateShareAndEC', obj);
+          res = await BH_AXIOS.post('updateShareAndEC', obj);
           console.log('updateShareAndEC res', res);
         } else {
           res = await BH_AXIOS.post('updateEphemeralChannel', {
@@ -404,6 +405,7 @@ export default class Keeper {
         this.keepers[shareId].ephemeralChannel.initiatedAt = initiatedAt;
 
       if (data && Object.keys(data).length) {
+        console.log('resresresresres if', data);
         if (!encKey) {
           this.updateEphemeralChannelData(shareId, data);
         }

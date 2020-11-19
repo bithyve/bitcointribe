@@ -343,7 +343,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     let securityQuestion = yield select(
       (state) => state.storage.database.WALLET_SETUP,
     );
-    let { DECENTRALIZED_BACKUP } = yield select(
+    let { DECENTRALIZED_BACKUP, SERVICES } = yield select(
       (state) => state.storage.database,
     );
 
@@ -458,6 +458,15 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           false,
         );
         if (updateRes.status == 200) {
+          const updatedSERVICES = {
+            ...SERVICES,
+            S3_SERVICE: JSON.stringify(s3Service),
+            KEEPERS_INFO: JSON.stringify(keeper),
+          };
+          console.log('updatedSERVICES UPDATE_SHARES_HEALTH EF CHANNEL', updatedSERVICES);
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
           if (isReshare) {
             yield call(uploadSecondaryShareWorker, {
               payload: {
@@ -510,15 +519,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             keeperInfo.push(obj);
           }
           yield put(updatedKeeperInfo(keeperInfo));
-          const { SERVICES } = yield select((state) => state.storage.database);
-          const updatedSERVICES = {
-            ...SERVICES,
-            S3_SERVICE: JSON.stringify(s3Service),
-            KEEPERS_INFO: JSON.stringify(keeper),
-          };
-          yield call(insertDBWorker, {
-            payload: { SERVICES: updatedSERVICES },
-          });
         }
       }
     }
