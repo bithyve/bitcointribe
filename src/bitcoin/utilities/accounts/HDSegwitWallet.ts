@@ -1557,7 +1557,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     const txPrerequisites: TransactionPrerequisite = {};
-    for (const priority of Object.keys(averageTxFees)) {
+    for (const priority of ['low', 'medium', 'high']) {
       if (
         priority === defaultTxPriority ||
         defaultDebitedAmount === confirmedBalance
@@ -1577,13 +1577,11 @@ export default class HDSegwitWallet extends Bitcoin {
         );
         const debitedAmount = netAmount + fee;
         if (!inputs || debitedAmount > confirmedBalance) {
-          // to default priorty assets
-          txPrerequisites[priority] = {
-            inputs: defaultPriorityInputs,
-            outputs: defaultPriorityOutputs,
-            fee: defaultPriorityFee,
-            estimatedBlocks: defaultEstimatedBlocks,
-          };
+          // to previous priority assets
+          if (priority === 'medium')
+            txPrerequisites[priority] = txPrerequisites['low'];
+          if (priority === 'high')
+            txPrerequisites[priority] = txPrerequisites['medium'];
         } else {
           txPrerequisites[priority] = {
             inputs,
