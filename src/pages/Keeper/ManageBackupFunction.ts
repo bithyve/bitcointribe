@@ -224,16 +224,16 @@ export const modifyLevelStatus = (
         // Level 1 => CLOUD
         if (levelHealthVar[1].levelInfo[0] || levelHealthVar[2].levelInfo[0]) {
           levelData[0].keeper1 =
-            currentLevel == 2
+            currentLevel == 2 && (levelHealthVar[2].levelInfo[4].updatedAt == 0 || levelHealthVar[2].levelInfo[5].updatedAt == 0)
               ? levelHealthVar[1].levelInfo[0]
               : levelHealthVar[2].levelInfo[0];
           levelData[0].keeper1.name = 'Cloud';
         } // Level 1 => SECURITY QUESTION
-        if (levelHealthVar[1].levelInfo[1] || levelHealthVar[2].levelInfo[0]) {
+        if (levelHealthVar[1].levelInfo[1] || levelHealthVar[2].levelInfo[1]) {
           levelData[0].keeper2 =
-            currentLevel == 2
-              ? levelHealthVar[1].levelInfo[1]
-              : levelHealthVar[2].levelInfo[1];
+            levelHealthVar[2].levelInfo[1]
+              ? levelHealthVar[2].levelInfo[1]
+              : levelHealthVar[1].levelInfo[1];
           levelData[0].keeper2.name = 'Security Question';
         } // Level 1 => Status
         if (
@@ -305,13 +305,13 @@ export const modifyLevelStatus = (
         // Level 1 => KEEPER 1 (PRIMARY KEEPER)
         if (levelHealthVar[1].levelInfo[2] || levelHealthVar[2].levelInfo[2]) {
           levelData[1].keeper1 =
-            currentLevel == 2
+            currentLevel == 2 && (levelHealthVar[2].levelInfo[4].updatedAt == 0 || levelHealthVar[2].levelInfo[5].updatedAt == 0)
               ? levelHealthVar[1].levelInfo[2]
               : levelHealthVar[2].levelInfo[2];
-        } // Level 1 =>
+        } // Level 1 => KEEPER 2 (Second KEEPER)
         if (levelHealthVar[1].levelInfo[3] || levelHealthVar[2].levelInfo[3]) {
           levelData[1].keeper2 =
-            currentLevel == 2
+            currentLevel == 2 && (levelHealthVar[2].levelInfo[4].updatedAt == 0 || levelHealthVar[2].levelInfo[5].updatedAt == 0)
               ? levelHealthVar[1].levelInfo[3]
               : levelHealthVar[2].levelInfo[3];
         } // Level 1 => Status
@@ -427,7 +427,7 @@ export const modifyLevelStatus = (
   if (levelData.findIndex((value) => value.status == 'bad') > -1) {
     isError = true;
   }
-  console.log('keeperinfo managebackupfunctions', keeperInfo)
-  console.log('levelData managebackupfunctions', levelData)
+  console.log('keeperinfo managebackupfunctions', keeperInfo);
+  console.log('levelData managebackupfunctions', levelData);
   return { levelData, isError };
 };

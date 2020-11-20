@@ -607,11 +607,15 @@ class ManageBackup extends Component<
                                   : Colors.white,
                             }}
                           >
-                            {value.status == 'good'
-                              ? value.infoGreen
-                              : value.status == 'bad'
-                              ? value.infoRed
-                              : value.infoGray}
+                            {
+                              value.keeper1.status == '' || value.keeper2.status == '' ? 
+                              value.infoGray :
+                              value.keeper1.status == 'accessible' && value.keeper2.status == 'accessible' ? 
+                              value.infoGreen :
+                              value.keeper1.status == 'accessible' || value.keeper2.status == 'accessible' ? 
+                              value.infoRed:
+                              value.infoRed
+                            }
                           </Text>
                         </View>
                         <TouchableOpacity
