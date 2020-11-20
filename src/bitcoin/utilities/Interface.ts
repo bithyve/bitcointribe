@@ -313,3 +313,31 @@ export interface EncryptedImage {
   SERVICES?: string;
   ASYNC_DATA?: string;
 }
+
+export interface xAccount {
+  accountId: string;
+  accountInfo: {
+    accountName: string;
+    accountType: string;
+    description: string;
+    order: number;
+    visibility: string;
+  };
+  primary_xpriv: string;
+  primary_xpub: string;
+  path: string;
+  associatedXprivs: string[];
+  balances: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions: {
+    totalTransactions: number;
+    confirmedTransactions: number;
+    unconfirmedTransactions: number;
+    transactionDetails: any[];
+  };
+  nextFreeAddressIndex: number;
+  nextFreeChangeAddressIndex: number;
+  confirmedUTXOs: {}[];
+}
