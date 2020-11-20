@@ -85,7 +85,7 @@ const AccountDetailsCard: React.FC<Props> = ({
               color: Colors.white,
             }}
           >
-            {primarySubAccountInfo.defaultTitle}
+            {primarySubAccountInfo.customDisplayName || primarySubAccountInfo.defaultTitle}
           </Text>
 
           <Text
@@ -96,7 +96,7 @@ const AccountDetailsCard: React.FC<Props> = ({
               marginTop: 2,
             }}
           >
-            {primarySubAccountInfo.defaultDescription}
+            {primarySubAccountInfo.customDescription || primarySubAccountInfo.defaultDescription}
           </Text>
         </View>
       </View>
