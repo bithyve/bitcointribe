@@ -182,7 +182,7 @@ dependencies {
     implementation "com.facebook.react:react-native:0.63.3"  // From node_modules
     addUnimodulesDependencies()
     // For animated GIF support
-    implementation 'com.facebook.fresco:animated-gif:1.10.0'
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
     // For WebP support, including animated WebP
     implementation 'com.facebook.fresco:animated-webp:1.10.0'
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
