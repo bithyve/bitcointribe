@@ -57,6 +57,7 @@ import {
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
   syncViaXpubAgentWatcher,
+  xCreateNewAccountWatcher,
 } from './sagas/accounts';
 
 import {
@@ -190,6 +191,9 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+
+    // Account Management
+    xCreateNewAccountWatcher,
   ];
 
   yield all(

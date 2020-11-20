@@ -25,6 +25,11 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
+export const X_CREATE_NEW_ACCOUNT = 'X_CREATE_NEW_ACCOUNT';
+
+// export const fetchAddress = (serviceType) => {
+//   return { type: FETCH_ADDR, payload: { serviceType } };
+// };
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -259,6 +264,13 @@ export const updateDonationPreferences = (
   return {
     type: UPDATE_DONATION_PREFERENCES,
     payload: { serviceType, accountNumber, preferences },
+  };
+};
+
+export const xCreateNewAccount = () => {
+  return {
+    type: X_CREATE_NEW_ACCOUNT,
+    payload: {},
   };
 };
 

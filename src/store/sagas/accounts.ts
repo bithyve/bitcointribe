@@ -34,6 +34,7 @@ import {
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
+  X_CREATE_NEW_ACCOUNT,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -49,6 +50,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
+import * as AccountManagement from '../../bitcoin/utilities/accounts/AccountManagement';
 
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
@@ -1060,4 +1062,32 @@ function* updateDonationPreferencesWorker({ payload }) {
 export const updateDonationPreferencesWatcher = createWatcher(
   updateDonationPreferencesWorker,
   UPDATE_DONATION_PREFERENCES,
+);
+
+function* xCreateNewAccountWorker({ payload }) {
+  const { accountDetails } = payload;
+
+  // TODO: Fetch mnemonic from the database & generate derv path
+  const mnemonic = '';
+  const path = '';
+
+  try {
+    const account = yield call(
+      AccountManagement.createAccount,
+      accountDetails,
+      mnemonic,
+      path,
+    );
+
+    // TODO: update the reducer w/ the new account instance
+    // TODO: store the new instance in the database
+  } catch (err) {
+    console.log({ err });
+    throw new Error(`Account creation failed: ${err}`);
+  }
+}
+
+export const xCreateNewAccountWatcher = createWatcher(
+  xCreateNewAccountWorker,
+  X_CREATE_NEW_ACCOUNT,
 );
