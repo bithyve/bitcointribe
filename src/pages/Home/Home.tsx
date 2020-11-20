@@ -1146,7 +1146,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationArrives = async (notification) => {
-    console.log({ notification });
+    console.log('*-* notification has been received ',{ notification });
     this.props.fetchNotifications();
     const { title, body } = notification;
     const deviceTrayNotification = new firebase.notifications.Notification()
@@ -1204,8 +1204,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage(() => {
-      //process data message
+    firebase.messaging().onMessage(async remoteMessage => {
+      console.log('A new FCM message arrived!',remoteMessage);
+      this.onNotificationArrives(remoteMessage);
     });
   };
 
