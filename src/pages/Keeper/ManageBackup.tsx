@@ -312,7 +312,6 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    console.log('service keeper', this.props.service);
     if (prevProps.levelHealth != this.props.levelHealth) {
       this.modifyLevelData();
     }

@@ -64,7 +64,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import { isEmptyObject } from '../../common/CommonFunctions/index';
+import { isEmpty } from '../../common/CommonFunctions/index';
 import HistoryHeaderComponent from './HistoryHeaderComponent';
 
 const TrustedContactHistoryKeeper = (props) => {
@@ -88,7 +88,7 @@ const TrustedContactHistoryKeeper = (props) => {
   const [OTP, setOTP] = useState('');
   const [renderTimer, setRenderTimer] = useState(false);
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
-  const [chosenContact, setChosenContact] = useState(props.navigation.state.params.selectedContact);
+  const [chosenContact, setChosenContact] = useState(props.navigation.state.params.selectedContact ? props.navigation.state.params.selectedContact: null);
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
@@ -462,7 +462,7 @@ const TrustedContactHistoryKeeper = (props) => {
   }, []);
 
   const getImageIcon = () => {
-    if (chosenContact.name) {
+    if (chosenContact && chosenContact.name) {
       if (chosenContact.imageAvailable) {
         return (
           <View style={styles.imageBackground}>
@@ -488,7 +488,7 @@ const TrustedContactHistoryKeeper = (props) => {
                 ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
                 : chosenContact && chosenContact.name
                 ? nameToInitials(
-                    chosenContact.firstName && chosenContact.lastName
+                  chosenContact && chosenContact.firstName && chosenContact.lastName
                       ? chosenContact.firstName + ' ' + chosenContact.lastName
                       : chosenContact.firstName && !chosenContact.lastName
                       ? chosenContact.firstName
@@ -818,7 +818,7 @@ const TrustedContactHistoryKeeper = (props) => {
       return;
     }
 
-    if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
+    if (chosenContact && chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
       }`
@@ -873,7 +873,7 @@ const TrustedContactHistoryKeeper = (props) => {
   ]);
 
   const SendShareModalFunction = useCallback(() => {
-    if (!isEmptyObject(chosenContact)) {
+    if (chosenContact && !isEmpty(chosenContact)) {
       return (
         <SendShareModal
           contact={chosenContact ? chosenContact : null}
@@ -909,7 +909,7 @@ const TrustedContactHistoryKeeper = (props) => {
   }, []);
 
   const renderSendViaLinkContents = useCallback(() => {
-    if (!isEmptyObject(chosenContact)) {
+    if (chosenContact && !isEmpty(chosenContact)) {
       return (
         <SendViaLink
           headerText={'Send Request'}
@@ -942,7 +942,7 @@ const TrustedContactHistoryKeeper = (props) => {
   }, [chosenContact, trustedLink]);
 
   const renderSendViaQRContents = useCallback(() => {
-    if (!isEmptyObject(chosenContact)) {
+    if (chosenContact && !isEmpty(chosenContact)) {
       return (
         <SendViaQR
           contactText={'Adding to Friends and Family:'}
