@@ -515,6 +515,7 @@ class SendToContact extends Component<
       selectedContact,
     } = this.state;
     const { accountsState } = this.props;
+
     if (
       bitcoinAmount &&
       currencyAmount &&
