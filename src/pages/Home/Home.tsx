@@ -14,7 +14,7 @@ import {
   Image,
   BackHandler,
 } from 'react-native';
-import { Easing } from "react-native-reanimated";
+import { Easing } from 'react-native-reanimated';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
@@ -36,13 +36,11 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
-import {
-  downloadMShare,
-  uploadRequestedShare,
-} from '../../store/actions/sss';
+import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss';
 import {
   initializeHealthSetup,
-  updateMSharesHealth
+  updateMSharesHealth,
+  onApprovalStatusChange,
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
@@ -62,9 +60,13 @@ import { storeFbtcData } from '../../store/actions/fbtc';
 import {
   setCurrencyCode,
   setCloudBackupStatus,
-  setCardData
+  setCardData,
 } from '../../store/actions/preferences';
-import { getCurrencyImageByRegion, CloudData, getKeeperInfoFromShareId } from '../../common/CommonFunctions/index';
+import {
+  getCurrencyImageByRegion,
+  CloudData,
+  getKeeperInfoFromShareId,
+} from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import Toast from '../../components/Toast';
 import firebase from 'react-native-firebase';
@@ -115,7 +117,6 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { fetchKeeperTrustedChannel } from '../../store/actions/keeper';
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
-
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
@@ -226,7 +227,7 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   updateLastSeen: any;
-  setCloudBackupStatus : any;
+  setCloudBackupStatus: any;
   cloudBackupStatus: any;
   regularAccount: RegularAccount;
   database: any;
@@ -236,10 +237,11 @@ interface HomePropsTypes {
   isLevel2Initialized: Boolean;
   isLevel3Initialized: Boolean;
   fetchKeeperTrustedChannel: any;
+  keeperApproveStatus: any;
+  onApprovalStatusChange: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
-  
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -315,7 +317,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.openBottomSheetOnLaunch(BottomSheetKind.NOTIFICATIONS_LIST);
   };
 
-
   processQRData = async (qrData) => {
     const { accounts, addTransferDetails, navigation } = this.props;
 
@@ -354,7 +355,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               // checking for donationId to send note
               if (options && options.message) {
                 const rawMessage = options.message;
-                donationId = rawMessage ? rawMessage.split(':').pop().trim() : '';
+                donationId = rawMessage
+                  ? rawMessage.split(':').pop().trim()
+                  : '';
               }
             } catch (err) {
               Alert.alert('Unable to decode payment URI');
@@ -425,7 +428,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             () => {
               navigation.goBack();
 
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -450,7 +456,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -473,7 +482,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -497,7 +509,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               recoveryRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
 
@@ -516,7 +531,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               trustedContactRequest: null,
             },
             () => {
-              this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1,
+              );
             },
           );
           break;
@@ -609,8 +627,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               carouselAcc === DONATION_ACCOUNT
                 ? `Accept bitcoin`
                 : serviceType === REGULAR_ACCOUNT
-                  ? 'User Checking Account'
-                  : 'User Savings Account',
+                ? 'User Checking Account'
+                : 'User Savings Account',
             accountType: serviceType,
             subType: carouselAcc,
             bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
@@ -656,18 +674,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
     // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        //repeatInterval: 'hour',
-      });
+    await firebase.notifications().scheduleNotification(notification, {
+      fireDate: date.getTime(),
+      //repeatInterval: 'hour',
+    });
 
-    firebase
-      .notifications()
-      .getScheduledNotifications();
+    firebase.notifications().getScheduledNotifications();
   };
-
 
   onAppStateChange = async (nextAppState) => {
     const { appState } = this.state;
@@ -691,12 +704,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
     const { navigation, s3Service, initializeHealthSetup } = this.props;
-
     this.closeBottomSheet();
     this.updateAccountCardData();
     this.getBalances();
@@ -712,7 +724,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // health check
     const { healthCheckInitialized } = s3Service.levelhealth;
-    console.log("healthCheckInitialized", healthCheckInitialized);
+    console.log('healthCheckInitialized', healthCheckInitialized);
     if (!healthCheckInitialized) {
       initializeHealthSetup();
     }
@@ -731,68 +743,99 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  cloudData = async (kpInfo? , level?, share?) => {
+  cloudData = async (kpInfo?, level?, share?) => {
     const { walletName, regularAccount, s3Service } = this.props;
     let encryptedCloudDataJson;
-    let shares = share && !(Object.keys(share).length === 0 && share.constructor === Object) ? JSON.stringify(share) : ''; 
+    let shares =
+      share &&
+      !(Object.keys(share).length === 0 && share.constructor === Object)
+        ? JSON.stringify(share)
+        : '';
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
-        shareId:'',
+        shareId: '',
         KeeperType: 'cloud',
-        updated:'',
-        reshareVersion: 0
+        updated: '',
+        reshareVersion: 0,
       },
-    ]
+    ];
     let data = {
       levelStatus: level ? level : 1,
       shares: shares,
-      encryptedCloudDataJson : encryptedCloudDataJson,
+      encryptedCloudDataJson: encryptedCloudDataJson,
       walletName: walletName,
       regularAccount: regularAccount,
-      keeperData: kpInfo? JSON.stringify(kpInfo) : JSON.stringify(keeperData)
-    }
-    let cloudObject = new CloudBackup({dataObject: data, callBack: this.setCloudBackupStatus, share});
+      keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
+    };
+    let cloudObject = new CloudBackup({
+      dataObject: data,
+      callBack: this.setCloudBackupStatus,
+      share,
+    });
     cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
   };
 
   setCloudBackupStatus = (share?) => {
-    this.props.setCloudBackupStatus({status: true});
-    if(this.props.cloudBackupStatus.status && this.props.currentLevel == 0){
+    this.props.setCloudBackupStatus({ status: true });
+    if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
       this.updateHealthForCloud();
-    }
-    else if(this.props.cloudBackupStatus.status && this.props.currentLevel == 1){
+    } else if (
+      this.props.cloudBackupStatus.status &&
+      this.props.currentLevel == 1
+    ) {
       this.updateHealthForCloud(share);
     }
-  }
+  };
 
-  updateCloudData = () =>{
-    console.log("inside updateCloudData");
-    let { currentLevel, keeperInfo, levelHealth, isLevel2Initialized, isLevel3Initialized, s3Service } = this.props;
+  updateCloudData = () => {
+    console.log('inside updateCloudData');
+    let {
+      currentLevel,
+      keeperInfo,
+      levelHealth,
+      isLevel2Initialized,
+      isLevel3Initialized,
+      s3Service,
+    } = this.props;
     let KPInfo: any[] = [];
     let secretShare = {};
-    if(levelHealth.length > 0){
+    if (levelHealth.length > 0) {
       let levelHealthVar = levelHealth[levelHealth.length - 1];
-      if(levelHealthVar.levelInfo){
+      if (levelHealthVar.levelInfo) {
         for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
           const element = levelHealthVar.levelInfo[i];
-          if(keeperInfo.findIndex(value => value.shareId == element.shareId) > -1 && element.status == 'accessible'){
-            let kpInfoElement = keeperInfo[keeperInfo.findIndex(value => value.shareId == element.shareId)];
+          if (
+            keeperInfo.findIndex((value) => value.shareId == element.shareId) >
+              -1 &&
+            element.status == 'accessible'
+          ) {
+            let kpInfoElement =
+              keeperInfo[
+                keeperInfo.findIndex(
+                  (value) => value.shareId == element.shareId,
+                )
+              ];
             let object = {
               type: kpInfoElement.type,
               name: kpInfoElement.name,
               shareId: kpInfoElement.shareId,
-              data: kpInfoElement.data
-            }
+              data: kpInfoElement.data,
+            };
             KPInfo.push(object);
           }
         }
-       
-        if(isLevel2Initialized && !isLevel3Initialized && levelHealthVar.levelInfo[2].status == 'accessible' && levelHealthVar.levelInfo[3].status == 'accessible'){
+
+        if (
+          isLevel2Initialized &&
+          !isLevel3Initialized &&
+          levelHealthVar.levelInfo[2].status == 'accessible' &&
+          levelHealthVar.levelInfo[3].status == 'accessible'
+        ) {
           for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
             const element = s3Service.levelhealth.metaShares[i];
-            if(levelHealthVar.levelInfo[0].shareId == element.shareId){
+            if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
               secretShare = element;
             }
           }
@@ -801,7 +844,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     this.cloudData(KPInfo, currentLevel, secretShare);
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
-  }
+  };
 
   getNewTransactionNotifications = async () => {
     let newTransactions = [];
@@ -896,23 +939,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
     date.setSeconds(date.getSeconds() + 1);
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-      });
+    await firebase.notifications().scheduleNotification(notification, {
+      fireDate: date.getTime(),
+    });
 
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then(() => { });
+      .then(() => {});
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if(prevProps.levelHealth != this.props.levelHealth){
-      if(this.props.levelHealth.length>0 && this.props.levelHealth.length == 1 && prevProps.levelHealth.length == 0){
+    if (prevProps.levelHealth != this.props.levelHealth) {
+      if (
+        this.props.levelHealth.length > 0 &&
+        this.props.levelHealth.length == 1 &&
+        prevProps.levelHealth.length == 0
+      ) {
         this.cloudData();
-      }else{
+      } else {
         // this.updateCloudData();
       }
     }
@@ -994,12 +1039,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const userKey = this.props.navigation.getParam('userKey');
 
     if (custodyRequest) {
-      this.setState(
-        { custodyRequest },
-        () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.CUSTODIAN_REQUEST);
-        },
-      );
+      this.setState({ custodyRequest }, () => {
+        this.openBottomSheetOnLaunch(BottomSheetKind.CUSTODIAN_REQUEST);
+      });
     } else if (recoveryRequest || trustedContactRequest) {
       this.setState(
         {
@@ -1007,7 +1049,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           trustedContactRequest,
         },
         () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1,
+          );
         },
       );
     } else if (userKey) {
@@ -1033,7 +1078,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.cleanupListeners();
   }
 
-  openBottomSheetOnLaunch(kind: BottomSheetKind, snapIndex: number | null = null) {
+  openBottomSheetOnLaunch(
+    kind: BottomSheetKind,
+    snapIndex: number | null = null,
+  ) {
     this.openBottomSheetOnLaunchTimeout = setTimeout(() => {
       this.openBottomSheet(kind, snapIndex);
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY);
@@ -1047,16 +1095,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
     if (!isFocused) {
-      navigation.dispatch(resetToHomeAction({
-        unhandledDeepLinkURL: url,
-      }));
+      navigation.dispatch(
+        resetToHomeAction({
+          unhandledDeepLinkURL: url,
+        }),
+      );
     } else {
       this.handleDeepLinking(url);
     }
   };
 
   handleDeepLinking = async (url: string | null) => {
-    if (url == null) { return; }
+    if (url == null) {
+      return;
+    }
 
     console.log('Home::handleDeepLinking::URL: ' + url);
 
@@ -1089,7 +1141,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest: null,
           },
           () => {
-            this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+              1,
+            );
           },
         );
       }
@@ -1098,7 +1153,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+            splits[3]
           }`,
         );
       } else {
@@ -1133,8 +1188,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             recoveryRequest: null,
           },
           () => {
-            this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
-          }
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+              1,
+            );
+          },
         );
       }
     } else if (splits[4] === 'rk') {
@@ -1152,7 +1210,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           trustedContactRequest: null,
         },
         () => {
-          this.openBottomSheetOnLaunch(BottomSheetKind.TRUSTED_CONTACT_REQUEST, 1);
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1,
+          );
         },
       );
     } else if (splits[4] === 'rrk') {
@@ -1245,8 +1306,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.storeFCMToken();
           this.scheduleNotification();
         })
-        .catch(() => {
-        });
+        .catch(() => {});
     } else {
       this.createNotificationListeners();
       this.storeFCMToken();
@@ -1325,7 +1385,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       .notifications()
       .getInitialNotification();
     if (notificationOpen) {
-
       this.props.fetchNotifications();
       this.onNotificationOpen(notificationOpen.notification);
     }
@@ -1347,7 +1406,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = [];
     }
     let readStatus = true;
-    if (content.notificationType == 'release' || content.notificationType == 'secureXpub') {
+    if (
+      content.notificationType == 'release' ||
+      content.notificationType == 'secureXpub'
+    ) {
       let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
@@ -1390,7 +1452,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1401,14 +1463,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1427,8 +1489,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     // secure derivative accounts
@@ -1437,7 +1499,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1536,7 +1598,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet();
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   handleBottomTabSelection = (tab: BottomTab) => {
     this.setState({ selectedBottomTab: tab });
@@ -1576,7 +1638,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       fetchTrustedChannel,
       walletName,
       trustedContacts,
-      updateMSharesHealth
+      updateMSharesHealth,
     } = this.props;
 
     if (!isRecovery) {
@@ -1639,7 +1701,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                      }`
+                    }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1748,9 +1810,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } else {
           this.bottomSheetRef.current?.snapTo(snapIndex);
         }
-      }
+      },
     );
-  }
+  };
 
   onBottomSheetClosed() {
     this.setState({
@@ -1770,7 +1832,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     );
 
     const { notificationData } = this.state;
-    const { navigation, s3Service, fetchKeeperTrustedChannel, levelHealth } = this.props;
+    const {
+      navigation,
+      s3Service,
+      fetchKeeperTrustedChannel,
+      levelHealth,
+    } = this.props;
     let tempNotificationData = notificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
@@ -1808,13 +1875,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if (value.type == 'release') {
-      RelayServices.fetchReleases(value.info ? value.info.split(' ')[1] : '' )
+      RelayServices.fetchReleases(value.info ? value.info.split(' ')[1] : '')
         .then(async (res) => {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1836,19 +1903,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       let share = getKeeperInfoFromShareId(levelHealth, shareId);
       fetchKeeperTrustedChannel(shareId, value.type, share.name);
     }
-
   };
 
-  updateHealthForCloud = (share?) =>{
+  updateHealthForCloud = (share?) => {
     let levelHealth = this.props.levelHealth;
     let levelHealthVar = levelHealth[0].levelInfo[0];
-    if(share && !(Object.keys(share).length === 0 && share.constructor === Object) && levelHealth.length > 0){
+    if (
+      share &&
+      !(Object.keys(share).length === 0 && share.constructor === Object) &&
+      levelHealth.length > 0
+    ) {
       levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
     }
-    // health update for 1st upload to cloud 
-    if(this.props.cloudBackupStatus && levelHealth.length && !this.props.isLevel2Initialized && levelHealthVar.status != 'accessible'){
-      if(levelHealthVar.shareType == 'cloud'){
-        levelHealthVar.updatedAt = moment(new Date()).valueOf();
+    // health update for 1st upload to cloud
+    if (
+      this.props.cloudBackupStatus &&
+      levelHealth.length &&
+      !this.props.isLevel2Initialized &&
+      levelHealthVar.status != 'accessible'
+    ) {
+      if (levelHealthVar.shareType == 'cloud') {
+        levelHealthVar.updatedAt = ''+moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
         levelHealthVar.reshareVersion = 0;
         levelHealthVar.name = 'Cloud';
@@ -1860,12 +1935,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           reshareVersion: levelHealthVar.reshareVersion,
           updatedAt: moment(new Date()).valueOf(),
           status: 'accessible',
-          shareType: 'cloud'
-        }
+          shareType: 'cloud',
+        },
       ];
       this.props.updateMSharesHealth(shareArray);
     }
-  }
+  };
 
   onPressElement = (item) => {
     const { navigation } = this.props;
@@ -1920,7 +1995,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
           // );
-          if (element.body && element.body.split(' ')[1] == releaseCases.build) {
+          if (
+            element.body &&
+            element.body.split(' ')[1] == releaseCases.build
+          ) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
             }
@@ -1931,6 +2009,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             readStatus = true;
           }
         }
+        if (element.notificationType == 'uploadPDFShare') {
+          let data = element.data;
+          if (data.shareID == this.props.keeperApproveStatus.shareId) {
+            this.props.onApprovalStatusChange(
+              true,
+              moment(new Date()).valueOf(),
+              data.shareID,
+            );
+          }
+        }
         if (
           asyncNotificationList.findIndex(
             (value) => value.notificationId == element.notificationId,
@@ -1938,9 +2026,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2005,14 +2093,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
         return [
           -50,
-          heightPercentageToDP(Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65),
+          heightPercentageToDP(
+            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+          ),
           heightPercentageToDP(95),
         ];
 
       case BottomSheetKind.ERROR:
         return [
           -50,
-          heightPercentageToDP(Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35),
+          heightPercentageToDP(
+            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+          ),
         ];
 
       case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
@@ -2032,10 +2124,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       case BottomSheetKind.TAB_BAR_ADD_MENU:
         return (
           <>
-            <BottomSheetHeader
-              title="Add"
-              onPress={this.closeBottomSheet}
-            />
+            <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
 
             <AddModalContents
               onPressElements={(type) => {
@@ -2047,7 +2136,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       isLoadContacts: true,
                     },
                     () => {
-                      this.openBottomSheet(BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK);
+                      this.openBottomSheet(
+                        BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK,
+                      );
                     },
                   );
                 }
@@ -2210,7 +2301,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       overallHealth,
       levelHealth,
       cardDataProps,
-      currentLevel
+      currentLevel,
     } = this.props;
 
     return (
@@ -2239,10 +2330,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             CurrencyCode={currencyCode}
             navigation={navigation}
             currentLevel={currentLevel}
-          //  onSwitchToggle={this.onSwitchToggle}
-           // setCurrencyToggleValue={this.setCurrencyToggleValue}
-           // navigation={this.props.navigation}
-           // overallHealth={overallHealth}
+            //  onSwitchToggle={this.onSwitchToggle}
+            // setCurrencyToggleValue={this.setCurrencyToggleValue}
+            // navigation={this.props.navigation}
+            // overallHealth={overallHealth}
           />
         </View>
 
@@ -2309,7 +2400,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           onSelect={this.handleBottomTabSelection}
           selectedTab={selectedBottomTab}
           tabBarZIndex={
-            (this.state.currentBottomSheetKind == BottomSheetKind.TAB_BAR_ADD_MENU || null) ? 1 : 0
+            this.state.currentBottomSheetKind ==
+              BottomSheetKind.TAB_BAR_ADD_MENU || null
+              ? 1
+              : 0
           }
         />
 
@@ -2323,9 +2417,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             handleComponent={defaultBottomSheetConfigs.handleComponent}
             onChange={this.handleBottomSheetPositionChange}
           >
-            <BottomSheetView>
-              {this.renderBottomSheetContent()}
-            </BottomSheetView>
+            <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
           </BottomSheet>
         )}
       </ImageBackground>
@@ -2359,7 +2451,8 @@ const mapStateToProps = (state) => {
       (_) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
-    cloudBackupStatus: idx(state, (_) => _.preferences.cloudBackupStatus) || false,
+    cloudBackupStatus:
+      idx(state, (_) => _.preferences.cloudBackupStatus) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
@@ -2367,6 +2460,7 @@ const mapStateToProps = (state) => {
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
+    keeperApproveStatus: idx(state, (_) => _.health.keeperApproveStatus),
   };
 };
 
@@ -2395,7 +2489,8 @@ export default withNavigationFocus(
     setCloudBackupStatus,
     updateMSharesHealth,
     setCardData,
-    fetchKeeperTrustedChannel
+    fetchKeeperTrustedChannel,
+    onApprovalStatusChange,
   })(Home),
 );
 

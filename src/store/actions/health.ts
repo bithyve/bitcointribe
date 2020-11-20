@@ -44,6 +44,7 @@ export const SEND_APPROVAL_REQUEST = 'SEND_APPROVAL_REQUEST';
 export const UPLOAD_SECONDARY_SHARE = 'UPLOAD_SECONDARY_SHARE';
 export const GENERATE_PDF = "GENERATE_PDF";
 export const PDF_GENERATED = "PDF_GENERATED";
+export const ON_APPROVAL_STATUS_CHANGE = 'ON_APPROVAL_STATUS_CHANGE';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -252,4 +253,8 @@ export const pdfGenerated = (generated: Boolean) => {
     type: PDF_GENERATED,
     payload: { generated },
   };
+};
+
+export const onApprovalStatusChange = (status, initiatedAt, shareId) => {
+  return { type: ON_APPROVAL_STATUS_CHANGE, payload: { status, initiatedAt, shareId }, };
 };

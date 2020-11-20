@@ -26,9 +26,7 @@ import DeviceInfo from 'react-native-device-info';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
-import {
-  fetchEphemeralChannel,
-} from '../../store/actions/trustedContacts';
+import { fetchEphemeralChannel } from '../../store/actions/trustedContacts';
 import {
   setCloudBackupStatus,
   setIsBackupProcessing,
@@ -48,6 +46,7 @@ import {
   initLevelTwo,
   updateMSharesHealth,
   sendApprovalRequest,
+  onApprovalStatusChange,
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 import ApproveSetup from './ApproveSetup';
@@ -66,7 +65,7 @@ interface ManageBackupStateTypes {
     shareId: string;
     reshareVersion: number;
     name: string;
-    data: any,
+    data: any;
   };
   selectedLevelId: number;
   selectedKeeperType: string;
@@ -97,6 +96,8 @@ interface ManageBackupPropsTypes {
   keeperInfo: any[];
   sendApprovalRequest: any;
   service: any;
+  isLevelThreeMetaShareCreated: Boolean;
+  onApprovalStatusChange: any;
 }
 
 class ManageBackup extends Component<
@@ -199,13 +200,12 @@ class ManageBackup extends Component<
       levelData.findIndex(
         (value) => value.status == 'bad' || value.status == 'notSetup',
       )
-    )
-      level =
-        levelData[
-          levelData.findIndex(
-            (value) => value.status == 'bad' || value.status == 'notSetup',
-          ) - 1
-        ].id;
+    ) {
+      let index = levelData.findIndex(
+        (value) => value.status == 'bad' || value.status == 'notSetup',
+      );
+      level = levelData[index > -1 ? index - 1 : 2].id;
+    }
     let value = 1;
     if (this.state.levelData[0].status == 'notSetup') value = 1;
     else if (level) value = level + 1;
@@ -396,7 +396,7 @@ class ManageBackup extends Component<
       selectedShareId: shareId,
       selectedLevelId: id,
       selectedContact: this.state.selectedKeeper.data,
-      selectedKeeper: this.state.selectedKeeper
+      selectedKeeper: this.state.selectedKeeper,
     };
     if (shareType == 'device' || shareType == 'primaryKeeper') {
       this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
@@ -414,7 +414,11 @@ class ManageBackup extends Component<
   };
 
   sendApprovalRequestToPK = () => {
-    this.props.sendApprovalRequest(this.state.selectedKeeper.shareId, this.state.levelData[1].keeper1.shareId);
+    this.props.sendApprovalRequest(
+      this.state.selectedKeeper.shareId,
+      this.state.levelData[1].keeper1.shareId,
+    );
+    this.props.onApprovalStatusChange(false, moment(new Date()).valueOf(), this.state.selectedKeeper.shareId);
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
   };
 
@@ -607,15 +611,16 @@ class ManageBackup extends Component<
                                   : Colors.white,
                             }}
                           >
-                            {
-                              value.keeper1.status == '' || value.keeper2.status == '' ? 
-                              value.infoGray :
-                              value.keeper1.status == 'accessible' && value.keeper2.status == 'accessible' ? 
-                              value.infoGreen :
-                              value.keeper1.status == 'accessible' || value.keeper2.status == 'accessible' ? 
-                              value.infoRed:
-                              value.infoRed
-                            }
+                            {value.keeper1.status == '' ||
+                            value.keeper2.status == ''
+                              ? value.infoGray
+                              : value.keeper1.status == 'accessible' &&
+                                value.keeper2.status == 'accessible'
+                              ? value.infoGreen
+                              : value.keeper1.status == 'accessible' ||
+                                value.keeper2.status == 'accessible'
+                              ? value.infoRed
+                              : value.infoRed}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -804,7 +809,7 @@ class ManageBackup extends Component<
                                       value.id === 2 ? true : false,
                                     selectedLevelId: value.id,
                                   });
-                                  if (value.keeper1.status == 'accessible') {
+                                  if (value.keeper1.updatedAt > 0) {
                                     let obj = {
                                       shareType: value.keeper1.shareType,
                                       keeperStatus: value.keeper1.status,
@@ -822,7 +827,10 @@ class ManageBackup extends Component<
                                         1,
                                       );
                                     else
-                                      (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                      (this.refs
+                                        .keeperTypeBottomSheet as any).snapTo(
+                                        1,
+                                      );
                                   }
                                 }}
                               >
@@ -917,7 +925,7 @@ class ManageBackup extends Component<
                                     isPrimaryKeeper: false,
                                     selectedLevelId: value.id,
                                   });
-                                  if (value.keeper2.status == 'accessible') {
+                                  if (value.keeper2.updatedAt > 0) {
                                     let obj = {
                                       shareType: value.keeper2.shareType,
                                       keeperStatus: value.keeper2.status,
@@ -929,7 +937,8 @@ class ManageBackup extends Component<
                                     this.goToHistory(obj);
                                     return;
                                   } else {
-                                    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                    (this.refs
+                                      .keeperTypeBottomSheet as any).snapTo(1);
                                   }
                                 }}
                               >
@@ -1017,8 +1026,19 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
-              onPressSetup={(type, name) => {
-                this.setState({selectedKeeperType: type, selectedKeeperName: name})
+              onPressSetup={async (type, name) => {
+                if (selectedLevelId == 3) {
+                  if (
+                    !this.props.isLevelThreeMetaShareCreated &&
+                    !this.props.isLevel3Initialized &&
+                    selectedLevelId == 3
+                  )
+                    await this.props.generateMetaShare(selectedLevelId);
+                }
+                this.setState({
+                  selectedKeeperType: type,
+                  selectedKeeperName: name,
+                });
                 this.sendApprovalRequestToPK();
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0);
               }}
@@ -1061,21 +1081,28 @@ class ManageBackup extends Component<
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
               onPressContinue={() => {
-                const { levelData, selectedLevelId, selectedKeeper } = this.state;
+                const {
+                  levelData,
+                  selectedLevelId,
+                  selectedKeeper,
+                } = this.state;
                 let PKStatus = levelData[1].keeper1.keeper1Done
                   ? 'accessed'
                   : 'notAccessible';
-                  let navigationParams = {
-                    selectedTime: this.getTime(new Date()),
-                    selectedStatus: PKStatus,
-                    selectedTitle: 'Primary Keeper',
-                    isPrimaryKeeper: true,
-                    isSetUp: true,
-                    selectedShareId: selectedKeeper.shareId,
-                    selectedLevelId,
-                    selectedContact: this.state.selectedKeeper.data
-                  }
-                this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
+                let navigationParams = {
+                  selectedTime: this.getTime(new Date()),
+                  selectedStatus: PKStatus,
+                  selectedTitle: 'Primary Keeper',
+                  isPrimaryKeeper: true,
+                  isSetUp: true,
+                  selectedShareId: selectedKeeper.shareId,
+                  selectedLevelId,
+                  selectedContact: this.state.selectedKeeper.data,
+                };
+                this.props.navigation.navigate(
+                  'KeeperDeviceHistory',
+                  navigationParams,
+                );
               }}
             />
           )}
@@ -1099,13 +1126,22 @@ class ManageBackup extends Component<
           renderContent={() => (
             <ApproveSetup
               onPressContinue={() => {
-                let { selectedKeeper, selectedLevelId, selectedKeeperType, selectedKeeperName } = this.state;
+                let {
+                  selectedKeeper,
+                  selectedLevelId,
+                  selectedKeeperType,
+                  selectedKeeperName,
+                } = this.state;
                 let obj = {
-                  shareType: selectedKeeper.shareType ? selectedKeeper.shareType : selectedKeeperType,
+                  shareType: selectedKeeper.shareType
+                    ? selectedKeeper.shareType
+                    : selectedKeeperType,
                   keeperStatus: selectedKeeper.status
                     ? selectedKeeper.status
                     : 'notAccessible',
-                  name: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
+                  name: selectedKeeper.name
+                    ? selectedKeeper.name
+                    : selectedKeeperName,
                   shareId: selectedKeeper.shareId ? selectedKeeper.shareId : '',
                   updatedAt: selectedKeeper.updatedAt
                     ? selectedKeeper.updatedAt
@@ -1152,9 +1188,13 @@ const mapStateToProps = (state) => {
     ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
+    isLevelThreeMetaShareCreated: idx(
+      state,
+      (_) => _.health.isLevelThreeMetaShareCreated,
+    ),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
-    service: idx(state, (_) => _.keeper.service)
+    service: idx(state, (_) => _.keeper.service),
   };
 };
 
@@ -1168,6 +1208,7 @@ export default withNavigationFocus(
     updateMSharesHealth,
     setIsBackupProcessing,
     sendApprovalRequest,
+    onApprovalStatusChange,
   })(ManageBackup),
 );
 

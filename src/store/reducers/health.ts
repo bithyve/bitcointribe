@@ -23,7 +23,8 @@ import {
   WALLET_IMAGE_HEALTH_CHECKED,
   S3_LOADING_KEEPER,
   IS_LEVEL3_INITIALIZED,
-  PDF_GENERATED
+  PDF_GENERATED,
+  ON_APPROVAL_STATUS_CHANGE
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -72,6 +73,11 @@ const initialState: {
     [otp: string]: { status: Boolean; err?: String };
   };
   errorReceiving: Boolean,
+  keeperApproveStatus:{
+    status: Boolean;
+    initiatedAt: number;
+    shareId: string;
+  }
 } = {
   service: null,
   loading: {
@@ -97,7 +103,11 @@ const initialState: {
   metaShare: null,
   downloadedMShare: {},
   errorReceiving: false,
-
+  keeperApproveStatus:{
+    status: false,
+    initiatedAt: 0,
+    shareId: ''
+  }
 };
 
 export default (state = initialState, action) => {
@@ -266,12 +276,22 @@ export default (state = initialState, action) => {
         },
       };
 
-      case PDF_GENERATED:
+    case PDF_GENERATED:
       return {
         ...state,
         pdfGenerated: {
           ...action.payload.generated,
         },
+      };
+    
+    case ON_APPROVAL_STATUS_CHANGE:
+      return {
+        ...state,
+        keeperApproveStatus:{
+          status: action.payload.status,
+          initiatedAt: action.payload.initiatedAt,
+          shareId: action.payload.shareId,
+        }
       };
   }
   return state;

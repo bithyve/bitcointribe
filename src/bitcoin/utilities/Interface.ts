@@ -178,7 +178,8 @@ export interface DerivativeAccounts {
 
 export enum notificationType {
   contact = 'contact',
-  approveKeeper = 'approveKeeper' 
+  approveKeeper = 'approveKeeper',
+  uploadPDFShare = 'uploadPDFShare'
 }
 export enum notificationTag {
   IMP = 'IMP',
