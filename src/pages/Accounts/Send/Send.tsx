@@ -50,6 +50,7 @@ import {
   AccountRecipientDescribing,
   makeContactRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
 export enum SectionKind {
   SCAN_QR,
@@ -438,7 +439,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             spendableBalance,
             derivativeAccountDetails,
             bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
+              ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
               : '',
             donationId,
           });
@@ -505,7 +506,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               spendableBalance,
               derivativeAccountDetails,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * 1e8)}`
+                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
                 : '',
               donationId,
             });

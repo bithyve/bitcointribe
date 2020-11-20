@@ -1,4 +1,4 @@
-import { call, put, select, delay } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import {
   INITIALIZE_TRUSTED_CONTACT,
   trustedContactInitialized,
@@ -27,9 +27,7 @@ import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
   EphemeralDataElements,
-  DerivativeAccount,
   Contacts,
-  TrustedData,
   TrustedDataElements,
   TrustedContactDerivativeAccountElements,
   INotification,
@@ -40,7 +38,6 @@ import {
 import {
   calculateOverallHealth,
   downloadMShare,
-  updateWalletImage,
 } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
@@ -56,7 +53,6 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
 import { downloadMetaShareWorker } from './sss';
-import { SYNC_LAST_SEENS } from '../actions/trustedContacts';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import DeviceInfo from 'react-native-device-info';
 import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts';
@@ -164,7 +160,6 @@ function* removeTrustedContactWorker({ payload }) {
   const trustedContactsInfo = yield select(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
-  const s3Service: S3Service = yield select((state) => state.sss.service);
   const regularAccount: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -876,40 +871,6 @@ export const trustedChannelsSetupSyncWatcher = createWatcher(
   TRUSTED_CHANNELS_SETUP_SYNC,
 );
 
-function* syncLastSeensWorker({ payload }) {
-  // updates and fetches last seen for all trusted channels
-  const trustedContacts: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service,
-  );
-
-  if (Object.keys(trustedContacts.tc.trustedContacts).length) {
-    const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
-
-    const res = yield call(trustedContacts.syncLastSeens);
-    console.log({ res });
-    if (res.status === 200) {
-      const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
-
-      if (preSyncTC !== postSyncTC) {
-        const { SERVICES } = yield select((state) => state.storage.database);
-        const updatedSERVICES = {
-          ...SERVICES,
-          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-        };
-        yield call(insertDBWorker, {
-          payload: { SERVICES: updatedSERVICES },
-        });
-      }
-    } else {
-      console.log('Failed to sync last seens', res.err);
-    }
-  }
-}
-
-export const syncLastSeensWatcher = createWatcher(
-  syncLastSeensWorker,
-  SYNC_LAST_SEENS,
-);
 
 function* walletCheckInWorker({ payload }) {
   // syncs last seen, health & exchange rates
@@ -1177,7 +1138,7 @@ export const syncTrustedChannelsWatcher = createWatcher(
   SYNC_TRUSTED_CHANNELS,
 );
 
-function* postRecoveryChannelSyncWorker({ payload }) {
+function* postRecoveryChannelSyncWorker({ }) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
