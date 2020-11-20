@@ -326,6 +326,7 @@ export interface xAccount {
   primary_xpriv: string;
   primary_xpub: string;
   path: string;
+  gapLimit: number;
   associatedXprivs: string[];
   balances: {
     balance: number;

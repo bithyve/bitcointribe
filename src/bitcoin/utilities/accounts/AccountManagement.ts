@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import { xAccount } from '../Interface';
 import { generateExtendedKeys } from './AccountUtils';
+import { config } from 'process';
 
 export const createAccount = (
   accountInfo: xAccount['accountInfo'],
@@ -21,6 +22,7 @@ export const createAccount = (
     primary_xpriv: xpriv,
     primary_xpub: xpub,
     path,
+    gapLimit: 5, // export to config file (conditional gap-limit)
     associatedXprivs: [],
     balances: {
       balance: 0,
