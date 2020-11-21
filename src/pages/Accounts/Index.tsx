@@ -218,13 +218,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   }
 
   componentDidMount = () => {
-
     let { serviceType } = this.state;
     let { accounts } = this.props;
     // setting these properties to true if they are false. true should be the starting state for these
     // properties else the account refresh can get stuck with loader displaying all the time
-    if (accounts[serviceType].loading.balanceTx) this.props.switchLoader(serviceType, 'balanceTx');
-    if(accounts[serviceType].loading.derivativeBalanceTx) this.props.switchLoader(serviceType, 'derivativeBalanceTx');
+    if (accounts[serviceType].loading.balanceTx)
+      this.props.switchLoader(serviceType, 'balanceTx');
+    if (accounts[serviceType].loading.derivativeBalanceTx)
+      this.props.switchLoader(serviceType, 'derivativeBalanceTx');
 
     this.updateCarouselData();
 
@@ -241,13 +242,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       this.setState({ is_initiated: true });
-      console.log('currencyCode interaction manager completed!')
+      console.log('currencyCode interaction manager completed!');
     });
 
     if (this.state.showLoader) {
       // after all interactions are done , loader need to be removed
       InteractionManager.runAfterInteractions(() => {
-        console.log('Loader interaction manager completed!')
+        console.log('Loader interaction manager completed!');
         this.setState({ showLoader: false });
         return;
       });
@@ -463,9 +464,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-
-
-
   refreshAccountBalance = () => {
     const { presentCarouselData, serviceType } = this.state;
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
@@ -486,9 +484,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
       this.props.setAutoAccountSync(derivativeAccountDetails.type);
     } else {
-        this.props.fetchBalanceTx(serviceType, {
-          loader: true,
-          syncTrustedDerivative:
+      this.props.fetchBalanceTx(serviceType, {
+        loader: true,
+        syncTrustedDerivative:
           serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
             ? true
             : false,
@@ -515,7 +513,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.setAutoAccountSync(accountType);
     }
   };
-
 
   setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = this.props.currencyCode;
@@ -1077,9 +1074,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
               refreshControl={
                 <RefreshControl
-                  refreshing={
-                    accounts[serviceType].loading.balanceTx
-                  }
+                  refreshing={accounts[serviceType].loading.balanceTx}
                   onRefresh={this.refreshAccountBalance}
                 />
               }
@@ -1599,10 +1594,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   isFromAccount={true}
                   transactionLoading={transactionLoading}
                   transactions={transactions}
-                  setTransactionItem={
-                    () => {}
-                    //this.setState({ selectedTransactionItem: item })
-                  }
+                  setTransactionItem={(item) => {
+                    this.setState({ transactionItem: item });
+                  }}
                   setTabBarZIndex={
                     () => {}
                     //this.setState({ tabBarIndex: index })
