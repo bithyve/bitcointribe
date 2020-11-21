@@ -239,6 +239,7 @@ interface HomePropsTypes {
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
   onApprovalStatusChange: any;
+  secureAccount: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -708,6 +709,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
+    console.log('walletIde', this.props.s3Service.getWalletId().data.walletId)
+    
+    console.log('this.props.fcmTokenValue', this.props.fcmTokenValue)
     const { navigation, s3Service, initializeHealthSetup } = this.props;
     this.closeBottomSheet();
     this.updateAccountCardData();
@@ -966,6 +970,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
     ) {
+      console.log('testing that it is also on managebackup from home')
       this.setupNotificationList();
     }
 
@@ -1897,7 +1902,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (value.type == 'contact') {
       this.closeBottomSheet();
     }
-    if (value.type == 'secureXpub') {
+    if (value.type == 'secureXpub' && !this.props.secureAccount.secureHDWallet.xpubs.secondary) {
       this.bottomSheetRef.current?.close();
       let shareId = s3Service.levelhealth.metaShares[1].shareId;
       let share = getKeeperInfoFromShareId(levelHealth, shareId);
@@ -1973,6 +1978,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
+    let { releaseCasesValue, keeperApproveStatus, onApprovalStatusChange, s3Service, levelHealth, notificationList, fetchKeeperTrustedChannel, secureAccount } = this.props;
     // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1985,13 +1991,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
     let tmpList = asyncNotificationList;
-    const { notificationList } = this.props;
     if (notificationList) {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = this.props.releaseCasesValue;
+          let releaseCases = releaseCasesValue;
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
           // );
@@ -2011,13 +2016,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
         if (element.notificationType == 'uploadPDFShare') {
           let data = element.data;
-          if (data.shareID == this.props.keeperApproveStatus.shareId) {
-            this.props.onApprovalStatusChange(
+          if (data.shareID == keeperApproveStatus.shareId) {
+            onApprovalStatusChange(
               true,
               moment(new Date()).valueOf(),
               data.shareID,
             );
           }
+        }
+        if (element.notificationType == 'secureXpub' && !secureAccount.secureHDWallet.xpubs.secondary) {
+          let shareId = s3Service.levelhealth.metaShares[1].shareId;
+          let share = getKeeperInfoFromShareId(levelHealth, shareId);
+          fetchKeeperTrustedChannel(shareId, element.notificationType, share.name);
         }
         if (
           asyncNotificationList.findIndex(
@@ -2437,7 +2447,7 @@ const mapStateToProps = (state) => {
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
     cardDataProps: idx(state, (_) => _.preferences.cardData),
-
+    secureAccount: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),
     s3Service: idx(state, (_) => _.health.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),

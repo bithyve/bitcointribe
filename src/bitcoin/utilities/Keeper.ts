@@ -220,11 +220,7 @@ export default class Keeper {
         .update(symmetricKey)
         .digest('hex');
 
-      const ephemeralAddress = EfChannelAddress;
-      // crypto
-      //   .createHash('sha256')
-      //   .update(encodedPublicKey)
-      //   .digest('hex');
+      const ephemeralAddress = EfChannelAddress ? EfChannelAddress : crypto.createHash('sha256').update(encodedPublicKey).digest('hex');
 
       this.keepers[shareId] = {
         ...this.keepers[shareId],

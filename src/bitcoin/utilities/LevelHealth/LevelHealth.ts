@@ -824,7 +824,6 @@ export default class LevelHealth {
     success: boolean;
     message: string;
   }> => {
-    console.log('INIT_LEVEL_TWO LH', SecurityQuestionHealth)
     let levelInfo = [];
     if (this.metaShares.length) {
       levelInfo[0] = {
@@ -857,7 +856,6 @@ export default class LevelHealth {
           level: _level,
           levelInfo,
         });
-        console.log('INIT_LEVEL_TWO axios res', res );
       } catch (err) {
         if (err.response) throw new Error(err.response.data.err);
         if (err.code) throw new Error(err.code);

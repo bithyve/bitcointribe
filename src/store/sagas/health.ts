@@ -38,6 +38,8 @@ import {
   isLevel3InitializedStatus,
   GENERATE_PDF,
   pdfGenerated,
+  onApprovalStatusChange,
+  UPLOAD_PDF_SHARE,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -84,6 +86,7 @@ import { ErrorSending } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
 import generatePDFKeeper from '../utils/generatePDFKeeper';
+import { getKeeperInfoFromShareId } from '../../common/CommonFunctions';
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -519,6 +522,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             keeperInfo.push(obj);
           }
           yield put(updatedKeeperInfo(keeperInfo));
+          yield put(onApprovalStatusChange(false, 0, ''));
         }
       }
     }
@@ -554,7 +558,6 @@ export const uploadSecondaryShareWatcher = createWatcher(
 
 function* updateHealthLevel2Worker({ payload }) {
   let { level } = payload;
-  console.log('INIT_LEVEL_TWO workes');
   let isLevelInitialized = yield select(
     (state) => state.health.isLevel3Initialized,
   );
@@ -563,7 +566,6 @@ function* updateHealthLevel2Worker({ payload }) {
       (state) => state.health.isLevel2Initialized,
     );
   }
-  console.log('INIT_LEVEL_TWO isLevel2Initialized', isLevelInitialized);
   if (!isLevelInitialized) {
     let s3Service: S3Service = yield select((state) => state.health.service);
     let Health = yield select((state) => state.health.levelHealth);
@@ -1297,12 +1299,12 @@ export const uploadEncMetaShareKeeperWatcher = createWatcher(
 
 function* sendApprovalRequestWorker({ payload }) {
   yield put(switchS3LoaderKeeper('approvalRequest'));
-  let { shareID, PkShareId } = payload;
+  let { shareID, PkShareId, notificationType } = payload;
   let keeper = yield select((state) => state.keeper.service);
-  let keeperInfo: Keepers = keeper.keeper.keepers[PkShareId];
+  let keeperInfo: Keepers = keeper.keeper.keepers;
   if (keeperInfo.keeperUUID) {
     const notification: INotification = {
-      notificationType: notificationType.approveKeeper,
+      notificationType: notificationType,
       title: 'Approval Request for Keeper',
       body: 'Approval Keeper setup',
       data: JSON.stringify({ shareID }),
@@ -1454,4 +1456,209 @@ function* generatePDFWorker({ payload }) {
 export const generatePDFWatcher = createWatcher(
   generatePDFWorker,
   GENERATE_PDF,
+);
+
+function* uploadPdfShareWorker({ payload }) {
+  try {
+    let {
+      isReshare,
+      selectedShareId,
+    } = payload;
+    let s3Service: S3Service = yield select((state) => state.health.service);
+    let levelHealth = yield select((state) => state.health.levelHealth);
+    let share = getKeeperInfoFromShareId(levelHealth, selectedShareId);
+    let type = 'pdf';
+
+    yield put(updateMSharesLoader(true));
+    const keeper: KeeperService = yield select((state) => state.keeper.service);
+
+    let securityQuestion = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+    let { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+      (state) => state.storage.database,
+    );
+
+    if (isReshare) {
+      let shareIndex = 1;
+      if (share.shareId && s3Service.levelhealth.metaShares.length) {
+        let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+        if (
+          metaShare.findIndex((value) => value.shareId == share.shareId) > -1
+        ) {
+          shareIndex = metaShare.findIndex(
+            (value) => value.shareId == share.shareId,
+          );
+        }
+      }
+      yield call(s3Service.reshareMetaShare, shareIndex);
+    }
+
+    let s3ServiceTest: S3Service = yield select(
+      (state) => state.accounts[TEST_ACCOUNT].service,
+    );
+    let s3ServiceRegular: S3Service = yield select(
+      (state) => state.accounts[REGULAR_ACCOUNT].service,
+    );
+    let s3ServiceSecure: SecureAccount = yield select(
+      (state) => state.accounts[SECURE_ACCOUNT].service,
+    );
+    // All acoount Xpubs
+    let testXpub = s3ServiceTest.hdWallet.getTestXPub();
+    let regularXpub = s3ServiceRegular.hdWallet.getXpub();
+    let secureXpub = s3ServiceSecure.getXpubsForAccount();
+
+    // let encKey;
+    // if (ScannedData.uuid) encKey = LevelHealth.strechKey(ScannedData.uuid);
+    // let { otpEncryptedData, otp } = LevelHealth.encryptViaOTP(ScannedData.uuid);
+    // const encryptedKey = otpEncryptedData;
+
+    // let walletID = s3Service.getWalletId().data.walletId;
+    // let hexaPublicKey = '';
+    // let trustedChannelAddress = '';
+    // let EfChannelAddress = ScannedData.ephemeralAddress;
+    // const result = yield call(
+    //   keeper.finalizeKeeper,
+    //   share.shareId,
+    //   ScannedData.publicKey,
+    //   encKey,
+    //   ScannedData.uuid,
+    //   featuresList,
+    //   isPrimaryKeeper,
+    //   ScannedData.walletName,
+    // );
+    // if (result.status === 200) {
+    //   hexaPublicKey = result.data.publicKey;
+    //   trustedChannelAddress = result.data.channelAddress;
+    //   EfChannelAddress = result.data.ephemeralAddress;
+
+    //   let dataElements: EphemeralDataElements = {
+    //     publicKey: ScannedData.publicKey, //Keeper scanned public key
+    //     FCM: fcmTokenValue,
+    //     walletID,
+    //     shareTransferDetails: {
+    //       otp,
+    //       encryptedKey,
+    //     },
+    //     DHInfo: {
+    //       publicKey: hexaPublicKey,
+    //     },
+    //     trustedAddress: trustedChannelAddress,
+    //   };
+    //   if (isReshare) dataElements.restoreOf = walletID;
+
+    //   const shareUploadables = LevelHealth.encryptMetaShare(
+    //     share,
+    //     ScannedData.uuid,
+    //   );
+    //   console.log('ScannedData.publicKey', ScannedData.publicKey,dataElements);
+
+    //   let res = yield call(
+    //     keeper.updateEphemeralChannel,
+    //     share.shareId,
+    //     type,
+    //     hexaPublicKey,
+    //     EfChannelAddress,
+    //     dataElements,
+    //     ScannedData.uuid,
+    //     shareUploadables,
+    //   );
+    //   console.log('updateEphemeralChannel saga res', res);
+    //   if (res.status == 200) {
+    //     // Create trusted channel
+    //     const data: TrustedDataElements = {
+    //       xPub: { testXpub, regularXpub, secureXpub: secureXpub },
+    //       walletID,
+    //       FCM: fcmTokenValue,
+    //       walletName: ScannedData.walletName,
+    //       version: DeviceInfo.getVersion(),
+    //       shareTransferDetails: {
+    //         otp,
+    //         encryptedKey,
+    //       },
+    //       isPrimary: isPrimaryKeeper,
+    //       featuresList,
+    //       securityQuestion,
+    //     };
+    //     const updateRes = yield call(
+    //       keeper.updateTrustedChannel,
+    //       share.shareId,
+    //       data,
+    //       false,
+    //     );
+    //     if (updateRes.status == 200) {
+    //       const updatedSERVICES = {
+    //         ...SERVICES,
+    //         S3_SERVICE: JSON.stringify(s3Service),
+    //         KEEPERS_INFO: JSON.stringify(keeper),
+    //       };
+    //       console.log('updatedSERVICES UPDATE_SHARES_HEALTH EF CHANNEL', updatedSERVICES);
+    //       yield call(insertDBWorker, {
+    //         payload: { SERVICES: updatedSERVICES },
+    //       });
+    //       if (isReshare) {
+    //         yield call(uploadSecondaryShareWorker, {
+    //           payload: {
+    //             encryptedKey: dataElements.shareTransferDetails.encryptedKey,
+    //             metaShare: DECENTRALIZED_BACKUP.PK_SHARE,
+    //             otp: dataElements.shareTransferDetails.otp,
+    //           },
+    //         });
+    //       }
+    //       let shareArray = [
+    //         {
+    //           walletId: s3Service.getWalletId().data.walletId,
+    //           shareId: share.shareId,
+    //           reshareVersion: 0,
+    //           updatedAt: moment(new Date()).valueOf(),
+    //           name: ScannedData.walletName,
+    //           shareType: type,
+    //         },
+    //       ];
+    //       yield put(updateMSharesHealth(shareArray));
+    //       let keeperInfo = yield select((state) => state.health.keeperInfo);
+    //       let flag = false;
+    //       if (keeperInfo.length > 0) {
+    //         for (let i = 0; i < keeperInfo.length; i++) {
+    //           const element = keeperInfo[i];
+    //           if (element.shareId == share.shareId) {
+    //             keeperInfo[i].name = ScannedData.walletName;
+    //             keeperInfo[i].uuid = ScannedData.uuid;
+    //             keeperInfo[i].publicKey = ScannedData.publicKey;
+    //             keeperInfo[i].ephemeralAddress = ScannedData.ephemeralAddress;
+    //             keeperInfo[i].type = type;
+    //             break;
+    //           } else {
+    //             flag = true;
+    //             break;
+    //           }
+    //         }
+    //       } else {
+    //         flag = true;
+    //       }
+    //       if (flag) {
+    //         let obj = {
+    //           shareId: share.shareId,
+    //           name: ScannedData.walletName,
+    //           uuid: ScannedData.uuid,
+    //           publicKey: ScannedData.publicKey,
+    //           ephemeralAddress: ScannedData.ephemeralAddress,
+    //           type,
+    //         };
+    //         keeperInfo.push(obj);
+    //       }
+    //       yield put(updatedKeeperInfo(keeperInfo));
+    //       yield put(onApprovalStatusChange(false, 0, ''));
+    //     }
+    //   }
+    // }
+    yield put(updateMSharesLoader(false));
+  } catch (error) {
+    console.log('Error EF channel', error);
+  }
+}
+
+export const uploadPdfShareWatcher = createWatcher(
+  uploadPdfShareWorker,
+  UPLOAD_PDF_SHARE,
 );

@@ -75,7 +75,6 @@ export const fetchKeeperTrustedChannelWatcher = createWatcher(
 );
 
 function* downloadSMShareWorker({ payload }) {
-  console.log('downloadShareWorker', payload);
   const { encryptedKey, otp } = payload;
 
   if (!encryptedKey) return;

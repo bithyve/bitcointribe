@@ -45,6 +45,7 @@ export const UPLOAD_SECONDARY_SHARE = 'UPLOAD_SECONDARY_SHARE';
 export const GENERATE_PDF = "GENERATE_PDF";
 export const PDF_GENERATED = "PDF_GENERATED";
 export const ON_APPROVAL_STATUS_CHANGE = 'ON_APPROVAL_STATUS_CHANGE';
+export const UPLOAD_PDF_SHARE = 'UPLOAD_PDF_SHARE';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -234,8 +235,8 @@ export const uploadEncMShareKeeper = (
   };
 };
 
-export const sendApprovalRequest = (shareID, PkShareId) => {
-  return { type: SEND_APPROVAL_REQUEST, payload: { shareID, PkShareId } };
+export const sendApprovalRequest = (shareID, PkShareId, notificationType) => {
+  return { type: SEND_APPROVAL_REQUEST, payload: { shareID, PkShareId, notificationType } };
 };
 
 export const uploadSecondaryShare = () => {
@@ -258,3 +259,14 @@ export const pdfGenerated = (generated: Boolean) => {
 export const onApprovalStatusChange = (status, initiatedAt, shareId) => {
   return { type: ON_APPROVAL_STATUS_CHANGE, payload: { status, initiatedAt, shareId }, };
 };
+
+export const uploadPdfShare = (
+  selectedShareId,
+  isReshare,
+) => {
+  return {
+    type: UPLOAD_PDF_SHARE,
+    payload: { selectedShareId, isReshare },
+  };
+};
+

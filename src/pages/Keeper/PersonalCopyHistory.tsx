@@ -24,7 +24,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
-import HistoryPageComponent from '../../components/HistoryPageComponent';
+import HistoryPageComponent from './HistoryPageComponent';
 import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
 import moment from 'moment';
 import _ from 'underscore';
@@ -35,6 +35,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
+import HistoryHeaderComponent from './HistoryHeaderComponent';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -85,21 +86,43 @@ const PersonalCopyHistory = (props) => {
   );
   
   const [personalCopyDetails, setPersonalCopyDetails] = useState(null);
+  const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
+    props.navigation.state.params.isPrimaryKeeper,
+  );
+  const [selectedShareId, setSelectedShareId] = useState(
+    props.navigation.state.params.selectedShareId,
+  );
+  const [selectedLevelId, setSelectedLevelId] = useState(
+    props.navigation.state.params.selectedLevelId,
+  );
+  const [selectedKeeper, setSelectedKeeper] = useState(
+    props.navigation.state.params.selectedKeeper,
+  );
+  const [isReshare, setIsReshare] = useState(
+    props.navigation.state.params.selectedStatus == 'notAccessible'
+      ? false
+      : true,
+  );
+  const levelHealth = useSelector((state) => state.health.levelHealth);
+  const currentLevel = useSelector((state) => state.health.currentLevel);
 
   useEffect(() => {
-    (async () => {
-      const blockPCShare = await AsyncStorage.getItem('blockPCShare');
-      if (blockPCShare) {
-        setBlockReshare(blockPCShare);
-      } 
-      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-      //   AsyncStorage.setItem('blockPCShare', 'true');
-      //   setBlockReshare(blockPCShare);
-      // }
-    })();
-  }, []);
-
-  
+    setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
+    setSelectedShareId(props.navigation.state.params.selectedShareId);
+    setSelectedLevelId(props.navigation.state.params.selectedLevelId);
+    setSelectedKeeper(props.navigation.state.params.selectedKeeper);
+    setIsReshare(
+      props.navigation.state.params.selectedStatus == 'notAccessible'
+        ? false
+        : true,
+    );
+  }, [
+    props.navigation.state.params.selectedShareId,
+    props.navigation.state.params.selectedLevelId,
+    props.navigation.state.params.isPrimaryKeeper,
+    props.navigation.state.params.selectedKeeper,
+    props.navigation.state.params.selectedStatus,
+  ]);
 
   const saveInTransitHistory = async () => {
     const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
@@ -242,109 +265,39 @@ const PersonalCopyHistory = (props) => {
     }}/>;
   };
 
+  const confirmClick = () => {
+    
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View
-        style={{
-          ...styles.modalHeaderTitleView,
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.goBack();
-            }}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              // marginLeft: 10,
-              marginRight: 10,
-            }}
-          >
-            <Image
-              style={{
-                width: wp('9%'),
-                height: wp('9%'),
-                resizeMode: 'contain',
-                alignSelf: 'center',
-                marginRight: 8,
-              }}
-              source={require('../../assets/images/icons/note.png')}
-            />
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={BackupStyles.modalHeaderTitleText}>
-                {'Personal Copy'}
-              </Text>
-              <Text style={BackupStyles.modalHeaderInfoText}>
-                Last backup{' '}
-                <Text
-                  style={{
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {' '}
-                  {props.navigation.state.params.selectedTime}
-                </Text>
-              </Text>
-            </View>
-            <KnowMoreButton
-              onpress={() => {
-                (HelpBottomSheet as any).current.snapTo(1);
-              }}
-              containerStyle={{
-                marginTop: 'auto',
-                marginBottom: 'auto',
-                marginRight: 10,
-              }}
-              textStyle={{}}
-            />
-            <Image
-              style={{
-                width: 17,
-                height: 17,
-                resizeMode: 'contain',
-                marginLeft: 'auto',
-                alignSelf: 'center',
-              }}
-              source={
-                getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
-              }
-            />
-          </View>
-        </View>
-      </View>
+      <HistoryHeaderComponent
+        onPressBack={() => props.navigation.goBack()}
+        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTime={props.navigation.state.params.selectedTime}
+        selectedStatus={props.navigation.state.params.selectedStatus}
+        moreInfo={props.navigation.state.params.selectedTitle}
+        headerImage={require('../../assets/images/icons/note.png')}
+      />
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           type={'copy'}
-          // IsReshare
-         // IsReshare={pcShared ? true : false}
+          IsReshare={isReshare}
           data={sortedHistory(personalCopyHistory)}
-          // reshareInfo={
-          //   pcShared
-          //     ? 'Want to send the Recovery Key again to the same destination? '
-          //     : null
-          // }
+          confirmButtonText={'Confirm'}
           onPressConfirm={() => {
-            
+            (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
+          reshareButtonText={'Restore Keeper'}
           onPressReshare={async () => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
-          onPressContinue={() => {
+          changeButtonText={'Change Keeper'}
+          onPressChange={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
         />
@@ -385,19 +338,4 @@ const PersonalCopyHistory = (props) => {
 export default PersonalCopyHistory;
 
 const styles = StyleSheet.create({
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp('3%'),
-    marginTop: 20,
-    marginBottom: 15,
-  },
 });

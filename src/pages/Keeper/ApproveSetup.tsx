@@ -64,6 +64,7 @@ export default function ApproveSetup(props) {
           </Text>
           <View style={styles.bottomButtonView}>
             <AppBottomSheetTouchableWrapper
+              disabled={props.isContinueDisabled ? props.isContinueDisabled : false}
               onPress={() => props.onPressContinue()}
               style={{
                 ...styles.successModalButtonView,
