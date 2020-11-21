@@ -42,7 +42,6 @@ import {
 } from '../../common/constants/serviceTypes';
 import {
   switchLoader,
-  fetchBalance,
   fetchTransactions,
   getTestcoins,
   fetchBalanceTx,
@@ -86,6 +85,7 @@ import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
 import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 interface AccountsStateTypes {
   carouselData: any;
@@ -116,7 +116,6 @@ interface AccountsStateTypes {
 interface AccountsPropsTypes {
   navigation: any;
   exchangeRates: any;
-  fetchBalance: any;
   fetchTransactions: any;
   getTestcoins: any;
   switchLoader: any;
@@ -901,7 +900,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.exchangeRates
                 ? (
-                    (this.state.netBalance / 1e8) *
+                    (this.state.netBalance / SATOSHIS_IN_BTC) *
                     this.state.exchangeRates[this.state.CurrencyCode].last
                   ).toFixed(2)
                 : null}
@@ -1134,7 +1133,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         ? UsNumberFormat(spendableBalance)
                         : exchangeRates
                         ? (
-                            (spendableBalance / 1e8) *
+                            (spendableBalance / SATOSHIS_IN_BTC) *
                             exchangeRates[CurrencyCode].last
                           ).toFixed(2)
                         : null}{' '}
@@ -1302,7 +1301,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                   ? UsNumberFormat(item.amount)
                                   : exchangeRates
                                   ? (
-                                      (item.amount / 1e8) *
+                                      (item.amount / SATOSHIS_IN_BTC) *
                                       exchangeRates[CurrencyCode].last
                                     ).toFixed(2)
                                   : null}
@@ -1399,7 +1398,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               ((averageTxFees
                                 ? averageTxFees['low'].averageTxFee
                                 : 0) /
-                                1e8) *
+                                SATOSHIS_IN_BTC) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2) +
                             ' ' +
@@ -1910,7 +1909,6 @@ const mapStateToProps = (state) => {
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    fetchBalance,
     fetchTransactions,
     getTestcoins,
     switchLoader,

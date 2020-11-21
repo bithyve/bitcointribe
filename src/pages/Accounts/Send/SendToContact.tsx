@@ -64,11 +64,11 @@ import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
 import {
   RecipientDescribing,
-  ContactRecipientDescribing,
-  AccountRecipientDescribing,
   makeContactRecipientDescription,
   makeSubAccountRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+
 
 const currencyCode = [
   'BRL',
@@ -212,7 +212,7 @@ class SendToContact extends Component<
         if (bitcoinAmount) {
           const currency = this.state.exchangeRates
             ? (
-              (parseInt(bitcoinAmount) / 1e8) *
+              (parseInt(bitcoinAmount) / SATOSHIS_IN_BTC) *
               this.state.exchangeRates[this.state.CurrencyCode].last
             ).toFixed(2)
             : 0;
@@ -408,14 +408,8 @@ class SendToContact extends Component<
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
           if (derivativeAccount[accountNumber].balances) {
             secureBalance += derivativeAccount[accountNumber].balances.balance;
-            // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
@@ -481,14 +475,14 @@ class SendToContact extends Component<
     let temp = value;
     if (prefersBitcoin) {
       let result = exchangeRates
-        ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+        ? ((value / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
         : 0;
       this.setState({ bitcoinAmount: temp, currencyAmount: result.toString() });
     } else {
       let currency = exchangeRates
         ? value / exchangeRates[CurrencyCode].last
         : 0;
-      currency = currency < 1 ? currency * 1e8 : currency;
+      currency = currency < 1 ? currency * SATOSHIS_IN_BTC : currency;
       this.setState({
         currencyAmount: temp,
         bitcoinAmount: currency.toFixed(0),
@@ -515,6 +509,7 @@ class SendToContact extends Component<
       selectedContact,
     } = this.state;
     const { accountsState } = this.props;
+
     if (
       bitcoinAmount &&
       currencyAmount &&
@@ -789,7 +784,7 @@ class SendToContact extends Component<
       : prefersBitcoin
         ? UsNumberFormat(spendableBalance)
         : exchangeRates
-          ? ((spendableBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          ? ((spendableBalance / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
           : null;
   };
 
@@ -946,20 +941,21 @@ class SendToContact extends Component<
                     ? item.currencyAmount
                     : currencyAmount,
               };
+
+              // 🔑 This seems to be the way the backend is defining the "account kind".
+              // This should be refactored to leverage the new accounts structure
+              // in https://github.com/bithyve/hexa/tree/feature/account-management
+              const accountKind = {
+                'Checking Account': REGULAR_ACCOUNT,
+                'Savings Account': SECURE_ACCOUNT,
+                'Test Account': TEST_ACCOUNT,
+                'Donation Account': DONATION_ACCOUNT,
+              }[item.selectedContact.account_name || 'Checking Account'];
+
+
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.selectedContact.account_name != null) {
-
-                // 🔑 This seems to be the way the backend is defining the "account kind".
-                // This should be refactored to leverage the new accounts structure
-                // in https://github.com/bithyve/hexa/tree/feature/account-management
-                const accountKind = {
-                  'Checking Account': REGULAR_ACCOUNT,
-                  'Savings Account': SECURE_ACCOUNT,
-                  'Test Account': TEST_ACCOUNT,
-                  'Donation Account': DONATION_ACCOUNT,
-                }[item.selectedContact.account_name || 'Checking Account'];
-
                 recipient = makeSubAccountRecipientDescription(
                   newItem,
                   accountKind,

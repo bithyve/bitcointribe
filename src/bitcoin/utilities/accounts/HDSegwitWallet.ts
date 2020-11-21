@@ -29,6 +29,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 
@@ -1150,11 +1151,10 @@ export default class HDSegwitWallet extends Bitcoin {
     balances: any;
     transactions: any;
   }> => {
-    // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
     if (!this.isTest) {
       throw new Error('Can only fund test account');
     }
-    const amount = 10000 / 1e8;
+    const amount = 10000 / SATOSHIS_IN_BTC;
     let res: AxiosResponse;
     const recipientAddress = this.getAddress(false, 0);
     try {
@@ -1171,13 +1171,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { txid, funded } = res.data;
 
-    // const { balance, unconfirmedBalance } = await this.getBalanceByAddresses([
-    //   recipientAddress,
-    // ]);
     if (txid) {
       this.usedAddresses = [recipientAddress];
       const ownedAddresses = { [recipientAddress]: true };
-      // this.balances = { balance: amount * 1e8, unconfirmedBalance: 0 }; // assumption: we don't call testFaucet twice (spendable exception: 1st receive test-utxo)
       const {
         UTXOs,
         balances,
