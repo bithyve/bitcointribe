@@ -94,6 +94,7 @@ export default function ErrorModalContents(props) {
               }}
             >
               Okay
+            {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
           {props.isIgnoreButton && (
