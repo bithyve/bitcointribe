@@ -50,7 +50,7 @@ export default function ContactList(props) {
     contactPermissionBottomSheet,
     setContactPermissionBottomSheet,
   ] = useState(React.createRef());
-  const selectectcontactlist = props.selectedContacts
+  const selectedcontactlist = props.selectedContacts
     ? props.selectedContacts
     : [];
   const [contactData, setContactData] = useState([]);
@@ -67,7 +67,7 @@ export default function ContactList(props) {
 
   useEffect(() => {
     if (props.selectedContacts) {
-      setSelectedContacts(selectectcontactlist);
+      setSelectedContacts(selectedcontactlist);
       for (let i = 0; i < filterContactData.length; i++) {
         if (
           props.selectedContacts.findIndex(
@@ -81,9 +81,9 @@ export default function ContactList(props) {
       }
       setRadioOnOff(!radioOnOff);
       setFilterContactData(filterContactData);
-      props.onSelectContact(selectectcontactlist);
+      props.onSelectContact(selectedcontactlist);
     }
-  }, [selectectcontactlist, filterContactData]);
+  }, [selectedcontactlist, filterContactData]);
 
   const requestContactsPermission = async () => {
     try {
