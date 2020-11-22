@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -52,11 +52,8 @@ import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpCo
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet] = useState(React.createRef());
   const [HelpBottomSheet] = useState(React.createRef());
-  const [
-    storagePermissionBottomSheet,
-    setStoragePermissionBottomSheet,
-  ] = useState(React.createRef());
-  const [ storagePermission, setStoragePermission ] = useState(false)
+  const storagePermissionBottomSheet = useRef<BottomSheet>()
+  const [ hasStoragePermission, setHasStoragePermission ] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [QrBottomSheet] = useState(React.createRef());
@@ -124,6 +121,13 @@ const PersonalCopyHistory = (props) => {
   const [mailOptionsBottomSheet] = useState(
     React.createRef(),
   );
+
+  useEffect(()=>  {
+    hasStoragePermission
+      ? (storagePermissionBottomSheet as any).current.snapTo(0)
+      : (storagePermissionBottomSheet as any).current.snapTo(1);
+    
+  }, [hasStoragePermission]);
 
   useEffect(() => {
     if (personalCopiesGenerated === false) {
@@ -244,17 +248,16 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     (async () => {
-      await getStoragePermission()
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
       personalCopyDetails = JSON.parse(personalCopyDetails);
-      if (
+      if ( hasStoragePermission && (
         !personalCopyDetails ||
         !personalCopyDetails[selectedPersonalCopy.type] ||
         !(await verifyPersonalCopyAccess(
-          personalCopyDetails[selectedPersonalCopy.type],
-        ))
+          personalCopyDetails[selectedPersonalCopy.type]
+        )))
       ) {
         // generate a pdf only if health is less than 100%
         if (!overallHealth || (overallHealth && overallHealth.overallStatus < 100)) {
@@ -265,7 +268,7 @@ const PersonalCopyHistory = (props) => {
         setPersonalCopyDetails(personalCopyDetails);
       }
     })();
-  }, [generated, shared]);
+  }, [generated, shared, hasStoragePermission]);
 
   useEffect(() => {
     if (
@@ -306,6 +309,7 @@ const PersonalCopyHistory = (props) => {
   }, [shared]);
 
   const renderStoragePermissionModalContent = useCallback(() => {
+    checkStoragePermission();
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
@@ -316,10 +320,8 @@ const PersonalCopyHistory = (props) => {
         isIgnoreButton={false}
         onPressProceed={() => {
           getStoragePermission();
-          (storagePermissionBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
-          (storagePermissionBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/contactPermission.png')}
@@ -340,43 +342,39 @@ const PersonalCopyHistory = (props) => {
 
 
   const getStoragePermission = async () => {
+    // await checkStoragePermission()
     if (Platform.OS === 'android') {
       const granted = await requestStoragePermission();
-      if (!granted) {  
+      if (!granted) {
         setErrorMessage(
-          'Cannot access storage. Permission denied.\nYou can enable storage from the phone settings page Settings > Hexa > Storage',
+          'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
         );
+        setHasStoragePermission(false);
+        (storagePermissionBottomSheet as any).current.snapTo(0);
         (ErrorBottomSheet as any).current.snapTo(1);
-        setStoragePermission(false);
         return;
+      }
+      else {
+        setHasStoragePermission(true);
       }
     }
     
     if (Platform.OS === 'ios') {
       const { status } = await Permissions.getAsync( Permissions.CONTACTS);
       if (status === 'denied') {
-        setStoragePermission(false);
+        setHasStoragePermission(false);
         setErrorMessage(
-          'Cannot access storage. Permission denied.\nYou can enable storage from the phone settings page Settings > Hexa > Storage',
+          'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
         );
         (ErrorBottomSheet as any).current.snapTo(1);
         return;
       }
+      else setHasStoragePermission(true)
     }
   }
 
   const requestStoragePermission = async () => {
     try {
-      (storagePermissionBottomSheet as any).current.snapTo(1)
-      const [read, write] = [
-        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
-        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
-      ];
-      if(read && write) {
-        (storagePermissionBottomSheet as any).current.snapTo(0);
-        return true
-      };
-
       const result = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -385,12 +383,32 @@ const PersonalCopyHistory = (props) => {
         result["android.permission.READ_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
         &&
         result["android.permission.WRITE_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
-      ) return true
+      ) {
+        return true
+      }
+      else {
+        return false;
+      }
     } catch (err) {
       console.warn(err);
       return false
     }
   };
+
+  const checkStoragePermission = async () =>  {
+    const [read, write] = [
+      await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
+      await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+    ];
+    if(read && write) {
+      setHasStoragePermission(true)
+      return true
+    }
+    else {
+      setHasStoragePermission(false)
+      return false
+    }
+  }
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -398,8 +416,9 @@ const PersonalCopyHistory = (props) => {
         modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
+        proceedButtonText={'Ok'}
         onPressProceed={() => {
+
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
@@ -500,8 +519,6 @@ const PersonalCopyHistory = (props) => {
                   .restored;
               }
             } catch (err) {
-              // if secondary mnemonic parsing fails
-              console.log({ err });
               restored = secureAccount.restoreSecondaryMnemonic(qrData)
                 .restored;
             }
@@ -731,7 +748,7 @@ const PersonalCopyHistory = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={storagePermissionBottomSheet}
+        ref={storagePermissionBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
