@@ -1,10 +1,10 @@
+
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 apply plugin: 'io.fabric'      
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"     
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
-
 
 project.ext.react = [
     enableHermes: false,
