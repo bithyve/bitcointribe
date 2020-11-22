@@ -31,9 +31,7 @@ import {
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import NavStyles from '../../common/Styles/NavStyles';
-import CommonStyles from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
@@ -50,8 +48,6 @@ import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
-import { State } from 'react-native-gesture-handler';
-import { read } from 'fs';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet] = useState(React.createRef());
@@ -171,7 +167,7 @@ const PersonalCopyHistory = (props) => {
   }, [healthCheckFailed]);
 
   useEffect(() => {
-    if (next) (storagePermissionBottomSheet as any).current.snapTo(1);
+    if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
   }, [next]);
 
   const [pcShared, setPCShared] = useState(false);
