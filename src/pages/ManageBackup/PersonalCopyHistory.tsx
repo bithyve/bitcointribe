@@ -9,7 +9,9 @@ import {
   AsyncStorage,
   Platform,
   Alert,
+  PermissionsAndroid
 } from 'react-native';
+import * as Permissions from 'expo-permissions';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
@@ -49,10 +51,16 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
 import { State } from 'react-native-gesture-handler';
+import { read } from 'fs';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet] = useState(React.createRef());
   const [HelpBottomSheet] = useState(React.createRef());
+  const [
+    storagePermissionBottomSheet,
+    setStoragePermissionBottomSheet,
+  ] = useState(React.createRef());
+  const [ storagePermission, setStoragePermission ] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [QrBottomSheet] = useState(React.createRef());
@@ -163,7 +171,7 @@ const PersonalCopyHistory = (props) => {
   }, [healthCheckFailed]);
 
   useEffect(() => {
-    if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    if (next) (storagePermissionBottomSheet as any).current.snapTo(1);
   }, [next]);
 
   const [pcShared, setPCShared] = useState(false);
@@ -240,6 +248,7 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     (async () => {
+      await getStoragePermission()
       let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
@@ -252,7 +261,7 @@ const PersonalCopyHistory = (props) => {
         ))
       ) {
         // generate a pdf only if health is less than 100%
-        if (overallHealth.overallStatus < 100) {
+        if (!overallHealth || (overallHealth && overallHealth.overallStatus < 100)) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
         }
@@ -299,6 +308,120 @@ const PersonalCopyHistory = (props) => {
       dispatch(personalCopyShared({ [selectedPersonalCopy.type]: null }));
     }
   }, [shared]);
+
+  const renderStoragePermissionModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={storagePermissionBottomSheet}
+        title={'Why do we need access to your storage?'}
+        info={"Storage access will allow Hexa save a pdf with your recovery keys. This is also required for Hexa to let you attach it to emails and share it with your trusted keepers.\n\n It is a good way to remember who the contacts are with their name and image"}
+        otherText={'Don’t worry these are only sent to the contacts you trust and choose'}
+        proceedButtonText={'Continue'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          (storagePermissionBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (storagePermissionBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/contactPermission.png')}
+      />
+    );
+  }, []);
+
+
+  const renderStoragePermissionModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (storagePermissionBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+
+  const getStoragePermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await requestStoragePermission();
+      if (!granted) {  
+        setErrorMessage(
+          'Cannot access storage. Permission denied.\nYou can enable storage from the phone settings page Settings > Hexa > Storage',
+        );
+        (ErrorBottomSheet as any).current.snapTo(1);
+        setStoragePermission(false);
+        return;
+      }
+    }
+    
+    if (Platform.OS === 'ios') {
+      const { status } = await Permissions.getAsync( Permissions.CONTACTS);
+      if (status === 'denied') {
+        setStoragePermission(false);
+        setErrorMessage(
+          'Cannot access storage. Permission denied.\nYou can enable storage from the phone settings page Settings > Hexa > Storage',
+        );
+        (ErrorBottomSheet as any).current.snapTo(1);
+        return;
+      }
+    }
+  }
+
+  const requestStoragePermission = async () => {
+    try {
+      const [read, write] = [
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+      ];
+      console.log('read, write ', read, write)
+      if(read && write) return true;
+      (storagePermissionBottomSheet as any).current.snapTo(1);
+      // let isContactOpen = false;
+      // AsyncStorage.getItem('isContactOpen', (err, value) => {
+      //   if (err) console.log(err);
+      //   else {
+      //     isContactOpen = JSON.parse(value);
+      //   }
+      // });
+      // if (!isContactOpen) {
+      //   await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
+      // }
+      
+      const result = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      ]);
+      console.log('@-> result of persmissions ', result)
+      if(
+        result["android.permission.READ_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
+        &&
+        result["android.permission.WRITE_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
+      ) return true
+    } catch (err) {
+      console.warn(err);
+      return false
+    }
+  };
+
+  // const getContactsAsync = async () => {
+  //   if (Platform.OS === 'android') {
+  //     const chckContactPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+  //     //console.log("chckContactPermission",chckContactPermission)
+  //       if (!chckContactPermission) {
+  //         (contactPermissionBottomSheet as any).current.snapTo(1);
+  //       } else {
+  //         getContactPermission();
+  //       }
+  //   } else if (Platform.OS === 'ios') {
+  //     if((await Permissions.getAsync(Permissions.CONTACTS)).status === "undetermined"){
+  //       (contactPermissionBottomSheet as any).current.snapTo(1);
+  //     }
+  //     else {
+  //       getContactPermission();
+  //     }
+  //   }
+  // };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -639,6 +762,16 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={storagePermissionBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderStoragePermissionModalContent}
+        renderHeader={renderStoragePermissionModalHeader}
       />
     </View>
   );
