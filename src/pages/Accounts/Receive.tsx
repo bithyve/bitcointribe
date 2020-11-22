@@ -63,6 +63,7 @@ import {
 } from '../../store/actions/preferences';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 export default function Receive(props) {
   const [isOTPType, setIsOTPType] = useState(false);
@@ -157,7 +158,7 @@ export default function Receive(props) {
         let receiveAt = receivingAddress;
         if (amount) {
           receiveAt = service.getPaymentURI(receiveAt, {
-            amount: parseInt(amount) / 1e8,
+            amount: parseInt(amount) / SATOSHIS_IN_BTC,
           }).paymentURI;
         }
         setReceiveLink(receiveAt);
@@ -397,7 +398,7 @@ export default function Receive(props) {
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
-          amount: parseInt(amount) / 1e8,
+          amount: parseInt(amount) / SATOSHIS_IN_BTC,
         }).paymentURI;
       }
       let accountNumber =
@@ -426,7 +427,7 @@ export default function Receive(props) {
       let trustedPaymentURI;
       if (amount) {
         trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
-          amount: parseInt(amount) / 1e8,
+          amount: parseInt(amount) / SATOSHIS_IN_BTC,
         }).paymentURI;
       }
 

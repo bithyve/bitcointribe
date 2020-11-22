@@ -21,7 +21,6 @@ import { getIconByStatus, verifyPersonalCopyAccess } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
-  checkMSharesHealth,
   personalCopyShared,
   generatePersonalCopy,
   personalCopyGenerated,
@@ -118,7 +117,7 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
-  const [mailOptionsBottomSheet] = useState(
+  const [] = useState(
     React.createRef(),
   );
   useEffect(()=>  {
