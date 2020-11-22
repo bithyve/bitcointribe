@@ -121,11 +121,14 @@ const PersonalCopyHistory = (props) => {
   const [mailOptionsBottomSheet] = useState(
     React.createRef(),
   );
-
   useEffect(()=>  {
-    hasStoragePermission
+    if(Platform.OS === 'ios') {
+      (storagePermissionBottomSheet as any).current.snapTo(0)
+    } else {
+      hasStoragePermission
       ? (storagePermissionBottomSheet as any).current.snapTo(0)
       : (storagePermissionBottomSheet as any).current.snapTo(1);
+    }
     
   }, [hasStoragePermission]);
 
@@ -360,16 +363,8 @@ const PersonalCopyHistory = (props) => {
     }
     
     if (Platform.OS === 'ios') {
-      const { status } = await Permissions.getAsync( Permissions.CONTACTS);
-      if (status === 'denied') {
-        setHasStoragePermission(false);
-        setErrorMessage(
-          'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
-        );
-        (ErrorBottomSheet as any).current.snapTo(1);
-        return;
-      }
-      else setHasStoragePermission(true)
+      setHasStoragePermission(true)
+      return;
     }
   }
 
@@ -396,18 +391,21 @@ const PersonalCopyHistory = (props) => {
   };
 
   const checkStoragePermission = async () =>  {
-    const [read, write] = [
-      await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
-      await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
-    ];
-    if(read && write) {
-      setHasStoragePermission(true)
-      return true
+    if(Platform.OS==='android') {
+      const [read, write] = [
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+      ];
+      if(read && write) {
+        setHasStoragePermission(true)
+        return true
+      }
+      else {
+        setHasStoragePermission(false)
+        return false
+      }
     }
-    else {
-      setHasStoragePermission(false)
-      return false
-    }
+    
   }
 
   const renderErrorModalContent = useCallback(() => {
