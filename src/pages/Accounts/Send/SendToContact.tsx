@@ -335,7 +335,7 @@ class SendToContact extends Component<
           `You no longer seem to be a F&F contact for ${this.state.selectedContact.displayedName}`,
           [
             {
-              text: 'Okay',
+              text: 'Okay ',
               onPress: () => {
                 this.props.navigation.goBack();
               },

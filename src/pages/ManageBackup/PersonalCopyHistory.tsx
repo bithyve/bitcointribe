@@ -313,12 +313,13 @@ const PersonalCopyHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
-        title={'Why do we need access to your storage?'}
-        info={"Storage access will allow Hexa save a pdf with your recovery keys. This is also required for Hexa to let you attach it to emails and share it with your trusted keepers.\n\n It is a good way to remember who the contacts are with their name and image"}
-        otherText={'Don’t worry these are only sent to the contacts you trust and choose'}
+        title={'Why do we need access to your files and storage?'}
+        info={"File and Storage access will let Hexa save a pdf with your recovery keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n"}
+        otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
         isIgnoreButton={false}
         onPressProceed={() => {
+          getStoragePermission();
           (storagePermissionBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
@@ -370,29 +371,20 @@ const PersonalCopyHistory = (props) => {
 
   const requestStoragePermission = async () => {
     try {
+      (storagePermissionBottomSheet as any).current.snapTo(1)
       const [read, write] = [
         await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
         await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
       ];
-      console.log('read, write ', read, write)
-      if(read && write) return true;
-      (storagePermissionBottomSheet as any).current.snapTo(1);
-      // let isContactOpen = false;
-      // AsyncStorage.getItem('isContactOpen', (err, value) => {
-      //   if (err) console.log(err);
-      //   else {
-      //     isContactOpen = JSON.parse(value);
-      //   }
-      // });
-      // if (!isContactOpen) {
-      //   await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
-      // }
-      
+      if(read && write) {
+        (storagePermissionBottomSheet as any).current.snapTo(0);
+        return true
+      };
+
       const result = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       ]);
-      console.log('@-> result of persmissions ', result)
       if(
         result["android.permission.READ_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
         &&
@@ -403,25 +395,6 @@ const PersonalCopyHistory = (props) => {
       return false
     }
   };
-
-  // const getContactsAsync = async () => {
-  //   if (Platform.OS === 'android') {
-  //     const chckContactPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
-  //     //console.log("chckContactPermission",chckContactPermission)
-  //       if (!chckContactPermission) {
-  //         (contactPermissionBottomSheet as any).current.snapTo(1);
-  //       } else {
-  //         getContactPermission();
-  //       }
-  //   } else if (Platform.OS === 'ios') {
-  //     if((await Permissions.getAsync(Permissions.CONTACTS)).status === "undetermined"){
-  //       (contactPermissionBottomSheet as any).current.snapTo(1);
-  //     }
-  //     else {
-  //       getContactPermission();
-  //     }
-  //   }
-  // };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -499,9 +472,6 @@ const PersonalCopyHistory = (props) => {
         infoText={
           "Open your PDF copy which is password protected with your Security Question's answer"
         }
-        // noteText={
-        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onBackPress={() => {

@@ -93,7 +93,7 @@ export default function ErrorModalContents(props) {
                   : Colors.white,
               }}
             >
-              Okay
+              Okay 
             {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
