@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.rnfs.RNFSPackage;
+import com.rpt.reactnativecheckpackageinstallation.CheckPackageInstallationPackage;
 import com.reactcommunity.rnlocalize.RNLocalizePackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.gantix.JailMonkey.JailMonkeyPackage;
