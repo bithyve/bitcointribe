@@ -124,6 +124,7 @@ const PersonalCopyHistory = (props) => {
   useEffect(()=>  {
     if(Platform.OS === 'ios') {
       (storagePermissionBottomSheet as any).current.snapTo(0)
+      setHasStoragePermission(true)
     } else {
       hasStoragePermission
       ? (storagePermissionBottomSheet as any).current.snapTo(0)
