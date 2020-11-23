@@ -32,3 +32,4 @@ const Colors = {
   gray5: '#3A3A3C',
   gray6: '#2F2F2F',
 };
+export default Colors;
