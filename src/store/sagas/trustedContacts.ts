@@ -35,10 +35,7 @@ import {
   notificationTag,
   trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
-import {
-  calculateOverallHealth,
-  downloadMShare,
-} from '../actions/sss';
+import { calculateOverallHealth, downloadMShare } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -871,7 +868,6 @@ export const trustedChannelsSetupSyncWatcher = createWatcher(
   TRUSTED_CHANNELS_SETUP_SYNC,
 );
 
-
 function* walletCheckInWorker({ payload }) {
   // syncs last seen, health & exchange rates
 
@@ -899,8 +895,10 @@ function* walletCheckInWorker({ payload }) {
   if (
     synchingContacts &&
     !Object.keys(trustedContacts.tc.trustedContacts).length
-  )
+  ) {
+    yield put(calculateOverallHealth(s3Service));
     return; // aborting checkIn if walletSync is specifically done in context of trusted-contacts
+  }
 
   yield put(switchTCLoading('walletCheckIn'));
   console.log('Wallet Check-In in progress...');
@@ -1138,7 +1136,7 @@ export const syncTrustedChannelsWatcher = createWatcher(
   SYNC_TRUSTED_CHANNELS,
 );
 
-function* postRecoveryChannelSyncWorker({ }) {
+function* postRecoveryChannelSyncWorker({}) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
