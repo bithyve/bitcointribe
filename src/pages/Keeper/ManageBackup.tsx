@@ -44,6 +44,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   CloudData,
   getKeeperInfoFromShareId,
+  getLevelInfo,
 } from '../../common/CommonFunctions';
 import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import {
@@ -395,16 +396,18 @@ class ManageBackup extends Component<
       this.props.isLevel3Initialized &&
       this.props.isLevelThreeMetaShareCreated
     ) {
+      let obj = {
+        shareType: this.state.selectedKeeperType,
+        name: this.state.selectedKeeperName,
+        reshareVersion: 0,
+        status: 'notAccessible',
+        updatedAt: 0,
+        shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
+        data: {},
+      }
+      console.log('obj', obj);
       this.setState({
-        selectedKeeper: {
-          shareType: this.state.selectedKeeperType,
-          name: this.state.selectedKeeperName,
-          reshareVersion: 0,
-          status: 'notAccessible',
-          updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
-          data: {},
-        },
+        selectedKeeper: obj,
       });
       this.sendApprovalRequestToPK();
       (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -424,10 +427,10 @@ class ManageBackup extends Component<
     let KPInfo: any[] = [];
     let secretShare = {};
     if (levelHealth.length > 0) {
-      let levelHealthVar = levelHealth[levelHealth.length - 1];
-      if (levelHealthVar.levelInfo) {
-        for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
-          const element = levelHealthVar.levelInfo[i];
+      let levelInfo = getLevelInfo(levelHealth, currentLevel);
+      if (levelInfo) {
+        for (let i = 0; i < levelInfo.length; i++) {
+          const element = levelInfo[i];
           if (
             keeperInfo.findIndex((value) => value.shareId == element.shareId) >
               -1 &&
@@ -452,12 +455,12 @@ class ManageBackup extends Component<
         if (
           isLevel2Initialized &&
           !isLevel3Initialized &&
-          levelHealthVar.levelInfo[2].status == 'accessible' &&
-          levelHealthVar.levelInfo[3].status == 'accessible'
+          levelInfo[2].status == 'accessible' &&
+          levelInfo[3].status == 'accessible'
         ) {
           for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
             const element = s3Service.levelhealth.metaShares[i];
-            if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
+            if (levelInfo[0].shareId == element.shareId) {
               secretShare = element;
             }
           }
@@ -1110,10 +1113,14 @@ class ManageBackup extends Component<
                 if (
                   selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
-                  !this.props.isLevel3Initialized
+                  !this.props.isLevel3Initialized &&
+                  this.props.currentLevel == 2
                 ) {
                   await this.props.generateMetaShare(selectedLevelId);
-                } else {
+                } else if(this.props.currentLevel == 1 && selectedLevelId == 3){
+                  alert('Complete Level 2');
+                }
+                 else {
                   this.sendApprovalRequestToPK();
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
                 }

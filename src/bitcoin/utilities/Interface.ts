@@ -377,12 +377,14 @@ export interface EphemeralDataForKeeper {
 }
 
 export interface LevelHealth {
-  levelInfo: {
-    shareType: string;
-    updatedAt: string;
-    status: string;
-    shareId: string;
-    reshareVersion?: number;
-    name?: string;
-  }[];
+  levelInfo: LevelInfo[];
 }
+
+export interface LevelInfo {
+  shareType: string;
+  updatedAt: number;
+  status: string;
+  shareId: string;
+  reshareVersion?: number;
+  name?: string;
+};
