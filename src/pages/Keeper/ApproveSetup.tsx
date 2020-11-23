@@ -10,7 +10,7 @@ import {
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
-import CountDown from '../../components/CountDown';
+import CountDown from 'react-native-countdown-component';
 import Config from '../../bitcoin/HexaConfig';
 
 export default function ApproveSetup(props) {
