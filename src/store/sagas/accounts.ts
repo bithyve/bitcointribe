@@ -35,6 +35,7 @@ import {
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
   X_CREATE_NEW_ACCOUNT,
+  X_SYNC_ACCOUNTS,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -51,7 +52,6 @@ import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
 import * as AccountManagement from '../../bitcoin/utilities/accounts/AccountManagement';
-
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -121,7 +121,6 @@ export const fetchDerivativeAccAddressWatcher = createWatcher(
   fetchDerivativeAccAddressWorker,
   FETCH_DERIVATIVE_ACC_ADDRESS,
 );
-
 
 function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
@@ -857,7 +856,7 @@ export const removeTwoFAWatcher = createWatcher(
   REMOVE_TWO_FA,
 );
 
-function* accountsSyncWorker({ }) {
+function* accountsSyncWorker({}) {
   try {
     const accounts = yield select((state) => state.accounts);
 
@@ -954,7 +953,7 @@ export const accountsSyncWatcher = createWatcher(
   SYNC_ACCOUNTS,
 );
 
-function* startupSyncWorker({ }) {
+function* startupSyncWorker({}) {
   /*
   Skippiing this entire sync process
   to improve login performance.
@@ -1090,4 +1089,26 @@ function* xCreateNewAccountWorker({ payload }) {
 export const xCreateNewAccountWatcher = createWatcher(
   xCreateNewAccountWorker,
   X_CREATE_NEW_ACCOUNT,
+);
+
+function* xSyncAccountWorker({ payload }) {
+  const { accountsToSync } = payload;
+
+  try {
+    const synchedAccounts = yield call(
+      AccountManagement.syncAccount,
+      accountsToSync,
+    );
+
+    // TODO: store latest tx/bal/utxo data in the database
+    // TODO: update the reducer w/ the new data
+  } catch (err) {
+    console.log({ err });
+    throw new Error(`Account creation failed: ${err}`);
+  }
+}
+
+export const xSyncAccountWatcher = createWatcher(
+  xSyncAccountWorker,
+  X_SYNC_ACCOUNTS,
 );

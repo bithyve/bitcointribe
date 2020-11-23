@@ -1,7 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import { xAccount } from '../Interface';
-import { generateExtendedKeys, getAddress } from './AccountUtils';
+import {
+  generateExtendedKeys,
+  getAddress,
+  syncBalanceUtxoTx,
+} from './AccountUtils';
 import { config } from 'process';
 
 export const createAccount = (
@@ -40,4 +44,14 @@ export const createAccount = (
     receivingAddress: getAddress(false, 0, xpub),
   };
   return account;
+};
+
+export const syncAccount = async (
+  accounts: xAccount[],
+  network?: bitcoinJS.Network,
+): Promise<xAccount[]> => {
+  return await syncBalanceUtxoTx(
+    accounts,
+    network ? network : bitcoinJS.networks.bitcoin,
+  );
 };
