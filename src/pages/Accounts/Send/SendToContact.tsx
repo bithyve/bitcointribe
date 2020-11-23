@@ -67,6 +67,7 @@ import {
   makeContactRecipientDescription,
   makeSubAccountRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import Loader from '../../../components/loader';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
 
@@ -126,6 +127,7 @@ interface SendToContactStateTypes {
   spendableBalances: any;
   isSendMax: boolean;
   prefersBitcoin: boolean;
+  showLoader: boolean;
 }
 
 class SendToContact extends Component<
@@ -179,6 +181,7 @@ class SendToContact extends Component<
       },
       isSendMax: false,
       prefersBitcoin: this.props.currencyKind === CurrencyKind.BITCOIN,
+      showLoader: false,
     };
   }
 
@@ -550,12 +553,13 @@ class SendToContact extends Component<
     const { accountsState } = this.props;
     if (!recipients.length) return;
     if (accountsState[serviceType].transfer.stage1.failed) {
-      this.setState({ isConfirmDisabled: false });
+      this.setState({ isConfirmDisabled: false, showLoader: false });
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
     } else if (accountsState[serviceType].transfer.executed === 'ST1') {
       if (accountsState[serviceType].transfer.details.length) {
+        this.setState({ isConfirmDisabled: false, showLoader: false });
         this.props.navigation.navigate('SendConfirmation', {
           serviceType,
           sweepSecure,
@@ -818,6 +822,7 @@ class SendToContact extends Component<
       InputStyleNote,
       isInvalidBalance,
       spendableBalances,
+      showLoader
     } = this.state;
 
     const {
@@ -1079,6 +1084,8 @@ class SendToContact extends Component<
                           }, 10);
                         }
                       }}
+                      autoCorrect={false}
+                      autoCompleteType="off"
                     />
                     {!prefersBitcoin && (
                       <Text
@@ -1172,6 +1179,8 @@ class SendToContact extends Component<
                           }, 10);
                         }
                       }}
+                      autoCorrect={false}
+                      autoCompleteType="off"
                     />
                     {prefersBitcoin && (
                       <Text
@@ -1259,13 +1268,15 @@ class SendToContact extends Component<
                     onBlur={() => {
                       this.setState({ InputStyleNote: styles.textBoxView });
                     }}
+                    autoCorrect={false}
+                    autoCompleteType="off"
                   />
                 </View>
               ) : null}
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({ isConfirmDisabled: true });
+                    this.setState({ isConfirmDisabled: true, showLoader: true });
                     this.onConfirm();
                   }}
                   disabled={
@@ -1359,7 +1370,7 @@ class SendToContact extends Component<
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
-
+        {showLoader ? <Loader isLoading={true}/> : null}
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}

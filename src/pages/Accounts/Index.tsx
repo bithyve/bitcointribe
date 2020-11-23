@@ -111,6 +111,8 @@ interface AccountsStateTypes {
   spendableBalance: any;
   providedBalance: any;
   prefersBitcoin: boolean;
+  showRefreshLoader: boolean;
+
 }
 
 interface AccountsPropsTypes {
@@ -209,6 +211,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactionItem: {},
       isHelperDone: true,
       showLoader: true,
+      showRefreshLoader: false,
       netBalance: 0,
       providedBalance: 0,
       spendableBalance: 0,
@@ -466,6 +469,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   refreshAccountBalance = () => {
     const { presentCarouselData, serviceType } = this.state;
+    this.setState({showRefreshLoader: true});
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
 
@@ -544,6 +548,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
     if (prevState.serviceType !== this.state.serviceType) {
       this.getAverageTxFees();
+    }
+
+    if(prevProps.accounts[this.state.serviceType].loading.balanceTx !== this.props.accounts[this.state.serviceType].loading.balanceTx){
+      if(!this.props.accounts[this.state.serviceType].loading.balanceTx){
+        this.setState({showRefreshLoader: false});
+      }
     }
 
     if (prevProps.accounts !== this.props.accounts) {
@@ -770,14 +780,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
                 } else if (item.accountType == 'Checking Account') {
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
-                      1,
-                    );
-                } else if (item.accountType == 'Donation Account') {
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(1);
+                } else if (item.derivativeAccountDetails && item.derivativeAccountDetails.type == DONATION_ACCOUNT) {
                   if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                      1,
-                    );
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(1);
                 }
               }}
             >
@@ -975,6 +981,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       serviceType,
       carouselInitIndex,
       showLoader,
+      showRefreshLoader,
       transactionLoading,
       isTestHelperDone,
       isSecureAccountHelperDone,
@@ -989,7 +996,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       carouselData,
       averageTxFees,
     } = this.state;
-
     const { exchangeRates, accounts } = this.props;
 
     return (
@@ -1103,11 +1109,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   if (this.refs.TestAccountHelperBottomSheet as any)
                     (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
                   if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
-                      0,
-                    );
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(0);
                   if (this.refs.SecureAccountHelperBottomSheet as any)
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
+                  if (this.refs.DonationAccountHelperBottomSheet as any)
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(0);
                 }}
               >
                 <View>
@@ -1471,7 +1477,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null}
             </ScrollView>
-            {showLoader ? <Loader /> : null}
+            {showLoader ? <Loader isLoading={true}/> : showRefreshLoader ? <Loader/> : null}
           </View>
         ) : (
           <ScrollView
@@ -1853,9 +1859,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               <DonationAccountHelpContents
                 titleClicked={() => {
                   if (this.refs.DonationAccountHelperBottomSheet as any)
-                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(
-                      0,
-                    );
+                    (this.refs.DonationAccountHelperBottomSheet as any).snapTo(0);
                 }}
               />
             )}

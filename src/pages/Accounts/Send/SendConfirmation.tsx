@@ -58,11 +58,8 @@ import SmallHeaderModal from '../../../components/SmallHeaderModal';
 import RadioButton from '../../../components/RadioButton';
 import CustomPriorityContent from '../CustomPriorityContent';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
-import {
-  RecipientDescribing,
-  makeSubAccountRecipientDescription,
-  makeContactRecipientDescription,
-} from '../../../common/data/models/interfaces/RecipientDescribing';
+import Loader from '../../../components/loader';
+import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
@@ -82,6 +79,7 @@ interface SendConfirmationStateTypes {
   customFeePerByteErr: string;
   customTxPrerequisites: any;
   derivativeAccountDetails: { type: string; number: number };
+  showLoader: boolean;
 }
 
 interface SendConfirmationPropsTypes {
@@ -152,6 +150,7 @@ class SendConfirmation extends Component<
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
       ),
+      showLoader: false
     };
   }
 
@@ -237,7 +236,7 @@ class SendConfirmation extends Component<
     }
 
     if (transfer.stage2 && transfer.stage2.failed) {
-      this.setState({ isConfirmDisabled: false });
+      this.setState({ isConfirmDisabled: false, showLoader: false });
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
@@ -278,6 +277,8 @@ class SendConfirmation extends Component<
               : false,
         });
       }
+      this.setState({showLoader: false });
+
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
       }, 10);
@@ -501,6 +502,7 @@ class SendConfirmation extends Component<
       totalAmount,
       isConfirmDisabled,
       transfer,
+      showLoader,
       selectedRecipients,
     } = this.state;
     const { navigation, exchangeRates, currencyKind } = this.props;
@@ -986,7 +988,7 @@ class SendConfirmation extends Component<
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={() => {
-                this.setState({ isConfirmDisabled: true });
+                this.setState({ isConfirmDisabled: true, showLoader:true });
                 this.onConfirm();
               }}
               disabled={isConfirmDisabled}
@@ -1027,6 +1029,7 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
           </View>
         </ScrollView>
+        {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomSheet
           onCloseStart={() => {
