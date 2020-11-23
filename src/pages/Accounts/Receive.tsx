@@ -867,7 +867,7 @@ export default function Receive(props) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      {/* {isLoading ? <Loader loader={true}/> : null} */}
+      {/* {isLoading ? <Loader isLoading={true}/> : null} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}

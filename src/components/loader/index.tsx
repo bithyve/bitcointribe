@@ -2,9 +2,9 @@ import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-const Loader = ({ backgroundColor, indicatorColor, loader }) => (
+const Loader = ({ backgroundColor, indicatorColor, isLoading }) => (
   <View style={[styles.container, { backgroundColor }]}>
-    {loader ? <ActivityIndicator size="large" animating color={indicatorColor} /> : null}
+    {isLoading ? <ActivityIndicator size="large" animating color={indicatorColor} /> : null}
   </View>
 );
 
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 Loader.propTypes = {
   backgroundColor: PropTypes.string,
   indicatorColor: PropTypes.string,
-  loader: PropTypes.bool,
+  isLoading: PropTypes.bool,
 };
 
 Loader.defaultProps = {

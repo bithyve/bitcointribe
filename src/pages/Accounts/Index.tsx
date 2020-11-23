@@ -1481,7 +1481,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 </View>
               ) : null}
             </ScrollView>
-            {showLoader ? <Loader loader={true}/> : showRefreshLoader ? <Loader/> : null}
+            {showLoader ? <Loader isLoading={true}/> : showRefreshLoader ? <Loader/> : null}
           </View>
         ) : (
           <ScrollView

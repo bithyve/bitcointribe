@@ -1364,7 +1364,7 @@ class SendToContact extends Component<
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
-        {showLoader ? <Loader loader={true}/> : null}
+        {showLoader ? <Loader isLoading={true}/> : null}
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}

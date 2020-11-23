@@ -384,7 +384,7 @@ class AddNewAccount extends PureComponent<
               </View>
             </View>
           </ScrollView>
-          {showLoader ? <Loader loader={true}/> : null}
+          {showLoader ? <Loader isLoading={true}/> : null}
         </View>
       </View>
     );

@@ -1027,7 +1027,7 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
           </View>
         </ScrollView>
-        {showLoader ? <Loader loader={true}/> : null}
+        {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomSheet
           onCloseStart={() => {
