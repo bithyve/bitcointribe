@@ -49,6 +49,11 @@ export default function SendModalContents(props) {
                                 props.modalRef.current.snapTo(1)
                                 }
                             }}
+                            autoCorrect={false}
+                            autoCompleteType="off"
+                            keyboardType={
+                                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                              }
                         />
                         <View style={styles.contactNameInputImageView}>
                             <Image style={styles.textBoxImage} source={require("../assets/images/icons/phone-book.png")} />
@@ -72,6 +77,11 @@ export default function SendModalContents(props) {
                                 props.modalRef.current.snapTo(1)
                                 }
                             }}
+                            autoCorrect={false}
+                            autoCompleteType="off"
+                            keyboardType={
+                                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                              }
                         />
                     </View>
                     <View style={{ ...styles.textBoxView, height: 100 }}>
@@ -91,6 +101,11 @@ export default function SendModalContents(props) {
                                     props.modalRef.current.snapTo(1)
                                 }
                             }}
+                            autoCorrect={false}
+                            autoCompleteType="off"
+                            keyboardType={
+                                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                              }
                         />
                     </View>
                 </View>

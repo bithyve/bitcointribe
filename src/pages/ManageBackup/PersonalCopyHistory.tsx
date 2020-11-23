@@ -146,10 +146,11 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     if (healthChecked) {
-      Toast('PDF scanned Successfully');
       // dispatch(checkMSharesHealth());
       dispatch(calculateOverallHealth());
       dispatch(pdfHealthChecked(''));
+      props.navigation.goBack();
+      Toast('PDF scanned Successfully');
     }
   }, [healthChecked]);
 

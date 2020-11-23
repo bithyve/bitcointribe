@@ -1287,9 +1287,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { currencyCode } = this.props;
     let currencyCodeTmp = currencyCode;
     if (!currencyCodeTmp) {
-      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
-    }
-    if (!currencyCodeTmp) {
       this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
@@ -2455,7 +2452,7 @@ const mapStateToProps = (state) => {
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
-    currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
     secondaryDeviceAddressValue: idx(
       state,

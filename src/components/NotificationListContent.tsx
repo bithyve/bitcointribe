@@ -83,7 +83,7 @@ export default function NotificationListContent(props) {
         </View>
       </ScrollView>
       {
-        props.notificationLoading ? <Loader /> : null
+        props.notificationLoading ? <Loader isLoading={true}/> : null
       }
       {!props.NotificationData.length ? (
         <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>

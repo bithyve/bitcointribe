@@ -727,6 +727,9 @@ export default function Receive(props) {
                     keyboardType={'numeric'}
                     onChangeText={(value) => setAmount(value)}
                     placeholderTextColor={Colors.borderColor}
+                    autoCorrect={false}
+                    autoFocus={false}
+                    autoCompleteType="off"
                   />
                 </View>
 
@@ -867,7 +870,7 @@ export default function Receive(props) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      {/* {isLoading ? <Loader /> : null} */}
+      {/* {isLoading ? <Loader isLoading={true}/> : null} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}

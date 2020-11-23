@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -12,7 +12,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function PersonalCopyHelpContents(props) {
-    const scrollViewRef = useRef();
+    const scrollViewRef = useRef<ScrollView>();
     return (
         <View
             style={styles.modalContainer}>
@@ -73,11 +73,11 @@ export default function PersonalCopyHelpContents(props) {
                     >
                         If you do not delete your keys from your phone,{'\n'}a hacker in possession of your phone may be{'\n'}able to access all three keys and access your{'\n'}Checking Account
                     </Text>
-                    <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+                    <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
                         scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('85%'), animated: true });
                     }}>
                         <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-                    </TouchableOpacity>
+                    </AppBottomSheetTouchableWrapper>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <View
                             style={{

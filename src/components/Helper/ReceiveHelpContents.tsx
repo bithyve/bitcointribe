@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
   Linking,
@@ -19,7 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function ReceiveHelpContents(props) {
-  const scrollViewRef = useRef();
+  const scrollViewRef = useRef<ScrollView>();
   const openLink = (url) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
@@ -117,11 +116,11 @@ export default function ReceiveHelpContents(props) {
             bitcoin{'\n'}from Friends and Family, please check the{'\n'}checkbox
             above
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{

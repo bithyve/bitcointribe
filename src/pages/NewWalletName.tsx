@@ -81,6 +81,8 @@ export default function NewWalletName(props) {
               onBlur={() => {
                 setInputStyle(styles.inputBox);
               }}
+              autoCorrect={false}
+              autoCompleteType="off"
             />
             <View style={{marginLeft: 20,}}>
               <Text style={{fontSize: RFValue(12),
