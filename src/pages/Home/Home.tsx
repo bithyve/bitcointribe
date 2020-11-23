@@ -43,7 +43,6 @@ import {
   onApprovalStatusChange,
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
-import { updateAddressBookLocally } from '../../store/actions/trustedContacts';
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
@@ -116,7 +115,7 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { fetchKeeperTrustedChannel } from '../../store/actions/keeper';
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY = 800; // milliseconds
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
 const getIconByAccountType = (type) => {
   if (type == 'saving') {
@@ -133,6 +132,9 @@ const getIconByAccountType = (type) => {
     return require('../../assets/images/icons/icon_test.png');
   }
 };
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+
 
 export enum BottomSheetState {
   Closed,
@@ -377,7 +379,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               selectedContact: item,
               serviceType,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * 1e8)}`
+                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
                 : '',
               donationId,
             });
@@ -1029,7 +1031,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         selectedContact: item,
         serviceType,
         bitcoinAmount: options.amount
-          ? `${Math.round(options.amount * 1e8)}`
+          ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
           : '',
       });
     }
@@ -2369,7 +2371,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 isBalanceLoading={isBalanceLoading}
                 Items={Items}
                 navigation={navigation}
-                getIconByAccountType={getIconByAccountType}
                 accounts={accounts}
                 addNewDisable={cardDataProps.length == 4 ? true : false}
                 balances={balances}
@@ -2494,7 +2495,6 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    updateAddressBookLocally,
     updateLastSeen,
     setCloudBackupStatus,
     updateMSharesHealth,

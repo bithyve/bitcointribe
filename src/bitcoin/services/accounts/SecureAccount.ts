@@ -707,7 +707,7 @@ export default class SecureAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees?: any,
+    averageTxFees: any,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -728,10 +728,6 @@ export default class SecureAccount {
       }
   > => {
     try {
-      // if (this.hdWallet.isValidAddress(recipientAddress)) {
-      // amount = Math.round(amount * 1e8); // converting into sats
-      // amount = Math.round(amount);
-
       recipients = recipients.map((recipient) => {
         recipient.amount = Math.round(recipient.amount);
         return recipient;

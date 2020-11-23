@@ -8,7 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import currencyIconSource from '../../utils/assets/currencyIconSource';
+import currencyIconSource from '../../utils/currency/currencyIconSource';
 
 export default function QuoteConfirmation(props) {
   const currencySymbol = currencyIconSource(props.currencyCode, false)

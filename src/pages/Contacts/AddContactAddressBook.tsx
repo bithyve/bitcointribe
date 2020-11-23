@@ -41,6 +41,10 @@ export default function AddContactAddressBook(props) {
   const [contactPermissionAndroid, setContactPermissionAndroid] = useState(
     false,
   );
+  const [
+    contactPermissionBottomSheet,
+    setContactPermissionBottomSheet,
+  ] = useState(React.createRef());
   const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
   const [
     contactListErrorBottomSheet,
@@ -104,10 +108,10 @@ export default function AddContactAddressBook(props) {
     }
   };
 
-  const getContactsAsync = async () => {
+  const getContactPermission = async () => {
     if (Platform.OS === 'android') {
       const granted = await requestContactsPermission();
-      console.log('GRANTED', granted);
+      //console.log('GRANTED', granted);
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
         setErrorMessage(
           'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
@@ -132,6 +136,25 @@ export default function AddContactAddressBook(props) {
         return;
       } else {
         getContact();
+      }
+    }
+  }
+
+  const getContactsAsync = async () => {
+    if (Platform.OS === 'android') {
+      const chckContactPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+      //console.log("chckContactPermission",chckContactPermission)
+        if (!chckContactPermission) {
+          (contactPermissionBottomSheet as any).current.snapTo(1);
+        } else {
+          getContactPermission();
+        }
+    } else if (Platform.OS === 'ios') {
+      if((await Permissions.getAsync(Permissions.CONTACTS)).status === "undetermined"){
+        (contactPermissionBottomSheet as any).current.snapTo(1);
+      }
+      else {
+        getContactPermission();
       }
     }
   };
@@ -261,56 +284,6 @@ export default function AddContactAddressBook(props) {
     props.onSelectContact(selectedContacts);
   }
 
-  const addContact = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await requestContactsPermission();
-      console.log('GRANTED', granted);
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        );
-        (contactListErrorBottomSheet as any).current.snapTo(1);
-        setContactPermissionAndroid(false);
-        return;
-      } else {
-        var newPerson = {
-          displayName: '',
-        };
-        console.log('contact permission granted');
-        Contacts.openContactForm(newPerson, (err, contact) => {
-          if (err) return;
-          if (contact) {
-            console.log('contact', contact);
-            getContactsAsync();
-          }
-        });
-      }
-    } else if (Platform.OS === 'ios') {
-      const { status, expires, permissions } = await Permissions.getAsync(
-        Permissions.CONTACTS,
-      );
-      if (status === 'denied') {
-        setContactPermissionIOS(false);
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        );
-        (contactListErrorBottomSheet as any).current.snapTo(1);
-        return;
-      } else {
-        var newPerson = {
-          displayName: '',
-        };
-        Contacts.openContactForm(newPerson, (err, contact) => {
-          if (err) return;
-          if (contact) {
-            console.log('contact---', contact);
-            getContactsAsync();
-          }
-        });
-      }
-    }
-  };
-
   const renderContactListErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -341,6 +314,38 @@ export default function AddContactAddressBook(props) {
     );
   }, []);
 
+  const renderContactPermissionModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={contactPermissionBottomSheet}
+        title={'Why do we need access to your address book?'}
+        info={"If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\n It is a good way to remember who the contacts are with their name and image"}
+        otherText={'Don’t worry these details don’t leave your phone and are for your eyes'}
+        proceedButtonText={'Continue'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          getContactPermission();
+          (contactPermissionBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (contactPermissionBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/contactPermission.png')}
+      />
+    );
+  }, []);
+
+  const renderContactPermissionModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (contactPermissionBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -361,7 +366,6 @@ export default function AddContactAddressBook(props) {
           </View>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              //addContact()
               props.onSkipContinue();
             }}
             style={{
@@ -461,6 +465,8 @@ export default function AddContactAddressBook(props) {
               keyboardType={
                 Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
+              autoCorrect={false}
+              autoFocus={false}
               placeholder="Search"
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
@@ -544,6 +550,16 @@ export default function AddContactAddressBook(props) {
             renderContent={renderContactListErrorModalContent}
             renderHeader={renderContactListErrorModalHeader}
           />
+          <BottomSheet
+        enabledInnerScrolling={true}
+        ref={contactPermissionBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderContactPermissionModalContent}
+        renderHeader={renderContactPermissionModalHeader}
+      />
         </View>
       </View>
     </View>

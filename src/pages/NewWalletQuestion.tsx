@@ -34,15 +34,11 @@ import { initializeSetup } from '../store/actions/setupAndAuth';
 import { initializeHealthSetup } from '../store/actions/health';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import {
-  getTestcoins,
-  calculateExchangeRate,
-} from '../store/actions/accounts';
-import {
-  TEST_ACCOUNT,
-} from '../common/constants/serviceTypes';
+import { getTestcoins } from '../store/actions/accounts';
+import { TEST_ACCOUNT } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
+import { walletCheckIn } from '../store/actions/trustedContacts';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -75,9 +71,7 @@ export default function NewWalletQuestion(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized } = useSelector((state) => state.setupAndAuth);
   const [loaderBottomSheet] = useState(React.createRef());
-  const [confirmAnswerTextInput] = useState(
-    React.createRef(),
-  );
+  const [confirmAnswerTextInput] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector((state) => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
@@ -95,13 +89,6 @@ export default function NewWalletQuestion(props) {
       }
     })();
   }, [testAccService]);
-
-  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
-  useEffect(() => {
-    if (!exchangeRates) {
-      dispatch(calculateExchangeRate());
-    }
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -138,6 +125,7 @@ export default function NewWalletQuestion(props) {
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
+      dispatch(walletCheckIn()); // fetches exchange rates
       props.navigation.navigate('HomeNav');
     }
   }, [isInitialized]);
@@ -552,6 +540,7 @@ export default function NewWalletQuestion(props) {
                 </Text>
               </View>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={{
                 flexDirection: 'row',

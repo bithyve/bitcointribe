@@ -1,14 +1,19 @@
-import { useMemo } from "react";
-import BitcoinUnit, { displayNameForBitcoinUnit } from "../../../common/data/enums/BitcoinUnit";
-import CurrencyKind from "../../../common/data/enums/CurrencyKind";
-import useCurrencyCode from "../state-selectors/UseCurrencyCode";
-import useCurrencyKind from "../state-selectors/UseCurrencyKind";
 
+import { useMemo } from 'react';
+import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import useCurrencyCode from '../state-selectors/UseCurrencyCode';
+import useCurrencyKind from '../state-selectors/UseCurrencyKind';
 
-export default function useFormattedUnitText(
-  bitcoinUnit: BitcoinUnit,
-): string {
-  const currencyKind = useCurrencyKind();
+export type Props = {
+  bitcoinUnit?: BitcoinUnit;
+  currencyKind?: CurrencyKind;
+};
+
+export default function useFormattedUnitText({
+  bitcoinUnit = BitcoinUnit.SATS,
+  currencyKind = useCurrencyKind(),
+}: Props): string {
   const fiatCurrencyCode = useCurrencyCode();
 
   const prefersBitcoin: boolean = useMemo(() => {

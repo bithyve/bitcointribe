@@ -30,22 +30,18 @@ import HeaderTitle from '../../components/HeaderTitle';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { initializeRecovery, initializeSetup } from '../../store/actions/setupAndAuth';
+import {
+  initializeRecovery,
+  initializeSetup,
+} from '../../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../../components/LoaderModal';
-import {
-  getTestcoins,
-  calculateExchangeRate,
-  accountsSynched,
-} from '../../store/actions/accounts';
-import {
-  TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+import { getTestcoins, accountsSynched } from '../../store/actions/accounts';
+import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
 
 export default function NewRecoveryOwnQuestions(props) {
-
   const [question, setQuestion] = useState('');
   const [questionInputStyle, setQuestionInputStyle] = useState(styles.inputBox);
   const [answerInputStyle, setAnswerInputStyle] = useState(styles.inputBox);
@@ -58,7 +54,7 @@ export default function NewRecoveryOwnQuestions(props) {
 
   const [visibleButton, setVisibleButton] = useState(false);
 
-  const { insertedIntoDB } = useSelector(state => state.storage);
+  const { insertedIntoDB } = useSelector((state) => state.storage);
   useEffect(() => {
     (async () => {
       if (insertedIntoDB) {
@@ -75,21 +71,20 @@ export default function NewRecoveryOwnQuestions(props) {
     }, 2);
     return (
       <TouchableOpacity
-      disabled={question && answer ? false : true}
-      onPress={() => {
-        const security = {
-          question: question,
-          answer,
-        };
-        dispatch(initializeRecovery(walletName, security));
-      }}
-        style={{ ...styles.buttonView, }}
+        disabled={question && answer ? false : true}
+        onPress={() => {
+          const security = {
+            question: question,
+            answer,
+          };
+          dispatch(initializeRecovery(walletName, security));
+        }}
+        style={{ ...styles.buttonView }}
       >
         <Text style={styles.buttonText}>{'Confirm'}</Text>
       </TouchableOpacity>
     );
   };
-
 
   return (
     <View style={{ flex: 1 }}>
@@ -108,7 +103,7 @@ export default function NewRecoveryOwnQuestions(props) {
                 onPress={() => {
                   props.navigation.goBack();
                 }}
-                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
               >
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
                   <FontAwesome
@@ -129,17 +124,18 @@ export default function NewRecoveryOwnQuestions(props) {
               disabled={isDisabled}
             >
               <View style={{ flexDirection: 'row', padding: wp('7%') }}>
-            <View style={{ flex: 3, justifyContent: 'center' }}>
-              <Text style={styles.modalTitleText}>
-                Enter Security Question{'\n'}and Answer
-              </Text>
-              <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-                To recover your wallet you have to select the security question
-                and enter its answer
-              </Text>
-            </View>
-
-          </View>
+                <View style={{ flex: 3, justifyContent: 'center' }}>
+                  <Text style={styles.modalTitleText}>
+                    Enter Security Question{'\n'}and Answer
+                  </Text>
+                  <Text
+                    style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}
+                  >
+                    To recover your wallet you have to select the security
+                    question and enter its answer
+                  </Text>
+                </View>
+              </View>
 
               <View
                 style={{
@@ -195,7 +191,6 @@ export default function NewRecoveryOwnQuestions(props) {
                     autoCorrect={false}
                     editable={isEditable}
                     autoCapitalize="none"
-
                     keyboardType={
                       Platform.OS == 'ios'
                         ? 'ascii-capable'
@@ -212,7 +207,6 @@ export default function NewRecoveryOwnQuestions(props) {
                     }}
                     onBlur={() => {
                       setAnswerInputStyle(styles.inputBox);
-
                     }}
                     onKeyPress={(e) => {
                       if (e.nativeEvent.key === 'Backspace') {
@@ -222,9 +216,7 @@ export default function NewRecoveryOwnQuestions(props) {
                       }
                     }}
                   />
-
                 </View>
-
               </View>
               <View
                 style={{
@@ -247,29 +239,28 @@ export default function NewRecoveryOwnQuestions(props) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{ ...styles.bottomButtonView }}>
-          {setButtonVisible()}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View>
+      </KeyboardAvoidingView>
+      <View style={{ ...styles.bottomButtonView }}>
+        {setButtonVisible()}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
-        {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={'This answer is used to encrypt your wallet'}
-              infoText={'It is extremely important that only you'}
-              italicText={' know and remember the answer'}
-            />
-          </View>
-        ) : null}
-
+      </View>
+      {!visibleButton ? (
+        <View
+          style={{
+            marginBottom:
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
+          }}
+        >
+          <BottomInfoBox
+            title={'This answer is used to encrypt your wallet'}
+            infoText={'It is extremely important that only you'}
+            italicText={' know and remember the answer'}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }

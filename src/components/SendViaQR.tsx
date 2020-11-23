@@ -319,12 +319,7 @@ export default function SendViaQR(props) {
                             : ''}
                     </Text>
                   </Text>
-                  {/* <Ionicons
-                style={{ marginRight: 10, marginLeft: 10 }}
-                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-                size={20}
-                color={Colors.blue}
-              /> */}
+
                 </AppBottomSheetTouchableWrapper>
               ) : null}
               {props.amount && (

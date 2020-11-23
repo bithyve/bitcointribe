@@ -143,7 +143,7 @@ export default class SecureHDWallet extends Bitcoin {
         : 0;
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
-    this.derivativeGapLimit = this.gapLimit / 2;
+    this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT;
     this.primaryXpriv =
       stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
     this.secondaryXpriv =
@@ -387,38 +387,6 @@ export default class SecureHDWallet extends Bitcoin {
     return { isValid: res.data.isValid };
   };
 
-  public averageTransactionFee = async () => {
-    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
-    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
-
-    const { feeRatesByPriority, rates } = await this.feeRatesPerByte();
-    this.feeRates = rates;
-
-    return {
-      high: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['high'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['high'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
-      },
-      medium: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['medium'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['medium'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
-      },
-      low: {
-        averageTxFee: Math.round(
-          averageTxSize * feeRatesByPriority['low'].feePerByte,
-        ),
-        feePerByte: feeRatesByPriority['low'].feePerByte,
-        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
-      },
-    };
-  };
-
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync;
@@ -461,18 +429,14 @@ export default class SecureHDWallet extends Bitcoin {
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = [];
-    for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
+    for (let itr = 0; itr <= this.nextFreeAddressIndex; itr++) {
       const { address } = this.createSecureMultiSig(itr);
       externalAddresses.push(address);
       ownedAddresses[address] = true;
     }
 
     const internalAddresses = [];
-    for (
-      let itr = 0;
-      itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-      itr++
-    ) {
+    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex; itr++) {
       const { address } = this.createSecureMultiSig(itr, true);
       internalAddresses.push(address);
       ownedAddresses[address] = true;
@@ -700,31 +664,21 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].lastBalTxSync = latestSyncTime;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].newTransactions = newTransactions;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].confirmedUTXOs = confirmedUTXOs;
-    this.derivativeAccounts[accountType][accountNumber].balances = balances;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].transactions = transactions;
-    this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
-      res.nextFreeAddressIndex;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].nextFreeChangeAddressIndex = res.nextFreeChangeAddressIndex;
-    this.derivativeAccounts[accountType][
-      accountNumber
-    ].receivingAddress = this.createSecureMultiSig(
-      res.nextFreeAddressIndex,
-      false,
-      this.derivativeAccounts[accountType][accountNumber].xpub,
-    ).address;
+    this.derivativeAccounts[accountType][accountNumber] = {
+      ...this.derivativeAccounts[accountType][accountNumber],
+      lastBalTxSync: latestSyncTime,
+      newTransactions,
+      confirmedUTXOs,
+      balances,
+      transactions,
+      nextFreeAddressIndex: res.nextFreeAddressIndex,
+      nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
+      receivingAddress: this.createSecureMultiSig(
+        res.nextFreeAddressIndex,
+        false,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
+      ).address,
+    };
 
     return { balances, transactions };
   };
@@ -734,7 +688,7 @@ export default class SecureHDWallet extends Bitcoin {
   ): Promise<{
     synched: boolean;
   }> => {
-    const batchedDerivativeAddresses = [];
+    const accountsToAddressMapping = {};
 
     for (const dAccountType of accountTypes) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -751,6 +705,7 @@ export default class SecureHDWallet extends Bitcoin {
         let {
           nextFreeAddressIndex,
           nextFreeChangeAddressIndex,
+          xpubId,
         } = this.derivativeAccounts[dAccountType][accountNumber];
         // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
         if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
@@ -795,42 +750,31 @@ export default class SecureHDWallet extends Bitcoin {
           'usedAddresses'
         ] = usedAddresses;
         // console.log({ derivativeAccUsedAddresses: usedAddresses });
-        batchedDerivativeAddresses.push(...usedAddresses);
+        accountsToAddressMapping[xpubId] = {
+          External: externalAddresses,
+          Internal: internalAddresses,
+        };
       }
     }
 
-    if (!batchedDerivativeAddresses.length) return;
+    if (!Object.keys(accountsToAddressMapping).length) return;
 
     let res: AxiosResponse;
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
-          {
-            addresses: batchedDerivativeAddresses,
-          },
+          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+          accountsToAddressMapping,
         );
       } else {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
-          {
-            addresses: batchedDerivativeAddresses,
-          },
+          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+          accountsToAddressMapping,
         );
       }
 
-      let { Utxos, Txs } = res.data;
-
-      Utxos = Utxos.filter(
-        (addressSpecificUTXOs) => !!addressSpecificUTXOs.length,
-      );
-
-      Txs = Txs.filter(
-        (addressSpecificTxs) => !!addressSpecificTxs.TotalTransactions,
-      );
-
-      const addressesInfo = Txs;
-      // console.log({ addressesInfo });
+      let accountsToResponseMapping = res.data;
+      if (!Object.keys(accountsToResponseMapping).length) return;
 
       for (const dAccountType of accountTypes) {
         if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -842,16 +786,21 @@ export default class SecureHDWallet extends Bitcoin {
           accountNumber <= derivativeAccounts.instance.using;
           accountNumber++
         ) {
-          const balances = {
-            balance: 0,
-            unconfirmedBalance: 0,
-          };
-
           const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
           const {
             nextFreeAddressIndex,
             nextFreeChangeAddressIndex,
+            xpubId,
           } = derivativeAccounts[accountNumber];
+
+          if (!accountsToResponseMapping[xpubId]) continue;
+          const { Utxos, Txs } = accountsToResponseMapping[xpubId];
+          if (!Utxos && !Txs) continue;
+
+          const balances = {
+            balance: 0,
+            unconfirmedBalance: 0,
+          };
           const externalAddresses = [];
           const internalAddresses = [];
           const ownedAddresses = {};
@@ -885,26 +834,27 @@ export default class SecureHDWallet extends Bitcoin {
           }
 
           const UTXOs = [];
-          for (const addressSpecificUTXOs of Utxos) {
-            for (const utxo of addressSpecificUTXOs) {
-              const { value, Address, status, vout, txid } = utxo;
+          if (Utxos)
+            for (const addressSpecificUTXOs of Utxos) {
+              for (const utxo of addressSpecificUTXOs) {
+                const { value, Address, status, vout, txid } = utxo;
 
-              if (addressInUse.includes(Address)) {
-                UTXOs.push({
-                  txId: txid,
-                  vout,
-                  value,
-                  address: Address,
-                  status,
-                });
+                if (addressInUse.includes(Address)) {
+                  UTXOs.push({
+                    txId: txid,
+                    vout,
+                    value,
+                    address: Address,
+                    status,
+                  });
 
-                if (status.confirmed) balances.balance += value;
-                else if (internalAddresses.includes(Address))
-                  balances.balance += value;
-                else balances.unconfirmedBalance += value;
+                  if (status.confirmed) balances.balance += value;
+                  else if (internalAddresses.includes(Address))
+                    balances.balance += value;
+                  else balances.unconfirmedBalance += value;
+                }
               }
             }
-          }
 
           const confirmedUTXOs = [];
           for (const utxo of UTXOs) {
@@ -929,81 +879,79 @@ export default class SecureHDWallet extends Bitcoin {
             transactionDetails: [],
           };
 
+          const addressesInfo = Txs;
+          const txMap = new Map();
+
           let lastUsedAddressIndex = nextFreeAddressIndex - 1;
           let lastUsedChangeAddressIndex = nextFreeChangeAddressIndex - 1;
 
-          const txMap = new Map();
-          for (const addressInfo of addressesInfo) {
-            if (!addressInUse.includes(addressInfo.Address)) continue;
-            if (addressInfo.TotalTransactions === 0) continue;
+          if (addressesInfo)
+            for (const addressInfo of addressesInfo) {
+              if (addressInfo.TotalTransactions === 0) continue;
 
-            transactions.totalTransactions += addressInfo.TotalTransactions;
-            transactions.confirmedTransactions +=
-              addressInfo.ConfirmedTransactions;
-            transactions.unconfirmedTransactions +=
-              addressInfo.UnconfirmedTransactions;
+              transactions.totalTransactions += addressInfo.TotalTransactions;
+              transactions.confirmedTransactions +=
+                addressInfo.ConfirmedTransactions;
+              transactions.unconfirmedTransactions +=
+                addressInfo.UnconfirmedTransactions;
 
-            addressInfo.Transactions.forEach((tx) => {
-              if (!txMap.has(tx.txid)) {
-                // check for duplicate tx (fetched against sending and then again for change address)
-                txMap.set(tx.txid, true);
-                this.categorizeTx(
-                  tx,
-                  ownedAddresses,
-                  dAccountType,
-                  ownedAddresses,
-                );
+              addressInfo.Transactions.forEach((tx) => {
+                if (!txMap.has(tx.txid)) {
+                  // check for duplicate tx (fetched against sending and then again for change address)
+                  txMap.set(tx.txid, true);
 
-                const transaction = {
-                  txid: tx.txid,
-                  confirmations: tx.NumberofConfirmations,
-                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fee,
-                  date: tx.Status.block_time
-                    ? new Date(tx.Status.block_time * 1000).toUTCString()
-                    : new Date(Date.now()).toUTCString(),
-                  transactionType: tx.transactionType,
-                  amount:
-                    tx.transactionType === 'Sent'
-                      ? tx.amount + tx.fee
-                      : tx.amount,
-                  accountType: tx.accountType,
-                  primaryAccType:
-                    tx.accountType === SUB_PRIMARY_ACCOUNT
-                      ? 'Savings Account'
-                      : null,
-                  recipientAddresses: tx.recipientAddresses,
-                  senderAddresses: tx.senderAddresses,
-                  blockTime: tx.Status.block_time, // only available when tx is confirmed
-                };
+                  const transaction = {
+                    txid: tx.txid,
+                    confirmations: tx.NumberofConfirmations,
+                    status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                    fee: tx.fee,
+                    date: tx.Status.block_time
+                      ? new Date(tx.Status.block_time * 1000).toUTCString()
+                      : new Date(Date.now()).toUTCString(),
+                    transactionType: tx.TransactionType,
+                    amount:
+                      tx.TransactionType === 'Sent'
+                        ? tx.Amount + tx.fee
+                        : tx.Amount,
+                    accountType: dAccountType,
+                    primaryAccType:
+                      dAccountType === SUB_PRIMARY_ACCOUNT
+                        ? 'Savings Account'
+                        : null,
+                    recipientAddresses: tx.RecipientAddresses,
+                    senderAddresses: tx.SenderAddresses,
+                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                  };
 
-                // over-ride sent transaction's accountType variable for derivative accounts
-                // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
-                if (transaction.transactionType === 'Sent')
-                  transaction.accountType = 'Savings Account';
+                  // over-ride sent transaction's accountType variable for derivative accounts
+                  // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
+                  if (transaction.transactionType === 'Sent')
+                    transaction.accountType = 'Savings Account';
 
-                transactions.transactionDetails.push(transaction);
-              }
-            });
+                  transactions.transactionDetails.push(transaction);
+                }
+              });
 
-            const addressIndex = externalAddresses.indexOf(addressInfo.Address);
-            if (addressIndex > -1) {
-              lastUsedAddressIndex =
-                addressIndex > lastUsedAddressIndex
-                  ? addressIndex
-                  : lastUsedAddressIndex;
-            } else {
-              const changeAddressIndex = internalAddresses.indexOf(
+              const addressIndex = externalAddresses.indexOf(
                 addressInfo.Address,
               );
-              if (changeAddressIndex > -1) {
-                lastUsedChangeAddressIndex =
-                  changeAddressIndex > lastUsedChangeAddressIndex
-                    ? changeAddressIndex
-                    : lastUsedChangeAddressIndex;
+              if (addressIndex > -1) {
+                lastUsedAddressIndex =
+                  addressIndex > lastUsedAddressIndex
+                    ? addressIndex
+                    : lastUsedAddressIndex;
+              } else {
+                const changeAddressIndex = internalAddresses.indexOf(
+                  addressInfo.Address,
+                );
+                if (changeAddressIndex > -1) {
+                  lastUsedChangeAddressIndex =
+                    changeAddressIndex > lastUsedChangeAddressIndex
+                      ? changeAddressIndex
+                      : lastUsedChangeAddressIndex;
+                }
               }
             }
-          }
 
           const lastSyncTime =
             this.derivativeAccounts[dAccountType][accountNumber]
@@ -1026,36 +974,22 @@ export default class SecureHDWallet extends Bitcoin {
             }
           }
 
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].lastBalTxSync = latestSyncTime;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].newTransactions = newTransactions;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].confirmedUTXOs = confirmedUTXOs;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].balances = balances;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].transactions = transactions;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].nextFreeChangeAddressIndex = lastUsedChangeAddressIndex + 1;
-          this.derivativeAccounts[dAccountType][
-            accountNumber
-          ].receivingAddress = this.createSecureMultiSig(
-            lastUsedAddressIndex + 1,
-            false,
-            this.derivativeAccounts[dAccountType][accountNumber].xpub,
-          ).address;
+          this.derivativeAccounts[dAccountType][accountNumber] = {
+            ...this.derivativeAccounts[dAccountType][accountNumber],
+            lastBalTxSync: latestSyncTime,
+            newTransactions,
+            confirmedUTXOs,
+            balances,
+            transactions,
+            nextFreeAddressIndex: lastUsedAddressIndex + 1,
+            nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+            receivingAddress: this.createSecureMultiSig(
+              lastUsedAddressIndex + 1,
+              false,
+              this.derivativeAccounts[dAccountType][accountNumber].xpub,
+            ).address,
+          };
         }
-        //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
 
       return { synched: true };
@@ -1608,7 +1542,7 @@ export default class SecureHDWallet extends Bitcoin {
       address: string;
       amount: number;
     }[],
-    averageTxFees?: any,
+    averageTxFees: any,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -1669,16 +1603,11 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log('Output UTXOs:', outputUTXOs);
 
     const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
-    let defaultFeePerByte, defaultEstimatedBlocks;
     // console.log({ averageTxFees });
-    if (averageTxFees) {
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    } else {
-      const averageTxFees = await this.averageTransactionFee();
-      defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
-      defaultEstimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
-    }
+
+    const defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+    const defaultEstimatedBlocks =
+      averageTxFees[defaultTxPriority].estimatedBlocks;
 
     const assets = coinselect(inputUTXOs, outputUTXOs, defaultFeePerByte);
     const defaultPriorityInputs = assets.inputs;
@@ -1701,7 +1630,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     const txPrerequisites: TransactionPrerequisite = {};
-    for (const priority of Object.keys(averageTxFees)) {
+    for (const priority of ['low', 'medium', 'high']) {
       if (
         priority === defaultTxPriority ||
         defaultDebitedAmount === confirmedBalance
@@ -1721,13 +1650,11 @@ export default class SecureHDWallet extends Bitcoin {
         );
         const debitedAmount = netAmount + fee;
         if (!inputs || debitedAmount > confirmedBalance) {
-          // to default priorty assets
-          txPrerequisites[priority] = {
-            inputs: defaultPriorityInputs,
-            outputs: defaultPriorityOutputs,
-            fee: defaultPriorityFee,
-            estimatedBlocks: defaultEstimatedBlocks,
-          };
+          // to previous priority assets
+          if (priority === 'medium')
+            txPrerequisites[priority] = { ...txPrerequisites['low'] };
+          if (priority === 'high')
+            txPrerequisites[priority] = { ...txPrerequisites['medium'] };
         } else {
           txPrerequisites[priority] = {
             inputs,

@@ -7,19 +7,19 @@ import {
   TEST_ACCOUNT_HELPER_DONE,
   TRANSACTION_HELPER_DONE,
   RECEIVE_HELPER_DONE,
-  SEND_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS, 
   UPDATE_LAST_SEEN,
   CLOUD_BACKUP_DATA_STATUS,
   CARD_DATA,
-  IS_BACKUP_PROCESSING
-
+  IS_BACKUP_PROCESSING,
+  INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { stat } from 'fs';
 
 const initialState = ip.freeze({
   hasShownNoInternetWarning: false,
@@ -34,6 +34,7 @@ const initialState = ip.freeze({
   savingWarning: false,
   isSendHelperDoneValue: false,
   // isTwoFASetupDone: false,
+  hasShownInitialKnowMoreSendSheet: false,
   isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,
@@ -84,16 +85,19 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         isTransactionHelperDoneValue: payload.isTransactionHelperDoneValue,
       };
+
     case RECEIVE_HELPER_DONE:
       return {
         ...state,
         isReceiveHelperDoneValue: payload.isReceiveHelperDoneValue,
       };
-    case SEND_HELPER_DONE:
+
+    case INITIAL_KNOW_MORE_SEND_SHEET_SHOWN:
       return {
         ...state,
-        isSendHelperDoneValue: payload.isSendHelperDoneValue,
+        hasShownInitialKnowMoreSendSheet: true,
       };
+
     case SAVING_WARNING:
       return {
         ...state,

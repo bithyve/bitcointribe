@@ -40,7 +40,6 @@ import {
 } from './sagas/setupAndAuth';
 
 import {
-  fetchBalanceWatcher,
   fetchTransactionsWatcher,
   transferST1Watcher,
   transferST2Watcher,
@@ -49,14 +48,12 @@ import {
   accumulativeTxAndBalWatcher,
   accountsSyncWatcher,
   fetchBalanceTxWatcher,
-  exchangeRateWatcher,
   alternateTransferST2Watcher,
   // generateSecondaryXprivWatcher,
   // resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
-  syncDerivativeAccountsWatcher,
   startupSyncWatcher,
   // removeTwoFAWatcher,
   setupDonationAccountWatcher,
@@ -108,9 +105,8 @@ import {
   updateTrustedChannelWatcher,
   trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
-  syncLastSeensWatcher,
   syncTrustedChannelsWatcher,
-  syncLastSeensAndHealthWatcher,
+  walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
 } from './sagas/trustedContacts';
 
@@ -154,7 +150,6 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchBalanceWatcher,
     fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
     transferST1Watcher,
@@ -164,14 +159,13 @@ const rootSaga = function* () {
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     accountsSyncWatcher,
-    exchangeRateWatcher,
+    //exchangeRateWatcher,
     // generateSecondaryXprivWatcher,
     // resetTwoFAWatcher,
     // removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
-    syncDerivativeAccountsWatcher,
     syncViaXpubAgentWatcher,
     startupSyncWatcher,
     setupDonationAccountWatcher,
@@ -218,8 +212,7 @@ const rootSaga = function* () {
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
     trustedChannelsSetupSyncWatcher,
-    syncLastSeensWatcher,
-    syncLastSeensAndHealthWatcher,
+    walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
     
@@ -273,19 +266,17 @@ const rootReducer = combineReducers({
   keeper,
 });
 
-
 export default function makeStore() {
   const sagaMiddleware = createSagaMiddleware();
   const reducers = persistReducer(config, rootReducer);
-  const storeMiddleware = composeWithDevTools(applyMiddleware(sagaMiddleware, thunk));
-
-  const store = createStore(
-    reducers,
-    storeMiddleware
+  const storeMiddleware = composeWithDevTools(
+    applyMiddleware(sagaMiddleware, thunk),
   );
+
+  const store = createStore(reducers, storeMiddleware);
 
   persistStore(store);
   sagaMiddleware.run(rootSaga);
 
   return store;
-};
+}

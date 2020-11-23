@@ -1,6 +1,4 @@
 import {
-  ADDR_FETCHED,
-  BALANCE_FETCHED,
   TRANSACTIONS_FETCHED,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
@@ -59,9 +57,9 @@ const ACCOUNT_VARS: {
   };
   averageTxFees: any;
   donationAccount: {
-    settedup: Boolean,
-    loading: Boolean
-  }
+    settedup: Boolean;
+    loading: Boolean;
+  };
 } = {
   service: null,
   receivingAddress: '',
@@ -90,8 +88,8 @@ const ACCOUNT_VARS: {
   averageTxFees: null,
   donationAccount: {
     settedup: false,
-    loading: false
-  }
+    loading: false,
+  },
 };
 
 const initialState: {
@@ -118,18 +116,6 @@ const initialState: {
 export default (state = initialState, action) => {
   const account = action.payload ? action.payload.serviceType : null;
   switch (action.type) {
-    case ADDR_FETCHED:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          receivingAddress: action.payload.address,
-          loading: {
-            ...state[account].loading,
-            receivingAddress: false,
-          },
-        },
-      };
 
     case TESTCOINS_RECEIVED:
       return {
@@ -137,19 +123,6 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           service: action.payload.service,
-        },
-      };
-
-    case BALANCE_FETCHED:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          balances: action.payload.balances,
-          loading: {
-            ...state[account].loading,
-            balances: false,
-          },
         },
       };
 
@@ -465,8 +438,8 @@ export default (state = initialState, action) => {
             settedup: false,
             loading: true,
           },
-        }
-      }
+        },
+      };
 
     case SETTED_DONATION_ACC:
       return {
@@ -477,9 +450,9 @@ export default (state = initialState, action) => {
             ...state[account].donationAccount,
             settedup: action.payload.successful,
             loading: false,
-          }
-        }
-      }
+          },
+        },
+      };
   }
   return state;
 };

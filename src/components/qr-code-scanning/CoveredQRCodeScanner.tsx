@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { RNCamera } from 'react-native-camera';
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
@@ -40,14 +41,14 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
 
   const CameraCover: React.FC = () => {
     return (
-      <TouchableOpacity onPress={() => setIsCameraOpen(true)} >
+      <AppBottomSheetTouchableWrapper onPress={() => setIsCameraOpen(true)} >
         <ImageBackground
           source={coverImageSource}
           style={{ ...styles.rootContainer, ...containerStyle }}
         >
           <CameraFrameIndicators />
         </ImageBackground>
-      </TouchableOpacity>
+      </AppBottomSheetTouchableWrapper>
     );
   };
 
@@ -87,7 +88,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 20,
     alignSelf: 'center',
-    marginBottom: 16,
     width: widthPercentageToDP(90),
     height: widthPercentageToDP(90),
   },

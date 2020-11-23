@@ -167,12 +167,6 @@ function* initHCWorker() {
   if (res.status === 200) {
     yield put(healthCheckInitialized());
 
-    // walletID globalization (in-app)
-    const walletID = yield call(AsyncStorage.getItem, 'walletID');
-    if (!walletID) {
-      yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
-    }
-
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,

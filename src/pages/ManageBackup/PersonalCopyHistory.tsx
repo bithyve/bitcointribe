@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,9 @@ import {
   AsyncStorage,
   Platform,
   Alert,
+  PermissionsAndroid
 } from 'react-native';
+import * as Permissions from 'expo-permissions';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
@@ -31,9 +33,7 @@ import {
 } from '../../store/actions/health';
 import Colors from '../../common/Colors';
 import NavStyles from '../../common/Styles/NavStyles';
-import CommonStyles from '../../common/Styles/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
@@ -50,11 +50,12 @@ import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
-import { State } from 'react-native-gesture-handler';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet] = useState(React.createRef());
   const [HelpBottomSheet] = useState(React.createRef());
+  const storagePermissionBottomSheet = useRef<BottomSheet>()
+  const [ hasStoragePermission, setHasStoragePermission ] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [QrBottomSheet] = useState(React.createRef());
@@ -119,9 +120,20 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
-  const [mailOptionsBottomSheet] = useState(
+  const [] = useState(
     React.createRef(),
   );
+  useEffect(()=>  {
+    if(Platform.OS === 'ios') {
+      (storagePermissionBottomSheet as any).current.snapTo(0)
+      setHasStoragePermission(true)
+    } else {
+      hasStoragePermission
+      ? (storagePermissionBottomSheet as any).current.snapTo(0)
+      : (storagePermissionBottomSheet as any).current.snapTo(1);
+    }
+    
+  }, [hasStoragePermission]);
 
   useEffect(() => {
     if (personalCopiesGenerated === false) {
@@ -247,15 +259,15 @@ const PersonalCopyHistory = (props) => {
         'personalCopyDetails',
       );
       personalCopyDetails = JSON.parse(personalCopyDetails);
-      if (
+      if ( hasStoragePermission && (
         !personalCopyDetails ||
         !personalCopyDetails[selectedPersonalCopy.type] ||
         !(await verifyPersonalCopyAccess(
-          personalCopyDetails[selectedPersonalCopy.type],
-        ))
+          personalCopyDetails[selectedPersonalCopy.type]
+        )))
       ) {
         // generate a pdf only if health is less than 100%
-        if (overallHealth.overallStatus < 100) {
+        if (!overallHealth || (overallHealth && overallHealth.overallStatus < 100)) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
           setPCShared(!!personalCopyDetails[selectedPersonalCopy.type].shared);
         }
@@ -263,7 +275,7 @@ const PersonalCopyHistory = (props) => {
         setPersonalCopyDetails(personalCopyDetails);
       }
     })();
-  }, [generated, shared]);
+  }, [generated, shared, hasStoragePermission]);
 
   useEffect(() => {
     if (
@@ -303,14 +315,112 @@ const PersonalCopyHistory = (props) => {
     }
   }, [shared]);
 
+  const renderStoragePermissionModalContent = useCallback(() => {
+    checkStoragePermission();
+    return (
+      <ErrorModalContents
+        modalRef={storagePermissionBottomSheet}
+        title={'Why do we need access to your files and storage?'}
+        info={"File and Storage access will let Hexa save a pdf with your recovery keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n"}
+        otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
+        proceedButtonText={'Continue'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          getStoragePermission();
+        }}
+        onPressIgnore={() => {
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/contactPermission.png')}
+      />
+    );
+  }, []);
+
+
+  const renderStoragePermissionModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (storagePermissionBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+
+  const getStoragePermission = async () => {
+    // await checkStoragePermission()
+    if (Platform.OS === 'android') {
+      const granted = await requestStoragePermission();
+      if (!granted) {
+        setErrorMessage(
+          'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
+        );
+        setHasStoragePermission(false);
+        (storagePermissionBottomSheet as any).current.snapTo(0);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        return;
+      }
+      else {
+        setHasStoragePermission(true);
+      }
+    }
+    
+    if (Platform.OS === 'ios') {
+      setHasStoragePermission(true)
+      return;
+    }
+  }
+
+  const requestStoragePermission = async () => {
+    try {
+      const result = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      ]);
+      if(
+        result["android.permission.READ_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
+        &&
+        result["android.permission.WRITE_EXTERNAL_STORAGE"] === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        return true
+      }
+      else {
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false
+    }
+  };
+
+  const checkStoragePermission = async () =>  {
+    if(Platform.OS==='android') {
+      const [read, write] = [
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE),
+        await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+      ];
+      if(read && write) {
+        setHasStoragePermission(true)
+        return true
+      }
+      else {
+        setHasStoragePermission(false)
+        return false
+      }
+    }
+    
+  }
+
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
+        proceedButtonText={'Ok'}
         onPressProceed={() => {
+
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
@@ -379,9 +489,6 @@ const PersonalCopyHistory = (props) => {
         infoText={
           "Open your PDF copy which is password protected with your Security Question's answer"
         }
-        // noteText={
-        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onBackPress={() => {
@@ -642,6 +749,16 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={storagePermissionBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderStoragePermissionModalContent}
+        renderHeader={renderStoragePermissionModalHeader}
       />
     </View>
   );

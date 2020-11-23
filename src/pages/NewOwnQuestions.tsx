@@ -36,16 +36,13 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import {
   getTestcoins,
-  calculateExchangeRate,
-  accountsSynched,
 } from '../store/actions/accounts';
 import {
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
+import { walletCheckIn } from '../store/actions/trustedContacts';
 
 export default function NewOwnQuestions(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -101,13 +98,6 @@ export default function NewOwnQuestions(props) {
     })();
   }, [testAccService]);
 
-  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
-  useEffect(() => {
-    if (!exchangeRates) {
-      dispatch(calculateExchangeRate());
-    }
-  }, []);
-
   useEffect(() => {
     (async () => {
       if (isLoaderStart) {
@@ -143,6 +133,8 @@ export default function NewOwnQuestions(props) {
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
+      dispatch(walletCheckIn()); // fetches exchange rates
+
       props.navigation.navigate('HomeNav');
     }
   }, [isInitialized]);
@@ -268,7 +260,7 @@ export default function NewOwnQuestions(props) {
             <View style={CommonStyles.headerContainer}>
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
-                hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
                 onPress={() => {
                   props.navigation.goBack();
                 }}

@@ -26,6 +26,12 @@ export const serviceGenerator = async (
   if (res.status !== 200) throw new Error('Regular account gen failed');
   primaryMnemonic = res.data.mnemonic;
 
+  // walletID globalization (in-app)
+  const wiRes = regularAcc.getWalletId();
+  if (wiRes.status !== 200 || !wiRes.data.walletId)
+    throw new Error('Wallet Id gen failed');
+  AsyncStorage.setItem('walletID', wiRes.data.walletId);
+
   // Test account
   const testAcc = new TestAccount(primaryMnemonic);
 

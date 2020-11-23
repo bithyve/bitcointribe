@@ -26,6 +26,7 @@ class HexaConfig {
     10,
   );
   public GAP_LIMIT: number = parseInt(Config.BIT_GAP_LIMIT.trim(), 10);
+  public DERIVATIVE_GAP_LIMIT: number = 5;
   public CIPHER_SPEC: {
     algorithm: string;
     salt: string;
@@ -41,6 +42,10 @@ class HexaConfig {
     Config.BIT_KEY_STRETCH_ITERATIONS.trim(),
     10,
   );
+
+  public LAST_SEEN_ACTIVE_DURATION: number = parseInt(Config.LAST_SEEN_ACTIVE_DURATION.trim(), 10);
+  public LAST_SEEN_AWAY_DURATION: number = parseInt(Config.LAST_SEEN_AWAY_DURATION.trim(), 10);
+  
   public BH_SERVERS = {
     RELAY: Config.BIT_API_URLS_RELAY.trim(),
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
@@ -116,6 +121,7 @@ class HexaConfig {
       MULTITXN: Config.BIT_ESPLORA_TESTNET_MULTITXN.trim(),
       MULTIBALANCETXN: Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN.trim(),
       MULTIUTXOTXN: Config.BIT_ESPLORA_TESTNET_MULTIUTXOTXN.trim(),
+      NEWMULTIUTXOTXN: Config.BIT_ESPLORA_TESTNET_NEW_MULTIUTXOTXN.trim(),
       TXN_FEE: Config.BIT_ESPLORA_TESTNET_TXNFEE.trim(),
       TXNDETAILS: Config.BIT_ESPLORA_TESTNET_TXNDETAILS.trim(),
       BROADCAST_TX: Config.BIT_ESPLORA_TESTNET_BROADCAST_TX.trim(),
@@ -126,6 +132,7 @@ class HexaConfig {
       MULTITXN: Config.BIT_ESPLORA_MAINNET_MULTITXN.trim(),
       MULTIBALANCETXN: Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN.trim(),
       MULTIUTXOTXN: Config.BIT_ESPLORA_MAINNET_MULTIUTXOTXN.trim(),
+      NEWMULTIUTXOTXN: Config.BIT_ESPLORA_MAINNET_NEW_MULTIUTXOTXN.trim(),
       TXN_FEE: Config.BIT_ESPLORA_MAINNET_TXNFEE.trim(),
       TXNDETAILS: Config.BIT_ESPLORA_MAINNET_TXNDETAILS.trim(),
       BROADCAST_TX: Config.BIT_ESPLORA_MAINNET_BROADCAST_TX.trim(),

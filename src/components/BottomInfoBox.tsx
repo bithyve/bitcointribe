@@ -17,6 +17,7 @@ export default function BottomInfoBox(props) {
         marginRight: 20,
         borderRadius: 10,
         justifyContent: 'center',
+        ...props.containerStyle,
       }}
     >
       <Text
