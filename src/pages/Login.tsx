@@ -169,6 +169,7 @@ export default function Login(props) {
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseCases'),
         // );
+        console.log('Login>RelayServices.fetchReleases',res.data.releases)
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()

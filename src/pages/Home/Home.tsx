@@ -1635,13 +1635,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bottomSheetRef.current?.close();
     this.onBottomSheetClosed();
   };
-
+  
   onNotificationClicked = async (value) => {
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
+    console.log('Notification clicked Home>onNotificationClicked')
+    console.log('asyncNotifications ', asyncNotifications)
+    console.log('notification passed ', value)
 
     const { notificationData } = this.state;
+    console.log('notificationData from state ', notificationData)
     const { navigation } = this.props;
     let tempNotificationData = notificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
