@@ -207,6 +207,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             trustedAddress,
             contactsWalletName,
             otp,
+            lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ];
@@ -237,7 +238,10 @@ class FriendsAndFamilyScreen extends PureComponent<
             : false;
 
           const element = {
-            contactName,
+            contactName:
+              contactInfo.firstName === 'F&F request' && contactsWalletName
+                ? contactsWalletName
+                : contactName,
             connectedVia,
             usesOTP,
             hasXpub,
@@ -248,6 +252,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             shareIndex,
             hasTrustedChannel,
             contactsWalletName,
+            lastSeen,
             ...contactInfo,
           };
           trustedContacts.push(element);

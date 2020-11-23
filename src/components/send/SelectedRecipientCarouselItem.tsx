@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ImageStyles from '../../common/Styles/ImageStyles';
 import HeadingStyles from '../../common/Styles/HeadingStyles';
 import Colors from '../../common/Colors';
@@ -10,7 +10,6 @@ import RecipientKind from '../../common/data/enums/RecipientKind';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import ContactAvatar from '../ContactAvatar';
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 
 
@@ -25,12 +24,12 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
   onRemove,
   containerStyle = {},
 }: Props) => {
- // const amountText = useFormattedAmountText(Number(amount) || 0);
-  const unitText = useFormattedUnitText();
+  const unitText = useFormattedUnitText({});
 
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.contentContainer}>
+
         <View style={styles.circledAvatarContainer}>
 
           <ContactAvatar contact={recipient} />
@@ -43,9 +42,22 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
           )}
         </View>
 
-        <View>
-          <Text style={styles.titleText}>{recipient.displayedName}</Text>
-          <Text style={styles.amountText}>{recipient.availableBalance} {unitText}</Text>
+        <View style={styles.textContentContainer}>
+          <Text
+            style={styles.titleText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {recipient.displayedName}
+          </Text>
+
+          <Text
+            style={styles.amountText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {recipient.availableBalance} {unitText}
+          </Text>
         </View>
       </View>
 
@@ -81,10 +93,21 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
 
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+
   circledAvatarContainer: {
     ...ImageStyles.thumbnailImageMedium,
     ...ImageStyles.circledAvatarContainer,
     marginRight: 8,
+  },
+
+  textContentContainer: {
+    flex: 1,
+    overflow: 'hidden',
   },
 
   titleText: {

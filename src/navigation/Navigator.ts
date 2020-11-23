@@ -48,8 +48,6 @@ import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
 import UpdateApp from '../pages/UpdateApp';
-import SettingWalletNameChange from '../pages/SettingWalletNameChange';
-import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
@@ -159,8 +157,6 @@ const HomeNavigator = createStackNavigator(
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
-    SettingWalletNameChange,
-    SettingNewWalletName,
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
