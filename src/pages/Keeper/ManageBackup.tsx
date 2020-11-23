@@ -496,8 +496,10 @@ class ManageBackup extends Component<
   };
 
   sendApprovalRequestToPK = () => {
-    let PKShareId = this.props.currentLevel == 2 ? this.props.levelHealth[1].levelInfo[2] : this.props.levelHealth[2].levelInfo[2];
-    this.props.sendApprovalRequest(
+    let { levelHealth, currentLevel, sendApprovalRequest, onApprovalStatusChange } = this.props;
+    let PKShareId = currentLevel == 2 || currentLevel == 1 ? levelHealth[1].levelInfo[2].shareId : currentLevel == 3 ? levelHealth[2].levelInfo[2].shareId : levelHealth[1].levelInfo[2].shareId;
+    
+    sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
       this.state.selectedKeeperType == 'pdf'
@@ -505,7 +507,7 @@ class ManageBackup extends Component<
         : notificationType.approveKeeper,
     );
     if (this.state.selectedKeeperType == 'pdf') {
-      this.props.onApprovalStatusChange(
+      onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),
         this.state.selectedKeeper.shareId,

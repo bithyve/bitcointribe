@@ -1302,7 +1302,7 @@ function* sendApprovalRequestWorker({ payload }) {
   let { shareID, PkShareId, notificationType } = payload;
   let keeper = yield select((state) => state.keeper.service);
   let keeperInfo: Keepers = keeper.keeper.keepers;
-  if (keeperInfo.keeperUUID) {
+  if (keeperInfo[PkShareId].keeperUUID) {
     const notification: INotification = {
       notificationType: notificationType,
       title: 'Approval Request for Keeper',
@@ -1313,7 +1313,7 @@ function* sendApprovalRequestWorker({ payload }) {
     };
     let res = yield call(
       RelayServices.sendKeeperNotifications,
-      [keeperInfo.keeperUUID],
+      [keeperInfo[PkShareId].keeperUUID],
       notification,
     );
   }
