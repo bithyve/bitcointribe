@@ -822,7 +822,7 @@ function* sharePersonalCopyWorker({ payload }) {
             Mailer.mail,
             {
               subject: selectedPersonalCopy.title,
-              body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your ${security.question} is used to password protect the PDF.</b>`,
+              body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
               // body: `<b>Please find the attached personal copy ${
               //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
               //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
@@ -851,7 +851,7 @@ function* sharePersonalCopyWorker({ payload }) {
         } else {
           let shareOptions = {
             title: selectedPersonalCopy.title,
-            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your ${security.question} is used to password protect the PDF.`,
+            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
             // message: `Please find the attached personal copy ${
             //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
             //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
@@ -922,7 +922,7 @@ function* sharePersonalCopyWorker({ payload }) {
       case 'Other':
         let shareOptions = {
           title: selectedPersonalCopy.title,
-          message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your ${security.question} is used to password protect the PDF.`,
+          message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
           // message: `Please find the attached personal copy ${
           //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
           //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
