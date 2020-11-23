@@ -257,6 +257,8 @@ class AddNewAccount extends PureComponent<
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"
                   returnKeyLabel="Done"
+                  autoCorrect={false}
+                  autoCompleteType="off"
                 />
               </View>
 
@@ -275,6 +277,8 @@ class AddNewAccount extends PureComponent<
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"
                   returnKeyLabel="Done"
+                  autoCorrect={false}
+                  autoCompleteType="off"
                 />
               </View>
               <View style={{ ...styles.modalTextBoxView, height: wp('20%') }}>
@@ -299,6 +303,8 @@ class AddNewAccount extends PureComponent<
                   placeholderTextColor={Colors.borderColor}
                   returnKeyType="done"
                   returnKeyLabel="Done"
+                  autoCorrect={false}
+                  autoCompleteType="off"
                 />
               </View>
               <View style={styles.greyBoxView}>

@@ -202,6 +202,8 @@ export default function SettingDonationWebPageContents(props) {
                 placeholderTextColor={Colors.borderColor}
                 returnKeyType="done"
                 returnKeyLabel="Done"
+                autoCorrect={false}
+                autoCompleteType="off"
               />
             </View>
             <Text style={styles.titleTextStyle}>Organised by</Text>
@@ -219,6 +221,8 @@ export default function SettingDonationWebPageContents(props) {
                 placeholderTextColor={Colors.borderColor}
                 returnKeyType="done"
                 returnKeyLabel="Done"
+                autoCorrect={false}
+                autoCompleteType="off"
               />
             </View>
             <Text style={styles.titleTextStyle}>
@@ -246,6 +250,8 @@ export default function SettingDonationWebPageContents(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 blurOnSubmit={true}
+                autoCorrect={false}
+                autoCompleteType="off"
               />
             </View>
 

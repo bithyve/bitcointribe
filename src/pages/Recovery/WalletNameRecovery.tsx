@@ -93,6 +93,8 @@ export default function WalletNameRecovery(props) {
             onBlur={() => {
               setInputStyle(styles.inputBox);
             }}
+            autoCorrect={false}
+          autoCompleteType="off"
           />
 </View>
 

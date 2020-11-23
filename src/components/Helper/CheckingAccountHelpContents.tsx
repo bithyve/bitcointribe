@@ -2,10 +2,8 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function CheckingAccountHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -74,11 +73,11 @@ export default function CheckingAccountHelpContents(props) {
             storing more funds or for spending infrequently, please store
             your bitcoin in the Savings Account
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{

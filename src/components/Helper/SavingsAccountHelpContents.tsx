@@ -2,10 +2,8 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SavingsAccountHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -98,11 +97,11 @@ export default function SavingsAccountHelpContents(props) {
             the Checking Account.{'\n'}This is in part, due to the requirement
             of {'\n'}2FA confirmation to confirm spending
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('80%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
@@ -152,11 +151,11 @@ export default function SavingsAccountHelpContents(props) {
             keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}
             one key belongs to BitHyve signing server
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('162%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{

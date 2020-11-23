@@ -1046,6 +1046,10 @@ const VoucherScanner = (props) => {
                 setTextHideShow(true);
               }}
               value={voucherCode}
+              autoCompleteType="off"
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
             />
           </View>
         </ScrollView>

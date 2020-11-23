@@ -2,10 +2,8 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,7 +13,8 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ManageBackupHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -23,7 +22,7 @@ export default function ManageBackupHelpContents(props) {
   return (
     <View style={styles.modalContainer}>
       <AppBottomSheetTouchableWrapper
-        style={{ justifyContent: 'center', alignItems: 'center' }}
+        style={styles.viewStyle}
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
@@ -46,12 +45,11 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            The Health Shield shows if your Recovery Keys are available. There
-            are three modes - Red, Yellow and Green. Red requires immediate
-            action and Yellow requires you to act when possible. Green shows
-            your Recovery Keys are available
+            Manage Backup helps you ensure that you don’t lose your wallet even
+            if you lose your phone or accidentally delete the Hexa App from your
+            phone
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={styles.viewStyle}>
             <Image
               source={require('../../assets/images/icons/manage_backup_info_1.png')}
               style={styles.helperImage}
@@ -63,21 +61,30 @@ export default function ManageBackupHelpContents(props) {
               // marginBottom: wp('15%'),
             }}
           >
-            Hexa’s backup scheme enables you to recover your wallet at any time
-            by retrieving three of your five Recovery Keys. These need to be
-            constantly available in order to enable you to retrieve your account
+            The first five items in this section are called “Keepers” that help
+            generate “Recovery Keys”, which, as the name suggests, helps you
+            recover the wallet if it’s lost. The sixth item is your Security
+            Question, used for different purposes
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current?.scrollTo({ x: 0, y: hp('85%'), animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('85%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
           <View
             style={{
-              borderStyle: 'dotted',
-              borderWidth: 1,
-              borderRadius: 1,
-              borderColor: Colors.white,
+              ...styles.separatorViewDotted,
               ...styles.separatorView,
             }}
           />
@@ -89,37 +96,77 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            This recovery is enabled by a cryptographic scheme known as Shamir’s
-            Secret Sharing or SSS. SSS uses polynomial points to enable you to
-            recover your Hexa Wallet with three of your five Recovery Keys
+            It looks daunting we know! But backing up your wallet is literally
+            child’s play. We have ensured it
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={styles.viewStyle}>
             <Image
               source={require('../../assets/images/icons/FnF_recovery_key.png')}
               style={styles.helperImage}
             />
           </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0 }}>
-              Recovery Keys need to be available at all times to enable
-              recovery. If your keys are not available, you will not be able to
-              recover your Wallet
-            </Text>
-            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
-              <Text style={styles.toKnowMoreText}>To know more,</Text>
-              <TouchableOpacity
-                style={{ marginLeft: 5 }}
-                onPress={() =>
-                  openLink(
-                    'https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing',
-                  )
-                }
-              >
-                <Text style={styles.clickHereText}>click here</Text>
-              </TouchableOpacity>
-            </View>
+          <Text style={{ ...styles.infoText }}>
+            The Health shield indicates the extent to which your wallet is
+            safely backed up. Red requires immediate action. Yellow requires you
+            to act when possible. Green shows your Recovery Keys are available
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('170%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View
+            style={{
+              ...styles.separatorViewDotted,
+              ...styles.separatorView,
+            }}
+          />
+        </View>
+
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('7%'),
+            }}
+          >
+            Use “Know More” in each section to guide you through the process of
+            backing up your wallet. Or watch the video on our Youtube channel
+          </Text>
+          <View style={styles.viewStyle}>
+            <Image
+              source={require('../../assets/images/icons/manage_backup_info_1.png')}
+              style={styles.helperImage}
+            />
           </View>
-          <View style={styles.separatorView} />
+          <Text
+            style={{
+              ...styles.infoText,
+              // marginBottom: wp('15%'),
+            }}
+          >
+            Remember: Recovery Keys need to be available at all times to enable
+            recovery, if your wallet is lost. If your keys are not available,
+            you will not be able to recover your wallet
+          </Text>
+
+          <View
+            style={{
+              ...styles.separatorViewDotted,
+              ...styles.separatorView,
+            }}
+          />
         </View>
       </ScrollView>
     </View>
@@ -196,5 +243,12 @@ const styles = StyleSheet.create({
     marginLeft: wp('10%'),
     marginRight: wp('10%'),
     marginBottom: wp('20%'),
+  },
+  viewStyle: { justifyContent: 'center', alignItems: 'center' },
+  separatorViewDotted: {
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
   },
 });
