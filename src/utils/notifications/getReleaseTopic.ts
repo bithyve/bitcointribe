@@ -7,14 +7,14 @@ export const getReleaseTopic = () => {
 }
 
 const getEnvSpecificReleaseTopic = () => {
-  switch (config.APP_STAGE) {
-    case 'app':
+    switch (config.BIT_SERVER_MODE) {
+    case 'PROD':
       releaseTopic = 'release'
       break
-    case 'sta':
+    case 'STA':
       releaseTopic = 'release' + '_stage'
       break
-    case 'dev':
+    case 'DEV':
       releaseTopic = 'release' + '_dev'
   }
   return releaseTopic

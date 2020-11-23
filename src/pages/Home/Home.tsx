@@ -1205,8 +1205,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
      * Triggered for data only payload in foreground
      * */
     firebase.messaging().onMessage(async remoteMessage => {
-      console.log('A new FCM message arrived!',remoteMessage);
-      this.onNotificationArrives(remoteMessage);
+      // console.log('A new FCM message arrived!',remoteMessage);
     });
   };
 

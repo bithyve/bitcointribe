@@ -42,9 +42,7 @@ export default class Relay {
         HEXA_ID,
         build,
       });
-      console.log('fetchNotifications res ', { resData:res.data })
     } catch (err) {
-      console.log({ err })
       if (err.response) console.log(err.response.data.err);
       if (err.code) console.log(err.code);
     }
