@@ -20,6 +20,11 @@ const ListStyles = StyleSheet.create({
     height: 54,
   },
 
+  thumbnailImageXLarge: {
+    width: 64,
+    height: 64,
+  },
+
   reorderItemIconImage: {
     width: 44,
     height: 44,

@@ -1,10 +1,6 @@
-import { call, put, select, delay, all } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
-  // FETCH_ADDR,
-  addressFetched,
-  FETCH_BALANCE,
-  balanceFetched,
   FETCH_TRANSACTIONS,
   transactionsFetched,
   switchLoader,
@@ -13,10 +9,8 @@ import {
   executedST1,
   executedST2,
   GET_TESTCOINS,
-  fetchBalance,
   TRANSFER_ST3,
   executedST3,
-  fetchTransactions,
   ACCUMULATIVE_BAL_AND_TX,
   failedST1,
   failedST2,
@@ -26,19 +20,15 @@ import {
   accountsSynched,
   settedDonationAccount,
   FETCH_BALANCE_TX,
-  exchangeRatesCalculated,
   ALTERNATE_TRANSFER_ST2,
   secondaryXprivGenerated,
   GENERATE_SECONDARY_XPRIV,
   alternateTransferST2Executed,
   RESET_TWO_FA,
   twoFAResetted,
-  RUN_TEST,
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
-  SYNC_DERIVATIVE_ACCOUNTS,
-  syncDerivativeAccounts,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
@@ -49,12 +39,8 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  FAST_BITCOINS,
   TRUSTED_CONTACTS,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { AsyncStorage, Alert } from 'react-native';
-import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
@@ -64,36 +50,6 @@ import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
 
-// function* fetchAddrWorker({ payload }) {
-//   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-//   const service = yield select(
-//     (state) => state.accounts[payload.serviceType].service,
-//   );
-//   const preFetchAddress =
-//     payload.serviceType === SECURE_ACCOUNT
-//       ? service.secureHDWallet.receivingAddress
-//       : service.hdWallet.receivingAddress;
-//   const res = yield call(service.getAddress);
-//   const postFetchAddress =
-//     res.status === 200 ? res.data.address : preFetchAddress;
-//   if (
-//     res.status === 200 &&
-//     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
-//   ) {
-//     yield put(addressFetched(payload.serviceType, postFetchAddress));
-//     const { SERVICES } = yield select((state) => state.storage.database);
-//     const updatedSERVICES = {
-//       ...SERVICES,
-//       [payload.serviceType]: JSON.stringify(service),
-//     };
-//     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-//   } else {
-//     if (res.err === 'ECONNABORTED') requestTimedout();
-//     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-//   }
-// }
-
-// export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -164,55 +120,6 @@ export const fetchDerivativeAccAddressWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_ADDRESS,
 );
 
-function* fetchBalanceWorker({ payload }) {
-  if (payload.options && payload.options.loader)
-    yield put(switchLoader(payload.serviceType, 'balances'));
-  const service = yield select(
-    (state) => state.accounts[payload.serviceType].service,
-  );
-
-  const preFetchBalances =
-    payload.serviceType === SECURE_ACCOUNT
-      ? service.secureHDWallet.balances
-      : service.hdWallet.balances;
-  const res = yield call(service.getBalance, {
-    restore: payload.options.restore,
-  });
-  const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
-
-  if (
-    res.status === 200 &&
-    payload.options &&
-    payload.options.fetchTransactionsSync
-  ) {
-    yield call(fetchTransactionsWorker, {
-      payload: {
-        serviceType: payload.serviceType,
-        service,
-      },
-    }); // have to dispatch everytime (if selected) as the tx confirmations increments
-  } else if (
-    res.status === 200 &&
-    JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
-  ) {
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [payload.serviceType]: JSON.stringify(service),
-    };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  }
-
-  if (payload.options.loader) {
-    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
-    yield put(switchLoader(payload.serviceType, 'balances'));
-  }
-}
-
-export const fetchBalanceWatcher = createWatcher(
-  fetchBalanceWorker,
-  FETCH_BALANCE,
-);
 
 function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
@@ -433,11 +340,6 @@ function* syncDerivativeAccountsWorker({ payload }) {
     // yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
   }
 }
-
-export const syncDerivativeAccountsWatcher = createWatcher(
-  syncDerivativeAccountsWorker,
-  SYNC_DERIVATIVE_ACCOUNTS,
-);
 
 function* syncViaXpubAgentWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'balanceTx'));
@@ -811,11 +713,6 @@ function* testcoinsWorker({ payload }) {
   const res = yield call(service.getTestcoins);
   console.log({ res });
   if (res.status === 200) {
-    // console.log('testcoins received');
-    // yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
-    // yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
-    // yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
-    // yield put(fetchTransactions(payload.serviceType, service));
     yield put(testcoinsReceived(payload.serviceType, service));
 
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -839,10 +736,6 @@ function* accumulativeTxAndBalWorker() {
   const accounts = yield select((state) => state.accounts);
   console.log({ accounts });
 
-  const testBalance = accounts[TEST_ACCOUNT].service
-    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
@@ -962,7 +855,7 @@ export const removeTwoFAWatcher = createWatcher(
   REMOVE_TWO_FA,
 );
 
-function* accountsSyncWorker({ payload }) {
+function* accountsSyncWorker({ }) {
   try {
     const accounts = yield select((state) => state.accounts);
 
@@ -1059,7 +952,7 @@ export const accountsSyncWatcher = createWatcher(
   SYNC_ACCOUNTS,
 );
 
-function* startupSyncWorker({ payload }) {
+function* startupSyncWorker({ }) {
   /*
   Skippiing this entire sync process
   to improve login performance.

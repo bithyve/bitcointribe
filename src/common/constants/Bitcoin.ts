@@ -1,1 +1,1 @@
-export const SATOSHIS_IN_BTC = 100000000
+export const SATOSHIS_IN_BTC = 1e8;

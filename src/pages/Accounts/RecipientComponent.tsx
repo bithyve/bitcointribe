@@ -1,61 +1,53 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
+import HeadingStyles from '../../common/Styles/HeadingStyles';
+import ImageStyles from '../../common/Styles/ImageStyles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
+import { TEST_ACCOUNT, REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
+import ContactAvatar from '../../components/ContactAvatar';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 
-function RecipientComponent(props) {
-  const currencyCode = useCurrencyCode();
-  const currencyKind: CurrencyKind = useCurrencyKind();
+export type Props = {
+  recipient: RecipientDescribing;
+  onPressElement?: () => void;
+  selectedContactId: string;
+  accountKind?: string;
+};
 
-  const prefersBTC = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
-
-
-  const getCorrectAmountCurrency = () => {
-    if (prefersBTC == false) {
-      return (
-        props.item.currencyAmount &&
-        props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase()
-      );
-    } else {
-      return (
-        props.item.bitcoinAmount &&
-        props.item.bitcoinAmount +
-          (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats')
-      );
-    }
-  };
+function RecipientComponent({
+  recipient,
+  onPressElement = () => {},
+  selectedContactId,
+  accountKind = REGULAR_ACCOUNT,
+}: Props) {
+  const unitText = useFormattedUnitText({
+    bitcoinUnit: accountKind == TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
+  });
 
   return (
     <TouchableOpacity
-      onPress={() => props.onPressElement()}
-      activeOpacity={10}
+      onPress={() => onPressElement()}
       style={{
         marginRight: wp('6%'),
         marginLeft: wp('6%'),
         borderRadius: 10,
         marginTop: hp('1.7%'),
         height:
-          props.SelectedContactId == props.item.selectedContact.id
+          selectedContactId == recipient.id
             ? wp('50%')
             : wp('25%'),
         backgroundColor: Colors.backgroundColor1,
@@ -66,122 +58,52 @@ function RecipientComponent(props) {
           flexDirection: 'row',
           alignItems: 'center',
           height: wp('25%'),
+          paddingHorizontal: 10,
         }}
       >
-        <View style={{ marginLeft: 10 }}>
-          {props.item.selectedContact.imageAvailable ? (
-            <Image
-              source={props.item.selectedContact.image}
-              style={styles.circleShapeView}
-            />
-          ) : (
-            <View
-              style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.shadowBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {props.item.selectedContact && props.item.selectedContact.name ? (
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    props.item.selectedContact.firstName === 'F&F request' &&
-                      props.item.selectedContact.contactsWalletName !==
-                        undefined &&
-                      props.item.selectedContact.contactsWalletName !== ''
-                      ? `${props.item.selectedContact.contactsWalletName}'s wallet`
-                      : props.item.selectedContact.firstName &&
-                        props.item.selectedContact.lastName
-                      ? props.item.selectedContact.firstName +
-                        ' ' +
-                        props.item.selectedContact.lastName
-                      : props.item.selectedContact.firstName &&
-                        !props.item.selectedContact.lastName
-                      ? props.item.selectedContact.firstName
-                      : !props.item.selectedContact.firstName &&
-                        props.item.selectedContact.lastName
-                      ? props.item.selectedContact.lastName
-                      : '',
-                  )}
-                </Text>
-              ) : props.item && props.item.selectedContact.id ? (
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(30),
-                    lineHeight: RFValue(30), //... One for top and one for bottom alignment
-                  }}
-                >
-                  @
-                </Text>
-              ) : (
-                <Image
-                  source={require('../../assets/images/icons/icon_user.png')}
-                  style={styles.circleShapeView}
-                />
-              )}
-            </View>
-          )}
-        </View>
+        <ContactAvatar
+          contact={recipient}
+          contentContainerStyle={styles.avatarImage}
+        />
+
         <View style={{ marginLeft: 10, marginRight: 20 }}>
           <Text
             style={{
               color: Colors.textColorGrey,
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue(11),
-              paddingTop: 5,
-              paddingBottom: 3,
+              marginBottom: 3,
             }}
           >
             Sending to:
           </Text>
+
           <Text style={styles.contactNameText} numberOfLines={1}>
-            {props.item.selectedContact.firstName === 'F&F request' &&
-            props.item.selectedContact.contactsWalletName !== undefined &&
-            props.item.selectedContact.contactsWalletName !== ''
-              ? `${props.item.selectedContact.contactsWalletName}'s wallet`
-              : props.item.selectedContact.name ||
-                props.item.selectedContact.account_name ||
-                props.item.selectedContact.id}
+            {recipient.displayedName}
           </Text>
-          {props.item.hasOwnProperty('bitcoinAmount') ||
-          props.item.hasOwnProperty('currencyAmount') ? (
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontSize: RFValue(10),
-                paddingTop: 3,
-              }}
-            >
-              {getCorrectAmountCurrency()}
-              {/* {props.item.bitcoinAmount
-                ? `${props.item.bitcoinAmount}` + `${props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
-                : '$ ' + props.item.currencyAmount
-                ? props.item.currencyAmount
-                : ''} */}
-            </Text>
-          ) : null}
+
+          <Text
+            style={styles.amountText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {recipient.availableBalance} {unitText}
+          </Text>
         </View>
-       {props.item && props.item.note ? <Ionicons
+
+        <Ionicons
           style={{ marginLeft: 'auto', marginRight: 10 }}
           name={
-            props.SelectedContactId == props.item.selectedContact.id
+            selectedContactId == recipient.id
               ? 'ios-arrow-up'
               : 'ios-arrow-down'
           }
           size={20}
           color={Colors.borderColor}
-        /> : null}
+        /> 
       </View>
-      {props.SelectedContactId == props.item.selectedContact.id && (
+
+      {selectedContactId == recipient.id && (
         <View
           style={{
             height: wp('25%'),
@@ -216,7 +138,7 @@ function RecipientComponent(props) {
                 marginTop: 5,
               }}
             >
-              {props.item.note}
+              {recipient.note}
             </Text>
           </View>
         </View>
@@ -226,6 +148,11 @@ function RecipientComponent(props) {
 }
 
 const styles = StyleSheet.create({
+  avatarImage: {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageXLarge,
+  },
+
   circleShapeView: {
     width: wp('20%'),
     height: wp('20%'),
@@ -253,5 +180,12 @@ const styles = StyleSheet.create({
     height: 20,
     resizeMode: 'cover',
   },
+
+  amountText: {
+    ...HeadingStyles.captionText,
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.blue,
+    marginTop: 3,
+  }
 });
 export default memo(RecipientComponent);

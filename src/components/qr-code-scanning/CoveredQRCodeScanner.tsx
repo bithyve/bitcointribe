@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 20,
     alignSelf: 'center',
-    marginBottom: 16,
     width: widthPercentageToDP(90),
     height: widthPercentageToDP(90),
   },

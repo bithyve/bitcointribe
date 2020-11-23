@@ -91,6 +91,7 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -306,7 +307,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               selectedContact: item,
               serviceType,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * 1e8)}`
+                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
                 : '',
               donationId,
             });
@@ -833,7 +834,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         selectedContact: item,
         serviceType,
         bitcoinAmount: options.amount
-          ? `${Math.round(options.amount * 1e8)}`
+          ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
           : '',
       });
     }

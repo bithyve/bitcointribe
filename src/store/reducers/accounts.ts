@@ -1,6 +1,4 @@
 import {
-  ADDR_FETCHED,
-  BALANCE_FETCHED,
   TRANSACTIONS_FETCHED,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
@@ -118,18 +116,6 @@ const initialState: {
 export default (state = initialState, action) => {
   const account = action.payload ? action.payload.serviceType : null;
   switch (action.type) {
-    case ADDR_FETCHED:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          receivingAddress: action.payload.address,
-          loading: {
-            ...state[account].loading,
-            receivingAddress: false,
-          },
-        },
-      };
 
     case TESTCOINS_RECEIVED:
       return {
@@ -137,19 +123,6 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           service: action.payload.service,
-        },
-      };
-
-    case BALANCE_FETCHED:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          balances: action.payload.balances,
-          loading: {
-            ...state[account].loading,
-            balances: false,
-          },
         },
       };
 
