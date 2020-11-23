@@ -35,6 +35,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
+  const [searchName, setSearchName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
@@ -447,7 +448,13 @@ export default function ContactList(props) {
           autoCompleteType="off"
           placeholder="Search"
           placeholderTextColor={Colors.textColorGrey}
-          onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          onChangeText={(nameKeyword) => {
+            nameKeyword = nameKeyword.replace(/[^A-Za-z0-9]/g, '');
+            setSearchName(nameKeyword);
+            filterContacts(nameKeyword)
+          }
+          }
+          value={searchName}
         />
       </View>
       <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
