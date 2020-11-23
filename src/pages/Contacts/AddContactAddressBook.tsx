@@ -82,7 +82,9 @@ export default function AddContactAddressBook(props) {
   };
 
   useEffect(() => {
-    getContactsAsync();
+    if(props.isLoadContacts){
+      getContactsAsync();
+    }
   }, [props.isLoadContacts]);
 
 
