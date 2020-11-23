@@ -92,6 +92,8 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
+const releaseNotificationTopic = getReleaseTopic()
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -1218,7 +1220,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = [];
     }
     let readStatus = true;
-    if (content.notificationType == 'release_dev') {
+    if (content.notificationType == releaseNotificationTopic) {
       let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
@@ -1633,7 +1635,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bottomSheetRef.current?.close();
     this.onBottomSheetClosed();
   };
-  
+
   onNotificationClicked = async (value) => {
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1681,7 +1683,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    if (value.type == 'release_dev') {
+    if (value.type == releaseNotificationTopic) {
       RelayServices.fetchReleases(value.info.split(' ')[1])
         .then(async (res) => {
           if (res.data.releases.length) {
@@ -1724,7 +1726,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
-        if (element.notificationType == 'release_dev') {
+        if (element.notificationType == releaseNotificationTopic) {
           let releaseCases = this.props.releaseCasesValue;
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
@@ -1751,7 +1753,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (value) => value.notificationId == element.notificationId,
               )
             ];
-          if (element.notificationType == 'release_dev') {
+          if (element.notificationType == releaseNotificationTopic) {
             readStatus = readStatus;
           } else {
             readStatus = temp.read;
