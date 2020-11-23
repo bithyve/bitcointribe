@@ -197,7 +197,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         // to refactor this around leveraging the `RecipientKind` enum.
 
         return data.selectedContact.hasOwnProperty('account_name') == false;
-      });
+      })
+
+      // These items are currently being structured as objects with a `selectedContact` key.
+      .map(object => object.selectedContact);
 
       this.setState({ selectedContacts });
     }
