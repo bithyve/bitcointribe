@@ -520,7 +520,7 @@ class ManageBackup extends Component<
     let keeper = number == 1 ? value.keeper1 : value.keeper2;
     this.setState({
       selectedKeeper: keeper,
-      isPrimaryKeeper: value.id === 2 ? true : false,
+      isPrimaryKeeper: value.id === 2 && number == 1 ? true : false,
       selectedLevelId: value.id,
     });
     if (keeper.updatedAt > 0) {
