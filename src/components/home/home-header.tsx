@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
@@ -130,7 +131,7 @@ const HomeHeader = ({
                   ? UsNumberFormat(balances.accumulativeBalance)
                   : exchangeRates
                     ? (
-                      (balances.accumulativeBalance / 1e8) *
+                      (balances.accumulativeBalance / SATOSHIS_IN_BTC) *
                       exchangeRates[CurrencyCode].last
                     ).toFixed(2)
                     : 0}

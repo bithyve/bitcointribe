@@ -42,7 +42,6 @@ import {
 } from '../../common/constants/serviceTypes';
 import {
   switchLoader,
-  fetchBalance,
   fetchTransactions,
   getTestcoins,
   fetchBalanceTx,
@@ -86,6 +85,7 @@ import ModalHeader from '../../components/ModalHeader';
 import DonationAccountHelpContents from '../../components/Helper/DonationAccountHelpContents';
 import SettingDonationWebPageContents from '../../components/SettingDonationWebpageContents';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 interface AccountsStateTypes {
   carouselData: any;
@@ -118,7 +118,6 @@ interface AccountsStateTypes {
 interface AccountsPropsTypes {
   navigation: any;
   exchangeRates: any;
-  fetchBalance: any;
   fetchTransactions: any;
   getTestcoins: any;
   switchLoader: any;
@@ -222,18 +221,19 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   }
 
   componentDidMount = () => {
-    
     let { serviceType } = this.state;
     let { accounts } = this.props;
     // setting these properties to true if they are false. true should be the starting state for these
     // properties else the account refresh can get stuck with loader displaying all the time
-    if (accounts[serviceType].loading.balanceTx) this.props.switchLoader(serviceType, 'balanceTx');
-    if(accounts[serviceType].loading.derivativeBalanceTx) this.props.switchLoader(serviceType, 'derivativeBalanceTx');
+    if (accounts[serviceType].loading.balanceTx)
+      this.props.switchLoader(serviceType, 'balanceTx');
+    if (accounts[serviceType].loading.derivativeBalanceTx)
+      this.props.switchLoader(serviceType, 'derivativeBalanceTx');
 
     this.updateCarouselData();
 
     this.getBalance();
-  
+
     const service = accounts[serviceType].service;
     this.wallet =
       this.props.navigation.getParam('serviceType') === SECURE_ACCOUNT
@@ -245,13 +245,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     this.setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       this.setState({ is_initiated: true });
-      console.log('currencyCode interaction manager completed!')
+      console.log('currencyCode interaction manager completed!');
     });
 
     if (this.state.showLoader) {
       // after all interactions are done , loader need to be removed
       InteractionManager.runAfterInteractions(() => {
-        console.log('Loader interaction manager completed!')
+        console.log('Loader interaction manager completed!');
         this.setState({ showLoader: false });
         return;
       });
@@ -467,22 +467,19 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-
-
-
   refreshAccountBalance = () => {
     const { presentCarouselData, serviceType } = this.state;
     this.setState({showRefreshLoader: true});
     if (presentCarouselData && presentCarouselData.derivativeAccountDetails) {
       const { derivativeAccountDetails } = presentCarouselData;
-      
+
       if (derivativeAccountDetails.type === DONATION_ACCOUNT)
         this.props.syncViaXpubAgent(
           serviceType,
           derivativeAccountDetails.type,
           derivativeAccountDetails.number,
         );
-      else  
+      else
         this.props.fetchDerivativeAccBalTx(
           serviceType,
           derivativeAccountDetails.type,
@@ -491,9 +488,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
       this.props.setAutoAccountSync(derivativeAccountDetails.type);
     } else {
-        this.props.fetchBalanceTx(serviceType, {
-          loader: true,
-          syncTrustedDerivative:
+      this.props.fetchBalanceTx(serviceType, {
+        loader: true,
+        syncTrustedDerivative:
           serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
             ? true
             : false,
@@ -520,7 +517,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.setAutoAccountSync(accountType);
     }
   };
-
 
   setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = this.props.currencyCode;
@@ -914,7 +910,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.exchangeRates
                 ? (
-                    (this.state.netBalance / 1e8) *
+                    (this.state.netBalance / SATOSHIS_IN_BTC) *
                     this.state.exchangeRates[this.state.CurrencyCode].last
                   ).toFixed(2)
                 : null}
@@ -1088,9 +1084,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
               refreshControl={
                 <RefreshControl
-                  refreshing={
-                    accounts[serviceType].loading.balanceTx
-                  }
+                  refreshing={accounts[serviceType].loading.balanceTx}
                   onRefresh={this.refreshAccountBalance}
                 />
               }
@@ -1149,7 +1143,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         ? UsNumberFormat(spendableBalance)
                         : exchangeRates
                         ? (
-                            (spendableBalance / 1e8) *
+                            (spendableBalance / SATOSHIS_IN_BTC) *
                             exchangeRates[CurrencyCode].last
                           ).toFixed(2)
                         : null}{' '}
@@ -1317,7 +1311,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                   ? UsNumberFormat(item.amount)
                                   : exchangeRates
                                   ? (
-                                      (item.amount / 1e8) *
+                                      (item.amount / SATOSHIS_IN_BTC) *
                                       exchangeRates[CurrencyCode].last
                                     ).toFixed(2)
                                   : null}
@@ -1414,7 +1408,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               ((averageTxFees
                                 ? averageTxFees['low'].averageTxFee
                                 : 0) /
-                                1e8) *
+                                SATOSHIS_IN_BTC) *
                               exchangeRates[CurrencyCode].last
                             ).toFixed(2) +
                             ' ' +
@@ -1610,10 +1604,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   isFromAccount={true}
                   transactionLoading={transactionLoading}
                   transactions={transactions}
-                  setTransactionItem={
-                    () => {}
-                    //this.setState({ selectedTransactionItem: item })
-                  }
+                  setTransactionItem={(item) => {
+                    this.setState({ transactionItem: item });
+                  }}
                   setTabBarZIndex={
                     () => {}
                     //this.setState({ tabBarIndex: index })
@@ -1926,7 +1919,6 @@ const mapStateToProps = (state) => {
 
 export default withNavigationFocus(
   connect(mapStateToProps, {
-    fetchBalance,
     fetchTransactions,
     getTestcoins,
     switchLoader,
