@@ -341,4 +341,5 @@ export interface xAccount {
   nextFreeAddressIndex: number;
   nextFreeChangeAddressIndex: number;
   confirmedUTXOs: {}[];
+  receivingAddress: string;
 }

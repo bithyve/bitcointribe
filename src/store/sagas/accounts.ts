@@ -1079,8 +1079,8 @@ function* xCreateNewAccountWorker({ payload }) {
       path,
     );
 
-    // TODO: update the reducer w/ the new account instance
     // TODO: store the new instance in the database
+    // TODO: update the reducer w/ the new account instance
   } catch (err) {
     console.log({ err });
     throw new Error(`Account creation failed: ${err}`);

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import { xAccount } from '../Interface';
-import { generateExtendedKeys } from './AccountUtils';
+import { generateExtendedKeys, getAddress } from './AccountUtils';
 import { config } from 'process';
 
 export const createAccount = (
@@ -37,6 +37,7 @@ export const createAccount = (
     nextFreeAddressIndex: 0,
     nextFreeChangeAddressIndex: 0,
     confirmedUTXOs: [],
+    receivingAddress: getAddress(false, 0, xpub),
   };
   return account;
 };
