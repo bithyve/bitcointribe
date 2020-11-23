@@ -206,13 +206,22 @@ export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealth[], shareId:
 }
 
 export const getLevelInfo = (levelHealthVar: LevelHealth[], currentLevel: number) : LevelInfo[] =>{
-  if(currentLevel == 0) {
-    return levelHealthVar[0].levelInfo;
-  } else if((currentLevel == 1 || currentLevel == 2) && levelHealthVar[1].levelInfo.findIndex(item => item.updatedAt > 0) > -1) {
-    return levelHealthVar[1].levelInfo;
-  } else if(currentLevel == 2 && !levelHealthVar[2]) {
-    return levelHealthVar[1].levelInfo;
-  } else if((currentLevel == 2 || currentLevel == 3) && levelHealthVar[2]) {
-    return levelHealthVar[2].levelInfo;
+
+  if (levelHealthVar[currentLevel]) {
+    for (let i = 0; i < levelHealthVar[currentLevel].levelInfo.length; i++) {
+      if (levelHealthVar[currentLevel].levelInfo[i].status === "accessible" && levelHealthVar[currentLevel].levelInfo[i].shareType !== "securityQuestion") {
+        return levelHealthVar[currentLevel].levelInfo;
+      }
+    }
   }
+  return levelHealthVar[currentLevel - 1].levelInfo;
+  // if(currentLevel == 0) {
+  //   return levelHealthVar[0].levelInfo;
+  // } else if((currentLevel == 1 || currentLevel == 2) && levelHealthVar[1].levelInfo.findIndex(item => item.updatedAt > 0) > -1) {
+  //   return levelHealthVar[1].levelInfo;
+  // } else if(currentLevel == 2 && !levelHealthVar[2]) {
+  //   return levelHealthVar[1].levelInfo;
+  // } else if((currentLevel == 2 || currentLevel == 3) && levelHealthVar[2]) {
+  //   return levelHealthVar[2].levelInfo;
+  // }
 }
