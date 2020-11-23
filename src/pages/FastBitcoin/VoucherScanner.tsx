@@ -1227,7 +1227,7 @@ const VoucherScanner = (props) => {
           </View>
         </TouchableOpacity>
       </View>
-      {showLoader ? <Loader /> : null}
+      {showLoader ? <Loader isLoading={true}/> : null}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
