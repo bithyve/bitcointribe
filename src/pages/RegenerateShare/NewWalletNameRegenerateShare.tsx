@@ -63,6 +63,9 @@ export default function NewWalletNameRegenerateShare(props) {
             />
             <TextInput
               style={inputStyle}
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
               placeholder={"Enter a name for your wallet"}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
@@ -73,6 +76,9 @@ export default function NewWalletNameRegenerateShare(props) {
               onBlur={() => {
                 setInputStyle(styles.inputBox);
               }}
+              autoCorrect={false}
+              autoFocus={false}
+              autoCompleteType="off"
             />
           </ScrollView>
 

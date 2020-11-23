@@ -33,7 +33,6 @@ const RecipientSelectionStrip: React.FC<Props> = ({
     <View style={styles.rootContainer}>
       <FlatList
         horizontal
-        contentContainerStyle={styles.listContentContainer}
         data={recipients}
         extraData={[accountsState[accountKind].transfer.details]}
         keyExtractor={(item) => item.id}
@@ -43,7 +42,7 @@ const RecipientSelectionStrip: React.FC<Props> = ({
           <TouchableOpacity onPress={() => onRecipientSelected(recipient)}>
             {recipient.kind == RecipientKind.CONTACT && (
               <SendableContactCarouselItem
-                containerStyle={{ marginHorizontal: 14 }}
+                containerStyle={styles.listItemsContainer}
                 contact={(recipient as ContactRecipientDescribing)}
                 isSelected={isSelected(recipient)}
               />
@@ -64,7 +63,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
   },
 
-  listContentContainer: {
+  listItemsContainer: {
+    marginHorizontal: 14,
     paddingVertical: 16,
   },
 });

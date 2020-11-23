@@ -31,6 +31,7 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
 import getAvatarForSubAccountKind from '../../utils/accounts/GetAvatarForSubAccountKind';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
@@ -240,7 +241,7 @@ const HomeList = ({
                             : config.EJECTED_ACCOUNTS.includes(value.subType) &&
                               exchangeRates
                               ? (
-                                (value.amount / 1e8) *
+                                (value.amount / SATOSHIS_IN_BTC) *
                                 exchangeRates[currencyCode].last
                               ).toFixed(2)
                               : value.accountType === TEST_ACCOUNT
@@ -248,12 +249,12 @@ const HomeList = ({
                                 : value.accountType === REGULAR_ACCOUNT &&
                                   exchangeRates
                                   ? (
-                                    (balances.regularBalance / 1e8) *
+                                    (balances.regularBalance / SATOSHIS_IN_BTC) *
                                     exchangeRates[currencyCode].last
                                   ).toFixed(2)
                                   : exchangeRates
                                     ? (
-                                      (balances.secureBalance / 1e8) *
+                                      (balances.secureBalance / SATOSHIS_IN_BTC) *
                                       exchangeRates[currencyCode].last
                                     ).toFixed(2)
                                     : value.amount}

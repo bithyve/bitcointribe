@@ -50,6 +50,7 @@ import {
   AccountRecipientDescribing,
   makeContactRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
 export enum SectionKind {
   SCAN_QR,
@@ -163,7 +164,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     });
     this.updateAccountData();
-    this.props.clearTransfer(this.state.serviceType);
     this.getAccountBalances();
     console.log({ avgTxFee: this.state.averageTxFees });
     if (this.state.serviceType === SECURE_ACCOUNT) {
@@ -195,7 +195,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         // TODO: This seems to be the way the backend is distinguishing between
         // an "account" recipient and a "contact" recipient. There should be a way
         // to refactor this around leveraging the `RecipientKind` enum.
-        return data.selectedContact?.account_name == null;
+
+        return data.selectedContact.hasOwnProperty('account_name') == false;
       });
 
       this.setState({ selectedContacts });
@@ -438,7 +439,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             spendableBalance,
             derivativeAccountDetails,
             bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
+              ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
               : '',
             donationId,
           });
@@ -505,7 +506,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               spendableBalance,
               derivativeAccountDetails,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * 1e8)}`
+                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
                 : '',
               donationId,
             });

@@ -1,18 +1,4 @@
 import { Platform, NativeModules, Alert } from 'react-native';
-import { PermissionsAndroid } from 'react-native';
-
-async function requestStoragePermission() {
-  try {
-    const userResponse = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    ]);
-    return userResponse;
-  } catch (err) {
-    console.log(err);
-  }
-  return null;
-}
 
 const chunkArray = (arr: any, n: any) => {
   var chunkLength = Math.max(arr.length / n, 1);
@@ -64,9 +50,6 @@ const getPdfPath = async (pdfData: any) => {
     const PdfPassword = NativeModules.PdfPassword;
     return await PdfPassword.createPdf(JSON.stringify(pdfData));
   } else {
-    if (!(await requestStoragePermission())) {
-      throw new Error('Storage Permission Denied');
-    }
     var PdfPassword = await NativeModules.PdfPassword;
     await PdfPassword.createPdf(
       JSON.stringify(pdfData),

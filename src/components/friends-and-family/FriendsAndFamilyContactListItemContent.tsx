@@ -28,7 +28,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ({
   }, [contact]);
 
   const secondNamePieceText = useMemo(() => {
-      return contact.displayedName.split(' ').slice(1).join(' ');
+    return contact.displayedName.split(' ').slice(1).join(' ');
   }, [contact]);
 
   const trustKindText = useMemo(() => {
@@ -85,15 +85,17 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ({
       </ListItem.Content>
 
       <ListItem.Content style={{ flex: 1 }}>
-        <ListItem.Subtitle
-          style={styles.lastSeenText}
-          numberOfLines={1}
-        >
-          <Text>Last seen </Text>
-          <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-            {agoTextForLastSeen(contact.lastSeenActive)}
-          </Text>
-        </ListItem.Subtitle>
+        {contact.lastSeenActive != undefined && (
+          <ListItem.Subtitle
+            style={styles.lastSeenText}
+            numberOfLines={1}
+          >
+            <Text>Last seen </Text>
+            <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+              {agoTextForLastSeen(contact.lastSeenActive)}
+            </Text>
+          </ListItem.Subtitle>
+        )}
 
         <ListItem.Title
           style={styles.listItemTitle}
@@ -103,12 +105,17 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ({
           <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
         </ListItem.Title>
 
-        <ListItem.Subtitle
+        {/*
+          📝 TODO: Show this when the F&F list is refactored to a
+          single flat list. (See: https://github.com/bithyve/hexa/issues/2123#issuecomment-732326014)
+        */}
+        {/* <ListItem.Subtitle
           style={styles.trustKindText}
           numberOfLines={1}
         >
           {trustKindText}
-        </ListItem.Subtitle>
+        </ListItem.Subtitle> */}
+
       </ListItem.Content>
 
       {hasExpirationBadge && (
