@@ -11,8 +11,6 @@ pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios/RNFirebase
 pod 'Firebase/Core', '~> 5.20.1'
 pod 'Firebase/Messaging', '~> 5.20.1'
 
-
-
 def all_pods
     config = use_native_modules!
     use_react_native!(:path => config["reactNativePath"])
