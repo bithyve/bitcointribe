@@ -1540,7 +1540,6 @@ function* recoverWalletWorker({ payload }) {
     });
 
     if (Object.keys(restorationShares).length !== 3) {
-      Alert.alert('Insufficient compatible shares to recover the wallet');
       throw new Error(`Insufficient compatible shares to recover the wallet`);
     }
 
