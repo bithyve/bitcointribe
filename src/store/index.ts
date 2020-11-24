@@ -59,6 +59,7 @@ import {
   syncViaXpubAgentWatcher,
   xCreateNewAccountWatcher,
   xSyncAccountWatcher,
+  xTransferST1Watcher,
 } from './sagas/accounts';
 
 import {
@@ -196,6 +197,7 @@ const rootSaga = function* () {
     // Account Management
     xCreateNewAccountWatcher,
     xSyncAccountWatcher,
+    xTransferST1Watcher,
   ];
 
   yield all(
