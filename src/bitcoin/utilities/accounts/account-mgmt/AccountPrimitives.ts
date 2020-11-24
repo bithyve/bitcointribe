@@ -394,11 +394,11 @@ export const createHDTransaction = async (
 };
 
 export const signHDTransaction = (
+  account: xAccount,
   inputs: any,
   txb: bitcoinJS.TransactionBuilder,
-  account: xAccount,
-  witnessScript?: any,
   network?: bitcoinJS.Network,
+  witnessScript?: any,
 ): bitcoinJS.TransactionBuilder => {
   try {
     // console.log('------ Transaction Signing ----------');
@@ -425,5 +425,56 @@ export const signHDTransaction = (
     return txb;
   } catch (err) {
     throw new Error(`Transaction signing failed: ${err.message}`);
+  }
+};
+
+export const broadcastTransaction = async (
+  txHex: string,
+  network: bitcoinJS.Network,
+): Promise<{
+  txid: string;
+}> => {
+  try {
+    let res: AxiosResponse;
+    if (network === bitcoinJS.networks.testnet) {
+      res = await axios.post(
+        config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+        txHex,
+        {
+          headers: { 'Content-Type': 'text/plain' },
+        },
+      );
+    } else {
+      res = await axios.post(
+        config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
+        txHex,
+        {
+          headers: { 'Content-Type': 'text/plain' },
+        },
+      );
+    }
+    return { txid: res.data };
+  } catch (err) {
+    // tx-broadcast fallback
+    try {
+      let res: AxiosResponse;
+      if (network === bitcoinJS.networks.testnet) {
+        res = await axios.post(config.API_URLS.TESTNET.BROADCAST, {
+          hex: txHex,
+        });
+      } else {
+        res = await axios.post(config.API_URLS.MAINNET.BROADCAST, {
+          hex: txHex,
+        });
+      }
+
+      const { txid } = res.data;
+      return {
+        txid,
+      };
+    } catch (err) {
+      // console.log(err.message);
+      throw new Error('Transaction broadcasting failed');
+    }
   }
 };

@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import { TransactionPrerequisite, xAccount } from '../../Interface';
 import {
+  broadcastTransaction,
+  createHDTransaction,
+  signHDTransaction,
   syncBalanceUtxoTx,
   transactionPrerequisites,
 } from './AccountPrimitives';
@@ -139,5 +142,58 @@ export const transferST1 = async (
     }
   } catch (err) {
     return { status: 106, err: err.message };
+  }
+};
+
+export const transferST2 = async (
+  account: xAccount,
+  txPrerequisites: TransactionPrerequisite,
+  txnPriority: string,
+  customTxPrerequisites?: any,
+  network?: bitcoinJS.Network,
+  nSequence?: number,
+): Promise<
+  | {
+      status: number;
+      data: {
+        txid: string;
+      };
+      err?: undefined;
+    }
+  | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+> => {
+  try {
+    const { txb } = await createHDTransaction(
+      account,
+      txnPriority.toLowerCase(),
+      txPrerequisites,
+      customTxPrerequisites,
+      network,
+      nSequence,
+    );
+
+    let inputs;
+    if (txnPriority === 'custom' && customTxPrerequisites) {
+      inputs = customTxPrerequisites.inputs;
+    } else {
+      inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
+    }
+
+    const signedTxb = signHDTransaction(account, inputs, txb, network);
+    // console.log('---- Transaction Signed ----');
+
+    const txHex = signedTxb.build().toHex();
+    // console.log({ txHex });
+    const { txid } = await broadcastTransaction(txHex, network);
+    // console.log('---- Transaction Broadcasted ----');
+    // console.log({ txid });
+
+    return { status: config.STATUS.SUCCESS, data: { txid } };
+  } catch (err) {
+    return { status: 107, err: err.message };
   }
 };
