@@ -85,7 +85,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ({
       </ListItem.Content>
 
       <ListItem.Content style={{ flex: 1 }}>
-        {contact.lastSeenActive != undefined && (
+        {Number.isFinite(contact.lastSeenActive) && (
           <ListItem.Subtitle
             style={styles.lastSeenText}
             numberOfLines={1}
