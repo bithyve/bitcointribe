@@ -873,7 +873,6 @@ export const trustedChannelsSetupSyncWatcher = createWatcher(
   TRUSTED_CHANNELS_SETUP_SYNC,
 );
 
-
 function* walletCheckInWorker({ payload }) {
   // syncs last seen, health & exchange rates
 
@@ -901,8 +900,10 @@ function* walletCheckInWorker({ payload }) {
   if (
     synchingContacts &&
     !Object.keys(trustedContacts.tc.trustedContacts).length
-  )
+  ) {
+    yield put(calculateOverallHealth(s3Service));
     return; // aborting checkIn if walletSync is specifically done in context of trusted-contacts
+  }
 
     const { metaShares, healthCheckStatus } = s3Service.levelhealth; // Fixing error old code is => s3Service.sss
     const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
@@ -1140,7 +1141,7 @@ export const syncTrustedChannelsWatcher = createWatcher(
   SYNC_TRUSTED_CHANNELS,
 );
 
-function* postRecoveryChannelSyncWorker({ }) {
+function* postRecoveryChannelSyncWorker({}) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );

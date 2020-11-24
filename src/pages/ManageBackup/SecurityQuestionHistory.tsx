@@ -57,12 +57,8 @@ const SecurityQuestionHistory = (props) => {
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
   ]);
-  const [
-    SecurityQuestionBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
+  const [SecurityQuestionBottomSheet] = useState(React.createRef());
+  const [HealthCheckSuccessBottomSheet] = useState(React.createRef());
 
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
@@ -220,7 +216,7 @@ const SecurityQuestionHistory = (props) => {
 
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
 
-      <View style={NavStyles.modalHeaderTitleView} >
+      <View style={NavStyles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {

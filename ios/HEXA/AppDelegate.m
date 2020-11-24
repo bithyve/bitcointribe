@@ -68,9 +68,9 @@
   didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   
-  if ([FIRApp defaultApp] == nil) {
-    [FIRApp configure];
-  }
+  [FIRApp configure];
+  [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+  [RNFirebaseNotifications configure];
   
 //  #ifdef FB_SONARKIT_ENABLED
 //    InitializeFlipper(application);

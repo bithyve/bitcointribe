@@ -134,6 +134,8 @@ const getIconByAccountType = (type) => {
 };
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
+const releaseNotificationTopic = getReleaseTopic()
 
 
 export enum BottomSheetState {
@@ -1079,6 +1081,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     Linking.removeEventListener('url', this.handleDeepLinkEvent);
 
     clearTimeout(this.openBottomSheetOnLaunchTimeout);
+    if (this.firebaseNotificationListener) {
+      this.firebaseNotificationListener();
+    }
   }
 
   componentWillUnmount() {
@@ -1338,6 +1343,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationArrives = async (notification) => {
+    console.log('*-* notification has been received ',{ notification });
     this.props.fetchNotifications();
     const { title, body } = notification;
     const deviceTrayNotification = new firebase.notifications.Notification()
@@ -1395,8 +1401,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage(() => {
-      //process data message
+    firebase.messaging().onMessage(async remoteMessage => {
+      // console.log('A new FCM message arrived!',remoteMessage);
     });
   };
 
@@ -1411,7 +1417,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (
-      content.notificationType == 'release' ||
+      content.notificationType == releaseNotificationTopic ||
       content.notificationType == 'secureXpub'
     ) {
       let releaseCases = this.props.releaseCasesValue;
@@ -1834,6 +1840,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
+    console.log('Notification clicked Home>onNotificationClicked')
+    console.log('asyncNotifications ', asyncNotifications)
+    console.log('notification passed ', value)
 
     const { notificationData } = this.state;
     const {
@@ -1878,8 +1887,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    if (value.type == 'release') {
-      RelayServices.fetchReleases(value.info ? value.info.split(' ')[1] : '')
+    if (value.type == releaseNotificationTopic) {
+      RelayServices.fetchReleases(value.info.split(' ')[1])
         .then(async (res) => {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
@@ -1994,8 +2003,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
-        if (element.notificationType == 'release') {
-          let releaseCases = releaseCasesValue;
+        if (element.notificationType == releaseNotificationTopic) {
+          let releaseCases = this.props.releaseCasesValue;
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
           // );
@@ -2039,7 +2048,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (value) => value.notificationId == element.notificationId,
               )
             ];
-          if (element.notificationType == 'release') {
+          if (element.notificationType == releaseNotificationTopic) {
             readStatus = readStatus;
           } else {
             readStatus = temp.read;
