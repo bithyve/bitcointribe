@@ -60,6 +60,7 @@ import {
   xCreateNewAccountWatcher,
   xSyncAccountWatcher,
   xTransferST1Watcher,
+  xTransferST2Watcher,
 } from './sagas/accounts';
 
 import {
@@ -198,6 +199,7 @@ const rootSaga = function* () {
     xCreateNewAccountWatcher,
     xSyncAccountWatcher,
     xTransferST1Watcher,
+    xTransferST2Watcher,
   ];
 
   yield all(

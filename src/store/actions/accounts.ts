@@ -28,6 +28,7 @@ export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 export const X_CREATE_NEW_ACCOUNT = 'X_CREATE_NEW_ACCOUNT';
 export const X_SYNC_ACCOUNTS = 'X_SYNC_ACCOUNTS';
 export const X_TRANSFER_ST1 = 'X_TRANSFER_ST1';
+export const X_TRANSFER_ST2 = 'X_TRANSFER_ST2';
 
 // export const fetchAddress = (serviceType) => {
 //   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -283,10 +284,17 @@ export const xSyncAccounts = (accountsToSync) => {
   };
 };
 
-export const xTransferST1 = (recipients, accounts) => {
+export const xTransferST1 = (recipients, account) => {
   return {
     type: X_TRANSFER_ST1,
-    payload: { recipients, accounts },
+    payload: { recipients, account },
+  };
+};
+
+export const xTransferST2 = () => {
+  return {
+    type: X_TRANSFER_ST2,
+    payload: {},
   };
 };
 

@@ -37,6 +37,7 @@ import {
   X_CREATE_NEW_ACCOUNT,
   X_SYNC_ACCOUNTS,
   X_TRANSFER_ST1,
+  X_TRANSFER_ST2,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -1116,9 +1117,9 @@ export const xSyncAccountWatcher = createWatcher(
 );
 
 function* xTransferST1Worker({ payload }) {
-  const { recipients, accounts } = payload;
+  const { recipients, account } = payload;
 
-  // TODO: using accounts payload, calculate the utxos to be used
+  // TODO: using account payload, fetch the utxos to be used from db
   const confirmedUTXOs = [];
   const averageTxFees = {}; // fetch averageTxFees from the reducer
 
@@ -1137,12 +1138,44 @@ function* xTransferST1Worker({ payload }) {
     }
   } catch (err) {
     console.log({ err });
-    // TODO: fire an action to update the reducer w/ the transfer ST1 failure data
-    throw new Error(`Account creation failed: ${err}`);
+    // TODO: fire an action to update the reducer w/ the transfer ST1 failure data (txPrerequisites)
+    throw new Error(`Transfer ST1 failed: ${err}`);
   }
 }
 
 export const xTransferST1Watcher = createWatcher(
   xTransferST1Worker,
   X_TRANSFER_ST1,
+);
+
+function* xTransferST2Worker({ payload }) {
+  const { account, txnPriority, customTxPrerequisites } = payload;
+
+  // TODO: capture transfer ST1 data (txPrerequisites) from the reducer
+  const txPrerequisites = {};
+
+  try {
+    const res = yield call(
+      AccountManagement.transferST2,
+      account,
+      txPrerequisites,
+      txnPriority,
+      customTxPrerequisites,
+    );
+
+    if (res.status === 200) {
+      // TODO: fire an action to update the reducer w/ the transfer ST2 success data
+    } else {
+      throw new Error(res.err);
+    }
+  } catch (err) {
+    console.log({ err });
+    // TODO: fire an action to update the reducer w/ the transfer ST2 failure data
+    throw new Error(`Transfer ST2 failed: ${err}`);
+  }
+}
+
+export const xTransferST2Watcher = createWatcher(
+  xTransferST2Worker,
+  X_TRANSFER_ST2,
 );
