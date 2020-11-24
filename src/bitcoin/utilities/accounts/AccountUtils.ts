@@ -47,6 +47,43 @@ export const getAddress = (
   );
 };
 
+const sortOutputs = async (
+  outputs: Array<{
+    address: string;
+    value: number;
+  }>,
+  account: xAccount,
+): Promise<
+  Array<{
+    address: string;
+    value: number;
+  }>
+> => {
+  for (const output of outputs) {
+    if (!output.address) {
+      const { nextFreeChangeAddressIndex, primary_xpub } = account;
+
+      output.address = getAddress(
+        true,
+        nextFreeChangeAddressIndex,
+        primary_xpub,
+      );
+    }
+  }
+
+  outputs.sort((out1, out2) => {
+    if (out1.address < out2.address) {
+      return -1;
+    }
+    if (out1.address > out2.address) {
+      return 1;
+    }
+    return 0;
+  });
+
+  return outputs;
+};
+
 export const generateExtendedKeys = (
   mnemonic,
   network,
@@ -399,4 +436,46 @@ export const transactionPrerequisites = async (
   }
 
   return { txPrerequisites };
+};
+
+export const createHDTransaction = async (
+  account: xAccount,
+  txnPriority: string,
+  txPrerequisites: TransactionPrerequisite,
+  customTxPrerequisites?: any,
+  network?: bitcoinJS.Network,
+  nSequence?: number,
+): Promise<{
+  txb: bitcoinJS.TransactionBuilder;
+}> => {
+  try {
+    let inputs, outputs;
+    if (txnPriority === 'custom' && customTxPrerequisites) {
+      inputs = customTxPrerequisites.inputs;
+      outputs = customTxPrerequisites.outputs;
+    } else {
+      inputs = txPrerequisites[txnPriority].inputs;
+      outputs = txPrerequisites[txnPriority].outputs;
+    }
+    // console.log({ inputs, outputs });
+    const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
+      network ? network : bitcoinJS.networks.bitcoin,
+    );
+
+    for (const input of inputs) {
+      txb.addInput(input.txId, input.vout, nSequence);
+    }
+
+    const sortedOuts = await sortOutputs(outputs, account);
+
+    for (const output of sortedOuts) {
+      txb.addOutput(output.address, output.value);
+    }
+
+    return {
+      txb,
+    };
+  } catch (err) {
+    throw new Error(`Transaction creation failed: ${err.message}`);
+  }
 };
