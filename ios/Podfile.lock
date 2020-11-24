@@ -483,7 +483,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - RNFirebase (from `../node_modules/react-native-firebase/ios/RNFirebase.podspec`)
+  - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../node_modules/react-native-localize`)
@@ -624,7 +624,7 @@ EXTERNAL SOURCES:
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFirebase:
-    :path: "../node_modules/react-native-firebase/ios/RNFirebase.podspec"
+    :path: "../node_modules/react-native-firebase/ios"
   RNFS:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
@@ -766,6 +766,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: 7abbe6812f5fccc924c1642277100832f2cd6ade
+PODFILE CHECKSUM: 279deb7c90ee99b9e9635a4d96384f01abccfee3
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
