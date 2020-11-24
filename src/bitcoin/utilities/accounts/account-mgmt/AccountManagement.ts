@@ -1,13 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import { TransactionPrerequisite, xAccount } from '../Interface';
+import { TransactionPrerequisite, xAccount } from '../../Interface';
 import {
-  generateExtendedKeys,
-  getAddress,
   syncBalanceUtxoTx,
   transactionPrerequisites,
-} from './AccountUtils';
-import config from '../../HexaConfig';
+} from './AccountPrimitives';
+import { generateExtendedKeys, getAddress } from './BitcoinPrimitives';
+import config from '../../../HexaConfig';
 
 export const createAccount = (
   accountInfo: xAccount['accountInfo'],

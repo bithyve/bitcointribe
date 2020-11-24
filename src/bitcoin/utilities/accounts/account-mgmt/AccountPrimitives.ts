@@ -1,106 +1,19 @@
-import * as bip32 from 'bip32';
-import * as bip39 from 'bip39';
-import { xAccount, Transactions, TransactionPrerequisite } from '../Interface';
+import {
+  getAddress,
+  sortOutputs,
+  getKeyPair,
+  addressToPrivateKey,
+  getP2SH,
+} from './BitcoinPrimitives';
+import {
+  xAccount,
+  Transactions,
+  TransactionPrerequisite,
+} from '../../Interface';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import config from '../../HexaConfig';
+import config from '../../../HexaConfig';
 import axios, { AxiosResponse } from 'axios';
 import coinselect from 'coinselect';
-
-const deriveAddress = (
-  keyPair: bip32.BIP32Interface,
-  standard: number,
-  network: bitcoinJS.Network,
-): string => {
-  if (standard === config.STANDARD.BIP44) {
-    return bitcoinJS.payments.p2pkh({
-      pubkey: keyPair.publicKey,
-      network: network,
-    }).address;
-  } else if (standard === config.STANDARD.BIP49) {
-    return bitcoinJS.payments.p2sh({
-      redeem: bitcoinJS.payments.p2wpkh({
-        pubkey: keyPair.publicKey,
-        network,
-      }),
-      network,
-    }).address;
-  } else if (standard === config.STANDARD.BIP84) {
-    return bitcoinJS.payments.p2wpkh({
-      pubkey: keyPair.publicKey,
-      network,
-    }).address;
-  }
-};
-
-export const getAddress = (
-  internal: boolean,
-  index: number,
-  xpub: string,
-  network?: bitcoinJS.Network,
-): string => {
-  const nw = network ? network : bitcoinJS.networks.bitcoin;
-  const node = bip32.fromBase58(xpub, nw);
-  return deriveAddress(
-    node.derive(internal ? 1 : 0).derive(index),
-    config.DPATH_PURPOSE,
-    nw,
-  );
-};
-
-const sortOutputs = async (
-  outputs: Array<{
-    address: string;
-    value: number;
-  }>,
-  account: xAccount,
-): Promise<
-  Array<{
-    address: string;
-    value: number;
-  }>
-> => {
-  for (const output of outputs) {
-    if (!output.address) {
-      const { nextFreeChangeAddressIndex, primary_xpub } = account;
-
-      output.address = getAddress(
-        true,
-        nextFreeChangeAddressIndex,
-        primary_xpub,
-      );
-    }
-  }
-
-  outputs.sort((out1, out2) => {
-    if (out1.address < out2.address) {
-      return -1;
-    }
-    if (out1.address > out2.address) {
-      return 1;
-    }
-    return 0;
-  });
-
-  return outputs;
-};
-
-export const generateExtendedKeys = (
-  mnemonic,
-  network,
-  derivationPath,
-  passphrase?,
-): { xpriv: string; xpub: string } => {
-  const seed = bip39.mnemonicToSeedSync(mnemonic, passphrase);
-  const root = bip32.fromSeed(seed, network);
-
-  const xpriv_child = root.derivePath(derivationPath);
-  const xpriv = xpriv_child.toBase58();
-
-  const xpub_child = root.derivePath(derivationPath).neutered();
-  const xpub = xpub_child.toBase58();
-
-  return { xpriv, xpub };
-};
 
 export const syncBalanceUtxoTx = async (
   accounts: xAccount[],
@@ -477,5 +390,40 @@ export const createHDTransaction = async (
     };
   } catch (err) {
     throw new Error(`Transaction creation failed: ${err.message}`);
+  }
+};
+
+export const signHDTransaction = (
+  inputs: any,
+  txb: bitcoinJS.TransactionBuilder,
+  account: xAccount,
+  witnessScript?: any,
+  network?: bitcoinJS.Network,
+): bitcoinJS.TransactionBuilder => {
+  try {
+    // console.log('------ Transaction Signing ----------');
+    network = network ? network : bitcoinJS.networks.bitcoin;
+
+    let vin = 0;
+    for (const input of inputs) {
+      const keyPair = getKeyPair(
+        addressToPrivateKey(input.address, account, network),
+        network,
+      );
+
+      txb.sign(
+        vin,
+        keyPair,
+        getP2SH(keyPair, network).redeem.output,
+        null,
+        input.value,
+        witnessScript,
+      );
+      vin++;
+    }
+
+    return txb;
+  } catch (err) {
+    throw new Error(`Transaction signing failed: ${err.message}`);
   }
 };

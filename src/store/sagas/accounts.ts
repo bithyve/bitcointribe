@@ -52,7 +52,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
-import * as AccountManagement from '../../bitcoin/utilities/accounts/AccountManagement';
+import * as AccountManagement from '../../bitcoin/utilities/accounts/account-mgmt/AccountManagement';
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
