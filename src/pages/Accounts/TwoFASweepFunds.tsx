@@ -163,6 +163,9 @@ export default function TwoFASweepFunds(props) {
                             );
                             setIsInvalidAddress(isAddressValid);
                           }}
+                          autoCorrect={false}
+                          autoFocus={false}
+                          autoCompleteType="off"
                         />
                         <AppBottomSheetTouchableWrapper
                           style={styles.contactNameInputImageView}
@@ -239,6 +242,9 @@ export default function TwoFASweepFunds(props) {
                           value={description}
                           onChangeText={setDescription}
                           placeholderTextColor={Colors.borderColor}
+                          autoCorrect={false}
+                          autoFocus={false}
+                          autoCompleteType="off"
                         />
                       </View>
                     </View>

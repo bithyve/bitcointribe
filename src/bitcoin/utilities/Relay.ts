@@ -82,13 +82,13 @@ export default class Relay {
     DHInfos: [{ address: string; publicKey: string }];
   }> => {
     let res: AxiosResponse;
-
     try {
       res = await BH_AXIOS.post('fetchNotifications', {
         HEXA_ID,
         walletID,
       });
     } catch (err) {
+      console.log({ err })
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }

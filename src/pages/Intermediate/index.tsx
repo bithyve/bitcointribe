@@ -93,7 +93,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
     render() {
         return (
             <ImageBackground source={imageBackground} style={styles.wrapper}>
-                <Loader />
+                <Loader isLoading={true}/>
             </ImageBackground>
         )
     }

@@ -1,6 +1,7 @@
 enum RecipientKind {
-  CONTACT,
-  SUB_ACCOUNT,
+  CONTACT = 'CONTACT',
+  SUB_ACCOUNT = 'SUB_ACCOUNT',
+  ADDRESS = 'ADDRESS',
 };
 
 export default RecipientKind;

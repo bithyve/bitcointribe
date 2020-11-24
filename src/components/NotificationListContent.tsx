@@ -12,6 +12,8 @@ import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouc
 import { ScrollView } from 'react-native-gesture-handler';
 import DeviceInfo from 'react-native-device-info';
 import Loader from './loader';
+import { getReleaseTopic } from "../utils/notifications/getReleaseTopic"
+const releaseNotificationTopic = getReleaseTopic()
 
 export default function NotificationListContent(props) {
   return (
@@ -50,7 +52,7 @@ export default function NotificationListContent(props) {
                   >
                     <Image
                       source={
-                        value.type == 'release'
+                        value.type == releaseNotificationTopic
                           ? require('../assets/images/icons/icon_hexa.png')
                           : require('../assets/images/icons/icon_receive.png')
                       }
@@ -83,7 +85,7 @@ export default function NotificationListContent(props) {
         </View>
       </ScrollView>
       {
-        props.notificationLoading ? <Loader /> : null
+        props.notificationLoading ? <Loader isLoading={true}/> : null
       }
       {!props.NotificationData.length ? (
         <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>

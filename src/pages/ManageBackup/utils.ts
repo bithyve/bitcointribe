@@ -21,7 +21,7 @@ export const verifyPersonalCopyAccess = async (personalCopyDetails) => {
   try {
     return RNFS.exists(path);
   } catch (err) {
-    console.log('error checking file, err', err);
+    // console.log('error checking file, err', err);
     // error in verifying file access
     // to err on the side of caution lets
     // just declare that the file may not exist

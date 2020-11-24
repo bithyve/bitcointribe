@@ -40,6 +40,12 @@ export default function RecoveryWalletNameModalContents(props) {
                     setInputStyle(styles.inputBox);
                     props.onPressTextBoxBlur()
                 }}
+                autoCorrect={false}
+                autoFocus={false}
+                autoCompleteType="off"
+                keyboardType={
+                    Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                  }
             />
         </View>
         <View style={{ flexDirection: 'row', marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp('2%') : 0 }} >

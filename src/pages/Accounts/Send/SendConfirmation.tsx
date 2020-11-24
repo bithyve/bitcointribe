@@ -55,21 +55,22 @@ import idx from 'idx';
 import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../../components/SmallHeaderModal';
-import RecipientSendConfirmation from '../RecipientSendConfirmation';
 import RadioButton from '../../../components/RadioButton';
 import CustomPriorityContent from '../CustomPriorityContent';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import Loader from '../../../components/loader';
 import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
-import SendableContactCarouselItem from '../../../components/send/SendableContactCarouselItem';
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 
 interface SendConfirmationStateTypes {
+  selectedRecipients: unknown[];
   CurrencyCode: string;
   totalAmount: any;
   sliderValue: any;
   sliderValueText: string;
   exchangeRates: any;
-  SelectedContactId: any;
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
@@ -78,6 +79,7 @@ interface SendConfirmationStateTypes {
   customFeePerByteErr: string;
   customTxPrerequisites: any;
   derivativeAccountDetails: { type: string; number: number };
+  showLoader: boolean;
 }
 
 interface SendConfirmationPropsTypes {
@@ -98,7 +100,7 @@ interface SendConfirmationPropsTypes {
 class SendConfirmation extends Component<
   SendConfirmationPropsTypes,
   SendConfirmationStateTypes
-  > {
+> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -132,12 +134,12 @@ class SendConfirmation extends Component<
     this.viewRef = React.createRef();
 
     this.state = {
+      selectedRecipients: [],
       CurrencyCode: 'USD',
       totalAmount: 0,
       sliderValue: 0,
       sliderValueText: 'Low Fee',
       exchangeRates: this.props.exchangeRates,
-      SelectedContactId: 0,
       transfer: {},
       loading: {},
       isConfirmDisabled: false,
@@ -148,6 +150,7 @@ class SendConfirmation extends Component<
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
       ),
+      showLoader: false
     };
   }
 
@@ -162,6 +165,7 @@ class SendConfirmation extends Component<
     }
     this.setState({
       transfer: accounts[this.serviceType].transfer,
+      selectedRecipients: accounts[this.serviceType].transfer.details,
       loading: accounts[this.serviceType].loading,
     });
     this.onChangeInTransfer();
@@ -198,14 +202,10 @@ class SendConfirmation extends Component<
     let { transfer } = this.state;
     const receivers = [];
     transfer.details.forEach((details) => {
-      if (details.selectedContact && details.selectedContact.firstName) {
-        const contactName = `${details.selectedContact.firstName} ${
-          details.selectedContact.lastName
-            ? details.selectedContact.lastName
-            : ''
-          }`
-          .toLowerCase()
-          .trim();
+      if (details.selectedContact && details.selectedContact.displayedName) {
+        const { displayedName } = details.selectedContact;
+        const contactName = displayedName.toLowerCase().trim();
+
         const recipient =
           trustedContactsService.tc.trustedContacts[contactName];
         if (recipient.walletID && recipient.FCMs.length)
@@ -236,7 +236,7 @@ class SendConfirmation extends Component<
     }
 
     if (transfer.stage2 && transfer.stage2.failed) {
-      this.setState({ isConfirmDisabled: false });
+      this.setState({ isConfirmDisabled: false, showLoader: false });
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
       }, 2);
@@ -272,11 +272,13 @@ class SendConfirmation extends Component<
           loader: true,
           syncTrustedDerivative:
             this.serviceType === REGULAR_ACCOUNT ||
-              this.serviceType === SECURE_ACCOUNT
+            this.serviceType === SECURE_ACCOUNT
               ? true
               : false,
         });
       }
+      this.setState({showLoader: false });
+
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
       }, 10);
@@ -467,7 +469,10 @@ class SendConfirmation extends Component<
     ) {
       return UsNumberFormat(value);
     } else if (exchangeRates !== undefined) {
-      return ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2);
+      return (
+        (value / SATOSHIS_IN_BTC) *
+        exchangeRates[CurrencyCode].last
+      ).toFixed(2);
     } else {
       return null;
     }
@@ -496,8 +501,9 @@ class SendConfirmation extends Component<
       CurrencyCode,
       totalAmount,
       isConfirmDisabled,
-      SelectedContactId,
       transfer,
+      showLoader,
+      selectedRecipients,
     } = this.state;
     const { navigation, exchangeRates, currencyKind } = this.props;
     const prefersBitcoin = currencyKind === CurrencyKind.BITCOIN;
@@ -526,13 +532,13 @@ class SendConfirmation extends Component<
             <Image
               source={
                 this.state.derivativeAccountDetails &&
-                  this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../../assets/images/icons/icon_donation_account.png')
                   : this.serviceType == TEST_ACCOUNT
-                    ? require('../../../assets/images/icons/icon_test.png')
-                    : this.serviceType == REGULAR_ACCOUNT
-                      ? require('../../../assets/images/icons/icon_regular.png')
-                      : require('../../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../../assets/images/icons/icon_test.png')
+                  : this.serviceType == REGULAR_ACCOUNT
+                  ? require('../../../assets/images/icons/icon_regular.png')
+                  : require('../../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -572,20 +578,20 @@ class SendConfirmation extends Component<
                 {this.serviceType == TEST_ACCOUNT
                   ? UsNumberFormat(this.spendableBalance)
                   : prefersBitcoin
-                    ? UsNumberFormat(this.spendableBalance)
-                    : exchangeRates
-                      ? (
-                        (this.spendableBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                      : null}
+                  ? UsNumberFormat(this.spendableBalance)
+                  : exchangeRates
+                  ? (
+                      (this.spendableBalance / SATOSHIS_IN_BTC) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                  : null}
               </Text>
               <Text style={styles.textTsats}>
                 {this.serviceType == TEST_ACCOUNT
                   ? ' t-sats)'
                   : prefersBitcoin
-                    ? ' sats)'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats)'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
           </View>
@@ -639,47 +645,57 @@ class SendConfirmation extends Component<
               </View>
             )}
 
-            <FlatList
-              horizontal
-              contentContainerStyle={{ paddingVertical: 16 }}
-              data={this.recipients}
-              keyExtractor={ (item) => item.id }
-              showsHorizontalScrollIndicator={false}
-              contentOffset={{ x: -14, y: 0 }}
-              renderItem={({ item }: { item: unknown }) => {
+          <FlatList
+            horizontal
+            contentContainerStyle={{ paddingVertical: 16 }}
+            // data={this.recipients}
+            data={selectedRecipients}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: -14, y: 0 }}
+            renderItem={({ item }: { item: unknown }) => {
+              const selectedContactData = {
+                ...item.selectedContact,
+                amount:
+                  item.selectedContact.bitcoinAmount || item.bitcoinAmount, // https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605722649345500?thread_ts=1605718686.340700&cid=CEBLWDEKH
+              };
 
-                // TODO: This should already be computed
-                // ahead of time in the data passed to this screen.
-                let recipient: RecipientDescribing;
+              // TODO: This should already be computed
+              // ahead of time in the data passed to this screen.
+              let recipient: RecipientDescribing;
 
-                // 🔑 This seems to be the way the backend is defining the "account kind".
-                // This should be refactored to leverage the new accounts structure
-                // in https://github.com/bithyve/hexa/tree/feature/account-management
-                const accountKind = {
-                  'Checking Account': REGULAR_ACCOUNT,
-                  'Savings Account': SECURE_ACCOUNT,
-                  'Test Account': TEST_ACCOUNT,
-                  'Donation Account': DONATION_ACCOUNT,
-                }[item.account_name || 'Checking Account'];
+              // 🔑 This seems to be the way the backend is defining the "account kind".
+              // This should be refactored to leverage the new accounts structure
+              // in https://github.com/bithyve/hexa/tree/feature/account-management
+              const accountKind = {
+                'Checking Account': REGULAR_ACCOUNT,
+                'Savings Account': SECURE_ACCOUNT,
+                'Test Account': TEST_ACCOUNT,
+                'Donation Account': DONATION_ACCOUNT,
+              }[selectedContactData.account_name || 'Checking Account'];
 
-                if (item.account_name != null) {
-                  recipient = makeSubAccountRecipientDescription(
-                    item,
-                    accountKind,
-                  );
-                } else {
-                  recipient = makeContactRecipientDescription(item);
-                }
-
-                return (
-                  <ConfirmedRecipientCarouselItem
-                    containerStyle={{ marginHorizontal: 14 }}
-                    recipient={recipient}
-                    accountKind={accountKind}
-                  />
+              // 🔑 This seems to be the way the backend is distinguishing between
+              // accounts and contacts.
+              if (selectedContactData.account_name != null) {
+                recipient = makeSubAccountRecipientDescription(
+                  selectedContactData,
+                  accountKind,
                 );
-              }}
-            />
+              } else {
+                recipient = makeContactRecipientDescription(
+                  selectedContactData,
+                );
+              }
+
+              return (
+                <ConfirmedRecipientCarouselItem
+                  containerStyle={{ marginHorizontal: 14 }}
+                  recipient={recipient}
+                  accountKind={accountKind}
+                />
+              );
+            }}
+          />
 
           <View style={styles.totalMountView}>
             <Text style={styles.totalAmountText}>Total Amount</Text>
@@ -696,20 +712,20 @@ class SendConfirmation extends Component<
                   {this.serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(totalAmount)
                     : prefersBitcoin
-                      ? UsNumberFormat(totalAmount)
-                      : exchangeRates
-                        ? (
-                          (totalAmount / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)
-                        : null}
+                    ? UsNumberFormat(totalAmount)
+                    : exchangeRates
+                    ? (
+                        (totalAmount / SATOSHIS_IN_BTC) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : null}
                 </Text>
                 <Text style={styles.amountUnitText}>
                   {this.serviceType == TEST_ACCOUNT
                     ? ' t-sats'
                     : prefersBitcoin
-                      ? ' sats'
-                      : ' ' + CurrencyCode.toLocaleLowerCase()}
+                    ? ' sats'
+                    : ' ' + CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
@@ -756,18 +772,18 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   {transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {timeConvertNear30(
-                          (transfer.stage1.txPrerequisites['high']
-                            .estimatedBlocks +
-                            1) *
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['high']
+                          .estimatedBlocks +
+                          1) *
                           10,
-                        )}
-                      </Text>
-                    ) : null}
+                      )}
+                    </Text>
+                  ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -802,18 +818,18 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   {transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {timeConvertNear30(
-                          (transfer.stage1.txPrerequisites['medium']
-                            .estimatedBlocks +
-                            1) *
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['medium']
+                          .estimatedBlocks +
+                          1) *
                           10,
-                        )}
-                      </Text>
-                    ) : null}
+                      )}
+                    </Text>
+                  ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -854,23 +870,23 @@ class SendConfirmation extends Component<
               <View style={styles.priorityValueContainer}>
                 {!this.isSendMax ? (
                   transfer &&
-                    transfer.stage1 &&
-                    transfer.stage1.txPrerequisites ? (
-                      <Text style={styles.priorityTableText}>
-                        ~
-                        {timeConvertNear30(
-                          (transfer.stage1.txPrerequisites['low']
-                            .estimatedBlocks +
-                            1) *
+                  transfer.stage1 &&
+                  transfer.stage1.txPrerequisites ? (
+                    <Text style={styles.priorityTableText}>
+                      ~
+                      {timeConvertNear30(
+                        (transfer.stage1.txPrerequisites['low']
+                          .estimatedBlocks +
+                          1) *
                           10,
-                        )}
-                      </Text>
-                    ) : null
+                      )}
+                    </Text>
+                  ) : null
                 ) : (
-                    <View style={[styles.priorityValueContainer]}>
-                      <Text style={styles.priorityTableText}>~6.5 hours</Text>
-                    </View>
-                  )}
+                  <View style={[styles.priorityValueContainer]}>
+                    <Text style={styles.priorityTableText}>~6.5 hours</Text>
+                  </View>
+                )}
               </View>
               <View style={styles.priorityValueContainer}>
                 <Text style={styles.priorityTableText}>
@@ -912,8 +928,8 @@ class SendConfirmation extends Component<
                   <Text style={styles.priorityTableText}>
                     ~
                     {timeConvertNear30(
-                    (this.state.customEstimatedBlock + 1) * 10,
-                  )}
+                      (this.state.customEstimatedBlock + 1) * 10,
+                    )}
                   </Text>
                 </View>
                 <View style={styles.priorityValueContainer}>
@@ -972,7 +988,7 @@ class SendConfirmation extends Component<
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={() => {
-                this.setState({ isConfirmDisabled: true });
+                this.setState({ isConfirmDisabled: true, showLoader:true });
                 this.onConfirm();
               }}
               disabled={isConfirmDisabled}
@@ -989,12 +1005,12 @@ class SendConfirmation extends Component<
             >
               {(!isConfirmDisabled &&
                 this.props.accounts[this.serviceType].loading.transfer) ||
-                (isConfirmDisabled &&
-                  this.props.accounts[this.serviceType].loading.transfer) ? (
-                  <ActivityIndicator />
-                ) : (
-                  <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
-                )}
+              (isConfirmDisabled &&
+                this.props.accounts[this.serviceType].loading.transfer) ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -1013,6 +1029,7 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
           </View>
         </ScrollView>
+        {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomSheet
           onCloseStart={() => {
@@ -1020,16 +1037,20 @@ class SendConfirmation extends Component<
               (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
             this.props.clearTransfer(this.serviceType);
-            navigation.navigate('AccountDetails', {
-              serviceType: this.serviceType,
-              index:
-                this.serviceType === TEST_ACCOUNT
+
+            navigation.dispatch(
+              resetStackToAccountDetails({
+                serviceType: this.serviceType,
+                index: this.state.derivativeAccountDetails
+                  ? 3
+                  : this.serviceType === TEST_ACCOUNT
                   ? 0
                   : this.serviceType === REGULAR_ACCOUNT
-                    ? 1
-                    : 2,
-              spendableBalance: this.spendableBalance - totalAmount,
-            });
+                  ? 1
+                  : 2,
+                spendableBalance: this.spendableBalance - totalAmount,
+              }),
+            );
           }}
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1053,25 +1074,25 @@ class SendConfirmation extends Component<
 
                 this.props.clearTransfer(this.serviceType);
 
-                navigation.navigate('AccountDetails', {
-                  serviceType: this.serviceType,
-                  index: this.state.derivativeAccountDetails
-                    ? 3
-                    : this.serviceType === TEST_ACCOUNT
+                navigation.dispatch(
+                  resetStackToAccountDetails({
+                    serviceType: this.serviceType,
+                    index: this.state.derivativeAccountDetails
+                      ? 3
+                      : this.serviceType === TEST_ACCOUNT
                       ? 0
                       : this.serviceType === REGULAR_ACCOUNT
-                        ? 1
-                        : 2,
-                  spendableBalance: this.spendableBalance - totalAmount,
-                });
+                      ? 1
+                      : 2,
+                    spendableBalance: this.spendableBalance - totalAmount,
+                  }),
+                );
               }}
               isSuccess={true}
               accountKind={this.serviceType}
             />
           )}
-          renderHeader={() => (
-            <ModalHeader />
-          )}
+          renderHeader={() => <ModalHeader />}
         />
 
         <BottomSheet
@@ -1105,9 +1126,7 @@ class SendConfirmation extends Component<
               accountKind={this.serviceType}
             />
           )}
-          renderHeader={() => (
-            <ModalHeader />
-          )}
+          renderHeader={() => <ModalHeader />}
         />
 
         <BottomSheet
@@ -1121,22 +1140,16 @@ class SendConfirmation extends Component<
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('20%')
               : Platform.OS == 'android'
-                ? hp('21%')
-                : hp('20%'),
+              ? hp('21%')
+              : hp('20%'),
           ]}
           renderContent={() => (
             <TestAccountHelperModalContents
               topButtonText={'Note'}
-              // image={require('../../../assets/images/icons/regular.png')}
               boldPara={''}
               helperInfo={
                 'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
               }
-            // continueButtonText={'Ok, got it'}
-            // onPressContinue={() => {
-            //   if (KnowMoreBottomSheet.current)
-            //     (KnowMoreBottomSheet as any).current.snapTo(0);
-            // }}
             />
           )}
           renderHeader={() => (
