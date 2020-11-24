@@ -1,10 +1,10 @@
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
-import { xAccount, Transactions } from '../Interface';
+import { xAccount, Transactions, TransactionPrerequisite } from '../Interface';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import config from '../../HexaConfig';
 import axios, { AxiosResponse } from 'axios';
-import { acc } from 'react-native-reanimated';
+import coinselect from 'coinselect';
 
 const deriveAddress = (
   keyPair: bip32.BIP32Interface,
@@ -306,4 +306,97 @@ export const syncBalanceUtxoTx = async (
   } catch (err) {
     throw new Error('Fetching balance-utxo-txn failed');
   }
+};
+
+export const transactionPrerequisites = async (
+  recipients: {
+    address: string;
+    amount: number;
+  }[],
+  averageTxFees: any,
+  confirmedUTXOs: any,
+): Promise<
+  | {
+      fee: number;
+      balance: number;
+      txPrerequisites?: undefined;
+    }
+  | {
+      txPrerequisites: TransactionPrerequisite;
+      fee?: undefined;
+      balance?: undefined;
+    }
+> => {
+  let confirmedBalance = 0;
+  confirmedUTXOs.forEach((utxo) => {
+    confirmedBalance += utxo.value;
+  });
+
+  const outputUTXOs = [];
+  for (const recipient of recipients) {
+    outputUTXOs.push({
+      address: recipient.address,
+      value: recipient.amount,
+    });
+  }
+
+  const defaultTxPriority = 'low'; // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
+
+  const defaultFeePerByte = averageTxFees[defaultTxPriority].feePerByte;
+  const defaultEstimatedBlocks =
+    averageTxFees[defaultTxPriority].estimatedBlocks;
+
+  const assets = coinselect(confirmedUTXOs, outputUTXOs, defaultFeePerByte);
+  const defaultPriorityInputs = assets.inputs;
+  const defaultPriorityOutputs = assets.outputs;
+  const defaultPriorityFee = assets.fee;
+
+  let netAmount = 0;
+  recipients.forEach((recipient) => {
+    netAmount += recipient.amount;
+  });
+  const defaultDebitedAmount = netAmount + defaultPriorityFee;
+  if (!defaultPriorityInputs || defaultDebitedAmount > confirmedBalance) {
+    // insufficient input utxos to compensate for output utxos + lowest priority fee
+    return { fee: defaultPriorityFee, balance: confirmedBalance };
+  }
+
+  const txPrerequisites: TransactionPrerequisite = {};
+  for (const priority of ['low', 'medium', 'high']) {
+    if (
+      priority === defaultTxPriority ||
+      defaultDebitedAmount === confirmedBalance
+    ) {
+      txPrerequisites[priority] = {
+        inputs: defaultPriorityInputs,
+        outputs: defaultPriorityOutputs,
+        fee: defaultPriorityFee,
+        estimatedBlocks: defaultEstimatedBlocks,
+      };
+    } else {
+      // re-computing inputs with a non-default priority fee
+      const { inputs, outputs, fee } = coinselect(
+        confirmedUTXOs,
+        outputUTXOs,
+        averageTxFees[priority].feePerByte,
+      );
+      const debitedAmount = netAmount + fee;
+      if (!inputs || debitedAmount > confirmedBalance) {
+        // to previous priority assets
+        if (priority === 'medium')
+          txPrerequisites[priority] = txPrerequisites['low'];
+        if (priority === 'high')
+          txPrerequisites[priority] = txPrerequisites['medium'];
+      } else {
+        txPrerequisites[priority] = {
+          inputs,
+          outputs,
+          fee,
+          estimatedBlocks: averageTxFees[priority].estimatedBlocks,
+        };
+      }
+    }
+  }
+
+  return { txPrerequisites };
 };

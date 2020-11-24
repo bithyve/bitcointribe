@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import { xAccount } from '../Interface';
+import { TransactionPrerequisite, xAccount } from '../Interface';
 import {
   generateExtendedKeys,
   getAddress,
   syncBalanceUtxoTx,
+  transactionPrerequisites,
 } from './AccountUtils';
-import { config } from 'process';
+import config from '../../HexaConfig';
 
 export const createAccount = (
   accountInfo: xAccount['accountInfo'],
@@ -46,12 +47,98 @@ export const createAccount = (
   return account;
 };
 
-export const syncAccount = async (
+export const syncAccounts = async (
   accounts: xAccount[],
   network?: bitcoinJS.Network,
-): Promise<xAccount[]> => {
-  return await syncBalanceUtxoTx(
-    accounts,
-    network ? network : bitcoinJS.networks.bitcoin,
-  );
+): Promise<
+  | {
+      status: number;
+      data: {
+        synchedAccounts: xAccount[];
+      };
+      err?: undefined;
+    }
+  | {
+      status: number;
+      err: any;
+      data?: undefined;
+    }
+> => {
+  try {
+    return {
+      status: config.STATUS.SUCCESS,
+      data: {
+        synchedAccounts: await syncBalanceUtxoTx(
+          accounts,
+          network ? network : bitcoinJS.networks.bitcoin,
+        ),
+      },
+    };
+  } catch (err) {
+    return { status: 106, err: err.message };
+  }
+};
+
+export const transferST1 = async (
+  recipients: {
+    address: string;
+    amount: number;
+  }[],
+  averageTxFees: any,
+  confirmedUTXOs: any,
+): Promise<
+  | {
+      status: number;
+      data: {
+        txPrerequisites: TransactionPrerequisite;
+      };
+      err?: undefined;
+    }
+  | {
+      status: number;
+      err: string;
+      fee?: number;
+      netAmount?: number;
+      data?: undefined;
+    }
+> => {
+  try {
+    recipients = recipients.map((recipient) => {
+      recipient.amount = Math.round(recipient.amount);
+      return recipient;
+    });
+
+    const { fee, balance, txPrerequisites } = await transactionPrerequisites(
+      recipients,
+      averageTxFees,
+      confirmedUTXOs,
+    );
+
+    let netAmount = 0;
+    recipients.forEach((recipient) => {
+      netAmount += recipient.amount;
+    });
+
+    if (balance < netAmount + fee) {
+      return {
+        status: 0o6,
+        err: `Insufficient balance`,
+        fee,
+        netAmount,
+      };
+    }
+
+    if (txPrerequisites) {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: { txPrerequisites },
+      };
+    } else {
+      throw new Error(
+        'Unable to create transaction: inputs failed at coinselect',
+      );
+    }
+  } catch (err) {
+    return { status: 106, err: err.message };
+  }
 };
