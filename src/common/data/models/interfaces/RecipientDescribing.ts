@@ -81,7 +81,7 @@ export function makeContactRecipientDescription(
     kind: recipientKind,
     displayedName: displayedName,
     walletName: data.contactsWalletName || data.walletName,
-    avatarImageSource: data.avatarImageSource,
+    avatarImageSource: data.avatarImageSource || data.image,
     availableBalance: data.bitcoinAmount || data.amount || 0,
     initiatedAt: data.initiatedAt,
     lastSeenActive: data.lastSeen || data.lastSeenActive,
