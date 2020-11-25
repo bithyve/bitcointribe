@@ -100,7 +100,7 @@ function RecipientComponent({
           }
           size={20}
           color={Colors.borderColor}
-        />
+        /> 
       </View>
 
       {selectedContactId == recipient.id && (

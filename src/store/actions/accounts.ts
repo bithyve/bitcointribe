@@ -1,6 +1,4 @@
 // types and action creators: dispatched by components and sagas
-// export const FETCH_ADDR = 'FETCH_ADDR';
-export const FETCH_BALANCE = 'FETCH_BALANCE';
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
 export const TRANSFER_ST1 = 'TRANSFER_ST1';
@@ -14,9 +12,7 @@ export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
-export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT';
-// export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
 export const RUN_TEST = 'RUN_TEST';
@@ -28,16 +24,7 @@ export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
-// export const fetchAddress = (serviceType) => {
-//   return { type: FETCH_ADDR, payload: { serviceType } };
-// };
 
-export const fetchBalance = (
-  serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
-) => {
-  return { type: FETCH_BALANCE, payload: { serviceType, options } };
-};
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -150,13 +137,6 @@ export const startupSync = (restore?) => {
 
 export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
-};
-
-export const syncDerivativeAccounts = (serviceTypes: string[]) => {
-  return {
-    type: SYNC_DERIVATIVE_ACCOUNTS,
-    payload: { serviceTypes },
-  };
 };
 
 export const syncViaXpubAgent = (
@@ -283,8 +263,6 @@ export const updateDonationPreferences = (
 };
 
 // types and action creators (saga): dispatched by saga workers
-export const ADDR_FETCHED = 'ADDR_FETCHED';
-export const BALANCE_FETCHED = 'BALANCE_FETCHED';
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED';
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED';
 export const TRANSFER_ST1_EXECUTED = 'TRANSFER_ST1_EXECUTED';
@@ -303,16 +281,7 @@ export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
 
 export const testcoinsReceived = (serviceType, service) => {
-  // console.log("Called testcoinsReceived", new Date())
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
-};
-
-export const addressFetched = (serviceType, address) => {
-  return { type: ADDR_FETCHED, payload: { serviceType, address } };
-};
-
-export const balanceFetched = (serviceType, balances) => {
-  return { type: BALANCE_FETCHED, payload: { serviceType, balances } };
 };
 
 export const transactionsFetched = (serviceType, transactions) => {

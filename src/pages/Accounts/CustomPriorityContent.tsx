@@ -108,6 +108,8 @@ export default function CustomPriorityContent(props) {
           keyboardType={'numeric'}
           onChangeText={(value) => onCustomFeeChange(value)}
           placeholderTextColor={Colors.borderColor}
+          autoCorrect={false}
+          autoCompleteType="off"
         />
       </TouchableOpacity>
       {props.err ? (

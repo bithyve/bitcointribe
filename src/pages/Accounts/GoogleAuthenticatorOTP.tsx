@@ -125,6 +125,7 @@ const GoogleAuthenticatorOTP = props => {
                       contextMenuHidden={true}
                       autoFocus = {true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput = input;
                       }}
@@ -156,6 +157,7 @@ const GoogleAuthenticatorOTP = props => {
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput2 = input;
                       }}
@@ -187,6 +189,7 @@ const GoogleAuthenticatorOTP = props => {
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput3 = input;
                       }}
@@ -218,6 +221,7 @@ const GoogleAuthenticatorOTP = props => {
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput4 = input;
                       }}
@@ -248,6 +252,7 @@ const GoogleAuthenticatorOTP = props => {
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput5 = input;
                       }}
@@ -277,6 +282,7 @@ const GoogleAuthenticatorOTP = props => {
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
                       autoCorrect={false}
+                      autoCompleteType="off"
                       ref={input => {
                         this.textInput6 = input;
                       }}

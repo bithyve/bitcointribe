@@ -41,6 +41,7 @@ import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 import { walletCheckIn } from '../../store/actions/trustedContacts';
+import Loader from '../../components/loader';
 
 export default function ManageBackup(props) {
   const [PersonalCopyQRScannerBottomSheet] = useState(React.createRef());
@@ -59,7 +60,7 @@ export default function ManageBackup(props) {
   const [WalletBackupAndRecoveryBottomSheet] = useState(React.createRef());
   const [CommunicationModeBottomSheet] = useState(React.createRef());
   const [RegenerateShareHelperBottomSheet] = useState(React.createRef());
-
+  const [showLoader, setShowLoader] = useState(false);
   const [secondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -796,6 +797,11 @@ export default function ManageBackup(props) {
   useEffect(() => {
     setContactsFromAsync();
   }, [trustedContactsInfo]);
+
+  useEffect(() => {
+    if(healthLoading) setShowLoader(true);
+    else setShowLoader(false);
+  }, [healthLoading]);
 
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
@@ -1852,6 +1858,7 @@ export default function ManageBackup(props) {
                 })}
               </View>
             </ScrollView>
+            {showLoader ? <Loader /> : null}
             <BottomSheet
               enabledInnerScrolling={true}
               ref={WalletBackupAndRecoveryBottomSheet as any}
