@@ -264,8 +264,7 @@ export const modifyLevelStatus = (
             (levelHealthVar[2].levelInfo[2].status == 'notAccessible' ||
               levelHealthVar[2].levelInfo[3].status == 'notAccessible' ||
               levelHealthVar[2].levelInfo[4].status == 'notAccessible' ||
-              levelHealthVar[2].levelInfo[5].status == 'notAccessible') &&
-            currentLevel == 3
+              levelHealthVar[2].levelInfo[5].status == 'notAccessible')
           ) {
             levelData[2].status = 'bad';
           }
