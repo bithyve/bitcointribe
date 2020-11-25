@@ -713,9 +713,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    console.log('walletIde', this.props.s3Service.getWalletId().data.walletId)
+    //console.log('walletIde', this.props.s3Service.getWalletId().data.walletId)
     
-    console.log('this.props.fcmTokenValue', this.props.fcmTokenValue)
+    //console.log('this.props.fcmTokenValue', this.props.fcmTokenValue)
     const { navigation, s3Service, initializeHealthSetup } = this.props;
     this.closeBottomSheet();
     this.updateAccountCardData();
