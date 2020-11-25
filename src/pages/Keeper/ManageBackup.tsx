@@ -453,8 +453,7 @@ class ManageBackup extends Component<
         }
 
         if (
-          isLevel2Initialized &&
-          !isLevel3Initialized &&
+          levelInfo[2] && levelInfo[3] &&
           levelInfo[2].status == 'accessible' &&
           levelInfo[3].status == 'accessible'
         ) {
