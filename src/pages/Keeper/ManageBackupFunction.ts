@@ -41,7 +41,6 @@ export const modifyLevelStatus = (
         levelData[0].keeper1.name = 'Cloud';
         levelData[0].keeper2 = levelHealthVar[0].levelInfo[1];
         levelData[0].keeper2.name = 'Security Question';
-        console.log('ld1', levelData);
         if (
           levelHealthVar[0].levelInfo[1].updatedAt === 0 &&
           levelHealthVar[0].levelInfo[0].updatedAt === 0
@@ -85,7 +84,6 @@ export const modifyLevelStatus = (
             ? levelHealthVar[1].levelInfo[1]
             : levelHealthVar[0].levelInfo[1];
         levelData[0].keeper2.name = 'Security Question';
-        console.log('ld2', levelData);
         if (
           (levelHealthVar[0].levelInfo[1].updatedAt === 0 &&
             levelHealthVar[0].levelInfo[0].updatedAt === 0 &&
@@ -125,7 +123,6 @@ export const modifyLevelStatus = (
       if (levelHealthVar[1].levelInfo[2] && levelHealthVar[1].levelInfo[3]) {
         levelData[1].keeper1 = levelHealthVar[1].levelInfo[2];
         levelData[1].keeper2 = levelHealthVar[1].levelInfo[3];
-        console.log('ld3', levelData);
         if (
           levelHealthVar[1].levelInfo[2].updatedAt === 0 &&
           levelHealthVar[1].levelInfo[3].updatedAt === 0
@@ -168,7 +165,6 @@ export const modifyLevelStatus = (
           ? levelHealthVar[2].levelInfo[1]
           : levelHealthVar[1].levelInfo[1];
         levelData[0].keeper2.name = 'Security Question';
-        console.log('ld4', levelData);
         if (
           (levelHealthVar[2].levelInfo[1].updatedAt === 0 &&
             levelHealthVar[2].levelInfo[0].updatedAt === 0) ||
@@ -212,7 +208,6 @@ export const modifyLevelStatus = (
           currentLevel === 3
             ? levelHealthVar[2].levelInfo[3]
             : levelHealthVar[1].levelInfo[3];
-        console.log('ld5', levelData);
         if (
           (levelHealthVar[1].levelInfo[2].updatedAt == 0 &&
             levelHealthVar[1].levelInfo[3].updatedAt == 0 &&
@@ -252,7 +247,6 @@ export const modifyLevelStatus = (
       if (levelHealthVar[2].levelInfo[4] && levelHealthVar[2].levelInfo[5]) {
         levelData[2].keeper1 = levelHealthVar[2].levelInfo[4];
         levelData[2].keeper2 = levelHealthVar[2].levelInfo[5];
-        console.log('ld6', levelData);
         if (
           levelHealthVar[2].levelInfo[4].updatedAt == 0 &&
           levelHealthVar[2].levelInfo[5].updatedAt == 0
