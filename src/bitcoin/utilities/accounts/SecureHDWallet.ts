@@ -331,6 +331,7 @@ export default class SecureHDWallet extends Bitcoin {
       secondary: secondary,
       bh,
     };
+    this.receivingAddress = this.getInitialReceivingAddress();
     return this.xpubs;
   };
 
