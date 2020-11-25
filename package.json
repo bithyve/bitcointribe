@@ -26,7 +26,8 @@
     "androidStagingDebug": "ENVFILE=.env.staging react-native run-android --variant=stagingDebug --appIdSuffix=staging && yarn start",
     "androidStagingRelease": "ENVFILE=.env.staging react-native run-android --variant=stagingRelease --appIdSuffix=staging",
     "androidProductionDebug": "ENVFILE=.env.production react-native run-android --variant=productionDebug && yarn start",
-    "androidProductionRelease": "ENVFILE=.env.production react-native run-android --variant=productionRelease"
+    "androidProductionRelease": "ENVFILE=.env.production react-native run-android --variant=productionRelease",
+    "deep-clean": "yarn clear && yarn clean:node && yarn clean:ios && yarn clean:android && yarn install"
   },
   "xcodeSchemes": {
     "Debug": [

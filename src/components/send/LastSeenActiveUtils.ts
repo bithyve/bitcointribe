@@ -25,5 +25,11 @@ export function colorForLastSeenActive(lastSeenActiveTime: Milliseconds) {
 
 
 export function agoTextForLastSeen(lastSeenActiveTime: Milliseconds) {
-  return moment(lastSeenActiveTime).fromNow();
+  const daysDiff = moment(lastSeenActiveTime).diff(Date.now(), 'days');
+
+  if (daysDiff == 0) {
+    return 'today';
+  } else {
+    return moment(lastSeenActiveTime).fromNow();
+  }
 }

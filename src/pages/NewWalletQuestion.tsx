@@ -141,14 +141,8 @@ export default function NewWalletQuestion(props) {
     }
   };
 
-  const setBackspace = (event) => {
-    if (event.nativeEvent.key == 'Backspace') {
-      setTimeout(() => {
-        setAnsError('');
-        setConfirmAnswer('');
-        setConfirmAnswerMasked('');
-      }, 70);
-    }
+  const handleBackspacePress = () => {
+    setAnsError('');
   };
 
   useEffect(() => {
@@ -417,14 +411,6 @@ export default function NewWalletQuestion(props) {
                           }, 2);
                         }
                       }}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            setAnswer('');
-                            setAnswerMasked('');
-                          }, 70);
-                        }
-                      }}
                     />
                     {answer ? (
                       <TouchableWithoutFeedback
@@ -473,7 +459,9 @@ export default function NewWalletQuestion(props) {
                       editable={isEditable}
                       autoCapitalize="none"
                       onKeyPress={(event) => {
-                        setBackspace(event);
+                        if (event.nativeEvent.key == 'Backspace') {
+                          handleBackspacePress();
+                        }
                       }}
                       onChangeText={(text) => {
                         setTempAns(text);
@@ -519,8 +507,8 @@ export default function NewWalletQuestion(props) {
                   </View>
                 </View>
               ) : (
-                <View style={{ marginTop: 15 }} />
-              )}
+                  <View style={{ marginTop: 15 }} />
+                )}
               <View
                 style={{
                   marginLeft: 20,
@@ -576,8 +564,8 @@ export default function NewWalletQuestion(props) {
         </ScrollView>
         <View style={{ ...styles.bottomButtonView }}>
           {answer.trim() == confirmAnswer.trim() &&
-          confirmAnswer.trim() &&
-          answer.trim()
+            confirmAnswer.trim() &&
+            answer.trim()
             ? setButtonVisible()
             : null}
           <View style={styles.statusIndicatorView}>
@@ -600,7 +588,7 @@ export default function NewWalletQuestion(props) {
           </View>
         ) : null}
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

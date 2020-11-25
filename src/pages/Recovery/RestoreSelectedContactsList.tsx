@@ -76,7 +76,6 @@ export default function RestoreSelectedContactsList(props) {
   const isErrorReceivingFailed = useSelector(
     (state) => state.sss.errorReceiving,
   );
-  console.log('isWalletRecoveryFailed', isWalletRecoveryFailed);
 
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector((state) => state.accounts);
@@ -258,16 +257,20 @@ export default function RestoreSelectedContactsList(props) {
     return <ModalHeader />;
   }, []);
 
-  if (isWalletRecoveryFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error recovering your wallet!');
-      setErrorMessage(
-        'There was an error while recovering your wallet, please try again',
-      );
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(walletRecoveryFailed(null));
-  }
+  useEffect(() => {
+    if (isWalletRecoveryFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error recovering your wallet!');
+        setErrorMessage(
+          'There was an error while recovering your wallet (incompatible recovery shares), please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      (loaderBottomSheet as any).current.snapTo(0);
+
+      dispatch(walletRecoveryFailed(null));
+    }
+  }, [isWalletRecoveryFailed]);
 
   useEffect(() => {
     if (isErrorReceivingFailed) {
