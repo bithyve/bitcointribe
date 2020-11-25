@@ -64,7 +64,14 @@ export function makeContactRecipientDescription(
   // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
   let displayedName = data.contactName || data.displayedName;
 
-  if (displayedName == "F&F request") {
+  if (
+    [
+      "f&f request",
+      "f&f request awaiting",
+      "f & f request",
+      "f & f request awaiting",
+    ].some(placeholder => displayedName.startsWith(placeholder))
+  ) {
     displayedName = null;
   }
 
