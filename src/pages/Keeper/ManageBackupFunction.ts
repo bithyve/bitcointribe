@@ -1,3 +1,5 @@
+import { lessOrEq } from "react-native-reanimated";
+
 export const modifyLevelStatus = (
   levelData: any[],
   levelHealthVar: any[],
@@ -31,117 +33,19 @@ export const modifyLevelStatus = (
 
     // Executes when level 1 setup or complete and level 2 not initialized
     if (
-      (currentLevel == 1 || currentLevel == 0) &&
-      levelHealthVar[0] &&
-      !levelHealthVar[1] &&
-      !levelHealthVar[2]
+      (currentLevel == 1 || currentLevel == 0) && levelHealthVar[0]
     ) {
-      if (levelHealthVar[0].levelInfo[0] && levelHealthVar[0].levelInfo[1]) {
-        levelData[0].keeper1 = levelHealthVar[0].levelInfo[0];
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper2 = levelHealthVar[0].levelInfo[1];
-        levelData[0].keeper2.name = 'Security Question';
-        if (
-          levelHealthVar[0].levelInfo[1].updatedAt === 0 &&
-          levelHealthVar[0].levelInfo[0].updatedAt === 0
-        ) {
-          levelData[0].status = 'notSetup';
-        } else {
-          if (
-            levelHealthVar[0].levelInfo[1].status === 'accessible' &&
-            levelHealthVar[0].levelInfo[0].status === 'accessible'
-          ) {
-            levelData[0].status = 'good';
-          } else if (
-            levelHealthVar[0].levelInfo[1].status === 'notAccessible' ||
-            levelHealthVar[0].levelInfo[0].status === 'notAccessible'
-          ) {
-            levelData[0].status = 'bad';
-          }
-        }
-      }
+      levelData = checkLevelHealth(levelData, levelHealthVar, 0, 0);
     }
 
     // Executes when level 1 complete or level 2 in setup for completed setup and level 3 not initialized
     if (
       (currentLevel == 1 || currentLevel == 2) &&
       levelHealthVar[0] &&
-      levelHealthVar[1] &&
-      !levelHealthVar[2]
+      levelHealthVar[1]
     ) {
       // if level 2 complete then change level 1 share data with level 2 share data at for cloud and security question
-      if (
-        (levelHealthVar[0].levelInfo[0] && levelHealthVar[0].levelInfo[1]) ||
-        (levelHealthVar[1].levelInfo[0] && levelHealthVar[1].levelInfo[1])
-      ) {
-        levelData[0].keeper1 =
-          currentLevel === 2
-            ? levelHealthVar[1].levelInfo[0]
-            : levelHealthVar[0].levelInfo[0];
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper2 =
-          currentLevel === 2
-            ? levelHealthVar[1].levelInfo[1]
-            : levelHealthVar[0].levelInfo[1];
-        levelData[0].keeper2.name = 'Security Question';
-        if (
-          (levelHealthVar[0].levelInfo[1].updatedAt === 0 &&
-            levelHealthVar[0].levelInfo[0].updatedAt === 0 &&
-            currentLevel === 1) ||
-          (levelHealthVar[1].levelInfo[1].updatedAt === 0 &&
-            levelHealthVar[1].levelInfo[0].updatedAt === 0 &&
-            currentLevel === 2)
-        ) {
-          levelData[0].status = 'notSetup';
-        } else {
-          if (
-            (levelHealthVar[0].levelInfo[1].status === 'accessible' &&
-              levelHealthVar[0].levelInfo[0].status === 'accessible' &&
-              currentLevel === 1) ||
-            (levelHealthVar[1].levelInfo[1].status === 'accessible' &&
-              levelHealthVar[1].levelInfo[0].status === 'accessible' &&
-              currentLevel === 2)
-          ) {
-            levelData[0].status = 'good';
-          } else if (
-            (levelHealthVar[0].levelInfo[1].status === 'notAccessible' ||
-              levelHealthVar[0].levelInfo[0].status === 'notAccessible') &&
-            currentLevel === 1
-          ) {
-            levelData[0].status = 'bad';
-          } else if (
-            (levelHealthVar[1].levelInfo[1].status === 'notAccessible' ||
-              levelHealthVar[1].levelInfo[0].status === 'notAccessible') &&
-            currentLevel === 2
-          ) {
-            levelData[0].status = 'bad';
-          }
-        }
-      }
-
-      // assigning level 2 share data
-      if (levelHealthVar[1].levelInfo[2] && levelHealthVar[1].levelInfo[3]) {
-        levelData[1].keeper1 = levelHealthVar[1].levelInfo[2];
-        levelData[1].keeper2 = levelHealthVar[1].levelInfo[3];
-        if (
-          levelHealthVar[1].levelInfo[2].updatedAt === 0 &&
-          levelHealthVar[1].levelInfo[3].updatedAt === 0
-        ) {
-          levelData[1].status = 'notSetup';
-        } else {
-          if (
-            levelHealthVar[1].levelInfo[2].status === 'accessible' &&
-            levelHealthVar[1].levelInfo[3].status === 'accessible'
-          ) {
-            levelData[1].status = 'good';
-          } else if (
-            levelHealthVar[1].levelInfo[2].status === 'notAccessible' ||
-            levelHealthVar[1].levelInfo[3].status === 'notAccessible'
-          ) {
-            levelData[1].status = 'bad';
-          }
-        }
-      }
+      levelData = checkLevelHealth(levelData, levelHealthVar, 1, 2);
     }
 
     // Executes when level 2 complete or level 3 in setup for completed setup
@@ -152,124 +56,7 @@ export const modifyLevelStatus = (
       levelHealthVar[2]
     ) {
       // if level 3 complete then change level 2 share data with level 3 share data at for cloud and security question
-      if (
-        (levelHealthVar[1].levelInfo[0] && levelHealthVar[1].levelInfo[1]) ||
-        (levelHealthVar[2].levelInfo[0] && levelHealthVar[2].levelInfo[1])
-      ) {
-        levelData[0].keeper1 =
-          currentLevel === 3
-            ? levelHealthVar[2].levelInfo[0]
-            : levelHealthVar[1].levelInfo[0];
-        levelData[0].keeper1.name = 'Cloud';
-        levelData[0].keeper2 = levelHealthVar[2].levelInfo[1]
-          ? levelHealthVar[2].levelInfo[1]
-          : levelHealthVar[1].levelInfo[1];
-        levelData[0].keeper2.name = 'Security Question';
-        if (
-          (levelHealthVar[2].levelInfo[1].updatedAt === 0 &&
-            levelHealthVar[2].levelInfo[0].updatedAt === 0) ||
-          (levelHealthVar[1].levelInfo[1].updatedAt === 0 &&
-            levelHealthVar[1].levelInfo[0].updatedAt === 0)
-        ) {
-          levelData[0].status = 'notSetup';
-        } else {
-          if (
-            (levelHealthVar[2].levelInfo[1].status === 'accessible' &&
-              levelHealthVar[2].levelInfo[0].status === 'accessible' &&
-              currentLevel === 3) ||
-            (levelHealthVar[1].levelInfo[1].status === 'accessible' &&
-              levelHealthVar[1].levelInfo[0].status === 'accessible' &&
-              currentLevel === 2)
-          ) {
-            levelData[0].status = 'good';
-          } else if (
-            ((levelHealthVar[2].levelInfo[1].status === 'notAccessible' ||
-              levelHealthVar[2].levelInfo[0].status === 'notAccessible') &&
-              currentLevel === 3) ||
-            ((levelHealthVar[1].levelInfo[1].status === 'notAccessible' ||
-              levelHealthVar[1].levelInfo[0].status === 'notAccessible') &&
-              currentLevel === 2)
-          ) {
-            levelData[0].status = 'bad';
-          }
-        }
-      }
-
-      // if level 3 complete then change level 2 share data with level 3 share data at for 1st and 2nd keeper
-      if (
-        (levelHealthVar[1].levelInfo[2] && levelHealthVar[1].levelInfo[3]) ||
-        (levelHealthVar[2].levelInfo[2] && levelHealthVar[2].levelInfo[3])
-      ) {
-        levelData[1].keeper1 =
-          currentLevel === 3
-            ? levelHealthVar[2].levelInfo[2]
-            : levelHealthVar[1].levelInfo[2];
-        levelData[1].keeper2 =
-          currentLevel === 3
-            ? levelHealthVar[2].levelInfo[3]
-            : levelHealthVar[1].levelInfo[3];
-        if (
-          (levelHealthVar[1].levelInfo[2].updatedAt == 0 &&
-            levelHealthVar[1].levelInfo[3].updatedAt == 0 &&
-            currentLevel == 2) ||
-          (levelHealthVar[2].levelInfo[2].updatedAt == 0 &&
-            levelHealthVar[2].levelInfo[3].updatedAt == 0 &&
-            currentLevel == 3)
-        ) {
-          levelData[1].status = 'notSetup';
-        } else {
-          if (
-            (levelHealthVar[1].levelInfo[2].status == 'accessible' &&
-              levelHealthVar[1].levelInfo[3].status == 'accessible' &&
-              currentLevel == 2) ||
-            (levelHealthVar[2].levelInfo[2].status == 'accessible' &&
-              levelHealthVar[2].levelInfo[3].status == 'accessible' &&
-              currentLevel == 3)
-          ) {
-            levelData[1].status = 'good';
-          } else if (
-            (levelHealthVar[1].levelInfo[2].status == 'notAccessible' ||
-              levelHealthVar[1].levelInfo[3].status == 'notAccessible') &&
-            currentLevel == 2
-          ) {
-            levelData[1].status = 'bad';
-          } else if (
-            (levelHealthVar[2].levelInfo[2].status == 'notAccessible' ||
-              levelHealthVar[2].levelInfo[3].status == 'notAccessible') &&
-            currentLevel == 3
-          ) {
-            levelData[1].status = 'bad';
-          }
-        }
-      }
-
-      // assign level 3 data
-      if (levelHealthVar[2].levelInfo[4] && levelHealthVar[2].levelInfo[5]) {
-        levelData[2].keeper1 = levelHealthVar[2].levelInfo[4];
-        levelData[2].keeper2 = levelHealthVar[2].levelInfo[5];
-        if (
-          levelHealthVar[2].levelInfo[4].updatedAt == 0 &&
-          levelHealthVar[2].levelInfo[5].updatedAt == 0
-        ) {
-          levelData[2].status = 'notSetup';
-        } else {
-          if (
-            levelHealthVar[2].levelInfo[2].status == 'accessible' &&
-            levelHealthVar[2].levelInfo[3].status == 'accessible' &&
-            levelHealthVar[2].levelInfo[4].status == 'accessible' &&
-            levelHealthVar[2].levelInfo[5].status == 'accessible'
-          ) {
-            levelData[2].status = 'good';
-          } else if (
-            (levelHealthVar[2].levelInfo[2].status == 'notAccessible' ||
-              levelHealthVar[2].levelInfo[3].status == 'notAccessible' ||
-              levelHealthVar[2].levelInfo[4].status == 'notAccessible' ||
-              levelHealthVar[2].levelInfo[5].status == 'notAccessible')
-          ) {
-            levelData[2].status = 'bad';
-          }
-        }
-      }
+      levelData = checkLevelHealth(levelData, levelHealthVar, 2, 4);
     }
   }
   if (levelData.findIndex((value) => value.status == 'bad') > -1) {
@@ -279,3 +66,69 @@ export const modifyLevelStatus = (
   console.log('levelData managebackupfunctions', levelData);
   return { levelData, isError };
 };
+
+const checkLevelHealth = (
+  levelData: any[],
+  levelHealthVar: any[],
+  index: number,
+  index2: number,
+) => {
+  if (
+    levelHealthVar[index].levelInfo[index2].updatedAt === 0 &&
+    levelHealthVar[index].levelInfo[index2 + 1].updatedAt === 0
+  ) {
+    levelData[index].status = 'notSetup';
+    return levelData;
+  }
+  else {
+    const status = checkStatus(levelHealthVar, index, index2);
+    let levelIndex = status === 'good' ? index : (index !== 0 ? index - 1 : 0);
+    if (index + 1 === 1 || index === 1 || index - 1 === 1) {
+      levelData[0].keeper1 = levelHealthVar[levelIndex].levelInfo[0];
+      levelData[0].keeper1.name = 'Cloud';
+      levelData[0].keeper2 = levelHealthVar[levelIndex].levelInfo[1];
+      levelData[0].keeper2.name = 'Security Question';
+      levelData[0].status = checkStatus(levelHealthVar, levelIndex, 0);
+    }
+    if (index + 1 === 2 || index === 2) {
+      if (levelIndex === 2) {
+        levelData[1].keeper1 = levelHealthVar[levelIndex - 1].levelInfo[2];
+        levelData[1].keeper1.shareId = levelHealthVar[levelIndex].levelInfo[2].shareId;
+        levelData[1].keeper1.status = levelHealthVar[levelIndex].levelInfo[2].status;
+        levelData[1].keeper2 = levelHealthVar[levelIndex - 1].levelInfo[3];
+        levelData[1].keeper2.shareId = levelHealthVar[levelIndex].levelInfo[3].shareId;
+        levelData[1].keeper2.status = levelHealthVar[levelIndex].levelInfo[3].status;
+      } else {
+        levelData[1].keeper1 = levelHealthVar[levelIndex].levelInfo[2];
+        levelData[1].keeper2 = levelHealthVar[levelIndex].levelInfo[3];
+      }
+      levelData[1].status = checkStatus(levelHealthVar, levelIndex, 2);
+
+    }
+    if (index + 1 === 3) {
+      levelData[2].keeper1 = levelHealthVar[2].levelInfo[4];
+      levelData[2].keeper2 = levelHealthVar[2].levelInfo[5];
+      levelData[2].status = checkStatus(levelHealthVar, 2, 4);
+    }
+  }
+  return levelData;
+}
+
+const checkStatus = (
+  levelHealthVar: any[],
+  index: number,
+  index2: number,
+) => {
+  if (
+    levelHealthVar[index].levelInfo[index2].status === 'accessible' &&
+    levelHealthVar[index].levelInfo[index2 + 1].status === 'accessible'
+  ) {
+    return 'good';
+  } else if (
+    levelHealthVar[index].levelInfo[index2].status === 'notAccessible' ||
+    levelHealthVar[index].levelInfo[index2 + 1].status === 'notAccessible'
+  ) {
+    return 'bad';
+  }
+}
+
