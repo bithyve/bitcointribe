@@ -31,8 +31,7 @@ export const modifyLevelStatus = (
 
     // Executes when level 1 setup or complete and level 2 not initialized
     if (
-      (currentLevel == 1 || currentLevel == 0) && levelHealthVar[0] &&
-      !levelHealthVar[1]
+      (currentLevel == 1 || currentLevel == 0) && levelHealthVar[0]
     ) {
       levelData = checkLevelHealth(levelData, levelHealthVar, 0, 0);
     }
@@ -41,8 +40,7 @@ export const modifyLevelStatus = (
     if (
       (currentLevel == 1 || currentLevel == 2) &&
       levelHealthVar[0] &&
-      levelHealthVar[1] &&
-      !levelHealthVar[2]
+      levelHealthVar[1]
     ) {
       // if level 2 complete then change level 1 share data with level 2 share data at for cloud and security question
       levelData = checkLevelHealth(levelData, levelHealthVar, 1, 2);
