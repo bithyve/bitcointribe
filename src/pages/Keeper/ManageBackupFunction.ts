@@ -97,7 +97,11 @@ const checkLevelHealth = (
         levelData[1].keeper2 = levelHealthVar[levelIndex - 1].levelInfo[3];
         levelData[1].keeper2.shareId = levelHealthVar[levelIndex].levelInfo[3].shareId;
         levelData[1].keeper2.status = levelHealthVar[levelIndex].levelInfo[3].status;
-      } else {
+      } else if(levelIndex === 1) {
+        levelData[1].keeper1 = levelHealthVar[levelIndex].levelInfo[2];
+        levelData[1].keeper2 = levelHealthVar[levelIndex].levelInfo[3];
+      }
+      else{
         levelData[1].keeper1 = levelHealthVar[index].levelInfo[2];
         levelData[1].keeper2 = levelHealthVar[index].levelInfo[3];
       }
