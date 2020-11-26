@@ -60,9 +60,6 @@ export const modifyLevelStatus = (
   if (levelData.findIndex((value) => value.status == 'bad') > -1) {
     isError = true;
   }
-  console.log('levelHealthVar managebackupfunctions', currentLevel);
-  console.log('levelHealthVar managebackupfunctions', levelHealthVar);
-  console.log('levelData managebackupfunctions', levelData);
   return { levelData, isError };
 };
 
@@ -90,22 +87,19 @@ const checkLevelHealth = (
       levelData[0].status = checkStatus(levelHealthVar, levelIndex, 0);
     }
     if (index + 1 === 2 || index === 2) {
-      if (levelIndex === 2) {
+     if (levelIndex === 2) {
         levelData[1].keeper1 = levelHealthVar[levelIndex - 1].levelInfo[2];
         levelData[1].keeper1.shareId = levelHealthVar[levelIndex].levelInfo[2].shareId;
         levelData[1].keeper1.status = levelHealthVar[levelIndex].levelInfo[2].status;
         levelData[1].keeper2 = levelHealthVar[levelIndex - 1].levelInfo[3];
         levelData[1].keeper2.shareId = levelHealthVar[levelIndex].levelInfo[3].shareId;
         levelData[1].keeper2.status = levelHealthVar[levelIndex].levelInfo[3].status;
+        levelData[1].status = checkStatus(levelHealthVar, index, 2);
       } else if(levelIndex === 1) {
         levelData[1].keeper1 = levelHealthVar[levelIndex].levelInfo[2];
         levelData[1].keeper2 = levelHealthVar[levelIndex].levelInfo[3];
+        levelData[1].status = checkStatus(levelHealthVar, levelIndex, 2);
       }
-      else{
-        levelData[1].keeper1 = levelHealthVar[index].levelInfo[2];
-        levelData[1].keeper2 = levelHealthVar[index].levelInfo[3];
-      }
-      levelData[1].status = checkStatus(levelHealthVar, index, 2);
     }
     if (index + 1 === 3) {
       levelData[2].keeper1 = levelHealthVar[2].levelInfo[4];
