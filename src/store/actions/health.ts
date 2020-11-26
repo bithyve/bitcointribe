@@ -217,6 +217,7 @@ export const switchS3LoaderKeeper = (beingLoaded) => {
 };
 
 export const uploadEncMShareKeeper = (
+  index: number,
   shareId: string,
   contactInfo: { contactName: string; info: string },
   data: EphemeralDataElements,
@@ -226,6 +227,7 @@ export const uploadEncMShareKeeper = (
   return {
     type: UPLOAD_ENC_MSHARE_KEEPER,
     payload: {
+      index,
       shareId,
       contactInfo,
       data,

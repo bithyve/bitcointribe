@@ -404,7 +404,7 @@ class ManageBackup extends Component<
         updatedAt: 0,
         shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
         data: {},
-      }
+      };
       console.log('obj', obj);
       this.setState({
         selectedKeeper: obj,
@@ -453,7 +453,8 @@ class ManageBackup extends Component<
         }
 
         if (
-          levelInfo[2] && levelInfo[3] &&
+          levelInfo[2] &&
+          levelInfo[3] &&
           levelInfo[2].status == 'accessible' &&
           levelInfo[3].status == 'accessible'
         ) {
@@ -471,24 +472,69 @@ class ManageBackup extends Component<
   };
 
   goToHistory = (value) => {
-    let { shareType, keeperStatus, name, shareId, updatedAt, id } = value;
+    let {
+      shareType,
+      keeperStatus,
+      name,
+      updatedAt,
+      id,
+      selectedKeeper,
+      isSetup
+    } = value;
     let navigationParams = {
       selectedTime: updatedAt ? this.getTime(updatedAt) : 'never',
       selectedStatus: keeperStatus,
       selectedTitle: name,
       isPrimaryKeeper: this.state.isPrimaryKeeper,
-      selectedShareId: shareId,
       selectedLevelId: id,
-      selectedContact: this.state.selectedKeeper.data,
-      selectedKeeper: this.state.selectedKeeper,
+      selectedContact: selectedKeeper.data,
+      selectedKeeper,
     };
     if (shareType == 'device' || shareType == 'primaryKeeper') {
       this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
     } else if (shareType == 'contact') {
-      this.props.navigation.navigate(
-        'TrustedContactHistoryKeeper',
-        navigationParams,
+      let index = 1;
+      let contactIndex = this.state.levelData.findIndex(
+        (value) =>
+          value.keeper1.shareType == 'contact' ||
+          value.keeper2.shareType == 'contact',
       );
+      let count = 0;
+      for (let i = 0; i < this.state.levelData.length; i++) {
+        const element = this.state.levelData[i];
+        if(element.keeper1.shareType == 'contact') count ++;
+        if(element.keeper2.shareType == 'contact') count ++;
+      }
+      console.log('count', count)
+      if(count == 1 && isSetup) index = 2;
+      else if(count == 0 && isSetup) index = 1;
+      else{
+        if (contactIndex == -1) index = 1;
+        else {
+          let idxTmp = 0;
+          for (let i = 0; i < this.state.levelData.length; i++) {
+            const element = this.state.levelData[i];
+            if (element.keeper1.shareType == 'contact') {
+              idxTmp++;
+            }
+            if (element.keeper1.shareType == 'contact' && element.keeper1.shareId == selectedKeeper.shareId) {
+              break;
+            }
+            if (element.keeper2.shareType == 'contact') {
+              idxTmp++;
+            }
+            if (element.keeper2.shareType == 'contact' && element.keeper2.shareId == selectedKeeper.shareId) {
+              break;
+            }
+          }
+          index = idxTmp;
+        }
+      }
+      console.log('ContactIndex', index);
+      this.props.navigation.navigate('TrustedContactHistoryKeeper', {
+        ...navigationParams,
+        index,
+      });
     } else if (shareType) {
       this.props.navigation.navigate(
         'PersonalCopyHistoryKeeper',
@@ -498,9 +544,19 @@ class ManageBackup extends Component<
   };
 
   sendApprovalRequestToPK = () => {
-    let { levelHealth, currentLevel, sendApprovalRequest, onApprovalStatusChange } = this.props;
-    let PKShareId = currentLevel == 2 || currentLevel == 1 ? levelHealth[1].levelInfo[2].shareId : currentLevel == 3 ? levelHealth[2].levelInfo[2].shareId : levelHealth[1].levelInfo[2].shareId;
-    
+    let {
+      levelHealth,
+      currentLevel,
+      sendApprovalRequest,
+      onApprovalStatusChange,
+    } = this.props;
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : currentLevel == 3
+        ? levelHealth[2].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+
     sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
@@ -533,6 +589,8 @@ class ManageBackup extends Component<
         shareId: keeper.shareId,
         updatedAt: keeper.updatedAt,
         id: value.id,
+        selectedKeeper: keeper,
+        isSetup: false
       };
       this.goToHistory(obj);
       return;
@@ -1116,10 +1174,12 @@ class ManageBackup extends Component<
                   this.props.currentLevel == 2
                 ) {
                   await this.props.generateMetaShare(selectedLevelId);
-                } else if(this.props.currentLevel == 1 && selectedLevelId == 3){
+                } else if (
+                  this.props.currentLevel == 1 &&
+                  selectedLevelId == 3
+                ) {
                   alert('Complete Level 2');
-                }
-                 else {
+                } else {
                   this.sendApprovalRequestToPK();
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
                 }
@@ -1177,9 +1237,9 @@ class ManageBackup extends Component<
                   selectedTitle: 'Primary Keeper',
                   isPrimaryKeeper: true,
                   isSetUp: true,
-                  selectedShareId: selectedKeeper.shareId,
                   selectedLevelId,
-                  selectedContact: this.state.selectedKeeper.data,
+                  selectedContact: selectedKeeper.data,
+                  selectedKeeper: selectedKeeper,
                 };
                 this.props.navigation.navigate(
                   'KeeperDeviceHistory',
@@ -1210,8 +1270,7 @@ class ManageBackup extends Component<
               isContinueDisabled={
                 selectedKeeperType == 'pdf'
                   ? !keeperApproveStatus.status
-                  : 
-                  false
+                  : false
               }
               onPressContinue={() => {
                 let {
@@ -1235,6 +1294,8 @@ class ManageBackup extends Component<
                     ? selectedKeeper.updatedAt
                     : 0,
                   id: selectedLevelId,
+                  selectedKeeper: selectedKeeper,
+                  isSetup: true
                 };
                 this.goToHistory(obj);
               }}
