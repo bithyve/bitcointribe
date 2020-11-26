@@ -89,9 +89,6 @@ const PersonalCopyHistory = (props) => {
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
     props.navigation.state.params.isPrimaryKeeper,
   );
-  const [selectedShareId, setSelectedShareId] = useState(
-    props.navigation.state.params.selectedShareId,
-  );
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.navigation.state.params.selectedLevelId,
   );
@@ -108,7 +105,6 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
-    setSelectedShareId(props.navigation.state.params.selectedShareId);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
@@ -117,7 +113,6 @@ const PersonalCopyHistory = (props) => {
         : true,
     );
   }, [
-    props.navigation.state.params.selectedShareId,
     props.navigation.state.params.selectedLevelId,
     props.navigation.state.params.isPrimaryKeeper,
     props.navigation.state.params.selectedKeeper,

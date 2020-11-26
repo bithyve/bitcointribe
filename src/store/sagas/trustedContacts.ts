@@ -879,7 +879,7 @@ function* walletCheckInWorker({ payload }) {
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
-  let s3Service: S3Service = yield select((state) => state.levelhealth.service);
+  let s3Service: S3Service = yield select((state) => state.health.service);
 
   const storedExchangeRates = yield select(
     (state) => state.accounts.exchangeRates,
@@ -906,6 +906,7 @@ function* walletCheckInWorker({ payload }) {
   }
 
     const { metaShares, healthCheckStatus } = s3Service.levelhealth; // Fixing error old code is => s3Service.sss
+    console.log("metaShares, healthCheckStatus",metaShares, healthCheckStatus);
     const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
   yield put(switchTCLoading('walletCheckIn'));
   console.log('Wallet Check-In in progress...');

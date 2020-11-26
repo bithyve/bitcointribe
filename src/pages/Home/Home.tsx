@@ -713,9 +713,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    console.log('walletIde', this.props.s3Service.getWalletId().data.walletId)
-    
-    console.log('this.props.fcmTokenValue', this.props.fcmTokenValue)
     const { navigation, s3Service, initializeHealthSetup } = this.props;
     this.closeBottomSheet();
     this.updateAccountCardData();
@@ -974,7 +971,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
     ) {
-      console.log('testing that it is also on managebackup from home')
       this.setupNotificationList();
     }
 

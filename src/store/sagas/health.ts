@@ -1114,6 +1114,7 @@ export const fetchWalletImageHealthWatcher = createWatcher(
 function* uploadEncMetaShareKeeperWorker({ payload }) {
   // Transfer: User >>> Guardian
   yield put(switchS3LoaderKeeper('uploadMetaShare'));
+  let { index } = payload;
 
   const s3Service: S3Service = yield select((state) => state.health.service);
   if (!s3Service.levelhealth.metaShares.length) return;
@@ -1163,10 +1164,10 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     }
   } else {
     // preventing re-uploads till expiry
-    if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareIndex]) {
+    if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[index]) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareIndex].UPLOADED_AT <
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[index].UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -1220,7 +1221,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [shareIndex]: {
+        [index]: {
           OTP: otp,
           ENCRYPTED_KEY: encryptedKey,
           UPLOADED_AT: Date.now(),
@@ -1503,10 +1504,7 @@ function* uploadPdfShareWorker({ payload }) {
     let s3ServiceSecure: SecureAccount = yield select(
       (state) => state.accounts[SECURE_ACCOUNT].service,
     );
-    // All acoount Xpubs
-    let testXpub = s3ServiceTest.hdWallet.getTestXPub();
-    let regularXpub = s3ServiceRegular.hdWallet.getXpub();
-    let secureXpub = s3ServiceSecure.getXpubsForAccount();
+    
 
     // let encKey;
     // if (ScannedData.uuid) encKey = LevelHealth.strechKey(ScannedData.uuid);
@@ -1566,26 +1564,25 @@ function* uploadPdfShareWorker({ payload }) {
     //   console.log('updateEphemeralChannel saga res', res);
     //   if (res.status == 200) {
     //     // Create trusted channel
-    //     const data: TrustedDataElements = {
-    //       xPub: { testXpub, regularXpub, secureXpub: secureXpub },
-    //       walletID,
-    //       FCM: fcmTokenValue,
-    //       walletName: ScannedData.walletName,
-    //       version: DeviceInfo.getVersion(),
-    //       shareTransferDetails: {
-    //         otp,
-    //         encryptedKey,
-    //       },
-    //       isPrimary: isPrimaryKeeper,
-    //       featuresList,
-    //       securityQuestion,
-    //     };
-    //     const updateRes = yield call(
-    //       keeper.updateTrustedChannel,
-    //       share.shareId,
-    //       data,
-    //       false,
-    //     );
+        // const data: TrustedDataElements = {
+        //   walletID,
+        //   // FCM: fcmTokenValue,
+        //   walletName: ScannedData.walletName,
+        //   version: DeviceInfo.getVersion(),
+        //   shareTransferDetails: {
+        //     otp,
+        //     encryptedKey,
+        //   },
+        //   // isPrimary: isPrimaryKeeper,
+        //   // featuresList,
+        //   securityQuestion,
+        // };
+        // const updateRes = yield call(
+        //   keeper.updateTrustedChannel,
+        //   share.shareId,
+        //   data,
+        //   false,
+        // );
     //     if (updateRes.status == 200) {
     //       const updatedSERVICES = {
     //         ...SERVICES,

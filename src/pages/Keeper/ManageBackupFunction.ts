@@ -1,5 +1,3 @@
-import { lessOrEq } from "react-native-reanimated";
-
 export const modifyLevelStatus = (
   levelData: any[],
   levelHealthVar: any[],
@@ -62,6 +60,7 @@ export const modifyLevelStatus = (
   if (levelData.findIndex((value) => value.status == 'bad') > -1) {
     isError = true;
   }
+  console.log('levelHealthVar managebackupfunctions', currentLevel);
   console.log('levelHealthVar managebackupfunctions', levelHealthVar);
   console.log('levelData managebackupfunctions', levelData);
   return { levelData, isError };

@@ -215,8 +215,10 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getInitialReceivingAddress = (): string => {
-    if (this.xpubs) return this.createSecureMultiSig(0).address;
-  };
+    if (this.xpubs) {
+      return this.createSecureMultiSig(0).address;
+    }
+    };
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
@@ -325,13 +327,15 @@ export default class SecureHDWallet extends Bitcoin {
     secondary?: string;
     bh?: string;
   } => {
-
-    this.xpubs = {
+     this.xpubs = {
       ...this.xpubs,
       secondary: secondary,
       bh,
     };
-    this.receivingAddress = this.getInitialReceivingAddress();
+    
+    this.receivingAddress = this.createSecureMultiSig(
+      this.nextFreeAddressIndex,
+    ).address;
     return this.xpubs;
   };
 
@@ -1920,7 +1924,7 @@ export default class SecureHDWallet extends Bitcoin {
       // }
 
       this.xpubs = { ...this.xpubs, primary: primaryXpub };
-
+        console.log("this.xpubs prepareSecureAccount2",this.xpubs);
       return {
         prepared: true,
       };
@@ -2166,6 +2170,8 @@ export default class SecureHDWallet extends Bitcoin {
     address: string;
   } => {
     let childPrimaryPub;
+    let childRecoveryPub;
+    let childBHPub;
     if (!derivativeXpub)
       childPrimaryPub = this.getPub(
         this.derivePrimaryChildXKey(this.xpubs.primary, childIndex, internal),
@@ -2174,35 +2180,38 @@ export default class SecureHDWallet extends Bitcoin {
       childPrimaryPub = this.getPub(
         this.deriveDerivativeChildXKey(derivativeXpub, childIndex, internal),
       );
-
-    // const childRecoveryPub = this.getPub(
-    //   this.deriveChildXKey(this.xpubs.secondary, childIndex),
-    // );
-    // const childBHPub = this.getPub(
-    //   this.deriveChildXKey(this.xpubs.bh, childIndex),
-    // );
+if(this.xpubs.secondary && this.xpubs.bh){
+    childRecoveryPub = this.getPub(
+      this.deriveChildXKey(this.xpubs.secondary, childIndex),
+    );
+    childBHPub = this.getPub(
+      this.deriveChildXKey(this.xpubs.bh, childIndex),
+    );
+  
 
     // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
     // for generating ga_recovery based recoverable multiSigs
-    // const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
+     const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
     // // console.log({ pubs });
-    // const multiSig = this.generateMultiSig(2, pubs);
+     const multiSig = this.generateMultiSig(2, pubs);
 
     const construct = {
       scripts: {
-        redeem: '',
-        witness: '',
+        redeem: multiSig.p2sh.redeem.output.toString('hex'),
+        witness: multiSig.p2wsh.redeem.output.toString('hex'),
       },
-      address: '',
-      // scripts: {
-      //   redeem: multiSig.p2sh.redeem.output.toString('hex'),
-      //   witness: multiSig.p2wsh.redeem.output.toString('hex'),
-      // },
-      // address: multiSig.address,
+      address: multiSig.address,
     };
 
     return construct;
-  };
+  }
+  return {
+    scripts: {
+    redeem: '',
+    witness: '',
+  },
+  address: ''}
+  }
 
   private generateKey = (psuedoKey: string): string => {
     const hashRounds = 5048;

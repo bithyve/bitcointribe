@@ -27,6 +27,7 @@ import _ from 'underscore';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendApprovalRequest } from '../../store/actions/health';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
+import { notificationType } from '../../bitcoin/utilities/Interface';
 
 const KeeperDeviceHistory = (props) => {
   const dispatch = useDispatch();
@@ -89,9 +90,6 @@ const KeeperDeviceHistory = (props) => {
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
     props.navigation.state.params.isPrimaryKeeper,
   );
-  const [selectedShareId, setSelectedShareId] = useState(
-    props.navigation.state.params.selectedShareId,
-  );
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.navigation.state.params.selectedLevelId,
   );
@@ -108,7 +106,6 @@ const KeeperDeviceHistory = (props) => {
 
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
-    setSelectedShareId(props.navigation.state.params.selectedShareId);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
@@ -117,7 +114,6 @@ const KeeperDeviceHistory = (props) => {
         : true,
     );
   }, [
-    props.navigation.state.params.selectedShareId,
     props.navigation.state.params.selectedLevelId,
     props.navigation.state.params.isPrimaryKeeper,
     props.navigation.state.params.selectedKeeper,
@@ -214,7 +210,7 @@ const KeeperDeviceHistory = (props) => {
                 isReshare,
                 qrScannedData: qrData,
                 isPrimaryKeeper: isPrimaryKeeper,
-                selectedShareId: selectedShareId,
+                selectedShareId: selectedKeeper.shareId,
                 selectedLevelId
               });
               (QrBottomSheet as any).current.snapTo(0);
@@ -235,14 +231,16 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          // {uuid: "92a0e2795e4c15457132b4c8", publicKey: "4b27442515663b9c0ca010d1a115c90964cb5a337c7eb226cc21135372df53b7", privateKey: "06775349cac054531aa02a8838f3594412c6a22b71276c8156077e4c09233a73", ephemeralAddress: "6a0742396fc552374a5992547ae905e97bf238ce86e11ce1e0a6e1eb91877006", isSignUp: true, …}
-          let qrScannedData =
-            '{"uuid":"92a0e2795e4c15457132b4c8","publicKey": "4b27442515663b9c0ca010d1a115c90964cb5a337c7eb226cc21135372df53b7","ephemeralAddress": "6a0742396fc552374a5992547ae905e97bf238ce86e11ce1e0a6e1eb91877006","walletName":"Sam"}';
+          // {uuid: "49c33c31d647e83eabc8f820", publicKey: "65abf583924eeaf11095d7079977fd0b0774f462e22460975048bfd02ebc84f5", privateKey: "0a24e05d1c8b40f08657f695a58d5681a72e2ca7367c302d6e7414d349b9e3ee", ephemeralAddress: "ce6c7ac1637cc5286f8312b20182ec4238a40699842a061641ef9cf6011e11c4", isSignUp: true, …}
+          let qrScannedData = isPrimaryKeeper ?
+            '{"uuid":"f9e2309af828c73867858da6","publicKey": "5bff353bba9a545842c8f889cb2ee748b96e397f4ea4b839bf678ad042f03346","ephemeralAddress": "e90337892695b31607617bd874e6db801c5e703f873aab367b0f3d8579e94169","walletName":"Primary"}' :
+            '{"uuid":"49c33c31d647e83eabc8f820","publicKey": "65abf583924eeaf11095d7079977fd0b0774f462e22460975048bfd02ebc84f5","ephemeralAddress": "ce6c7ac1637cc5286f8312b20182ec4238a40699842a061641ef9cf6011e11c4","walletName":"Secondary"}';
+            console.log('qrScannedData', qrScannedData)
           props.navigation.navigate('KeeperFeatures', {
             isReshare,
             qrScannedData,
             isPrimaryKeeper: isPrimaryKeeper,
-            selectedShareId: selectedShareId,
+            selectedShareId: selectedKeeper.shareId,
             selectedLevelId: selectedLevelId,
           });
         }}
@@ -291,7 +289,7 @@ const KeeperDeviceHistory = (props) => {
       let PKShareId;
       if (currentLevel == 2) PKShareId = levelHealth[1].levelInfo[2].shareId;
       if (currentLevel == 3) PKShareId = levelHealth[2].levelInfo[2].shareId;
-      dispatch(sendApprovalRequest(selectedShareId, PKShareId));
+      dispatch(sendApprovalRequest(selectedKeeper.shareId, PKShareId, notificationType.approveKeeper));
       (ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
     }
   };
@@ -394,7 +392,7 @@ const KeeperDeviceHistory = (props) => {
                 isReshare,
                 qrScannedData,
                 isPrimaryKeeper: isPrimaryKeeper,
-                selectedShareId: selectedShareId,
+                selectedShareId: selectedKeeper.shareId,
               });
             }}
           />
