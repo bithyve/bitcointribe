@@ -712,6 +712,7 @@ export default class BaseAccount {
         data?: undefined;
       }
   > => {
+    let executed = 'tx-init';
     try {
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
@@ -720,6 +721,7 @@ export default class BaseAccount {
         derivativeAccountDetails,
         nSequence,
       );
+      executed = 'tx-creation';
 
       let inputs;
       if (txnPriority === 'custom' && customTxPrerequisites) {
@@ -727,19 +729,23 @@ export default class BaseAccount {
       } else {
         inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
       }
-
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       // console.log('---- Transaction Signed ----');
+      executed = 'tx-signing';
 
       const txHex = signedTxb.build().toHex();
       // console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
+      executed = 'tx-broadcast';
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
-
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
-      return { status: 107, err: err.message, message: ErrMap[107] };
+      return {
+        status: 107,
+        err: err.message + `(failed post: ${executed})`,
+        message: ErrMap[107],
+      };
     }
   };
 }

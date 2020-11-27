@@ -59,7 +59,11 @@ import RadioButton from '../../../components/RadioButton';
 import CustomPriorityContent from '../CustomPriorityContent';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import Loader from '../../../components/loader';
-import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../../common/data/models/interfaces/RecipientDescribing';
+import {
+  RecipientDescribing,
+  makeSubAccountRecipientDescription,
+  makeContactRecipientDescription,
+} from '../../../common/data/models/interfaces/RecipientDescribing';
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
@@ -150,7 +154,7 @@ class SendConfirmation extends Component<
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
       ),
-      showLoader: false
+      showLoader: false,
     };
   }
 
@@ -277,7 +281,7 @@ class SendConfirmation extends Component<
               : false,
         });
       }
-      this.setState({showLoader: false });
+      this.setState({ showLoader: false });
 
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
@@ -988,7 +992,7 @@ class SendConfirmation extends Component<
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={() => {
-                this.setState({ isConfirmDisabled: true, showLoader:true });
+                this.setState({ isConfirmDisabled: true, showLoader: true });
                 this.onConfirm();
               }}
               disabled={isConfirmDisabled}
@@ -1029,7 +1033,7 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
           </View>
         </ScrollView>
-        {showLoader ? <Loader isLoading={true}/> : null}
+        {showLoader ? <Loader isLoading={true} /> : null}
 
         <BottomSheet
           onCloseStart={() => {
@@ -1106,7 +1110,11 @@ class SendConfirmation extends Component<
           renderContent={() => (
             <SendConfirmationContent
               title={'Send Unsuccessful'}
-              info={'Something went wrong, please try again'}
+              info={
+                transfer && transfer.stage2
+                  ? 'Something went wrong; ' + transfer.stage2.err
+                  : 'Something went wrong, please try again'
+              }
               userInfo={transfer.details ? transfer.details : []}
               isFromContact={false}
               okButtonText={'Try Again'}

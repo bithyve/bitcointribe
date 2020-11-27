@@ -50,7 +50,6 @@ import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { startupSyncLoaded } from '../actions/loaders';
 
-
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
   const serivceType = REGULAR_ACCOUNT;
@@ -119,7 +118,6 @@ export const fetchDerivativeAccAddressWatcher = createWatcher(
   fetchDerivativeAccAddressWorker,
   FETCH_DERIVATIVE_ACC_ADDRESS,
 );
-
 
 function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
@@ -595,7 +593,7 @@ function* transferST2Worker({ payload }) {
     } else yield put(executedST2(serviceType, res.data.txid));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST2(serviceType));
+    yield put(failedST2(serviceType, { ...res }));
     // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
@@ -665,7 +663,7 @@ function* alternateTransferST2Worker({ payload }) {
     yield put(alternateTransferST2Executed(serviceType, res.data.txid));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST2(serviceType));
+    yield put(failedST2(serviceType, { ...res }));
     // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
@@ -855,7 +853,7 @@ export const removeTwoFAWatcher = createWatcher(
   REMOVE_TWO_FA,
 );
 
-function* accountsSyncWorker({ }) {
+function* accountsSyncWorker({}) {
   try {
     const accounts = yield select((state) => state.accounts);
 
@@ -952,7 +950,7 @@ export const accountsSyncWatcher = createWatcher(
   SYNC_ACCOUNTS,
 );
 
-function* startupSyncWorker({ }) {
+function* startupSyncWorker({}) {
   /*
   Skippiing this entire sync process
   to improve login performance.
