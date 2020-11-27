@@ -353,7 +353,11 @@ export default (state = initialState, action) => {
           ...state[account],
           transfer: {
             ...state[account].transfer,
-            stage3: { ...state[account].transfer.stage3, failed: true },
+            stage3: {
+              ...state[account].transfer.stage3,
+              failed: true,
+              ...action.payload.errorDetails,
+            },
           },
           loading: {
             ...state[account].loading,
