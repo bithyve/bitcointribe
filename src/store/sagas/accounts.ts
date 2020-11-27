@@ -692,7 +692,7 @@ function* transferST3Worker({ payload }) {
     yield put(executedST3(payload.serviceType, res.data.txid));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST3(payload.serviceType));
+    yield put(failedST3(payload.serviceType, { ...res }));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
