@@ -1,11 +1,11 @@
-import { useSelector } from 'react-redux';
-import BitcoinUnit from '../../../../common/data/enums/BitcoinUnit';
-import TransactionGroup from '../../../../common/data/enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../../../common/data/enums/UTXOCompatibilityGroup';
 import AccountShell from '../../../../common/data/models/AccountShell';
+import useAccountsState from './UseAccountsState';
+import { useMemo } from 'react';
 import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
+import BitcoinUnit from '../../../../common/data/enums/BitcoinUnit';
 import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
 import TestSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
-import { AccountsState } from '../../../../store/reducers/accounts';
 
 const sampleShellsForTestingTransactionReassignment: AccountShell[] = [
   new AccountShell({
@@ -23,15 +23,15 @@ const sampleShellsForTestingTransactionReassignment: AccountShell[] = [
 ];
 
 
-function useAccountShellsInTransactionGroup(transactionGroup: TransactionGroup): AccountShell[] {
-  return useSelector(state => {
-    const accountsState: AccountsState = state.accounts;
+function useAccountShellsInUTXOCompatibilityGroup(utxoCompatibilityGroup: UTXOCompatibilityGroup): AccountShell[] {
+  const accountsState = useAccountsState();
 
+  return useMemo(() => {
     return accountsState
       .accountShells
       // .concat(sampleShellsForTestingTransactionReassignment)
-      .filter(accountShell => AccountShell.getTransactionGroup(accountShell) === transactionGroup);
-  });
+      .filter(shell => AccountShell.getUTXOCompatibilityGroup(shell) == utxoCompatibilityGroup);
+  }, [accountsState.accountShells]);
 }
 
-export default useAccountShellsInTransactionGroup;
+export default useAccountShellsInUTXOCompatibilityGroup;

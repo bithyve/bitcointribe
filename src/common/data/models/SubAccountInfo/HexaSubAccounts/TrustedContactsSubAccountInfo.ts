@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
-import TransactionGroup from '../../../enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
 import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
 import { ImageSourcePropType } from 'react-native';
 
@@ -25,7 +25,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
   avatarImageSource: ImageSourcePropType;
 
   transactionIDs: string[];
-  transactionGroup: TransactionGroup;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
     accountShellID = null,
@@ -36,7 +36,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
+    utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -46,7 +46,7 @@ export default class TrustedContactsSubAccountInfo implements HexaSubAccountDesc
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
     this.transactionIDs = transactionIDs;
-    this.transactionGroup = transactionGroup;
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
 
     // TODO: Define some way to generate this from the address book avatar.
     this.avatarImageSource = require('../../../../../assets/images/icons/icon_hexa.png');

@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
-import TransactionGroup from '../../../enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
 import { ImportedWalletSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
@@ -24,7 +24,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo implements ImportedWa
   avatarImageSource = require('../../../../../assets/images/icons/icon_import_watch_only_wallet.png');
 
   transactionIDs: string[];
-  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     accountShellID = null,

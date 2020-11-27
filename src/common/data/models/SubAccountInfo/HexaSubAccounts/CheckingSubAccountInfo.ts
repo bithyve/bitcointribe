@@ -1,7 +1,7 @@
  import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
-import TransactionGroup from '../../../enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
 import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
@@ -23,7 +23,7 @@ export default class CheckingSubAccountInfo implements HexaSubAccountDescribing 
   avatarImageSource = require('../../../../../assets/images/icons/icon_regular.png');
 
   transactionIDs: string[];
-  transactionGroup: TransactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     accountShellID = null,

@@ -3,12 +3,13 @@ import AccountShell from '../../../common/data/models/AccountShell';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 
 
-function useReassignableSourcesForAccountShell(
+export default function useReassignableSourcesForAccountShell(
   accountShell: AccountShell,
 ): SubAccountDescribing[] {
   return useMemo(() => {
-    return accountShell.subAccounts;
-  }, [accountShell.subAccounts]);
+    return [
+      accountShell.primarySubAccount,
+      ...accountShell.secondarySubAccounts
+    ];
+  }, [accountShell.primarySubAccount, accountShell.secondarySubAccounts]);
 }
-
-export default useReassignableSourcesForAccountShell;

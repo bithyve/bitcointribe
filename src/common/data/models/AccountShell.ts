@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from "../enums/AccountVisibility";
 import BitcoinUnit from "../enums/BitcoinUnit";
-import TransactionGroup from "../enums/TransactionGroup";
+import UTXOCompatibilityGroup from "../enums/UTXOCompatibilityGroup";
 import SubAccountDescribing from "./SubAccountInfo/Interfaces";
 import { Satoshis } from '../typealiases/UnitAliases';
 
@@ -53,8 +53,8 @@ export default class AccountShell {
     this.unit = unit;
   }
 
-  static getTransactionGroup(shell: AccountShell): TransactionGroup {
-    return shell.primarySubAccount.transactionGroup;
+  static getUTXOCompatibilityGroup(shell: AccountShell): UTXOCompatibilityGroup {
+    return shell.primarySubAccount.utxoCompatibilityGroup;
   }
 
   static getSubAccounts(shell: AccountShell): SubAccountDescribing[] {

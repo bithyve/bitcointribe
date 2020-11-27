@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from 'uuid';
 import SubAccountKind from "../../enums/SubAccountKind";
 import { DonationSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
-import TransactionGroup from '../../enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import AccountVisibility from '../../enums/AccountVisibility';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
@@ -35,7 +35,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
    * Can either be `SINGLE_SIG_PUBLIC` or `MULTI_SIG_PUBLIC`,
    * depending on what the user chooses during creation.
    */
-  transactionGroup: TransactionGroup;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
     accountShellID = null,
@@ -48,7 +48,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactionIDs = [],
-    transactionGroup = TransactionGroup.MULTI_SIG_PUBLIC,
+    utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -60,6 +60,6 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactionIDs = transactionIDs;
-    this.transactionGroup = transactionGroup;
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
   }
 }
