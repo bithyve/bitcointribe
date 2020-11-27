@@ -308,8 +308,8 @@ export const executedST3 = (serviceType, result) => {
   return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST3 = (serviceType) => {
-  return { type: TRANSFER_ST3_FAILED, payload: { serviceType } };
+export const failedST3 = (serviceType, errorDetails) => {
+  return { type: TRANSFER_ST3_FAILED, payload: { serviceType, errorDetails } };
 };
 
 export const switchLoader = (serviceType, beingLoaded) => {
