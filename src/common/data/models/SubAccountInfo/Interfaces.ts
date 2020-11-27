@@ -1,6 +1,6 @@
 import SubAccountKind from "../../enums/SubAccountKind";
 import ServiceAccountKind from "../../enums/ServiceAccountKind";
-import TransactionGroup from "../../enums/TransactionGroup";
+import UTXOCompatibilityGroup from "../../enums/UTXOCompatibilityGroup";
 import AccountVisibility from "../../enums/AccountVisibility";
 import { ImageSourcePropType } from "react-native";
 
@@ -45,7 +45,7 @@ interface SubAccountDescribing {
 
   avatarImageSource: ImageSourcePropType;
 
-  transactionGroup: TransactionGroup;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup;
   transactionIDs: string[];
 }
 
@@ -75,7 +75,7 @@ export type SubAccountDescribingConstructorProps = {
   isTFAEnabled?: boolean;
   avatarImageSource?: ImageSourcePropType;
   secondaryAccountUUIDs?: string[];
-  transactionGroup?: TransactionGroup;
+  utxoCompatibilityGroup?: UTXOCompatibilityGroup;
   transactionIDs?: string[];
 };
 

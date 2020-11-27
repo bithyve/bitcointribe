@@ -2,7 +2,7 @@ import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
-import TransactionGroup from '../../enums/TransactionGroup';
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
 import { ImageSourcePropType } from 'react-native';
 
@@ -31,7 +31,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   avatarImageSource: ImageSourcePropType;
 
   transactionIDs: string[];
-  transactionGroup: TransactionGroup;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
     accountShellID = null,
@@ -44,7 +44,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     transactionIDs = [],
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionGroup = TransactionGroup.SINGLE_SIG_PUBLIC,
+    utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -56,7 +56,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.isTFAEnabled = isTFAEnabled;
     this.visibility = visibility;
     this.transactionIDs = transactionIDs;
-    this.transactionGroup = transactionGroup;
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
 
     this.avatarImageSource = getAvatarImageSource(serviceAccountKind);
   }

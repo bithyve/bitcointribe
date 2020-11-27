@@ -1,6 +1,6 @@
 import AccountShell from '../../../common/data/models/AccountShell';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
-import useAccountShellsInTransactionGroup from '../state-selectors/accounts/UseAccountShellsInTransactionGroup';
+import useAccountShellsInUTXOCompatibilityGroup from '../state-selectors/accounts/UseAccountShellsInUTXOCompatibilityGroup';
 
 
 /**
@@ -9,7 +9,7 @@ import useAccountShellsInTransactionGroup from '../state-selectors/accounts/UseA
 function useCompatibleReassignmentDestinationsForAccount(
   accountShell: AccountShell,
 ): SubAccountDescribing[] {
-  return useAccountShellsInTransactionGroup(AccountShell.getTransactionGroup(accountShell))
+  return useAccountShellsInUTXOCompatibilityGroup(AccountShell.getUTXOCompatibilityGroup(accountShell))
     .flatMap(shell => {
       return shell.id === accountShell.id ? [] : AccountShell.getSubAccounts(accountShell);
     });
