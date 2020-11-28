@@ -147,8 +147,8 @@ export default class HDSegwitWallet extends Bitcoin {
         : this.confirmedUTXOs;
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
-        ? stateVars.derivativeAccounts
-        : this.derivativeAccounts;
+        ? { ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts }
+        : config.DERIVATIVE_ACC;
     this.lastBalTxSync =
       stateVars && stateVars.lastBalTxSync
         ? stateVars.lastBalTxSync
