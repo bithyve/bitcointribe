@@ -1,10 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,7 +8,7 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import openLink from '../../utils/OpenLink';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -27,11 +22,7 @@ export default function CheckingAccountHelpContents(props) {
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text
-          style={styles.headerText}
-        >
-          Checking Account
-        </Text>
+        <Text style={styles.headerText}>Checking Account</Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
@@ -40,7 +31,7 @@ export default function CheckingAccountHelpContents(props) {
           flex: 1,
           backgroundColor: Colors.blue,
         }}
-        snapToInterval={hp('89%')}
+        snapToInterval={hp('85%')}
         decelerationRate="fast"
       >
         <View style={styles.ElementView}>
@@ -50,10 +41,7 @@ export default function CheckingAccountHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            The Checking Account is designed as an account that you plan to
-            use in the short term. Funds in the Checking Account can be
-            spent immediately without 2FA confirmation, and carries lower
-            fees compared to the Savings Account
+            Store some sats here not all. Use these stored sats to transact or send to your friends and family.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -67,16 +55,24 @@ export default function CheckingAccountHelpContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Since the Checking Account does not require 2FA confirmation
-            for spending, a person using your phone and knowing your
-            passcode will be able to spend your bitcoin. Hence, for
-            storing more funds or for spending infrequently, please store
-            your bitcoin in the Savings Account
+            Use the Savings Account to store bigger quantities of sats.
           </Text>
-          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current &&
+                scrollViewRef.current.scrollTo({
+                  x: 0,
+                  y: hp('85%'),
+                  animated: true,
+                });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
@@ -90,6 +86,7 @@ export default function CheckingAccountHelpContents(props) {
             />
           </View>
         </View>
+
         <View style={styles.ElementView}>
           <Text
             style={{
@@ -97,10 +94,60 @@ export default function CheckingAccountHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            The Checking Account is a single signature account as compared
-            to the multi signature Savings Account, and does not require
-            2FA confirmation for spending. This smaller requirement
-            results in a lesser fee compared to the Savings Account
+            The Checking Account is a single signature account and the Savings Account is a 2 of 3 multi-signature account.
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/checking_account_info_1.png')}
+              style={styles.helperImage}
+            />
+          </View>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginBottom: wp('5%'),
+            }}
+          >
+            Correspondingly, transactions are cheaper from the Checking Account compared the the Savings Account.
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current &&
+              scrollViewRef.current.scrollTo({
+                x: 0,
+                y: hp('170%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
+                ...styles.separatorView,
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('5%'),
+            }}
+          >
+            Caution! The Checking Account does not require 2 Factor Authentication for spending sats. Someone having your phone’s, and your Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -108,31 +155,15 @@ export default function CheckingAccountHelpContents(props) {
               style={styles.helperImage}
             />
           </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
-              Use this account to store small amounts for daily use
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('5%'),
+              paddingBottom: hp('6%'),
+            }}
+          >
+            Note that due to the security built into the accounts, it is cheaper transacting from the Checking Account compared to the Savings account.
           </Text>
-            <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
-              <Text
-                style={styles.toKnowMoreText}
-              >
-                To read more,
-            </Text>
-              <AppBottomSheetTouchableWrapper
-                style={{ marginLeft: 5 }}
-                onPress={() =>
-                  openLink(
-                    'https://en.bitcoin.it/wiki/Techniques_to_reduce_transaction_fees',
-                  )
-                }
-              >
-                <Text
-                  style={styles.clickHereText}>
-                  click here
-              </Text>
-              </AppBottomSheetTouchableWrapper>
-            </View>
-          </View>
         </View>
       </ScrollView>
     </View>
@@ -191,7 +222,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('80%'),
+    height: hp('85%'),
     justifyContent: 'space-between',
   },
   separatorView: {

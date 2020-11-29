@@ -1,11 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  Linking,
-} from 'react-native';
+import { View, Image, Text, StyleSheet, Linking } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -15,7 +9,7 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function ReceiveHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -64,24 +58,12 @@ export default function ReceiveHelpContents(props) {
         decelerationRate="fast"
       >
         <View
-          style={{
-            height: hp('80%'),
-            justifyContent: 'space-between',
-            paddingBottom: hp('6%'),
-            marginTop: hp('4%')
-          }}
+          style={styles.elementView}
         >
           <Text
-            style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
+            style={styles.infoText}
           >
-            When you want to receive bitcoin, the sender{'\n'}needs to know
-            where to send them to. This is{'\n'}given by your address shown as a
-            QR code and{'\n'}as plaintext above
+            To receive sats or bitcoin, simply share the QR code with whomever it is that you wish to receive the money from. The QR code packs in your bitcoin address to which they send the sats to.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -93,78 +75,93 @@ export default function ReceiveHelpContents(props) {
               }}
             />
           </View>
-          {/* <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
-            </Text> */}
+          
           <Text
-            style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+            style={styles.infoText}
+          >
+            For your privacy, a new address is generated each time you want to receive sats or bitcoin. We do this under the hood and you do not have to worry about this!
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current &&
+                scrollViewRef.current.scrollTo({
+                  x: 0,
+                  y: hp('80%'),
+                  animated: true,
+                });
             }}
           >
-            To improve your privacy, a new address is{'\n'}generated each time
-            you want to receive{'\n'}bitcoin. If you would like to receive
-            bitcoin{'\n'}from Friends and Family, please check the{'\n'}checkbox
-            above
-          </Text>
-          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('80%'), animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
-              style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
-                width: wp('70%'),
-                height: 0,
-              }}
+              style={styles.dottedView}
             />
           </View>
         </View>
+
         <View
-          style={{
-            height: hp('80%'),
-            justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
-          }}
+          style={styles.elementView}
+        >
+          <Text
+            style={styles.infoText}
+          >
+            You need to keep in mind the minor’s incentive to process your transaction while receiving sats or bitcoin.
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/bitcoin_receive_info_1.png')}
+              style={{
+                width: wp('80%'),
+                height: wp('80%'),
+                resizeMode: 'contain',
+              }}
+            />
+          </View>
+          
+          <Text
+            style={styles.infoText}
+          >
+            Please ensure the sender sends the money with appropriate fees for it to reach you faster.
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current &&
+                scrollViewRef.current.scrollTo({
+                  x: 0,
+                  y: hp('160%'),
+                  animated: true,
+                });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={styles.dottedView}
+            />
+          </View>
+        </View>
+
+        <View
+          style={{...styles.elementView,
+            marginTop: wp('1%'),}}
         >
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            {/* <Text
-                    style={{
-                        textAlign: 'center',
-                        color: Colors.white,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
-                    }}
-                >
-                    Once the sender sends the transaction, the{'\n'}transaction is relayed to a bitcoin full node.{'\n'}This full node then announces the{'\n'}transactions to other full nodes, including{'\n'}those of miners
-                </Text> */}
             <Text
-              style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
+              style={styles.infoText}
             >
-              A miner includes a transaction within a{'\n'}block only if the fee
-              associated is{'\n'}sufficiently high. Please make sure the sender
-              {'\n'}sends the transaction with appropriate fees{'\n'}for it to
-              reach you faster
+              If the fee associated with a transaction is low, you may increase the fee paid by RBF or Replace-By-fee.
             </Text>
             <Image
               source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
@@ -176,17 +173,9 @@ export default function ReceiveHelpContents(props) {
             />
           </View>
           <Text
-            style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
+            style={styles.infoText}
           >
-            If the fee associated with a transaction is low,{'\n'}you may
-            increase the fee paid by RBF or{'\n'}Replace-By-Fee. This provides
-            additional{'\n'}incentive for the miner to mine your{'\n'}
-            transaction, and may result in you receiving{'\n'}bitcoin earlier
+            This provides additional incentive for the miner to process your transaction, resulting in you receiving your sats faster.
           </Text>
           <View
             style={{
@@ -244,4 +233,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
   },
+  infoText: {
+    textAlign: 'center',
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: wp('10%'),
+   marginRight: wp('10%'),
+  },
+  elementView: {
+    height: hp('80%'),
+    justifyContent: 'space-between',
+    paddingBottom: hp('6%'),
+    marginTop: hp('4%'),
+  }, 
+  dottedView:{
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
+    width: wp('70%'),
+    height: 0,
+  }
 });

@@ -57,13 +57,6 @@ export default function SendConfirmationContent(props) {
     return (
       <RecipientComponent
         recipient={recipient}
-        onPressElement={() => {
-          if (item.note) {
-            if (SelectedContactId == recipient.id)
-              setSelectedContactId(0);
-            else setSelectedContactId(recipient.id);
-          }
-        }}
         selectedContactId={String(SelectedContactId)}
         accountKind={props.accountKind}
       />
