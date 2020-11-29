@@ -40,8 +40,7 @@ export default function DonationAccountHelpContents(props) {
               marginTop: wp('4%'),
             }}
           >
-            Use this Account to collect donations for causes you are passionate
-            about
+            Your supporters can donate to your causes anonymously.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -55,8 +54,7 @@ export default function DonationAccountHelpContents(props) {
               marginBottom: wp('4%'),
             }}
           >
-            2 Factor Authentication ensures that the donations you receive are
-            safely stored in your wallet
+            Source sats and bitcoin from around the world without hassle or worrying about the tech involved.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}

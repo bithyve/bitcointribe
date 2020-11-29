@@ -99,7 +99,7 @@ export default class Bitcoin {
   public fetchBalanceTransactionsByAddresses = async (
     externalAddresses: string[],
     internalAddresses: string[],
-    ownedAddresses: { [address: string]: boolean },
+    ownedAddresses: string[],
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -124,6 +124,7 @@ export default class Bitcoin {
         ['mono-id']: {
           External: externalAddresses,
           Internal: internalAddresses,
+          Owned: ownedAddresses,
         },
       };
 
