@@ -29,7 +29,7 @@ const INITIAL_STATE: SendingState = {
 };
 
 
-const sendingReducer = (state: SendingState = INITIAL_STATE, action) => {
+const sendingReducer = (state: SendingState = INITIAL_STATE, action): SendingState => {
   let recipient: RecipientDescribing;
 
   switch (action.type) {

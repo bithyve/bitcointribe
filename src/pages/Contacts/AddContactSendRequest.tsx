@@ -30,7 +30,7 @@ import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
   updateEphemeralChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts';
 import {
   EphemeralDataElements,
@@ -131,7 +131,7 @@ export default function AddContactSendRequest(props) {
       tcInfo[3] = contact;
     }
     await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
-    dispatch(updateTrustedContactInfoLocally(tcInfo));
+    dispatch(updateTrustedContactsInfoLocally(tcInfo));
   };
 
   const dispatch = useDispatch();

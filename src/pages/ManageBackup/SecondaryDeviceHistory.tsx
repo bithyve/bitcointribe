@@ -39,7 +39,7 @@ import {
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
   updateEphemeralChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import QRModal from '../Accounts/QRModal';
@@ -187,7 +187,7 @@ const SecondaryDeviceHistory = (props) => {
         tcInfo[0] = contact;
       }
       await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
-      dispatch(updateTrustedContactInfoLocally(tcInfo));
+      dispatch(updateTrustedContactsInfoLocally(tcInfo));
     },
     [trustedContactsInfo],
   );

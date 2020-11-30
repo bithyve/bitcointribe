@@ -20,7 +20,6 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   lastSeenActive: number | null;
   walletName: string | null;
   trustKind: ContactTrustKind;
-  hasXPub: boolean;
   hasTrustedAddress: boolean;
 
   /**

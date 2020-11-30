@@ -16,7 +16,7 @@ export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO'
+export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
 export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
@@ -155,11 +155,11 @@ export const postRecoveryChannelSync = () => {
   }
 }
 
-export const updateTrustedContactInfoLocally = ( trustedContactInfo ) => {
+export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
   return {
-    type: UPDATE_TRUSTED_CONTACT_INFO,
+    type: UPDATE_TRUSTED_CONTACTS_INFO,
     payload: {
-      trustedContactInfo
+      trustedContactsInfo
     },
   }
 }

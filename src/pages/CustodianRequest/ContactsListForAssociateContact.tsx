@@ -16,7 +16,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts'
+import { updateTrustedContactsInfoLocally } from '../../store/actions/trustedContacts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
@@ -88,7 +88,7 @@ const ContactsListForAssociateContact = ( props ) => {
       postAssociation( associatedContact )
     }
     await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
   const { approvedTrustedContacts } = useSelector(

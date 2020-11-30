@@ -10,7 +10,6 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
-  WYRE,
 } from '../../../common/constants/serviceTypes'
 import SmallHeaderModal from '../../../components/SmallHeaderModal'
 import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface'
@@ -19,6 +18,7 @@ import TrustedContactsService from '../../../bitcoin/services/TrustedContactsSer
 import {
   addTransferDetails,
   clearTransfer,
+  removeTwoFA,
 } from '../../../store/actions/accounts'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
@@ -47,8 +47,6 @@ import {
   makeContactRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
-import { getAccountIcon, getAccountTitle } from './utils'
 
 export enum SectionKind {
   SCAN_QR,
@@ -66,7 +64,7 @@ function renderSectionHeader(
   switch ( sectionKind ) {
       case SectionKind.SELECT_CONTACTS:
         return <Text style={styles.listSectionHeading}>Send To Contacts</Text>
-      case SectionKind.SELECT_SUB_ACCOUNTS:
+      case SectionKind.SELECT_ACCOUNT_SHELLS:
         if ( accountKind != TEST_ACCOUNT ) {
           return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
         }
@@ -155,6 +153,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     } )
     this.updateAccountData()
     this.getAccountBalances()
+    if ( this.state.serviceType === SECURE_ACCOUNT ) {
+      this.twoFASetupMethod()
+    }
+
     if (
       this.state.serviceType === TEST_ACCOUNT &&
       !this.props.hasShownInitialKnowMoreSendSheet
@@ -232,21 +234,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         checked: false,
         image: require( '../../../assets/images/icons/icon_regular_account.png' ),
       },
+      {
+        id: SECURE_ACCOUNT,
+        account_name: 'Savings Account',
+        type: SECURE_ACCOUNT,
+        checked: false,
+        image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
+      },
     ]
 
-    if( is2FAActive ) defaultAccountData.push( {
-      id: SECURE_ACCOUNT,
-      account_name: 'Savings Account',
-      type: SECURE_ACCOUNT,
-      checked: false,
-      image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
-    } )
-
-    const parentAccounts = [ REGULAR_ACCOUNT ]
-    if( is2FAActive ) parentAccounts.push( SECURE_ACCOUNT )
-
     const additionalAccountData = []
-    for ( const serviceType of parentAccounts ) {
+    for ( const serviceType of [ REGULAR_ACCOUNT, SECURE_ACCOUNT ] ) {
       const derivativeAccounts = this.props.accountsState[ serviceType ].service[
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
       ].derivativeAccounts
@@ -265,10 +263,20 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           const accInstance = {
             id: accType,
             account_number: index,
-            account_name: getAccountTitle( serviceType, derivativeAccountDetails ),
+            account_name:
+              accType === DONATION_ACCOUNT
+                ? 'Donation Account'
+                : serviceType === REGULAR_ACCOUNT
+                  ? 'Checking Account'
+                  : 'Savings Account',
             type: serviceType,
             checked: false,
-            image: getAccountIcon( serviceType, derivativeAccountDetails )
+            image:
+              accType === DONATION_ACCOUNT
+                ? require( '../../../assets/images/icons/icon_donation_account.png' )
+                : serviceType === REGULAR_ACCOUNT
+                  ? require( '../../../assets/images/icons/icon_regular_account.png' )
+                  : require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
           }
           additionalAccountData.push( accInstance )
         }
@@ -595,6 +603,22 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
+  twoFASetupMethod = async () => {
+    const { accountsState, hasCompletedTFASetup } = this.props
+
+    if (
+      !hasCompletedTFASetup &&
+      accountsState[ this.state.serviceType ].service.secureHDWallet.twoFASetup
+    ) {
+      this.props.navigation.navigate( 'TwoFASetup', {
+        twoFASetup:
+          accountsState[ this.state.serviceType ].service.secureHDWallet
+            .twoFASetup,
+      } )
+      this.props.removeTwoFA()
+    }
+  };
+
   updateAddressBook = async () => {
     const {
       regularAccount,
@@ -606,9 +630,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if ( trustedContactsInfo ) {
       if ( trustedContactsInfo.length ) {
         const sendableTrustedContacts = []
+
         for ( let index = 0; index < trustedContactsInfo.length; index++ ) {
           const contactInfo = trustedContactsInfo[ index ]
+
           if ( !contactInfo ) continue
+
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
           }`
@@ -624,11 +651,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             trustedContactToDA,
             derivativeAccounts,
           } = regularAccount.hdWallet
+
           const accountNumber =
             trustedContactToDA[ contactName.toLowerCase().trim() ]
+
           if ( accountNumber ) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ]
+
             if ( serviceType === TEST_ACCOUNT ) {
               if (
                 trustedContact.contactDetails &&
@@ -751,7 +781,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         margin: 0, padding: 0
                       }}
                       placeholder="Enter Address Manually"
-                      accountKind={serviceType}
+                      subAccountKind={serviceType}
                       onAddressSubmitted={( address ) => {
                         this.setState( {
                           recipientAddress: address
@@ -793,7 +823,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               },
             },
             {
-              kind: SectionKind.SELECT_SUB_ACCOUNTS,
+              kind: SectionKind.SELECT_ACCOUNT_SHELLS,
               data: [ null ],
               renderItem: () => {
                 return (
@@ -946,6 +976,7 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
+    removeTwoFA,
     addTransferDetails,
     clearTransfer,
     initialKnowMoreSendSheetShown,
@@ -1031,7 +1062,14 @@ function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<Naviga
         <View style={styles.navHeaderTitleContainer}>
           <Image
             source={
-              getAccountIcon( accountKind, derivativeAccountDetails )
+              derivativeAccountDetails &&
+              derivativeAccountDetails.type === DONATION_ACCOUNT
+                ? require( '../../../assets/images/icons/icon_donation_hexa.png' )
+                : accountKind == TEST_ACCOUNT
+                  ? require( '../../../assets/images/icons/icon_test.png' )
+                  : accountKind == REGULAR_ACCOUNT
+                    ? require( '../../../assets/images/icons/icon_regular.png' )
+                    : require( '../../../assets/images/icons/icon_secureaccount.png' )
             }
             style={{
               width: 40, height: 40

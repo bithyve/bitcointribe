@@ -48,7 +48,7 @@ import config from '../../bitcoin/HexaConfig'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import {
   updateEphemeralChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
   clearTrustedContactsCache
 } from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -782,7 +782,7 @@ const TrustedContactHistory = ( props ) => {
       }
       await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
 
-      dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },
     [ index, trustedContactsInfo ],
   )

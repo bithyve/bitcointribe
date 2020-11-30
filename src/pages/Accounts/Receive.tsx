@@ -45,7 +45,7 @@ import {
 } from '../../common/constants/serviceTypes'
 import {
   updateEphemeralChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import {
   EphemeralDataElements,
@@ -325,7 +325,7 @@ export default function Receive( props ) {
       tcInfo[ 3 ] = contact // initial 3 reserved for Guardians
     }
     await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
   const createTrustedContact = useCallback( async () => {
