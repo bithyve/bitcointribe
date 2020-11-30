@@ -146,9 +146,13 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/runtime": "^7.11.2",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "^7.0.0",
+    "eslint": "^7.14.0",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-native": "^3.10.0",
     "jest": "^26.4.2",
     "jetifier": "^1.6.4",
     "metro-react-native-babel-preset": "^0.63.0",
