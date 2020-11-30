@@ -2,7 +2,11 @@ import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
+import { AccountBalance } from '../../../types/Account';
+import {
+  HexaSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from '../Interfaces';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -10,12 +14,12 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TEST;
-  balance: number;
+  balances: AccountBalance;
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Learn Bitcoin";
+  defaultDescription: string = 'Learn Bitcoin';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -26,8 +30,8 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
 
   constructor({
     accountShellID = null,
-    defaultTitle = "Test Account",
-    balance = 0,
+    defaultTitle = 'Test Account',
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
@@ -36,7 +40,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;

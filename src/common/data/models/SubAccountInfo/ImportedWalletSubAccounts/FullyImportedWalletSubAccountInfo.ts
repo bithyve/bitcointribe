@@ -2,22 +2,26 @@ import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { ImportedWalletSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
+import { AccountBalance } from '../../../types/Account';
+import {
+  ImportedWalletSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from '../Interfaces';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
-
-export default class FullyImportedWalletSubAccountInfo implements ImportedWalletSubAccountDescribing {
+export default class FullyImportedWalletSubAccountInfo
+  implements ImportedWalletSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
-  balance: number;
+  balances: AccountBalance;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
+  defaultDescription: string = 'Fully import and manage a non-Hexa wallet.';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -28,8 +32,8 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
 
   constructor({
     accountShellID = null,
-    defaultTitle = "Full Import",
-    balance = 0,
+    defaultTitle = 'Full Import',
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
@@ -38,7 +42,7 @@ export default class FullyImportedWalletSubAccountInfo implements ImportedWallet
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;

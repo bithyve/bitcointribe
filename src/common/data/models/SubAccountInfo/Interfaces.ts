@@ -1,9 +1,9 @@
-import SubAccountKind from "../../enums/SubAccountKind";
-import ServiceAccountKind from "../../enums/ServiceAccountKind";
+import SubAccountKind from '../../enums/SubAccountKind';
+import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import UTXOCompatibilityGroup from "../../enums/UTXOCompatibilityGroup";
-import AccountVisibility from "../../enums/AccountVisibility";
-import { ImageSourcePropType } from "react-native";
-
+import AccountVisibility from '../../enums/AccountVisibility';
+import { ImageSourcePropType } from 'react-native';
+import { AccountBalance } from '../../types/Account';
 
 interface SubAccountDescribing {
   readonly id: string;
@@ -12,9 +12,9 @@ interface SubAccountDescribing {
   readonly kind: SubAccountKind;
 
   /**
-   * Balance in Satoshis.
+   * Balances in Satoshis.
    */
-  balance: number;
+  balances: AccountBalance;
 
   /**
    * Default displayable title.
@@ -49,7 +49,6 @@ interface SubAccountDescribing {
   transactionIDs: string[];
 }
 
-
 export interface HexaSubAccountDescribing extends SubAccountDescribing {}
 
 export interface DonationSubAccountDescribing extends HexaSubAccountDescribing {
@@ -57,20 +56,20 @@ export interface DonationSubAccountDescribing extends HexaSubAccountDescribing {
   causeName: string;
 }
 
-export interface ExternalServiceSubAccountDescribing extends
-  SubAccountDescribing {
+export interface ExternalServiceSubAccountDescribing
+  extends SubAccountDescribing {
   readonly serviceAccountKind: ServiceAccountKind;
 }
 
-export interface ImportedWalletSubAccountDescribing extends SubAccountDescribing {}
-
+export interface ImportedWalletSubAccountDescribing
+  extends SubAccountDescribing {}
 
 export type SubAccountDescribingConstructorProps = {
   accountShellID?: string | null;
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;
-  balance?: number;
+  balances?: AccountBalance;
   visibility?: AccountVisibility;
   isTFAEnabled?: boolean;
   avatarImageSource?: ImageSourcePropType;
@@ -79,7 +78,4 @@ export type SubAccountDescribingConstructorProps = {
   transactionIDs?: string[];
 };
 
-
 export default SubAccountDescribing;
-
-

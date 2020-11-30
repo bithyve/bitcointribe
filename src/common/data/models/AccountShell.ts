@@ -1,8 +1,8 @@
 import { v4 as uuidV4 } from 'uuid';
-import AccountVisibility from "../enums/AccountVisibility";
-import BitcoinUnit from "../enums/BitcoinUnit";
-import UTXOCompatibilityGroup from "../enums/UTXOCompatibilityGroup";
-import SubAccountDescribing from "./SubAccountInfo/Interfaces";
+import AccountVisibility from '../enums/AccountVisibility';
+import BitcoinUnit from '../enums/BitcoinUnit';
+import UTXOCompatibilityGroup from '../enums/UTXOCompatibilityGroup';
+import SubAccountDescribing from './SubAccountInfo/Interfaces';
 import { Satoshis } from '../typealiases/UnitAliases';
 
 type ConstructorProps = {
@@ -12,9 +12,7 @@ type ConstructorProps = {
   secondarySubAccounts?: SubAccountDescribing[];
 };
 
-
 export default class AccountShell {
-
   /**
    * Unique Identifier
    */
@@ -34,7 +32,6 @@ export default class AccountShell {
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: SubAccountDescribing[];
 
-
   constructor({
     displayOrder = null,
     unit = BitcoinUnit.BTC,
@@ -47,7 +44,7 @@ export default class AccountShell {
     this.primarySubAccount.accountShellID = this.id;
 
     this.secondarySubAccounts = secondarySubAccounts;
-    this.secondarySubAccounts.forEach(s => s.accountShellID = this.id);
+    this.secondarySubAccounts.forEach((s) => (s.accountShellID = this.id));
 
     this.displayOrder = displayOrder;
     this.unit = unit;
@@ -58,26 +55,29 @@ export default class AccountShell {
   }
 
   static getSubAccounts(shell: AccountShell): SubAccountDescribing[] {
-    return [
-      shell.primarySubAccount,
-      ...shell.secondarySubAccounts,
-    ];
+    return [shell.primarySubAccount, ...shell.secondarySubAccounts];
   }
 
   /**
    * Total balance of all sub-accounts in Satoshis.
-  */
+   */
   static getTotalBalance = (shell: AccountShell): Satoshis => {
-    return AccountShell
-      .getSubAccounts(shell)
-      .reduce((accumulated, current) => accumulated + current.balance, 0);
-  }
+    return AccountShell.getSubAccounts(shell).reduce(
+      (accumulated, current) =>
+        accumulated +
+        (current.balances.confirmed + current.balances.unconfirmed),
+      0,
+    );
+  };
 
   static getVisibility(shell: AccountShell): AccountVisibility {
     return shell.primarySubAccount.visibility;
   }
 
-  static setPrimarySubAccount(shell: AccountShell, subAccount: SubAccountDescribing) {
+  static setPrimarySubAccount(
+    shell: AccountShell,
+    subAccount: SubAccountDescribing,
+  ) {
     subAccount.accountShellID = shell.id;
     shell.primarySubAccount = subAccount;
   }
