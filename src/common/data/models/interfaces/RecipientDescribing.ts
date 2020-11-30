@@ -1,8 +1,8 @@
-import { ImageSourcePropType } from "react-native";
-import RecipientKind from "../../enums/RecipientKind";
-import { Satoshis } from "../../typealiases/UnitAliases";
-import ContactTrustKind from "../../enums/ContactTrustKind";
-import getAvatarForSubAccountKind from "../../../../utils/accounts/GetAvatarForSubAccountKind";
+import { ImageSourcePropType } from 'react-native';
+import RecipientKind from '../../enums/RecipientKind';
+import { Satoshis } from '../../typealiases/UnitAliases';
+import ContactTrustKind from '../../enums/ContactTrustKind';
+import getAvatarForSubAccountKind from '../../../../utils/accounts/GetAvatarForSubAccountKind';
 
 export interface RecipientDescribing {
   id: string;
@@ -22,7 +22,6 @@ export interface RecipientDescribing {
   initiatedAt: number;
 }
 
-
 export interface ContactRecipientDescribing extends RecipientDescribing {
   lastSeenActive: number | null;
   walletName: string | null;
@@ -36,12 +35,11 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   hasTrustedChannelWithUser: boolean;
 }
 
-export interface AccountRecipientDescribing extends RecipientDescribing {
-}
+export interface AccountRecipientDescribing extends RecipientDescribing {}
 
 export function makeSubAccountRecipientDescription(
   data: unknown,
-  accountKind: string
+  accountKind: string,
 ): AccountRecipientDescribing {
   return {
     id: data.id,
@@ -53,8 +51,6 @@ export function makeSubAccountRecipientDescription(
   };
 }
 
-
-
 export function makeContactRecipientDescription(
   data: unknown,
   trustKind: ContactTrustKind = ContactTrustKind.OTHER,
@@ -64,7 +60,15 @@ export function makeContactRecipientDescription(
   // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
   let displayedName = data.contactName || data.displayedName;
 
-  if (displayedName == "F&F request") {
+  if (
+    displayedName &&
+    [
+      'f&f request',
+      'f&f request awaiting',
+      'f & f request',
+      'f & f request awaiting',
+    ].some((placeholder) => displayedName.startsWith(placeholder))
+  ) {
     displayedName = null;
   }
 
@@ -88,6 +92,7 @@ export function makeContactRecipientDescription(
     trustKind,
     hasXPub: data.hasXpub,
     hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser: data.hasTrustedChannel || data.hasTrustedChannelWithUser,
+    hasTrustedChannelWithUser:
+      data.hasTrustedChannel || data.hasTrustedChannelWithUser,
   };
 }

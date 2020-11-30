@@ -91,7 +91,7 @@ function RecipientComponent({
           </Text>
         </View>
 
-        <Ionicons
+        {/* <Ionicons
           style={{ marginLeft: 'auto', marginRight: 10 }}
           name={
             selectedContactId == recipient.id
@@ -100,7 +100,7 @@ function RecipientComponent({
           }
           size={20}
           color={Colors.borderColor}
-        /> 
+        />  */}
       </View>
 
       {selectedContactId == recipient.id && (

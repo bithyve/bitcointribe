@@ -159,8 +159,8 @@ export default function TwoFAToken(props) {
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={
-          'There seems to be a problem' + '\n' + transfer.stage3.failed
-            ? 'Invalid 2FA token, please try again.'
+          transfer && transfer.stage3
+            ? 'There seems to be a problem' + '\n' + transfer.stage3.err
             : 'Something went wrong, please try again.'
         }
         userInfo={transfer.details}
@@ -217,7 +217,7 @@ export default function TwoFAToken(props) {
           onPress={() => {
             props.navigation.goBack();
           }}
-          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+          hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />

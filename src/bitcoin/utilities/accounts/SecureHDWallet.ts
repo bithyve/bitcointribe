@@ -169,8 +169,8 @@ export default class SecureHDWallet extends Bitcoin {
     //   stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined;
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
-        ? stateVars.derivativeAccounts
-        : this.derivativeAccounts;
+        ? { ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts }
+        : config.DERIVATIVE_ACC;
     this.lastBalTxSync =
       stateVars && stateVars.lastBalTxSync
         ? stateVars.lastBalTxSync
@@ -430,21 +430,21 @@ export default class SecureHDWallet extends Bitcoin {
     //   this.consumedAddresses.push(multiSig.address);
     // }
 
-    const ownedAddresses = {}; // owned address mapping
+    const ownedAddresses = []; // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = [];
     for (let itr = 0; itr <= this.nextFreeAddressIndex; itr++) {
       const { address } = this.createSecureMultiSig(itr);
       externalAddresses.push(address);
-      ownedAddresses[address] = true;
+      ownedAddresses.push(address);
     }
 
     const internalAddresses = [];
     for (let itr = 0; itr <= this.nextFreeChangeAddressIndex; itr++) {
       const { address } = this.createSecureMultiSig(itr, true);
       internalAddresses.push(address);
-      ownedAddresses[address] = true;
+      ownedAddresses.push(address);
     }
 
     this.usedAddresses = [...externalAddresses, ...internalAddresses];
@@ -468,14 +468,11 @@ export default class SecureHDWallet extends Bitcoin {
             batchedDerivativeAddresses.push(
               ...derivativeInstance.usedAddresses,
             );
+            ownedAddresses.push(...derivativeInstance.usedAddresses);
           }
         }
       }
     }
-
-    batchedDerivativeAddresses.forEach((derivativeAddress) => {
-      ownedAddresses[derivativeAddress] = true;
-    });
 
     const {
       UTXOs,
@@ -588,7 +585,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     const externalAddresses = [];
     const internalAddresses = [];
-    const ownedAddresses = {};
+    const ownedAddresses = [];
     for (
       let itr = 0;
       itr < nextFreeAddressIndex + this.derivativeGapLimit;
@@ -600,7 +597,7 @@ export default class SecureHDWallet extends Bitcoin {
         this.derivativeAccounts[accountType][accountNumber].xpub,
       );
       externalAddresses.push(address);
-      ownedAddresses[address] = true;
+      ownedAddresses.push(address);
     }
 
     for (
@@ -614,7 +611,7 @@ export default class SecureHDWallet extends Bitcoin {
         this.derivativeAccounts[accountType][accountNumber].xpub,
       );
       internalAddresses.push(address);
-      ownedAddresses[address] = true;
+      ownedAddresses.push(address);
     }
 
     const usedAddresses = [...externalAddresses, ...internalAddresses];
@@ -753,11 +750,12 @@ export default class SecureHDWallet extends Bitcoin {
 
         this.derivativeAccounts[dAccountType][accountNumber][
           'usedAddresses'
-        ] = usedAddresses;
+        ] = usedAddresses; // derv used addresses forms a part of ownedAddresses array during primary-acc sync
         // console.log({ derivativeAccUsedAddresses: usedAddresses });
         accountsToAddressMapping[xpubId] = {
           External: externalAddresses,
           Internal: internalAddresses,
+          Owned: [...externalAddresses, ...internalAddresses],
         };
       }
     }

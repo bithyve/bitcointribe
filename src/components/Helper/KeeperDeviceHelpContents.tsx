@@ -1,10 +1,5 @@
 import React, { useRef } from 'react';
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,7 +8,7 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import openLink from '../../utils/OpenLink';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -54,10 +49,14 @@ export default function KeeperDeviceHelpContents(props) {
         snapToInterval={hp('85%')}
         decelerationRate="fast"
       >
-        <View style={{
-          height: hp('85%'), justifyContent: 'space-between', paddingBottom: hp('6%'),
-          marginTop: hp('2%')
-        }}>
+        <View
+          style={{
+            height: hp('85%'),
+            justifyContent: 'space-between',
+            paddingBottom: hp('6%'),
+            marginTop: hp('2%'),
+          }}
+        >
           <Text
             style={{
               textAlign: 'center',
@@ -65,12 +64,11 @@ export default function KeeperDeviceHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: wp('5%'),
-              marginRight: wp('5%')
+              marginRight: wp('5%'),
             }}
           >
-            One of your five Recovery Keys can be delegated to a Keeper, which
-            is a device on which you have Hexa installed. This device must be
-            different from the one you are using right now
+            Any other phone that has Hexa installed can become a “Keeper
+            Device”. A Keeper Device stores one of your five Recovery Keys
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -89,16 +87,27 @@ export default function KeeperDeviceHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: wp('5%'),
-              marginRight: wp('5%')
+              marginRight: wp('5%'),
             }}
           >
             If your Keeper Device is not accessible, it is possible to restore
-            it using your primary device and one of your Keepers.
+            it using your primary device and one of your Keepers
           </Text>
-          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current?.scrollTo({ x: 0, y: hp('85%'), animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('85%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
@@ -118,7 +127,7 @@ export default function KeeperDeviceHelpContents(props) {
             height: hp('85%'),
             // paddingTop: hp('2%'),
             paddingBottom: hp('6%'),
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }}
         >
           <Text
@@ -128,12 +137,10 @@ export default function KeeperDeviceHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: wp('5%'),
-              marginRight: wp('5%')
+              marginRight: wp('5%'),
             }}
           >
-            The Keeper acts as the host of the Exit Key,which can be used to
-            migrate from Hexa to another wallet at any time. The Keeper also
-            stores the 2FA Key required to spend from the Savings Account
+            Click on “Backup Now”. You will see a QR Code
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -152,17 +159,28 @@ export default function KeeperDeviceHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: wp('5%'),
-              marginRight: wp('5%')
+              marginRight: wp('5%'),
             }}
           >
-            The Exit Key on the Keeper Device is an alphanumeric string that can
-            be used to derive your addresses and private keys at any time. This
-            string is also called a “mnemonic”.
+            Go to the “Scan a QR” section on your Keeper Device and scan the QR
+            you just saw on your Primary Device. Click on “Yes I have scanned”
+            on your Primary Device after you have scanned the QR
           </Text>
-          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
-            scrollViewRef.current?.scrollTo({ x: 0, y: hp('170%'), animated: true });
-          }}>
-            <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
+          <AppBottomSheetTouchableWrapper
+            style={{ alignItems: 'center' }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('170%'),
+                animated: true,
+              });
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
@@ -182,7 +200,7 @@ export default function KeeperDeviceHelpContents(props) {
             height: hp('85%'),
             // paddingTop: hp('2%'),
             paddingBottom: hp('6%'),
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }}
         >
           <Text
@@ -192,12 +210,11 @@ export default function KeeperDeviceHelpContents(props) {
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: wp('5%'),
-              marginRight: wp('5%')
+              marginRight: wp('5%'),
             }}
           >
-            Your primary device has no access to the Exit Key. Therefore, a
-            person with access to your primary device does not have access to
-            your Savings Account
+            Note that you cannot make a device that has your “Personal Copy”
+            backed up as your Keeper Device
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -209,42 +226,20 @@ export default function KeeperDeviceHelpContents(props) {
               }}
             />
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp('10%'),
-              marginRight: wp('10%'),
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Text
+          <Text
               style={{
-                color: Colors.white,
-                // textAlign: 'center',
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
+                textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('5%'),
+              marginRight: wp('5%'),
               }}
             >
-              To know more,
+              The Keeper Device also acts as the host of your Exit Key, which
+              can be used to migrate from Hexa to another wallet at any time.
+              Although, why would you want to do that!
             </Text>
-            <AppBottomSheetTouchableWrapper
-              style={{ marginLeft: 5 }}
-              onPress={() => openLink('https://en.bitcoin.it/wiki/Seed_phrase')}
-            >
-              <Text
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                  textAlign: 'center',
-                }}
-              >
-                click here
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View>
         </View>
       </ScrollView>
     </View>

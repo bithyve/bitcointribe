@@ -70,12 +70,6 @@ export default function RestoreWalletBySecondaryDevice(props) {
       )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
-  // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
-
-  // const deepLink = REQUEST_DETAILS
-  //   ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` +
-  //     REQUEST_DETAILS.ENCRYPTED_KEY
-  //   : '';
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -169,12 +163,12 @@ export default function RestoreWalletBySecondaryDevice(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{ flex: 1 }}>
+
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
               props.navigation.goBack();
-              // props.navigation.navigate('RestoreSelectedContactsList');
             }}
             hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
           >
@@ -187,12 +181,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
             </View>
           </TouchableOpacity>
         </View>
+
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View style={{ flex: 2 }}>
+          <View style={{ marginBottom: 22 }}>
             <HeaderTitle
               isKnowMoreButton={true}
               onPressKnowMore={() => {}}
@@ -204,15 +199,15 @@ export default function RestoreWalletBySecondaryDevice(props) {
               infoTextBold={'you will need to have the other device with you'}
             />
           </View>
+
           <View
-            style={{ flex: 4, alignItems: 'center', justifyContent: 'center' }}
+            style={{ alignItems: 'center', justifyContent: 'center' }}
           >
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
               <QRCode value={secondaryQR} size={hp('27%')} />
             )}
-            {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 
           {REQUEST_DETAILS ? (
@@ -283,29 +278,17 @@ export default function RestoreWalletBySecondaryDevice(props) {
                   Scan
                 </Text>
               </TouchableOpacity>
-              {/* <Button
-                title={META_SHARE ? 'Downloaded' : 'Download'}
-                disabled={!!META_SHARE}
-                onPress={() =>
-                  dispatch(
-                    downloadMShare(
-                      REQUEST_DETAILS.KEY,
-                      'recovery',
-                    ),
-                  )
-                }
-              /> */}
             </View>
           ) : null}
-
-          <View style={{ flex: 2, justifyContent: 'flex-end' }}></View>
         </KeyboardAvoidingView>
+
         <BottomInfoBox
           title={'Note'}
           infoText={
             'Once you have scanned and accepted the request, press continue button'
           }
         />
+
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ErrorBottomSheet as any}

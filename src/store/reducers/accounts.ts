@@ -116,7 +116,6 @@ const initialState: {
 export default (state = initialState, action) => {
   const account = action.payload ? action.payload.serviceType : null;
   switch (action.type) {
-
     case TESTCOINS_RECEIVED:
       return {
         ...state,
@@ -317,7 +316,11 @@ export default (state = initialState, action) => {
           ...state[account],
           transfer: {
             ...state[account].transfer,
-            stage2: { ...state[account].transfer.stage2, failed: true },
+            stage2: {
+              ...state[account].transfer.stage2,
+              failed: true,
+              ...action.payload.errorDetails,
+            },
           },
           loading: {
             ...state[account].loading,
@@ -350,7 +353,11 @@ export default (state = initialState, action) => {
           ...state[account],
           transfer: {
             ...state[account].transfer,
-            stage3: { ...state[account].transfer.stage3, failed: true },
+            stage3: {
+              ...state[account].transfer.stage3,
+              failed: true,
+              ...action.payload.errorDetails,
+            },
           },
           loading: {
             ...state[account].loading,

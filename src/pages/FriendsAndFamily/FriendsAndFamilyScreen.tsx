@@ -49,6 +49,7 @@ import {
   makeContactRecipientDescription,
 } from '../../common/data/models/interfaces/RecipientDescribing';
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
+import Loader from '../../components/loader';
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -72,6 +73,7 @@ interface FriendsAndFamilyStateTypes {
   OtherTrustedContact: any[];
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
+  showLoader: boolean;
 }
 
 class FriendsAndFamilyScreen extends PureComponent<
@@ -102,6 +104,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       OtherTrustedContact:
         idx(props, (_) => _.addressBookData.OtherTrustedContact) || [],
       isShowingKnowMoreSheet: false,
+      showLoader: false
     };
   }
 
@@ -116,7 +119,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const oldDerivativeAccounts = idx(
       prevProps,
       (_) => _.regularAccount.hdWallet.derivativeAccounts,
@@ -142,6 +145,9 @@ class FriendsAndFamilyScreen extends PureComponent<
     ) {
       this.setState({
         loading: this.props.trustedChannelsSetupSyncing,
+      });
+      this.setState({
+        showLoader: this.props.trustedChannelsSetupSyncing,
       });
     }
   }
@@ -410,6 +416,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       IMKeeper: contactsKeptByUser,
       OtherTrustedContact: otherTrustedContacts,
       onRefresh,
+      showLoader
     } = this.state;
 
     return (
@@ -530,6 +537,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               />
             )}
         </ScrollView>
+        {showLoader ? <Loader /> : null}
 
         <BottomSheet
           enabledGestureInteraction={false}

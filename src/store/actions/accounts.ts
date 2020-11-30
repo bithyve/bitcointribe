@@ -25,7 +25,6 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 
-
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
 };
@@ -301,8 +300,8 @@ export const executedST2 = (serviceType, result) => {
   return { type: TRANSFER_ST2_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST2 = (serviceType) => {
-  return { type: TRANSFER_ST2_FAILED, payload: { serviceType } };
+export const failedST2 = (serviceType, errorDetails) => {
+  return { type: TRANSFER_ST2_FAILED, payload: { serviceType, errorDetails } };
 };
 
 export const executedST3 = (serviceType, result) => {
@@ -310,8 +309,8 @@ export const executedST3 = (serviceType, result) => {
   return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST3 = (serviceType) => {
-  return { type: TRANSFER_ST3_FAILED, payload: { serviceType } };
+export const failedST3 = (serviceType, errorDetails) => {
+  return { type: TRANSFER_ST3_FAILED, payload: { serviceType, errorDetails } };
 };
 
 export const switchLoader = (serviceType, beingLoaded) => {
