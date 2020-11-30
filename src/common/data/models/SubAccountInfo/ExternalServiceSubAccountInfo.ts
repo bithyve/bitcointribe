@@ -5,6 +5,7 @@ import SubAccountKind from '../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
 import { ImageSourcePropType } from 'react-native';
+import { AccountBalance } from '../../types/Account';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultTitle: string;
@@ -12,13 +13,13 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
   serviceAccountKind: ServiceAccountKind;
 };
 
-
-export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
+export default class ExternalServiceSubAccountInfo
+  implements ExternalServiceSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SERVICE;
   serviceAccountKind: ServiceAccountKind;
-  balance: number;
+  balances: AccountBalance;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -38,7 +39,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
-    balance = 0,
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     transactionIDs = [],
@@ -50,7 +51,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.defaultTitle = defaultTitle;
     this.defaultDescription = defaultDescription;
     this.serviceAccountKind = serviceAccountKind;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.isTFAEnabled = isTFAEnabled;
@@ -62,8 +63,9 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   }
 }
 
-
-function getAvatarImageSource(serviceAccountKind: ServiceAccountKind): ImageSourcePropType {
+function getAvatarImageSource(
+  serviceAccountKind: ServiceAccountKind,
+): ImageSourcePropType {
   switch (serviceAccountKind) {
     case ServiceAccountKind.FAST_BITCOINS:
       return require('../../../../assets/images/icons/icon_fastbitcoins_hex_dark.png');
