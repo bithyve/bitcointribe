@@ -1,15 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import Colors from '../../common/Colors';
 import CardStyles from '../../common/Styles/Cards';
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import SendableContactCarouselItem from './SendableContactCarouselItem';
 import RecipientKind from '../../common/data/enums/RecipientKind';
 import { ContactRecipientDescribing, RecipientDescribing, AccountRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 import SubAccountOptionCard from '../accounts/SubAccountOptionCard';
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 export type Props = {
   accountKind: string;
@@ -19,7 +17,6 @@ export type Props = {
 };
 
 const RecipientSelectionStrip: React.FC<Props> = ({
-  accountKind,
   recipients,
   selectedRecipients,
   onRecipientSelected,
@@ -56,7 +53,7 @@ const RecipientSelectionStrip: React.FC<Props> = ({
           >
             {recipient.kind == RecipientKind.CONTACT && (
               <SendableContactCarouselItem
-                containerStyle={styles.listItemContainer}
+                containerStyle={styles.contactListItemContainer}
                 contact={(recipient as ContactRecipientDescribing)}
                 isSelected={isSelected(recipient)}
               />
@@ -64,7 +61,7 @@ const RecipientSelectionStrip: React.FC<Props> = ({
               <SubAccountOptionCard
                 subAccount={getSubAccountForRecipient((recipient as AccountRecipientDescribing))}
                 isSelected={isSelected(recipient)}
-                containerStyle={styles.listItemContainer}
+                containerStyle={styles.accountShellListItemContainer}
               />
             ))}
           </TouchableOpacity>
@@ -80,27 +77,20 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor,
   },
 
-  // cardRootContainer: {
-  //   ...CardStyles.horizontalScrollViewCardContainer,
-  //   flex: 1,
-  //   width: widthPercentageToDP(34),
-  //   minWidth: 120,
-  //   marginLeft: 6,
-  // },
-
   listItemTouchableWrapper: {
     flex: 1,
-    width: widthPercentageToDP(34),
-    minWidth: 140,
-    marginLeft: 6,
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
-    backgroundColor: 'transparent',
     overflow: 'hidden',
     paddingVertical: 16,
+    marginHorizontal: 10,
   },
 
-  listItemContainer: {
-    marginHorizontal: 14,
+  accountShellListItemContainer: {
+    width: 120,
+  },
+
+  contactListItemContainer: {
+    width: 80,
   },
 });
 

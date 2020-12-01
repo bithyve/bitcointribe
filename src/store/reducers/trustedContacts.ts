@@ -112,7 +112,7 @@ export default (state: TrustedContactsState = initialState, action): TrustedCont
         service: action.payload.services[TRUSTED_CONTACTS],
         trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions({
           trustedContactsInfo: state.trustedContactsInfo,
-          intricateTrustedContactsData: action.payload.services[TRUSTED_CONTACTS].tc.trustedContacts,
+          backendTrustedContactsData: action.payload.services[TRUSTED_CONTACTS].tc.trustedContacts,
         }),
       };
 
@@ -217,7 +217,7 @@ export default (state: TrustedContactsState = initialState, action): TrustedCont
         trustedContactsInfo: action.payload.trustedContactsInfo,
         trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions({
           trustedContactsInfo: action.payload.trustedContactsInfo,
-          intricateTrustedContactsData: state.service.tc.trustedContacts,
+          backendTrustedContactsData: state.service.tc.trustedContacts,
         }),
       };
   }
@@ -228,10 +228,10 @@ export default (state: TrustedContactsState = initialState, action): TrustedCont
 
 function reduceTCInfoIntoRecipientDescriptions({
   trustedContactsInfo,
-  intricateTrustedContactsData,
+  backendTrustedContactsData,
 }: {
   trustedContactsInfo: TrustedContactInfo[];
-  intricateTrustedContactsData: Record<string, unknown>;
+  backendTrustedContactsData: Record<string, unknown>;
 }): ContactRecipientDescribing[] {
   return trustedContactsInfo.reduce((
     accumulatedRecipients: ContactRecipientDescribing[],
@@ -244,7 +244,7 @@ function reduceTCInfoIntoRecipientDescriptions({
     // someone is a guardian.
     const isGuardian = currentIndex < 3 ? true : false;
 
-    const backendTCInfo = intricateTrustedContactsData[displayedName.toLowerCase().trim()] || {};
+    backendTrustedContactsData[displayedName.toLowerCase().trim()] || {};
 
     const isWard: boolean = backendTCInfo.isWard || false;
     const hasTrustedAddress = Boolean(backendTCInfo.trustedAddress) || Boolean(backendTCInfo.trustedTestAddress);

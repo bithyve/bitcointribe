@@ -1,6 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import React, { useCallback, useEffect, ReactElement, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import React, { useCallback, useEffect, ReactElement, useMemo } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
@@ -19,8 +19,7 @@ import RecipientSelectionStrip from '../../../components/send/RecipientSelection
 import BottomInfoBox from '../../../components/BottomInfoBox';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { NavigationScreenComponent, NavigationScreenConfig } from 'react-navigation';
-import { NavigationStackOptions } from 'react-navigation-stack';
+import { NavigationScreenComponent } from 'react-navigation';
 import HeadingStyles from '../../../common/Styles/HeadingStyles';
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions';
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
@@ -30,7 +29,7 @@ import useWalletServiceForSubAccountKind from '../../../utils/hooks/state-select
 import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface';
 import Toast from '../../../components/Toast';
 import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells';
-import { AccountRecipientDescribing, RecipientDescribing, ContactRecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing';
 import { makeAddressRecipientDescription, makeAccountRecipientDescription } from '../../../utils/sending/RecipientFactories';
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState';
 import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../../store/actions/sending';
@@ -112,6 +111,15 @@ const AccountSendContainerScreen: NavigationScreenComponent<
     }, [sendingState]);
 
 
+    const isRecipientSelectedForSending = useCallback((recipient: RecipientDescribing) => {
+      return (
+        sendingState
+          .selectedRecipients
+          .some(recipient => recipient.id == recipient.id)
+      );
+    }, [sendingState]);
+
+
     function handleRecipientSelection(recipient: RecipientDescribing) {
       dispatch(addRecipientForSending(recipient));
       dispatch(recipientSelectedForAmountSetting(recipient));
@@ -125,6 +133,57 @@ const AccountSendContainerScreen: NavigationScreenComponent<
       });
     }
 
+
+    function handlePaymentURIScan(uri: string) {
+      let address: string;
+      let donationID: string | null = null;
+
+      try {
+        const decodingResult = walletService.decodePaymentURI(uri);
+
+        address = decodingResult.address;
+        const options = decodingResult.options;
+
+        // checking for donationId to send note
+        if (options?.message) {
+          const rawMessage = options.message;
+          donationID = rawMessage.split(':').pop().trim();
+        }
+      } catch (err) {
+        Alert.alert('Unable to decode payment URI');
+        return;
+      }
+
+      const newRecipient = makeAddressRecipientDescription({
+        address,
+        donationID,
+      });
+
+      handleRecipientSelection(newRecipient);
+    }
+
+
+    function handleManualAddressSubmit(address: string) {
+      const {
+        type: scannedAddressKind
+      }: { type: ScannedAddressKind } = walletService.addressDiff(address.trim());
+
+      switch (scannedAddressKind) {
+        case ScannedAddressKind.ADDRESS:
+          const addressRecipient = makeAddressRecipientDescription({ address });
+
+          if (isRecipientSelectedForSending(addressRecipient) == false) {
+            handleRecipientSelection(addressRecipient);
+          }
+
+          break;
+        case ScannedAddressKind.PAYMENT_URI:
+          handlePaymentURIScan(address);
+          break;
+      }
+    }
+
+
     function handleQRScan({ data: barcodeDataString }: BarCodeReadEvent) {
       const {
         type: scannedAddressKind
@@ -135,42 +194,13 @@ const AccountSendContainerScreen: NavigationScreenComponent<
           const recipientAddress = barcodeDataString;
           const addressRecipient = makeAddressRecipientDescription({ address: recipientAddress });
 
-          if ((
-            sendingState
-              .selectedRecipients
-              .some(recipient => recipient.id == addressRecipient.id)
-          ) == false) {
+          if (isRecipientSelectedForSending(addressRecipient) == false) {
             handleRecipientSelection(addressRecipient);
           }
 
           break;
         case ScannedAddressKind.PAYMENT_URI:
-          let address: string;
-          let donationID: string | null = null;
-
-          try {
-            const decodingResult = walletService.decodePaymentURI(barcodeDataString);
-
-            address = decodingResult.address;
-            const options = decodingResult.options;
-
-            // checking for donationId to send note
-            if (options?.message) {
-              const rawMessage = options.message;
-              donationID = rawMessage.split(':').pop().trim();
-            }
-          } catch (err) {
-            Alert.alert('Unable to decode payment URI');
-            return;
-          }
-
-          const newRecipient = makeAddressRecipientDescription({
-            address,
-            donationID,
-          });
-
-          handleRecipientSelection(newRecipient);
-
+          handlePaymentURIScan(barcodeDataString);
           break;
         default:
           Toast('Invalid QR');
@@ -205,7 +235,7 @@ const AccountSendContainerScreen: NavigationScreenComponent<
                     placeholder="Enter Address Manually"
                     subAccountKind={primarySubAccount.kind}
                     onAddressSubmitted={(address) => {
-                      this.setState({ recipientAddress: address });
+                      handleManualAddressSubmit(address);
                     }}
                   />
                 </View>
@@ -240,23 +270,23 @@ const AccountSendContainerScreen: NavigationScreenComponent<
           },
         ],
         ...(isShowingSelectableAccountsSection ? [{
-            kind: SectionKind.SELECT_ACCOUNT_SHELLS,
-            data: [null],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <View style={styles.viewSectionContentContainer}>
-                    <RecipientSelectionStrip
-                      accountKind={primarySubAccount.kind}
-                      recipients={accountRecipients}
-                      selectedRecipients={selectedAccountRecipients}
-                      onRecipientSelected={handleRecipientSelection}
-                    />
-                  </View>
+          kind: SectionKind.SELECT_ACCOUNT_SHELLS,
+          data: [null],
+          renderItem: () => {
+            return (
+              <View style={styles.viewSectionContainer}>
+                <View style={styles.viewSectionContentContainer}>
+                  <RecipientSelectionStrip
+                    accountKind={primarySubAccount.kind}
+                    recipients={accountRecipients}
+                    selectedRecipients={selectedAccountRecipients}
+                    onRecipientSelected={handleRecipientSelection}
+                  />
                 </View>
-              );
-            },
-          }] : []),
+              </View>
+            );
+          },
+        }] : []),
       ];
     }, []);
 

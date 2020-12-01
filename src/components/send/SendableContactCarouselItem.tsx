@@ -19,12 +19,6 @@ const SendableContactCarouselItem: React.FC<Props> = ({
   isSelected = false,
   containerStyle = {},
 }: Props) => {
-  const displayedNameText = useMemo(() => {
-    if (contact.displayedName.includes('F&F request'))
-      return `${contact.walletName}`;
-    else return `${contact.displayedName}`;
-  }, [contact]);
-
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>
       <View style={styles.circledAvatarContainer}>
@@ -49,7 +43,7 @@ const SendableContactCarouselItem: React.FC<Props> = ({
       </View>
 
       <Text style={styles.contactNameText} numberOfLines={1}>
-        {displayedNameText}
+        {contact.displayedName}
       </Text>
     </View>
   );
