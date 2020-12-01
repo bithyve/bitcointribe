@@ -11,6 +11,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes';
+import { v4 as uuidv4 } from 'uuid';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
 const { TESTNET, MAINNET } = API_URLS;
@@ -120,8 +121,9 @@ export default class Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
+      const requestId = uuidv4();
       const accountToAddressMapping = {
-        ['mono-id']: {
+        [requestId]: {
           External: externalAddresses,
           Internal: internalAddresses,
           Owned: ownedAddresses,
@@ -141,12 +143,12 @@ export default class Bitcoin {
       }
 
       const accountToResponseMapping = res.data;
-      const { Utxos, Txs } = accountToResponseMapping['mono-id'];
+
+      const { Utxos, Txs } = accountToResponseMapping[requestId];
       let balances = {
         balance: 0,
         unconfirmedBalance: 0,
       };
-
       const UTXOs = [];
       if (Utxos)
         for (const addressSpecificUTXOs of Utxos) {
