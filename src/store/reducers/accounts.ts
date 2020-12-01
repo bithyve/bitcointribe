@@ -156,7 +156,7 @@ export type AccountsState = {
   hasAccountShellMergeFailed: boolean;
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
-}
+};
 
 const initialState: AccountsState = {
   servicesEnriched: false,
@@ -460,6 +460,48 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       };
 
     case SERVICES_ENRICHED:
+      const { services } = action.payload;
+      const testAcc: TestAccount = services[TEST_ACCOUNT];
+      const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
+      const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
+
+      const updatedAccountShells = [
+        new AccountShell({
+          primarySubAccount: new TestSubAccountInfo({
+            balances: {
+              confirmed: testAcc.hdWallet.balances.balance,
+              unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
+            },
+            transactions: testAcc.hdWallet.transactions.transactionDetails,
+          }),
+          unit: BitcoinUnit.TSATS,
+          displayOrder: 1,
+        }),
+        new AccountShell({
+          primarySubAccount: new CheckingSubAccountInfo({
+            balances: {
+              confirmed: regularAcc.hdWallet.balances.balance,
+              unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
+            },
+            transactions: regularAcc.hdWallet.transactions.transactionDetails,
+          }),
+          unit: BitcoinUnit.SATS,
+          displayOrder: 2,
+        }),
+        new AccountShell({
+          primarySubAccount: new SavingsSubAccountInfo({
+            balances: {
+              confirmed: secureAcc.secureHDWallet.balances.balance,
+              unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
+            },
+            transactions:
+              secureAcc.secureHDWallet.transactions.transactionDetails,
+          }),
+          unit: BitcoinUnit.SATS,
+          displayOrder: 3,
+        }),
+      ];
+
       return {
         ...state,
         [REGULAR_ACCOUNT]: {
@@ -475,6 +517,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
           service: action.payload.services[SECURE_ACCOUNT],
         },
         servicesEnriched: true,
+        accountShells: updatedAccountShells,
       };
 
     case ACCOUNTS_LOADING:
@@ -551,8 +594,8 @@ export default (state: AccountsState = initialState, action): AccountsState => {
             ...state[accountType].donationAccount,
             settedup: action.payload.successful,
             loading: false,
-          }
-        }
+          },
+        },
       };
 
     case ADD_NEW_ACCOUNT_SHELL:
@@ -570,7 +613,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         hasNewAccountShellGenerationSucceeded: true,
         accountShells: state.accountShells.concat(action.payload),
       };
-
 
     case NEW_ACCOUNT_ADD_FAILED:
       return {
@@ -612,7 +654,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         hasAccountSettingsUpdateSucceeded: false,
         hasAccountSettingsUpdateFailed: false,
       };
-
 
     case REASSIGN_TRANSACTIONS:
       return {

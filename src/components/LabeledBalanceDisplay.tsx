@@ -1,12 +1,20 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import CurrencyKind from '../common/data/enums/CurrencyKind';
 import useCurrencyCode from '../utils/hooks/state-selectors/UseCurrencyCode';
 import useCurrencyKind from '../utils/hooks/state-selectors/UseCurrencyKind';
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from './MaterialCurrencyCodeIcon';
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from './MaterialCurrencyCodeIcon';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions';
 import useFormattedAmountText from '../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../utils/hooks/formatting/UseFormattedUnitText';
@@ -15,18 +23,17 @@ import BitcoinUnit from '../common/data/enums/BitcoinUnit';
 import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin';
 
 export type Props = {
-  balance: Satoshis,
+  balance: Satoshis;
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind;
   textColor?: string;
-  bitcoinIconColor?: 'gray' | 'dark' | 'light',
+  bitcoinIconColor?: 'gray' | 'dark' | 'light';
   iconSpacing?: number;
   containerStyle?: Record<string, unknown>;
   currencyImageStyle?: Record<string, unknown>;
   amountTextStyle?: Record<string, unknown>;
   unitTextStyle?: Record<string, unknown>;
 };
-
 
 /**
  * Displays a formatted balance amount in between a current icon
@@ -93,26 +100,25 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
     };
 
     if (prefersBitcoin) {
-      return <Image
-        style={style}
-        source={bitcoinIconSource}
-      />;
+      return <Image style={style} source={bitcoinIconSource} />;
     }
 
     if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
-      return <MaterialCurrencyCodeIcon
-        currencyCode={fiatCurrencyCode}
-        color={textColor}
-        size={style.width}
-        style={style}
-      />;
+      return (
+        <MaterialCurrencyCodeIcon
+          currencyCode={fiatCurrencyCode}
+          color={textColor}
+          size={style.width}
+          style={style}
+        />
+      );
     } else {
-      return <Image
-        style={style}
-        source={
-          getCurrencyImageByRegion(fiatCurrencyCode, bitcoinIconColor)
-        }
-      />;
+      return (
+        <Image
+          style={style}
+          source={getCurrencyImageByRegion(fiatCurrencyCode, bitcoinIconColor)}
+        />
+      );
     }
   };
 
@@ -122,17 +128,20 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
         <BalanceCurrencyIcon />
       </View>
 
-      <Text style={{ ...defaultStyles.amountText, color: textColor, ...amountTextStyle }}>
+      <Text
+        style={{
+          ...defaultStyles.amountText,
+          color: textColor,
+          ...amountTextStyle,
+        }}
+      >
         {formattedBalanceText}
       </Text>
 
-      <Text style={unitTextStyles}>
-        {formattedUnitText}
-      </Text>
+      <Text style={unitTextStyles}>{formattedUnitText}</Text>
     </View>
   );
 };
-
 
 const defaultStyles = StyleSheet.create({
   rootContainer: {
