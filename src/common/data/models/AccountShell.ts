@@ -4,6 +4,7 @@ import BitcoinUnit from '../enums/BitcoinUnit';
 import UTXOCompatibilityGroup from '../enums/UTXOCompatibilityGroup';
 import SubAccountDescribing from './SubAccountInfo/Interfaces';
 import { Satoshis } from '../typealiases/UnitAliases';
+import TransactionDescribing from './Transactions/Interfaces';
 
 type ConstructorProps = {
   displayOrder?: number | null;
@@ -68,6 +69,32 @@ export default class AccountShell {
         (current.balances.confirmed + current.balances.unconfirmed),
       0,
     );
+  };
+
+  /**
+   * Spendable balance of all sub-accounts in Satoshis.
+   */
+  static getSpendableBalance = (shell: AccountShell): Satoshis => {
+    return AccountShell.getSubAccounts(shell).reduce(
+      (accumulated, current) => accumulated + current.balances.confirmed,
+      0,
+    );
+  };
+
+  /**
+   * Transactions of all sub-accounts.
+   */
+  static getAllTransactions = (
+    shell: AccountShell,
+  ): TransactionDescribing[] => {
+    const transactions: TransactionDescribing[] = [];
+    AccountShell.getSubAccounts(shell).forEach(
+      (subAccount: SubAccountDescribing) => {
+        if (subAccount.transactions)
+          transactions.push(...subAccount.transactions);
+      },
+    );
+    return transactions;
   };
 
   static getVisibility(shell: AccountShell): AccountVisibility {

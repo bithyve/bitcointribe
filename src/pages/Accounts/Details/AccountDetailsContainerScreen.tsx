@@ -69,7 +69,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
   // TODO: Implement a hook that fetches transactions for an account and use it here.
   // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
-  const accountTransactions: TransactionDescribing[] = [];
+  const accountTransactions = AccountShell.getAllTransactions(accountShell);
 
   const {
     present: presentBottomSheet,
@@ -206,7 +206,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onSendPressed={() => {
             navigation.navigate('Send', {
               accountShellID,
-              spendableBalance: AccountShell.getTotalBalance(accountShell),
+              spendableBalance: AccountShell.getSpendableBalance(accountShell),
             });
           }}
           onReceivePressed={() => {
