@@ -28,16 +28,57 @@ export interface TransactionDetails {
   txid: string;
   status: string;
   confirmations: number;
+
+  /**
+   * Sats per byte
+   */
   fee: string;
+
+  /**
+   * UTC string
+   */
   date: string;
+
+  /**
+   * Inbound(Received)/Outbound(Sent) transaction
+   */
   transactionType: string;
+
+  /**
+   * Amount in Satoshis.
+   */
   amount: number;
+
+  /**
+   * Account(sub) to which the transaction belongs
+   */
   accountType: string;
+
+  /**
+   * Account(primary-sub) to which the transaction belongs
+   */
   primaryAccType?: string;
+
+  /**
+   * Name of the contact in case of an inbound transaction from trusted-contact
+   */
   contactName?: string;
+
+  /**
+   * Outbound transaction's destination
+   */
   recipientAddresses?: string[];
+
+  /**
+   * Inbound transaction's source
+   */
   senderAddresses?: string[];
+
   blockTime?: number;
+
+  /**
+   * Note/message attached w/ the transaction(Donation acc specific)
+   */
   message?: string;
 }
 
