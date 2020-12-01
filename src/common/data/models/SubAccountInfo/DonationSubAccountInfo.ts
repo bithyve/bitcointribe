@@ -3,7 +3,10 @@ import SubAccountKind from '../../enums/SubAccountKind';
 import { DonationSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import AccountVisibility from '../../enums/AccountVisibility';
-import { AccountBalance } from '../../types/Account';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   doneeName: string;
@@ -15,7 +18,7 @@ export default class DonationSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.DONATION;
-  balances: AccountBalance;
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -30,7 +33,7 @@ export default class DonationSubAccountInfo
 
   avatarImageSource = require('../../../../assets/images/icons/icon_donation_hexa.png');
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
 
   /**
    * Can either be `SINGLE_SIG_PUBLIC` or `MULTI_SIG_PUBLIC`,
@@ -48,7 +51,7 @@ export default class DonationSubAccountInfo
     causeName,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
@@ -60,7 +63,7 @@ export default class DonationSubAccountInfo
     this.isTFAEnabled = isTFAEnabled;
     this.doneeName = doneeName;
     this.causeName = causeName;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
   }
 }

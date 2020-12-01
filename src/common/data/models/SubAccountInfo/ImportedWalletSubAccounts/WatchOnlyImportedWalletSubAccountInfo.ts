@@ -1,8 +1,11 @@
 import { v4 as uuidV4 } from 'uuid';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { AccountBalance } from '../../../types/Account';
 import {
   ImportedWalletSubAccountDescribing,
   SubAccountDescribingConstructorProps,
@@ -15,7 +18,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.WATCH_ONLY_IMPORTED_WALLET;
-  balances: AccountBalance;
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -27,7 +30,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_import_watch_only_wallet.png');
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
@@ -38,7 +41,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -47,6 +50,6 @@ export default class WatchOnlyImportedWalletSubAccountInfo
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
   }
 }
