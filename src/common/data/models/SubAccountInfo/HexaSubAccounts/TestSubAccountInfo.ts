@@ -1,8 +1,11 @@
 import { v4 as uuidV4 } from 'uuid';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { AccountBalance } from '../../../types/Account';
 import {
   HexaSubAccountDescribing,
   SubAccountDescribingConstructorProps,
@@ -14,7 +17,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TEST;
-  balances: AccountBalance;
+  balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
@@ -25,7 +28,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_test.png');
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.TESTNET;
 
   constructor({
@@ -36,7 +39,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -45,6 +48,6 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
   }
 }

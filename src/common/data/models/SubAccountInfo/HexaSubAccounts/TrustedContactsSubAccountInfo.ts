@@ -7,7 +7,10 @@ import {
   SubAccountDescribingConstructorProps,
 } from '../Interfaces';
 import { ImageSourcePropType } from 'react-native';
-import { AccountBalance } from '../../../types/Account';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -16,7 +19,7 @@ export default class TrustedContactsSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
-  balances: AccountBalance;
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -28,7 +31,7 @@ export default class TrustedContactsSubAccountInfo
 
   avatarImageSource: ImageSourcePropType;
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
@@ -39,7 +42,7 @@ export default class TrustedContactsSubAccountInfo
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
@@ -49,7 +52,7 @@ export default class TrustedContactsSubAccountInfo
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
 
     // TODO: Define some way to generate this from the address book avatar.

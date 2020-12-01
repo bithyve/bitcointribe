@@ -1,8 +1,11 @@
 import { v4 as uuidV4 } from 'uuid';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { AccountBalance } from '../../../types/Account';
 import {
   HexaSubAccountDescribing,
   SubAccountDescribingConstructorProps,
@@ -15,7 +18,7 @@ export default class CheckingSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.REGULAR;
-  balances: AccountBalance;
+  balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled: boolean = false;
 
@@ -26,7 +29,7 @@ export default class CheckingSubAccountInfo
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_regular.png');
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
@@ -36,7 +39,7 @@ export default class CheckingSubAccountInfo
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
-    transactionIDs = [],
+    transactions = [],
   }: ConstructorProps) {
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
@@ -44,6 +47,6 @@ export default class CheckingSubAccountInfo
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
   }
 }

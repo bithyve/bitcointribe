@@ -41,6 +41,11 @@ export interface TransactionDetails {
   message?: string;
 }
 
+export interface Balances {
+  confirmed: number;
+  unconfirmed: number;
+}
+
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;

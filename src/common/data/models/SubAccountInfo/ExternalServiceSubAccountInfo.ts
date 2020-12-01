@@ -5,7 +5,10 @@ import SubAccountKind from '../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
 import { ImageSourcePropType } from 'react-native';
-import { AccountBalance } from '../../types/Account';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultTitle: string;
@@ -19,7 +22,7 @@ export default class ExternalServiceSubAccountInfo
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SERVICE;
   serviceAccountKind: ServiceAccountKind;
-  balances: AccountBalance;
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -31,7 +34,7 @@ export default class ExternalServiceSubAccountInfo
 
   avatarImageSource: ImageSourcePropType;
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
@@ -42,7 +45,7 @@ export default class ExternalServiceSubAccountInfo
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
-    transactionIDs = [],
+    transactions = [],
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
@@ -56,7 +59,7 @@ export default class ExternalServiceSubAccountInfo
     this.customDescription = customDescription;
     this.isTFAEnabled = isTFAEnabled;
     this.visibility = visibility;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
 
     this.avatarImageSource = getAvatarImageSource(serviceAccountKind);

@@ -3,7 +3,10 @@ import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import UTXOCompatibilityGroup from "../../enums/UTXOCompatibilityGroup";
 import AccountVisibility from '../../enums/AccountVisibility';
 import { ImageSourcePropType } from 'react-native';
-import { AccountBalance } from '../../types/Account';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
 
 interface SubAccountDescribing {
   readonly id: string;
@@ -14,7 +17,7 @@ interface SubAccountDescribing {
   /**
    * Balances in Satoshis.
    */
-  balances: AccountBalance;
+  balances: Balances;
 
   /**
    * Default displayable title.
@@ -46,7 +49,8 @@ interface SubAccountDescribing {
   avatarImageSource: ImageSourcePropType;
 
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
-  transactionIDs: string[];
+  // transactionIDs: string[];
+  transactions: TransactionDetails[];
 }
 
 export interface HexaSubAccountDescribing extends SubAccountDescribing {}
@@ -69,13 +73,13 @@ export type SubAccountDescribingConstructorProps = {
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;
-  balances?: AccountBalance;
+  balances?: Balances;
   visibility?: AccountVisibility;
   isTFAEnabled?: boolean;
   avatarImageSource?: ImageSourcePropType;
   secondaryAccountUUIDs?: string[];
   utxoCompatibilityGroup?: UTXOCompatibilityGroup;
-  transactionIDs?: string[];
+  transactions?: TransactionDetails[];
 };
 
 export default SubAccountDescribing;
