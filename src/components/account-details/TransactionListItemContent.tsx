@@ -24,47 +24,51 @@ const TransactionListItemContent: React.FC<Props> = ({
   currencyKind = useCurrencyKind(),
 }: Props) => {
   const transactionKindIconName = useMemo(() => {
-    switch (transaction.transactionKind) {
+    switch (transaction.transactionType) {
       case TransactionKind.RECEIVE:
         return 'long-arrow-down';
       case TransactionKind.SEND:
         return 'long-arrow-up';
     }
-  }, [transaction.transactionKind]);
+  }, [transaction.transactionType]);
 
   const transactionKindIconColor = useMemo(() => {
-    switch (transaction.transactionKind) {
+    switch (transaction.transactionType) {
       case TransactionKind.RECEIVE:
         return Colors.green;
       case TransactionKind.SEND:
         return Colors.red;
     }
-  }, [transaction.transactionKind]);
+  }, [transaction.transactionType]);
 
   const amountTextStyle = useMemo(() => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
     };
-  }, [transaction.transactionKind]);
+  }, [transaction.transactionType]);
 
   const formattedDateText = useMemo(() => {
-    return moment(transaction.timestamp).format('DD MMMM YYYY');
-  }, [transaction.transactionKind]);
+    return moment(transaction.date).format('DD MMMM YYYY');
+  }, [transaction.transactionType]);
 
   return (
     <>
       <Icon
         style={styles.transactionKindIcon}
         name={transactionKindIconName}
-        type={"font-awesome"}
+        type={'font-awesome'}
         color={transactionKindIconColor}
         size={13}
       />
 
       <ListItem.Content style={styles.titleSection}>
-        <ListItem.Title style={styles.titleText} numberOfLines={1}>{transaction.message}</ListItem.Title>
-        <ListItem.Subtitle style={styles.subtitleText}>{formattedDateText}</ListItem.Subtitle>
+        <ListItem.Title style={styles.titleText} numberOfLines={1}>
+          {transaction.message}
+        </ListItem.Title>
+        <ListItem.Subtitle style={styles.subtitleText}>
+          {formattedDateText}
+        </ListItem.Subtitle>
       </ListItem.Content>
 
       <ListItem.Content style={styles.amountSection}>
@@ -75,8 +79,8 @@ const TransactionListItemContent: React.FC<Props> = ({
           amountTextStyle={amountTextStyle}
           currencyImageStyle={styles.bitcoinImage}
           iconSpacing={2}
-          bitcoinIconColor='gray'
-          textColor='gray'
+          bitcoinIconColor="gray"
+          textColor="gray"
         />
       </ListItem.Content>
     </>
