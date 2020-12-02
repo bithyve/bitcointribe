@@ -167,23 +167,7 @@ const initialState: AccountsState = {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
-  accountShells: [
-    new AccountShell({
-      primarySubAccount: new TestSubAccountInfo({}),
-      unit: BitcoinUnit.TSATS,
-      displayOrder: 1,
-    }),
-    new AccountShell({
-      primarySubAccount: new CheckingSubAccountInfo({}),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 2,
-    }),
-    new AccountShell({
-      primarySubAccount: new SavingsSubAccountInfo({}),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 3,
-    }),
-  ],
+  accountShells: [],
 
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,

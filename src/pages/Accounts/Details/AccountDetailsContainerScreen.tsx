@@ -211,7 +211,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           }}
           onReceivePressed={() => {
             navigation.navigate('Receive', {
-              accountShellID,
+              serviceType: primarySubAccount.sourceKind,
+              //TODO: fill derivativeAccountDetails(for ejected accounts)
             });
           }}
         />
