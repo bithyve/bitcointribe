@@ -1,18 +1,24 @@
 import SubAccountKind from '../../enums/SubAccountKind';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
-import UTXOCompatibilityGroup from "../../enums/UTXOCompatibilityGroup";
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import AccountVisibility from '../../enums/AccountVisibility';
 import { ImageSourcePropType } from 'react-native';
 import {
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
   readonly id: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
+
+  /**
+   * Parent account(backend) of this sub-account
+   */
+  sourceKind: SourceAccountKind;
 
   /**
    * Balances in Satoshis.

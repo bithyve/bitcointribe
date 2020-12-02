@@ -4,6 +4,7 @@ import {
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
+import SourceAccountKind from '../../../enums/SourceAccountKind';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
 import {
@@ -18,6 +19,7 @@ export default class CheckingSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.REGULAR;
+  sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
   balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled: boolean = false;
@@ -30,7 +32,8 @@ export default class CheckingSubAccountInfo
   avatarImageSource = require('../../../../../assets/images/icons/icon_regular.png');
 
   transactions: TransactionDetails[];
-  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup =
+    UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
     accountShellID = null,

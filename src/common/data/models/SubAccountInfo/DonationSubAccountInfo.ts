@@ -1,12 +1,16 @@
 import { v4 as uuidV4 } from 'uuid';
 import SubAccountKind from '../../enums/SubAccountKind';
-import { DonationSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
+import {
+  DonationSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from './Interfaces';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import AccountVisibility from '../../enums/AccountVisibility';
 import {
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   doneeName: string;
@@ -19,6 +23,7 @@ export default class DonationSubAccountInfo
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.DONATION;
   balances: Balances;
+  sourceKind: SourceAccountKind;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -61,6 +66,9 @@ export default class DonationSubAccountInfo
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
+    this.sourceKind = isTFAEnabled
+      ? SourceAccountKind.SECURE_ACCOUNT
+      : SourceAccountKind.REGULAR_ACCOUNT;
     this.doneeName = doneeName;
     this.causeName = causeName;
     this.transactions = transactions;

@@ -26,6 +26,6 @@ enum SubAccountKind {
   WATCH_ONLY_IMPORTED_WALLET,
 
   FULLY_IMPORTED_WALLET,
-};
+}
 
 export default SubAccountKind;
