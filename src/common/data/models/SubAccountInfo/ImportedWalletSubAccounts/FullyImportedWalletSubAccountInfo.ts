@@ -1,48 +1,61 @@
 import { v4 as uuidV4 } from 'uuid';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
+import SourceAccountKind from '../../../enums/SourceAccountKind';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { ImportedWalletSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
+import {
+  ImportedWalletSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from '../Interfaces';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
-
-export default class FullyImportedWalletSubAccountInfo implements ImportedWalletSubAccountDescribing {
-  id: string = uuidV4();
+export default class FullyImportedWalletSubAccountInfo
+  implements ImportedWalletSubAccountDescribing {
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
-  balance: number;
+  sourceKind: SourceAccountKind;
+
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Fully import and manage a non-Hexa wallet.";
+  defaultDescription: string = 'Fully import and manage a non-Hexa wallet.';
   customDisplayName: string | null;
   customDescription: string | null;
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_wallet.png');
 
-  transactionIDs: string[];
-  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
+  transactions: TransactionDetails[];
+  utxoCompatibilityGroup: UTXOCompatibilityGroup =
+    UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
-    defaultTitle = "Full Import",
-    balance = 0,
+    defaultTitle = 'Full Import',
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
   }
 }

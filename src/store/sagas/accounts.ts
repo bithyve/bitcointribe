@@ -154,7 +154,7 @@ function* fetchTransactionsWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify(preFetchTransactions) !==
-    JSON.stringify(postFetchTransactions)
+      JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -195,7 +195,7 @@ function* fetchBalanceTxWorker({ payload }) {
   const res = yield call(service.getBalanceTransactions, {
     restore: payload.options.restore,
   });
-
+  console.log({ res });
   const postFetchBalances =
     res.status === 200 ? JSON.stringify(res.data.balances) : preFetchBalances;
   const postFetchTransactions =
@@ -287,7 +287,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-    JSON.stringify({ postFetchBalances, postFetchTransactions })
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -366,11 +366,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const preFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-      accountNumber
-      ]
+          accountNumber
+        ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-      accountNumber
-      ],
+          accountNumber
+        ],
   );
 
   const res = yield call(
@@ -382,11 +382,11 @@ function* syncViaXpubAgentWorker({ payload }) {
   const postFetchDerivativeAccount = JSON.stringify(
     serviceType === REGULAR_ACCOUNT
       ? service.hdWallet.derivativeAccounts[derivativeAccountType][
-      accountNumber
-      ]
+          accountNumber
+        ]
       : service.secureHDWallet.derivativeAccounts[derivativeAccountType][
-      accountNumber
-      ],
+          accountNumber
+        ],
   );
 
   if (res.status === 200) {
@@ -474,7 +474,7 @@ function* processRecipients(
 
         const accountNumber =
           regularAccount.hdWallet.trustedContactToDA[
-          contactName.toLowerCase().trim()
+            contactName.toLowerCase().trim()
           ];
         if (accountNumber) {
           const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
@@ -494,7 +494,7 @@ function* processRecipients(
                 trustedAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedAddress)
                 res = { status: 200, data: { address: trustedAddress } };
               else
@@ -511,7 +511,7 @@ function* processRecipients(
                 trustedTestAddress,
               } = trustedContactsServices.tc.trustedContacts[
                 contactName.toLowerCase().trim()
-                ];
+              ];
               if (trustedTestAddress)
                 res = { status: 200, data: { address: trustedTestAddress } };
               else
@@ -754,12 +754,12 @@ function* accumulativeTxAndBalWorker() {
 
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -771,7 +771,7 @@ function* accumulativeTxAndBalWorker() {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-      .transactionDetails
+        .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -1078,13 +1078,19 @@ export const updateDonationPreferencesWatcher = createWatcher(
   UPDATE_DONATION_PREFERENCES,
 );
 
-
-function* addNewAccountShell({ payload: subAccountInfo }: { payload: SubAccountDescribing }) {
+function* addNewAccountShell({
+  payload: subAccountInfo,
+}: {
+  payload: SubAccountDescribing;
+}) {
   // TODO: Devise some way to reference and call a new account creation service here.
 
   console.log('addNewAccountShell saga');
 
-  const bitcoinUnit = subAccountInfo.kind == SubAccountKind.TEST ? BitcoinUnit.TSATS : BitcoinUnit.SATS;
+  const bitcoinUnit =
+    subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
+      ? BitcoinUnit.TSATS
+      : BitcoinUnit.SATS;
 
   const newAccountShell = new AccountShell({
     unit: bitcoinUnit,
@@ -1100,7 +1106,9 @@ function* addNewAccountShell({ payload: subAccountInfo }: { payload: SubAccountD
     yield put(newAccountShellAdded({ accountShell: newAccountShell }));
   } catch (error) {
     console.log('addNewAccountShell saga::error: ' + error);
-    yield put(newAccountShellAddFailed({ accountShell: newAccountShell, error }));
+    yield put(
+      newAccountShellAddFailed({ accountShell: newAccountShell, error }),
+    );
   }
 }
 
@@ -1109,8 +1117,11 @@ export const addNewAccountShellWatcher = createWatcher(
   ADD_NEW_ACCOUNT_SHELL,
 );
 
-
-function* updateAccountSettings({ payload: account }: { payload: SubAccountDescribing }) {
+function* updateAccountSettings({
+  payload: account,
+}: {
+  payload: SubAccountDescribing;
+}) {
   try {
     // TODO: Implement backend logic here for saving an account's properties
     yield put(accountSettingsUpdated({ account }));
@@ -1124,30 +1135,30 @@ export const updateAccountSettingsWatcher = createWatcher(
   UPDATE_SUB_ACCOUNT_SETTINGS,
 );
 
-
-
 function* reassignTransactions({
-  payload: {
-    transactionIDs,
-    sourceID,
-    destinationID,
-  }
-}: { payload: ReassignTransactionsActionPayload }) {
+  payload: { transactionIDs, sourceID, destinationID },
+}: {
+  payload: ReassignTransactionsActionPayload;
+}) {
   try {
     // TODO: Implement backend logic here for processing transaction re-assignment
 
-    yield put(transactionReassignmentSucceeded({
-      transactionIDs,
-      sourceID,
-      destinationID,
-    }));
+    yield put(
+      transactionReassignmentSucceeded({
+        transactionIDs,
+        sourceID,
+        destinationID,
+      }),
+    );
   } catch (error) {
-    yield put(transactionReassignmentFailed({
-      transactionIDs,
-      sourceID,
-      destinationID,
-      error,
-    }));
+    yield put(
+      transactionReassignmentFailed({
+        transactionIDs,
+        sourceID,
+        destinationID,
+        error,
+      }),
+    );
   }
 }
 
@@ -1156,26 +1167,28 @@ export const reassignTransactionsWatcher = createWatcher(
   REASSIGN_TRANSACTIONS,
 );
 
-
 function* mergeAccountShells({
-  payload: {
-    source,
-    destination,
-  }
-}: { payload: MergeAccountShellsActionPayload }) {
+  payload: { source, destination },
+}: {
+  payload: MergeAccountShellsActionPayload;
+}) {
   try {
     // TODO: Implement backend logic here for processing the merge
 
-    yield put(accountShellMergeSucceeded({
-      source,
-      destination,
-    }));
+    yield put(
+      accountShellMergeSucceeded({
+        source,
+        destination,
+      }),
+    );
   } catch (error) {
-    yield put(accountShellMergeFailed({
-      source,
-      destination,
-      error,
-    }));
+    yield put(
+      accountShellMergeFailed({
+        source,
+        destination,
+        error,
+      }),
+    );
   }
 }
 

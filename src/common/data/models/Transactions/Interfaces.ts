@@ -1,8 +1,8 @@
-import SubAccountKind from "../../enums/SubAccountKind";
-import ServiceAccountKind from "../../enums/ServiceAccountKind";
-import TransactionConfirmationStatus from "../../enums/TransactionConfirmationStatus";
-import TransactionKind from "../../enums/TransactionKind";
-
+import SubAccountKind from '../../enums/SubAccountKind';
+import ServiceAccountKind from '../../enums/ServiceAccountKind';
+import TransactionConfirmationStatus from '../../enums/TransactionConfirmationStatus';
+import TransactionKind from '../../enums/TransactionKind';
+import { TransactionDetails } from '../../../../bitcoin/utilities/Interface';
 
 export interface BaseTransactionDescribing {
   txID: string;
@@ -16,8 +16,8 @@ export interface BaseTransactionDescribing {
   fee: number;
 
   /**
-  * Unix timestamp (The number of milliseconds elapsed since January 1, 1970 00:00:00 UTC)
-  */
+   * Unix timestamp (The number of milliseconds elapsed since January 1, 1970 00:00:00 UTC)
+   */
   timestamp: number;
 
   /**
@@ -38,8 +38,8 @@ export interface BaseTransactionDescribing {
   xPubServiceKind?: ServiceAccountKind;
 }
 
-export interface InboundTransactionDescribing extends BaseTransactionDescribing {
-
+export interface InboundTransactionDescribing
+  extends BaseTransactionDescribing {
   /**
    * The address that this transaction was sent from.
    * (Applies when the transaction is an inbound (AKA "RECEIVE") transaction)
@@ -52,8 +52,8 @@ export interface InboundTransactionDescribing extends BaseTransactionDescribing 
   sourceXPubAccountID: string | null;
 }
 
-export interface OutboundTransactionDescribing extends BaseTransactionDescribing {
-
+export interface OutboundTransactionDescribing
+  extends BaseTransactionDescribing {
   /**
    * The address that this transaction was sent to.
    * (Applies when the transaction is an outgoing (AKA "SEND") transaction)
@@ -61,10 +61,8 @@ export interface OutboundTransactionDescribing extends BaseTransactionDescribing
   destinationAddress: string | null;
 }
 
-
-type TransactionDescribing =
-  InboundTransactionDescribing |
-  OutboundTransactionDescribing;
-
+type TransactionDescribing = TransactionDetails; // tx-describing now stands for backend's tx-details interface
+// InboundTransactionDescribing |
+// OutboundTransactionDescribing;
 
 export default TransactionDescribing;

@@ -1,46 +1,59 @@
 import { v4 as uuidV4 } from 'uuid';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
+import SourceAccountKind from '../../../enums/SourceAccountKind';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
-import { HexaSubAccountDescribing, SubAccountDescribingConstructorProps } from "../Interfaces";
+import {
+  HexaSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from '../Interfaces';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
-  kind: SubAccountKind = SubAccountKind.TEST;
-  balance: number;
+  kind: SubAccountKind = SubAccountKind.TEST_ACCOUNT;
+  sourceKind: SourceAccountKind = SourceAccountKind.TEST_ACCOUNT;
+
+  balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Learn Bitcoin";
+  defaultDescription: string = 'Learn Bitcoin';
   customDisplayName: string | null;
   customDescription: string | null;
 
   avatarImageSource = require('../../../../../assets/images/icons/icon_test.png');
 
-  transactionIDs: string[];
-  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.TESTNET;
+  transactions: TransactionDetails[];
+  utxoCompatibilityGroup: UTXOCompatibilityGroup =
+    UTXOCompatibilityGroup.TESTNET;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
-    defaultTitle = "Test Account",
-    balance = 0,
+    defaultTitle = 'Test Account',
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
   }
 }

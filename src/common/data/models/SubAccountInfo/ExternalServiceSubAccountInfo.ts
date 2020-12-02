@@ -3,8 +3,16 @@ import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
-import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
+import {
+  ExternalServiceSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from './Interfaces';
 import { ImageSourcePropType } from 'react-native';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultTitle: string;
@@ -12,13 +20,15 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
   serviceAccountKind: ServiceAccountKind;
 };
 
-
-export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
-  id: string = uuidV4();
+export default class ExternalServiceSubAccountInfo
+  implements ExternalServiceSubAccountDescribing {
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SERVICE;
+  sourceKind: SourceAccountKind;
+
   serviceAccountKind: ServiceAccountKind;
-  balance: number;
+  balances: Balances;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
@@ -30,40 +40,43 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
 
   avatarImageSource: ImageSourcePropType;
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
-    balance = 0,
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
-    transactionIDs = [],
+    transactions = [],
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.defaultDescription = defaultDescription;
     this.serviceAccountKind = serviceAccountKind;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.isTFAEnabled = isTFAEnabled;
     this.visibility = visibility;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
 
     this.avatarImageSource = getAvatarImageSource(serviceAccountKind);
   }
 }
 
-
-function getAvatarImageSource(serviceAccountKind: ServiceAccountKind): ImageSourcePropType {
+function getAvatarImageSource(
+  serviceAccountKind: ServiceAccountKind,
+): ImageSourcePropType {
   switch (serviceAccountKind) {
     case ServiceAccountKind.FAST_BITCOINS:
       return require('../../../../assets/images/icons/icon_fastbitcoins_hex_dark.png');

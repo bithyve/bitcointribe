@@ -1,26 +1,35 @@
 import { v4 as uuidV4 } from 'uuid';
-import SubAccountKind from "../../enums/SubAccountKind";
-import { DonationSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
+import SubAccountKind from '../../enums/SubAccountKind';
+import {
+  DonationSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from './Interfaces';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
 import AccountVisibility from '../../enums/AccountVisibility';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   doneeName: string;
   causeName: string;
-}
+};
 
-
-export default class DonationSubAccountInfo implements DonationSubAccountDescribing {
-  id: string = uuidV4();
+export default class DonationSubAccountInfo
+  implements DonationSubAccountDescribing {
+  id: string;
   accountShellID: string | null;
-  kind: SubAccountKind = SubAccountKind.DONATION;
-  balance: number;
+  kind: SubAccountKind = SubAccountKind.DONATION_ACCOUNT;
+  balances: Balances;
+  sourceKind: SourceAccountKind;
 
   visibility: AccountVisibility;
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = "Directly Accept Donations";
+  defaultDescription: string = 'Directly Accept Donations';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -29,7 +38,7 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
 
   avatarImageSource = require('../../../../assets/images/icons/icon_donation_hexa.png');
 
-  transactionIDs: string[];
+  transactions: TransactionDetails[];
 
   /**
    * Can either be `SINGLE_SIG_PUBLIC` or `MULTI_SIG_PUBLIC`,
@@ -38,28 +47,33 @@ export default class DonationSubAccountInfo implements DonationSubAccountDescrib
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
-    defaultTitle = "Donation Account",
-    balance = 0,
+    defaultTitle = 'Donation Account',
+    balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
     doneeName,
     causeName,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
-    transactionIDs = [],
+    transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
-    this.balance = balance;
+    this.balances = balances;
     this.customDisplayName = customDisplayName;
     this.customDescription = customDescription;
     this.visibility = visibility;
     this.isTFAEnabled = isTFAEnabled;
+    this.sourceKind = isTFAEnabled
+      ? SourceAccountKind.SECURE_ACCOUNT
+      : SourceAccountKind.REGULAR_ACCOUNT;
     this.doneeName = doneeName;
     this.causeName = causeName;
-    this.transactionIDs = transactionIDs;
+    this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
   }
 }

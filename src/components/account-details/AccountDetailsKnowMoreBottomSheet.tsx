@@ -23,14 +23,34 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
 }: Props) => {
   const BottomSheetContent = () => {
     switch (accountKind) {
-      case SubAccountKind.TEST:
-        return <TestAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case SubAccountKind.SECURE:
-        return <SavingsAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case SubAccountKind.REGULAR:
-        return <CheckingAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer}/>;
-      case SubAccountKind.DONATION:
-        return <DonationAccountKnowMoreSheetContents titleClicked={onClose} containerStyle={styles.contentContainer} />;
+      case SubAccountKind.TEST_ACCOUNT:
+        return (
+          <TestAccountKnowMoreSheetContents
+            titleClicked={onClose}
+            containerStyle={styles.contentContainer}
+          />
+        );
+      case SubAccountKind.SECURE_ACCOUNT:
+        return (
+          <SavingsAccountKnowMoreSheetContents
+            titleClicked={onClose}
+            containerStyle={styles.contentContainer}
+          />
+        );
+      case SubAccountKind.REGULAR_ACCOUNT:
+        return (
+          <CheckingAccountKnowMoreSheetContents
+            titleClicked={onClose}
+            containerStyle={styles.contentContainer}
+          />
+        );
+      case SubAccountKind.DONATION_ACCOUNT:
+        return (
+          <DonationAccountKnowMoreSheetContents
+            titleClicked={onClose}
+            containerStyle={styles.contentContainer}
+          />
+        );
       default:
         return null;
     }

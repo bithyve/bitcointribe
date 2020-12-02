@@ -1,6 +1,6 @@
 enum TransactionKind {
-  SEND,
-  RECEIVE,
-};
+  SEND = 'Send',
+  RECEIVE = 'Received',
+}
 
 export default TransactionKind;

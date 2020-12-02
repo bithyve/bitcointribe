@@ -1,20 +1,29 @@
-import SubAccountKind from "../../enums/SubAccountKind";
-import ServiceAccountKind from "../../enums/ServiceAccountKind";
-import UTXOCompatibilityGroup from "../../enums/UTXOCompatibilityGroup";
-import AccountVisibility from "../../enums/AccountVisibility";
-import { ImageSourcePropType } from "react-native";
-
+import SubAccountKind from '../../enums/SubAccountKind';
+import ServiceAccountKind from '../../enums/ServiceAccountKind';
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
+import AccountVisibility from '../../enums/AccountVisibility';
+import { ImageSourcePropType } from 'react-native';
+import {
+  Balances,
+  TransactionDetails,
+} from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
-  readonly id: string;
+  id: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
 
   /**
-   * Balance in Satoshis.
+   * Parent account(backend) of this sub-account
    */
-  balance: number;
+  sourceKind: SourceAccountKind;
+
+  /**
+   * Balances in Satoshis.
+   */
+  balances: Balances;
 
   /**
    * Default displayable title.
@@ -46,9 +55,9 @@ interface SubAccountDescribing {
   avatarImageSource: ImageSourcePropType;
 
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
-  transactionIDs: string[];
+  // transactionIDs: string[];
+  transactions: TransactionDetails[];
 }
-
 
 export interface HexaSubAccountDescribing extends SubAccountDescribing {}
 
@@ -57,29 +66,27 @@ export interface DonationSubAccountDescribing extends HexaSubAccountDescribing {
   causeName: string;
 }
 
-export interface ExternalServiceSubAccountDescribing extends
-  SubAccountDescribing {
+export interface ExternalServiceSubAccountDescribing
+  extends SubAccountDescribing {
   readonly serviceAccountKind: ServiceAccountKind;
 }
 
-export interface ImportedWalletSubAccountDescribing extends SubAccountDescribing {}
-
+export interface ImportedWalletSubAccountDescribing
+  extends SubAccountDescribing {}
 
 export type SubAccountDescribingConstructorProps = {
+  id?: string;
   accountShellID?: string | null;
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;
-  balance?: number;
+  balances?: Balances;
   visibility?: AccountVisibility;
   isTFAEnabled?: boolean;
   avatarImageSource?: ImageSourcePropType;
   secondaryAccountUUIDs?: string[];
   utxoCompatibilityGroup?: UTXOCompatibilityGroup;
-  transactionIDs?: string[];
+  transactions?: TransactionDetails[];
 };
 
-
 export default SubAccountDescribing;
-
-

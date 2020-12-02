@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,10 +8,11 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
 import TransactionsList from '../../../components/account-details/AccountDetailsTransactionsList';
-import sampleTransactions from './SampleTransactions';
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import KnowMoreBottomSheet, { KnowMoreBottomSheetHandle } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet';
+import KnowMoreBottomSheet, {
+  KnowMoreBottomSheetHandle,
+} from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet';
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
@@ -23,6 +25,17 @@ import AccountShell from '../../../common/data/models/AccountShell';
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
 import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
+import {
+  DONATION_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../../common/constants/serviceTypes';
+import SubAccountKind from '../../../common/data/enums/SubAccountKind';
+import {
+  fetchBalanceTx,
+  fetchDerivativeAccBalTx,
+  syncViaXpubAgent,
+} from '../../../store/actions/accounts';
+import { setAutoAccountSync } from '../../../store/actions/loaders';
 
 export type Props = {
   navigation: any;
@@ -30,47 +43,111 @@ export type Props = {
 
 export type TransactionPreviewHeaderProps = {
   onViewMorePressed: () => void;
-}
+};
 
 const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> = ({
   onViewMorePressed,
 }: TransactionPreviewHeaderProps) => {
   return (
-    <View style={{ flexDirection: 'row', marginBottom: 42, justifyContent: 'space-between' }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        marginBottom: 42,
+        justifyContent: 'space-between',
+      }}
+    >
       <Text style={styles.transactionPreviewHeaderDateText}>Today</Text>
 
       <TouchableOpacity
         style={{ marginLeft: 'auto', flex: 0 }}
         onPress={onViewMorePressed}
       >
-        <Text style={styles.transactionPreviewHeaderTouchableText}>View More</Text>
+        <Text style={styles.transactionPreviewHeaderTouchableText}>
+          View More
+        </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
+const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
+  const dispatch = useDispatch();
 
-const AccountDetailsContainerScreen: React.FC<Props> = ({
-  navigation,
-}) => {
   const accountShellID = useMemo(() => {
     return navigation.getParam('accountShellID');
   }, [navigation]);
-
   const accountShell = useAccountShellFromNavigation(navigation);
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
+  const accountTransactions = AccountShell.getAllTransactions(accountShell);
 
-  // TODO: Implement a hook that fetches transactions for an account and use it here.
-  // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
-  const accountTransactions = sampleTransactions;
+  const autoAccountSync = useSelector((state) => state.loaders.autoAccountSync);
 
-  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal();
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal();
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
     navigation.navigate('TransactionDetails', {
-      txID: transaction.txID,
+      txID: transaction.txid,
     });
   }
+
+  const refreshAccountBalance = useCallback(() => {
+    const nonDerivativeAccounts = [
+      SubAccountKind.TEST_ACCOUNT,
+      SubAccountKind.REGULAR_ACCOUNT,
+      SubAccountKind.SECURE_ACCOUNT,
+    ];
+    if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
+      const derivativeAccountDetails = {
+        type: primarySubAccount.kind,
+        number: 0,
+      };
+
+      if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+        dispatch(
+          syncViaXpubAgent(
+            primarySubAccount.sourceKind,
+            derivativeAccountDetails.type,
+            derivativeAccountDetails.number,
+          ),
+        );
+      else
+        dispatch(
+          fetchDerivativeAccBalTx(
+            primarySubAccount.sourceKind,
+            derivativeAccountDetails.type,
+            derivativeAccountDetails.number,
+          ),
+        );
+
+      dispatch(setAutoAccountSync(`${derivativeAccountDetails.type + 0}`));
+    } else {
+      dispatch(
+        fetchBalanceTx(primarySubAccount.sourceKind, {
+          loader: true,
+          syncTrustedDerivative:
+            primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
+        }),
+      );
+      dispatch(setAutoAccountSync(`${primarySubAccount.kind + 0}`));
+    }
+  }, [primarySubAccount]);
+
+  const autoAccountRefresh = useCallback(() => {
+    // refreshes the account-shell once per-session
+    if (autoAccountSync && autoAccountSync[`${primarySubAccount.kind + 0}`])
+      // account-shell already synched
+      return;
+    else {
+      refreshAccountBalance();
+    }
+  }, [autoAccountSync, primarySubAccount]);
+
+  useEffect(() => {
+    autoAccountRefresh();
+  }, []);
 
   function navigateToTransactionsList() {
     navigation.navigate('TransactionsList', {
@@ -86,7 +163,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
 
   const showKnowMoreSheet = useCallback(() => {
     presentBottomSheet(
-      <KnowMoreBottomSheet accountKind={primarySubAccount.kind} onClose={dismissBottomSheet} />,
+      <KnowMoreBottomSheet
+        accountKind={primarySubAccount.kind}
+        onClose={dismissBottomSheet}
+      />,
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [0, '95%'],
@@ -95,64 +175,70 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
     );
   }, [presentBottomSheet, dismissBottomSheet]);
 
-  const showReassignmentConfirmationBottomSheet = useCallback((destinationID) => {
-    presentBottomSheet(
-      <TransactionReassignmentSuccessBottomSheet
-        onViewAccountDetailsPressed={() => {
-          dismissBottomSheet();
-          navigation.dispatch(resetStackToAccountDetails({
-            accountShellID: destinationID,
-          }));
-        }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [0, '40%'],
-      },
-    );
-  }, [presentBottomSheet, dismissBottomSheet]);
+  const showReassignmentConfirmationBottomSheet = useCallback(
+    (destinationID) => {
+      presentBottomSheet(
+        <TransactionReassignmentSuccessBottomSheet
+          onViewAccountDetailsPressed={() => {
+            dismissBottomSheet();
+            navigation.dispatch(
+              resetStackToAccountDetails({
+                accountShellID: destinationID,
+              }),
+            );
+          }}
+        />,
+        {
+          ...defaultBottomSheetConfigs,
+          snapPoints: [0, '40%'],
+        },
+      );
+    },
+    [presentBottomSheet, dismissBottomSheet],
+  );
 
-  const showMergeConfirmationBottomSheet = useCallback(({
-    source,
-    destination,
-  }) => {
-    presentBottomSheet(
-      <AccountShellMergeSuccessBottomSheet
-        sourceAccountShell={source}
-        destinationAccountShell={destination}
-        onViewAccountDetailsPressed={() => {
-          dismissBottomSheet();
-          navigation.dispatch(resetStackToAccountDetails({
-            accountShellID: destination.id,
-          }));
-        }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [0, '67%'],
-      },
-    );
-  }, [presentBottomSheet, dismissBottomSheet]);
-
+  const showMergeConfirmationBottomSheet = useCallback(
+    ({ source, destination }) => {
+      presentBottomSheet(
+        <AccountShellMergeSuccessBottomSheet
+          sourceAccountShell={source}
+          destinationAccountShell={destination}
+          onViewAccountDetailsPressed={() => {
+            dismissBottomSheet();
+            navigation.dispatch(
+              resetStackToAccountDetails({
+                accountShellID: destination.id,
+              }),
+            );
+          }}
+        />,
+        {
+          ...defaultBottomSheetConfigs,
+          snapPoints: [0, '67%'],
+        },
+      );
+    },
+    [presentBottomSheet, dismissBottomSheet],
+  );
 
   useTransactionReassignmentCompletedEffect({
     onSuccess: showReassignmentConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
-        "Transaction Reassignment Error",
-        "An error occurred while attempting to reassign transactions",
+        'Transaction Reassignment Error',
+        'An error occurred while attempting to reassign transactions',
       );
-    }
+    },
   });
 
   useAccountShellMergeCompletionEffect({
     onSuccess: showMergeConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
-        "Account Merge Error",
-        "An error occurred while attempting to merge accounts.",
+        'Account Merge Error',
+        'An error occurred while attempting to merge accounts.',
       );
-    }
+    },
   });
 
   return (
@@ -187,12 +273,13 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({
           onSendPressed={() => {
             navigation.navigate('Send', {
               accountShellID,
-              spendableBalance: AccountShell.getTotalBalance(accountShell),
+              spendableBalance: AccountShell.getSpendableBalance(accountShell),
             });
           }}
           onReceivePressed={() => {
             navigation.navigate('Receive', {
-              accountShellID,
+              serviceType: primarySubAccount.sourceKind,
+              //TODO: fill derivativeAccountDetails(for ejected accounts)
             });
           }}
         />
@@ -225,16 +312,19 @@ const styles = StyleSheet.create({
   },
 });
 
-
-AccountDetailsContainerScreen.navigationOptions = ({ navigation }): NavigationScreenConfig<NavigationStackOptions, any> => {
+AccountDetailsContainerScreen.navigationOptions = ({
+  navigation,
+}): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
     header() {
       const { accountShellID } = navigation.state.params;
 
-      return <NavHeader
-        accountShellID={accountShellID}
-        onBackPressed={() => navigation.pop() }
-      />;
+      return (
+        <NavHeader
+          accountShellID={accountShellID}
+          onBackPressed={() => navigation.pop()}
+        />
+      );
     },
   };
 };

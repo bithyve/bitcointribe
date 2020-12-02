@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ImageSourcePropType } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
@@ -17,15 +24,17 @@ export type Props = {
   onSettingsPressed: () => void;
 };
 
-function backgroundImageForAccountKind(accountKind: SubAccountKind): ImageSourcePropType {
+function backgroundImageForAccountKind(
+  accountKind: SubAccountKind,
+): ImageSourcePropType {
   switch (accountKind) {
-    case SubAccountKind.TEST:
+    case SubAccountKind.TEST_ACCOUNT:
       return require('../../assets/images/carouselImages/test_account_background.png');
-    case SubAccountKind.REGULAR:
+    case SubAccountKind.REGULAR_ACCOUNT:
       return require('../../assets/images/carouselImages/regular_account_background.png');
-    case SubAccountKind.SECURE:
+    case SubAccountKind.SECURE_ACCOUNT:
       return require('../../assets/images/carouselImages/savings_account_background.png');
-    case SubAccountKind.DONATION:
+    case SubAccountKind.DONATION_ACCOUNT:
       return require('../../assets/images/carouselImages/donation_account_background.png');
     default:
       return require('../../assets/images/carouselImages/savings_account_background.png');
@@ -34,13 +43,13 @@ function backgroundImageForAccountKind(accountKind: SubAccountKind): ImageSource
 
 function shadowColorForAccountKind(accountKind: SubAccountKind): string {
   switch (accountKind) {
-    case SubAccountKind.TEST:
+    case SubAccountKind.TEST_ACCOUNT:
       return Colors.blue;
-    case SubAccountKind.REGULAR:
+    case SubAccountKind.REGULAR_ACCOUNT:
       return Colors.yellow;
-    case SubAccountKind.SECURE:
+    case SubAccountKind.SECURE_ACCOUNT:
       return Colors.green;
-    case SubAccountKind.DONATION:
+    case SubAccountKind.DONATION_ACCOUNT:
       return Colors.borderColor;
     default:
       return Colors.borderColor;
@@ -61,11 +70,9 @@ const AccountDetailsCard: React.FC<Props> = ({
     };
   }, [primarySubAccountInfo]);
 
-
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
-
         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
           <Image
             source={primarySubAccountInfo.avatarImageSource}
@@ -85,7 +92,8 @@ const AccountDetailsCard: React.FC<Props> = ({
               color: Colors.white,
             }}
           >
-            {primarySubAccountInfo.customDisplayName || primarySubAccountInfo.defaultTitle}
+            {primarySubAccountInfo.customDisplayName ||
+              primarySubAccountInfo.defaultTitle}
           </Text>
 
           <Text
@@ -96,12 +104,13 @@ const AccountDetailsCard: React.FC<Props> = ({
               marginTop: 2,
             }}
           >
-            {primarySubAccountInfo.customDescription || primarySubAccountInfo.defaultDescription}
+            {primarySubAccountInfo.customDescription ||
+              primarySubAccountInfo.defaultDescription}
           </Text>
         </View>
       </View>
     );
-  }
+  };
 
   const FooterSection: React.FC = () => {
     return (
@@ -112,7 +121,7 @@ const AccountDetailsCard: React.FC<Props> = ({
           amountTextStyle={styles.balanceAmountText}
           unitTextStyle={styles.balanceUnitText}
           currencyImageStyle={styles.balanceCurrencyIcon}
-          bitcoinIconColor='light'
+          bitcoinIconColor="light"
           textColor={Colors.white}
         />
 
@@ -120,7 +129,6 @@ const AccountDetailsCard: React.FC<Props> = ({
       </View>
     );
   };
-
 
   const KnowMoreButton: React.FC = () => {
     return (
@@ -154,7 +162,7 @@ const AccountDetailsCard: React.FC<Props> = ({
         />
       </TouchableOpacity>
     );
-  }
+  };
 
   return (
     <View style={rootContainerStyle}>
@@ -169,12 +177,10 @@ const AccountDetailsCard: React.FC<Props> = ({
           <AccountKindDetailsSection />
           <FooterSection />
         </View>
-
       </ImageBackground>
     </View>
   );
 };
-
 
 const cardBorderRadius = 15;
 
