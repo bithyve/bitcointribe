@@ -1,6 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { createWatcher } from '../utils/utilities'
 import {
   UPDATE_FCM_TOKENS,
@@ -32,7 +32,7 @@ function* updateFCMTokensWorker( { payload } ) {
   if ( res.status === 200 ) {
     const { updated } = res.data
     console.log( {
-      updated 
+      updated
     } )
   } else {
     console.log( 'Failed to update FCMs on the server' )

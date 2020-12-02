@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
+import * as bip39 from 'bip39'
+import bip65 from 'bip65'
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
@@ -8,7 +10,7 @@ import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interfa
 import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
@@ -566,8 +568,8 @@ export default class Bitcoin {
   ): Promise<{
     txid: string;
   }> => {
-    let res: AxiosResponse
-    try{
+    try {
+      let res: AxiosResponse
       if ( this.network === bitcoinJS.networks.testnet ) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
@@ -592,10 +594,21 @@ export default class Bitcoin {
       return {
         txid: res.data
       }
-    } catch( err ){
-      console.log(
-        `An error occurred while broadcasting via current node. ${err}`,
-      )
+    } catch ( err ) {
+      // console.log(
+      //  `An error occurred while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
+      //);
+      try {
+        let res: AxiosResponse
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post( TESTNET.BROADCAST, {
+            hex: txHex
+          } )
+        } else {
+          res = await bitcoinAxios.post( MAINNET.BROADCAST, {
+            hex: txHex
+          } )
+        }
 
       if( config.USE_ESPLORA_FALLBACK ){
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
@@ -703,7 +716,6 @@ export default class Bitcoin {
 
     outputs.forEach( ( output ) => {
       if ( !output.addresses && !output.scriptpubkey_address ) {
-        // skip
       } else {
         const address = output.addresses
           ? output.addresses[ 0 ]

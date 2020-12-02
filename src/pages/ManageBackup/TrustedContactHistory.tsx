@@ -57,7 +57,7 @@ import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 

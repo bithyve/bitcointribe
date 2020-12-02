@@ -50,7 +50,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';

@@ -15,7 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TEST_ACCOUNT, REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import { TEST_ACCOUNT, REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types';
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
 import ContactAvatar from '../../components/ContactAvatar';

@@ -53,7 +53,7 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import {
   EncDynamicNonPMDD,
   MetaShare,

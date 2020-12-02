@@ -8,7 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RadioButton from '../../components/RadioButton'
 
 export default function AccountSelectionModalContents( props ) {
@@ -53,18 +53,18 @@ export default function AccountSelectionModalContents( props ) {
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>Change Account</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
         }}>
           Choose the account to send from
         </Text>
       </View>
       <View>
         {accountData.map( ( item, index )=>{
-          return <View style={{ 
-            flexDirection: 'row', alignItems:'center', marginLeft: wp( '2%' ), marginTop: index==0 ? wp( '4%' ) : wp( '2%' ), marginBottom: index==1 ? wp( '4%' ) : wp( '2%' ) 
+          return <View style={{
+            flexDirection: 'row', alignItems:'center', marginLeft: wp( '2%' ), marginTop: index==0 ? wp( '4%' ) : wp( '2%' ), marginBottom: index==1 ? wp( '4%' ) : wp( '2%' )
           }}>
-            <View style={{ 
-              width: wp( '10%' ), height: wp( '10%' ), justifyContent:'center', alignItems:'center', 
+            <View style={{
+              width: wp( '10%' ), height: wp( '10%' ), justifyContent:'center', alignItems:'center',
             }}>
               <RadioButton
                 size={15}
@@ -74,10 +74,10 @@ export default function AccountSelectionModalContents( props ) {
                 onpress={() => onAccountSelection( item )}
               />
             </View>
-            <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => onAccountSelection( item )}  style={{ 
-              flexDirection:'row', backgroundColor: Colors.backgroundColor1, width: wp( '80%' ), padding: wp( '3%' ), borderRadius: 10 
+            <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => onAccountSelection( item )}  style={{
+              flexDirection:'row', backgroundColor: Colors.backgroundColor1, width: wp( '80%' ), padding: wp( '3%' ), borderRadius: 10
             }}>
-              <View style={{ 
+              <View style={{
                 width: wp( '17%' ), height: wp( '17%' ), backgroundColor: Colors.backgroundColor, borderRadius: wp( '17%' )/2, justifyContent:'center', alignItems:'center', borderWidth:2, borderColor: Colors.white,
                 shadowOffset: {
                   width: 0,
@@ -89,18 +89,18 @@ export default function AccountSelectionModalContents( props ) {
                 elevation: item.isSelected ? 10 : 0,
 
               }}>
-                <Image source={item.accountImage} style={{ 
-                  width: wp( '10%' ), height: wp( '10%' ) 
+                <Image source={item.accountImage} style={{
+                  width: wp( '10%' ), height: wp( '10%' )
                 }} />
               </View>
-              <View style={{ 
-                marginLeft: wp( '2%' ), alignSelf:'center' 
+              <View style={{
+                marginLeft: wp( '2%' ), alignSelf:'center'
               }}>
-                <Text style={{ 
-                  color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 20 ) 
+                <Text style={{
+                  color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 20 )
                 }}>{item.accountName}</Text>
-                <Text style={{ 
-                  color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5 
+                <Text style={{
+                  color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5
                 }}>Available to spend {item.accountBalance} sats</Text>
               </View>
             </AppBottomSheetTouchableWrapper>
@@ -139,7 +139,7 @@ export default function AccountSelectionModalContents( props ) {
           }}
         >
           <Text style={{
-            ...styles.proceedButtonText, color: Colors.blue 
+            ...styles.proceedButtonText, color: Colors.blue
           }}>
             Back
           </Text>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

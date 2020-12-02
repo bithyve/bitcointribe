@@ -10,7 +10,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import RecipientComponent from './RecipientComponent'
 import { ScrollView } from 'react-native-gesture-handler'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { makeAccountRecipientDescriptionFromUnknownData, makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 

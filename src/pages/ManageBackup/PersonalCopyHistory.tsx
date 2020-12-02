@@ -27,30 +27,30 @@ import {
   pdfHealthChecked,
   pdfHealthCheckFailed,
   calculateOverallHealth,
-} from '../../store/actions/sss'
-import Colors from '../../common/Colors'
-import NavStyles from '../../common/Styles/NavStyles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import HistoryPageComponent from '../../components/HistoryPageComponent'
-import PersonalCopyShareModal from '../../components/PersonalCopyShareModal'
-import moment from 'moment'
-import _ from 'underscore'
-import Toast from '../../components/Toast'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes'
-import QRModal from '../Accounts/QRModal'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
+} from '../../store/actions/sss';
+import Colors from '../../common/Colors';
+import NavStyles from '../../common/Styles/NavStyles';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import BottomSheet from 'reanimated-bottom-sheet';
+import ModalHeader from '../../components/ModalHeader';
+import HistoryPageComponent from '../../components/HistoryPageComponent';
+import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
+import moment from 'moment';
+import _ from 'underscore';
+import Toast from '../../components/Toast';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types';
+import QRModal from '../Accounts/QRModal';
+import S3Service from '../../bitcoin/services/sss/S3Service';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
 
-const PersonalCopyHistory = ( props ) => {
-  const [ ErrorBottomSheet ] = useState( React.createRef() )
-  const [ HelpBottomSheet ] = useState( React.createRef() )
+const PersonalCopyHistory = (props) => {
+  const [ErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet] = useState(React.createRef());
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
@@ -129,6 +129,8 @@ const PersonalCopyHistory = ( props ) => {
         ? ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
         : ( storagePermissionBottomSheet as any ).current.snapTo( 1 )
     }
+
+  }, [hasStoragePermission]);
 
   }, [ hasStoragePermission ] )
 
@@ -367,9 +369,9 @@ const PersonalCopyHistory = ( props ) => {
       }
     }
 
-    if ( Platform.OS === 'ios' ) {
-      setHasStoragePermission( true )
-      return
+    if (Platform.OS === 'ios') {
+      setHasStoragePermission(true)
+      return;
     }
   }
 

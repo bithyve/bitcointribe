@@ -39,7 +39,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
 import { AsyncStorage } from 'react-native'
 import { fetchNotificationsWorker } from './notifications'
@@ -54,7 +54,7 @@ import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
-  if ( recipient.walletID )
+  if ( recipient.walletID && recipient.FCMs.length )
     receivers.push( {
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,

@@ -42,7 +42,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import {
   updateEphemeralChannel,
   updateTrustedContactsInfoLocally,

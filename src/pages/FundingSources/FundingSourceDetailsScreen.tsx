@@ -17,7 +17,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 
 import {
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import moment from 'moment';
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton';
 

@@ -10,7 +10,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import SmallHeaderModal from '../../../components/SmallHeaderModal'
 import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface'
 import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount'

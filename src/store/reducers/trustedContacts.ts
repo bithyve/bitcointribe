@@ -1,6 +1,6 @@
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { SERVICES_ENRICHED } from '../actions/storage'
-import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { SERVICES_ENRICHED } from '../actions/storage';
+import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types';
 import {
   TRUSTED_CONTACT_APPROVED,
   EPHEMERAL_CHANNEL_FETCHED,

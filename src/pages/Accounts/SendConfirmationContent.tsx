@@ -17,7 +17,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { makeAccountRecipientDescriptionFromUnknownData, makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 

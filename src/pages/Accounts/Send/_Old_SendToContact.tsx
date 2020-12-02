@@ -43,7 +43,7 @@ import {
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
 import {

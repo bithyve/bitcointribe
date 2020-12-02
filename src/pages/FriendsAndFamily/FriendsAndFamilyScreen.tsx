@@ -28,7 +28,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import BottomInfoBox from '../../components/BottomInfoBox'

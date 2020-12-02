@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import {
@@ -11,10 +10,8 @@ import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-  WYRE
-} from '../common/constants/serviceTypes'
-import PersonalNode from '../common/data/models/PersonalNode'
-import _ from 'lodash'
+} from '../common/constants/wallet-service-types'
+
 class HexaConfig {
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'demo-web-client'
@@ -25,12 +22,15 @@ class HexaConfig {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public BITCOIN_NODE: Client;
-  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
-  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
-  public TOKEN = 'notUsed';
-  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
-  public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
-  public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
+  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH.trim();
+  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH.trim();
+  public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN.trim();
+  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH.trim();
+  public REQUEST_TIMEOUT: number = parseInt(
+    Config.BIT_REQUEST_TIMEOUT.trim(),
+    10,
+  );
+  public GAP_LIMIT: number = parseInt( Config.BIT_GAP_LIMIT.trim(), 10 );
   public DERIVATIVE_GAP_LIMIT = 5;
   public CIPHER_SPEC: {
     algorithm: string;
@@ -38,9 +38,9 @@ class HexaConfig {
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: Config.BIT_CIPHER_ALGORITHM ? Config.BIT_CIPHER_ALGORITHM.trim() : 'aes-192-cbc',
-    salt: Config.BIT_CIPHER_SALT ? Config.BIT_CIPHER_SALT.trim() : '',
-    keyLength: Config.BIT_CIPHER_KEYLENGTH ? parseInt( Config.BIT_CIPHER_KEYLENGTH.trim(), 10 ) : 24,
+    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
+    salt: Config.BIT_CIPHER_SALT.trim(),
+    keyLength: parseInt( Config.BIT_CIPHER_KEYLENGTH.trim(), 10 ),
     iv: Buffer.alloc( 16, 0 ),
   };
   public KEY_STRETCH_ITERATIONS = Config.BIT_KEY_STRETCH_ITERATIONS ? parseInt( Config.BIT_KEY_STRETCH_ITERATIONS.trim(), 10 ) : 10000;
@@ -52,31 +52,33 @@ class HexaConfig {
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER ? Config.BIT_API_URLS_SIGNING_SERVER.trim() : '',
   };
   public BSI = {
-    INIT_INDEX: Config.BIT_BSI_INIT_INDEX ? parseInt( Config.BIT_BSI_INIT_INDEX.trim(), 10 ) : 100,
-    MAXUSEDINDEX: Config.BIT_BSI_MAXUSEDINDEX ? parseInt( Config.BIT_BSI_MAXUSEDINDEX.trim(), 10 ) : 0,
-    MINUNUSEDINDEX: Config.BIT_BSI_MINUNUSEDINDEX ? parseInt( Config.BIT_BSI_MINUNUSEDINDEX.trim(), 10 ) : 1000000,
+    INIT_INDEX: parseInt( Config.BIT_BSI_INIT_INDEX.trim(), 10 ),
+    MAXUSEDINDEX: parseInt( Config.BIT_BSI_MAXUSEDINDEX.trim(), 10 ),
+    MINUNUSEDINDEX: parseInt( Config.BIT_BSI_MINUNUSEDINDEX.trim(), 10 ),
     DEPTH: {
-      INIT: Config.BIT_BSI_DEPTH_INIT ? parseInt( Config.BIT_BSI_DEPTH_INIT.trim(), 10 ) : 0,
-      LIMIT: Config.BIT_BSI_DEPTH_LIMIT ? parseInt( Config.BIT_BSI_DEPTH_LIMIT.trim(), 10 ) : 20,
+      INIT: parseInt( Config.BIT_BSI_DEPTH_INIT.trim(), 10 ),
+      LIMIT: parseInt( Config.BIT_BSI_DEPTH_LIMIT.trim(), 10 ),
     },
   };
-  public SSS_TOTAL: number = Config.BIT_SSS_TOTAL ? parseInt( Config.BIT_SSS_TOTAL.trim(), 10 ) : 5;
-  public SSS_THRESHOLD: number = Config.BIT_SSS_THRESHOLD ? parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 ) : 3;
-  public MSG_ID_LENGTH: number = Config.BIT_MSG_ID_LENGTH ? parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 ) : 12;
-  public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
-  public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
+  public SSS_TOTAL: number = parseInt( Config.BIT_SSS_TOTAL.trim(), 10 );
+  public SSS_THRESHOLD: number = parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 );
+  public MSG_ID_LENGTH: number = parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 );
+  public CHUNK_SIZE: number = parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 );
+  public CHECKSUM_ITR: number = parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 );
   public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
-  public ENC_KEY_STORAGE_IDENTIFIER: string = Config.ENC_KEY_STORAGE_IDENTIFIER.trim();
-  public DPATH_PURPOSE: number = Config.BIT_DPATH_PURPOSE ? parseInt( Config.BIT_DPATH_PURPOSE.trim(), 10 ) : 49;
-  public SSS_METASHARE_SPLITS: number = Config.BIT_SSS_METASHARE_SPLITS ? parseInt( Config.BIT_SSS_METASHARE_SPLITS.trim(), 10 ) : 8;
+  public DPATH_PURPOSE: number = parseInt( Config.BIT_DPATH_PURPOSE.trim(), 10 );
+  public SSS_METASHARE_SPLITS: number = parseInt(
+    Config.BIT_SSS_METASHARE_SPLITS.trim(),
+    10,
+  );
   public STATUS = {
-    SUCCESS: Config.BIT_SUCCESS_STATUS_CODE ? parseInt( Config.BIT_SUCCESS_STATUS_CODE.trim(), 10 ) : 200,
-    ERROR: Config.BIT_ERROR_STATUS_CODE ? parseInt( Config.BIT_ERROR_STATUS_CODE.trim(), 10 ) : 400,
+    SUCCESS: parseInt( Config.BIT_SUCCESS_STATUS_CODE.trim(), 10 ),
+    ERROR: parseInt( Config.BIT_ERROR_STATUS_CODE.trim(), 10 ),
   };
   public STANDARD = {
-    BIP44: Config.BIT_STANDARD_BIP44 ? parseInt( Config.BIT_STANDARD_BIP44.trim(), 10 ) : 44,
-    BIP49: Config.BIT_STANDARD_BIP49 ? parseInt( Config.BIT_STANDARD_BIP49.trim(), 10 ) : 49,
-    BIP84: Config.BIT_STANDARD_BIP84 ? parseInt( Config.BIT_STANDARD_BIP84.trim(), 10 ) : 84,
+    BIP44: parseInt( Config.BIT_STANDARD_BIP44.trim(), 10 ),
+    BIP49: parseInt( Config.BIT_STANDARD_BIP49.trim(), 10 ),
+    BIP84: parseInt( Config.BIT_STANDARD_BIP84.trim(), 10 ),
   };
 
   public HEALTH_STATUS = {
@@ -95,16 +97,16 @@ class HexaConfig {
     },
 
     TIME_SLOTS: {
-      // 2 weeks in minutes: 20160
-      SHARE_SLOT1: Config.BIT_SHARE_HEALTH_TIME_SLOT1 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ) : 20160,
-
-      //4 weeks in minutes: 40320
-      SHARE_SLOT2: Config.BIT_SHARE_HEALTH_TIME_SLOT2 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ) : 40320,
+      SHARE_SLOT1: parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ),
+      SHARE_SLOT2: parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ),
     },
   };
 
-  public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
-  public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
+  public LEGACY_TC_REQUEST_EXPIRY = parseInt(
+    Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(),
+    10,
+  );
+  public TC_REQUEST_EXPIRY = parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 );
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
@@ -147,42 +149,34 @@ class HexaConfig {
   };
 
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
-    series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
+    series: parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ),
     instance: {
-      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ),
       using: 0,
     },
   };
 
   public FAST_BITCOINS: DerivativeAccount = {
-    series: Config.BIT_FAST_BITCOINS_SERIES ? parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ) : 11,
+    series: parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ),
     instance: {
-      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 10,
-      using: 0,
-    },
-  };
-
-  public WYRE: DerivativeAccount = {
-    series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
-    instance: {
-      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ),
       using: 0,
     },
   };
 
   public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
-    series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
+    series: parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ),
     instance: {
-      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 1000,
+      max: parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ),
       using: 0,
     },
   };
 
   public DONATION_ACCOUNT: DonationDerivativeAccount = {
-    series: Config.BIT_DONATION_ACCOUNT_SERIES ? parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ) : 101,
+    series: parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ),
     instance: {
-      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ),
       using: 0,
     },
   };
@@ -196,14 +190,14 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
   );
 
   constructor( env: string ) {
-    this.ENVIRONMENT = env || 'MAIN'
+    this.ENVIRONMENT = env
     // console.log({ env });
 
     // console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
@@ -219,16 +213,19 @@ class HexaConfig {
       10,
     )
 
+    // console.log(this.HEALTH_STATUS.TIME_SLOTS);
+    // console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
+
+    // console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork()
 
-    // TODO:: Refactor Bitcoin folder to remove Client
     this.BITCOIN_NODE = new Client( {
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
       timeout: 10000,
-      username: 'notUsed',
-      password: 'noUsed',
-      host: 'notUsed',
+      username: Config.BIT_RPC_USERNAME.trim(),
+      password: Config.BIT_RPC_PASSWORD.trim(),
+      host: Config.BIT_HOST_IP.trim(),
     } )
 
     if (

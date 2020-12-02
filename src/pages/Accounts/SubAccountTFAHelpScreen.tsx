@@ -32,7 +32,7 @@ import {
   twoFAResetted,
   secondaryXprivGenerated,
 } from '../../store/actions/accounts';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types';
 
 export type Props = {
   navigation: any;

@@ -7,7 +7,7 @@ import HeadingStyles from '../../common/Styles/HeadingStyles';
 import Fonts from '../../common/Fonts';
 ; import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
-import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import { TEST_ACCOUNT } from '../../common/constants/wallet-service-types';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Satoshis } from '../../common/data/typealiases/UnitAliases';

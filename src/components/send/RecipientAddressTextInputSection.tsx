@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import useWalletServiceForSubAccountKind from '../../utils/hooks/state-selectors/accounts/UseWalletServiceForSubAccountKind'
+import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 
 const SAMPLE_ADDRESS = '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8'
 
@@ -12,7 +12,8 @@ export type Props = {
   placeholder: string;
   containerStyle?: Record<string, unknown>;
   subAccountKind: SubAccountKind;
-  onAddressSubmitted: ( address: string ) => void;
+  onAddressEntered: ( address: string ) => void;
+  onPaymentURIEntered: ( uri: string ) => void;
 };
 
 const RecipientAddressTextInputSection: React.FC<Props> = ( {
@@ -20,7 +21,8 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   containerStyle = {
   },
   subAccountKind,
-  onAddressSubmitted,
+  onAddressEntered,
+  onPaymentURIEntered,
 }: Props ) => {
   const [ recipientAddress, setRecipientAddress ] = useState( '' )
   const [ isAddressInvalid, setIsAddressInvalid ] = useState( false )
@@ -32,16 +34,24 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   }, [ walletService ] )
 
 
-  // TODO: Every text change shouldn't be treated as a "submit".
-  // We're doing this because `Send` is calling `setRecipientAddress` on
-  // every change and inspecting it to take an action once an actionable
-  // address is interpreted. We should probably move that logic into this component
-  // and avoid re-rendering the entire send screen on text changes.
   function handleTextChange( newValue: string ) {
     setRecipientAddress( newValue )
 
-    if ( isAddressInvalid == false ) {
-      onAddressSubmitted( newValue )
+    const isAddressInvalid = walletInstance.isValidAddress( newValue ) == false
+
+    setIsAddressInvalid( isAddressInvalid )
+
+    if ( isAddressInvalid ) { return }
+
+    const { type: scannedAddressKind }: { type: ScannedAddressKind } = walletService.addressDiff( newValue.trim() )
+
+    switch ( scannedAddressKind ) {
+        case ScannedAddressKind.ADDRESS:
+          onAddressEntered( newValue )
+          break
+        case ScannedAddressKind.PAYMENT_URI:
+          onPaymentURIEntered( newValue )
+          break
     }
   }
 
@@ -67,7 +77,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         numberOfLines={1}
       />
 
-      {subAccountKind == SubAccountKind.TEST && (
+      {subAccountKind == SubAccountKind.TEST_ACCOUNT && (
         <TouchableOpacity
           onPress={() => {
             handleTextChange( SAMPLE_ADDRESS )
