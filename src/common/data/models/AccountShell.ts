@@ -5,6 +5,7 @@ import UTXOCompatibilityGroup from '../enums/UTXOCompatibilityGroup';
 import SubAccountDescribing from './SubAccountInfo/Interfaces';
 import { Satoshis } from '../typealiases/UnitAliases';
 import TransactionDescribing from './Transactions/Interfaces';
+import { Balances } from '../../../bitcoin/utilities/Interface';
 
 type ConstructorProps = {
   displayOrder?: number | null;
@@ -109,5 +110,20 @@ export default class AccountShell {
   ) {
     subAccount.accountShellID = shell.id;
     shell.primarySubAccount = subAccount;
+  }
+
+  /**
+   * Updates primary sub-account w/ latest balance and transactions
+   */
+  static updatePrimarySubAccountBalanceTx(
+    shell: AccountShell,
+    newbalance: Balances,
+    newTransactions: TransactionDescribing[],
+  ) {
+    shell.primarySubAccount = {
+      ...shell.primarySubAccount,
+      balances: newbalance,
+      transactions: newTransactions,
+    };
   }
 }

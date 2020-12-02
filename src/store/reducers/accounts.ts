@@ -50,6 +50,10 @@ import AccountShell from '../../common/data/models/AccountShell';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
 import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
+import ShellKind from '../../common/data/enums/ShellKind';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import { Balances } from '../../bitcoin/utilities/Interface';
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {
@@ -167,7 +171,23 @@ const initialState: AccountsState = {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
-  accountShells: [],
+  accountShells: [
+    new AccountShell({
+      primarySubAccount: new TestSubAccountInfo({}),
+      unit: BitcoinUnit.TSATS,
+      displayOrder: 1,
+    }),
+    new AccountShell({
+      primarySubAccount: new CheckingSubAccountInfo({}),
+      unit: BitcoinUnit.SATS,
+      displayOrder: 2,
+    }),
+    new AccountShell({
+      primarySubAccount: new SavingsSubAccountInfo({}),
+      unit: BitcoinUnit.SATS,
+      displayOrder: 3,
+    }),
+  ],
 
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
@@ -449,42 +469,52 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
       const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
 
-      const updatedAccountShells = [
-        new AccountShell({
-          primarySubAccount: new TestSubAccountInfo({
-            balances: {
-              confirmed: testAcc.hdWallet.balances.balance,
-              unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
-            },
-            transactions: testAcc.hdWallet.transactions.transactionDetails,
-          }),
-          unit: BitcoinUnit.TSATS,
-          displayOrder: 1,
-        }),
-        new AccountShell({
-          primarySubAccount: new CheckingSubAccountInfo({
-            balances: {
-              confirmed: regularAcc.hdWallet.balances.balance,
-              unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
-            },
-            transactions: regularAcc.hdWallet.transactions.transactionDetails,
-          }),
-          unit: BitcoinUnit.SATS,
-          displayOrder: 2,
-        }),
-        new AccountShell({
-          primarySubAccount: new SavingsSubAccountInfo({
-            balances: {
-              confirmed: secureAcc.secureHDWallet.balances.balance,
-              unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
-            },
-            transactions:
-              secureAcc.secureHDWallet.transactions.transactionDetails,
-          }),
-          unit: BitcoinUnit.SATS,
-          displayOrder: 3,
-        }),
-      ];
+      const updatedAccountShells = state.accountShells.map(
+        (shell: AccountShell) => {
+          // update primary sub-accounts
+
+          let balances: Balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          };
+          let transactions: TransactionDescribing[] = [];
+          switch (shell.primarySubAccount.kind) {
+            case SubAccountKind.TEST_ACCOUNT:
+              balances = {
+                confirmed: testAcc.hdWallet.balances.balance,
+                unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
+              };
+              transactions = testAcc.hdWallet.transactions.transactionDetails;
+              break;
+
+            case SubAccountKind.REGULAR_ACCOUNT:
+              balances = {
+                confirmed: regularAcc.hdWallet.balances.balance,
+                unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
+              };
+              transactions =
+                regularAcc.hdWallet.transactions.transactionDetails;
+              break;
+
+            case SubAccountKind.SECURE_ACCOUNT:
+              balances = {
+                confirmed: secureAcc.secureHDWallet.balances.balance,
+                unconfirmed:
+                  secureAcc.secureHDWallet.balances.unconfirmedBalance,
+              };
+              transactions =
+                secureAcc.secureHDWallet.transactions.transactionDetails;
+              break;
+          }
+
+          AccountShell.updatePrimarySubAccountBalanceTx(
+            shell,
+            balances,
+            transactions,
+          );
+          return shell;
+        },
+      );
 
       return {
         ...state,
