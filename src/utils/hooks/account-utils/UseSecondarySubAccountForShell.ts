@@ -6,6 +6,6 @@ export default function useSecondarySubAccountsForShell(
   accountShell: AccountShell,
 ): SubAccountDescribing[] {
   return useMemo(() => {
-    return accountShell.secondarySubAccounts;
+    return Object.values(accountShell.secondarySubAccounts);
   }, [accountShell.secondarySubAccounts]);
 }

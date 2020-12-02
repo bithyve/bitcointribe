@@ -10,6 +10,7 @@ import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAcco
 import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/UseSecondarySubAccountForShell';
+import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell';
 
 
 export type Props = {
@@ -57,11 +58,12 @@ const BodySection: React.FC<BodyProps> = ({
 }: BodyProps) => {
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountsState = useAccountsState();
+  const totalBalance = useTotalBalanceForAccountShell(accountShell);
 
   const balanceTextStyle = useMemo(() => {
-    const color = accountsState.accountsSynched ? Colors.black : Colors.textColorGrey;
-
-    return { color };
+    return {
+      color: accountsState.accountsSynched ? Colors.black : Colors.textColorGrey,
+    };
   }, [accountsState.accountsSynced]);
 
 
@@ -76,7 +78,7 @@ const BodySection: React.FC<BodyProps> = ({
       </Text>
 
       <LabeledBalanceDisplay
-        balance={AccountShell.getTotalBalance(accountShell)}
+        balance={totalBalance}
         bitcoinUnit={accountShell.unit}
         containerStyle={styles.balanceRow}
         amountTextStyle={balanceTextStyle}
