@@ -36,7 +36,7 @@ export const modifyLevelStatus = (
       !levelHealthVar[1] &&
       !levelHealthVar[2]
     ) {
-      levelData = checkLevelHealth(levelData, levelHealthVar, 0, 0);
+      levelData = checkLevelHealth(levelData, levelHealthVar, 0, 0, currentLevel);
     }
 
     // Executes when level 1 complete or level 2 in setup for completed setup and level 3 not initialized
@@ -47,7 +47,7 @@ export const modifyLevelStatus = (
       !levelHealthVar[2]
     ) {
       // if level 2 complete then change level 1 share data with level 2 share data at for cloud and security question
-      levelData = checkLevelHealth(levelData, levelHealthVar, 1, 2);
+      levelData = checkLevelHealth(levelData, levelHealthVar, 1, 2, currentLevel);
     }
 
     // Executes when level 2 complete or level 3 in setup for completed setup
@@ -58,7 +58,7 @@ export const modifyLevelStatus = (
       levelHealthVar[2]
     ) {
       // if level 3 complete then change level 2 share data with level 3 share data at for cloud and security question
-      levelData = checkLevelHealth(levelData, levelHealthVar, 2, 4);
+      levelData = checkLevelHealth(levelData, levelHealthVar, 2, 4, currentLevel);
     }
   }
   if (levelData.findIndex((value) => value.status == 'bad') > -1) {
@@ -72,6 +72,7 @@ const checkLevelHealth = (
   levelHealthVar: any[],
   index: number,
   index2: number,
+  currentLevel: number
 ) => {
   if (
     levelHealthVar[index].levelInfo[index2].updatedAt === 0 &&
@@ -81,40 +82,24 @@ const checkLevelHealth = (
     return levelData;
   } else {
     const status = checkStatus(levelHealthVar, index, index2);
-    let levelIndex = status === 'good' ? index : index !== 0 ? index - 1 : 0;
-    if (index + 1 === 1 || index === 1 || index - 1 === 1) {
-      levelData[0].keeper1 = levelHealthVar[levelIndex].levelInfo[0];
-      levelData[0].keeper1.name = 'Cloud';
-      levelData[0].keeper2 = levelHealthVar[levelIndex].levelInfo[1];
-      levelData[0].keeper2.name = 'Security Question';
-      console.log(checkStatus(levelHealthVar, 0, 0), levelData[0]);
-      levelData[0].status = checkStatus(levelHealthVar, levelIndex, 0);
-    }
-    if (index + 1 === 2 || index === 2) {
-      console.log('li', index, levelIndex);
-      if (levelIndex === 2) {
-        levelData[1].keeper1 = levelHealthVar[levelIndex - 1].levelInfo[2];
-        levelData[1].keeper1.shareId =
-          levelHealthVar[levelIndex].levelInfo[2].shareId;
-        levelData[1].keeper1.status =
-          levelHealthVar[levelIndex].levelInfo[2].status;
-        levelData[1].keeper2 = levelHealthVar[levelIndex - 1].levelInfo[3];
-        levelData[1].keeper2.shareId =
-          levelHealthVar[levelIndex].levelInfo[3].shareId;
-        levelData[1].keeper2.status =
-          levelHealthVar[levelIndex].levelInfo[3].status;
-      } else if (levelIndex === 1) {
-        levelData[1].keeper1 = levelHealthVar[levelIndex].levelInfo[2];
-        levelData[1].keeper2 = levelHealthVar[levelIndex].levelInfo[3];
-      } else {
-        levelData[1].keeper1 = levelHealthVar[index].levelInfo[2];
-        levelData[1].keeper2 = levelHealthVar[index].levelInfo[3];
+    levelData[0].keeper1 = levelHealthVar[currentLevel - 1].levelInfo[0];
+    levelData[0].keeper1.name = 'Cloud';
+    levelData[0].keeper2 = levelHealthVar[currentLevel - 1].levelInfo[1];
+    levelData[0].keeper2.name = 'Security Question';
+    levelData[0].status = checkStatus(levelHealthVar, currentLevel - 1, 0);
+    if (levelHealthVar[1]) {
+      if (currentLevel === 3) {
+        levelData[1].keeper1 = levelHealthVar[2].levelInfo[2];
+        levelData[1].keeper2 = levelHealthVar[2].levelInfo[3];
+        levelData[1].status = checkStatus(levelHealthVar, 2, 2);
       }
-      console.log('ld2', levelData);
-      levelData[1].status = checkStatus(levelHealthVar, 1, 2);
-      console.log('ld22', levelData);
+      else {
+        levelData[1].keeper1 = levelHealthVar[1].levelInfo[2];
+        levelData[1].keeper2 = levelHealthVar[1].levelInfo[3];
+        levelData[1].status = checkStatus(levelHealthVar, 1, 2);
+      }
     }
-    if (index + 1 === 3) {
+    if (levelHealthVar[2]) {
       levelData[2].keeper1 = levelHealthVar[2].levelInfo[4];
       levelData[2].keeper2 = levelHealthVar[2].levelInfo[5];
       levelData[2].status = checkStatus(levelHealthVar, 2, 4);
