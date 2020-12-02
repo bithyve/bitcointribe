@@ -58,7 +58,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
   }, [currencyKind]);
 
   const amountToDisplay = useMemo(() => {
-    const divisor = bitcoinUnit == BitcoinUnit.SATS ? 1 : SATOSHIS_IN_BTC;
+    const divisor = [BitcoinUnit.SATS, BitcoinUnit.TSATS].includes(bitcoinUnit) ? 1 : SATOSHIS_IN_BTC;
 
     return balance / divisor;
   }, [balance, bitcoinUnit]);
