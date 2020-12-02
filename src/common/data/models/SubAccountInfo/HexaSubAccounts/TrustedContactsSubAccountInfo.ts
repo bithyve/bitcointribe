@@ -11,6 +11,7 @@ import {
   Balances,
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../../enums/SourceAccountKind';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -19,6 +20,8 @@ export default class TrustedContactsSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
+  sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
+
   balances: Balances;
 
   visibility: AccountVisibility;

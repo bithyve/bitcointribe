@@ -3,12 +3,16 @@ import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
-import { ExternalServiceSubAccountDescribing, SubAccountDescribingConstructorProps } from './Interfaces';
+import {
+  ExternalServiceSubAccountDescribing,
+  SubAccountDescribingConstructorProps,
+} from './Interfaces';
 import { ImageSourcePropType } from 'react-native';
 import {
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface';
+import SourceAccountKind from '../../enums/SourceAccountKind';
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultTitle: string;
@@ -21,6 +25,8 @@ export default class ExternalServiceSubAccountInfo
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SERVICE;
+  sourceKind: SourceAccountKind;
+
   serviceAccountKind: ServiceAccountKind;
   balances: Balances;
 

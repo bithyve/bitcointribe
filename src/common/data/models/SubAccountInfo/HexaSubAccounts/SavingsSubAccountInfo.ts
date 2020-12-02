@@ -4,6 +4,7 @@ import {
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface';
 import AccountVisibility from '../../../enums/AccountVisibility';
+import SourceAccountKind from '../../../enums/SourceAccountKind';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
 import {
@@ -17,6 +18,8 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SECURE;
+  sourceKind: SourceAccountKind = SourceAccountKind.SECURE_ACCOUNT;
+
   balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled: boolean = true;
@@ -29,7 +32,8 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   avatarImageSource = require('../../../../../assets/images/icons/icon_secureaccount.png');
 
   transactions: TransactionDetails[];
-  utxoCompatibilityGroup: UTXOCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
+  utxoCompatibilityGroup: UTXOCompatibilityGroup =
+    UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
 
   constructor({
     accountShellID = null,
