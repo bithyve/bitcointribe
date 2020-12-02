@@ -11,7 +11,7 @@ import AccountShell from '../../common/data/models/AccountShell';
 
 export type Props = {
   cardData: AccountShell[];
-  appendsAddButton: boolean;
+  prependsAddButton: boolean;
   onAccountCardSelected: (accountShell: AccountShell) => void;
   onAddNewAccountPressed: () => void;
   onCardLongPressed: (accountShell: AccountShell) => void;
@@ -19,13 +19,17 @@ export type Props = {
 
 const AccountCardColumn: React.FC<Props> = ({
   cardData,
-  appendsAddButton,
+  prependsAddButton,
   onAccountCardSelected,
   onAddNewAccountPressed,
   onCardLongPressed,
 }: Props) => {
   return (
     <View style={styles.rootContainer}>
+      {prependsAddButton && (
+        <AddNewAccountCard onPress={onAddNewAccountPressed} />
+      )}
+
       {cardData.map((accountShell) => {
         return (
           <TouchableOpacity
@@ -40,10 +44,6 @@ const AccountCardColumn: React.FC<Props> = ({
           </TouchableOpacity>
         );
       })}
-
-      {appendsAddButton && (
-        <AddNewAccountCard onPress={onAddNewAccountPressed} />
-      )}
     </View>
   );
 };

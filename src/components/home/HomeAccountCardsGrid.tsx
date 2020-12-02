@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 import AccountShell from '../../common/data/models/AccountShell';
-import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
 import AccountCardColumn from './AccountCardColumn';
 
 export type Props = {
@@ -13,17 +12,13 @@ export type Props = {
 };
 
 type RenderItemProps = {
-  item: AccountShell[] | string;
+  item: AccountShell[];
   index: number;
 };
 
 
-function keyExtractor(item: AccountShell[] | string): string {
-  if (typeof item === 'string') {
-    return item;
-  } else {
-    return (item as AccountShell[])[0].id;
-  }
+function keyExtractor(item: AccountShell[]): string {
+  return item[0].id;
 }
 
 const HomeAccountCardsGrid: React.FC<Props> = ({
@@ -39,70 +34,48 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
       return [];
     }
 
-    if (accountShells.length <= 2) {
+    if (accountShells.length == 1) {
       return [accountShells];
     }
 
     let columns = [];
     let currentColumn = [];
 
-    for (let accountShell of accountShells) {
+    accountShells.forEach((accountShell, index) => {
       currentColumn.push(accountShell);
 
-      if (currentColumn.length == 2) {
+      // Make a new column after adding two items -- or after adding the
+      // very first item. This is because the first column
+      // will only contain one item, since the "Add new" button will be placed
+      // in front of everything.
+      if (currentColumn.length == 2 || index == 0) {
         columns.push(currentColumn);
         currentColumn = [];
       }
-    }
 
-    if (currentColumn.length > 0) {
-      columns.push(currentColumn);
-    }
+      if (currentColumn.length > 0) {
+        columns.push(currentColumn);
+      }
+    });
 
     return columns;
   }, [accountShells]);
-
-  const columnCount = useMemo(() => {
-    return columnData.length;
-  }, [columnData]);
-
-  const lastColumnLength = useMemo(() => {
-    if (columnCount === 0) {
-      return 0;
-    } else {
-      return columnData[columnCount - 1].length;
-    }
-  }, [columnData, columnCount]);
-
 
   return (
     <FlatList
       horizontal
       contentContainerStyle={contentContainerStyle}
       showsHorizontalScrollIndicator={false}
-      data={[...columnData, 'Flag for Add Button']}
+      data={columnData}
       keyExtractor={keyExtractor}
       renderItem={({ item, index }: RenderItemProps) => {
-        if (typeof item === 'string') {
-          // "Manually" append an Add button ONLY if we're at the end and we know
-          // it won't be stacked as the last item of a column.
-          if (lastColumnLength === 1) {
-            return null;
-          } else {
-            return <AddNewAccountCard onPress={onAddNewSelected} />
-          }
-        } else {
-          return <AccountCardColumn
-            cardData={item as AccountShell[]}
-            appendsAddButton={
-              (item as AccountShell[]).length === 1 &&
-              index === columnCount - 1
-            }
-            onAccountCardSelected={onAccountSelected}
-            onAddNewAccountPressed={onAddNewSelected}
-            onCardLongPressed={onCardLongPressed}
-          />
-        }
+        return <AccountCardColumn
+          cardData={item}
+          prependsAddButton={index == 0}
+          onAccountCardSelected={onAccountSelected}
+          onAddNewAccountPressed={onAddNewSelected}
+          onCardLongPressed={onCardLongPressed}
+        />
       }}
     />
   );
