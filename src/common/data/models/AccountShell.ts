@@ -51,7 +51,9 @@ export default class AccountShell {
     this.unit = unit;
   }
 
-  static getUTXOCompatibilityGroup(shell: AccountShell): UTXOCompatibilityGroup {
+  static getUTXOCompatibilityGroup(
+    shell: AccountShell,
+  ): UTXOCompatibilityGroup {
     return shell.primarySubAccount.utxoCompatibilityGroup;
   }
 
