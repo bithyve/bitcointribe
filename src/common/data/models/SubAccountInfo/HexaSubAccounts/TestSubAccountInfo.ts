@@ -17,7 +17,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
-  kind: SubAccountKind = SubAccountKind.TEST;
+  kind: SubAccountKind = SubAccountKind.TEST_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.TEST_ACCOUNT;
 
   balances: Balances;

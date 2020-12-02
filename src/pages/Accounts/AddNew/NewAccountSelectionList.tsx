@@ -7,7 +7,7 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
 import { addNewAccountShell } from '../../../store/actions/accounts';
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux';
 import { resetToHomeAction } from '../../../navigation/actions/NavigationActions';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
@@ -20,16 +20,16 @@ export enum SectionKind {
   IMPORT_WALLET,
 }
 
-const sectionListItemKeyExtractor = index => index;
+const sectionListItemKeyExtractor = (index) => index;
 
 function titleForSectionHeader(kind: SectionKind) {
   switch (kind) {
     case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-      return "Create a Hexa Account";
+      return 'Create a Hexa Account';
     case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-      return "Integrate A Service";
+      return 'Integrate A Service';
     case SectionKind.IMPORT_WALLET:
-      return "Import A Wallet";
+      return 'Import A Wallet';
   }
 }
 
@@ -44,12 +44,10 @@ function renderSectionHeader({ section }) {
 }
 
 export interface Props {
-  navigation: any,
+  navigation: any;
 }
 
-const NewAccountSelectionList: React.FC<Props> = ({
-  navigation,
-}: Props) => {
+const NewAccountSelectionList: React.FC<Props> = ({ navigation }: Props) => {
   useAccountShellCreationCompletionEffect(() => {
     console.log('dispatching resetToHomeAction');
     navigation.dispatch(resetToHomeAction());
@@ -57,12 +55,13 @@ const NewAccountSelectionList: React.FC<Props> = ({
 
   const dispatch = useDispatch();
   const newAccountChoices = useNewAccountChoices();
-  const [selectedChoice, setSelectedChoice] = useState<SubAccountDescribing>(null);
+  const [selectedChoice, setSelectedChoice] = useState<SubAccountDescribing>(
+    null,
+  );
 
   const canProceed = useMemo(() => {
     return selectedChoice !== null;
   }, [selectedChoice]);
-
 
   function handleProceedButtonPress() {
     if (selectedChoice.kind === SubAccountKind.SERVICE) {
@@ -70,7 +69,9 @@ const NewAccountSelectionList: React.FC<Props> = ({
       //  - Present options for choosing b/w a standalone
       //    service account or adding it to a Hexa
       //    account (e.g. Checking or Savings account).
-      switch ((selectedChoice as ExternalServiceSubAccountInfo).serviceAccountKind) {
+      switch (
+        (selectedChoice as ExternalServiceSubAccountInfo).serviceAccountKind
+      ) {
         case ServiceAccountKind.FAST_BITCOINS:
           dispatch(addNewAccountShell(selectedChoice));
           break;
@@ -80,14 +81,14 @@ const NewAccountSelectionList: React.FC<Props> = ({
     }
 
     switch (selectedChoice.kind) {
-      case SubAccountKind.TEST:
-      case SubAccountKind.REGULAR:
-      case SubAccountKind.SECURE:
+      case SubAccountKind.TEST_ACCOUNT:
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
         navigation.navigate('AddNewHexaAccountDetails', {
           currentSubAccountInfo: selectedChoice,
         });
         break;
-      case SubAccountKind.DONATION:
+      case SubAccountKind.DONATION_ACCOUNT:
         // TODO: Implement alongside Re-integrating current "Add donation account" UI.
         navigation.navigate('AddNewDonationAccountDetails', {
           currentSubAccountInfo: selectedChoice,
@@ -180,8 +181,7 @@ const NewAccountSelectionList: React.FC<Props> = ({
         keyExtractor={sectionListItemKeyExtractor}
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
-      >
-      </SectionList>
+      ></SectionList>
     </View>
   );
 };

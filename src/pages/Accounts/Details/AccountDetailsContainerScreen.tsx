@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -24,7 +25,17 @@ import AccountShell from '../../../common/data/models/AccountShell';
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
 import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
-import { TransactionDetails } from '../../../bitcoin/utilities/Interface';
+import {
+  DONATION_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../../common/constants/serviceTypes';
+import SubAccountKind from '../../../common/data/enums/SubAccountKind';
+import {
+  fetchBalanceTx,
+  fetchDerivativeAccBalTx,
+  syncViaXpubAgent,
+} from '../../../store/actions/accounts';
+import { setAutoAccountSync } from '../../../store/actions/loaders';
 
 export type Props = {
   navigation: any;
@@ -60,16 +71,16 @@ const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> = ({
 };
 
 const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   const accountShellID = useMemo(() => {
     return navigation.getParam('accountShellID');
   }, [navigation]);
-
   const accountShell = useAccountShellFromNavigation(navigation);
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
-
-  // TODO: Implement a hook that fetches transactions for an account and use it here.
-  // const [accountTransactions, isFetchingTransactions] = useTransactions(accountID);
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
+
+  const autoAccountSync = useSelector((state) => state.loaders.autoAccountSync);
 
   const {
     present: presentBottomSheet,
@@ -81,6 +92,62 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       txID: transaction.txid,
     });
   }
+
+  const refreshAccountBalance = useCallback(() => {
+    const nonDerivativeAccounts = [
+      SubAccountKind.TEST_ACCOUNT,
+      SubAccountKind.REGULAR_ACCOUNT,
+      SubAccountKind.SECURE_ACCOUNT,
+    ];
+    if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
+      const derivativeAccountDetails = {
+        type: primarySubAccount.kind,
+        number: 0,
+      };
+
+      if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+        dispatch(
+          syncViaXpubAgent(
+            primarySubAccount.sourceKind,
+            derivativeAccountDetails.type,
+            derivativeAccountDetails.number,
+          ),
+        );
+      else
+        dispatch(
+          fetchDerivativeAccBalTx(
+            primarySubAccount.sourceKind,
+            derivativeAccountDetails.type,
+            derivativeAccountDetails.number,
+          ),
+        );
+
+      dispatch(setAutoAccountSync(`${derivativeAccountDetails.type + 0}`));
+    } else {
+      dispatch(
+        fetchBalanceTx(primarySubAccount.sourceKind, {
+          loader: true,
+          syncTrustedDerivative:
+            primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
+        }),
+      );
+      dispatch(setAutoAccountSync(`${primarySubAccount.kind + 0}`));
+    }
+  }, [primarySubAccount]);
+
+  const autoAccountRefresh = useCallback(() => {
+    // refreshes the account-shell once per-session
+    if (autoAccountSync && autoAccountSync[`${primarySubAccount.kind + 0}`])
+      // account-shell already synched
+      return;
+    else {
+      refreshAccountBalance();
+    }
+  }, [autoAccountSync, primarySubAccount]);
+
+  useEffect(() => {
+    autoAccountRefresh();
+  }, []);
 
   function navigateToTransactionsList() {
     navigation.navigate('TransactionsList', {

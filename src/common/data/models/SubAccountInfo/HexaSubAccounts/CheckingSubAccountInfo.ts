@@ -18,7 +18,7 @@ export default class CheckingSubAccountInfo
   implements HexaSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
-  kind: SubAccountKind = SubAccountKind.REGULAR;
+  kind: SubAccountKind = SubAccountKind.REGULAR_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
   balances: Balances;
   visibility: AccountVisibility;

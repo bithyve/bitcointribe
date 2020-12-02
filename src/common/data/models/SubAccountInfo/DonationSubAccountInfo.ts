@@ -21,7 +21,7 @@ export default class DonationSubAccountInfo
   implements DonationSubAccountDescribing {
   id: string = uuidV4();
   accountShellID: string | null;
-  kind: SubAccountKind = SubAccountKind.DONATION;
+  kind: SubAccountKind = SubAccountKind.DONATION_ACCOUNT;
   balances: Balances;
   sourceKind: SourceAccountKind;
 
