@@ -19,7 +19,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 
 export default class DonationSubAccountInfo
   implements DonationSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.DONATION_ACCOUNT;
   balances: Balances;
@@ -47,6 +47,7 @@ export default class DonationSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Donation Account',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -59,6 +60,7 @@ export default class DonationSubAccountInfo
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;

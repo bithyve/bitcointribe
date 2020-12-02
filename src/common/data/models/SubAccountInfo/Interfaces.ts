@@ -10,7 +10,7 @@ import {
 import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
-  readonly id: string;
+  id: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
@@ -75,6 +75,7 @@ export interface ImportedWalletSubAccountDescribing
   extends SubAccountDescribing {}
 
 export type SubAccountDescribingConstructorProps = {
+  id?: string;
   accountShellID?: string | null;
   defaultTitle?: string;
   customDisplayName?: string | null;

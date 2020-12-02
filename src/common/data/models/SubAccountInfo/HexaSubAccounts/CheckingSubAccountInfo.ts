@@ -16,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class CheckingSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.REGULAR_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
@@ -36,6 +36,7 @@ export default class CheckingSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Checking Account',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -44,6 +45,7 @@ export default class CheckingSubAccountInfo
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;

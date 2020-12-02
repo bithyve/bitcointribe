@@ -16,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class FullyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
   sourceKind: SourceAccountKind;
@@ -38,6 +38,7 @@ export default class FullyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Full Import',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -47,6 +48,7 @@ export default class FullyImportedWalletSubAccountInfo
     isTFAEnabled = false,
     transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;

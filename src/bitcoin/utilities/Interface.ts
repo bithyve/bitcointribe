@@ -160,6 +160,13 @@ export interface DerivativeAccountElements {
   newTransactions?: TransactionDetails[];
 }
 
+export enum DerivativeAccountTypes {
+  SUB_PRIMARY_ACCOUNT = 'SUB_PRIMARY_ACCOUNT',
+  FAST_BITCOINS = 'FAST_BITCOINS',
+  TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
+  DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+}
+
 // Base Dervative Account
 export interface DerivativeAccount {
   series: number;

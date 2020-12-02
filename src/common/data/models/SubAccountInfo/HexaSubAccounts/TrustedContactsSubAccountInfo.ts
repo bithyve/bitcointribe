@@ -17,7 +17,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TrustedContactsSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
@@ -38,6 +38,7 @@ export default class TrustedContactsSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Joint Account',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -48,6 +49,7 @@ export default class TrustedContactsSubAccountInfo
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;

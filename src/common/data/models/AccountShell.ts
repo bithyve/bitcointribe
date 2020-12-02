@@ -11,7 +11,7 @@ type ConstructorProps = {
   displayOrder?: number | null;
   unit: BitcoinUnit;
   primarySubAccount: SubAccountDescribing;
-  secondarySubAccounts?: SubAccountDescribing[];
+  secondarySubAccounts?: { [id: string]: SubAccountDescribing };
 };
 
 export default class AccountShell {
@@ -32,13 +32,13 @@ export default class AccountShell {
   unit: BitcoinUnit;
 
   primarySubAccount: SubAccountDescribing;
-  secondarySubAccounts: SubAccountDescribing[];
+  secondarySubAccounts: { [id: string]: SubAccountDescribing };
 
   constructor({
     displayOrder = null,
     unit = BitcoinUnit.BTC,
     primarySubAccount,
-    secondarySubAccounts = [],
+    secondarySubAccounts = {},
   }: ConstructorProps) {
     this.id = uuidV4();
 
@@ -46,7 +46,9 @@ export default class AccountShell {
     this.primarySubAccount.accountShellID = this.id;
 
     this.secondarySubAccounts = secondarySubAccounts;
-    this.secondarySubAccounts.forEach((s) => (s.accountShellID = this.id));
+    Object.values(this.secondarySubAccounts).forEach(
+      (s) => (s.accountShellID = this.id),
+    );
 
     this.displayOrder = displayOrder;
     this.unit = unit;
@@ -59,7 +61,10 @@ export default class AccountShell {
   }
 
   static getSubAccounts(shell: AccountShell): SubAccountDescribing[] {
-    return [shell.primarySubAccount, ...shell.secondarySubAccounts];
+    return [
+      shell.primarySubAccount,
+      ...Object.values(shell.secondarySubAccounts),
+    ];
   }
 
   /**
@@ -125,5 +130,32 @@ export default class AccountShell {
       balances: newbalance,
       transactions: newTransactions,
     };
+  }
+
+  static addSecondarySubAccount(
+    shell: AccountShell,
+    subAccId: string,
+    subAccount: SubAccountDescribing,
+  ) {
+    shell.secondarySubAccounts[subAccId] = subAccount;
+  }
+
+  /**
+   * Updates secondary sub-account w/ latest balance and transactions
+   */
+  static updateSecondarySubAccountBalanceTx(
+    shell: AccountShell,
+    subAccId: string,
+    newbalance: Balances,
+    newTransactions: TransactionDescribing[],
+  ) {
+    let secondarySub = shell.secondarySubAccounts[subAccId];
+    if (secondarySub) {
+      secondarySub = {
+        ...secondarySub,
+        balances: newbalance,
+        transactions: newTransactions,
+      };
+    }
   }
 }
