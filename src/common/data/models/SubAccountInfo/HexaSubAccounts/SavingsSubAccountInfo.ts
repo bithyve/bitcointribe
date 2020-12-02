@@ -15,7 +15,7 @@ import {
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.SECURE_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.SECURE_ACCOUNT;
@@ -36,6 +36,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Savings Account',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -44,6 +45,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;

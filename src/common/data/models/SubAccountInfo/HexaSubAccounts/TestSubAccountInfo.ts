@@ -15,7 +15,7 @@ import {
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
-  id: string = uuidV4();
+  id: string;
   accountShellID: string | null;
   kind: SubAccountKind = SubAccountKind.TEST_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.TEST_ACCOUNT;
@@ -36,6 +36,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.TESTNET;
 
   constructor({
+    id = uuidV4(),
     accountShellID = null,
     defaultTitle = 'Test Account',
     balances = { confirmed: 0, unconfirmed: 0 },
@@ -45,6 +46,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     isTFAEnabled = false,
     transactions = [],
   }: ConstructorProps) {
+    this.id = id;
     this.accountShellID = accountShellID;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
