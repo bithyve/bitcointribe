@@ -38,6 +38,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
       return [accountShells];
     }
 
+    const shellCount = accountShells.length;
     let columns = [];
     let currentColumn = [];
 
@@ -53,7 +54,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
         currentColumn = [];
       }
 
-      if (currentColumn.length > 0) {
+      if (index == shellCount - 1) {
         columns.push(currentColumn);
       }
     });

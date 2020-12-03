@@ -35,6 +35,7 @@ import {
   ACCOUNT_SHELL_MERGE_SUCCEEDED,
   ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
+  ACCOUNT_SHELL_ORDERED_TO_FRONT,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -669,10 +670,32 @@ export default (state: AccountsState = initialState, action): AccountsState => {
     case ACCOUNT_SHELLS_ORDER_UPDATED:
       return {
         ...state,
-        accountShells: action.payload,
+        accountShells: action.payload.map(updateDisplayOrderForSortedShell),
+      };
+
+    case ACCOUNT_SHELL_ORDERED_TO_FRONT:
+      const index = state
+        .accountShells
+        .findIndex(shell => shell.id == action.payload.id);
+
+      const shellToMove = state.accountShells.splice(index);
+
+      return {
+        ...state,
+        accountShells: [...shellToMove, ...state.accountShells].map(updateDisplayOrderForSortedShell),
       };
 
     default:
       return state;
   }
 };
+
+
+function updateDisplayOrderForSortedShell(
+  accountShell: AccountShell,
+  sortedIndex: number,
+): AccountShell {
+  accountShell.displayOrder = sortedIndex + 1;
+
+  return accountShell;
+}
