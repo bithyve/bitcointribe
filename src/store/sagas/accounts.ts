@@ -52,6 +52,7 @@ import {
   syncViaXpubAgent,
   fetchDerivativeAccBalTx,
   fetchBalanceTx,
+  accountShellOrderedToFront,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -1158,9 +1159,6 @@ function* addNewAccountShell({
   payload: SubAccountDescribing;
 }) {
   // TODO: Devise some way to reference and call a new account creation service here.
-
-  console.log('addNewAccountShell saga');
-
   const bitcoinUnit =
     subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
       ? BitcoinUnit.TSATS
@@ -1169,6 +1167,7 @@ function* addNewAccountShell({
   const newAccountShell = new AccountShell({
     unit: bitcoinUnit,
     primarySubAccount: subAccountInfo,
+    displayOrder: 1,
   });
 
   try {
@@ -1178,6 +1177,7 @@ function* addNewAccountShell({
     //   ...payload,
     // );
     yield put(newAccountShellAdded({ accountShell: newAccountShell }));
+    yield put(accountShellOrderedToFront(newAccountShell));
   } catch (error) {
     console.log('addNewAccountShell saga::error: ' + error);
     yield put(
