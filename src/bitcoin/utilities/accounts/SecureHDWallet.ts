@@ -294,12 +294,9 @@ export default class SecureHDWallet extends Bitcoin {
     return { secondaryXpub: this.xpubs.secondary };
   };
 
-  public getAccountId = (): { accountId: string } => {
-    const mutliSig = this.createSecureMultiSig(0);
-    const { address } = mutliSig; // getting the first receiving address
-    return {
-      accountId: crypto.createHash('sha256').update(address).digest('hex'),
-    };
+  public getAccountId = (): string => {
+    const xpub = this.xpubs.secondary;
+    return crypto.createHash('sha256').update(xpub).digest('hex');
   };
 
   public decryptSecondaryXpub = (encryptedSecXpub: string) => {

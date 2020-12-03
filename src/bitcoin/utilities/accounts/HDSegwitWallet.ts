@@ -190,13 +190,9 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public getAccountId = (): { accountId: string } => {
-    const node = bip32.fromBase58(this.getXpub(), this.network);
-    const keyPair = node.derive(0).derive(0);
-    const address = this.deriveAddress(keyPair, this.purpose); // getting the first receiving address
-    return {
-      accountId: crypto.createHash('sha256').update(address).digest('hex'),
-    };
+  public getAccountId = (): string => {
+    const xpub = this.getXpub();
+    return crypto.createHash('sha256').update(xpub).digest('hex');
   };
 
   public getInitialReceivingAddress = (): string => {
