@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from "react-navigation-stack";
-import NewAccountSelectionList from "../../../pages/Accounts/AddNew/NewAccountSelectionList";
+import NewAccountSelectionContainerScreen from "../../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen";
 import AddNewHexaAccountDetailsScreen from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen";
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen';
@@ -11,7 +11,7 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 const AddNewAccountStack = createStackNavigator(
   {
     AccountSelectionList: {
-      screen: NewAccountSelectionList,
+      screen: NewAccountSelectionContainerScreen,
       navigationOptions: ({ navigation }) => {
         return {
           title: "Add New Account",

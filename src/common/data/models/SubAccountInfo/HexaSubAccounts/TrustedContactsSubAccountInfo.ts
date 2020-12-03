@@ -40,7 +40,7 @@ export default class TrustedContactsSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
-    defaultTitle = null,
+    defaultTitle = 'Trusted Contacts',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
     customDescription = null,
