@@ -1,9 +1,8 @@
-import { Action } from "redux";
-import AccountShell from "../../common/data/models/AccountShell";
+import { Action } from 'redux';
+import AccountShell from '../../common/data/models/AccountShell';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
+
 // types and action creators: dispatched by components and sagas
-
-import SubAccountDescribing from "../../common/data/models/SubAccountInfo/Interfaces";
-
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
 export const TRANSFER_ST1 = 'TRANSFER_ST1';
@@ -30,14 +29,18 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT';
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES';
 export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL';
-export const ADD_NEW_ACCOUNT_SHELL_COMPLETED = 'ADD_NEW_ACCOUNT_SHELL_COMPLETED';
+export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
+  'ADD_NEW_ACCOUNT_SHELL_COMPLETED';
 export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS';
-export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED = 'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED';
+export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED =
+  'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED';
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS';
-export const TRANSACTION_REASSIGNMENT_COMPLETED = 'TRANSACTION_REASSIGNMENT_COMPLETED';
+export const TRANSACTION_REASSIGNMENT_COMPLETED =
+  'TRANSACTION_REASSIGNMENT_COMPLETED';
 export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS';
 export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED';
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED';
+export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -275,20 +278,28 @@ export const updateDonationPreferences = (
   };
 };
 
+export const refreshAccountShell = (
+  shell: AccountShell,
+  options?: { autoSync?: Boolean },
+) => {
+  return { type: REFRESH_ACCOUNT_SHELL, payload: { shell, options } };
+};
 export interface AddNewAccountShellAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL;
   payload: SubAccountDescribing;
-};
+}
 
-export const addNewAccountShell = (payload: SubAccountDescribing): AddNewAccountShellAction => {
+export const addNewAccountShell = (
+  payload: SubAccountDescribing,
+): AddNewAccountShellAction => {
   return {
     type: ADD_NEW_ACCOUNT_SHELL,
     payload,
-  }
-}
+  };
+};
 export interface AddNewAccountShellCompletionAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL_COMPLETED;
-};
+}
 
 export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletionAction => {
   return { type: ADD_NEW_ACCOUNT_SHELL_COMPLETED };
@@ -297,20 +308,21 @@ export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletion
 export interface UpdateSubAccountSettingsAction extends Action {
   type: typeof UPDATE_SUB_ACCOUNT_SETTINGS;
   payload: SubAccountDescribing;
-};
+}
 
-export const updateSubAccountSettings = (payload: SubAccountDescribing): UpdateSubAccountSettingsAction => {
+export const updateSubAccountSettings = (
+  payload: SubAccountDescribing,
+): UpdateSubAccountSettingsAction => {
   return { type: UPDATE_SUB_ACCOUNT_SETTINGS, payload };
 };
 
 export interface UpdateSubAccountSettingsCompletionAction extends Action {
   type: typeof SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED;
-};
+}
 
 export const subAccountSettingsUpdateCompleted = (): UpdateSubAccountSettingsCompletionAction => {
   return { type: SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED };
 };
-
 
 export type ReassignTransactionsActionPayload = {
   transactionIDs: string[];
@@ -321,21 +333,21 @@ export type ReassignTransactionsActionPayload = {
 export interface ReassignTransactionsAction extends Action {
   type: typeof REASSIGN_TRANSACTIONS;
   payload: ReassignTransactionsActionPayload;
-};
+}
 
-export const reassignTransactions = (payload: ReassignTransactionsActionPayload): ReassignTransactionsAction => {
+export const reassignTransactions = (
+  payload: ReassignTransactionsActionPayload,
+): ReassignTransactionsAction => {
   return { type: REASSIGN_TRANSACTIONS, payload };
 };
 
 export interface TransactionReassignmentCompletionAction extends Action {
   type: typeof TRANSACTION_REASSIGNMENT_COMPLETED;
-};
+}
 
 export const transactionReassignmentCompleted = (): TransactionReassignmentCompletionAction => {
   return { type: TRANSACTION_REASSIGNMENT_COMPLETED };
 };
-
-
 
 export type MergeAccountShellsActionPayload = {
   source: AccountShell;
@@ -345,15 +357,17 @@ export type MergeAccountShellsActionPayload = {
 export interface MergeAccountShellsAction extends Action {
   type: typeof MERGE_ACCOUNT_SHELLS;
   payload: MergeAccountShellsActionPayload;
-};
+}
 
-export const mergeAccountShells = (payload: MergeAccountShellsActionPayload): MergeAccountShellsAction => {
+export const mergeAccountShells = (
+  payload: MergeAccountShellsActionPayload,
+): MergeAccountShellsAction => {
   return { type: MERGE_ACCOUNT_SHELLS, payload };
 };
 
 export interface AccountShellMergeCompletionAction extends Action {
   type: typeof ACCOUNT_SHELL_MERGE_COMPLETED;
-};
+}
 
 export const accountShellMergeCompleted = (): AccountShellMergeCompletionAction => {
   return { type: ACCOUNT_SHELL_MERGE_COMPLETED };
@@ -362,15 +376,16 @@ export const accountShellMergeCompleted = (): AccountShellMergeCompletionAction 
 export interface AccountShellsOrderUpdatedAction extends Action {
   type: typeof ACCOUNT_SHELLS_ORDER_UPDATED;
   payload: AccountShell[];
-};
+}
 
-export const accountShellsOrderUpdated = (payload: AccountShell[]): AccountShellsOrderUpdatedAction => {
+export const accountShellsOrderUpdated = (
+  payload: AccountShell[],
+): AccountShellsOrderUpdatedAction => {
   return {
     type: ACCOUNT_SHELLS_ORDER_UPDATED,
     payload,
   };
 };
-
 
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED';
@@ -393,11 +408,12 @@ export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED';
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
-export const TRANSACTION_REASSIGNMENT_SUCCEEDED = 'TRANSACTION_REASSIGNMENT_SUCCEEDED';
-export const TRANSACTION_REASSIGNMENT_FAILED = 'TRANSACTION_REASSIGNMENT_FAILED';
+export const TRANSACTION_REASSIGNMENT_SUCCEEDED =
+  'TRANSACTION_REASSIGNMENT_SUCCEEDED';
+export const TRANSACTION_REASSIGNMENT_FAILED =
+  'TRANSACTION_REASSIGNMENT_FAILED';
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED';
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED';
-
 
 export const testcoinsReceived = (serviceType, service) => {
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
@@ -463,38 +479,44 @@ export const settedDonationAccount = (serviceType, successful) => {
   return { type: SETTED_DONATION_ACC, payload: { serviceType, successful } };
 };
 
-export const newAccountShellAddFailed = ({ accountShell, error }: {
-  accountShell: AccountShell,
-  error: Error,
+export const newAccountShellAddFailed = ({
+  accountShell,
+  error,
+}: {
+  accountShell: AccountShell;
+  error: Error;
 }) => {
   return { type: NEW_ACCOUNT_ADD_FAILED, payload: { accountShell, error } };
 };
 
-export const newAccountShellAdded = ({ accountShell }: {
-  accountShell: AccountShell,
+export const newAccountShellAdded = ({
+  accountShell,
+}: {
+  accountShell: AccountShell;
 }) => {
   return { type: NEW_ACCOUNT_SHELL_ADDED, payload: accountShell };
 };
 
-
-export const accountSettingsUpdateFailed = (
-  {
-    account,
-    error
-  }: {
-    account: SubAccountDescribing,
-    error: Error
-  }) => {
+export const accountSettingsUpdateFailed = ({
+  account,
+  error,
+}: {
+  account: SubAccountDescribing;
+  error: Error;
+}) => {
   return { type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: { account, error } };
-}
+};
 
-export const accountSettingsUpdated = ({ account }: { account: SubAccountDescribing }) => {
+export const accountSettingsUpdated = ({
+  account,
+}: {
+  account: SubAccountDescribing;
+}) => {
   return { type: ACCOUNT_SETTINGS_UPDATED, payload: account };
 };
 
-
 export const transactionReassignmentFailed = (
-  payload: ReassignTransactionsActionPayload & { error: Error }
+  payload: ReassignTransactionsActionPayload & { error: Error },
 ) => {
   return {
     type: TRANSACTION_REASSIGNMENT_FAILED,
@@ -502,13 +524,14 @@ export const transactionReassignmentFailed = (
   };
 };
 
-export const transactionReassignmentSucceeded = (payload: ReassignTransactionsActionPayload) => {
+export const transactionReassignmentSucceeded = (
+  payload: ReassignTransactionsActionPayload,
+) => {
   return { type: TRANSACTION_REASSIGNMENT_SUCCEEDED, payload };
 };
 
-
 export const accountShellMergeFailed = (
-  payload: MergeAccountShellsActionPayload & { error: Error }
+  payload: MergeAccountShellsActionPayload & { error: Error },
 ) => {
   return {
     type: ACCOUNT_SHELL_MERGE_FAILED,
@@ -516,6 +539,8 @@ export const accountShellMergeFailed = (
   };
 };
 
-export const accountShellMergeSucceeded = (payload: MergeAccountShellsActionPayload) => {
+export const accountShellMergeSucceeded = (
+  payload: MergeAccountShellsActionPayload,
+) => {
   return { type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload };
 };
