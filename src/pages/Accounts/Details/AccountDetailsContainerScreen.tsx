@@ -25,16 +25,8 @@ import AccountShell from '../../../common/data/models/AccountShell';
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs';
 import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
-import {
-  DONATION_ACCOUNT,
-  TEST_ACCOUNT,
-} from '../../../common/constants/serviceTypes';
-import SubAccountKind from '../../../common/data/enums/SubAccountKind';
-import {
-  fetchBalanceTx,
-  fetchDerivativeAccBalTx,
-  syncViaXpubAgent,
-} from '../../../store/actions/accounts';
+
+import { refreshAccountShell } from '../../../store/actions/accounts';
 import { setAutoAccountSync } from '../../../store/actions/loaders';
 
 export type Props = {
@@ -80,8 +72,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
 
-  const autoAccountSync = useSelector((state) => state.loaders.autoAccountSync);
-
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -92,65 +82,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       txID: transaction.txid,
     });
   }
-
-  const refreshAccountBalance = useCallback(() => {
-    const nonDerivativeAccounts = [
-      SubAccountKind.TEST_ACCOUNT,
-      SubAccountKind.REGULAR_ACCOUNT,
-      SubAccountKind.SECURE_ACCOUNT,
-    ];
-    if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
-      if (primarySubAccount.kind === DONATION_ACCOUNT)
-        dispatch(
-          syncViaXpubAgent(
-            primarySubAccount.sourceKind,
-            primarySubAccount.kind,
-            primarySubAccount.instanceNumber,
-          ),
-        );
-      else
-        dispatch(
-          fetchDerivativeAccBalTx(
-            primarySubAccount.sourceKind,
-            primarySubAccount.kind,
-            primarySubAccount.instanceNumber,
-          ),
-        );
-
-      dispatch(
-        setAutoAccountSync(
-          `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
-        ),
-      );
-    } else {
-      dispatch(
-        fetchBalanceTx(primarySubAccount.kind, {
-          loader: true,
-          syncTrustedDerivative:
-            primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
-        }),
-      );
-      dispatch(
-        setAutoAccountSync(
-          `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
-        ),
-      );
-    }
-  }, [primarySubAccount]);
-
-  const autoAccountRefresh = useCallback(() => {
-    // refreshes the account-shell once per-session
-    if (autoAccountSync && autoAccountSync[`${primarySubAccount.kind + 0}`])
-      // account-shell already synched
-      return;
-    else {
-      refreshAccountBalance();
-    }
-  }, [autoAccountSync, primarySubAccount]);
-
-  useEffect(() => {
-    autoAccountRefresh();
-  }, []);
 
   function navigateToTransactionsList() {
     navigation.navigate('TransactionsList', {
@@ -243,6 +174,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       );
     },
   });
+
+  useEffect(() => {
+    // auto-refresh account shell once per session
+    dispatch(refreshAccountShell(accountShell, { autoSync: true }));
+  }, []);
 
   return (
     <ScrollView style={styles.rootContainer}>
