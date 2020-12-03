@@ -48,12 +48,17 @@ import {
   MERGE_ACCOUNT_SHELLS,
   accountShellMergeSucceeded,
   accountShellMergeFailed,
+  REFRESH_ACCOUNT_SHELL,
+  syncViaXpubAgent,
+  fetchDerivativeAccBalTx,
+  fetchBalanceTx,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -62,7 +67,7 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { startupSyncLoaded } from '../actions/loaders';
+import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import AccountShell from '../../common/data/models/AccountShell';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
@@ -1076,6 +1081,75 @@ function* updateDonationPreferencesWorker({ payload }) {
 export const updateDonationPreferencesWatcher = createWatcher(
   updateDonationPreferencesWorker,
   UPDATE_DONATION_PREFERENCES,
+);
+
+function* refreshAccountShellWorker({ payload }) {
+  const shell: AccountShell = payload.shell;
+  const { primarySubAccount } = shell;
+  const options: { autoSync?: Boolean } = payload.options;
+
+  if (options && options.autoSync) {
+    // auto-refresh the account-shell once per-session
+    const autoAccountSync = yield select(
+      (state) => state.loaders.autoAccountSync,
+    );
+    if (
+      autoAccountSync &&
+      autoAccountSync[
+        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`
+      ]
+    )
+      // account-shell already synched
+      return;
+  }
+
+  const nonDerivativeAccounts = [
+    SubAccountKind.TEST_ACCOUNT,
+    SubAccountKind.REGULAR_ACCOUNT,
+    SubAccountKind.SECURE_ACCOUNT,
+  ];
+  if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
+    if (primarySubAccount.kind === DONATION_ACCOUNT)
+      yield put(
+        syncViaXpubAgent(
+          primarySubAccount.sourceKind,
+          primarySubAccount.kind,
+          primarySubAccount.instanceNumber,
+        ),
+      );
+    else
+      yield put(
+        fetchDerivativeAccBalTx(
+          primarySubAccount.sourceKind,
+          primarySubAccount.kind,
+          primarySubAccount.instanceNumber,
+        ),
+      );
+
+    yield put(
+      setAutoAccountSync(
+        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
+      ),
+    );
+  } else {
+    yield put(
+      fetchBalanceTx(primarySubAccount.kind, {
+        loader: true,
+        syncTrustedDerivative:
+          primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
+      }),
+    );
+    yield put(
+      setAutoAccountSync(
+        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
+      ),
+    );
+  }
+}
+
+export const refreshAccountShellWatcher = createWatcher(
+  refreshAccountShellWorker,
+  REFRESH_ACCOUNT_SHELL,
 );
 
 function* addNewAccountShell({

@@ -61,6 +61,7 @@ import {
   updateAccountSettingsWatcher,
   reassignTransactionsWatcher,
   mergeAccountShellsWatcher,
+  refreshAccountShellWatcher,
 } from './sagas/accounts';
 
 import {
@@ -148,6 +149,7 @@ const rootSaga = function* () {
     startupSyncWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
+    refreshAccountShellWatcher,
     addNewAccountShellWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,

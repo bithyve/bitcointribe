@@ -156,6 +156,7 @@ export default class AccountShell {
         balances: newbalance,
         transactions: newTransactions,
       };
+      shell.secondarySubAccounts[subAccId] = secondarySub;
     }
   }
 }

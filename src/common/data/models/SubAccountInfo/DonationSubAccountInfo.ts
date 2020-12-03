@@ -21,6 +21,8 @@ export default class DonationSubAccountInfo
   implements DonationSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.DONATION_ACCOUNT;
   balances: Balances;
   sourceKind: SourceAccountKind;
@@ -49,6 +51,7 @@ export default class DonationSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle = 'Donation Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
@@ -62,6 +65,7 @@ export default class DonationSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
     this.customDisplayName = customDisplayName;
