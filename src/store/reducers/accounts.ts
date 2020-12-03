@@ -44,23 +44,9 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
 import AccountShell from '../../common/data/models/AccountShell';
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
-import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
-import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
-import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import {
-  Balances,
-  DerivativeAccount,
-  DerivativeAccountTypes,
-} from '../../bitcoin/utilities/Interface';
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
-import config from '../../bitcoin/HexaConfig';
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo';
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
+import { updateAccountShells } from '../utils/accShellMapping';
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {
@@ -456,177 +442,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
 
     case SERVICES_ENRICHED:
       const { services } = action.payload;
-      const testAcc: TestAccount = services[TEST_ACCOUNT];
-      const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
-      const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
-
-      let accountShells = state.accountShells;
-
-      // init out-of-the-box account shells
-      if (!accountShells.length) {
-        accountShells = [
-          new AccountShell({
-            primarySubAccount: new TestSubAccountInfo({
-              id: testAcc.getAccountId(),
-            }),
-            unit: BitcoinUnit.TSATS,
-            displayOrder: 1,
-          }),
-          new AccountShell({
-            primarySubAccount: new CheckingSubAccountInfo({
-              id: regularAcc.getAccountId(),
-            }),
-            unit: BitcoinUnit.SATS,
-            displayOrder: 2,
-          }),
-          new AccountShell({
-            primarySubAccount: new SavingsSubAccountInfo({
-              id: secureAcc.getAccountId(),
-            }),
-            unit: BitcoinUnit.SATS,
-            displayOrder: 3,
-          }),
-        ];
-      }
-
-      // update primary sub-accounts
-      let updatedAccountShells = accountShells.map((shell: AccountShell) => {
-        let balances: Balances = {
-          confirmed: 0,
-          unconfirmed: 0,
-        };
-        let transactions: TransactionDescribing[] = [];
-
-        switch (shell.primarySubAccount.kind) {
-          case SubAccountKind.TEST_ACCOUNT:
-            balances = {
-              confirmed: testAcc.hdWallet.balances.balance,
-              unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
-            };
-            transactions = testAcc.hdWallet.transactions.transactionDetails;
-            break;
-
-          case SubAccountKind.REGULAR_ACCOUNT:
-            balances = {
-              confirmed: regularAcc.hdWallet.balances.balance,
-              unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
-            };
-            transactions = regularAcc.hdWallet.transactions.transactionDetails;
-
-            break;
-
-          case SubAccountKind.SECURE_ACCOUNT:
-            balances = {
-              confirmed: secureAcc.secureHDWallet.balances.balance,
-              unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
-            };
-            transactions =
-              secureAcc.secureHDWallet.transactions.transactionDetails;
-
-            break;
-        }
-
-        AccountShell.updatePrimarySubAccountBalanceTx(
-          shell,
-          balances,
-          transactions,
-        );
-
-        return shell;
-      });
-
-      // insert/update secondary sub-accounts
-      updatedAccountShells = updatedAccountShells.map((shell: AccountShell) => {
-        switch (shell.primarySubAccount.kind) {
-          case SubAccountKind.REGULAR_ACCOUNT:
-            for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-              const derivativeAccount: DerivativeAccount =
-                regularAcc.hdWallet.derivativeAccounts[dAccountType];
-
-              if (derivativeAccount && derivativeAccount.instance.using) {
-                const derivativeAccountBalTxMapping = {};
-                for (
-                  let accountNumber = 1;
-                  accountNumber <= derivativeAccount.instance.using;
-                  accountNumber++
-                ) {
-                  let dervBalances: Balances = {
-                    confirmed: 0,
-                    unconfirmed: 0,
-                  };
-                  let dervTransactions: TransactionDescribing[] = [];
-
-                  if (derivativeAccount[accountNumber].balances)
-                    dervBalances = {
-                      confirmed:
-                        derivativeAccount[accountNumber].balances.balance,
-                      unconfirmed:
-                        derivativeAccount[accountNumber].balances
-                          .unconfirmedBalance,
-                    };
-
-                  if (derivativeAccount[accountNumber].transactions)
-                    dervTransactions =
-                      derivativeAccount[accountNumber].transactions
-                        .transactionDetails;
-
-                  const derivativeId = derivativeAccount[accountNumber].xpubId;
-                  derivativeAccountBalTxMapping[derivativeId] = {
-                    balances: dervBalances,
-                    transactions: dervTransactions,
-                  };
-                }
-
-                switch (
-                  dAccountType // non-ejected accounts
-                ) {
-                  case DerivativeAccountTypes.TRUSTED_CONTACTS:
-                    Object.keys(derivativeAccountBalTxMapping).forEach(
-                      (derivativeId) => {
-                        const {
-                          balances,
-                          transactions,
-                        } = derivativeAccountBalTxMapping[derivativeId];
-
-                        if (shell.secondarySubAccounts[derivativeId]) {
-                          AccountShell.updateSecondarySubAccountBalanceTx(
-                            shell,
-                            derivativeId,
-                            balances,
-                            transactions,
-                          );
-                        } else {
-                          // backward compatibiliy for versions < 1.4.0
-                          const trustedContactSubAccc = new TrustedContactsSubAccountInfo(
-                            {
-                              id: derivativeId,
-                              accountShellID: shell.id,
-                              balances,
-                              transactions,
-                            },
-                          );
-
-                          AccountShell.addSecondarySubAccount(
-                            shell,
-                            derivativeId,
-                            trustedContactSubAccc,
-                          );
-                        }
-                      },
-                    );
-                    break;
-
-                  case DerivativeAccountTypes.FAST_BITCOINS:
-                    // new ExternalServiceSubAccountInfo({});
-                    break;
-                }
-              }
-            }
-            break;
-        }
-
-        return shell;
-      });
 
       return {
         ...state,
@@ -643,7 +458,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
           service: action.payload.services[SECURE_ACCOUNT],
         },
         servicesEnriched: true,
-        accountShells: updatedAccountShells,
+        accountShells: updateAccountShells(services, state.accountShells),
       };
 
     case ACCOUNTS_LOADING:
