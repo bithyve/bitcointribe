@@ -66,7 +66,6 @@ import { nameToInitials } from '../../common/CommonFunctions';
 interface ManageBackupStateTypes {
   levelData: any[];
   selectedId: any;
-  securityAtLevel: any;
   encryptedCloudDataJson: any;
   isPrimaryKeeper: any;
   isError: boolean;
@@ -146,7 +145,6 @@ class ManageBackup extends Component<
     };
     this.state = {
       selectedKeeper: obj,
-      securityAtLevel: 0,
       selectedId: 0,
       isError: false,
       levelData: [
@@ -273,7 +271,7 @@ class ManageBackup extends Component<
     if (this.state.levelData[0].status == 'notSetup') value = 1;
     else if (level) value = level + 1;
     else if (level == 3) value = 3;
-    this.setState({ selectedId: value, securityAtLevel: level });
+    this.setState({ selectedId: value });
   };
 
   selectId = (value) => {
@@ -635,18 +633,14 @@ class ManageBackup extends Component<
   };
 
   getImageIcon = (chosenContact) => {
-    console.log('chosenContact', chosenContact);
-    console.log('chosenContact.image.uri', chosenContact.image.uri)
     if (chosenContact && chosenContact.name) {
       if (chosenContact.imageAvailable) {
-        console.log('if');
         return (
           <View style={styles.imageBackground}>
             <Image source={{uri: chosenContact.image.uri}} style={styles.contactImage} />
           </View>
         );
       } else {
-        console.log('else');
         return (
           <View style={styles.imageBackground}>
             <Text
@@ -678,7 +672,6 @@ class ManageBackup extends Component<
         );
       }
     }
-    console.log('other');
     return (
       <Image
         style={styles.contactImageAvatar}
@@ -691,8 +684,6 @@ class ManageBackup extends Component<
     const {
       levelData,
       selectedId,
-      securityAtLevel,
-      isPrimaryKeeper,
       isError,
       selectedLevelId,
       selectedKeeperType,
@@ -700,7 +691,6 @@ class ManageBackup extends Component<
     const {
       navigation,
       healthLoading,
-      checkMSharesHealth,
       keeperApproveStatus,
       currentLevel,
     } = this.props;
@@ -1276,6 +1266,7 @@ class ManageBackup extends Component<
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
               onPressContinue={() => {
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
                 const {
                   levelData,
                   selectedLevelId,
@@ -1326,6 +1317,7 @@ class ManageBackup extends Component<
                   : false
               }
               onPressContinue={() => {
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
                 let {
                   selectedKeeper,
                   selectedLevelId,

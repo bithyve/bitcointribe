@@ -17,7 +17,7 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { withNavigationFocus } from 'react-navigation';
+import { withNavigationFocus, StackActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
 import RadioButton from '../../components/RadioButton';
@@ -176,6 +176,8 @@ class KeeperFeatures extends Component<
         this.props.navigation.state.params.selectedLevelId,
         navigation.getParam('isChange') ? navigation.getParam('isChange') : false,
       );
+      const popAction = StackActions.pop({ n: 2 });
+      navigation.dispatch(popAction);
       navigation.replace('ManageBackupKeeper');
     }
   };
