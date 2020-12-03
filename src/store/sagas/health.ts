@@ -328,6 +328,7 @@ export const updateSharesHealthWatcher = createWatcher(
 
 function* createAndUploadOnEFChannelWorker({ payload }) {
   try {
+    yield put(switchS3LoaderKeeper('keeperSetupStatus'));
     let {
       isReshare,
       featuresList,
@@ -337,7 +338,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       level,
       isChange,
     } = payload;
-    console.log('payload', payload);
     let s3Service: S3Service = yield select((state) => state.health.service);
     let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
     let shareIndex = level == 2 ? 1 : 3;
@@ -359,7 +359,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     );
     let type = isPrimaryKeeper ? 'primaryKeeper' : payload.type;
 
-    yield put(updateMSharesLoader(true));
+    
     const keeper: KeeperService = yield select((state) => state.keeper.service);
 
     let securityQuestion = yield select(
@@ -531,9 +531,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         }
       }
     }
-    yield put(updateMSharesLoader(false));
+    yield put(switchS3LoaderKeeper('keeperSetupStatus'));
   } catch (error) {
     console.log('Error EF channel', error);
+    yield put(switchS3LoaderKeeper('keeperSetupStatus'));
   }
 }
 

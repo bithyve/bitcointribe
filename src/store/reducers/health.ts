@@ -43,6 +43,7 @@ const initialState: {
     uploadMetaShare: Boolean;
     approvalRequest: Boolean;
     reshareWithSameKeeper: Boolean;
+    keeperSetupStatus: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -96,6 +97,7 @@ const initialState: {
     uploadMetaShare: false,
     approvalRequest: false,
     reshareWithSameKeeper: false,
+    keeperSetupStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

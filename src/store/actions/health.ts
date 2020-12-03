@@ -219,7 +219,6 @@ export const updateCloudMShare = (metaShare, replaceIndex?) => {
 };
 
 export const switchS3LoaderKeeper = (beingLoaded) => {
-  // console.log("Called s3 Loading", new Date())
   return { type: S3_LOADING_KEEPER, payload: { beingLoaded } };
 };
 

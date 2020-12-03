@@ -51,6 +51,7 @@ interface KeeperFeaturesPropsTypes {
   isLevel3Initialized: Boolean;
   metaShare: MetaShare[];
   keeperInfo: any[];
+  keeperSetupStatus: Boolean;
 }
 
 class KeeperFeatures extends Component<
@@ -101,6 +102,11 @@ class KeeperFeatures extends Component<
       this.state.setupKeeperClicked)
     ) {
       this.uploadDataOnEFChannel();
+    }
+    if(prevProp.keeperSetupStatus != this.props.keeperSetupStatus && !this.props.keeperSetupStatus && this.state.setUpLoader) {
+      const popAction = StackActions.pop({ n: 2 });
+      this.props.navigation.dispatch(popAction);
+      this.props.navigation.replace('ManageBackupKeeper');
     }
   };
 
@@ -164,7 +170,6 @@ class KeeperFeatures extends Component<
         share =
           metaShare[metaShare.findIndex((value) => value.shareId == shareId)];
       }
-      console.log('share', share, metaShare)
       createAndUploadOnEFChannel(
         navigation.state.params.qrScannedData,
         featuresList,
@@ -176,9 +181,6 @@ class KeeperFeatures extends Component<
         this.props.navigation.state.params.selectedLevelId,
         navigation.getParam('isChange') ? navigation.getParam('isChange') : false,
       );
-      const popAction = StackActions.pop({ n: 2 });
-      navigation.dispatch(popAction);
-      navigation.replace('ManageBackupKeeper');
     }
   };
 
@@ -421,6 +423,7 @@ const mapStateToProps = (state) => {
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     metaShare: idx(state, (_) => _.sss.service.levelhealth.metaShares),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
+    keeperSetupStatus: idx(state, (_) => _.health.loading.keeperSetupStatus),
   };
 };
 

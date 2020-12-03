@@ -1388,6 +1388,7 @@ const mapStateToProps = (state) => {
       (_) => _.health.isLevelThreeMetaShareCreated,
     ),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
+    keeperSetupStatus: idx(state, (_) => _.health.loading.keeperSetupStatus),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
     service: idx(state, (_) => _.keeper.service),
     secureAccount: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),

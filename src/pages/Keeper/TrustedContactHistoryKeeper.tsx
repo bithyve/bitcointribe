@@ -62,6 +62,7 @@ import { isEmpty } from '../../common/CommonFunctions/index';
 import HistoryHeaderComponent from './HistoryHeaderComponent';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import QRModal from '../Accounts/QRModal';
+import { StackActions } from 'react-navigation';
 
 const TrustedContactHistoryKeeper = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -972,6 +973,9 @@ const TrustedContactHistoryKeeper = (props) => {
               (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
             }
             (SendViaLinkBottomSheet as any).current.snapTo(0);
+            const popAction = StackActions.pop({ n: 1 });
+            props.navigation.dispatch(popAction);
+            props.navigation.replace('ManageBackupKeeper');
           }}
         />
       );
