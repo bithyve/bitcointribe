@@ -1,4 +1,3 @@
-import { v4 as uuidV4 } from 'uuid';
 import SubAccountKind from '../../enums/SubAccountKind';
 import {
   DonationSubAccountDescribing,
@@ -49,9 +48,9 @@ export default class DonationSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = uuidV4(),
+    id,
     accountShellID = null,
-    instanceNumber = null,
+    instanceNumber,
     defaultTitle = 'Donation Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
