@@ -218,7 +218,10 @@ export const updateAccountShells = (
   let updatedAccountShells = updatePrimarySubAccounts(services, accountShells);
 
   // insert/update secondary sub-accounts
-  updatedAccountShells = updateSecondarySubAccounts(services, accountShells);
+  updatedAccountShells = updateSecondarySubAccounts(
+    services,
+    updatedAccountShells,
+  );
 
   return updatedAccountShells;
 };
