@@ -178,23 +178,7 @@ const initialState: AccountsState = {
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
-  accountShells: [
-    new AccountShell({
-      primarySubAccount: new TestSubAccountInfo({ id: '000' }),
-      unit: BitcoinUnit.TSATS,
-      displayOrder: 1,
-    }),
-    new AccountShell({
-      primarySubAccount: new CheckingSubAccountInfo({ id: '001' }),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 2,
-    }),
-    new AccountShell({
-      primarySubAccount: new SavingsSubAccountInfo({ id: '002' }),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 3,
-    }),
-  ],
+  accountShells: [],
 
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
@@ -476,55 +460,80 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
       const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
 
+      let accountShells = state.accountShells;
+
+      // init out-of-the-box account shells
+      if (!accountShells.length) {
+        accountShells = [
+          new AccountShell({
+            primarySubAccount: new TestSubAccountInfo({
+              id: testAcc.getAccountId(),
+            }),
+            unit: BitcoinUnit.TSATS,
+            displayOrder: 1,
+          }),
+          new AccountShell({
+            primarySubAccount: new CheckingSubAccountInfo({
+              id: regularAcc.getAccountId(),
+            }),
+            unit: BitcoinUnit.SATS,
+            displayOrder: 2,
+          }),
+          new AccountShell({
+            primarySubAccount: new SavingsSubAccountInfo({
+              id: secureAcc.getAccountId(),
+            }),
+            unit: BitcoinUnit.SATS,
+            displayOrder: 3,
+          }),
+        ];
+      }
+
       // update primary sub-accounts
-      let updatedAccountShells = state.accountShells.map(
-        (shell: AccountShell) => {
-          let balances: Balances = {
-            confirmed: 0,
-            unconfirmed: 0,
-          };
-          let transactions: TransactionDescribing[] = [];
+      let updatedAccountShells = accountShells.map((shell: AccountShell) => {
+        let balances: Balances = {
+          confirmed: 0,
+          unconfirmed: 0,
+        };
+        let transactions: TransactionDescribing[] = [];
 
-          switch (shell.primarySubAccount.kind) {
-            case SubAccountKind.TEST_ACCOUNT:
-              balances = {
-                confirmed: testAcc.hdWallet.balances.balance,
-                unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
-              };
-              transactions = testAcc.hdWallet.transactions.transactionDetails;
-              break;
+        switch (shell.primarySubAccount.kind) {
+          case SubAccountKind.TEST_ACCOUNT:
+            balances = {
+              confirmed: testAcc.hdWallet.balances.balance,
+              unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
+            };
+            transactions = testAcc.hdWallet.transactions.transactionDetails;
+            break;
 
-            case SubAccountKind.REGULAR_ACCOUNT:
-              balances = {
-                confirmed: regularAcc.hdWallet.balances.balance,
-                unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
-              };
-              transactions =
-                regularAcc.hdWallet.transactions.transactionDetails;
+          case SubAccountKind.REGULAR_ACCOUNT:
+            balances = {
+              confirmed: regularAcc.hdWallet.balances.balance,
+              unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
+            };
+            transactions = regularAcc.hdWallet.transactions.transactionDetails;
 
-              break;
+            break;
 
-            case SubAccountKind.SECURE_ACCOUNT:
-              balances = {
-                confirmed: secureAcc.secureHDWallet.balances.balance,
-                unconfirmed:
-                  secureAcc.secureHDWallet.balances.unconfirmedBalance,
-              };
-              transactions =
-                secureAcc.secureHDWallet.transactions.transactionDetails;
+          case SubAccountKind.SECURE_ACCOUNT:
+            balances = {
+              confirmed: secureAcc.secureHDWallet.balances.balance,
+              unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
+            };
+            transactions =
+              secureAcc.secureHDWallet.transactions.transactionDetails;
 
-              break;
-          }
+            break;
+        }
 
-          AccountShell.updatePrimarySubAccountBalanceTx(
-            shell,
-            balances,
-            transactions,
-          );
+        AccountShell.updatePrimarySubAccountBalanceTx(
+          shell,
+          balances,
+          transactions,
+        );
 
-          return shell;
-        },
-      );
+        return shell;
+      });
 
       // insert/update secondary sub-accounts
       updatedAccountShells = updatedAccountShells.map((shell: AccountShell) => {

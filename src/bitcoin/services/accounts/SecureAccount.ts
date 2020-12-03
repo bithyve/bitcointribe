@@ -349,30 +349,7 @@ export default class SecureAccount {
     }
   };
 
-  public getAccountId = ():
-    | {
-        status: number;
-        data: {
-          accountId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getAccountId(),
-      };
-    } catch (err) {
-      return { status: 0o0, err: err.message, message: ErrMap[0o0] };
-    }
-  };
+  public getAccountId = (): string => this.secureHDWallet.getAccountId();
 
   public getPaymentURI = (
     address: string,
