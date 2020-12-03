@@ -1,4 +1,3 @@
-import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
@@ -44,9 +43,9 @@ export default class ExternalServiceSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = uuidV4(),
+    id,
     accountShellID = null,
-    instanceNumber = null,
+    instanceNumber,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,

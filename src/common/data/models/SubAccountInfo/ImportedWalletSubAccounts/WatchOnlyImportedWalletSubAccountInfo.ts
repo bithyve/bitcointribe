@@ -1,4 +1,3 @@
-import { v4 as uuidV4 } from 'uuid';
 import {
   Balances,
   TransactionDetails,
@@ -40,9 +39,9 @@ export default class WatchOnlyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id = uuidV4(),
+    id,
     accountShellID = null,
-    instanceNumber = null,
+    instanceNumber,
     defaultTitle = 'Watch-Only',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
