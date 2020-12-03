@@ -128,9 +128,6 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    // AddNewAccount: {
-    //   screen: AddNewAccountStack,
-    // },
     Send: {
       screen: SendStack,
     },

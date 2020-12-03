@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { Card } from 'react-native-elements';
+import { Card, Overlay } from 'react-native-elements';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CardStyles from '../../common/Styles/Cards.js';
@@ -9,12 +9,14 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
+  isDisabled: boolean;
   isSelected: boolean;
   containerStyle?: Record<string, unknown>;
 }
 
 const SubAccountOptionCard: React.FC<Props> = ({
   subAccountInfo,
+  isDisabled,
   isSelected,
   containerStyle = {},
 }: Props) => {
@@ -31,6 +33,7 @@ const SubAccountOptionCard: React.FC<Props> = ({
     return {
       ...styles.cardContainer,
       backgroundColor: isSelected ? 'transparent' : Colors.white,
+      opacity: isDisabled ? 0.35 : 1.0,
     };
   }, [isSelected]);
 
