@@ -20,6 +20,9 @@ import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubA
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo';
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
 import config from '../../bitcoin/HexaConfig';
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 
 const initAccountShells = (services) => {
   const testAcc: TestAccount = services[TEST_ACCOUNT];
@@ -108,95 +111,92 @@ const updatePrimarySubAccounts = (
 const updateSecondarySubAccounts = (
   services,
   accountShells: AccountShell[],
-) => {
+): AccountShell[] => {
   const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
+  const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
 
   const updatedAccountShells = accountShells.map((shell: AccountShell) => {
+    let derivativeAccounts;
     switch (shell.primarySubAccount.kind) {
       case SubAccountKind.REGULAR_ACCOUNT:
-        for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-          const derivativeAccount: DerivativeAccount =
-            regularAcc.hdWallet.derivativeAccounts[dAccountType];
+        derivativeAccounts = regularAcc.hdWallet.derivativeAccounts;
+        break;
 
-          if (derivativeAccount && derivativeAccount.instance.using) {
-            const derivativeAccountBalTxMapping = {};
-            for (
-              let accountNumber = 1;
-              accountNumber <= derivativeAccount.instance.using;
-              accountNumber++
-            ) {
-              let dervBalances: Balances = {
-                confirmed: 0,
-                unconfirmed: 0,
-              };
-              let dervTransactions: TransactionDescribing[] = [];
+      case SubAccountKind.SECURE_ACCOUNT:
+        derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts;
+        break;
+    }
 
-              if (derivativeAccount[accountNumber].balances)
-                dervBalances = {
-                  confirmed: derivativeAccount[accountNumber].balances.balance,
-                  unconfirmed:
-                    derivativeAccount[accountNumber].balances
-                      .unconfirmedBalance,
-                };
+    if (!derivativeAccounts) return shell;
 
-              if (derivativeAccount[accountNumber].transactions)
-                dervTransactions =
-                  derivativeAccount[accountNumber].transactions
-                    .transactionDetails;
+    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      const derivativeAccount: DerivativeAccount =
+        derivativeAccounts[dAccountType];
 
-              const derivativeId = derivativeAccount[accountNumber].xpubId;
-              derivativeAccountBalTxMapping[derivativeId] = {
-                balances: dervBalances,
-                transactions: dervTransactions,
-              };
-            }
+      if (derivativeAccount && derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          let dervBalances: Balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          };
+          let dervTransactions: TransactionDescribing[] = [];
 
-            switch (
-              dAccountType // non-ejected accounts
-            ) {
+          if (derivativeAccount[accountNumber].balances)
+            dervBalances = {
+              confirmed: derivativeAccount[accountNumber].balances.balance,
+              unconfirmed:
+                derivativeAccount[accountNumber].balances.unconfirmedBalance,
+            };
+
+          if (derivativeAccount[accountNumber].transactions)
+            dervTransactions =
+              derivativeAccount[accountNumber].transactions.transactionDetails;
+
+          const derivativeId = derivativeAccount[accountNumber].xpubId;
+
+          if (shell.secondarySubAccounts[derivativeId]) {
+            AccountShell.updateSecondarySubAccountBalanceTx(
+              shell,
+              derivativeId,
+              dervBalances,
+              dervTransactions,
+            );
+          } else {
+            // backward compatibiliy for versions < 1.4.0 (adding the sub-account)
+            let secondarySubAccount: SubAccountDescribing;
+            switch (dAccountType) {
               case DerivativeAccountTypes.TRUSTED_CONTACTS:
-                Object.keys(derivativeAccountBalTxMapping).forEach(
-                  (derivativeId) => {
-                    const {
-                      balances,
-                      transactions,
-                    } = derivativeAccountBalTxMapping[derivativeId];
-
-                    if (shell.secondarySubAccounts[derivativeId]) {
-                      AccountShell.updateSecondarySubAccountBalanceTx(
-                        shell,
-                        derivativeId,
-                        balances,
-                        transactions,
-                      );
-                    } else {
-                      // backward compatibiliy for versions < 1.4.0
-                      const trustedContactSubAccc = new TrustedContactsSubAccountInfo(
-                        {
-                          id: derivativeId,
-                          accountShellID: shell.id,
-                          balances,
-                          transactions,
-                        },
-                      );
-
-                      AccountShell.addSecondarySubAccount(
-                        shell,
-                        derivativeId,
-                        trustedContactSubAccc,
-                      );
-                    }
-                  },
-                );
+                secondarySubAccount = new TrustedContactsSubAccountInfo({
+                  id: derivativeId,
+                  accountShellID: shell.id,
+                  balances: dervBalances,
+                  transactions: dervTransactions,
+                });
                 break;
 
               case DerivativeAccountTypes.FAST_BITCOINS:
-                // new ExternalServiceSubAccountInfo({});
+                secondarySubAccount = new ExternalServiceSubAccountInfo({
+                  id: derivativeId,
+                  accountShellID: shell.id,
+                  serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
+                  balances: dervBalances,
+                  transactions: dervTransactions,
+                });
                 break;
             }
+
+            AccountShell.addSecondarySubAccount(
+              shell,
+              derivativeId,
+              secondarySubAccount,
+            );
           }
         }
-        break;
+      }
     }
 
     return shell;
