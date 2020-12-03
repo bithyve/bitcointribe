@@ -46,7 +46,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import AccountShell from '../../common/data/models/AccountShell';
-import { updateAccountShells } from '../utils/accShellMapping';
+import { updateAccountShells } from '../utils/accountShellMapping';
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {

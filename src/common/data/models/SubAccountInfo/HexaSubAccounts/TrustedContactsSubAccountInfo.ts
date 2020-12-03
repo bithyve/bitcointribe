@@ -19,6 +19,8 @@ export default class TrustedContactsSubAccountInfo
   implements HexaSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.TRUSTED_CONTACTS;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
 
@@ -40,6 +42,7 @@ export default class TrustedContactsSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle = 'Trusted Contacts',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
@@ -51,6 +54,7 @@ export default class TrustedContactsSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
     this.customDisplayName = customDisplayName;

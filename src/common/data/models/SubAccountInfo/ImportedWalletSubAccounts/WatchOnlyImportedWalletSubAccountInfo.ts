@@ -18,6 +18,8 @@ export default class WatchOnlyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.WATCH_ONLY_IMPORTED_WALLET;
   sourceKind: SourceAccountKind;
 
@@ -40,6 +42,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle = 'Watch-Only',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
@@ -50,6 +53,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
     this.customDisplayName = customDisplayName;

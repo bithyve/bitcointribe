@@ -18,6 +18,8 @@ export default class CheckingSubAccountInfo
   implements HexaSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.REGULAR_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
   balances: Balances;
@@ -38,6 +40,7 @@ export default class CheckingSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle = 'Checking Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
@@ -47,6 +50,7 @@ export default class CheckingSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
     this.customDisplayName = customDisplayName;
