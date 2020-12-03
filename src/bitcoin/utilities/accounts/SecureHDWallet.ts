@@ -91,7 +91,7 @@ export default class SecureHDWallet extends Bitcoin {
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-      // secondaryXpriv?: string;
+     secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -1949,24 +1949,24 @@ export default class SecureHDWallet extends Bitcoin {
     return true;
   };
 
-  // public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
-  //   const path = this.derivePath(this.xpubs.bh);
-  //   const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
-  //   if (currentXpub !== this.xpubs.secondary) {
-  //     throw new Error('Invaild secondary mnemonic');
-  //   }
+  public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      throw new Error('Invaild secondary mnemonic');
+    }
 
-  //   this.secondaryXpriv = this.getRecoverableXKey(
-  //     secondaryMnemonic,
-  //     path,
-  //     true,
-  //   );
-  //   return true;
-  // };
+    this.secondaryXpriv = this.getRecoverableXKey(
+      secondaryMnemonic,
+      path,
+      true,
+    );
+    return true;
+  };
 
-  // public removeSecondaryXpriv = () => {
-  //   this.secondaryXpriv = null;
-  // };
+  public removeSecondaryXpriv = () => {
+    this.secondaryXpriv = null;
+  };
 
   private getSigningEssentials = (address: string) => {
     for (

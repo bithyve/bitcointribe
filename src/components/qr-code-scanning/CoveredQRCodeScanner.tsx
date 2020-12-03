@@ -14,19 +14,14 @@ export type Props = {
 const CameraFrameIndicators: React.FC = () => {
   return (
     <>
-      <View
-        style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}
-      >
-        <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: heightPercentageToDP('5%'), width: heightPercentageToDP('5%'), borderTopWidth: 1 }} />
-
-        <View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: heightPercentageToDP('5%'), width: heightPercentageToDP('5%'), marginLeft: 'auto' }} />
+      <View style={styles.view1}>
+        <View style={styles.view2} />
+        <View style={styles.view3} />
       </View>
 
-      <View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%', }}>
-
-        <View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: heightPercentageToDP('5%'), width: heightPercentageToDP('5%'), borderBottomWidth: 1 }} />
-
-        <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: heightPercentageToDP('5%'), width: heightPercentageToDP('5%'), marginLeft: 'auto' }} />
+      <View style={styles.view4}>
+        <View style={styles.view5} />
+        <View style={styles.view6} />
       </View>
     </>
   );
@@ -41,7 +36,14 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
 
   const CameraCover: React.FC = () => {
     return (
-      <AppBottomSheetTouchableWrapper onPress={() => setIsCameraOpen(true)} >
+      <AppBottomSheetTouchableWrapper onPress={() => {
+        setIsCameraOpen(true)
+        // let data ={
+        //   key: "a9a1a6b7f20c58a55f83c949",
+        //   name: 'primaryk'
+        // }
+        // onCodeScanned(data)
+        }} >
         <ImageBackground
           source={coverImageSource}
           style={{ ...styles.rootContainer, ...containerStyle }}
@@ -91,6 +93,53 @@ const styles = StyleSheet.create({
     width: widthPercentageToDP(90),
     height: widthPercentageToDP(90),
   },
+  view1:{ flexDirection: 'row', 
+  paddingTop: 12, 
+  paddingRight: 12, 
+  paddingLeft: 12, 
+  width: '100%' 
+},
+  view2: { 
+    borderLeftWidth: 1, 
+    borderTopColor: 'white', 
+    borderLeftColor: 'white', 
+    height: heightPercentageToDP('5%'), 
+    width: heightPercentageToDP('5%'), 
+    borderTopWidth: 1 
+  },
+  view3:{ borderTopWidth: 1, 
+    borderRightWidth: 1, 
+    borderRightColor: 'white', 
+    borderTopColor: 'white', 
+    height: heightPercentageToDP('5%'), 
+    width: heightPercentageToDP('5%'), 
+    marginLeft: 'auto' 
+  },
+  view4: { 
+    marginTop: 'auto', 
+  flexDirection: 'row', 
+  paddingBottom: 12, 
+  paddingRight: 12, 
+  paddingLeft: 12, 
+  width: '100%', 
+},
+view5: { 
+  borderLeftWidth: 1,
+  borderBottomWidth: 1, 
+  borderBottomColor: 'white', 
+  borderLeftColor: 'white', 
+  height: heightPercentageToDP('5%'), 
+  width: heightPercentageToDP('5%'), 
+},
+view6: { 
+  borderBottomWidth: 1, 
+  borderRightWidth: 1, 
+  borderRightColor: 'white', 
+  borderBottomColor: 'white', 
+  height: heightPercentageToDP('5%'), 
+  width: heightPercentageToDP('5%'), 
+  marginLeft: 'auto',
+}
 });
 
 export default CoveredQRCodeScanner;

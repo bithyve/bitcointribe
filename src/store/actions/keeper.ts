@@ -2,7 +2,6 @@
   export const TRUSTED_CONTACT_INITIALIZED = 'TRUSTED_CONTACT_INITIALIZED';
   export const FETCH_KEEPER_TRUSTED_CHANNEL = 'FETCH_KEEPER_TRUSTED_CHANNEL';
   export const KEEPER_LOADING = 'KEEPER_LOADING';
-  export const DOWNLOAD_SM_SHARES = 'DOWNLOAD_SM_SHARES';
 
   export const trustedContactInitialized = (
     contactName: string,
@@ -31,11 +30,4 @@
       payload: { beingLoaded },
     };
   };
-
-  export const downloadSMShard = (encryptedKey: string,
-    otp?: string) => {
-    return {
-      type: DOWNLOAD_SM_SHARES,
-      payload: { encryptedKey, otp },
-    };
-  };
+  

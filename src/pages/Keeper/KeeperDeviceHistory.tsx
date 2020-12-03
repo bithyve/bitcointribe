@@ -233,8 +233,8 @@ const KeeperDeviceHistory = (props) => {
         onPressContinue={() => {
           // {uuid: "49c33c31d647e83eabc8f820", publicKey: "65abf583924eeaf11095d7079977fd0b0774f462e22460975048bfd02ebc84f5", privateKey: "0a24e05d1c8b40f08657f695a58d5681a72e2ca7367c302d6e7414d349b9e3ee", ephemeralAddress: "ce6c7ac1637cc5286f8312b20182ec4238a40699842a061641ef9cf6011e11c4", isSignUp: true, …}
           let qrScannedData = isPrimaryKeeper ?
-            '{"uuid":"f9e2309af828c73867858da6","publicKey": "5bff353bba9a545842c8f889cb2ee748b96e397f4ea4b839bf678ad042f03346","ephemeralAddress": "e90337892695b31607617bd874e6db801c5e703f873aab367b0f3d8579e94169","walletName":"Primary"}' :
-            '{"uuid":"49c33c31d647e83eabc8f820","publicKey": "65abf583924eeaf11095d7079977fd0b0774f462e22460975048bfd02ebc84f5","ephemeralAddress": "ce6c7ac1637cc5286f8312b20182ec4238a40699842a061641ef9cf6011e11c4","walletName":"Secondary"}';
+            '{"uuid":"7b1e4f348e049dc5f69d2b56","publicKey": "669c42b692482d74e9e2da5463365c308ccc9a0fd30826a1a5ac059b098735c3","ephemeralAddress": "4fbb2d4969e080f5cd455b44d27bcbb231f01d14bd2df214157bcb8235b31d12","walletName":"primaryk"}' :
+            '{"uuid":"81e934115928bd62ac6b9273","publicKey": "35dfad343449e2196078ecef64f668f8db2ab89fbd2722f4d5591a60ebf5e3f1","ephemeralAddress": "08639be1e1fabdd7f3d779965f4eaa3e741af49e76b34c5fbc582b41bf4c35ed","walletName":"secondaryk"}';
             console.log('qrScannedData', qrScannedData)
           props.navigation.navigate('KeeperFeatures', {
             isReshare,

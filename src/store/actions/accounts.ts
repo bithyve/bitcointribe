@@ -159,12 +159,12 @@ export const syncViaXpubAgent = (
 //   return { type: EXCHANGE_RATE };
 // };
 
-// export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
-//   return {
-//     type: GENERATE_SECONDARY_XPRIV,
-//     payload: { serviceType, secondaryMnemonic },
-//   };
-// };
+export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
+  return {
+    type: GENERATE_SECONDARY_XPRIV,
+    payload: { serviceType, secondaryMnemonic },
+  };
+};
 
 // export const resetTwoFA = (secondaryMnemonic) => {
 //   return {
@@ -332,9 +332,9 @@ export const alternateTransferST2Executed = (serviceType, result) => {
   };
 };
 
-// export const secondaryXprivGenerated = (generated) => {
-//   return { type: SECONDARY_XPRIV_GENERATED, payload: { generated } };
-// };
+export const secondaryXprivGenerated = (generated) => {
+  return { type: SECONDARY_XPRIV_GENERATED, payload: { generated } };
+};
 
 // export const twoFAResetted = (resetted) => {
 //   return { type: TWO_FA_RESETTED, payload: { resetted } };

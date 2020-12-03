@@ -46,6 +46,11 @@ export const GENERATE_PDF = "GENERATE_PDF";
 export const PDF_GENERATED = "PDF_GENERATED";
 export const ON_APPROVAL_STATUS_CHANGE = 'ON_APPROVAL_STATUS_CHANGE';
 export const UPLOAD_PDF_SHARE = 'UPLOAD_PDF_SHARE';
+export const RECOVER_MNEMONIC_HEALTH = 'RECOVER_MNEMONIC_HEALTH';
+export const MNEMONIC_RECOVERED_HEALTH = 'MNEMONIC_RECOVERED_HEALTH';
+export const DOWNLOAD_SM_SHARES = 'DOWNLOAD_SM_SHARES';
+export const DOWNLOADED_SM_SHARES = 'DOWNLOADED_SM_SHARES';
+export const REMOVE_SN = 'REMOVE_SN';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -272,3 +277,32 @@ export const uploadPdfShare = (
   };
 };
 
+export const downloadSMShard = (encryptedKey: string,
+  otp?: string) => {
+  return {
+    type: DOWNLOAD_SM_SHARES,
+    payload: { encryptedKey, otp },
+  };
+};
+
+export const secondaryShareDownloaded = (metaShare) => {
+  return {
+    type: DOWNLOADED_SM_SHARES,
+    payload: { metaShare },
+  };
+};
+
+export const recoverMmnemonic = (metaShares, securityAns) => {
+  return { type: RECOVER_MNEMONIC_HEALTH, payload: { metaShares, securityAns } };
+};
+
+
+export const removeSecondaryMnemonic = () => {
+  return {
+    type: REMOVE_SN
+  };
+};
+
+export const mnemonicRecoveredHealth = (mnemonic) => {
+  return { type: MNEMONIC_RECOVERED_HEALTH, payload: { mnemonic } };
+};

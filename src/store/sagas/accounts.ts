@@ -21,7 +21,6 @@ import {
   settedDonationAccount,
   FETCH_BALANCE_TX,
   ALTERNATE_TRANSFER_ST2,
-  // secondaryXprivGenerated,
   GENERATE_SECONDARY_XPRIV,
   alternateTransferST2Executed,
   RESET_TWO_FA,
@@ -35,6 +34,7 @@ import {
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
+  secondaryXprivGenerated,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
@@ -604,32 +604,33 @@ export const transferST2Watcher = createWatcher(
   TRANSFER_ST2,
 );
 
-// function* generateSecondaryXprivWorker({ payload }) {
-//   const service = yield select(
-//     (state) => state.accounts[payload.serviceType].service,
-//   );
+function* generateSecondaryXprivWorker({ payload }) {
+  const service = yield select(
+    (state) => state.accounts[payload.serviceType].service,
+  );
+  console.log("service", service);
 
-//   const { generated } = service.generateSecondaryXpriv(
-//     payload.secondaryMnemonic,
-//   );
+  const { generated } = service.generateSecondaryXpriv(
+    payload.secondaryMnemonic,
+  );
+     console.log("generated", generated);
+  if (generated) {
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(secondaryXprivGenerated(true));
+  } else {
+    yield put(secondaryXprivGenerated(false));
+  }
+}
 
-//   if (generated) {
-//     const { SERVICES } = yield select((state) => state.storage.database);
-//     const updatedSERVICES = {
-//       ...SERVICES,
-//       [payload.serviceType]: JSON.stringify(service),
-//     };
-//     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-//     yield put(secondaryXprivGenerated(true));
-//   } else {
-//     yield put(secondaryXprivGenerated(false));
-//   }
-// }
-
-// export const generateSecondaryXprivWatcher = createWatcher(
-//   generateSecondaryXprivWorker,
-//   GENERATE_SECONDARY_XPRIV,
-// );
+export const generateSecondaryXprivWatcher = createWatcher(
+  generateSecondaryXprivWorker,
+  GENERATE_SECONDARY_XPRIV,
+);
 
 function* alternateTransferST2Worker({ payload }) {
   const {

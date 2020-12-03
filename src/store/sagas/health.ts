@@ -40,6 +40,10 @@ import {
   pdfGenerated,
   onApprovalStatusChange,
   UPLOAD_PDF_SHARE,
+  RECOVER_MNEMONIC_HEALTH,
+  DOWNLOAD_SM_SHARES,
+  secondaryShareDownloaded,
+  mnemonicRecoveredHealth,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -1658,4 +1662,53 @@ function* uploadPdfShareWorker({ payload }) {
 export const uploadPdfShareWatcher = createWatcher(
   uploadPdfShareWorker,
   UPLOAD_PDF_SHARE,
+);
+
+
+function* recoverMnemonicHealthWorker({ payload }) {
+  const { securityAns, metaShares } = payload;
+ // if (metaShares.length !== 3) return;
+
+  const encryptedSecrets: string[] = metaShares.map(
+    (metaShare) => metaShare.encryptedSecret,
+  );
+
+  const res = yield call(
+    S3Service.recoverFromSecrets,
+    encryptedSecrets,
+    securityAns,
+    2
+  );
+    console.log("RECOVER_MNEMONIC_HEALTH res", res);
+  if (res.status === 200) {
+    // TODO: recreate accounts and write to database
+    yield put(mnemonicRecoveredHealth(res.data.mnemonic)); // storing in redux state (for demo)
+  } else {
+    console.log({ err: res.err });
+  }
+}
+
+export const recoverMnemonicHealthWatcher = createWatcher(
+  recoverMnemonicHealthWorker,
+  RECOVER_MNEMONIC_HEALTH,
+);
+
+function* downloadSMShareWorker({ payload }) {
+  const { encryptedKey, otp } = payload;
+
+  if (!encryptedKey) return;
+  const res = yield call(S3Service.downloadSMShare, encryptedKey, otp);
+  console.log("Keeper Shares", res);
+  if (res.status === 200) {
+    console.log('SHARES DOWNLOAD', res.data);
+    yield put(secondaryShareDownloaded(res.data.metaShare));
+    // TODO: recreate accounts and write to database
+  } else {
+    console.log({ err: res.err });
+  }
+}
+
+export const downloadSMShareWatcher = createWatcher(
+  downloadSMShareWorker,
+  DOWNLOAD_SM_SHARES,
 );

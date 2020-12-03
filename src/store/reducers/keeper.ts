@@ -8,13 +8,14 @@ const initialState: {
   serviceEnriched: Boolean;
   loading: {
     fetchKeeperTC: Boolean;
-  }
+  },
 } = {
   service: null,
   serviceEnriched: false,
   loading: {
     fetchKeeperTC: false,
-  }
+  },
+
 };
 
 export default (state = initialState, action) => {

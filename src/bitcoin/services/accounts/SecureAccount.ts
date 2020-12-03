@@ -19,7 +19,7 @@ export default class SecureAccount {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
-      // secondaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -38,7 +38,7 @@ export default class SecureAccount {
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-      // secondaryXpriv?: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -71,7 +71,7 @@ export default class SecureAccount {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
-      // secondaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -663,19 +663,19 @@ export default class SecureAccount {
     }
   };
 
-  // public generateSecondaryXpriv = (
-  //   secondaryMnemonic: string,
-  // ): { generated: Boolean } => {
-  //   try {
-  //     const generated = this.secureHDWallet.generateSecondaryXpriv(
-  //       secondaryMnemonic,
-  //     );
-  //     return { generated };
-  //   } catch (err) {
-  //     // console.log({ err });
-  //     return { generated: false };
-  //   }
-  // };
+  public generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+  ): { generated: Boolean } => {
+    try {
+      const generated = this.secureHDWallet.generateSecondaryXpriv(
+        secondaryMnemonic,
+      );
+      return { generated };
+    } catch (err) {
+      // console.log({ err });
+      return { generated: false };
+    }
+  };
 
   public calculateSendMaxFee = (
     numberOfRecipients,
@@ -930,9 +930,7 @@ export default class SecureAccount {
       executed = 'tx-broadcast';
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
-
-      // this.secureHDWallet.removeSecondaryXpriv();
-      //this.secureHDWallet.removeSecondaryXpriv();
+      this.secureHDWallet.removeSecondaryXpriv();
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {

@@ -210,7 +210,8 @@ const ResetTwoFAHelp = (props) => {
           setTimeout(() => {
             setQRModalHeader('Sweep Funds');
           }, 2);
-          if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(1);
+          props.navigation.navigate("SweepFundUseExitKey");
+          //if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(1);
           (ServerNotRespondingBottomSheet as any).current.snapTo(0);
         }}
       />

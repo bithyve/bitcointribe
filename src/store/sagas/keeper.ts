@@ -2,7 +2,6 @@ import KeeperService from '../../bitcoin/services/KeeperService';
 import {
   FETCH_KEEPER_TRUSTED_CHANNEL,
   keeperLoading,
-  DOWNLOAD_SM_SHARES,
 } from '../actions/keeper';
 import { call, delay, put, select } from 'redux-saga/effects';
 import { createWatcher } from '../utils/utilities';
@@ -72,23 +71,4 @@ function* fetchKeeperTrustedChannelWorker({ payload }) {
 export const fetchKeeperTrustedChannelWatcher = createWatcher(
   fetchKeeperTrustedChannelWorker,
   FETCH_KEEPER_TRUSTED_CHANNEL,
-);
-
-function* downloadSMShareWorker({ payload }) {
-  const { encryptedKey, otp } = payload;
-
-  if (!encryptedKey) return;
-  const res = yield call(S3Service.downloadSMShare, encryptedKey, otp);
-
-  if (res.status === 200) {
-    console.log('SHARES DOWNLOAD', res.data);
-    // TODO: recreate accounts and write to database
-  } else {
-    console.log({ err: res.err });
-  }
-}
-
-export const downloadSMShareWatcher = createWatcher(
-  downloadSMShareWorker,
-  DOWNLOAD_SM_SHARES,
 );

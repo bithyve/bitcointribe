@@ -24,11 +24,15 @@ import {
   S3_LOADING_KEEPER,
   IS_LEVEL3_INITIALIZED,
   PDF_GENERATED,
-  ON_APPROVAL_STATUS_CHANGE
+  ON_APPROVAL_STATUS_CHANGE,
+  MNEMONIC_RECOVERED_HEALTH,
+  DOWNLOADED_SM_SHARES,
+  REMOVE_SN,
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
 const initialState: {
+  mnemonic: string;
   service: S3Service;
   loading: {
     levelHealthCheck: Boolean;
@@ -78,7 +82,9 @@ const initialState: {
     initiatedAt: number;
     shareId: string;
   }
+  secondaryShareDownloaded: any;
 } = {
+  mnemonic: '',
   service: null,
   loading: {
     levelHealthCheck: false,
@@ -107,7 +113,8 @@ const initialState: {
     status: false,
     initiatedAt: 0,
     shareId: ''
-  }
+  },
+  secondaryShareDownloaded: null
 };
 
 export default (state = initialState, action) => {
@@ -293,6 +300,24 @@ export default (state = initialState, action) => {
           shareId: action.payload.shareId,
         }
       };
+
+      case MNEMONIC_RECOVERED_HEALTH:
+        return {
+          ...state,
+          mnemonic: action.payload.mnemonic,
+        };
+
+        case REMOVE_SN:
+        return {
+          ...state,
+          mnemonic: '',
+        };
+
+      case DOWNLOADED_SM_SHARES:
+        return {
+          ...state,
+          secondaryShareDownloaded: action.payload.metaShare,
+        };
   }
   return state;
 };

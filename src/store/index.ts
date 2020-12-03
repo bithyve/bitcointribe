@@ -49,7 +49,7 @@ import {
   accountsSyncWatcher,
   fetchBalanceTxWatcher,
   alternateTransferST2Watcher,
-  // generateSecondaryXprivWatcher,
+  generateSecondaryXprivWatcher,
   // resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
@@ -124,7 +124,9 @@ import {
   cloudMetaShareHealthWatcher,
   fetchWalletImageHealthWatcher,
   uploadEncMetaShareKeeperWatcher,
-  sendApprovalRequestWatcher
+  sendApprovalRequestWatcher,
+  downloadSMShareWatcher,
+  recoverMnemonicHealthWatcher
 } from './sagas/health';
 
 import {
@@ -160,7 +162,7 @@ const rootSaga = function* () {
     accumulativeTxAndBalWatcher,
     accountsSyncWatcher,
     //exchangeRateWatcher,
-    // generateSecondaryXprivWatcher,
+   generateSecondaryXprivWatcher,
     // resetTwoFAWatcher,
     // removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
@@ -231,6 +233,8 @@ const rootSaga = function* () {
     fetchWalletImageHealthWatcher,
     uploadEncMetaShareKeeperWatcher,
     sendApprovalRequestWatcher,
+    recoverMnemonicHealthWatcher,
+    downloadSMShareWatcher,
 
     // Keeper saga
     fetchKeeperTrustedChannelWatcher
