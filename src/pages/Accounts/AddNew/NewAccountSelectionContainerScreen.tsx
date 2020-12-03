@@ -47,7 +47,7 @@ export interface Props {
   navigation: any;
 }
 
-const NewAccountSelectionList: React.FC<Props> = ({ navigation }: Props) => {
+const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
   useAccountShellCreationCompletionEffect(() => {
     console.log('dispatching resetToHomeAction');
     navigation.dispatch(resetToHomeAction());
@@ -206,4 +206,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewAccountSelectionList;
+export default NewAccountSelectionContainerScreen;
