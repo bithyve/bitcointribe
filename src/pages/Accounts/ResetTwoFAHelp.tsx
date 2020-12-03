@@ -256,7 +256,7 @@ const ResetTwoFAHelp = (props) => {
           </View>
         </View>
         <View style={{ flex: 1 }}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               setTimeout(() => {
                 setQRModalHeader('Reset 2FA');
@@ -302,7 +302,7 @@ const ResetTwoFAHelp = (props) => {
                 }}
               />
             </View>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
 
           <AppBottomSheetTouchableWrapper
             onPress={() => {
