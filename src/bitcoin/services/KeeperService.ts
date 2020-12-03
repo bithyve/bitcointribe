@@ -4,7 +4,7 @@ import {
   MetaShare,
   ShareUploadables,
   TrustedData,
-  TrustedDataElements
+  TrustedDataElements,
 } from '../utilities/Interface';
 import config from '../HexaConfig';
 import Keeper from '../utilities/Keeper';
@@ -43,6 +43,7 @@ export default class KeeperService {
   public initializeKeeper = (
     shareId: string,
     encKey: string,
+    otp: string,
   ):
     | {
         status: number;
@@ -61,10 +62,7 @@ export default class KeeperService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.keeper.initializeKeeper(
-          shareId.trim(),
-          encKey,
-        ),
+        data: this.keeper.initializeKeeper(shareId.trim(), encKey, otp),
       };
     } catch (err) {
       return {
@@ -78,12 +76,14 @@ export default class KeeperService {
   public finalizeKeeper = (
     shareId: string,
     encodedPublicKey: string,
-    encKey: string,
+    encryptedKey: string,
+    otp: string,
     keeperUUID: string,
     keeperFeatureList: any[],
     isPrimary: Boolean,
     walletName?: string,
     EfChannelAddress?: string,
+    trustedChannelAddress?: string,
   ):
     | {
         status: number;
@@ -107,13 +107,46 @@ export default class KeeperService {
         data: this.keeper.finalizeKeeper(
           shareId.trim(),
           encodedPublicKey,
-          encKey,
+          encryptedKey,
+          otp,
           keeperUUID,
           keeperFeatureList,
           isPrimary,
           walletName,
           EfChannelAddress,
+          trustedChannelAddress,
         ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to finalize keeper',
+      };
+    }
+  };
+
+  public initKeeperFromOldKeeper = (
+    oldShareId: string,
+    newShareId: string,
+  ):
+    | {
+        status: number;
+        data: boolean;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.keeper.initKeeperFromOldKeeper(oldShareId, newShareId)
+          .status,
       };
     } catch (err) {
       return {
@@ -136,27 +169,27 @@ export default class KeeperService {
     privateKey?: string,
   ): Promise<
     | {
-      status: number;
-      data:
-      | {
-        updated: any;
-        publicKey: string;
-        data: EphemeralDataElements;
+        status: number;
+        data:
+          | {
+              updated: any;
+              publicKey: string;
+              data: EphemeralDataElements;
+            }
+          | {
+              updated: any;
+              publicKey: string;
+              data?: undefined;
+            };
+        err?: undefined;
+        message?: undefined;
       }
-      | {
-        updated: any;
-        publicKey: string;
-        data?: undefined;
-      };
-      err?: undefined;
-      message?: undefined;
-    }
     | {
-      status: number;
-      err: string;
-      message: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
   > => {
     try {
       // Use this to create or update ephemeral data. You can see usage of the saga 'UPDATE_EPHEMERAL_CHANNEL' by dispatch of updateEphemeralChannel. (Search in project by 'dispatch(updateEphemeralChannel')
@@ -211,10 +244,6 @@ export default class KeeperService {
       }
   > => {
     try {
-      console.log('shareId', shareId);
-      console.log('dataElements', dataElements);
-      console.log('fetch', fetch);
-
       return {
         status: config.STATUS.SUCCESS,
         data: await this.keeper.updateTrustedChannel(
@@ -255,10 +284,7 @@ export default class KeeperService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.keeper.fetchTrustedChannel(
-          shareId.trim(),
-          walletName,
-        ),
+        data: await this.keeper.fetchTrustedChannel(shareId.trim(), walletName),
       };
     } catch (err) {
       return {
@@ -275,19 +301,19 @@ export default class KeeperService {
     otp?: string,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
-  | {
-      status: number;
-      data: { success: boolean; };
-      err?: undefined;
-      message?: undefined;
-    }
-  | {
-      status: number;
-      err: string;
-      message: string;
-      data?: undefined;
-    }
->  => {
+    | {
+        status: number;
+        data: { success: boolean };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -306,5 +332,4 @@ export default class KeeperService {
       };
     }
   };
-
 }

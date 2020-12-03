@@ -307,6 +307,7 @@ export default class S3Service {
       reshareVersion: number;
       updatedAt: number;
       status?: string;
+      name?: string;
     }],
   ): Promise<
     | {
@@ -683,7 +684,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.levelhealth.checkHealth2(),
+        data: (await this.levelhealth.checkHealth2()).data,
       };
     } catch (err) {
       return { status: 514, err: err.message, message: ErrMap[514] };

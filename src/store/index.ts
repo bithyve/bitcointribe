@@ -126,7 +126,8 @@ import {
   uploadEncMetaShareKeeperWatcher,
   sendApprovalRequestWatcher,
   downloadSMShareWatcher,
-  recoverMnemonicHealthWatcher
+  recoverMnemonicHealthWatcher,
+  reShareWithSameKeeperWatcher
 } from './sagas/health';
 
 import {
@@ -235,6 +236,7 @@ const rootSaga = function* () {
     sendApprovalRequestWatcher,
     recoverMnemonicHealthWatcher,
     downloadSMShareWatcher,
+    reShareWithSameKeeperWatcher,
 
     // Keeper saga
     fetchKeeperTrustedChannelWatcher

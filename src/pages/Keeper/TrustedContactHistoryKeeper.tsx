@@ -60,6 +60,8 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { isEmpty } from '../../common/CommonFunctions/index';
 import HistoryHeaderComponent from './HistoryHeaderComponent';
+import KeeperTypeModalContents from './KeeperTypeModalContent';
+import QRModal from '../Accounts/QRModal';
 
 const TrustedContactHistoryKeeper = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -96,6 +98,10 @@ const TrustedContactHistoryKeeper = (props) => {
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
+  const QrBottomSheet = React.createRef();
+  const keeperTypeBottomSheet = React.createRef();
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [qrScannedData, setQrScannedData] = useState('');
   const [shareBottomSheet, setshareBottomSheet] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -177,18 +183,17 @@ const TrustedContactHistoryKeeper = (props) => {
     props.navigation.state.params.selectedKeeper,
   );
   const [isReshare, setIsReshare] = useState(
-    props.navigation.state.params.selectedStatus == 'notAccessible'
+    props.navigation.state.params.selectedTitle == 'Friends and Family'
       ? false
       : true,
   );
   const levelHealth = useSelector((state) => state.health.levelHealth);
   const currentLevel = useSelector((state) => state.health.currentLevel);
-  console.log('SHARES_TRANSFER_DETAILS TC', SHARES_TRANSFER_DETAILS);
   useEffect(() => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
-      props.navigation.state.params.selectedStatus == 'notAccessible'
+      props.navigation.state.params.selectedTitle == 'Friends and Family'
         ? false
         : true,
     );
@@ -240,7 +245,9 @@ const TrustedContactHistoryKeeper = (props) => {
         if (selectedContacts[0]) {
           setSelectedTitle(
             selectedContacts[0].firstName && selectedContacts[0].lastName
-              ? selectedContacts[0].firstName +' '+ selectedContacts[0].lastName
+              ? selectedContacts[0].firstName +
+                  ' ' +
+                  selectedContacts[0].lastName
               : selectedContacts[0].firstName && !selectedContacts[0].lastName
               ? selectedContacts[0].firstName
               : !selectedContacts[0].firstName && selectedContacts[0].lastName
@@ -659,7 +666,7 @@ const TrustedContactHistoryKeeper = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      console.log('contact', contact);
+      console.log('AFTER RESHARE selectedKeeper.shareId', selectedKeeper.shareId);
       let shareArray = [
         {
           walletId: s3Service.getWalletId().data.walletId,
@@ -704,6 +711,7 @@ const TrustedContactHistoryKeeper = (props) => {
         };
         keeperInfo.push(obj);
       }
+      console.log('AFTER RESHARE keeperInfo', keeperInfo);
       dispatch(updatedKeeperInfo(keeperInfo));
     },
     [index, trustedContactsInfo],
@@ -805,6 +813,7 @@ const TrustedContactHistoryKeeper = (props) => {
       Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
         config.TC_REQUEST_EXPIRY
     ) {
+      console.log('!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
       setTrustedLink('');
       setTrustedQR('');
       dispatch(
@@ -821,6 +830,7 @@ const TrustedContactHistoryKeeper = (props) => {
         config.TC_REQUEST_EXPIRY &&
       !hasTrustedChannel
     ) {
+      console.log('SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
       setTrustedLink('');
       setTrustedQR('');
       dispatch(
@@ -992,6 +1002,76 @@ const TrustedContactHistoryKeeper = (props) => {
     }
   }, [chosenContact, trustedQR]);
 
+  const renderQrContent = useCallback(() => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={true}
+        QRModalHeader={'QR scanner'}
+        title={'Note'}
+        infoText={
+          'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
+        }
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={(qrData) => {
+          try {
+            setQrScannedData(qrData);
+            if (qrData) {
+              props.navigation.navigate('KeeperFeatures', {
+                isReshare: false,
+                qrScannedData: qrData,
+                isPrimaryKeeper: false,
+                selectedShareId: selectedKeeper.shareId,
+                selectedLevelId,
+                isChange: true
+              });
+              (QrBottomSheet as any).current.snapTo(0);
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+            (QrBottomSheet.current as any).snapTo(0);
+          }, 2);
+        }}
+        onBackPress={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onPressContinue={() => {
+          // {uuid: "77a5afe364edb1ff71d254e4", publicKey: "46e9c9490a34b76188839b7db8fc85fd6cccda59f33f54d8d2b7e20a5a2f6a1a", privateKey: "0ee8702c3a00c5fcb782feecac3542d6103a65629a83b8942507f20aa14b4875", ephemeralAddress: "621135470af4d9c55f641434230e2b5128315be2d1ae14e4dbc9d323a346fbf3", isSignUp: true, …}
+          let qrScannedData = 
+            '{"uuid":"77a5afe364edb1ff71d254e4","publicKey": "46e9c9490a34b76188839b7db8fc85fd6cccda59f33f54d8d2b7e20a5a2f6a1a","ephemeralAddress": "621135470af4d9c55f641434230e2b5128315be2d1ae14e4dbc9d323a346fbf3","walletName":"Change"}';
+          props.navigation.navigate('KeeperFeatures', {
+            isReshare: false,
+            qrScannedData,
+            isPrimaryKeeper: false,
+            selectedShareId: selectedKeeper.shareId,
+            selectedLevelId: selectedLevelId,
+            isChange: true
+          });
+        }}
+      />
+    );
+  }, [QrBottomSheetsFlag]);
+
+  const renderQrHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -1014,7 +1094,7 @@ const TrustedContactHistoryKeeper = (props) => {
           data={sortedHistory(trustedContactHistory)}
           confirmButtonText={'Confirm'}
           onPressChange={() => {
-            (ChangeBottomSheet as any).current.snapTo(1);
+            (keeperTypeBottomSheet as any).current.snapTo(1);
           }}
           onPressConfirm={() => {
             setTimeout(() => {
@@ -1149,6 +1229,50 @@ const TrustedContactHistoryKeeper = (props) => {
             }}
           />
         )}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={keeperTypeBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('75%') : hp('75%'),
+        ]}
+        renderContent={() => (
+          <KeeperTypeModalContents
+            onPressSetup={async (type, name) => {
+              if(type == 'contact') (ChangeBottomSheet as any).current.snapTo(1);
+              if(type == 'device') {
+                (QrBottomSheet as any).current.snapTo(1);
+              }
+            }}
+            onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+            selectedLevelId={selectedLevelId}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+          />
+        )}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('89%'),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
       />
     </View>
   );

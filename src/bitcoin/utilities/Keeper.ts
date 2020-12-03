@@ -147,6 +147,7 @@ export default class Keeper {
   public initializeKeeper = (
     shareId: string,
     encKey: string,
+    otp?: string
   ): { publicKey: string; ephemeralAddress: string } => {
     if (this.keepers[shareId]) {
       throw new Error(
@@ -163,13 +164,6 @@ export default class Keeper {
       .update(publicKey)
       .digest('hex');
 
-    let otp;
-    if (!encKey) {
-      // contact with no phone-number/email
-      otp = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-      encKey = LevelHealth.strechKey(otp);
-    }
-
     this.keepers[shareId] = {
       privateKey,
       publicKey,
@@ -185,12 +179,14 @@ export default class Keeper {
   public finalizeKeeper = (
     shareId: string,
     encodedPublicKey: string,
-    encKey: string,
+    encryptedKey: string,
+    otp?: string,
     keeperUUID?: string,
     keeperFeatureList?: any[],
     isPrimary?: Boolean,
     walletName?: string,
     EfChannelAddress?: string,
+    trustedChannelAddress?: string,
   ): {
     channelAddress: string;
     ephemeralAddress: string;
@@ -198,24 +194,16 @@ export default class Keeper {
   } => {
     try {
       if (!this.keepers[shareId]) {
-        this.initializeKeeper(shareId, encKey); // case: trusted contact setup has been requested
+        this.initializeKeeper(shareId, encryptedKey, otp);
       }
-
-      // if (
-      //   this.keepers[shareId].trustedChannel &&
-      //   this.keepers[shareId].trustedChannel.address
-      // ) {
-      //   throw new Error(
-      //     'TC finalize failed: channel already exists with this keeper',
-      //   );
-      // }
+      
       const { ephemeralChannel, privateKey } = this.keepers[shareId];
       const keyPair = ec.keyFromPrivate(privateKey, 'hex');
       const symmetricKey = keyPair
         .derive(this.decodePublicKey(encodedPublicKey))
         .toString(16); // ECDH
 
-      const channelAddress = crypto
+      const channelAddress = trustedChannelAddress ? trustedChannelAddress : crypto
         .createHash('sha256')
         .update(symmetricKey)
         .digest('hex');
@@ -233,11 +221,12 @@ export default class Keeper {
           address: channelAddress,
         },
         keeperPubKey: encodedPublicKey,
-        walletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+        walletName, 
         keeperUUID,
         keeperFeatureList,
         isPrimary,
       };
+
       return {
         channelAddress,
         ephemeralAddress,
@@ -249,6 +238,31 @@ export default class Keeper {
         channelAddress: '',
         ephemeralAddress: '',
         publicKey: '',
+      };
+    }
+  };
+
+  public initKeeperFromOldKeeper = (
+    oldShareId: string,
+    newShareId: string,
+  ): {
+    status: boolean;
+  } => {
+    try {
+      this.keepers[newShareId] = this.keepers[oldShareId];
+      // if (this.keepers[newShareId]) {
+        console.log('this.keepers[oldShareId]', this.keepers[oldShareId]);
+        console.log('this.keepers[newShareId]', this.keepers[newShareId])
+      //   delete this.keepers[oldShareId];
+      // }
+
+      return {
+        status: true
+      };
+    } catch (error) {
+      console.log('error finalize keeper', error);
+      return {
+        status: false,
       };
     }
   };

@@ -1,5 +1,5 @@
 import { AsyncStorage, NativeModules } from "react-native";
-import { LevelHealth, LevelInfo } from "../../bitcoin/utilities/Interface";
+import { LevelHealthInterface, LevelInfo } from "../../bitcoin/utilities/Interface";
 import SSS from "../../bitcoin/utilities/sss/SSS";
 import { decrypt, encrypt } from "../encryption";
 
@@ -187,7 +187,7 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
   }
 };
 
-export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealth[], shareId: string) : {
+export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealthInterface[], shareId: string) : {
   shareType: string;
   updatedAt: number;
   status: string;
@@ -205,7 +205,7 @@ export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealth[], shareId:
   }
 }
 
-export const getLevelInfo = (levelHealthVar: LevelHealth[], currentLevel: number) : LevelInfo[] =>{
+export const getLevelInfo = (levelHealthVar: LevelHealthInterface[], currentLevel: number) : LevelInfo[] =>{
   if (levelHealthVar[currentLevel]) {
     if(levelHealthVar[1]){
       for (let i = 0; i < levelHealthVar[currentLevel].levelInfo.length; i++) {

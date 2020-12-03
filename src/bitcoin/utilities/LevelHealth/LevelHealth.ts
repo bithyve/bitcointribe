@@ -292,6 +292,41 @@ export default class LevelHealth {
     return { success };
   };
 
+  public static uploadNewShare = async (
+    encryptedKey: string,
+    otp?: string,
+    metaShare?: MetaShare,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
+  ): Promise<{ success: boolean }> => {
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
+    const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
+      metaShare,
+      key,
+    );
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('uploadShare2', {
+        HEXA_ID,
+        share: encryptedMetaShare,
+        messageId,
+        encryptedDynamicNonPMDD,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { success } = res.data;
+    if (!success) {
+      throw new Error('Unable to upload share');
+    }
+    return { success };
+  };
+
   public static downloadAndValidateShare = async (
     encryptedKey: string,
     otp?: string,
@@ -415,6 +450,7 @@ export default class LevelHealth {
         reshareVersion: number;
         updatedAt: number;
         status?: string;
+        name?: string;
       },
     ],
   ): Promise<{
@@ -802,22 +838,26 @@ export default class LevelHealth {
   }> => {
     let response = {};
     let res: AxiosResponse;
-    const metaShares = this.metaShares.slice(0, 3);
     try {
       res = await BH_AXIOS.post('checkSharesHealth2', {
         HEXA_ID,
         walletID: this.walletId,
       });
       response = res;
-      console.log('checkSharesHealth2 result', res);
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
       response = err;
     }
-    return {
-      data: response,
+    if(res.data){
+      return {
+        data: res.data
+      };
+    }
+    else return {
+      data: response
     };
+    
   };
 
   public updateHealthLevel2 = async (SecurityQuestionHealth, _level): Promise<{

@@ -96,7 +96,7 @@ const PersonalCopyHistory = (props) => {
     props.navigation.state.params.selectedKeeper,
   );
   const [isReshare, setIsReshare] = useState(
-    props.navigation.state.params.selectedStatus == 'notAccessible'
+    props.navigation.state.params.selectedTitle == 'Pdf Keeper'
       ? false
       : true,
   );
@@ -108,7 +108,7 @@ const PersonalCopyHistory = (props) => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
-      props.navigation.state.params.selectedStatus == 'notAccessible'
+      props.navigation.state.params.selectedTitle == 'Pdf Keeper'
         ? false
         : true,
     );

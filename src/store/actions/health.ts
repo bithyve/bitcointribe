@@ -51,6 +51,7 @@ export const MNEMONIC_RECOVERED_HEALTH = 'MNEMONIC_RECOVERED_HEALTH';
 export const DOWNLOAD_SM_SHARES = 'DOWNLOAD_SM_SHARES';
 export const DOWNLOADED_SM_SHARES = 'DOWNLOADED_SM_SHARES';
 export const REMOVE_SN = 'REMOVE_SN';
+export const RESHARE_WITH_SAME_KEEPER = 'RESHARE_WITH_SAME_KEEPER';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -144,11 +145,12 @@ export const createAndUploadOnEFChannel = (
   share,
   type,
   isReshare,
-  level
+  level,
+  isChange?
 ) => {
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
-    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare, level },
+    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare, level, isChange },
   };
 };
 
@@ -305,4 +307,12 @@ export const removeSecondaryMnemonic = () => {
 
 export const mnemonicRecoveredHealth = (mnemonic) => {
   return { type: MNEMONIC_RECOVERED_HEALTH, payload: { mnemonic } };
+};
+export const reShareWithSameKeeper = (
+  deviceLevelInfo,
+) => {
+  return {
+    type: RESHARE_WITH_SAME_KEEPER,
+    payload: { deviceLevelInfo },
+  };
 };

@@ -54,12 +54,14 @@ import {
   updateMSharesHealth,
   sendApprovalRequest,
   onApprovalStatusChange,
+  reShareWithSameKeeper
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 import ApproveSetup from './ApproveSetup';
 import { MetaShare, notificationType } from '../../bitcoin/utilities/Interface';
 import firebase from 'react-native-firebase';
 import { fetchKeeperTrustedChannel } from '../../store/actions/keeper';
+import { nameToInitials } from '../../common/CommonFunctions';
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -112,6 +114,7 @@ interface ManageBackupPropsTypes {
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
   metaShares: MetaShare[];
+  reShareWithSameKeeper: any;
 }
 
 class ManageBackup extends Component<
@@ -139,6 +142,7 @@ class ManageBackup extends Component<
       reshareVersion: 0,
       name: '',
       data: {},
+      uuid: '',
     };
     this.state = {
       selectedKeeper: obj,
@@ -224,16 +228,18 @@ class ManageBackup extends Component<
     }
   };
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    await this.onRefresh();
     this.createNotificationListeners();
     this.modifyLevelData();
   };
 
   modifyLevelData = () => {
     let { levelHealth, currentLevel, keeperInfo } = this.props;
+    let levelHealthObject = [...levelHealth];
     let levelData = modifyLevelStatus(
       this.state.levelData,
-      levelHealth,
+      levelHealthObject,
       currentLevel,
       keeperInfo,
     );
@@ -308,6 +314,7 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
+    this.props.setIsBackupProcessing({ status: false });
     if (!this.props.isBackupProcessing.status) {
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
@@ -324,8 +331,8 @@ class ManageBackup extends Component<
     if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
       this.updateHealthForCloud();
     } else if (
-      this.props.cloudBackupStatus.status &&
-      this.props.currentLevel == 1
+      (this.props.cloudBackupStatus.status && this.props.currentLevel == 1) ||
+      this.props.currentLevel == 2
     ) {
       this.updateHealthForCloud(share);
     }
@@ -382,6 +389,7 @@ class ManageBackup extends Component<
         this.cloudData();
       } else {
         this.updateCloudData();
+        this.autoUploadShare();
       }
     }
 
@@ -405,7 +413,6 @@ class ManageBackup extends Component<
         shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
         data: {},
       };
-      console.log('obj', obj);
       this.setState({
         selectedKeeper: obj,
       });
@@ -415,15 +422,7 @@ class ManageBackup extends Component<
   };
 
   updateCloudData = () => {
-    console.log('inside updateCloudData');
-    let {
-      currentLevel,
-      keeperInfo,
-      levelHealth,
-      isLevel2Initialized,
-      isLevel3Initialized,
-      s3Service,
-    } = this.props;
+    let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let KPInfo: any[] = [];
     let secretShare = {};
     if (levelHealth.length > 0) {
@@ -471,6 +470,32 @@ class ManageBackup extends Component<
     // Call icloud update Keeper INfo with KPInfo and currentLevel vars
   };
 
+  autoUploadShare = () => {
+    let { levelHealth, currentLevel, reShareWithSameKeeper } = this.props;
+    if (levelHealth[2] &&
+      currentLevel == 2 &&
+      levelHealth[2].levelInfo[4].status == 'accessible' &&
+      levelHealth[2].levelInfo[5].status
+    ) {
+      let deviceLevelInfo = [];
+      let contactIndex = [];
+      for (let i = 2; i < levelHealth[2].levelInfo.length - 2; i++) {
+        if (levelHealth[2].levelInfo[i].status != 'accessible' && 
+          (levelHealth[1].levelInfo[i].shareType == 'primaryKeeper' ||
+          levelHealth[1].levelInfo.shareType == 'device')
+        ) {
+          let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i };
+          deviceLevelInfo.push(obj);
+        }
+        if (levelHealth[2].levelInfo[i].status != 'accessible' && levelHealth[1].levelInfo[i].shareType == 'contact') {
+          let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i }
+          contactIndex.push(obj);
+        }
+      }
+      if(deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
+    }
+  };
+
   goToHistory = (value) => {
     let {
       shareType,
@@ -479,7 +504,7 @@ class ManageBackup extends Component<
       updatedAt,
       id,
       selectedKeeper,
-      isSetup
+      isSetup,
     } = value;
     let navigationParams = {
       selectedTime: updatedAt ? this.getTime(updatedAt) : 'never',
@@ -502,13 +527,12 @@ class ManageBackup extends Component<
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
-        if(element.keeper1.shareType == 'contact') count ++;
-        if(element.keeper2.shareType == 'contact') count ++;
+        if (element.keeper1.shareType == 'contact') count++;
+        if (element.keeper2.shareType == 'contact') count++;
       }
-      console.log('count', count)
-      if(count == 1 && isSetup) index = 2;
-      else if(count == 0 && isSetup) index = 1;
-      else{
+      if (count == 1 && isSetup) index = 2;
+      else if (count == 0 && isSetup) index = 1;
+      else {
         if (contactIndex == -1) index = 1;
         else {
           let idxTmp = 0;
@@ -517,20 +541,25 @@ class ManageBackup extends Component<
             if (element.keeper1.shareType == 'contact') {
               idxTmp++;
             }
-            if (element.keeper1.shareType == 'contact' && element.keeper1.shareId == selectedKeeper.shareId) {
+            if (
+              element.keeper1.shareType == 'contact' &&
+              element.keeper1.shareId == selectedKeeper.shareId
+            ) {
               break;
             }
             if (element.keeper2.shareType == 'contact') {
               idxTmp++;
             }
-            if (element.keeper2.shareType == 'contact' && element.keeper2.shareId == selectedKeeper.shareId) {
+            if (
+              element.keeper2.shareType == 'contact' &&
+              element.keeper2.shareId == selectedKeeper.shareId
+            ) {
               break;
             }
           }
           index = idxTmp;
         }
       }
-      console.log('ContactIndex', index);
       this.props.navigation.navigate('TrustedContactHistoryKeeper', {
         ...navigationParams,
         index,
@@ -590,7 +619,7 @@ class ManageBackup extends Component<
         updatedAt: keeper.updatedAt,
         id: value.id,
         selectedKeeper: keeper,
-        isSetup: false
+        isSetup: false,
       };
       this.goToHistory(obj);
       return;
@@ -599,6 +628,63 @@ class ManageBackup extends Component<
         (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
       else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
     }
+  };
+
+  onRefresh = async () => {
+    this.props.checkMSharesHealth();
+  };
+
+  getImageIcon = (chosenContact) => {
+    console.log('chosenContact', chosenContact);
+    console.log('chosenContact.image.uri', chosenContact.image.uri)
+    if (chosenContact && chosenContact.name) {
+      if (chosenContact.imageAvailable) {
+        console.log('if');
+        return (
+          <View style={styles.imageBackground}>
+            <Image source={{uri: chosenContact.image.uri}} style={styles.contactImage} />
+          </View>
+        );
+      } else {
+        console.log('else');
+        return (
+          <View style={styles.imageBackground}>
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: RFValue(9),
+              }}
+            >
+              {chosenContact &&
+              chosenContact.firstName === 'F&F request' &&
+              chosenContact.contactsWalletName !== undefined &&
+              chosenContact.contactsWalletName !== ''
+                ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
+                : chosenContact && chosenContact.name
+                ? nameToInitials(
+                    chosenContact &&
+                      chosenContact.firstName &&
+                      chosenContact.lastName
+                      ? chosenContact.firstName + ' ' + chosenContact.lastName
+                      : chosenContact.firstName && !chosenContact.lastName
+                      ? chosenContact.firstName
+                      : !chosenContact.firstName && chosenContact.lastName
+                      ? chosenContact.lastName
+                      : '',
+                  )
+                : ''}
+            </Text>
+          </View>
+        );
+      }
+    }
+    console.log('other');
+    return (
+      <Image
+        style={styles.contactImageAvatar}
+        source={require('../../assets/images/icons/icon_user.png')}
+      />
+    );
   };
 
   render() {
@@ -616,6 +702,7 @@ class ManageBackup extends Component<
       healthLoading,
       checkMSharesHealth,
       keeperApproveStatus,
+      currentLevel,
     } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -648,9 +735,7 @@ class ManageBackup extends Component<
           refreshControl={
             <RefreshControl
               refreshing={healthLoading}
-              onRefresh={() => {
-                checkMSharesHealth();
-              }}
+              onRefresh={() => this.onRefresh()}
             />
           }
           style={{ flex: 1 }}
@@ -681,9 +766,7 @@ class ManageBackup extends Component<
             <View>
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>
-                at level {securityAtLevel ? securityAtLevel : 1}
-              </Text>
+              <Text style={styles.backupInfoText}>at level {currentLevel}</Text>
             </View>
           </View>
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
@@ -1010,22 +1093,7 @@ class ManageBackup extends Component<
                                     }}
                                   />
                                 ) : value.keeper1.shareType == 'contact' &&
-                                  value.keeper1.updatedAt != 0 ? (
-                                  <Image
-                                    source={
-                                      value.keeper1.data &&
-                                      value.keeper1.data.imageAvailable
-                                        ? value.keeper1.data.image
-                                        : require('../../assets/images/icons/pexels-photo.png')
-                                    }
-                                    style={{
-                                      width: wp('6%'),
-                                      height: wp('6%'),
-                                      resizeMode: 'contain',
-                                      borderRadius: wp('6%') / 2,
-                                    }}
-                                  />
-                                ) : (
+                                  value.keeper1.updatedAt != 0 ? this.getImageIcon(value.keeper1.data) : (
                                   <View
                                     style={{
                                       backgroundColor: Colors.red,
@@ -1097,22 +1165,7 @@ class ManageBackup extends Component<
                                     }}
                                   />
                                 ) : value.keeper2.shareType == 'contact' &&
-                                  value.keeper2.updatedAt != 0 ? (
-                                  <Image
-                                    source={
-                                      value.keeper2.data &&
-                                      value.keeper2.data.imageAvailable
-                                        ? value.keeper2.data.image
-                                        : require('../../assets/images/icons/pexels-photo.png')
-                                    }
-                                    style={{
-                                      width: wp('6%'),
-                                      height: wp('6%'),
-                                      resizeMode: 'contain',
-                                      borderRadius: wp('6%') / 2,
-                                    }}
-                                  />
-                                ) : (
+                                  value.keeper2.updatedAt != 0 ? this.getImageIcon(value.keeper2.data) : (
                                   <View
                                     style={{
                                       backgroundColor: Colors.red,
@@ -1178,7 +1231,7 @@ class ManageBackup extends Component<
                   this.props.currentLevel == 1 &&
                   selectedLevelId == 3
                 ) {
-                  alert('Complete Level 2');
+                  alert('Please complete Level 2');
                 } else {
                   this.sendApprovalRequestToPK();
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -1295,7 +1348,7 @@ class ManageBackup extends Component<
                     : 0,
                   id: selectedLevelId,
                   selectedKeeper: selectedKeeper,
-                  isSetup: true
+                  isSetup: true,
                 };
                 this.goToHistory(obj);
               }}
@@ -1362,6 +1415,7 @@ export default withNavigationFocus(
     sendApprovalRequest,
     onApprovalStatusChange,
     fetchKeeperTrustedChannel,
+    reShareWithSameKeeper
   })(ManageBackup),
 );
 
@@ -1489,5 +1543,33 @@ const styles = StyleSheet.create({
     width: wp('4%'),
     height: wp('4%'),
     resizeMode: 'contain',
+  },
+  contactImageAvatar: {
+    width: wp('6%'),
+    height: wp('6%'),
+    alignSelf: 'center',
+    shadowColor: Colors.textColorGrey,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+  },
+  contactImage: {
+    height: wp('6%'),
+    width: wp('6%'),
+    borderRadius: wp('6%') / 2,
+  },
+  imageBackground: {
+    backgroundColor: Colors.shadowBlue,
+    height: wp('6%'),
+    width: wp('6%'),
+    borderRadius: wp('6%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 1,
+    shadowColor: Colors.textColorGrey,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

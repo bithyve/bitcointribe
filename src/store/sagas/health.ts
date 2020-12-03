@@ -44,6 +44,7 @@ import {
   DOWNLOAD_SM_SHARES,
   secondaryShareDownloaded,
   mnemonicRecoveredHealth,
+  RESHARE_WITH_SAME_KEEPER,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -70,6 +71,7 @@ import {
   EphemeralDataElements,
   INotification,
   Keepers,
+  LevelHealthInterface,
   MetaShare,
   notificationTag,
   notificationType,
@@ -212,18 +214,19 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* checkSharesHealthWorker() {
-  yield put(switchS3LoadingStatus(true));
-  const s3Service: S3Service = yield select((state) => state.health.service);
-  const res = yield call(s3Service.checkHealth);
-
-  if (res.status === 200) {
-    yield put(
-      updateHealth(res.data.data.data.levels, res.data.data.data.currentLevel),
-    );
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
+  try {
+    yield put(switchS3LoadingStatus(true));
+    const s3Service: S3Service = yield select((state) => state.health.service);
+    const res = yield call(s3Service.checkHealth);
+    if (res.status === 200) {
+      yield put(updateHealth(res.data.levels, res.data.currentLevel));
+    } else {
+      if (res.err === 'ECONNABORTED') requestTimedout();
+    }
+    yield put(switchS3LoadingStatus(false));
+  } catch (error) {
+    console.log('error', error);
   }
-  yield put(switchS3LoadingStatus(false));
 }
 
 export const checkSharesHealthWatcher = createWatcher(
@@ -331,14 +334,26 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       isPrimaryKeeper,
       scannedData,
       selectedShareId,
-      level
+      level,
+      isChange,
     } = payload;
-    console.log("level", level);
+    console.log('payload', payload);
     let s3Service: S3Service = yield select((state) => state.health.service);
-    let share = level == 2 ? s3Service.levelhealth.metaShares[1] : s3Service.levelhealth.metaShares[3];
-    if (selectedShareId) {
-      share = payload.share;
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    let shareIndex = level == 2 ? 1 : 3;
+    if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+      if (
+        metaShare.findIndex((value) => value.shareId == selectedShareId) > -1
+      ) {
+        shareIndex = metaShare.findIndex(
+          (value) => value.shareId == selectedShareId,
+        );
+      }
     }
+    if (isReshare || isChange) {
+      yield call(s3Service.reshareMetaShare, shareIndex);
+    }
+    let share = metaShare[shareIndex];
     const fcmTokenValue = yield select(
       (state) => state.preferences.fcmTokenValue,
     );
@@ -354,20 +369,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       (state) => state.storage.database,
     );
 
-    if (isReshare) {
-      let shareIndex = 1;
-      if (share.shareId && s3Service.levelhealth.metaShares.length) {
-        let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
-        if (
-          metaShare.findIndex((value) => value.shareId == share.shareId) > -1
-        ) {
-          shareIndex = metaShare.findIndex(
-            (value) => value.shareId == share.shareId,
-          );
-        }
-      }
-      yield call(s3Service.reshareMetaShare, shareIndex);
-    }
+    console.log('s3Service', s3Service.levelhealth.metaShares);
 
     let s3ServiceTest: S3Service = yield select(
       (state) => state.accounts[TEST_ACCOUNT].service,
@@ -398,7 +400,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       keeper.finalizeKeeper,
       share.shareId,
       ScannedData.publicKey,
-      encKey,
+      encryptedKey,
+      otp,
       ScannedData.uuid,
       featuresList,
       isPrimaryKeeper,
@@ -429,7 +432,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
         share,
         ScannedData.uuid,
       );
-      console.log('ScannedData.publicKey', ScannedData.publicKey,dataElements);
 
       let res = yield call(
         keeper.updateEphemeralChannel,
@@ -470,7 +472,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             S3_SERVICE: JSON.stringify(s3Service),
             KEEPERS_INFO: JSON.stringify(keeper),
           };
-          console.log('updatedSERVICES UPDATE_SHARES_HEALTH EF CHANNEL', updatedSERVICES);
           yield call(insertDBWorker, {
             payload: { SERVICES: updatedSERVICES },
           });
@@ -578,7 +579,7 @@ function* updateHealthLevel2Worker({ payload }) {
     const res = yield call(
       s3Service.updateHealthLevel2,
       SecurityQuestionHealth,
-      level
+      level,
     );
     if (res.data.success) {
       // Update Health to reducer
@@ -753,7 +754,6 @@ export function* downloadMetaShareWorker({ payload }) {
             shareId: metaShare.shareId,
             reshareVersion: metaShare.meta.reshareVersion,
             updatedAt: moment(new Date()).valueOf(),
-            name: walletName,
             shareType: 'contact',
             status: 'accessible',
           },
@@ -1350,7 +1350,7 @@ function* generatePDFWorker({ payload }) {
   };
 
   const pdfData = {
-    qrData: qrData
+    qrData: qrData,
   };
 
   const { security, walletName } = yield select(
@@ -1362,7 +1362,7 @@ function* generatePDFWorker({ payload }) {
       generatePDFKeeper,
       pdfData,
       `Hexa_Recovery_Key_${walletName}.pdf`,
-      `Hexa Recovery Key for ${walletName}'s Wallet`
+      `Hexa Recovery Key for ${walletName}'s Wallet`,
     );
 
     let personalCopyDetails = yield call(
@@ -1414,7 +1414,7 @@ function* generatePDFWorker({ payload }) {
       storedPDFHealth = JSON.parse(storedPDFHealth);
       storedPDFHealth = {
         ...storedPDFHealth,
-       // [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
+        // [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
       };
       // console.log('/sagas/sss ', {storedPDFHealth})
       yield call(
@@ -1465,10 +1465,7 @@ export const generatePDFWatcher = createWatcher(
 
 function* uploadPdfShareWorker({ payload }) {
   try {
-    let {
-      isReshare,
-      selectedShareId,
-    } = payload;
+    let { isReshare, selectedShareId } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
     let levelHealth = yield select((state) => state.health.levelHealth);
     let share = getKeeperInfoFromShareId(levelHealth, selectedShareId);
@@ -1508,7 +1505,6 @@ function* uploadPdfShareWorker({ payload }) {
     let s3ServiceSecure: SecureAccount = yield select(
       (state) => state.accounts[SECURE_ACCOUNT].service,
     );
-    
 
     // let encKey;
     // if (ScannedData.uuid) encKey = LevelHealth.strechKey(ScannedData.uuid);
@@ -1568,25 +1564,25 @@ function* uploadPdfShareWorker({ payload }) {
     //   console.log('updateEphemeralChannel saga res', res);
     //   if (res.status == 200) {
     //     // Create trusted channel
-        // const data: TrustedDataElements = {
-        //   walletID,
-        //   // FCM: fcmTokenValue,
-        //   walletName: ScannedData.walletName,
-        //   version: DeviceInfo.getVersion(),
-        //   shareTransferDetails: {
-        //     otp,
-        //     encryptedKey,
-        //   },
-        //   // isPrimary: isPrimaryKeeper,
-        //   // featuresList,
-        //   securityQuestion,
-        // };
-        // const updateRes = yield call(
-        //   keeper.updateTrustedChannel,
-        //   share.shareId,
-        //   data,
-        //   false,
-        // );
+    // const data: TrustedDataElements = {
+    //   walletID,
+    //   // FCM: fcmTokenValue,
+    //   walletName: ScannedData.walletName,
+    //   version: DeviceInfo.getVersion(),
+    //   shareTransferDetails: {
+    //     otp,
+    //     encryptedKey,
+    //   },
+    //   // isPrimary: isPrimaryKeeper,
+    //   // featuresList,
+    //   securityQuestion,
+    // };
+    // const updateRes = yield call(
+    //   keeper.updateTrustedChannel,
+    //   share.shareId,
+    //   data,
+    //   false,
+    // );
     //     if (updateRes.status == 200) {
     //       const updatedSERVICES = {
     //         ...SERVICES,
@@ -1711,4 +1707,116 @@ function* downloadSMShareWorker({ payload }) {
 export const downloadSMShareWatcher = createWatcher(
   downloadSMShareWorker,
   DOWNLOAD_SM_SHARES,
+);
+function* reShareWithSameKeeperWorker({ payload }) {
+  try {
+    yield put(switchS3LoaderKeeper('reshareWithSameKeeper'));
+    let { deviceLevelInfo } = payload;
+    let levelHealth: LevelHealthInterface[] = yield select(
+      (state) => state.health.levelHealth,
+    );
+
+    for (let i = 0; i < deviceLevelInfo.length; i++) {
+      const element = deviceLevelInfo[i];
+      if (levelHealth[2].levelInfo[element.index].status != 'accessible') {
+        let type = element.shareType;
+        let oldShareId = element.shareId;
+        let selectedShareId = element.newShareId;
+        let name = element.name;
+        console.log('deviceLevelInfo', element);
+        let { SERVICES } = yield select((state) => state.storage.database);
+        let keeper: KeeperService = yield select(
+          (state) => state.keeper.service,
+        );
+        let keeperInfo: Keepers = keeper.keeper.keepers;
+
+        let s3Service: S3Service = yield select(
+          (state) => state.health.service,
+        );
+        let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+        let shareIndex = 3;
+        if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+          if (
+            metaShare.findIndex((value) => value.shareId == selectedShareId) >
+            -1
+          ) {
+            shareIndex = metaShare.findIndex(
+              (value) => value.shareId == selectedShareId,
+            );
+          }
+        }
+        console.log('oldShareId', oldShareId);
+        console.log('keeperInfo', keeperInfo);
+        let share = metaShare[shareIndex];
+        let oldKeeperInfo = keeperInfo[oldShareId];
+        console.log('oldKeeperInfo oldShareId', oldKeeperInfo);
+        const result = yield call(
+          keeper.initKeeperFromOldKeeper,
+          oldShareId,
+          selectedShareId,
+        );
+        console.log(
+          'keeper after finalize selectedShareId',
+          keeper.keeper.keepers[selectedShareId],
+        );
+        if (result.status === 200) {
+          const data: TrustedDataElements = { share };
+          const updateRes = yield call(
+            keeper.updateTrustedChannel,
+            share.shareId,
+            data,
+            false,
+          );
+          if (updateRes.status == 200) {
+            const updatedSERVICES = {
+              ...SERVICES,
+              S3_SERVICE: JSON.stringify(s3Service),
+              KEEPERS_INFO: JSON.stringify(keeper),
+            };
+            yield call(insertDBWorker, {
+              payload: { SERVICES: updatedSERVICES },
+            });
+
+            let shareArray = [
+              {
+                walletId: s3Service.getWalletId().data.walletId,
+                shareId: selectedShareId,
+                reshareVersion: share.meta.reshareVersion,
+                updatedAt: moment(new Date()).valueOf(),
+                shareType: type,
+                name,
+                status: 'accessible',
+              },
+            ];
+            yield put(updateMSharesHealth(shareArray));
+          }
+
+          if (oldKeeperInfo.keeperUUID) {
+            const notification: INotification = {
+              notificationType: notificationType.reShare,
+              title: 'New share uploaded',
+              body: 'New share uploaded. Please download the share.',
+              data: JSON.stringify({ selectedShareId }),
+              tag: notificationTag.IMP,
+              date: new Date(),
+            };
+            let ress = yield call(
+              RelayServices.sendKeeperNotifications,
+              [oldKeeperInfo.keeperUUID],
+              notification,
+            );
+          }
+        }
+      }
+    }
+    yield put(switchS3LoaderKeeper('reshareWithSameKeeper'));
+  } catch (error) {
+    yield put(switchS3LoaderKeeper('reshareWithSameKeeper'));
+    console.log('Error EF channel', error);
+  }
+}
+
+export const reShareWithSameKeeperWatcher = createWatcher(
+  reShareWithSameKeeperWorker,
+  RESHARE_WITH_SAME_KEEPER,
 );

@@ -174,6 +174,7 @@ class KeeperFeatures extends Component<
         'device',
         navigation.getParam('isReshare'),
         this.props.navigation.state.params.selectedLevelId,
+        navigation.getParam('isChange') ? navigation.getParam('isChange') : false,
       );
       navigation.replace('ManageBackupKeeper');
     }

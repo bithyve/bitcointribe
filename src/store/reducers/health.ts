@@ -39,9 +39,10 @@ const initialState: {
     checkMSharesHealth: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
-    updateEFChannelStatus: Boolean
+    updateEFChannelStatus: Boolean;
     uploadMetaShare: Boolean;
     approvalRequest: Boolean;
+    reshareWithSameKeeper: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -76,8 +77,8 @@ const initialState: {
   downloadedMShare: {
     [otp: string]: { status: Boolean; err?: String };
   };
-  errorReceiving: Boolean,
-  keeperApproveStatus:{
+  errorReceiving: Boolean;
+  keeperApproveStatus: {
     status: Boolean;
     initiatedAt: number;
     shareId: string;
@@ -93,7 +94,8 @@ const initialState: {
     updateMSharesHealth: false,
     updateEFChannelStatus: false,
     uploadMetaShare: false,
-    approvalRequest: false
+    approvalRequest: false,
+    reshareWithSameKeeper: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -109,7 +111,7 @@ const initialState: {
   metaShare: null,
   downloadedMShare: {},
   errorReceiving: false,
-  keeperApproveStatus:{
+  keeperApproveStatus: {
     status: false,
     initiatedAt: 0,
     shareId: ''
@@ -127,35 +129,35 @@ export default (state = initialState, action) => {
           levelHealthCheck: false,
         },
       };
-    
+
     case HEALTH_CHECK_INITIALIZE:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            levelHealthCheck: true,
-          },
-        };
-    
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          levelHealthCheck: true,
+        },
+      };
+
     case HEALTH_UPDATE:
       return {
         ...state,
         levelHealth: action.payload.health,
-        currentLevel: action.payload.currentLevel
+        currentLevel: action.payload.currentLevel,
       };
 
-    case GET_HEALTH_OBJECT: 
+    case GET_HEALTH_OBJECT:
       return {
-      ...state,
-      levelHealth: action.payload.health,
-    };
+        ...state,
+        levelHealth: action.payload.health,
+      };
 
     case ERROR_SENDING:
       return {
         ...state,
         errorSending: action.payload.isFailed,
       };
-    
+
     case S3_LOADING_STATUS:
       return {
         ...state,
@@ -164,7 +166,7 @@ export default (state = initialState, action) => {
           checkMSharesHealth: action.payload.beingLoaded,
         },
       };
-    
+
     case INIT_LOADING_STATUS:
       return {
         ...state,
@@ -183,12 +185,11 @@ export default (state = initialState, action) => {
         },
       };
 
-      
-    case MSHARES: 
+    case MSHARES:
       return {
-      ...state,
-      shares: action.payload.shares,
-    };
+        ...state,
+        shares: action.payload.shares,
+      };
 
     case UPDATE_EFCHANNEL_LOADING_STATUS:
       return {
@@ -198,13 +199,13 @@ export default (state = initialState, action) => {
           updateEFChannelStatus: action.payload.beingLoaded,
         },
       };
-    
+
     case IS_LEVEL_TWO_METASHARE:
       return {
         ...state,
         isLevelTwoMetaShareCreated: action.payload.beingLoaded,
       };
-  
+
     case IS_LEVEL_THREE_METASHARE:
       return {
         ...state,
@@ -222,7 +223,7 @@ export default (state = initialState, action) => {
         ...state,
         isLevel2Initialized: true,
       };
-    
+
     case IS_LEVEL3_INITIALIZED:
       return {
         ...state,
@@ -234,7 +235,7 @@ export default (state = initialState, action) => {
         ...state,
         metaShare: action.payload.metaShare,
       };
-      
+
     case DOWNLOADED_MSHARE_HEALTH:
       return {
         ...state,
@@ -252,7 +253,7 @@ export default (state = initialState, action) => {
         ...state,
         errorReceiving: action.payload.isFailed,
       };
-      
+
     case SERVICES_ENRICHED:
       return {
         ...state,
@@ -290,15 +291,15 @@ export default (state = initialState, action) => {
           ...action.payload.generated,
         },
       };
-    
+
     case ON_APPROVAL_STATUS_CHANGE:
       return {
         ...state,
-        keeperApproveStatus:{
+        keeperApproveStatus: {
           status: action.payload.status,
           initiatedAt: action.payload.initiatedAt,
           shareId: action.payload.shareId,
-        }
+        },
       };
 
       case MNEMONIC_RECOVERED_HEALTH:

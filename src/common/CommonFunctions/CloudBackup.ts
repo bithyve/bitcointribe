@@ -54,12 +54,13 @@ export default class CloudBackup {
   };
 
   public CloudDataBackup = (data, callback, share?) => {
+    // console.log('share inside cloud', share);
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
-        console.log('BackedUp JSON: DONE', backedJson);
+        // console.log('BackedUp JSON: DONE', backedJson);
         if (backedJson) {
           this.updateData({
             result1: backedJson,
@@ -287,7 +288,7 @@ export default class CloudBackup {
         newArray[index].keeperData = this.dataObject.keeperData;
         newArray[index].dateTime = moment(new Date());
       }
-      console.log('ARR', newArray);
+      // console.log('ARR', newArray);
     }
     if (Platform.OS == 'ios') {
       iCloud.startBackup(JSON.stringify(newArray));

@@ -1,34 +1,13 @@
 export const modifyLevelStatus = (
   levelData: any[],
-  levelHealthVar: any[],
+  levelHealth: any[],
   currentLevel: number,
   keeperInfo: any[],
 ): { levelData: any[]; isError: boolean } => {
   let isError = false;
+  let abc = JSON.stringify(levelHealth);
+  let levelHealthVar = [...getModifiedData(keeperInfo, JSON.parse(abc))];
   if (levelHealthVar && levelHealthVar.length > 0) {
-    if (keeperInfo.length > 0) {
-      for (let j = 0; j < levelHealthVar.length; j++) {
-        const elementJ = levelHealthVar[j];
-        for (let i = 0; i < elementJ.levelInfo.length; i++) {
-          const element = elementJ.levelInfo[i];
-          if (
-            keeperInfo.findIndex(
-              (value) =>
-                value.shareId == element.shareId && value.type == 'contact',
-            ) > -1
-          ) {
-            element.data =
-              keeperInfo[
-                keeperInfo.findIndex(
-                  (value) =>
-                    value.shareId == element.shareId && value.type == 'contact',
-                )
-              ].data;
-          }
-        }
-      }
-    }
-
     // Executes when level 1 setup or complete and level 2 not initialized
     if (
       (currentLevel == 1 || currentLevel == 0) &&
@@ -43,8 +22,7 @@ export const modifyLevelStatus = (
     if (
       (currentLevel == 1 || currentLevel == 2) &&
       levelHealthVar[0] &&
-      levelHealthVar[1] &&
-      !levelHealthVar[2]
+      levelHealthVar[1]
     ) {
       // if level 2 complete then change level 1 share data with level 2 share data at for cloud and security question
       levelData = checkLevelHealth(levelData, levelHealthVar, 1, 2, currentLevel);
@@ -105,19 +83,79 @@ const checkLevelHealth = (
       levelData[2].status = checkStatus(levelHealthVar, 2, 4);
     }
   }
+  console.log('levelData', levelData)
   return levelData;
 };
 
 const checkStatus = (levelHealthVar: any[], index: number, index2: number) => {
-  if (
-    levelHealthVar[index].levelInfo[index2].status === 'accessible' &&
-    levelHealthVar[index].levelInfo[index2 + 1].status === 'accessible'
-  ) {
-    return 'good';
-  } else if (
-    levelHealthVar[index].levelInfo[index2].status === 'notAccessible' ||
-    levelHealthVar[index].levelInfo[index2 + 1].status === 'notAccessible'
-  ) {
-    return 'bad';
+  let status = 'notSetup';
+  for (let i = 0; i < levelHealthVar[index].levelInfo.length; i++) {
+    const element = levelHealthVar[index].levelInfo[i];
+    if(element.status == 'accessible'){
+      status = 'good';
+    }
+    if(element.status == 'notAccessible'){
+      status = 'bad';
+      return status;
+    }
   }
+  return status;
+};
+
+const getModifiedData = (keeperInfo, levelHealthVar) => {
+  if (keeperInfo.length > 0) {
+    for (let j = 0; j < levelHealthVar.length; j++) {
+      const elementJ = levelHealthVar[j];
+      for (let i = 0; i < elementJ.levelInfo.length; i++) {
+        const element = elementJ.levelInfo[i];
+        if (
+          keeperInfo.findIndex(
+            (value) =>
+              value.shareId == element.shareId && value.type == 'contact',
+          ) > -1
+        ) {
+          element.data =
+            keeperInfo[
+              keeperInfo.findIndex(
+                (value) =>
+                  value.shareId == element.shareId && value.type == 'contact',
+              )
+            ].data;
+        }
+        if (
+          keeperInfo.findIndex((value) => value.shareId == element.shareId) > -1
+        ) {
+          element.uuid =
+            keeperInfo[
+              keeperInfo.findIndex((value) => value.shareId == element.shareId)
+            ].uuid;
+        }
+        if (
+          keeperInfo.findIndex((value) => value.shareId == element.shareId) > -1
+        ) {
+          element.uuid =
+            keeperInfo[
+              keeperInfo.findIndex((value) => value.shareId == element.shareId)
+            ].uuid;
+        }
+      }
+    }
+    if (
+      levelHealthVar[1] &&
+      levelHealthVar[1].levelInfo &&
+      levelHealthVar[2] &&
+      levelHealthVar[1].levelInfo
+    ) {
+      for (let j = 0; j < levelHealthVar[1].levelInfo.length; j++) {
+        if (
+          !levelHealthVar[2].levelInfo[j].uuid &&
+          levelHealthVar[2].levelInfo[j].name ==
+            levelHealthVar[1].levelInfo[j].name
+        )
+          levelHealthVar[2].levelInfo[j].uuid =
+            levelHealthVar[1].levelInfo[j].uuid;
+      }
+    }
+  }
+  return levelHealthVar;
 };
