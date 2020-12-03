@@ -100,38 +100,41 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       SubAccountKind.SECURE_ACCOUNT,
     ];
     if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
-      const derivativeAccountDetails = {
-        type: primarySubAccount.kind,
-        number: 0,
-      };
-
-      if (derivativeAccountDetails.type === DONATION_ACCOUNT)
+      if (primarySubAccount.kind === DONATION_ACCOUNT)
         dispatch(
           syncViaXpubAgent(
             primarySubAccount.sourceKind,
-            derivativeAccountDetails.type,
-            derivativeAccountDetails.number,
+            primarySubAccount.kind,
+            primarySubAccount.instanceNumber,
           ),
         );
       else
         dispatch(
           fetchDerivativeAccBalTx(
             primarySubAccount.sourceKind,
-            derivativeAccountDetails.type,
-            derivativeAccountDetails.number,
+            primarySubAccount.kind,
+            primarySubAccount.instanceNumber,
           ),
         );
 
-      dispatch(setAutoAccountSync(`${derivativeAccountDetails.type + 0}`));
+      dispatch(
+        setAutoAccountSync(
+          `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
+        ),
+      );
     } else {
       dispatch(
-        fetchBalanceTx(primarySubAccount.sourceKind, {
+        fetchBalanceTx(primarySubAccount.kind, {
           loader: true,
           syncTrustedDerivative:
             primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
         }),
       );
-      dispatch(setAutoAccountSync(`${primarySubAccount.kind + 0}`));
+      dispatch(
+        setAutoAccountSync(
+          `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
+        ),
+      );
     }
   }, [primarySubAccount]);
 

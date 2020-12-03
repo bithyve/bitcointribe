@@ -16,6 +16,11 @@ interface SubAccountDescribing {
   readonly kind: SubAccountKind;
 
   /**
+   * Instance number(backend) for a particular SubAccountKind
+   */
+  instanceNumber: number;
+
+  /**
    * Parent account(backend) of this sub-account
    */
   sourceKind: SourceAccountKind;
@@ -77,6 +82,7 @@ export interface ImportedWalletSubAccountDescribing
 export type SubAccountDescribingConstructorProps = {
   id?: string;
   accountShellID?: string | null;
+  instanceNumber?: number;
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;

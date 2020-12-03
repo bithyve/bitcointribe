@@ -32,6 +32,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new TestSubAccountInfo({
         id: testAcc.getAccountId(),
+        instanceNumber: 1,
       }),
       unit: BitcoinUnit.TSATS,
       displayOrder: 1,
@@ -39,6 +40,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new CheckingSubAccountInfo({
         id: regularAcc.getAccountId(),
+        instanceNumber: 1,
       }),
       unit: BitcoinUnit.SATS,
       displayOrder: 2,
@@ -46,6 +48,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new SavingsSubAccountInfo({
         id: secureAcc.getAccountId(),
+        instanceNumber: 1,
       }),
       unit: BitcoinUnit.SATS,
       displayOrder: 3,
@@ -172,6 +175,7 @@ const updateSecondarySubAccounts = (
               case DerivativeAccountTypes.TRUSTED_CONTACTS:
                 secondarySubAccount = new TrustedContactsSubAccountInfo({
                   id: derivativeId,
+                  instanceNumber: accountNumber,
                   accountShellID: shell.id,
                   balances: dervBalances,
                   transactions: dervTransactions,
@@ -181,6 +185,7 @@ const updateSecondarySubAccounts = (
               case DerivativeAccountTypes.FAST_BITCOINS:
                 secondarySubAccount = new ExternalServiceSubAccountInfo({
                   id: derivativeId,
+                  instanceNumber: accountNumber,
                   accountShellID: shell.id,
                   serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
                   balances: dervBalances,

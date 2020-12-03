@@ -22,6 +22,8 @@ export default class ExternalServiceSubAccountInfo
   implements ExternalServiceSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.SERVICE;
   sourceKind: SourceAccountKind;
 
@@ -44,6 +46,7 @@ export default class ExternalServiceSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
@@ -57,6 +60,7 @@ export default class ExternalServiceSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.defaultDescription = defaultDescription;
     this.serviceAccountKind = serviceAccountKind;

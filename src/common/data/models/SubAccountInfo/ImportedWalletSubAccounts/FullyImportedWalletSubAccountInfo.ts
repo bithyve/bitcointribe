@@ -18,6 +18,8 @@ export default class FullyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
   id: string;
   accountShellID: string | null;
+  instanceNumber: number;
+
   kind: SubAccountKind = SubAccountKind.FULLY_IMPORTED_WALLET;
   sourceKind: SourceAccountKind;
 
@@ -40,6 +42,7 @@ export default class FullyImportedWalletSubAccountInfo
   constructor({
     id = uuidV4(),
     accountShellID = null,
+    instanceNumber = null,
     defaultTitle = 'Full Import',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
@@ -50,6 +53,7 @@ export default class FullyImportedWalletSubAccountInfo
   }: ConstructorProps) {
     this.id = id;
     this.accountShellID = accountShellID;
+    this.instanceNumber = instanceNumber;
     this.defaultTitle = defaultTitle;
     this.balances = balances;
     this.customDisplayName = customDisplayName;
