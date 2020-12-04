@@ -380,7 +380,7 @@ class ManageBackup extends Component<
       this.modifyLevelData();
     }
 
-    if (prevProps.levelHealth != this.props.levelHealth) {
+    if (prevProps.levelHealth !== this.props.levelHealth) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -423,34 +423,10 @@ class ManageBackup extends Component<
 
   updateCloudData = () => {
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
-    let KPInfo: any[] = [];
     let secretShare = {};
     if (levelHealth.length > 0) {
       let levelInfo = getLevelInfo(levelHealth, currentLevel);
       if (levelInfo) {
-        for (let i = 0; i < levelInfo.length; i++) {
-          const element = levelInfo[i];
-          if (
-            keeperInfo.findIndex((value) => value.shareId == element.shareId) >
-              -1 &&
-            element.status == 'accessible'
-          ) {
-            let kpInfoElement =
-              keeperInfo[
-                keeperInfo.findIndex(
-                  (value) => value.shareId == element.shareId,
-                )
-              ];
-            let object = {
-              type: kpInfoElement.type,
-              name: kpInfoElement.name,
-              shareId: kpInfoElement.shareId,
-              data: kpInfoElement.data,
-            };
-            KPInfo.push(object);
-          }
-        }
-
         if (
           levelInfo[2] &&
           levelInfo[3] &&
@@ -466,8 +442,7 @@ class ManageBackup extends Component<
         }
       }
     }
-    this.cloudData(KPInfo, currentLevel, secretShare);
-    // Call icloud update Keeper INfo with KPInfo and currentLevel vars
+    this.cloudData(keeperInfo, currentLevel, secretShare);
   };
 
   autoUploadShare = () => {
