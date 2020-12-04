@@ -1086,7 +1086,11 @@ export default class SecureHDWallet extends Bitcoin {
       displayTxDetails: boolean;
     },
     disableAccount: boolean = false,
-  ): Promise<{ setupSuccessful: Boolean }> => {
+  ): Promise<{
+    setupSuccessful: Boolean;
+    accountId: string;
+    accountNumber: number;
+  }> => {
     const accountType = DONATION_ACCOUNT;
     let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
       accountType
@@ -1152,7 +1156,7 @@ export default class SecureHDWallet extends Bitcoin {
       throw new Error('Donation account setup failed');
     }
 
-    return { setupSuccessful };
+    return { setupSuccessful, accountId: xpubId, accountNumber };
   };
 
   public setupSecureAccount = async (): Promise<{

@@ -354,6 +354,8 @@ export default class BaseAccount {
         status: number;
         data: {
           setupSuccessful: Boolean;
+          accountId: String;
+          accountNumber: Number;
         };
         err?: undefined;
         message?: undefined;

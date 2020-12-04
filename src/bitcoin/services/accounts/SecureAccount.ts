@@ -524,6 +524,8 @@ export default class SecureAccount {
         status: number;
         data: {
           setupSuccessful: Boolean;
+          accountId: String;
+          accountNumber: Number;
         };
         err?: undefined;
         message?: undefined;

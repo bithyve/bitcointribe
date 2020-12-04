@@ -1031,7 +1031,8 @@ function* setupDonationAccountWorker({ payload }) {
 
   if (res.status === 200) {
     console.log({ res });
-    if (!res.data.setupSuccessful) {
+    const { setupSuccessful, accountId, accountNumber } = res.data;
+    if (!setupSuccessful) {
       yield put(settedDonationAccount(serviceType, false));
       throw new Error('Donation account setup failed');
     }
@@ -1043,6 +1044,7 @@ function* setupDonationAccountWorker({ payload }) {
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     yield put(settedDonationAccount(serviceType, true));
+    return { accountId, accountNumber };
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
@@ -1153,33 +1155,68 @@ export const refreshAccountShellWatcher = createWatcher(
   REFRESH_ACCOUNT_SHELL,
 );
 
+function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
+  let subAccountId: string;
+  let subAccountInstanceNum: number;
+  switch (subAccountInfo.kind) {
+    case SubAccountKind.DONATION_ACCOUNT:
+      const { accountId, accountNumber } = yield call(
+        setupDonationAccountWorker,
+        {
+          payload: {
+            serviceType: subAccountInfo.sourceKind,
+            donee: subAccountInfo.doneeName,
+            subject: subAccountInfo.customDisplayName,
+            description: subAccountInfo.customDescription,
+            configuration: {
+              displayBalance: true,
+              displayTransactions: true,
+              displayTxDetails: true,
+            },
+          },
+        },
+      );
+
+      subAccountId = accountId;
+      subAccountInstanceNum = accountNumber;
+      break;
+  }
+
+  if (subAccountId) return { subAccountId, subAccountInstanceNum };
+  else throw new Error('Failed to generate sub-account; subAccountId missing ');
+}
+
 function* addNewAccountShell({
   payload: subAccountInfo,
 }: {
   payload: SubAccountDescribing;
 }) {
-  // TODO: Devise some way to reference and call a new account creation service here.
   const bitcoinUnit =
     subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
       ? BitcoinUnit.TSATS
       : BitcoinUnit.SATS;
 
-  const newAccountShell = new AccountShell({
-    unit: bitcoinUnit,
-    primarySubAccount: subAccountInfo,
-    displayOrder: 1,
-  });
-
   try {
-    // TODO: Yield a result by calling the account creation service with the `AccountShell`.
-    // const res = yield call(
-    //   newAccountService.generateNewAccount,
-    //   ...payload,
-    // );
+    const { subAccountId, subAccountInstanceNum } = yield call(
+      addNewSubAccount,
+      subAccountInfo,
+    );
+    subAccountInfo.id = subAccountId;
+    subAccountInfo.instanceNumber = subAccountInstanceNum;
+    const newAccountShell = new AccountShell({
+      unit: bitcoinUnit,
+      primarySubAccount: subAccountInfo,
+      displayOrder: 1,
+    });
     yield put(newAccountShellAdded({ accountShell: newAccountShell }));
     yield put(accountShellOrderedToFront(newAccountShell));
   } catch (error) {
     console.log('addNewAccountShell saga::error: ' + error);
+    const newAccountShell = new AccountShell({
+      unit: bitcoinUnit,
+      primarySubAccount: subAccountInfo,
+      displayOrder: 1,
+    });
     yield put(
       newAccountShellAddFailed({ accountShell: newAccountShell, error }),
     );
