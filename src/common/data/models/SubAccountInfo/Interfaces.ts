@@ -10,7 +10,7 @@ import {
 import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;

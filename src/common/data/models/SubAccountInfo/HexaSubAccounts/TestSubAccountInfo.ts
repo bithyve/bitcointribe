@@ -14,7 +14,7 @@ import {
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 

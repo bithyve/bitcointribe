@@ -15,7 +15,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class FullyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 

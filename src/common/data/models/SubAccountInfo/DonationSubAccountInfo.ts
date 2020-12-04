@@ -18,7 +18,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 
 export default class DonationSubAccountInfo
   implements DonationSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 
