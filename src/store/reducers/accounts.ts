@@ -36,6 +36,8 @@ import {
   ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
+  ACCOUNT_SHELL_REFRESH_COMPLETED,
+  REFRESH_ACCOUNT_SHELL,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -684,6 +686,22 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         ...state,
         accountShells: [...shellToMove, ...state.accountShells].map(updateDisplayOrderForSortedShell),
       };
+
+    case REFRESH_ACCOUNT_SHELL:
+      state
+        .accountShells
+        .find(shell => shell.id == action.payload.shell.id)
+        .isSyncInProgress = true;
+
+      return state;
+
+    case ACCOUNT_SHELL_REFRESH_COMPLETED:
+      state
+        .accountShells
+        .find(shell => shell.id == action.payload.id)
+        .isSyncInProgress = false;
+
+      return state;
 
     default:
       return state;
