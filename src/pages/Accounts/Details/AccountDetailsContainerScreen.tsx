@@ -27,7 +27,9 @@ import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
 
 import { refreshAccountShell } from '../../../store/actions/accounts';
-import { setAutoAccountSync } from '../../../store/actions/loaders';
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind';
+import NetworkKind from '../../../common/data/enums/NetworkKind';
+import config from '../../../bitcoin/HexaConfig';
 
 export type Props = {
   navigation: any;
@@ -71,6 +73,17 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountShell = useAccountShellFromNavigation(navigation);
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
+  const averageTxFees = useSelector((state) => state.accounts.averageTxFees);
+
+  const derivativeAccountDetails: {
+    type: string;
+    number: number;
+  } = config.EJECTED_ACCOUNTS.includes(primarySubAccount.kind)
+    ? {
+        type: primarySubAccount.kind,
+        number: primarySubAccount.instanceNumber,
+      }
+    : null;
 
   const {
     present: presentBottomSheet,
@@ -211,16 +224,24 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         <SendAndReceiveButtonsFooter
           onSendPressed={() => {
             navigation.navigate('Send', {
-              accountShellID,
+              serviceType: primarySubAccount.sourceKind,
+              averageTxFees,
               spendableBalance: AccountShell.getSpendableBalance(accountShell),
+              derivativeAccountDetails,
             });
           }}
           onReceivePressed={() => {
             navigation.navigate('Receive', {
               serviceType: primarySubAccount.sourceKind,
-              //TODO: fill derivativeAccountDetails(for ejected accounts)
+              derivativeAccountDetails,
             });
           }}
+          averageTxFees={averageTxFees}
+          network={
+            primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+              ? NetworkKind.TESTNET
+              : NetworkKind.MAINNET
+          }
         />
       </View>
     </ScrollView>

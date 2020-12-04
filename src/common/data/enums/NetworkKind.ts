@@ -1,6 +1,6 @@
 enum NetworkKind {
-  MAINNET,
-  TESTNET,
+  MAINNET = 'MAINNET',
+  TESTNET = 'TESTNET',
 }
 
 export default NetworkKind;
