@@ -314,7 +314,7 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    this.props.setIsBackupProcessing({ status: false });
+    
     if (!this.props.isBackupProcessing.status) {
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
@@ -492,7 +492,7 @@ class ManageBackup extends Component<
           contactLevelInfo.push(obj);
         }
       }
-      console.log('contactLevelInfo', contactLevelInfo)
+      console.log('contactLevelInfo', contactLevelInfo);
       if(deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
       if(contactLevelInfo.length) autoShareContact(contactLevelInfo);
     }
