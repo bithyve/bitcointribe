@@ -15,7 +15,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class WatchOnlyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -39,7 +39,7 @@ export default class WatchOnlyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Watch-Only',

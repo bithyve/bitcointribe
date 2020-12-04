@@ -15,7 +15,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class CheckingSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -37,7 +37,7 @@ export default class CheckingSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Checking Account',
