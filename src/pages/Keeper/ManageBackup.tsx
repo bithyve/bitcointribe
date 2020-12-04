@@ -54,7 +54,8 @@ import {
   updateMSharesHealth,
   sendApprovalRequest,
   onApprovalStatusChange,
-  reShareWithSameKeeper
+  reShareWithSameKeeper,
+  autoShareContact
 } from '../../store/actions/health';
 import { modifyLevelStatus } from './ManageBackupFunction';
 import ApproveSetup from './ApproveSetup';
@@ -114,6 +115,7 @@ interface ManageBackupPropsTypes {
   keeperApproveStatus: any;
   metaShares: MetaShare[];
   reShareWithSameKeeper: any;
+  autoShareContact: any;
 }
 
 class ManageBackup extends Component<
@@ -469,28 +471,30 @@ class ManageBackup extends Component<
   };
 
   autoUploadShare = () => {
-    let { levelHealth, currentLevel, reShareWithSameKeeper } = this.props;
+    let { levelHealth, currentLevel, reShareWithSameKeeper, autoShareContact } = this.props;
     if (levelHealth[2] &&
       currentLevel == 2 &&
       levelHealth[2].levelInfo[4].status == 'accessible' &&
       levelHealth[2].levelInfo[5].status
     ) {
       let deviceLevelInfo = [];
-      let contactIndex = [];
+      let contactLevelInfo = [];
       for (let i = 2; i < levelHealth[2].levelInfo.length - 2; i++) {
         if (levelHealth[2].levelInfo[i].status != 'accessible' && 
           (levelHealth[1].levelInfo[i].shareType == 'primaryKeeper' ||
-          levelHealth[1].levelInfo.shareType == 'device')
+          levelHealth[1].levelInfo[i].shareType == 'device')
         ) {
           let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i };
           deviceLevelInfo.push(obj);
         }
         if (levelHealth[2].levelInfo[i].status != 'accessible' && levelHealth[1].levelInfo[i].shareType == 'contact') {
           let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i }
-          contactIndex.push(obj);
+          contactLevelInfo.push(obj);
         }
       }
+      console.log('contactLevelInfo', contactLevelInfo)
       if(deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
+      if(contactLevelInfo.length) autoShareContact(contactLevelInfo);
     }
   };
 
@@ -1408,7 +1412,8 @@ export default withNavigationFocus(
     sendApprovalRequest,
     onApprovalStatusChange,
     fetchKeeperTrustedChannel,
-    reShareWithSameKeeper
+    reShareWithSameKeeper,
+    autoShareContact
   })(ManageBackup),
 );
 

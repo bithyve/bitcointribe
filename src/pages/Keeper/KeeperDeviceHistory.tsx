@@ -229,10 +229,10 @@ const KeeperDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          // {uuid: "f691c2c35573f060fff13f42", publicKey: "0e7c7506afbd40865b99b47a42640811dba57a3928a549992c319055edcedbda", privateKey: "0c1fae273fed590118fefdba6c6e83b183ff53a3aac0a86d8a67d25d54152717", ephemeralAddress: "182b266d9739fa043d4fd21ea1438e78005a17acb60e12af6082252620464013", isSignUp: true, …}
+          // {uuid: "1a459ff80d9e781d4e00ca0d", publicKey: "2aafabfcc8e2cef6c486411e9613af82d3d6864aea2b31a4a9cc1b98b879af5d", privateKey: "0ef686aec1f7470fa71c53e68718f01bdaf02eb2f527ad7b8252f60b490a4012", ephemeralAddress: "cf25955ea5ac4d689cb502a8fce3c017ec447838942d8234fbe14f101c78ce3a", isSignUp: true, …}
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"021f0ce3dde9a684de0f57ac","publicKey": "59d819130e39fa350035adfaf10fcc6129a2456ade36f040f9d848033a55f3c2","ephemeralAddress": "3a807ccd9b2e8e200fbfbd31734e90e95837e10e35a0f7bc074d64f37eacbf8d","walletName":"PK"}'
-            : '{"uuid":"f691c2c35573f060fff13f42","publicKey": "0e7c7506afbd40865b99b47a42640811dba57a3928a549992c319055edcedbda","ephemeralAddress": "182b266d9739fa043d4fd21ea1438e78005a17acb60e12af6082252620464013","walletName":"SK"}';
+            ? '{"uuid":"dfa841154f1cb2e938f55998","publicKey": "5baf3a11770253212be668533a680a222f5578d3882e561c913c4be7662920ac","ephemeralAddress": "84b8433a1f129f5db0a2aa6dc56faf7684bf84312aff9ea6e046dd164586f49a","walletName":"PK"}'
+            : '{"uuid":"1a459ff80d9e781d4e00ca0d","publicKey": "2aafabfcc8e2cef6c486411e9613af82d3d6864aea2b31a4a9cc1b98b879af5d","ephemeralAddress": "cf25955ea5ac4d689cb502a8fce3c017ec447838942d8234fbe14f101c78ce3a","walletName":"TK"}';
           props.navigation.navigate('KeeperFeatures', {
             isReshare,
             qrScannedData,

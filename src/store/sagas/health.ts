@@ -45,6 +45,7 @@ import {
   secondaryShareDownloaded,
   mnemonicRecoveredHealth,
   RESHARE_WITH_SAME_KEEPER,
+  AUTO_SHARE_CONTACT,
 } from '../actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { updateHealth } from '../actions/health';
@@ -359,7 +360,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     );
     let type = isPrimaryKeeper ? 'primaryKeeper' : payload.type;
 
-    
     const keeper: KeeperService = yield select((state) => state.keeper.service);
 
     let securityQuestion = yield select(
@@ -1661,10 +1661,9 @@ export const uploadPdfShareWatcher = createWatcher(
   UPLOAD_PDF_SHARE,
 );
 
-
 function* recoverMnemonicHealthWorker({ payload }) {
   const { securityAns, metaShares } = payload;
- // if (metaShares.length !== 3) return;
+  // if (metaShares.length !== 3) return;
 
   const encryptedSecrets: string[] = metaShares.map(
     (metaShare) => metaShare.encryptedSecret,
@@ -1674,9 +1673,9 @@ function* recoverMnemonicHealthWorker({ payload }) {
     S3Service.recoverFromSecrets,
     encryptedSecrets,
     securityAns,
-    2
+    2,
   );
-    console.log("RECOVER_MNEMONIC_HEALTH res", res);
+  console.log('RECOVER_MNEMONIC_HEALTH res', res);
   if (res.status === 200) {
     // TODO: recreate accounts and write to database
     yield put(mnemonicRecoveredHealth(res.data.mnemonic)); // storing in redux state (for demo)
@@ -1695,7 +1694,7 @@ function* downloadSMShareWorker({ payload }) {
 
   if (!encryptedKey) return;
   const res = yield call(S3Service.downloadSMShare, encryptedKey, otp);
-  console.log("Keeper Shares", res);
+  console.log('Keeper Shares', res);
   if (res.status === 200) {
     console.log('SHARES DOWNLOAD', res.data);
     yield put(secondaryShareDownloaded(res.data.metaShare));
@@ -1709,6 +1708,7 @@ export const downloadSMShareWatcher = createWatcher(
   downloadSMShareWorker,
   DOWNLOAD_SM_SHARES,
 );
+
 function* reShareWithSameKeeperWorker({ payload }) {
   try {
     yield put(switchS3LoaderKeeper('reshareWithSameKeeper'));
@@ -1761,7 +1761,7 @@ function* reShareWithSameKeeperWorker({ payload }) {
           keeper.keeper.keepers[selectedShareId],
         );
         if (result.status === 200) {
-          const data: TrustedDataElements = { share };
+          const data: TrustedDataElements = { metaShare: share };
           const updateRes = yield call(
             keeper.updateTrustedChannel,
             share.shareId,
@@ -1820,4 +1820,116 @@ function* reShareWithSameKeeperWorker({ payload }) {
 export const reShareWithSameKeeperWatcher = createWatcher(
   reShareWithSameKeeperWorker,
   RESHARE_WITH_SAME_KEEPER,
+);
+
+function* autoShareContactWorker({ payload }) {
+  try {
+    yield put(switchS3LoaderKeeper('autoShareContact'));
+    let { deviceLevelInfo } = payload;
+    // let levelHealth: LevelHealthInterface[] = yield select(
+    //   (state) => state.health.levelHealth,
+    // );
+    console.log('deviceLevelInfo', deviceLevelInfo);
+
+    // const element = deviceLevelInfo[i];
+    // if (levelHealth[2].levelInfo[element.index].status != 'accessible') {
+    //   let type = element.shareType;
+    //   let oldShareId = element.shareId;
+    //   let selectedShareId = element.newShareId;
+    //   let name = element.name;
+    //   console.log('deviceLevelInfo', element);
+    //   let { SERVICES } = yield select((state) => state.storage.database);
+    //   let keeper: KeeperService = yield select(
+    //     (state) => state.keeper.service,
+    //   );
+    //   let keeperInfo: Keepers = keeper.keeper.keepers;
+
+    //   let s3Service: S3Service = yield select(
+    //     (state) => state.health.service,
+    //   );
+    //   let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    //   let shareIndex = 3;
+    //   if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+    //     if (
+    //       metaShare.findIndex((value) => value.shareId == selectedShareId) >
+    //       -1
+    //     ) {
+    //       shareIndex = metaShare.findIndex(
+    //         (value) => value.shareId == selectedShareId,
+    //       );
+    //     }
+    //   }
+    //   console.log('oldShareId', oldShareId);
+    //   console.log('keeperInfo', keeperInfo);
+    //   let share = metaShare[shareIndex];
+    //   let oldKeeperInfo = keeperInfo[oldShareId];
+    //   console.log('oldKeeperInfo oldShareId', oldKeeperInfo);
+    //   const result = yield call(
+    //     keeper.initKeeperFromOldKeeper,
+    //     oldShareId,
+    //     selectedShareId,
+    //   );
+    //   console.log(
+    //     'keeper after finalize selectedShareId',
+    //     keeper.keeper.keepers[selectedShareId],
+    //   );
+    //   if (result.status === 200) {
+    //     const data: TrustedDataElements = { share };
+    //     const updateRes = yield call(
+    //       keeper.updateTrustedChannel,
+    //       share.shareId,
+    //       data,
+    //       false,
+    //     );
+    //     if (updateRes.status == 200) {
+    //       const updatedSERVICES = {
+    //         ...SERVICES,
+    //         S3_SERVICE: JSON.stringify(s3Service),
+    //         KEEPERS_INFO: JSON.stringify(keeper),
+    //       };
+    //       yield call(insertDBWorker, {
+    //         payload: { SERVICES: updatedSERVICES },
+    //       });
+
+    //       let shareArray = [
+    //         {
+    //           walletId: s3Service.getWalletId().data.walletId,
+    //           shareId: selectedShareId,
+    //           reshareVersion: share.meta.reshareVersion,
+    //           updatedAt: moment(new Date()).valueOf(),
+    //           shareType: type,
+    //           name,
+    //           status: 'accessible',
+    //         },
+    //       ];
+    //       yield put(updateMSharesHealth(shareArray));
+    //     }
+
+    //     if (oldKeeperInfo.keeperUUID) {
+    //       const notification: INotification = {
+    //         notificationType: notificationType.reShare,
+    //         title: 'New share uploaded',
+    //         body: 'New share uploaded. Please download the share.',
+    //         data: JSON.stringify({ selectedShareId }),
+    //         tag: notificationTag.IMP,
+    //         date: new Date(),
+    //       };
+    //       let ress = yield call(
+    //         RelayServices.sendKeeperNotifications,
+    //         [oldKeeperInfo.keeperUUID],
+    //         notification,
+    //       );
+    //     }
+    //   }
+    // }
+    yield put(switchS3LoaderKeeper('autoShareContact'));
+  } catch (error) {
+    yield put(switchS3LoaderKeeper('autoShareContact'));
+    console.log('Error EF channel', error);
+  }
+}
+
+export const autoShareContactWatcher = createWatcher(
+  autoShareContactWorker,
+  AUTO_SHARE_CONTACT,
 );

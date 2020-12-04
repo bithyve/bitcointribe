@@ -44,6 +44,7 @@ const initialState: {
     approvalRequest: Boolean;
     reshareWithSameKeeper: Boolean;
     keeperSetupStatus: Boolean;
+    autoShareContact: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -98,6 +99,7 @@ const initialState: {
     approvalRequest: false,
     reshareWithSameKeeper: false,
     keeperSetupStatus: false,
+    autoShareContact: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

@@ -52,6 +52,7 @@ export const DOWNLOAD_SM_SHARES = 'DOWNLOAD_SM_SHARES';
 export const DOWNLOADED_SM_SHARES = 'DOWNLOADED_SM_SHARES';
 export const REMOVE_SN = 'REMOVE_SN';
 export const RESHARE_WITH_SAME_KEEPER = 'RESHARE_WITH_SAME_KEEPER';
+export const AUTO_SHARE_CONTACT = 'AUTO_SHARE_CONTACT';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -313,5 +314,14 @@ export const reShareWithSameKeeper = (
   return {
     type: RESHARE_WITH_SAME_KEEPER,
     payload: { deviceLevelInfo },
+  };
+};
+
+export const autoShareContact = (
+  contactLevelInfo,
+) => {
+  return {
+    type: AUTO_SHARE_CONTACT,
+    payload: { contactLevelInfo },
   };
 };

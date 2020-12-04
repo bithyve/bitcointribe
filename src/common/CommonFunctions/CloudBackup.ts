@@ -288,7 +288,7 @@ export default class CloudBackup {
         newArray[index].keeperData = this.dataObject.keeperData;
         newArray[index].dateTime = moment(new Date());
       }
-      // console.log('ARR', newArray);
+      console.log('ARR', newArray);
     }
     if (Platform.OS == 'ios') {
       iCloud.startBackup(JSON.stringify(newArray));
