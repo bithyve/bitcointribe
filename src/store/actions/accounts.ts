@@ -42,6 +42,7 @@ export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED';
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED';
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT';
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL';
+export const ACCOUNT_SHELL_REFRESH_COMPLETED = 'ACCOUNT_SHELL_REFRESH_COMPLETED';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -285,6 +286,17 @@ export const refreshAccountShell = (
 ) => {
   return { type: REFRESH_ACCOUNT_SHELL, payload: { shell, options } };
 };
+
+
+export const accountShellRefreshCompleted = (
+  payload: AccountShell,
+) => {
+  return {
+    type: ACCOUNT_SHELL_REFRESH_COMPLETED,
+    payload,
+  };
+};
+
 export interface AddNewAccountShellAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL;
   payload: SubAccountDescribing;
