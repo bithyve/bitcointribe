@@ -263,7 +263,7 @@ export interface TrustedDataElements {
   featuresList?: any;
   xPub?: any;
   securityQuestion?: any;
-  share? : MetaShare;
+  metaShare? : MetaShare;
 }
 export interface TrustedData {
   publicKey: string;
