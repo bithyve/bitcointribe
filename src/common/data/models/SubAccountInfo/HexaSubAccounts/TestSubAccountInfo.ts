@@ -1,4 +1,3 @@
-import { v4 as uuidV4 } from 'uuid';
 import {
   Balances,
   TransactionDetails,
@@ -38,9 +37,9 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.TESTNET;
 
   constructor({
-    id = uuidV4(),
+    id,
     accountShellID = null,
-    instanceNumber = null,
+    instanceNumber,
     defaultTitle = 'Test Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,

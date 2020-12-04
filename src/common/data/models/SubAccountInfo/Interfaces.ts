@@ -82,7 +82,7 @@ export interface ImportedWalletSubAccountDescribing
 export type SubAccountDescribingConstructorProps = {
   id?: string;
   accountShellID?: string | null;
-  instanceNumber?: number;
+  instanceNumber: number;
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;

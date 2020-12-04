@@ -1,4 +1,3 @@
-import { v4 as uuidV4 } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
@@ -40,9 +39,9 @@ export default class TrustedContactsSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = uuidV4(),
+    id,
     accountShellID = null,
-    instanceNumber = null,
+    instanceNumber,
     defaultTitle = 'Trusted Contacts',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
