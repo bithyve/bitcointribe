@@ -71,6 +71,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountShell = useAccountShellFromNavigation(navigation);
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
+  const averageTxFees = useSelector((state) => state.accounts.averageTxFees);
 
   const {
     present: presentBottomSheet,
@@ -211,8 +212,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         <SendAndReceiveButtonsFooter
           onSendPressed={() => {
             navigation.navigate('Send', {
-              accountShellID,
+              serviceType: primarySubAccount.sourceKind,
+              averageTxFees,
               spendableBalance: AccountShell.getSpendableBalance(accountShell),
+              //TODO: fill derivativeAccountDetails(for ejected accounts)
             });
           }}
           onReceivePressed={() => {

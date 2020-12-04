@@ -2,9 +2,7 @@ import React, { Component, createRef, ReactElement } from 'react';
 import { View, Image, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Colors from '../../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
-import {
-  heightPercentageToDP,
-} from 'react-native-responsive-screen';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   SECURE_ACCOUNT,
@@ -102,8 +100,6 @@ interface SendStateTypes {
   sweepSecure: any;
   spendableBalance: any;
   derivativeAccountDetails: { type: string; number: number };
-  getServiceType: any;
-  carouselIndex: number;
   averageTxFees: any;
   selectedContacts: ContactRecipientDescribing[];
   selectedSubAccounts: AccountRecipientDescribing[];
@@ -117,7 +113,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   constructor(props) {
     super(props);
 
-    const accountKind = this.props.navigation.getParam('serviceType') || REGULAR_ACCOUNT;
+    const accountKind = this.props.navigation.getParam('serviceType');
 
     this.state = {
       trustedContacts: [],
@@ -152,8 +148,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           image: require('../../../assets/images/icons/icon_secureaccount_white.png'),
         },
       ],
-      getServiceType: this.props.navigation.getParam('getServiceType') || null,
-      carouselIndex: this.props.navigation.getParam('carouselIndex') || null,
+
       selectedContacts: [],
       selectedSubAccounts: [],
     };
@@ -189,18 +184,20 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       this.getAccountBalances();
 
       const accountKind = this.state.serviceType;
-      const selectedRecipients = this.props.accountsState[accountKind].transfer.details;
+      const selectedRecipients = this.props.accountsState[accountKind].transfer
+        .details;
 
-      const selectedContacts = selectedRecipients.filter((data) => {
-        // TODO: This seems to be the way the backend is distinguishing between
-        // an "account" recipient and a "contact" recipient. There should be a way
-        // to refactor this around leveraging the `RecipientKind` enum.
+      const selectedContacts = selectedRecipients
+        .filter((data) => {
+          // TODO: This seems to be the way the backend is distinguishing between
+          // an "account" recipient and a "contact" recipient. There should be a way
+          // to refactor this around leveraging the `RecipientKind` enum.
 
-        return data.selectedContact.hasOwnProperty('account_name') == false;
-      })
+          return data.selectedContact.hasOwnProperty('account_name') == false;
+        })
 
-      // These items are currently being structured as objects with a `selectedContact` key.
-      .map(object => object.selectedContact);
+        // These items are currently being structured as objects with a `selectedContact` key.
+        .map((object) => object.selectedContact);
 
       this.setState({ selectedContacts });
     }
@@ -268,16 +265,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               accType === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType === REGULAR_ACCOUNT
-                  ? 'Checking Account'
-                  : 'Savings Account',
+                ? 'Checking Account'
+                : 'Savings Account',
             type: serviceType,
             checked: false,
             image:
               accType === DONATION_ACCOUNT
                 ? require('../../../assets/images/icons/icon_donation_account.png')
                 : serviceType === REGULAR_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_regular_account.png')
-                  : require('../../../assets/images/icons/icon_secureaccount_white.png'),
+                ? require('../../../assets/images/icons/icon_regular_account.png')
+                : require('../../../assets/images/icons/icon_secureaccount_white.png'),
           };
           additionalAccountData.push(accInstance);
         }
@@ -295,17 +292,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     const testBalance = accountsState[TEST_ACCOUNT].service
       ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     let regularBalance = accountsState[REGULAR_ACCOUNT].service
       ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances
-        .unconfirmedBalance
+        accountsState[REGULAR_ACCOUNT].service.hdWallet.balances
+          .unconfirmedBalance
       : 0;
     let secureBalance = accountsState[SECURE_ACCOUNT].service
       ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     let derivativeBalance = 0;
@@ -317,7 +314,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         if (serviceType !== REGULAR_ACCOUNT) {
           derivativeAccount =
             accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            dAccountType
+              dAccountType
             ];
         } else if (serviceType !== SECURE_ACCOUNT) {
           derivativeAccount =
@@ -561,7 +558,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             if (config.EJECTED_ACCOUNTS.includes(recipient.id)) {
               if (
                 recipient.account_number ===
-                contact.selectedContact.account_number &&
+                  contact.selectedContact.account_number &&
                 recipient.type === contact.selectedContact.type
               ) {
                 return (isNavigate = false);
@@ -621,7 +618,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -664,7 +661,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ];
 
           const hasTrustedAddress = Boolean(
             serviceType === TEST_ACCOUNT ? trustedTestAddress : trustedAddress,
@@ -783,14 +780,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                           onRecipientSelected={this.onRecipientSelected}
                         />
                       )) || (
-                          <BottomInfoBox
-                            containerStyle={styles.infoBoxContainer}
-                            title={'You have not added any Contacts'}
-                            infoText={
-                              'Add a Contact to send them sats without having to scan an address'
-                            }
-                          />
-                        )}
+                        <BottomInfoBox
+                          containerStyle={styles.infoBoxContainer}
+                          title={'You have not added any Contacts'}
+                          infoText={
+                            'Add a Contact to send them sats without having to scan an address'
+                          }
+                        />
+                      )}
                     </View>
                   </View>
                 );
@@ -833,7 +830,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                   ) {
                                     if (
                                       element.account_number ===
-                                      Items.item.account_number &&
+                                        Items.item.account_number &&
                                       element.type === Items.item.type
                                     ) {
                                       checked = true;
@@ -848,16 +845,18 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
                               if (
                                 Items.item.type != serviceType ||
-                                config.EJECTED_ACCOUNTS.includes(Items.item.id) ||
+                                config.EJECTED_ACCOUNTS.includes(
+                                  Items.item.id,
+                                ) ||
                                 derivativeAccountDetails
                               ) {
                                 if (
                                   derivativeAccountDetails &&
                                   derivativeAccountDetails.type ===
-                                  Items.item.id &&
+                                    Items.item.id &&
                                   serviceType === Items.item.type &&
                                   derivativeAccountDetails.number ===
-                                  Items.item.account_number
+                                    Items.item.account_number
                                 ) {
                                   return;
                                 } else {
@@ -879,7 +878,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                               balances,
                               selectedSubAccounts,
                             }}
-                          //keyExtractor={(item, index) => index.toString()}
+                            //keyExtractor={(item, index) => index.toString()}
                           />
                         </View>
                       )}
@@ -985,7 +984,7 @@ const styles = StyleSheet.create({
 
   qrScannerContainer: {
     width: '100%',
-    maxWidth: qrScannerHeight * (1.31),
+    maxWidth: qrScannerHeight * 1.31,
     height: qrScannerHeight,
     marginBottom: 9,
   },
@@ -1007,9 +1006,7 @@ const styles = StyleSheet.create({
 function makeNavigationOptions({
   navigation,
 }): NavigationScreenConfig<NavigationStackOptions, any> {
-  const accountKind = navigation.getParam('serviceType') || REGULAR_ACCOUNT;
-  const carouselIndex = navigation.getParam('carouselIndex');
-  const getServiceType = navigation.getParam('getServiceType');
+  const accountKind = navigation.getParam('serviceType');
   const derivativeAccountDetails = navigation.getParam(
     'derivativeAccountDetails',
   );
@@ -1026,10 +1023,6 @@ function makeNavigationOptions({
       return (
         <SmallNavHeaderBackButton
           onPress={() => {
-            if (getServiceType) {
-              getServiceType(accountKind, carouselIndex);
-            }
-
             clearTransfer(accountKind);
             navigation.popToTop();
           }}
@@ -1043,13 +1036,13 @@ function makeNavigationOptions({
           <Image
             source={
               derivativeAccountDetails &&
-                derivativeAccountDetails.type === DONATION_ACCOUNT
+              derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? require('../../../assets/images/icons/icon_donation_hexa.png')
                 : accountKind == TEST_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_test.png')
-                  : accountKind == REGULAR_ACCOUNT
-                    ? require('../../../assets/images/icons/icon_regular.png')
-                    : require('../../../assets/images/icons/icon_secureaccount.png')
+                ? require('../../../assets/images/icons/icon_test.png')
+                : accountKind == REGULAR_ACCOUNT
+                ? require('../../../assets/images/icons/icon_regular.png')
+                : require('../../../assets/images/icons/icon_secureaccount.png')
             }
             style={{ width: 40, height: 40 }}
           />
