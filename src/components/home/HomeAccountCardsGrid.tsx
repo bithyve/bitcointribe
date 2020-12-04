@@ -54,7 +54,9 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
         currentColumn = [];
       }
 
-      if (index == shellCount - 1) {
+      // If we're at the end and a partially filled column still exists,
+      // push it.
+      if (index == shellCount - 1 && currentColumn.length > 0) {
         columns.push(currentColumn);
       }
     });
