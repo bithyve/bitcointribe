@@ -16,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TrustedContactsSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -39,7 +39,7 @@ export default class TrustedContactsSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Trusted Contacts',

@@ -14,7 +14,7 @@ import {
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -37,7 +37,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Savings Account',
