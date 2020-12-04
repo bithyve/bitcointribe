@@ -27,7 +27,8 @@ import { NavigationScreenConfig } from 'react-navigation';
 import { NavigationStackOptions } from 'react-navigation-stack';
 
 import { refreshAccountShell } from '../../../store/actions/accounts';
-import { setAutoAccountSync } from '../../../store/actions/loaders';
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind';
+import NetworkKind from '../../../common/data/enums/NetworkKind';
 
 export type Props = {
   navigation: any;
@@ -224,6 +225,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
               //TODO: fill derivativeAccountDetails(for ejected accounts)
             });
           }}
+          averageTxFees={averageTxFees}
+          network={
+            primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+              ? NetworkKind.TESTNET
+              : NetworkKind.MAINNET
+          }
         />
       </View>
     </ScrollView>

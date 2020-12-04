@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../../../common/Colors';
+import NetworkKind from '../../../common/data/enums/NetworkKind';
 import Fonts from '../../../common/Fonts';
 
 type FooterButtonProps = {
@@ -10,12 +18,14 @@ type FooterButtonProps = {
   subtitle: string;
   imageSource: ImageSourcePropType;
   onPress: () => void;
-}
+};
 
 export type Props = {
   onSendPressed: () => void;
   onReceivePressed: () => void;
-}
+  averageTxFees: any;
+  network: NetworkKind;
+};
 
 const FooterButton: React.FC<FooterButtonProps> = ({
   style,
@@ -30,10 +40,7 @@ const FooterButton: React.FC<FooterButtonProps> = ({
       style={{ ...styles.buttonContainer, ...style }}
     >
       <View style={styles.buttonImageContainer}>
-        <Image
-          source={imageSource}
-          style={styles.buttonImage}
-        />
+        <Image source={imageSource} style={styles.buttonImage} />
       </View>
 
       <View style={styles.buttonTextContainer}>
@@ -47,20 +54,24 @@ const FooterButton: React.FC<FooterButtonProps> = ({
 const SendAndReceiveButtonsFooter: React.FC<Props> = ({
   onSendPressed,
   onReceivePressed,
+  averageTxFees,
+  network,
 }) => {
   return (
     <View style={styles.rootContainer}>
       <FooterButton
-        style={{marginRight: 8}}
+        style={{ marginRight: 8 }}
         onPress={onSendPressed}
         title="Send"
-        subtitle="Tran Fee: 0.032 (sats)"
+        subtitle={`Tran Fee: ${
+          averageTxFees ? averageTxFees[network].low.averageTxFee : 0
+        } (${network === NetworkKind.TESTNET ? 't-sats' : 'sats'})`}
         imageSource={require('../../../assets/images/icons/icon_send.png')}
       />
       <FooterButton
         onPress={onReceivePressed}
         title="Receive"
-        subtitle="Tran Fee: 0.032 (sats)"
+        subtitle={''}
         imageSource={require('../../../assets/images/icons/icon_receive_translucent.png')}
       />
     </View>
@@ -94,8 +105,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  buttonTextContainer: {
-  },
+  buttonTextContainer: {},
 
   buttonTitleText: {
     color: Colors.black,
