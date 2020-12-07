@@ -7,6 +7,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  DerivativeAccountTypes,
 } from '../../utilities/Interface';
 
 export default class SecureAccount {
@@ -505,6 +506,38 @@ export default class SecureAccount {
         status: 0o3,
         err: err.message,
         message: 'Failed to sync xpub via xpub agent',
+      };
+    }
+  };
+
+  public setupDerivativeAccount = (
+    accountType: string,
+  ):
+    | {
+        status: number;
+        data: {
+          accountId: string;
+          accountNumber: number;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.secureHDWallet.setupDerivativeAccount(accountType),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to setup derivative acccount',
       };
     }
   };
