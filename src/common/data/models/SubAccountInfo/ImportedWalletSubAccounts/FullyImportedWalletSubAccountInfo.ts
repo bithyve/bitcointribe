@@ -39,9 +39,9 @@ export default class FullyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Full Import',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,

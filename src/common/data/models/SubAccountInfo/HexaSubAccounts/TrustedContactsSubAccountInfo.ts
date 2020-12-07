@@ -39,9 +39,9 @@ export default class TrustedContactsSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Trusted Contacts',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,

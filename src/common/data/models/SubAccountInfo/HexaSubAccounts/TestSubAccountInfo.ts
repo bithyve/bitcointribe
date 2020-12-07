@@ -37,9 +37,9 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.TESTNET;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Test Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,

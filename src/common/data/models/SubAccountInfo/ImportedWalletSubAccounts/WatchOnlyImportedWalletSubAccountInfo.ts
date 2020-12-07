@@ -39,9 +39,9 @@ export default class WatchOnlyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Watch-Only',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,

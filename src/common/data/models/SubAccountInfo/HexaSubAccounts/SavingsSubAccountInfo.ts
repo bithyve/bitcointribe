@@ -37,9 +37,9 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Savings Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
