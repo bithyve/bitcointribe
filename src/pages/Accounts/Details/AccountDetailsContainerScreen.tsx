@@ -30,6 +30,9 @@ import { refreshAccountShell } from '../../../store/actions/accounts';
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind';
 import NetworkKind from '../../../common/data/enums/NetworkKind';
 import config from '../../../bitcoin/HexaConfig';
+import { DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface';
+import { REGULAR_ACCOUNT } from '../../../common/constants/serviceTypes';
+import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 
 export type Props = {
   navigation: any;
@@ -75,12 +78,20 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
   const averageTxFees = useSelector((state) => state.accounts.averageTxFees);
 
+  let derivativeAccountKind: any = primarySubAccount.kind;
+  if (
+    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
+    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
+  )
+    if (primarySubAccount.instanceNumber)
+      derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
+
   const derivativeAccountDetails: {
     type: string;
     number: number;
-  } = config.EJECTED_ACCOUNTS.includes(primarySubAccount.kind)
+  } = config.EJECTED_ACCOUNTS.includes(derivativeAccountKind)
     ? {
-        type: primarySubAccount.kind,
+        type: derivativeAccountKind,
         number: primarySubAccount.instanceNumber,
       }
     : null;

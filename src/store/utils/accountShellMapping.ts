@@ -34,7 +34,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new TestSubAccountInfo({
         id: testAcc.getAccountId(),
-        instanceNumber: 1,
+        instanceNumber: 0, // default instances(0)
       }),
       unit: BitcoinUnit.TSATS,
       displayOrder: 1,
@@ -42,7 +42,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new CheckingSubAccountInfo({
         id: regularAcc.getAccountId(),
-        instanceNumber: 1,
+        instanceNumber: 0,
       }),
       unit: BitcoinUnit.SATS,
       displayOrder: 2,
@@ -50,7 +50,7 @@ const initAccountShells = (services) => {
     new AccountShell({
       primarySubAccount: new SavingsSubAccountInfo({
         id: secureAcc.getAccountId(),
-        instanceNumber: 1,
+        instanceNumber: 0,
       }),
       unit: BitcoinUnit.SATS,
       displayOrder: 3,
@@ -83,20 +83,57 @@ const updatePrimarySubAccounts = (
         break;
 
       case SubAccountKind.REGULAR_ACCOUNT:
-        balances = {
-          confirmed: regularAcc.hdWallet.balances.balance,
-          unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
-        };
-        transactions = regularAcc.hdWallet.transactions.transactionDetails;
+        if (!shell.primarySubAccount.instanceNumber) {
+          balances = {
+            confirmed: regularAcc.hdWallet.balances.balance,
+            unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
+          };
+          transactions = regularAcc.hdWallet.transactions.transactionDetails;
+        } else {
+          const subPrimaryAccounts =
+            regularAcc.hdWallet.derivativeAccounts[
+              DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+            ];
+
+          const subPrimInstance =
+            subPrimaryAccounts[shell.primarySubAccount.instanceNumber];
+
+          if (subPrimInstance && subPrimInstance.balances) {
+            balances = {
+              confirmed: subPrimInstance.balances.balance,
+              unconfirmed: subPrimInstance.balances.unconfirmedBalance,
+            };
+            transactions = subPrimInstance.transactions.transactionDetails;
+          }
+        }
 
         break;
 
       case SubAccountKind.SECURE_ACCOUNT:
-        balances = {
-          confirmed: secureAcc.secureHDWallet.balances.balance,
-          unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
-        };
-        transactions = secureAcc.secureHDWallet.transactions.transactionDetails;
+        if (!shell.primarySubAccount.instanceNumber) {
+          balances = {
+            confirmed: secureAcc.secureHDWallet.balances.balance,
+            unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
+          };
+          transactions =
+            secureAcc.secureHDWallet.transactions.transactionDetails;
+        } else {
+          const subPrimaryAccounts: DerivativeAccount =
+            secureAcc.secureHDWallet.derivativeAccounts[
+              DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+            ];
+
+          const subPrimInstance =
+            subPrimaryAccounts[shell.primarySubAccount.instanceNumber];
+
+          if (subPrimInstance && subPrimInstance.balances) {
+            balances = {
+              confirmed: subPrimInstance.balances.balance,
+              unconfirmed: subPrimInstance.balances.unconfirmedBalance,
+            };
+            transactions = subPrimInstance.transactions.transactionDetails;
+          }
+        }
 
         break;
 
