@@ -61,10 +61,6 @@ export default function useNewAccountChoices() {
           instanceNumber: 1,
           defaultTitle: `Checking Account${checkingAccountCount > 0 ? ` ${checkingAccountCount + 1}`: ''}`,
         }),
-        new TrustedContactsSubAccountInfo({
-          instanceNumber: 1,
-        }),
-
         new DonationSubAccountInfo({
           instanceNumber: 1,
           defaultTitle: `Donation Account${donationAccountCount > 0 ? ` ${donationAccountCount + 1}` : ''}`,
