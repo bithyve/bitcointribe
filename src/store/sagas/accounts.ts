@@ -66,13 +66,17 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import {
+  DerivativeAccountTypes,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import AccountShell from '../../common/data/models/AccountShell';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -1160,25 +1164,46 @@ function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
   let subAccountInstanceNum: number;
   switch (subAccountInfo.kind) {
     case SubAccountKind.DONATION_ACCOUNT:
-      const { accountId, accountNumber } = yield call(
-        setupDonationAccountWorker,
-        {
-          payload: {
-            serviceType: subAccountInfo.sourceKind,
-            donee: subAccountInfo.doneeName,
-            subject: subAccountInfo.customDisplayName,
-            description: subAccountInfo.customDescription,
-            configuration: {
-              displayBalance: true,
-              displayTransactions: true,
-              displayTxDetails: true,
-            },
+      const donationInstance = yield call(setupDonationAccountWorker, {
+        payload: {
+          serviceType: subAccountInfo.sourceKind,
+          donee: subAccountInfo.doneeName,
+          subject: subAccountInfo.customDisplayName,
+          description: subAccountInfo.customDescription,
+          configuration: {
+            displayBalance: true,
+            displayTransactions: true,
+            displayTxDetails: true,
           },
         },
+      });
+
+      subAccountId = donationInstance.accountId;
+      subAccountInstanceNum = donationInstance.accountNumber;
+      break;
+
+    case SubAccountKind.REGULAR_ACCOUNT || SubAccountKind.SECURE_ACCOUNT: // SUB_
+      const service: BaseAccount = yield select(
+        (state) => state.accounts[subAccountInfo.kind].service,
       );
 
-      subAccountId = accountId;
-      subAccountInstanceNum = accountNumber;
+      const res = yield call(
+        service.setupDerivativeAccount,
+        DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
+      );
+
+      const { status, data, err } = res;
+      if (status === 200) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          [subAccountInfo.kind]: JSON.stringify(service),
+        };
+        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+        subAccountId = data.accountId;
+        subAccountInstanceNum = data.accountNumber;
+      } else console.log({ err });
       break;
   }
 

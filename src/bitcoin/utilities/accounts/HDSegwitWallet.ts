@@ -30,6 +30,8 @@ import {
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+import { DerivativeAccountTypes } from '../Interface';
+
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 
@@ -976,6 +978,30 @@ export default class HDSegwitWallet extends Bitcoin {
     );
 
     return { synched: true };
+  };
+
+  public setupDerivativeAccount = (
+    accountType: string,
+  ): {
+    accountId: string;
+    accountNumber: number;
+  } => {
+    let accountId: string;
+    let accountNumber: number;
+    switch (accountType) {
+      case SUB_PRIMARY_ACCOUNT:
+        const derivativeAccount: DerivativeAccount = this.derivativeAccounts[
+          accountType
+        ];
+        const inUse = derivativeAccount.instance.using;
+        accountNumber = inUse + 1;
+        this.generateDerivativeXpub(accountType, accountNumber);
+        accountId = derivativeAccount[accountNumber].xpubId;
+        break;
+    }
+
+    if (!accountId) throw new Error(`Failed to setup ${accountType} account`);
+    return { accountId, accountNumber };
   };
 
   public setupDonationAccount = async (

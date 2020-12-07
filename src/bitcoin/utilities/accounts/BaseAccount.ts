@@ -9,6 +9,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  DerivativeAccountTypes,
 } from '../Interface';
 
 export default class BaseAccount {
@@ -335,6 +336,38 @@ export default class BaseAccount {
         status: 0o3,
         err: err.message,
         message: 'Failed to sync xpub via xpub agent',
+      };
+    }
+  };
+
+  public setupDerivativeAccount = (
+    accountType: string,
+  ):
+    | {
+        status: number;
+        data: {
+          accountId: string;
+          accountNumber: number;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.hdWallet.setupDerivativeAccount(accountType),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to setup derivative acccount',
       };
     }
   };

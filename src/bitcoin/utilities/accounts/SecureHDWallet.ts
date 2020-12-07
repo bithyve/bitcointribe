@@ -13,6 +13,7 @@ import {
   TransactionPrerequisite,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
+  DerivativeAccountTypes,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import {
@@ -1074,6 +1075,30 @@ export default class SecureHDWallet extends Bitcoin {
     ).address;
 
     return { synched: true };
+  };
+
+  public setupDerivativeAccount = (
+    accountType: string,
+  ): {
+    accountId: string;
+    accountNumber: number;
+  } => {
+    let accountId: string;
+    let accountNumber: number;
+    switch (accountType) {
+      case SUB_PRIMARY_ACCOUNT:
+        const derivativeAccount: DerivativeAccount = this.derivativeAccounts[
+          accountType
+        ];
+        const inUse = derivativeAccount.instance.using;
+        accountNumber = inUse + 1;
+        this.generateDerivativeXpub(accountType, accountNumber);
+        accountId = derivativeAccount[accountNumber].xpubId;
+        break;
+    }
+
+    if (!accountId) throw new Error(`Failed to setup ${accountType} account`);
+    return { accountId, accountNumber };
   };
 
   public setupDonationAccount = async (
