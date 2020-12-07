@@ -27,9 +27,9 @@ function titleForSectionHeader(kind: SectionKind) {
     case SectionKind.ADD_NEW_HEXA_ACCOUNT:
       return 'Create a Hexa Account';
     case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-      return 'Integrate A Service';
+      return 'Integrate a Service';
     case SectionKind.IMPORT_WALLET:
-      return 'Import A Wallet';
+      return 'Import a Wallet';
   }
 }
 

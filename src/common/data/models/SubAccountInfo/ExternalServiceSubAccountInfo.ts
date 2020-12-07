@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import AccountVisibility from '../../enums/AccountVisibility';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import SubAccountKind from '../../enums/SubAccountKind';
@@ -19,7 +20,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 };
 export default class ExternalServiceSubAccountInfo
   implements ExternalServiceSubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -43,7 +44,7 @@ export default class ExternalServiceSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = null,
+    id = uuid(),
     accountShellID = null,
     instanceNumber,
     defaultTitle,

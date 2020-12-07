@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import {
   Balances,
   TransactionDetails,
@@ -15,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class CheckingSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -37,7 +38,7 @@ export default class CheckingSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id = null,
+    id = uuid(),
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Checking Account',

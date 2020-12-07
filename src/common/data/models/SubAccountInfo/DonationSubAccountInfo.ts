@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import SubAccountKind from '../../enums/SubAccountKind';
 import {
   DonationSubAccountDescribing,
@@ -18,7 +19,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 
 export default class DonationSubAccountInfo
   implements DonationSubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -48,7 +49,7 @@ export default class DonationSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = null,
+    id = uuid(),
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Donation Account',

@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import AccountVisibility from '../../../enums/AccountVisibility';
 import SubAccountKind from '../../../enums/SubAccountKind';
 import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
@@ -16,7 +17,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TrustedContactsSubAccountInfo
   implements HexaSubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -39,7 +40,7 @@ export default class TrustedContactsSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id = null,
+    id = uuid(),
     accountShellID = null,
     instanceNumber,
     defaultTitle = 'Trusted Contacts',

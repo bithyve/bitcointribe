@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import SubAccountKind from '../../enums/SubAccountKind';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
@@ -10,7 +11,7 @@ import {
 import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
@@ -80,7 +81,7 @@ export interface ImportedWalletSubAccountDescribing
   extends SubAccountDescribing {}
 
 export type SubAccountDescribingConstructorProps = {
-  id?: string | null;
+  id?: string;
   accountShellID?: string | null;
   instanceNumber: number;
   defaultTitle?: string;
