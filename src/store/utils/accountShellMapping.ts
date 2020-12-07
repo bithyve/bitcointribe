@@ -5,6 +5,7 @@ import {
   Balances,
   DerivativeAccount,
   DerivativeAccountTypes,
+  DonationDerivativeAccount,
 } from '../../bitcoin/utilities/Interface';
 import {
   REGULAR_ACCOUNT,
@@ -23,6 +24,7 @@ import config from '../../bitcoin/HexaConfig';
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind';
 
 const initAccountShells = (services) => {
   const testAcc: TestAccount = services[TEST_ACCOUNT];
@@ -95,6 +97,30 @@ const updatePrimarySubAccounts = (
           unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
         };
         transactions = secureAcc.secureHDWallet.transactions.transactionDetails;
+
+        break;
+
+      case SubAccountKind.DONATION_ACCOUNT:
+        const { sourceKind, instanceNumber } = shell.primarySubAccount;
+        let derivativeAccounts;
+        switch (sourceKind) {
+          case SourceAccountKind.REGULAR_ACCOUNT:
+            derivativeAccounts = regularAcc.hdWallet.derivativeAccounts;
+            break;
+
+          case SourceAccountKind.SECURE_ACCOUNT:
+            derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts;
+            break;
+        }
+        const donationAccounts: DonationDerivativeAccount =
+          derivativeAccounts[DerivativeAccountTypes.DONATION_ACCOUNT];
+        const donationInstance = donationAccounts[instanceNumber];
+
+        balances = {
+          confirmed: donationInstance.balances.balance,
+          unconfirmed: donationInstance.balances.unconfirmedBalance,
+        };
+        transactions = donationInstance.transactions.transactionDetails;
 
         break;
     }
