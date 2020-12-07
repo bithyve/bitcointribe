@@ -19,7 +19,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 };
 export default class ExternalServiceSubAccountInfo
   implements ExternalServiceSubAccountDescribing {
-  id: string;
+  id: string | null;
   accountShellID: string | null;
   instanceNumber: number;
 

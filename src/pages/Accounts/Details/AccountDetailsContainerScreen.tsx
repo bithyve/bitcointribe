@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { View, Text, StyleSheet, Alert, RefreshControl } from 'react-native';
+import { useDispatch } from 'react-redux';
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader';
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -33,6 +33,7 @@ import config from '../../../bitcoin/HexaConfig';
 import { DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface';
 import { REGULAR_ACCOUNT } from '../../../common/constants/serviceTypes';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState';
 
 export type Props = {
   navigation: any;
@@ -73,10 +74,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountShellID = useMemo(() => {
     return navigation.getParam('accountShellID');
   }, [navigation]);
+
   const accountShell = useAccountShellFromNavigation(navigation);
+  const accountsState = useAccountsState();
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
-  const averageTxFees = useSelector((state) => state.accounts.averageTxFees);
+  const averageTxFees = accountsState.averageTxFees;
 
   let derivativeAccountKind: any = primarySubAccount.kind;
   if (
@@ -95,6 +98,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         number: primarySubAccount.instanceNumber,
       }
     : null;
+
+  const isRefreshing = useMemo(() => {
+    return accountShell.isSyncInProgress;
+  }, [accountShell.isSyncInProgress]);
 
   const {
     present: presentBottomSheet,
@@ -117,6 +124,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('SubAccountSettings', {
       accountShellID,
     });
+  }
+
+  function performRefreshOnPullDown() {
+    dispatch(refreshAccountShell(accountShell, { autoSync: false }));
   }
 
   const showKnowMoreSheet = useCallback(() => {
@@ -200,12 +211,20 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   });
 
   useEffect(() => {
-    // auto-refresh account shell once per session
     dispatch(refreshAccountShell(accountShell, { autoSync: true }));
   }, []);
 
+
   return (
-    <ScrollView style={styles.rootContainer}>
+    <ScrollView
+      style={styles.rootContainer}
+      refreshControl={
+        <RefreshControl
+          onRefresh={performRefreshOnPullDown}
+          refreshing={isRefreshing}
+        />
+      }
+    >
       <View style={{ paddingVertical: 20 }}>
         <AccountDetailsCard
           accountShell={accountShell}

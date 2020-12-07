@@ -31,8 +31,11 @@ export default class AccountShell {
    */
   unit: BitcoinUnit;
 
+  isSyncInProgress: boolean = false;
+
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };
+
 
   constructor({
     displayOrder = null,
@@ -46,6 +49,7 @@ export default class AccountShell {
     this.primarySubAccount.accountShellID = this.id;
 
     this.secondarySubAccounts = secondarySubAccounts;
+
     Object.values(this.secondarySubAccounts).forEach(
       (s) => (s.accountShellID = this.id),
     );

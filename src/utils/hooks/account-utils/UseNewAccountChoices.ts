@@ -50,17 +50,23 @@ export default function useNewAccountChoices() {
     return {
       hexaAccounts: [
         new TestSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: `Test Account${testAccountCount > 0 ? ` ${testAccountCount + 1}`: ''}`,
         }),
         new SavingsSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: `Savings Account${savingsAccountCount > 0 ? ` ${savingsAccountCount + 1}`: ''}`,
         }),
         new CheckingSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: `Checking Account${checkingAccountCount > 0 ? ` ${checkingAccountCount + 1}`: ''}`,
         }),
-        new TrustedContactsSubAccountInfo({}),
+        new TrustedContactsSubAccountInfo({
+          instanceNumber: 1,
+        }),
 
         new DonationSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: `Donation Account${donationAccountCount > 0 ? ` ${donationAccountCount + 1}` : ''}`,
           doneeName: '',
           causeName: '',
@@ -69,16 +75,19 @@ export default function useNewAccountChoices() {
 
       serviceAccounts: [
         new ExternalServiceSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: "Swan Bitcoin",
           defaultDescription: "Stack Sats with Swan",
           serviceAccountKind: ServiceAccountKind.SWAN,
         }),
         new ExternalServiceSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: "FastBitcoins.com",
           defaultDescription: "Use FastBitcoin Vouchers",
           serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
         }),
         new ExternalServiceSubAccountInfo({
+          instanceNumber: 1,
           defaultTitle: "Whirlpool Account",
           defaultDescription: "Powered by Samurai",
           serviceAccountKind: ServiceAccountKind.WHIRLPOOL,
@@ -86,8 +95,12 @@ export default function useNewAccountChoices() {
       ],
 
       importedWalletAccounts: [
-        new WatchOnlyImportedWalletSubAccountInfo({}),
-        new FullyImportedWalletSubAccountInfo({}),
+        new WatchOnlyImportedWalletSubAccountInfo({
+          instanceNumber: 1,
+        }),
+        new FullyImportedWalletSubAccountInfo({
+          instanceNumber: 1,
+        }),
       ],
     };
   }, []);
