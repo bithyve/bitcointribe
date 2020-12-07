@@ -1110,17 +1110,25 @@ function* refreshAccountShellWorker({ payload }) {
       return;
   }
 
+  let accountKind: any = primarySubAccount.kind;
+  if (
+    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
+    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
+  )
+    if (primarySubAccount.instanceNumber)
+      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
+
   const nonDerivativeAccounts = [
     SubAccountKind.TEST_ACCOUNT,
     SubAccountKind.REGULAR_ACCOUNT,
     SubAccountKind.SECURE_ACCOUNT,
   ];
-  if (!nonDerivativeAccounts.includes(primarySubAccount.kind)) {
-    if (primarySubAccount.kind === DONATION_ACCOUNT)
+  if (!nonDerivativeAccounts.includes(accountKind)) {
+    if (accountKind === DONATION_ACCOUNT)
       yield put(
         syncViaXpubAgent(
           primarySubAccount.sourceKind,
-          primarySubAccount.kind,
+          accountKind,
           primarySubAccount.instanceNumber,
         ),
       );
@@ -1128,28 +1136,24 @@ function* refreshAccountShellWorker({ payload }) {
       yield put(
         fetchDerivativeAccBalTx(
           primarySubAccount.sourceKind,
-          primarySubAccount.kind,
+          accountKind,
           primarySubAccount.instanceNumber,
         ),
       );
 
     yield put(
-      setAutoAccountSync(
-        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
-      ),
+      setAutoAccountSync(`${accountKind + primarySubAccount.instanceNumber}`),
     );
   } else {
     yield put(
-      fetchBalanceTx(primarySubAccount.kind, {
+      fetchBalanceTx(accountKind, {
         loader: true,
         syncTrustedDerivative:
           primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
       }),
     );
     yield put(
-      setAutoAccountSync(
-        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`,
-      ),
+      setAutoAccountSync(`${accountKind + primarySubAccount.instanceNumber}`),
     );
   }
 }
