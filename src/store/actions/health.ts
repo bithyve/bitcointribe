@@ -207,8 +207,8 @@ export const ErrorReceiving = (isFailed) => {
   return { type: ERROR_RECEIVING_HEALTH, payload: { isFailed } };
 };
 
-export const recoverWallet = (level?) => {
-  return { type: RECOVER_WALLET_HEALTH, payload: {level} };
+export const recoverWallet = (level?, keeperData?, decryptedCloudDataJson?) => {
+  return { type: RECOVER_WALLET_HEALTH, payload: {level, keeperData, decryptedCloudDataJson} };
 };
 
 export const fetchWalletImage = () => {

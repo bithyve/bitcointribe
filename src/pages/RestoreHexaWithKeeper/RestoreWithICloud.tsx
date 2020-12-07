@@ -62,7 +62,6 @@ import {
 } from '../../store/actions/health';
 import axios from 'axios';
 import {
-  calculateExchangeRate,
   startupSync,
 } from '../../store/actions/accounts';
 import { initializeHealthSetup } from '../../store/actions/health';
@@ -78,7 +77,6 @@ interface RestoreWithICloudStateTypes {
   cloudBackup: boolean;
   hideShow: boolean;
   selectedBackup: any;
-  exchangeRates: any;
   metaShares: any[];
   showLoader: boolean;
 }
@@ -159,7 +157,6 @@ class RestoreWithICloud extends Component<
         shares: '',
         keeperData: ''
       },
-      exchangeRates: '',
       metaShares: [],
       showLoader: false,
     };
@@ -169,26 +166,6 @@ class RestoreWithICloud extends Component<
 
   componentDidMount = async () => {
     await this.cloudData();
-    const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-    if (storedExchangeRates) {
-      const exchangeRates = JSON.parse(storedExchangeRates);
-      if (Date.now() - exchangeRates.lastFetched < 1800000) {
-        this.setState({ exchangeRates });
-        return;
-      } // maintaining a half an hour difference b/w fetches
-    }
-    const res = await axios.get('https://blockchain.info/ticker');
-    if (res.status == 200) {
-      const exchangeRates = res.data;
-      exchangeRates.lastFetched = Date.now();
-      this.setState({ exchangeRates });
-      await AsyncStorage.setItem(
-        'exchangeRates',
-        JSON.stringify(exchangeRates),
-      );
-    } else {
-      console.log('Failed to retrieve exchange rates', res);
-    }
   };
 
   cloudData = async () => {
@@ -200,10 +177,7 @@ class RestoreWithICloud extends Component<
     const {
       walletImageChecked,
       SERVICES,
-      calculateExchangeRate,
-      startupSync,
       checkMSharesHealth,
-      initializeHealthSetup,
       walletRecoveryFailed
     } = this.props;
     if (
@@ -211,36 +185,28 @@ class RestoreWithICloud extends Component<
     ) {
       await AsyncStorage.setItem('walletExists', 'true');
       await AsyncStorage.setItem('walletRecovered', 'true');
-      calculateExchangeRate();
       checkMSharesHealth();
       (this.refs.loaderBottomSheet as any).snapTo(0);
-        this.props.navigation.navigate('Home', {
-          exchangeRates: this.state.exchangeRates,
-        });
+        this.props.navigation.navigate('Home');
     }
 
     if (prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES !== this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES) {
       console.log("INSIDE prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES");
-      if(!isEmpty(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES))
-      this.updateList();
+      if(!isEmpty(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) this.updateList();
     }
 
     if(prevProps.walletRecoveryFailed !== walletRecoveryFailed){
       (this.refs.loaderBottomSheet as any).snapTo(0);
     }
 
-    if(prevState.metaShares != this.state.metaShares){
-      if(this.state.metaShares.length === 2 && this.state.selectedBackup.levelStatus === 2){
-        console.log("INSIDE IF SHARES",this.state.metaShares.length, this.state.selectedBackup.levelStatus);
-        (this.refs.loaderBottomSheet as any).snapTo(1);
-        this.props.recoverWallet(this.state.selectedBackup.levelStatus);
-      }
-    }
   };
 
   updateList = () => {
     console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state;
+    let KeeperData = JSON.parse(selectedBackup.keeperData);
+    let key = SSS.strechKey(this.props.security.answer);
+    const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     let updatedListData = [];
     const shares: MetaShare[] = [];
     Object.keys(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
@@ -253,19 +219,30 @@ class RestoreWithICloud extends Component<
 
         if (insert) shares.push(META_SHARE);
       }
-      //if(selectedBackup.shares) shares.push(selectedBackup.shares)
     });
-    for(var i = 0 ; i < Object.keys(listData).length; i++){
-      //console.log("listData",listData[i]);
-        if(shares.findIndex(value=>value.shareId == listData[i].shareId)>-1) listData[i].status = "received";
+    updatedListData = [...listData];
+    for(var i = 0 ; i < Object.keys(updatedListData).length; i++){
+       if(shares.findIndex(value=>value.shareId == updatedListData[i].shareId)>-1) updatedListData[i].status = "received";
         //console.log("inside if jasjhadkhsdak",listData[i]);}
-      updatedListData.push(listData[i]);
+    }
+    if (shares.length) {
+      if(shares.length === 2 && selectedBackup.levelStatus === 2){
+        console.log("INSIDE IF SHARES",shares.length, selectedBackup.levelStatus);
+        (this.refs.loaderBottomSheet as any).snapTo(1);
+        this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
+        } else if(shares.length === 3 && selectedBackup.levelStatus === 3){
+        console.log("INSIDE IF SHARES ### 3",shares.length, selectedBackup.levelStatus);
+        (this.refs.loaderBottomSheet as any).snapTo(1);
+        this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
+      }
+      this.setState({metaShares: shares});
     }
     this.setState({listData: updatedListData});
-    
-
-    if (shares.length) this.setState({metaShares: shares})
   }
+
+recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
+  this.props.recoverWallet(levelStatus, KeeperData, decryptedCloudDataJson);
+}
 
   getData = (result) => {
     console.log('FILE DATA', result);
@@ -305,8 +282,12 @@ class RestoreWithICloud extends Component<
       this.setState({cloudBackup : true});
       this.props.updateCloudMShare(JSON.parse(selectedBackup.shares), 0);
      let KeeperData = JSON.parse(selectedBackup.keeperData);
+     let levelStatus = selectedBackup.levelStatus;
+     if(levelStatus === 2) KeeperData = KeeperData.slice(0, 2);
+     if(levelStatus === 3) KeeperData = KeeperData.slice(2, 6);
      let obj;
-     for(let i =0 ; i < KeeperData.length; i++){
+     console.log("KEEPERDATA slice", KeeperData)
+     for(let i = 0 ; i < KeeperData.length; i++){
       obj = {
         type:  KeeperData[i].type,
         title: KeeperData[i].name,
@@ -635,7 +616,7 @@ class RestoreWithICloud extends Component<
             let name;
             if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
-            //console.log("SELECTED BACKUP", selectedBackup);
+            console.log("SELECTED BACKUP", selectedBackup);
             return (
               <RestoreFromICloud
                 title={'Restore from ' + name}
@@ -843,7 +824,6 @@ export default withNavigationFocus(
     fetchEphemeralChannel,
     setCloudBackupStatus,
     recoverWalletUsingIcloud,
-    calculateExchangeRate,
     checkMSharesHealth,
     startupSync,
     initializeHealthSetup,

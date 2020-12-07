@@ -284,7 +284,7 @@ export default class CloudBackup {
       } else {
         newArray[index].levelStatus = this.dataObject.levelStatus;
         newArray[index].data = this.dataObject.encryptedCloudDataJson;
-        newArray[index].shares = this.dataObject.shares;
+        newArray[index].shares = this.dataObject.shares ? this.dataObject.shares : newArray[index].shares;
         newArray[index].keeperData = this.dataObject.keeperData;
         newArray[index].dateTime = moment(new Date());
       }
@@ -294,6 +294,7 @@ export default class CloudBackup {
       iCloud.startBackup(JSON.stringify(newArray));
       this.callBack(share);
     } else {
+      console.log("GOOGLEDATA", googleData);
       const metaData = {
         name: googleData.name,
         mimeType: googleData.mimeType,

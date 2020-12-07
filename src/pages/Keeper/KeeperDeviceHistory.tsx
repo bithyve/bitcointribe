@@ -37,7 +37,7 @@ const KeeperDeviceHistory = (props) => {
   const HelpBottomSheet = React.createRef();
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const QrBottomSheet = React.createRef();
+  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const ApproveSetupBottomSheet = React.createRef();
   const ApprovePrimaryKeeperBottomSheet = React.createRef(); 
@@ -226,6 +226,7 @@ const KeeperDeviceHistory = (props) => {
           setTimeout(() => {
             setQrBottomSheetsFlag(false);
           }, 2);
+          if(QrBottomSheet.current)
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {

@@ -237,6 +237,7 @@ export const checkSharesHealthWatcher = createWatcher(
 
 function* updateSharesHealthWorker({ payload }) {
   // // set a timelapse for auto update and enable instantaneous manual update
+  try{
   yield put(updateMSharesLoader(true));
 
   const trustedContactsService: TrustedContactsService = yield select(
@@ -320,6 +321,10 @@ function* updateSharesHealthWorker({ payload }) {
     if (res.err === 'ECONNABORTED') requestTimedout();
   }
   yield put(updateMSharesLoader(false));
+}
+catch(error){
+  console.log("inside UPDATE_SHARES_HEALTH", error);
+}
 }
 
 export const updateSharesHealthWatcher = createWatcher(
@@ -827,7 +832,8 @@ export const downloadMetaShareHealthWatcher = createWatcher(
 
 function* recoverWalletWorker({ payload }) {
   yield put(switchS3LoadingStatus('restoreWallet'));
-
+  const {keeperData, decryptedCloudDataJson} = payload;
+  console.log("KEEPERDATA", keeperData);
   try {
     const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
       (state) => state.storage.database,
@@ -904,6 +910,7 @@ function* recoverWalletWorker({ payload }) {
         security.answer,
         mnemonic,
         restorationShares,
+        decryptedCloudDataJson
       );
 
       const UNDER_CUSTODY = {};
@@ -959,7 +966,7 @@ function* recoverWalletWorker({ payload }) {
         'securityQuestionHistory',
         JSON.stringify(securityQuestionHistory),
       );
-
+      yield put(updatedKeeperInfo(keeperData));
       // personal copy health restoration
       // let updatedPDFHealth = {};
       // for (const share of restorationShares) {
