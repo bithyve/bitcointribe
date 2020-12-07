@@ -43,9 +43,9 @@ export default class ExternalServiceSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,

@@ -80,9 +80,9 @@ export interface ImportedWalletSubAccountDescribing
   extends SubAccountDescribing {}
 
 export type SubAccountDescribingConstructorProps = {
-  id?: string;
+  id?: string | null;
   accountShellID?: string | null;
-  instanceNumber: number;
+  instanceNumber?: number | null;
   defaultTitle?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;

@@ -48,9 +48,9 @@ export default class DonationSubAccountInfo
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
   constructor({
-    id,
+    id = null,
     accountShellID = null,
-    instanceNumber,
+    instanceNumber = null,
     defaultTitle = 'Donation Account',
     balances = { confirmed: 0, unconfirmed: 0 },
     customDisplayName = null,
