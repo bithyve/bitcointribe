@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import {
   Balances,
   TransactionDetails,
@@ -15,7 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class FullyImportedWalletSubAccountInfo
   implements ImportedWalletSubAccountDescribing {
-  id: string | null;
+  id: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -39,7 +40,7 @@ export default class FullyImportedWalletSubAccountInfo
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
   constructor({
-    id = null,
+    id = uuid(),
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Full Import',
