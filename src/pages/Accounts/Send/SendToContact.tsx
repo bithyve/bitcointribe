@@ -52,7 +52,6 @@ import idx from 'idx';
 import { withNavigationFocus } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CurrencyKind from '../../../common/data/enums/CurrencyKind';
-import { config } from 'react-native-firebase';
 import { currencyKindSet } from '../../../store/actions/preferences';
 import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../../components/MaterialCurrencyCodeIcon';
@@ -65,6 +64,7 @@ import FiatCurrencies from '../../../common/FiatCurrencies';
 import Loader from '../../../components/loader';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
 import { UsNumberFormat } from '../../../common/utilities';
+import config from '../../../bitcoin/HexaConfig';
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -188,9 +188,7 @@ class SendToContact extends Component<
       this.props.syncTrustedChannels(contacts);
     }
 
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      this.checkRecordsHavingPrice();
-    });
+    BackHandler.addEventListener('hardwareBackPress', this.checkRecordsHavingPrice)
 
     this.setState(
       { exchangeRates: accountsState && accountsState.exchangeRates },
@@ -449,10 +447,11 @@ class SendToContact extends Component<
             serviceType,
             accountsState[serviceType].transfer.details[i],
           );
+          return true;
         }
       }
     }
-  };
+  }
 
   convertBitCoinToCurrency = (value) => {
     const { exchangeRates, CurrencyCode, prefersBitcoin } = this.state;
