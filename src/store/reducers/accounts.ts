@@ -77,7 +77,6 @@ const ACCOUNT_VARS: {
     transfer: Boolean;
     testcoins: Boolean;
   };
-  averageTxFees: any;
   donationAccount: {
     settedup: Boolean;
     loading: Boolean;
@@ -107,7 +106,6 @@ const ACCOUNT_VARS: {
     transfer: false,
     testcoins: false,
   },
-  averageTxFees: null,
   donationAccount: {
     settedup: false,
     loading: false,
@@ -129,6 +127,8 @@ export type AccountsState = {
   REGULAR_ACCOUNT: any;
   TEST_ACCOUNT: any;
   SECURE_ACCOUNT: any;
+
+  averageTxFees: any;
 
   // TODO: How does this differ from ANY added account? (See `activeAccounts`)
   // Perhaps we should consolidate the items here into that array?
@@ -166,6 +166,8 @@ const initialState: AccountsState = {
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
+
+  averageTxFees: null,
 
   accountShells: [],
 
@@ -676,30 +678,30 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       };
 
     case ACCOUNT_SHELL_ORDERED_TO_FRONT:
-      const index = state
-        .accountShells
-        .findIndex(shell => shell.id == action.payload.id);
+      const index = state.accountShells.findIndex(
+        (shell) => shell.id == action.payload.id,
+      );
 
       const shellToMove = state.accountShells.splice(index);
 
       return {
         ...state,
-        accountShells: [...shellToMove, ...state.accountShells].map(updateDisplayOrderForSortedShell),
+        accountShells: [...shellToMove, ...state.accountShells].map(
+          updateDisplayOrderForSortedShell,
+        ),
       };
 
     case REFRESH_ACCOUNT_SHELL:
-      state
-        .accountShells
-        .find(shell => shell.id == action.payload.shell.id)
-        .isSyncInProgress = true;
+      state.accountShells.find(
+        (shell) => shell.id == action.payload.shell.id,
+      ).isSyncInProgress = true;
 
       return state;
 
     case ACCOUNT_SHELL_REFRESH_COMPLETED:
-      state
-        .accountShells
-        .find(shell => shell.id == action.payload.id)
-        .isSyncInProgress = false;
+      state.accountShells.find(
+        (shell) => shell.id == action.payload.id,
+      ).isSyncInProgress = false;
 
       return state;
 
@@ -707,7 +709,6 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       return state;
   }
 };
-
 
 function updateDisplayOrderForSortedShell(
   accountShell: AccountShell,
