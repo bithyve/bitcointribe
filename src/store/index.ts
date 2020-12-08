@@ -128,7 +128,8 @@ import {
   downloadSMShareWatcher,
   recoverMnemonicHealthWatcher,
   reShareWithSameKeeperWatcher,
-  autoShareContactWatcher
+  autoShareContactWatcher,
+  autoDownloadShareContactWatcher
 } from './sagas/health';
 
 import {
@@ -239,6 +240,7 @@ const rootSaga = function* () {
     downloadSMShareWatcher,
     reShareWithSameKeeperWatcher,
     autoShareContactWatcher,
+    autoDownloadShareContactWatcher,
 
     // Keeper saga
     fetchKeeperTrustedChannelWatcher

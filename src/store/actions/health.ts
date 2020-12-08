@@ -27,6 +27,7 @@ export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO';
 export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED';
 export const IS_LEVEL3_INITIALIZED = 'IS_LEVEL3_INITIALIZED';
 export const KEEPER_INFO = 'KEEPER_INFO';
+export const PUT_KEEPER_INFO = 'PUT_KEEPER_INFO';
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD';
 export const WALLET_RECOVERY_FAILED_HEALTH = 'WALLET_RECOVERY_FAILED_HEALTH';
 export const WALLET_IMAGE_HEALTH_CHECKED = 'WALLET_IMAGE_HEALTH_CHECKED';
@@ -53,6 +54,7 @@ export const DOWNLOADED_SM_SHARES = 'DOWNLOADED_SM_SHARES';
 export const REMOVE_SN = 'REMOVE_SN';
 export const RESHARE_WITH_SAME_KEEPER = 'RESHARE_WITH_SAME_KEEPER';
 export const AUTO_SHARE_CONTACT = 'AUTO_SHARE_CONTACT';
+export const AUTO_DOWNLOAD_SHARE_CONTACT = 'AUTO_DOWNLOAD_SHARE_CONTACT';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -182,6 +184,10 @@ export const isLevel3InitializedStatus = () => {
 export const updatedKeeperInfo = (info) =>{
   return { type: KEEPER_INFO, payload: { info } };
 }
+
+// export const putKeeperInfo = (info) =>{
+//   return { type: PUT_KEEPER_INFO, payload: { info } };
+// }
 
 export const downloadMShare = (
   payload: {
@@ -323,5 +329,15 @@ export const autoShareContact = (
   return {
     type: AUTO_SHARE_CONTACT,
     payload: { contactLevelInfo },
+  };
+};
+
+export const autoDownloadShareContact = (
+  shareId,
+  walletId
+) => {
+  return {
+    type: AUTO_DOWNLOAD_SHARE_CONTACT,
+    payload: { shareId, walletId },
   };
 };

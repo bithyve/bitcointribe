@@ -41,6 +41,7 @@ import {
   initializeHealthSetup,
   updateMSharesHealth,
   onApprovalStatusChange,
+  autoDownloadShareContact,
 } from '../../store/actions/health';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import {
@@ -92,6 +93,7 @@ import {
   TrustedContactDerivativeAccount,
   trustedChannelActions,
   DonationDerivativeAccountElements,
+  LevelHealthInterface,
 } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
@@ -200,16 +202,7 @@ interface HomePropsTypes {
   s3Service: any;
   initializeHealthSetup: any;
   overallHealth: any;
-  levelHealth: {
-    levelInfo: {
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      name?: string;
-    }[];
-  }[];
+  levelHealth: LevelHealthInterface[];
   currentLevel: number;
   keeperInfo: any[];
   fetchDerivativeAccBalTx: any;
@@ -244,6 +237,7 @@ interface HomePropsTypes {
   keeperApproveStatus: any;
   onApprovalStatusChange: any;
   secureAccount: any;
+  autoDownloadShareContact: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -1932,7 +1926,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       levelHealthVar.status != 'accessible'
     ) {
       if (levelHealthVar.shareType == 'cloud') {
-        levelHealthVar.updatedAt = ''+moment(new Date()).valueOf();
+        levelHealthVar.updatedAt = moment(new Date()).valueOf();
         levelHealthVar.status = 'accessible';
         levelHealthVar.reshareVersion = 0;
         levelHealthVar.name = 'Cloud';
@@ -2032,6 +2026,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           let shareId = s3Service.levelhealth.metaShares[1].shareId;
           let share = getKeeperInfoFromShareId(levelHealth, shareId);
           fetchKeeperTrustedChannel(shareId, element.notificationType, share.name);
+        }
+        if (element.notificationType == 'reShare') {
+          this.props.autoDownloadShareContact(JSON.parse(element.data).selectedShareId, '4608de092e3112b7321ab5612f94ded1cc5328694ddb918d21d8d1ce2563c55a');
         }
         if (
           asyncNotificationList.findIndex(
@@ -2503,6 +2500,7 @@ export default withNavigationFocus(
     setCardData,
     fetchKeeperTrustedChannel,
     onApprovalStatusChange,
+    autoDownloadShareContact
   })(Home),
 );
 

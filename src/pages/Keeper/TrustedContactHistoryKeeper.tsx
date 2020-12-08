@@ -667,6 +667,40 @@ const TrustedContactHistoryKeeper = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
+      let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
+
+      if (tcInfo) {
+        if (tcInfo[index]) {
+          let found = false;
+          for (let i = 3; i < tcInfo.length; i++) {
+            // push if not present in TC list
+            if (tcInfo[i] && tcInfo[i].name == tcInfo[index].name) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) tcInfo.push(tcInfo[index]);
+        }
+
+        for (let i = 0; i < tcInfo.length; i++) {
+          if (tcInfo[i] && tcInfo[i].name == contact.name) {
+            tcInfo.splice(i, 1);
+            break;
+          }
+        }
+
+        tcInfo[index] = contact;
+      } else {
+        tcInfo = [];
+        tcInfo[0] = null; // securing initial 3 positions for Guardians
+        tcInfo[1] = null;
+        tcInfo[2] = null;
+        tcInfo[index] = contact;
+      }
+      await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
+
+      dispatch(updateTrustedContactInfoLocally(tcInfo));
       console.log('AFTER RESHARE selectedKeeper.shareId', selectedKeeper.shareId);
       let shareArray = [
         {

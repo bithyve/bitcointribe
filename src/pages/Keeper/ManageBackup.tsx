@@ -459,7 +459,7 @@ class ManageBackup extends Component<
     if (levelHealth[2] &&
       currentLevel == 2 &&
       levelHealth[2].levelInfo[4].status == 'accessible' &&
-      levelHealth[2].levelInfo[5].status
+      levelHealth[2].levelInfo[5].status == 'accessible'
     ) {
       let deviceLevelInfo = [];
       let contactLevelInfo = [];
