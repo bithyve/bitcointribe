@@ -49,9 +49,6 @@ import {
   accountShellMergeSucceeded,
   accountShellMergeFailed,
   REFRESH_ACCOUNT_SHELL,
-  syncViaXpubAgent,
-  fetchDerivativeAccBalTx,
-  fetchBalanceTx,
   accountShellOrderedToFront,
   accountShellRefreshCompleted,
 } from '../actions/accounts';
@@ -77,7 +74,6 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 import AccountShell from '../../common/data/models/AccountShell';
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount';
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -1127,6 +1123,7 @@ function* refreshAccountShellWorker({ payload }) {
     SubAccountKind.REGULAR_ACCOUNT,
     SubAccountKind.SECURE_ACCOUNT,
   ];
+
   if (!nonDerivativeAccounts.includes(accountKind)) {
     if (accountKind === DONATION_ACCOUNT) {
       const payload = {

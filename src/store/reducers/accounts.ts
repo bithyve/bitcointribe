@@ -696,14 +696,18 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         (shell) => shell.id == action.payload.shell.id,
       ).isSyncInProgress = true;
 
-      return state;
+      return {
+        ...state,
+      };
 
     case ACCOUNT_SHELL_REFRESH_COMPLETED:
       state.accountShells.find(
         (shell) => shell.id == action.payload.id,
       ).isSyncInProgress = false;
 
-      return state;
+      return {
+        ...state,
+      };
 
     default:
       return state;
