@@ -746,6 +746,19 @@ export default class HDSegwitWallet extends Bitcoin {
                   // check for duplicate tx (fetched against sending and then again for change address)
                   txMap.set(tx.txid, true);
 
+                  let accType = dAccountType;
+                  switch (accType) {
+                    case TRUSTED_CONTACTS:
+                      accType = derivativeAccounts[accountNumber].contactName
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ');
+                    case SUB_PRIMARY_ACCOUNT:
+                      accType = 'Checking Account';
+                  }
+
                   const transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
@@ -759,20 +772,7 @@ export default class HDSegwitWallet extends Bitcoin {
                       tx.TransactionType === 'Sent'
                         ? tx.Amount + tx.fee
                         : tx.Amount,
-                    accountType:
-                      dAccountType === TRUSTED_CONTACTS
-                        ? derivativeAccounts[accountNumber].contactName
-                            .split(' ')
-                            .map(
-                              (word) =>
-                                word[0].toUpperCase() + word.substring(1),
-                            )
-                            .join(' ')
-                        : dAccountType,
-                    primaryAccType:
-                      dAccountType === SUB_PRIMARY_ACCOUNT
-                        ? 'Checking Account'
-                        : null,
+                    accountType: accType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time, // only available when tx is confirmed

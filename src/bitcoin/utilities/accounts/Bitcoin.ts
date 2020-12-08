@@ -218,7 +218,10 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Sent',
                   amount: tx.SentAmount,
-                  accountType,
+                  accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -234,7 +237,10 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Received',
                   amount: tx.ReceivedAmount,
-                  accountType,
+                  accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
                   primaryAccType,
                   senderAddresses: tx.SenderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -244,6 +250,18 @@ export default class Bitcoin {
                   ...[outgoingTx, incomingTx],
                 );
               } else {
+                let accType = accountType;
+                switch (accType) {
+                  case TRUSTED_CONTACTS:
+                    accType = contactName
+                      .split(' ')
+                      .map((word) => word[0].toUpperCase() + word.substring(1))
+                      .join(' ');
+
+                  case SUB_PRIMARY_ACCOUNT:
+                    accType = primaryAccType;
+                }
+
                 const transaction = {
                   txid: tx.txid,
                   confirmations:
@@ -260,15 +278,7 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: tx.TransactionType,
                   amount: tx.Amount,
-                  accountType:
-                    accountType === TRUSTED_CONTACTS
-                      ? contactName
-                          .split(' ')
-                          .map(
-                            (word) => word[0].toUpperCase() + word.substring(1),
-                          )
-                          .join(' ')
-                      : accountType,
+                  accountType: accType,
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   senderAddresses: tx.SenderAddresses,
