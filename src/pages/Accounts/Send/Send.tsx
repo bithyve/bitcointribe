@@ -114,7 +114,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     super(props);
 
     const accountKind = this.props.navigation.getParam('serviceType');
-
     this.state = {
       trustedContacts: [],
       isShowingKnowMoreSheet: false,
@@ -431,8 +430,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           this.props.addTransferDetails(serviceType, {
             selectedContact: item,
           });
+          const accountShellID = this.props.navigation.getParam(
+            'accountShellID',
+          );
 
           this.props.navigation.navigate('SendToContact', {
+            accountShellID,
             selectedContact: item,
             serviceType,
             sweepSecure,
@@ -498,8 +501,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             this.props.addTransferDetails(serviceType, {
               selectedContact: item,
             });
+            const accountShellID = this.props.navigation.getParam(
+              'accountShellID',
+            );
 
             this.props.navigation.navigate('SendToContact', {
+              accountShellID,
               selectedContact: item,
               serviceType,
               sweepSecure,
@@ -525,7 +532,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     const {
       serviceType,
-      averageTxFees,
       sweepSecure,
       spendableBalance,
       derivativeAccountDetails,
@@ -541,11 +547,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         selectedContact: recipient,
       });
       this.setState({ recipientAddress: '' });
+      const accountShellID = this.props.navigation.getParam('accountShellID');
 
       this.props.navigation.navigate('SendToContact', {
+        accountShellID,
         selectedContact: recipient,
         serviceType,
-        averageTxFees,
         sweepSecure,
         spendableBalance,
         derivativeAccountDetails,
@@ -573,10 +580,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           selectedContact: recipient,
         });
         this.setState({ recipientAddress: '' });
+        const accountShellID = this.props.navigation.getParam('accountShellID');
+
         this.props.navigation.navigate('SendToContact', {
+          accountShellID,
           selectedContact: recipient,
           serviceType,
-          averageTxFees,
           sweepSecure,
           spendableBalance,
           derivativeAccountDetails,

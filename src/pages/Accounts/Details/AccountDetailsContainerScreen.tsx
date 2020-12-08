@@ -213,7 +213,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     dispatch(refreshAccountShell(accountShell, { autoSync: true }));
   }, []);
 
-
   return (
     <ScrollView
       style={styles.rootContainer}
@@ -257,6 +256,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
               averageTxFees,
               spendableBalance: AccountShell.getSpendableBalance(accountShell),
               derivativeAccountDetails,
+              accountShellID,
             });
           }}
           onReceivePressed={() => {
