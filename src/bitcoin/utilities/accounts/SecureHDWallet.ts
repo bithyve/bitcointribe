@@ -856,6 +856,12 @@ export default class SecureHDWallet extends Bitcoin {
                   // check for duplicate tx (fetched against sending and then again for change address)
                   txMap.set(tx.txid, true);
 
+                  let accType = dAccountType;
+                  switch (accType) {
+                    case SUB_PRIMARY_ACCOUNT:
+                      accType = 'Savings Account';
+                  }
+
                   const transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
@@ -869,11 +875,7 @@ export default class SecureHDWallet extends Bitcoin {
                       tx.TransactionType === 'Sent'
                         ? tx.Amount + tx.fee
                         : tx.Amount,
-                    accountType: dAccountType,
-                    primaryAccType:
-                      dAccountType === SUB_PRIMARY_ACCOUNT
-                        ? 'Savings Account'
-                        : null,
+                    accountType: accType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time, // only available when tx is confirmed
