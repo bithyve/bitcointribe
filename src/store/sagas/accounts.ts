@@ -1195,28 +1195,49 @@ function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
       subAccountInstanceNum = donationInstance.accountNumber;
       break;
 
-    case SubAccountKind.REGULAR_ACCOUNT || SubAccountKind.SECURE_ACCOUNT: // SUB_
-      const service: BaseAccount = yield select(
+    case SubAccountKind.REGULAR_ACCOUNT:
+      const regularAcc = yield select(
         (state) => state.accounts[subAccountInfo.kind].service,
       );
-
-      const res = yield call(
-        service.setupDerivativeAccount,
+      const regRes = yield call(
+        regularAcc.setupDerivativeAccount,
         DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
       );
 
-      const { status, data, err } = res;
-      if (status === 200) {
+      if (regRes.status === 200) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
-          [subAccountInfo.kind]: JSON.stringify(service),
+          [subAccountInfo.kind]: JSON.stringify(regularAcc),
         };
         yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
-        subAccountId = data.accountId;
-        subAccountInstanceNum = data.accountNumber;
-      } else console.log({ err });
+        subAccountId = regRes.data.accountId;
+        subAccountInstanceNum = regRes.data.accountNumber;
+      } else console.log({ err: regRes.err });
+      break;
+
+    case SubAccountKind.SECURE_ACCOUNT:
+      const secureAcc = yield select(
+        (state) => state.accounts[subAccountInfo.kind].service,
+      );
+
+      const secureRes = yield call(
+        secureAcc.setupDerivativeAccount,
+        DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
+      );
+
+      if (secureRes.status === 200) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          [subAccountInfo.kind]: JSON.stringify(secureAcc),
+        };
+        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+        subAccountId = secureRes.data.accountId;
+        subAccountInstanceNum = secureRes.data.accountNumber;
+      } else console.log({ err: secureRes.err });
       break;
   }
 
