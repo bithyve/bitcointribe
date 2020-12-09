@@ -151,6 +151,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       selectedContacts: [],
       selectedSubAccounts: [],
     };
+    this.props.clearTransfer(accountKind);
   }
 
   componentDidMount = () => {

@@ -988,13 +988,15 @@ class SendToContact extends Component<
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
+                  currencyCode= {prefersBitcoin
+                    ? serviceType == TEST_ACCOUNT
+                    ? ' t-sats' : ' sats' : ''}
                   onRemove={() => {
                     let recipientItemToRemove = accountsState[
                       serviceType
-                    ].transfer.details.find((recipientInfo) => {
-                      return recipientInfo.selectedContact.id === recipient.id;
-                    });
-
+                    ].transfer.details[accountsState[
+                      serviceType
+                    ].transfer.details.length - 1 - index];
                     if (recipientItemToRemove) {
                       this.setState(
                         {
@@ -1400,7 +1402,8 @@ class SendToContact extends Component<
             ) {
               return (
                 <RemoveSelectedRecipient
-                  selectedContact={removeItem.selectedContact}
+                  selectedContact={removeItem}
+                  prefersBitcoin={prefersBitcoin}
                   onPressBack={() => {
                     this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
