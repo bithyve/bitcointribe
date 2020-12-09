@@ -385,4 +385,5 @@ export interface EncryptedImage {
   DECENTRALIZED_BACKUP?: string;
   SERVICES?: string;
   ASYNC_DATA?: string;
+  STATE_DATA?: string;
 }
