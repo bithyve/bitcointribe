@@ -19,6 +19,8 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
   DerivativeAccountElements,
+  SubPrimaryDerivativeAccount,
+  SubPrimaryDerivativeAccountElements,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
@@ -982,6 +984,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public setupDerivativeAccount = (
     accountType: string,
+    accountDetails: { accountName?: string; accountDescription?: string },
   ): {
     accountId: string;
     accountNumber: number;
@@ -990,13 +993,22 @@ export default class HDSegwitWallet extends Bitcoin {
     let accountNumber: number;
     switch (accountType) {
       case SUB_PRIMARY_ACCOUNT:
-        const derivativeAccount: DerivativeAccount = this.derivativeAccounts[
-          accountType
-        ];
-        const inUse = derivativeAccount.instance.using;
+        const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+          .derivativeAccounts[accountType];
+        const inUse = subPrimaryAccounts.instance.using;
         accountNumber = inUse + 1;
         this.generateDerivativeXpub(accountType, accountNumber);
-        accountId = derivativeAccount[accountNumber].xpubId;
+        let subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          .derivativeAccounts[accountType][accountNumber];
+        const updatedSubPrimInstance = {
+          ...subPrimInstance,
+          accountName: accountDetails.accountName,
+          accountDescription: accountDetails.accountDescription,
+        };
+        this.derivativeAccounts[accountType][
+          accountNumber
+        ] = updatedSubPrimInstance;
+        accountId = updatedSubPrimInstance.xpubId;
         break;
     }
 

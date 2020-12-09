@@ -1193,48 +1193,32 @@ function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
       break;
 
     case SubAccountKind.REGULAR_ACCOUNT:
-      const regularAcc = yield select(
-        (state) => state.accounts[subAccountInfo.kind].service,
-      );
-      const regRes = yield call(
-        regularAcc.setupDerivativeAccount,
-        DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
-      );
-
-      if (regRes.status === 200) {
-        const { SERVICES } = yield select((state) => state.storage.database);
-        const updatedSERVICES = {
-          ...SERVICES,
-          [subAccountInfo.kind]: JSON.stringify(regularAcc),
-        };
-        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-
-        subAccountId = regRes.data.accountId;
-        subAccountInstanceNum = regRes.data.accountNumber;
-      } else console.log({ err: regRes.err });
-      break;
-
     case SubAccountKind.SECURE_ACCOUNT:
-      const secureAcc = yield select(
+      const service = yield select(
         (state) => state.accounts[subAccountInfo.kind].service,
       );
 
-      const secureRes = yield call(
-        secureAcc.setupDerivativeAccount,
+      const accountDetails = {
+        accountName: subAccountInfo.customDisplayName,
+        accountDescription: subAccountInfo.customDescription,
+      };
+      const derivativeSetupRes = yield call(
+        service.setupDerivativeAccount,
         DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
+        accountDetails,
       );
 
-      if (secureRes.status === 200) {
+      if (derivativeSetupRes.status === 200) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
-          [subAccountInfo.kind]: JSON.stringify(secureAcc),
+          [subAccountInfo.kind]: JSON.stringify(service),
         };
         yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
-        subAccountId = secureRes.data.accountId;
-        subAccountInstanceNum = secureRes.data.accountNumber;
-      } else console.log({ err: secureRes.err });
+        subAccountId = derivativeSetupRes.data.accountId;
+        subAccountInstanceNum = derivativeSetupRes.data.accountNumber;
+      } else console.log({ err: derivativeSetupRes.err });
       break;
   }
 
