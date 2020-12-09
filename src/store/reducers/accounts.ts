@@ -38,6 +38,7 @@ import {
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
   ACCOUNT_SHELL_REFRESH_COMPLETED,
   REFRESH_ACCOUNT_SHELL,
+  RESTORED_ACCOUNT_SHELLS,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -574,6 +575,12 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         isGeneratingNewAccountShell: false,
         hasNewAccountShellGenerationSucceeded: false,
         hasNewAccountShellGenerationFailed: false,
+      };
+
+    case RESTORED_ACCOUNT_SHELLS:
+      return {
+        ...state,
+        accountShells: action.payload.accountShells,
       };
 
     case ACCOUNT_SETTINGS_UPDATED:

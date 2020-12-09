@@ -1092,6 +1092,14 @@ function* refreshAccountShellWorker({ payload }) {
   const { primarySubAccount } = shell;
   const options: { autoSync?: Boolean } = payload.options;
 
+  let accountKind: any = primarySubAccount.kind;
+  if (
+    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
+    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
+  )
+    if (primarySubAccount.instanceNumber)
+      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
+
   if (options && options.autoSync) {
     // auto-refresh the account-shell once per-session
     const autoAccountSync = yield select(
@@ -1100,23 +1108,13 @@ function* refreshAccountShellWorker({ payload }) {
 
     if (
       autoAccountSync &&
-      autoAccountSync[
-        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`
-      ]
+      autoAccountSync[`${accountKind + primarySubAccount.instanceNumber}`]
     ) {
       // account-shell already synched
       yield put(accountShellRefreshCompleted(shell));
       return;
     }
   }
-
-  let accountKind: any = primarySubAccount.kind;
-  if (
-    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
-    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
-  )
-    if (primarySubAccount.instanceNumber)
-      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
 
   const nonDerivativeAccounts = [
     SubAccountKind.TEST_ACCOUNT,
@@ -1193,48 +1191,32 @@ function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
       break;
 
     case SubAccountKind.REGULAR_ACCOUNT:
-      const regularAcc = yield select(
-        (state) => state.accounts[subAccountInfo.kind].service,
-      );
-      const regRes = yield call(
-        regularAcc.setupDerivativeAccount,
-        DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
-      );
-
-      if (regRes.status === 200) {
-        const { SERVICES } = yield select((state) => state.storage.database);
-        const updatedSERVICES = {
-          ...SERVICES,
-          [subAccountInfo.kind]: JSON.stringify(regularAcc),
-        };
-        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-
-        subAccountId = regRes.data.accountId;
-        subAccountInstanceNum = regRes.data.accountNumber;
-      } else console.log({ err: regRes.err });
-      break;
-
     case SubAccountKind.SECURE_ACCOUNT:
-      const secureAcc = yield select(
+      const service = yield select(
         (state) => state.accounts[subAccountInfo.kind].service,
       );
 
-      const secureRes = yield call(
-        secureAcc.setupDerivativeAccount,
+      const accountDetails = {
+        accountName: subAccountInfo.customDisplayName,
+        accountDescription: subAccountInfo.customDescription,
+      };
+      const derivativeSetupRes = yield call(
+        service.setupDerivativeAccount,
         DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
+        accountDetails,
       );
 
-      if (secureRes.status === 200) {
+      if (derivativeSetupRes.status === 200) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
-          [subAccountInfo.kind]: JSON.stringify(secureAcc),
+          [subAccountInfo.kind]: JSON.stringify(service),
         };
         yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
-        subAccountId = secureRes.data.accountId;
-        subAccountInstanceNum = secureRes.data.accountNumber;
-      } else console.log({ err: secureRes.err });
+        subAccountId = derivativeSetupRes.data.accountId;
+        subAccountInstanceNum = derivativeSetupRes.data.accountNumber;
+      } else console.log({ err: derivativeSetupRes.err });
       break;
   }
 

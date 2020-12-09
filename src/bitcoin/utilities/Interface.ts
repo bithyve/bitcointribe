@@ -215,7 +215,6 @@ export interface DonationDerivativeAccountElements
   disableAccount: boolean;
 }
 
-// Base Dervative Account
 export interface DonationDerivativeAccount {
   series: number;
   instance: {
@@ -224,11 +223,27 @@ export interface DonationDerivativeAccount {
   };
   [accounts: number]: DonationDerivativeAccountElements;
 }
+
+export interface SubPrimaryDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface SubPrimaryDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: SubPrimaryDerivativeAccountElements;
+}
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount
     | TrustedContactDerivativeAccount
-    | DonationDerivativeAccount;
+    | DonationDerivativeAccount
+    | SubPrimaryDerivativeAccount;
 }
 
 export enum notificationType {
@@ -360,6 +375,9 @@ export interface WalletImage {
   ASYNC_DATA?: {
     [identifier: string]: string;
   };
+  STATE_DATA?: {
+    [identifier: string]: string;
+  };
 }
 
 export interface EncryptedImage {
@@ -367,4 +385,5 @@ export interface EncryptedImage {
   DECENTRALIZED_BACKUP?: string;
   SERVICES?: string;
   ASYNC_DATA?: string;
+  STATE_DATA?: string;
 }

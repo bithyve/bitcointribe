@@ -185,11 +185,15 @@ const updateSecondarySubAccounts = (
     let derivativeAccounts;
     switch (shell.primarySubAccount.kind) {
       case SubAccountKind.REGULAR_ACCOUNT:
-        derivativeAccounts = regularAcc.hdWallet.derivativeAccounts;
+        if (!shell.primarySubAccount.instanceNumber)
+          // to default checking account
+          derivativeAccounts = regularAcc.hdWallet.derivativeAccounts;
         break;
 
       case SubAccountKind.SECURE_ACCOUNT:
-        derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts;
+        if (!shell.primarySubAccount.instanceNumber)
+          // to default savings account
+          derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts;
         break;
     }
 

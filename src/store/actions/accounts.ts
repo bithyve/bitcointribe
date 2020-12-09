@@ -42,7 +42,8 @@ export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED';
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED';
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT';
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL';
-export const ACCOUNT_SHELL_REFRESH_COMPLETED = 'ACCOUNT_SHELL_REFRESH_COMPLETED';
+export const ACCOUNT_SHELL_REFRESH_COMPLETED =
+  'ACCOUNT_SHELL_REFRESH_COMPLETED';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -287,10 +288,7 @@ export const refreshAccountShell = (
   return { type: REFRESH_ACCOUNT_SHELL, payload: { shell, options } };
 };
 
-
-export const accountShellRefreshCompleted = (
-  payload: AccountShell,
-) => {
+export const accountShellRefreshCompleted = (payload: AccountShell) => {
   return {
     type: ACCOUNT_SHELL_REFRESH_COMPLETED,
     payload,
@@ -433,6 +431,7 @@ export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC';
 export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED';
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED';
+export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS';
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED';
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED';
 export const TRANSACTION_REASSIGNMENT_SUCCEEDED =
@@ -522,6 +521,14 @@ export const newAccountShellAdded = ({
   accountShell: AccountShell;
 }) => {
   return { type: NEW_ACCOUNT_SHELL_ADDED, payload: accountShell };
+};
+
+export const restoredAccountShells = ({
+  accountShells,
+}: {
+  accountShells: AccountShell[];
+}) => {
+  return { type: RESTORED_ACCOUNT_SHELLS, payload: { accountShells } };
 };
 
 export const accountSettingsUpdateFailed = ({
