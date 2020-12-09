@@ -89,6 +89,7 @@ import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
 import { failedST3, restoredAccountShells } from '../actions/accounts';
 import RelayServices from '../../bitcoin/services/RelayService';
+import AccountShell from '../../common/data/models/AccountShell';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -1849,11 +1850,11 @@ function* fetchWalletImageWorker({ payload }) {
       }
     }
 
-    console.log({ STATE_DATA });
     if (STATE_DATA) {
       for (const key of Object.keys(STATE_DATA)) {
         if (key === 'accountShells' && STATE_DATA[key]) {
-          yield put(restoredAccountShells(JSON.parse(STATE_DATA[key])));
+          const accountShells: AccountShell[] = JSON.parse(STATE_DATA[key]);
+          yield put(restoredAccountShells({ accountShells }));
         }
       }
     }
