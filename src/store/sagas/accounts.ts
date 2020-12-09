@@ -1092,6 +1092,14 @@ function* refreshAccountShellWorker({ payload }) {
   const { primarySubAccount } = shell;
   const options: { autoSync?: Boolean } = payload.options;
 
+  let accountKind: any = primarySubAccount.kind;
+  if (
+    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
+    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
+  )
+    if (primarySubAccount.instanceNumber)
+      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
+
   if (options && options.autoSync) {
     // auto-refresh the account-shell once per-session
     const autoAccountSync = yield select(
@@ -1100,23 +1108,13 @@ function* refreshAccountShellWorker({ payload }) {
 
     if (
       autoAccountSync &&
-      autoAccountSync[
-        `${primarySubAccount.kind + primarySubAccount.instanceNumber}`
-      ]
+      autoAccountSync[`${accountKind + primarySubAccount.instanceNumber}`]
     ) {
       // account-shell already synched
       yield put(accountShellRefreshCompleted(shell));
       return;
     }
   }
-
-  let accountKind: any = primarySubAccount.kind;
-  if (
-    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
-    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
-  )
-    if (primarySubAccount.instanceNumber)
-      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
 
   const nonDerivativeAccounts = [
     SubAccountKind.TEST_ACCOUNT,
