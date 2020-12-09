@@ -1699,6 +1699,16 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA;
 };
 
+function* stateDataToBackup() {
+  // state data to backup
+  const accountShells = yield select((state) => state.accounts.accountShells);
+  const STATE_DATA = {};
+  if (accountShells && accountShells.length)
+    STATE_DATA['accountShells'] = accountShells;
+
+  return STATE_DATA;
+}
+
 function* updateWalletImageWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
 
@@ -1746,6 +1756,19 @@ function* updateWalletImageWorker({ payload }) {
         hashesWI.ASYNC_DATA = currentAsyncHash;
       }
     }
+
+    const STATE_DATA = yield call(stateDataToBackup);
+    if (Object.keys(STATE_DATA).length) {
+      const currentStateHash = hash(STATE_DATA);
+      console.log({
+        previousStateHash: hashesWI.STATE_DATA,
+        currentStateHash,
+      });
+      if (!hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA) {
+        walletImage['STATE_DATA'] = STATE_DATA;
+        hashesWI.STATE_DATA = currentStateHash;
+      }
+    }
   } else {
     walletImage = {
       DECENTRALIZED_BACKUP,
@@ -1761,6 +1784,12 @@ function* updateWalletImageWorker({ payload }) {
     if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
+    }
+
+    const STATE_DATA = yield call(stateDataToBackup);
+    if (Object.keys(STATE_DATA).length) {
+      walletImage['STATE_DATA'] = STATE_DATA;
+      hashesWI['STATE_DATA'] = hash(STATE_DATA);
     }
   }
 

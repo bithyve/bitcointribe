@@ -375,6 +375,9 @@ export interface WalletImage {
   ASYNC_DATA?: {
     [identifier: string]: string;
   };
+  STATE_DATA?: {
+    [identifier: string]: string;
+  };
 }
 
 export interface EncryptedImage {
