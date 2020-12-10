@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import AccountShell from '../../../../common/data/models/AccountShell';
-import useAccountShell from './UseAccountShell';
+import useAccountShellForID from './UseAccountShellForID';
 
 
 function useAccountShellFromNavigation(navigation: any): AccountShell | undefined {
@@ -8,7 +8,7 @@ function useAccountShellFromNavigation(navigation: any): AccountShell | undefine
     return navigation.getParam('accountShellID') || '';
   }, [navigation]);
 
-  return useAccountShell(accountShellID);
+  return useAccountShellForID(accountShellID);
 }
 
 export default useAccountShellFromNavigation;

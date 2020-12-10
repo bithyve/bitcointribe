@@ -33,6 +33,7 @@ import config from '../../../bitcoin/HexaConfig';
 import { DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState';
+import useTransactionsForAccountShell from '../../../utils/hooks/state-selectors/accounts/UseTransactionsForAccountShell';
 
 export type Props = {
   navigation: any;
@@ -77,7 +78,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountShell = useAccountShellFromNavigation(navigation);
   const accountsState = useAccountsState();
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
-  const accountTransactions = AccountShell.getAllTransactions(accountShell);
+  const accountTransactions = useTransactionsForAccountShell(accountShell);
   const averageTxFees = accountsState.averageTxFees;
 
   let derivativeAccountKind: any = primarySubAccount.kind;
@@ -109,7 +110,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
     navigation.navigate('TransactionDetails', {
-      txID: transaction.txid,
+      transaction,
+      accountShellID: accountShell.id,
     });
   }
 
