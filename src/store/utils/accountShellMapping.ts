@@ -231,11 +231,13 @@ const updatePrimarySubAccounts = (
           derivativeAccounts[DerivativeAccountTypes.DONATION_ACCOUNT];
         const donationInstance = donationAccounts[instanceNumber];
 
-        balances = {
-          confirmed: donationInstance.balances.balance,
-          unconfirmed: donationInstance.balances.unconfirmedBalance,
-        };
-        transactions = donationInstance.transactions.transactionDetails;
+        if (donationInstance && donationInstance.balances) {
+          balances = {
+            confirmed: donationInstance.balances.balance,
+            unconfirmed: donationInstance.balances.unconfirmedBalance,
+          };
+          transactions = donationInstance.transactions.transactionDetails;
+        }
 
         break;
     }
