@@ -13,6 +13,9 @@ import {
   TransactionPrerequisite,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
+  DerivativeAccountTypes,
+  SubPrimaryDerivativeAccountElements,
+  SubPrimaryDerivativeAccount,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import {
@@ -339,12 +342,9 @@ export default class SecureHDWallet extends Bitcoin {
     return this.xpubs;
   };
 
-  public getAccountId = (): { accountId: string } => {
-    const mutliSig = this.createSecureMultiSig(0);
-    const { address } = mutliSig; // getting the first receiving address
-    return {
-      accountId: crypto.createHash('sha256').update(address).digest('hex'),
-    };
+  public getAccountId = (): string => {
+    const xpub = this.xpubs.secondary;
+    return crypto.createHash('sha256').update(xpub).digest('hex');
   };
 
   public decryptSecondaryXpub = (encryptedSecXpub: string) => {
@@ -903,6 +903,12 @@ export default class SecureHDWallet extends Bitcoin {
                   // check for duplicate tx (fetched against sending and then again for change address)
                   txMap.set(tx.txid, true);
 
+                  let accType = dAccountType;
+                  switch (accType) {
+                    case SUB_PRIMARY_ACCOUNT:
+                      accType = 'Savings Account';
+                  }
+
                   const transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
@@ -916,11 +922,7 @@ export default class SecureHDWallet extends Bitcoin {
                       tx.TransactionType === 'Sent'
                         ? tx.Amount + tx.fee
                         : tx.Amount,
-                    accountType: dAccountType,
-                    primaryAccType:
-                      dAccountType === SUB_PRIMARY_ACCOUNT
-                        ? 'Savings Account'
-                        : null,
+                    accountType: accType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -1124,6 +1126,40 @@ export default class SecureHDWallet extends Bitcoin {
     return { synched: true };
   };
 
+  public setupDerivativeAccount = (
+    accountType: string,
+    accountDetails: { accountName?: string; accountDescription?: string },
+  ): {
+    accountId: string;
+    accountNumber: number;
+  } => {
+    let accountId: string;
+    let accountNumber: number;
+    switch (accountType) {
+      case SUB_PRIMARY_ACCOUNT:
+        const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+          .derivativeAccounts[accountType];
+        const inUse = subPrimaryAccounts.instance.using;
+        accountNumber = inUse + 1;
+        this.generateDerivativeXpub(accountType, accountNumber);
+        let subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          .derivativeAccounts[accountType][accountNumber];
+        const updatedSubPrimInstance = {
+          ...subPrimInstance,
+          accountName: accountDetails.accountName,
+          accountDescription: accountDetails.accountDescription,
+        };
+        this.derivativeAccounts[accountType][
+          accountNumber
+        ] = updatedSubPrimInstance;
+        accountId = updatedSubPrimInstance.xpubId;
+        break;
+    }
+
+    if (!accountId) throw new Error(`Failed to setup ${accountType} account`);
+    return { accountId, accountNumber };
+  };
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
@@ -1134,7 +1170,11 @@ export default class SecureHDWallet extends Bitcoin {
       displayTxDetails: boolean;
     },
     disableAccount: boolean = false,
-  ): Promise<{ setupSuccessful: Boolean }> => {
+  ): Promise<{
+    setupSuccessful: Boolean;
+    accountId: string;
+    accountNumber: number;
+  }> => {
     const accountType = DONATION_ACCOUNT;
     let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
       accountType
@@ -1204,7 +1244,7 @@ export default class SecureHDWallet extends Bitcoin {
       throw new Error('Donation account setup failed');
     }
 
-    return { setupSuccessful };
+    return { setupSuccessful, accountId: xpubId, accountNumber };
   };
 
   // TODO: This method Will modify

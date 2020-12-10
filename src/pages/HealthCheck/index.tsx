@@ -197,7 +197,7 @@ export default function HealthCheck(props) {
             onPress={() => { }}
           >
             <Image
-              source={require('../../assets/images/icons/icon_settings1.png')}
+              source={require('../../assets/images/icons/icon_settings_blue.png')}
               style={styles.image}
             />
           </TouchableOpacity>

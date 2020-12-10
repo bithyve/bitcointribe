@@ -1,0 +1,12 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "cSpell.words": [
+    "Hexa",
+    "mergeable",
+    "uuidv"
+  ],
+  "typescript.tsdk": "${workspaceFolder}/node_modules/typescript/lib",
+}

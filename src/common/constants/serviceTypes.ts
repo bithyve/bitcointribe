@@ -1,3 +1,4 @@
+// Account Types
 export const REGULAR_ACCOUNT = 'REGULAR_ACCOUNT';
 export const TEST_ACCOUNT = 'TEST_ACCOUNT';
 export const SECURE_ACCOUNT = 'SECURE_ACCOUNT';
@@ -8,3 +9,4 @@ export const DONATION_ACCOUNT = 'DONATION_ACCOUNT';
 export const KEEPERS_INFO = 'KEEPERS_INFO'
 // Third Party Services
 export const FAST_BITCOINS = 'FAST_BITCOINS';
+

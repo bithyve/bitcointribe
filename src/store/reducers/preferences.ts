@@ -19,11 +19,10 @@ import {
 import { UPDATE_APP_PREFERENCE } from '../constants';
 import ip, { chain } from 'icepick';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import { stat } from 'fs';
 
 const initialState = ip.freeze({
   hasShownNoInternetWarning: false,
-  currencyCode: null,
+  currencyCode: 'USD',
   currencyKind: CurrencyKind.BITCOIN,
   fcmTokenValue: '',
   secondaryDeviceAddressValue: '',

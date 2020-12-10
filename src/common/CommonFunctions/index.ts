@@ -107,9 +107,14 @@ export const CloudData = async (database) => {
 }
 }
 
-export const getCurrencyImageByRegion = (currencyCode, type) => {
+export const getCurrencyImageByRegion = (
+  currencyCode: string,
+  type: 'light' | 'dark' | 'gray' | 'light_blue',
+) => {
   const dollarCurrency = ['USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'TTD', 'TVD', 'ZWD']
+
   const poundCurrency = ['EGP', 'FKP', 'GIP', 'GGP', 'IMP', 'JEP', 'SHP', 'SYP', 'GBP']
+
   if (dollarCurrency.includes(currencyCode)) {
     if (type == 'light') {
       return require('../../assets/images/currencySymbols/icon_dollar_white.png');
@@ -122,6 +127,7 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
     }
     return require('../../assets/images/currencySymbols/icon_dollar_light.png');
   }
+
   if (poundCurrency.includes(currencyCode)) {
     if (type == 'light') {
       return require('../../assets/images/currencySymbols/icon_pound_white.png');
@@ -173,6 +179,7 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
     }
     return require('../../assets/images/currencySymbols/icon_thb_gray.png');
   }
+
   if (currencyCode == 'CHF') {
     if (type == 'light') {
       return require('../../assets/images/currencySymbols/icon_chf_white.png');

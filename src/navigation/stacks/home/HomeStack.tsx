@@ -7,12 +7,19 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 import MoreOptionsStack from '../more-options/MoreOptionsStack';
 import AllTransactionsStack from '../transactions/AllTransactionsStack';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import AddNewAccountStack from '../accounts/AddNewAccountStack';
 
 
 const HomeStack = createStackNavigator(
   {
     HomeRoot: {
       screen: HomeScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    AddNewAccount: {
+      screen: AddNewAccountStack,
       navigationOptions: {
         header: null,
       },

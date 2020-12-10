@@ -35,21 +35,46 @@ import {
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
   secondaryXprivGenerated,
+  ADD_NEW_ACCOUNT_SHELL,
+  newAccountShellAdded,
+  newAccountShellAddFailed,
+  UPDATE_SUB_ACCOUNT_SETTINGS,
+  accountSettingsUpdated,
+  accountSettingsUpdateFailed,
+  ReassignTransactionsActionPayload,
+  REASSIGN_TRANSACTIONS,
+  transactionReassignmentSucceeded,
+  transactionReassignmentFailed,
+  MergeAccountShellsActionPayload,
+  MERGE_ACCOUNT_SHELLS,
+  accountShellMergeSucceeded,
+  accountShellMergeFailed,
+  REFRESH_ACCOUNT_SHELL,
+  accountShellOrderedToFront,
+  accountShellRefreshCompleted,
 } from '../actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import {
+  DerivativeAccountTypes,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { startupSyncLoaded } from '../actions/loaders';
+import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders';
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
+import AccountShell from '../../common/data/models/AccountShell';
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -178,7 +203,7 @@ function* fetchBalanceTxWorker({ payload }) {
   const res = yield call(service.getBalanceTransactions, {
     restore: payload.options.restore,
   });
-
+  console.log({ res });
   const postFetchBalances =
     res.status === 200 ? JSON.stringify(res.data.balances) : preFetchBalances;
   const postFetchTransactions =
@@ -1009,7 +1034,8 @@ function* setupDonationAccountWorker({ payload }) {
 
   if (res.status === 200) {
     console.log({ res });
-    if (!res.data.setupSuccessful) {
+    const { setupSuccessful, accountId, accountNumber } = res.data;
+    if (!setupSuccessful) {
       yield put(settedDonationAccount(serviceType, false));
       throw new Error('Donation account setup failed');
     }
@@ -1021,6 +1047,7 @@ function* setupDonationAccountWorker({ payload }) {
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     yield put(settedDonationAccount(serviceType, true));
+    return { accountId, accountNumber };
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
@@ -1060,4 +1087,263 @@ function* updateDonationPreferencesWorker({ payload }) {
 export const updateDonationPreferencesWatcher = createWatcher(
   updateDonationPreferencesWorker,
   UPDATE_DONATION_PREFERENCES,
+);
+
+function* refreshAccountShellWorker({ payload }) {
+  const shell: AccountShell = payload.shell;
+  const { primarySubAccount } = shell;
+  const options: { autoSync?: Boolean } = payload.options;
+
+  let accountKind: any = primarySubAccount.kind;
+  if (
+    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
+    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
+  )
+    if (primarySubAccount.instanceNumber)
+      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT;
+
+  if (options && options.autoSync) {
+    // auto-refresh the account-shell once per-session
+    const autoAccountSync = yield select(
+      (state) => state.loaders.autoAccountSync,
+    );
+
+    if (
+      autoAccountSync &&
+      autoAccountSync[`${accountKind + primarySubAccount.instanceNumber}`]
+    ) {
+      // account-shell already synched
+      yield put(accountShellRefreshCompleted(shell));
+      return;
+    }
+  }
+
+  const nonDerivativeAccounts = [
+    SubAccountKind.TEST_ACCOUNT,
+    SubAccountKind.REGULAR_ACCOUNT,
+    SubAccountKind.SECURE_ACCOUNT,
+  ];
+
+  if (!nonDerivativeAccounts.includes(accountKind)) {
+    if (accountKind === DONATION_ACCOUNT) {
+      const payload = {
+        serviceType: primarySubAccount.sourceKind,
+        derivativeAccountType: accountKind,
+        accountNumber: primarySubAccount.instanceNumber,
+      };
+      yield call(syncViaXpubAgentWorker, { payload });
+    } else {
+      const payload = {
+        serviceType: primarySubAccount.sourceKind,
+        accountType: accountKind,
+        accountNumber: primarySubAccount.instanceNumber,
+      };
+      yield call(fetchDerivativeAccBalanceTxWorker, { payload });
+    }
+
+    yield put(
+      setAutoAccountSync(`${accountKind + primarySubAccount.instanceNumber}`),
+    );
+  } else {
+    const payload = {
+      serviceType: accountKind,
+      options: {
+        loader: true,
+        syncTrustedDerivative:
+          primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
+      },
+    };
+
+    yield call(fetchBalanceTxWorker, { payload });
+
+    yield put(
+      setAutoAccountSync(`${accountKind + primarySubAccount.instanceNumber}`),
+    );
+  }
+
+  yield put(accountShellRefreshCompleted(shell));
+}
+
+export const refreshAccountShellWatcher = createWatcher(
+  refreshAccountShellWorker,
+  REFRESH_ACCOUNT_SHELL,
+);
+
+function* addNewSubAccount(subAccountInfo: SubAccountDescribing) {
+  let subAccountId: string;
+  let subAccountInstanceNum: number;
+  switch (subAccountInfo.kind) {
+    case SubAccountKind.DONATION_ACCOUNT:
+      const donationInstance = yield call(setupDonationAccountWorker, {
+        payload: {
+          serviceType: subAccountInfo.sourceKind,
+          donee: subAccountInfo.doneeName,
+          subject: subAccountInfo.customDisplayName,
+          description: subAccountInfo.customDescription,
+          configuration: {
+            displayBalance: true,
+            displayTransactions: true,
+            displayTxDetails: true,
+          },
+        },
+      });
+
+      subAccountId = donationInstance.accountId;
+      subAccountInstanceNum = donationInstance.accountNumber;
+      break;
+
+    case SubAccountKind.REGULAR_ACCOUNT:
+    case SubAccountKind.SECURE_ACCOUNT:
+      const service = yield select(
+        (state) => state.accounts[subAccountInfo.kind].service,
+      );
+
+      const accountDetails = {
+        accountName: subAccountInfo.customDisplayName,
+        accountDescription: subAccountInfo.customDescription,
+      };
+      const derivativeSetupRes = yield call(
+        service.setupDerivativeAccount,
+        DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
+        accountDetails,
+      );
+
+      if (derivativeSetupRes.status === 200) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          [subAccountInfo.kind]: JSON.stringify(service),
+        };
+        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+        subAccountId = derivativeSetupRes.data.accountId;
+        subAccountInstanceNum = derivativeSetupRes.data.accountNumber;
+      } else console.log({ err: derivativeSetupRes.err });
+      break;
+  }
+
+  if (subAccountId) return { subAccountId, subAccountInstanceNum };
+  else throw new Error('Failed to generate sub-account; subAccountId missing ');
+}
+
+function* addNewAccountShell({
+  payload: subAccountInfo,
+}: {
+  payload: SubAccountDescribing;
+}) {
+  const bitcoinUnit =
+    subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
+      ? BitcoinUnit.TSATS
+      : BitcoinUnit.SATS;
+
+  try {
+    const { subAccountId, subAccountInstanceNum } = yield call(
+      addNewSubAccount,
+      subAccountInfo,
+    );
+    subAccountInfo.id = subAccountId;
+    subAccountInfo.instanceNumber = subAccountInstanceNum;
+    const newAccountShell = new AccountShell({
+      unit: bitcoinUnit,
+      primarySubAccount: subAccountInfo,
+      displayOrder: 1,
+    });
+    yield put(newAccountShellAdded({ accountShell: newAccountShell }));
+    yield put(accountShellOrderedToFront(newAccountShell));
+  } catch (error) {
+    console.log('addNewAccountShell saga::error: ' + error);
+    const newAccountShell = new AccountShell({
+      unit: bitcoinUnit,
+      primarySubAccount: subAccountInfo,
+      displayOrder: 1,
+    });
+    yield put(
+      newAccountShellAddFailed({ accountShell: newAccountShell, error }),
+    );
+  }
+}
+
+export const addNewAccountShellWatcher = createWatcher(
+  addNewAccountShell,
+  ADD_NEW_ACCOUNT_SHELL,
+);
+
+function* updateAccountSettings({
+  payload: account,
+}: {
+  payload: SubAccountDescribing;
+}) {
+  try {
+    // TODO: Implement backend logic here for saving an account's properties
+    yield put(accountSettingsUpdated({ account }));
+  } catch (error) {
+    yield put(accountSettingsUpdateFailed({ account, error }));
+  }
+}
+
+export const updateAccountSettingsWatcher = createWatcher(
+  updateAccountSettings,
+  UPDATE_SUB_ACCOUNT_SETTINGS,
+);
+
+function* reassignTransactions({
+  payload: { transactionIDs, sourceID, destinationID },
+}: {
+  payload: ReassignTransactionsActionPayload;
+}) {
+  try {
+    // TODO: Implement backend logic here for processing transaction re-assignment
+
+    yield put(
+      transactionReassignmentSucceeded({
+        transactionIDs,
+        sourceID,
+        destinationID,
+      }),
+    );
+  } catch (error) {
+    yield put(
+      transactionReassignmentFailed({
+        transactionIDs,
+        sourceID,
+        destinationID,
+        error,
+      }),
+    );
+  }
+}
+
+export const reassignTransactionsWatcher = createWatcher(
+  reassignTransactions,
+  REASSIGN_TRANSACTIONS,
+);
+
+function* mergeAccountShells({
+  payload: { source, destination },
+}: {
+  payload: MergeAccountShellsActionPayload;
+}) {
+  try {
+    // TODO: Implement backend logic here for processing the merge
+
+    yield put(
+      accountShellMergeSucceeded({
+        source,
+        destination,
+      }),
+    );
+  } catch (error) {
+    yield put(
+      accountShellMergeFailed({
+        source,
+        destination,
+        error,
+      }),
+    );
+  }
+}
+
+export const mergeAccountShellsWatcher = createWatcher(
+  mergeAccountShells,
+  MERGE_ACCOUNT_SHELLS,
 );

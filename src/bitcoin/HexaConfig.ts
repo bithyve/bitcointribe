@@ -43,9 +43,15 @@ class HexaConfig {
     10,
   );
 
-  public LAST_SEEN_ACTIVE_DURATION: number = parseInt(Config.LAST_SEEN_ACTIVE_DURATION.trim(), 10);
-  public LAST_SEEN_AWAY_DURATION: number = parseInt(Config.LAST_SEEN_AWAY_DURATION.trim(), 10);
-  
+  public LAST_SEEN_ACTIVE_DURATION: number = parseInt(
+    Config.LAST_SEEN_ACTIVE_DURATION.trim(),
+    10,
+  );
+  public LAST_SEEN_AWAY_DURATION: number = parseInt(
+    Config.LAST_SEEN_AWAY_DURATION.trim(),
+    10,
+  );
+
   public BH_SERVERS = {
     RELAY: Config.BIT_API_URLS_RELAY.trim(),
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),

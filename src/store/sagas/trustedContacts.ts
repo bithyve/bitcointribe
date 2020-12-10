@@ -924,12 +924,16 @@ function* walletCheckInWorker({ payload }) {
     const { updationInfo, exchangeRates, averageTxFees } = res.data;
 
     if (!exchangeRates) console.log('Failed to fetch exchange rates');
-    if (JSON.stringify(exchangeRates) !== JSON.stringify(storedExchangeRates))
-      yield put(exchangeRatesCalculated(exchangeRates));
+    else {
+      if (JSON.stringify(exchangeRates) !== JSON.stringify(storedExchangeRates))
+        yield put(exchangeRatesCalculated(exchangeRates));
+    }
 
     if (!averageTxFees) console.log('Failed to fetch fee rates');
-    if (JSON.stringify(averageTxFees) !== JSON.stringify(storedAverageTxFees))
-      yield put(setAverageTxFee(averageTxFees));
+    else {
+      if (JSON.stringify(averageTxFees) !== JSON.stringify(storedAverageTxFees))
+        yield put(setAverageTxFee(averageTxFees));
+    }
 
     let shareRemoved = false;
     if (updationInfo) {

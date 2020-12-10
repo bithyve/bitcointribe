@@ -7,6 +7,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  DerivativeAccountTypes,
 } from '../../utilities/Interface';
 
 export default class SecureAccount {
@@ -360,30 +361,7 @@ export default class SecureAccount {
     }
   };
 
-  public getAccountId = ():
-    | {
-        status: number;
-        data: {
-          accountId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getAccountId(),
-      };
-    } catch (err) {
-      return { status: 0o0, err: err.message, message: ErrMap[0o0] };
-    }
-  };
+  public getAccountId = (): string => this.secureHDWallet.getAccountId();
 
   public getPaymentURI = (
     address: string,
@@ -543,6 +521,42 @@ export default class SecureAccount {
     }
   };
 
+  public setupDerivativeAccount = (
+    accountType: string,
+    accountDetails: { accountName?: string; accountDescription?: string },
+  ):
+    | {
+        status: number;
+        data: {
+          accountId: string;
+          accountNumber: number;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.secureHDWallet.setupDerivativeAccount(
+          accountType,
+          accountDetails,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to setup derivative acccount',
+      };
+    }
+  };
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
@@ -558,6 +572,8 @@ export default class SecureAccount {
         status: number;
         data: {
           setupSuccessful: Boolean;
+          accountId: String;
+          accountNumber: Number;
         };
         err?: undefined;
         message?: undefined;

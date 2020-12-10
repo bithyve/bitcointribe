@@ -1077,18 +1077,13 @@ class SendConfirmation extends Component<
                   (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
                 this.props.clearTransfer(this.serviceType);
+                const accountShellID = this.props.navigation.getParam(
+                  'accountShellID',
+                );
 
                 navigation.dispatch(
                   resetStackToAccountDetails({
-                    serviceType: this.serviceType,
-                    index: this.state.derivativeAccountDetails
-                      ? 3
-                      : this.serviceType === TEST_ACCOUNT
-                      ? 0
-                      : this.serviceType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
-                    spendableBalance: this.spendableBalance - totalAmount,
+                    accountShellID,
                   }),
                 );
               }}

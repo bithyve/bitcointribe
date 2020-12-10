@@ -19,6 +19,8 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
   DerivativeAccountElements,
+  SubPrimaryDerivativeAccount,
+  SubPrimaryDerivativeAccountElements,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
@@ -30,6 +32,8 @@ import {
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+import { DerivativeAccountTypes } from '../Interface';
+
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
 const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 
@@ -190,13 +194,9 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public getAccountId = (): { accountId: string } => {
-    const node = bip32.fromBase58(this.getXpub(), this.network);
-    const keyPair = node.derive(0).derive(0);
-    const address = this.deriveAddress(keyPair, this.purpose); // getting the first receiving address
-    return {
-      accountId: crypto.createHash('sha256').update(address).digest('hex'),
-    };
+  public getAccountId = (): string => {
+    const xpub = this.getXpub();
+    return crypto.createHash('sha256').update(xpub).digest('hex');
   };
 
   public getInitialReceivingAddress = (): string => {
@@ -748,6 +748,19 @@ export default class HDSegwitWallet extends Bitcoin {
                   // check for duplicate tx (fetched against sending and then again for change address)
                   txMap.set(tx.txid, true);
 
+                  let accType = dAccountType;
+                  switch (accType) {
+                    case TRUSTED_CONTACTS:
+                      accType = derivativeAccounts[accountNumber].contactName
+                        .split(' ')
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
+                        .join(' ');
+                    case SUB_PRIMARY_ACCOUNT:
+                      accType = 'Checking Account';
+                  }
+
                   const transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
@@ -761,20 +774,7 @@ export default class HDSegwitWallet extends Bitcoin {
                       tx.TransactionType === 'Sent'
                         ? tx.Amount + tx.fee
                         : tx.Amount,
-                    accountType:
-                      dAccountType === TRUSTED_CONTACTS
-                        ? derivativeAccounts[accountNumber].contactName
-                            .split(' ')
-                            .map(
-                              (word) =>
-                                word[0].toUpperCase() + word.substring(1),
-                            )
-                            .join(' ')
-                        : dAccountType,
-                    primaryAccType:
-                      dAccountType === SUB_PRIMARY_ACCOUNT
-                        ? 'Checking Account'
-                        : null,
+                    accountType: accType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -982,6 +982,40 @@ export default class HDSegwitWallet extends Bitcoin {
     return { synched: true };
   };
 
+  public setupDerivativeAccount = (
+    accountType: string,
+    accountDetails: { accountName?: string; accountDescription?: string },
+  ): {
+    accountId: string;
+    accountNumber: number;
+  } => {
+    let accountId: string;
+    let accountNumber: number;
+    switch (accountType) {
+      case SUB_PRIMARY_ACCOUNT:
+        const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+          .derivativeAccounts[accountType];
+        const inUse = subPrimaryAccounts.instance.using;
+        accountNumber = inUse + 1;
+        this.generateDerivativeXpub(accountType, accountNumber);
+        let subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          .derivativeAccounts[accountType][accountNumber];
+        const updatedSubPrimInstance = {
+          ...subPrimInstance,
+          accountName: accountDetails.accountName,
+          accountDescription: accountDetails.accountDescription,
+        };
+        this.derivativeAccounts[accountType][
+          accountNumber
+        ] = updatedSubPrimInstance;
+        accountId = updatedSubPrimInstance.xpubId;
+        break;
+    }
+
+    if (!accountId) throw new Error(`Failed to setup ${accountType} account`);
+    return { accountId, accountNumber };
+  };
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
@@ -992,7 +1026,11 @@ export default class HDSegwitWallet extends Bitcoin {
       displayTxDetails: boolean;
     },
     disableAccount: boolean = false,
-  ): Promise<{ setupSuccessful: Boolean }> => {
+  ): Promise<{
+    setupSuccessful: Boolean;
+    accountId: string;
+    accountNumber: number;
+  }> => {
     const accountType = DONATION_ACCOUNT;
     let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
       accountType
@@ -1053,7 +1091,7 @@ export default class HDSegwitWallet extends Bitcoin {
       throw new Error('Donation account setup failed');
     }
 
-    return { setupSuccessful };
+    return { setupSuccessful, accountId: xpubId, accountNumber };
   };
 
   public updateDonationPreferences = async (
