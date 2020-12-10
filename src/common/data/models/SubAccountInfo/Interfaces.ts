@@ -11,7 +11,6 @@ import {
 import SourceAccountKind from '../../enums/SourceAccountKind';
 
 interface SubAccountDescribing {
-  doneeName: any;
   id: string;
   accountShellID: string | null;
 

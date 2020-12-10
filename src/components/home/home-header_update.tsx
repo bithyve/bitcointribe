@@ -19,7 +19,7 @@ import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
 import { useDispatch, useSelector } from 'react-redux';
 
-import ToggleSwitch from '../../components/ToggleSwitchSlim';
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
 const currencyCode = [
   'BRL',
   'CNY',
@@ -108,14 +108,14 @@ const HomeHeader = ({
   return (
     <View style={{ ...styles.headerViewContainer, flex: 1 }}>
       <View style={{ flexDirection: 'row' }}>
-        <ToggleSwitch
-          currencyCodeValue={CurrencyCode}
+        <CurrencyKindToggleSwitch
+          fiatCurrencyCode={CurrencyCode}
           onpress={() => {
             dispatch(currencyKindSet(
               prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
             ));
           }}
-          toggle={prefersBitcoin}
+          isOn={prefersBitcoin}
         />
         <TouchableOpacity
           onPress={onPressNotifications}

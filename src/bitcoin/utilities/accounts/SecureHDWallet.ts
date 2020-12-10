@@ -343,8 +343,11 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getAccountId = (): string => {
-    const xpub = this.xpubs.secondary;
-    return crypto.createHash('sha256').update(xpub).digest('hex');
+    console.log("this.xpubs",this.xpubs);
+    if(this.xpubs && this.xpubs.secondary){
+      const xpub = this.xpubs.secondary;
+      return crypto.createHash('sha256').update(xpub).digest('hex');
+    }
   };
 
   public decryptSecondaryXpub = (encryptedSecXpub: string) => {

@@ -17,7 +17,7 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ToggleSwitch from '../components/ToggleSwitch';
+import CurrencyKindToggleSwitch from '../components/CurrencyKindToggleSwitch';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -257,14 +257,14 @@ export default function SettingsContents(props) {
                   </View>
                   <View style={{ marginLeft: 'auto' }}>
                     {item.type == 'JumbleKeyboard' ? (
-                      <ToggleSwitch
+                      <CurrencyKindToggleSwitch
                         isNotImage={true}
-                        toggleColor={Colors.lightBlue}
-                        toggleCircleColor={Colors.blue}
+                        trackColor={Colors.lightBlue}
+                        thumbColor={Colors.blue}
                         onpress={() => {
                           setSwitchOn(!switchOn);
                         }}
-                        toggle={switchOn}
+                        isOn={switchOn}
                       />
                     ) : item.type != 'AboutApp' ? (
                       <Ionicons

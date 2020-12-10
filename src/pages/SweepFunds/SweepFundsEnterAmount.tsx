@@ -42,7 +42,7 @@ import idx from 'idx';
 import ModalHeader from '../../components/ModalHeader';
 import RemoveSelectedAcoount from './RemoveSelectedAccount';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import ToggleSwitch from '../../components/ToggleSwitch';
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import AccountSelectionModalContents from '../Accounts/AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
@@ -624,8 +624,8 @@ class SweepFundsEnterAmount extends Component<
                   {/* {renderBitCoinInputText()} */}
                 </View>
                 <View style={styles.toggleSwitchView}>
-                  <ToggleSwitch
-                    currencyCodeValue={CurrencyCode}
+                  <CurrencyKindToggleSwitch
+                    fiatCurrencyCode={CurrencyCode}
                     onpress={async () => {
                       this.setState({ switchOn: !switchOn });
                       let temp = !switchOn ? 'true' : '';
@@ -633,8 +633,8 @@ class SweepFundsEnterAmount extends Component<
 
                       //await AsyncStorage.setItem('currencyToggleValue', temp);
                     }}
-                    toggle={switchOn}
-                    transform={true}
+                    isOn={switchOn}
+                    isVertical={true}
                   />
                 </View>
               </View>
