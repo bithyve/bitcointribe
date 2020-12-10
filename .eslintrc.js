@@ -1,10 +1,11 @@
 module.exports = {
+  
   env: {
     browser: true,
     es2021: true,
     node: true
   },
-extends: [
+  extends: [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended'
@@ -19,17 +20,32 @@ extends: [
   },
   plugins: [ 'react', '@typescript-eslint' ],
   rules: {
-    'space-in-brackets': [ 'error', 'always', {
-      'singleValue': true,
-      'objectsInArrays': true,
-      'arraysInArrays': true,
-      'arraysInObjects': true,
-      'objectsInObjects': true,
-      'propertyName': true
-    } ],
+    'computed-property-spacing': [ 'error', 'always' ],
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
     'space-in-parens': [ 'error', 'always' ],
-    'quotes': [ 'error', 'single' ]
+    'quotes': [ 'error', 'single' ],
+
+    'comma-spacing': [ 'error', {
+      'before': false, 'after': true 
+    } ],
+
+    'semi': [ 'error', 'never' ],
+
+    'indent': [ 'error', 2, {
+      'SwitchCase': 2 
+    } ],
+
+    'object-curly-newline': [ 'error', {
+      'multiline': true 
+    }, {
+      'ObjectExpression': 'always',
+      'ObjectPattern': {
+        'multiline': true 
+      },
+      'ExportDeclaration': {
+        'multiline': true, 'minProperties': 3 
+      }
+    } ]
   }
 }
