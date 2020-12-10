@@ -8,11 +8,11 @@ enum BitcoinUnit {
 export function displayNameForBitcoinUnit(unit: BitcoinUnit): string {
   switch (unit) {
     case BitcoinUnit.SATS:
-      return "Sats";
+      return "sats";
     case BitcoinUnit.BTC:
       return "BTC";
     case BitcoinUnit.TSATS:
-      return "T-Sats";
+      return "t-sats";
   }
 }
 
