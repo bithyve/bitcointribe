@@ -1,7 +1,7 @@
 enum BitcoinUnit {
-  SATS,
-  BTC,
-  TSATS,
+  SATS = 'SATS',
+  BTC = 'BTC',
+  TSATS = 'TSATS',
 }
 
 

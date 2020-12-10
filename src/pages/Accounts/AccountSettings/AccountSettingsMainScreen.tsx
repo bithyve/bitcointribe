@@ -1,0 +1,104 @@
+import React, { useMemo } from 'react';
+import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native';
+import { ListItem } from 'react-native-elements';
+import ListStyles from '../../../common/Styles/ListStyles';
+
+export type Props = {
+  navigation: any;
+};
+
+export type SettingsListItem = {
+  title: string;
+  subtitle: string;
+  screenName: string;
+  imageSource: ImageSourcePropType;
+};
+
+const listItems: SettingsListItem[] = [
+  {
+    title: 'Name & Description',
+    subtitle: `Customize display properties`,
+    screenName: 'EditDisplayProperties',
+    imageSource: require('../../../assets/images/icons/icon_checking_blue.png'),
+  },
+  {
+    title: 'Reassign Transactions',
+    subtitle: 'Map from this account to another',
+    screenName: 'ReassignTransactionsMainOptions',
+    imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
+  },
+  {
+    title: 'Account Visibility',
+    subtitle: `Configure for different privacy-sensitive contexts`,
+    screenName: 'EditVisibility',
+    imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
+  },
+  {
+    title: 'Merge Account',
+    subtitle: `Move all transactions to another Hexa account`,
+    screenName: 'MergeAccounts',
+    imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
+  },
+  {
+    title: 'Archive Account',
+    subtitle: 'Move this account out of sight and out of mind',
+    screenName: '',
+    imageSource: require('../../../assets/images/icons/icon_archive.png'),
+  },
+];
+
+const listItemKeyExtractor = (item: SettingsListItem) => item.title;
+
+const AccountSettingsMainScreen: React.FC<Props> = ({
+  navigation,
+}: Props) => {
+  const accountShellID = useMemo(() => {
+    return navigation.getParam('accountShellID');
+  }, [navigation]);
+
+  function handleListItemPressed(listItem: SettingsListItem) {
+    navigation.navigate(listItem.screenName, {
+      accountShellID,
+    });
+  }
+
+  const renderItem = ({ item: listItem }: { item: SettingsListItem }) => {
+    return (
+      <ListItem
+        bottomDivider
+        onPress={() => { handleListItemPressed(listItem) }}
+      >
+        <Image
+          source={listItem.imageSource}
+          style={ListStyles.thumbnailImageSmall}
+          resizeMode="contain"
+        />
+
+        <ListItem.Content style={ListStyles.listItemContentContainer}>
+          <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
+          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
+        </ListItem.Content>
+
+        <ListItem.Chevron />
+      </ListItem>
+    );
+  };
+
+  return (
+    <FlatList
+      style={styles.rootContainer}
+      contentContainerStyle={{ paddingHorizontal: 14 }}
+      data={listItems}
+      keyExtractor={listItemKeyExtractor}
+      renderItem={renderItem}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    paddingHorizontal: 10,
+  },
+});
+
+export default AccountSettingsMainScreen;

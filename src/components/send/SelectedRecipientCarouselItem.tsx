@@ -11,20 +11,23 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import ContactAvatar from '../ContactAvatar';
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
+import CurrencyKind from '../../common/data/enums/CurrencyKind';
 
 
 export type Props = {
   recipient: RecipientDescribing;
   onRemove: () => void;
+  currencyCode?: string;
   containerStyle?: Record<string, unknown>;
 };
 
 const SelectedRecipientCarouselItem: React.FC<Props> = ({
   recipient,
   onRemove,
+  currencyCode = '',
   containerStyle = {},
 }: Props) => {
-  const unitText = useFormattedUnitText({});
+  const unitText = !currencyCode ? useFormattedUnitText({ currencyKind: CurrencyKind.FIAT }) : currencyCode;
 
   return (
     <View style={{ ...styles.rootContainer, ...containerStyle }}>

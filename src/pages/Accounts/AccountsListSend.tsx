@@ -13,7 +13,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import config from '../../bitcoin/HexaConfig';
-import AccountBalanceDisplay from '../../components/accounts/AccountBalanceDisplay';
+import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay';
 
 const AccountsListSend = ({
   balances,
@@ -79,7 +79,7 @@ const AccountsListSend = ({
           </Text>
 
           {!fromAddNewAccount && (
-            <AccountBalanceDisplay
+            <LabeledBalanceDisplay
               balance={balance}
               currencyImageStyle={balanceTextStyle}
               amountTextStyle={balanceTextStyle}

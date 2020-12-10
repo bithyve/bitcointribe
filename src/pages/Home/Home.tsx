@@ -3,21 +3,19 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  FlatList,
   ImageBackground,
   Platform,
   AsyncStorage,
   Linking,
   Alert,
   Image,
-  BackHandler,
+  AppState
 } from 'react-native';
 import { Easing } from 'react-native-reanimated';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 import DeviceInfo from 'react-native-device-info';
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents';
 import AddModalContents from '../../components/AddModalContents';
-import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import Colors from '../../common/Colors';
@@ -28,8 +26,6 @@ import {
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   FAST_BITCOINS,
-  DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { connect } from 'react-redux';
 import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss';
@@ -47,7 +43,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications';
 import { storeFbtcData } from '../../store/actions/fbtc';
-import { setCurrencyCode, setCardData } from '../../store/actions/preferences';
+import { setCurrencyCode } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import Toast from '../../components/Toast';
@@ -59,17 +55,15 @@ import RelayServices from '../../bitcoin/services/RelayService';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import config from '../../bitcoin/HexaConfig';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import HomeList from '../../components/home/home-list';
 import HomeHeader from '../../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs';
-import { initialCardData, closingCardData } from '../../stubs/initialCardData';
 import {
-  fetchDerivativeAccBalTx,
   addTransferDetails,
+  fetchDerivativeAccBalTx,
 } from '../../store/actions/accounts';
 import { trustedChannelActions } from '../../bitcoin/utilities/Interface';
 import moment from 'moment';
@@ -94,8 +88,12 @@ import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
 const releaseNotificationTopic = getReleaseTopic()
+import { AccountsState } from '../../store/reducers/accounts';
+import HomeAccountCardsList from './HomeAccountCardsList';
+import AccountShell from '../../common/data/models/AccountShell';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
+
 
 export enum BottomSheetState {
   Closed,
@@ -115,7 +113,6 @@ export enum BottomSheetKind {
 interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
-  cardData?: any[];
   CurrencyCode: string;
   balances: any;
   selectedBottomTab: BottomTab | null;
@@ -136,14 +133,13 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
-  isBalanceLoading: boolean;
 }
 
 interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
-  exchangeRates: any[];
-  accounts: any[];
+  exchangeRates?: any[];
+  accountsState: AccountsState;
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -174,8 +170,6 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  setCardData: any;
-  cardDataProps: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -198,7 +192,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.state = {
       notificationData: [],
-      cardData: [],
       CurrencyCode: 'USD',
       balances: {},
       selectedBottomTab: null,
@@ -218,9 +211,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
-      isBalanceLoading: true,
     };
   }
+
+  navigateToAddNewAccountScreen = () => {
+    this.props.navigation.navigate('AddNewAccount');
+  };
 
   onPressNotifications = async () => {
     let notificationList = JSON.parse(
@@ -253,14 +249,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   processQRData = async (qrData) => {
-    const { accounts, addTransferDetails, navigation } = this.props;
+    const { accountsState, addTransferDetails, navigation } = this.props;
 
     const network = Bitcoin.networkType(qrData);
     if (network) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT; // default service type
 
-      const service = accounts[serviceType].service;
+      const service = accountsState[serviceType].service;
       const { type } = service.addressDiff(qrData);
       if (type) {
         let item;
@@ -488,97 +484,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setAccountCardData = (newCardData) => {
-    let newArrayFinal = [];
-    let tempArray = [];
-    for (let a = 0; a < newCardData.length; a++) {
-      tempArray.push(newCardData[a]);
-      if (
-        tempArray.length == 2 ||
-        newCardData[newCardData.length - 1].id == tempArray[0].id
-      ) {
-        newArrayFinal.push(tempArray);
-        tempArray = [];
-      }
-    }
-    if (newArrayFinal) {
-      this.setState({
-        cardData: newArrayFinal,
-      });
-    }
-  };
-
-  updateAccountCardData = () => {
-    let { accounts } = this.props;
-    const defaultCardData = initialCardData;
-    let idIndex = initialCardData.length;
-    const allCards = [];
-    const additionalCardData = [];
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts =
-        accounts[serviceType].service[
-          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts;
-
-      for (const carouselAcc of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[carouselAcc]) continue;
-
-        for (
-          let index = 1;
-          index <= derivativeAccounts[carouselAcc].instance.using;
-          index++
-        ) {
-          const account = derivativeAccounts[carouselAcc][index];
-          idIndex++;
-
-          let title = '';
-          switch (carouselAcc) {
-            case DONATION_ACCOUNT:
-              title = account.subject ? account.subject : 'Donation Account';
-              break;
-
-            case SUB_PRIMARY_ACCOUNT:
-              if (serviceType === REGULAR_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Checking Account';
-              else if (serviceType === SECURE_ACCOUNT)
-                title = account.accountName
-                  ? account.accountName
-                  : 'Savings Account';
-              break;
-          }
-
-          const carouselInstance = {
-            id: idIndex,
-            title,
-            unit: 'sats',
-            amount: account.balances
-              ? account.balances.balance + account.balances.unconfirmedBalance
-              : 0,
-            account:
-              carouselAcc === DONATION_ACCOUNT
-                ? `Accept bitcoin`
-                : serviceType === REGULAR_ACCOUNT
-                ? 'User Checking Account'
-                : 'User Savings Account',
-            accountType: serviceType,
-            subType: carouselAcc,
-            bitcoinicon: require('../../assets/images/icons/icon_bitcoin_test.png'),
-          };
-          additionalCardData.push(carouselInstance);
-        }
-      }
-    }
-
-    allCards.push(...defaultCardData, ...additionalCardData);
-    this.props.setCardData(allCards);
-    this.setAccountCardData([
-      ...defaultCardData,
-      ...additionalCardData,
-      ...closingCardData,
-    ]);
-  };
 
   scheduleNotification = async () => {
     const channelId = new firebase.notifications.Android.Channel(
@@ -637,14 +542,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
-    const { s3Service, navigation } = this.props;
+    const { navigation } = this.props;
 
     this.closeBottomSheet();
-    this.updateAccountCardData();
     this.getBalances();
 
     this.appStateListener = AppState.addEventListener(
@@ -672,9 +576,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getNewTransactionNotifications = async () => {
     let newTransactions = [];
-    const { accounts } = this.props;
-    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
-    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+    const { accountsState } = this.props;
+    const regularAccount = accountsState[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accountsState[SECURE_ACCOUNT].service.secureHDWallet;
 
     let newTransactionsRegular =
       regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
@@ -781,10 +685,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList();
     }
 
-    if (prevProps.accounts !== this.props.accounts) {
+    if (prevProps.accountsState !== this.props.accountsState) {
       this.getBalances();
       this.getNewTransactionNotifications();
-      this.updateAccountCardData();
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -802,7 +705,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const serviceType = REGULAR_ACCOUNT;
       const {
         paymentDetails,
-        accounts,
+        accountsState,
         navigation,
         addTransferDetails,
         clearPaymentDetails,
@@ -811,7 +714,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       let options: any = {};
       if (paymentURI) {
         try {
-          const details = accounts[serviceType].service.decodePaymentURI(
+          const details = accountsState[serviceType].service.decodePaymentURI(
             paymentURI,
           );
           address = details.address;
@@ -968,7 +871,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1049,7 +952,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener('didFocus', () => {
       this.setCurrencyCodeFromAsync();
-      this.getAssociatedContact();
       this.checkFastBitcoin();
       this.props.fetchNotifications();
       this.setState({
@@ -1057,7 +959,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     });
 
-    this.getAssociatedContact();
     this.setCurrencyCodeFromAsync();
     this.checkFastBitcoin();
   };
@@ -1258,29 +1159,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getBalances = () => {
-    const { accounts } = this.props;
+    const { accountsState } = this.props;
 
-    let testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let testBalance = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    const testTransactions = accountsState[TEST_ACCOUNT].service
+      ? accountsState[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
 
     if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    let regularBalance = accountsState[REGULAR_ACCOUNT].service
+      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
+
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -1297,19 +1199,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+    let secureBalance = accountsState[SECURE_ACCOUNT].service
+      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
+
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       if (dAccountType === TRUSTED_CONTACTS) continue;
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+        dAccountType
         ];
 
       if (derivativeAccount && derivativeAccount.instance.using) {
@@ -1332,7 +1235,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
       const derivativeAccounts =
-        accounts[serviceType].service[
+        accountsState[serviceType].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
         ].derivativeAccounts;
 
@@ -1364,7 +1267,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         secureBalance,
         accumulativeBalance,
       },
-      isBalanceLoading: false,
     });
   };
 
@@ -1408,7 +1310,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet();
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   handleBottomTabSelection = (tab: BottomTab) => {
     this.setState({ selectedBottomTab: tab });
@@ -1510,7 +1412,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   if (contact) {
                     contactName = `${contact.firstName} ${
                       contact.lastName ? contact.lastName : ''
-                    }`
+                      }`
                       .toLowerCase()
                       .trim();
                   } else {
@@ -1596,6 +1498,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     }
+  };
+
+  handleAccountCardSelection = (selectedAccount: AccountShell) => {
+    this.props.navigation.navigate('AccountDetails', {
+      accountShellID: selectedAccount.id,
+    });
   };
 
   handleBottomSheetPositionChange = (newIndex: number) => {
@@ -1688,8 +1596,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1748,9 +1656,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == releaseNotificationTopic) {
             readStatus = readStatus;
@@ -2007,21 +1915,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      cardData,
       balances,
       selectedBottomTab,
       notificationData,
       currencyCode,
-      isBalanceLoading,
     } = this.state;
 
     const {
       navigation,
       exchangeRates,
-      accounts,
       walletName,
       overallHealth,
-      cardDataProps,
     } = this.props;
 
     return (
@@ -2053,36 +1957,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
         </View>
 
-        <View style={styles.accountCardsContainer}>
-          <FlatList
-            contentContainerStyle={{
-              paddingTop: 36,
-              alignItems: 'flex-start',
-            }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={cardData}
-            extraData={{
-              balances,
-              walletName,
-              currencyCode,
-              accounts,
-              exchangeRates,
-            }}
-            keyExtractor={(_, index) => String(index)}
-            renderItem={(Items) => (
-              <HomeList
-                isBalanceLoading={isBalanceLoading}
-                Items={Items}
-                navigation={navigation}
-                accounts={accounts}
-                addNewDisable={cardDataProps.length == 4 ? true : false}
-                balances={balances}
-                exchangeRates={exchangeRates}
-              />
-            )}
-          />
-        </View>
+        <HomeAccountCardsList
+          containerStyle={styles.accountCardsSectionContainer}
+          contentContainerStyle={{
+            paddingTop: 36,
+            paddingLeft: 14,
+          }}
+          onAddNewSelected={this.navigateToAddNewAccountScreen}
+          onCardSelected={this.handleAccountCardSelection}
+        />
 
         <View
           style={styles.floatingFriendsAndFamilyButtonContainer}
@@ -2143,16 +2026,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications,
+    accountsState: state.accounts,
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
-    accounts: state.accounts || [],
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     UNDER_CUSTODY: idx(
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
     ),
-    cardDataProps: idx(state, (_) => _.preferences.cardData),
-
     s3Service: idx(state, (_) => _.sss.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
@@ -2188,22 +2069,18 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    setCardData,
   })(Home),
 );
 
 const styles = StyleSheet.create({
-  accountCardsContainer: {
+  accountCardsSectionContainer: {
     flex: 7,
     marginTop: 30,
-    paddingLeft: 20,
+    backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
-    backgroundColor: Colors.backgroundColor,
-    justifyContent: 'center',
-    width: '100%',
   },
 
   floatingFriendsAndFamilyButtonContainer: {

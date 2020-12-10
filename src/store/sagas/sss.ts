@@ -87,8 +87,9 @@ import Toast from '../../components/Toast';
 import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
-import { failedST3 } from '../actions/accounts';
+import { failedST3, restoredAccountShells } from '../actions/accounts';
 import RelayServices from '../../bitcoin/services/RelayService';
+import AccountShell from '../../common/data/models/AccountShell';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -1699,6 +1700,16 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA;
 };
 
+function* stateDataToBackup() {
+  // state data to backup
+  const accountShells = yield select((state) => state.accounts.accountShells);
+  const STATE_DATA = {};
+  if (accountShells && accountShells.length)
+    STATE_DATA['accountShells'] = JSON.stringify(accountShells);
+
+  return STATE_DATA;
+}
+
 function* updateWalletImageWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
 
@@ -1746,6 +1757,20 @@ function* updateWalletImageWorker({ payload }) {
         hashesWI.ASYNC_DATA = currentAsyncHash;
       }
     }
+
+    const STATE_DATA = yield call(stateDataToBackup);
+    if (Object.keys(STATE_DATA).length) {
+      const currentStateHash = hash(STATE_DATA);
+      console.log({
+        STATE_DATA,
+        previousStateHash: hashesWI.STATE_DATA,
+        currentStateHash,
+      });
+      if (!hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA) {
+        walletImage['STATE_DATA'] = STATE_DATA;
+        hashesWI.STATE_DATA = currentStateHash;
+      }
+    }
   } else {
     walletImage = {
       DECENTRALIZED_BACKUP,
@@ -1761,6 +1786,13 @@ function* updateWalletImageWorker({ payload }) {
     if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
+    }
+
+    const STATE_DATA = yield call(stateDataToBackup);
+    console.log({ STATE_DATA });
+    if (Object.keys(STATE_DATA).length) {
+      walletImage['STATE_DATA'] = STATE_DATA;
+      hashesWI['STATE_DATA'] = hash(STATE_DATA);
     }
   }
 
@@ -1798,8 +1830,13 @@ function* fetchWalletImageWorker({ payload }) {
     if (!Object.keys(walletImage).length)
       console.log('Failed fetch: Empty Wallet Image');
 
-    // update DB and Async
-    const { DECENTRALIZED_BACKUP, SERVICES, ASYNC_DATA } = walletImage;
+    // restore DB, Async and State data
+    const {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+      ASYNC_DATA,
+      STATE_DATA,
+    } = walletImage;
 
     if (ASYNC_DATA) {
       for (const key of Object.keys(ASYNC_DATA)) {
@@ -1809,6 +1846,15 @@ function* fetchWalletImageWorker({ payload }) {
         if (key === 'TrustedContactsInfo' && ASYNC_DATA[key]) {
           const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
           yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+        }
+      }
+    }
+
+    if (STATE_DATA) {
+      for (const key of Object.keys(STATE_DATA)) {
+        if (key === 'accountShells' && STATE_DATA[key]) {
+          const accountShells: AccountShell[] = JSON.parse(STATE_DATA[key]);
+          yield put(restoredAccountShells({ accountShells }));
         }
       }
     }
