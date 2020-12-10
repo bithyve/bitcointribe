@@ -27,7 +27,10 @@ const AccountCardColumn: React.FC<Props> = ({
   return (
     <View style={styles.rootContainer}>
       {prependsAddButton && (
-        <AddNewAccountCard onPress={onAddNewAccountPressed} />
+        <AddNewAccountCard
+          containerStyle={styles.cardContainer}
+          onPress={onAddNewAccountPressed}
+        />
       )}
 
       {cardData.map((accountShell) => {
