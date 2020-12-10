@@ -42,7 +42,6 @@ import {
   fetchNotifications,
   notificationsUpdated,
 } from '../../store/actions/notifications';
-import { storeFbtcData } from '../../store/actions/fbtc';
 import { setCurrencyCode } from '../../store/actions/preferences';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -127,7 +126,6 @@ interface HomeStateTypes {
   selectedContact: any[];
   notificationDataChange: boolean;
   appState: string;
-  fbBTCAccount: any;
   trustedContactRequest: any;
   recoveryRequest: any;
   custodyRequest: any;
@@ -160,8 +158,6 @@ interface HomePropsTypes {
   isFocused: boolean;
   notificationListNew: any;
   notificationsUpdated: any;
-  FBTCAccountData: any;
-  storeFbtcData: any;
   setCurrencyCode: any;
   currencyCode: any;
   updatePreference: any;
@@ -204,7 +200,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       selectedContact: [],
       notificationDataChange: false,
       appState: '',
-      fbBTCAccount: {},
       trustedContactRequest: null,
       recoveryRequest: null,
       custodyRequest: null,
@@ -952,7 +947,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener('didFocus', () => {
       this.setCurrencyCodeFromAsync();
-      this.checkFastBitcoin();
       this.props.fetchNotifications();
       this.setState({
         lastActiveTime: moment().toISOString(),
@@ -960,16 +954,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     });
 
     this.setCurrencyCodeFromAsync();
-    this.checkFastBitcoin();
   };
 
-  checkFastBitcoin = async () => {
-    const { FBTCAccountData } = this.props;
-
-    let getFBTCAccount = FBTCAccountData || {};
-
-    this.setState({ fbBTCAccount: getFBTCAccount });
-  };
 
   setSecondaryDeviceAddresses = async () => {
     let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
@@ -2039,7 +2025,6 @@ const mapStateToProps = (state) => {
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
-    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
     secondaryDeviceAddressValue: idx(
@@ -2064,7 +2049,6 @@ export default withNavigationFocus(
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,
-    storeFbtcData,
     setCurrencyCode,
     updatePreference,
     setFCMToken,

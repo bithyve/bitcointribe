@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Image,
-  ImageSourcePropType,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Colors from '../common/Colors';
@@ -19,8 +18,9 @@ import { getCurrencyImageByRegion } from '../common/CommonFunctions';
 import useFormattedAmountText from '../utils/hooks/formatting/UseFormattedAmountText';
 import useFormattedUnitText from '../utils/hooks/formatting/UseFormattedUnitText';
 import { Satoshis } from '../common/data/enums/UnitAliases';
-import BitcoinUnit from '../common/data/enums/BitcoinUnit';
+import BitcoinUnit, { displayNameForBitcoinUnit } from '../common/data/enums/BitcoinUnit';
 import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin';
+import { UsNumberFormat } from '../common/utilities';
 
 export type Props = {
   balance: Satoshis;
@@ -33,11 +33,13 @@ export type Props = {
   currencyImageStyle?: Record<string, unknown>;
   amountTextStyle?: Record<string, unknown>;
   unitTextStyle?: Record<string, unknown>;
+  isTestAccount?: boolean;
 };
 
 /**
  * Displays a formatted balance amount in between a current icon
- * and a unit label.
+ * and a unit label that dynamically changes with the user's
+ * currency preferences.
  */
 const LabeledBalanceDisplay: React.FC<Props> = ({
   balance,
@@ -50,6 +52,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
   currencyImageStyle = {},
   amountTextStyle = {},
   unitTextStyle = {},
+  isTestAccount = false,
 }: Props) => {
   const fiatCurrencyCode = useCurrencyCode();
 
@@ -63,8 +66,13 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
     return balance / divisor;
   }, [balance, bitcoinUnit]);
 
-  const formattedBalanceText = useFormattedAmountText(amountToDisplay);
-  const formattedUnitText = useFormattedUnitText({ bitcoinUnit, currencyKind });
+  const formattedBalanceText = isTestAccount ?
+    UsNumberFormat(amountToDisplay)
+    : useFormattedAmountText(amountToDisplay);
+
+  const formattedUnitText = isTestAccount ?
+    displayNameForBitcoinUnit(bitcoinUnit)
+    : useFormattedUnitText({ bitcoinUnit, currencyKind });
 
   const bitcoinIconSource = useMemo(() => {
     switch (bitcoinIconColor) {
@@ -99,7 +107,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
       ...currencyImageStyle,
     };
 
-    if (prefersBitcoin) {
+    if (prefersBitcoin || isTestAccount) {
       return <Image style={style} source={bitcoinIconSource} />;
     }
 

@@ -11,6 +11,7 @@ import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/UseSecondarySubAccountForShell';
 import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 
 
 export type Props = {
@@ -66,6 +67,9 @@ const BodySection: React.FC<BodyProps> = ({
     };
   }, [accountsState.accountsSynced]);
 
+  const isTestAccount = useMemo(() => {
+    return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT;
+  }, [accountShell.primarySubAccount.kind]);
 
   return (
     <View style={styles.bodyContainer}>
@@ -82,6 +86,7 @@ const BodySection: React.FC<BodyProps> = ({
         bitcoinUnit={accountShell.unit}
         containerStyle={styles.balanceRow}
         amountTextStyle={balanceTextStyle}
+        isTestAccount={isTestAccount}
       />
     </View>
   );
