@@ -1,6 +1,7 @@
 enum TransactionKind {
-  SEND = 'Send',
+  SEND = 'Sent',
   RECEIVE = 'Received',
+  SELF = 'SELF',
 }
 
 export default TransactionKind;
