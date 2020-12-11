@@ -39,6 +39,7 @@ import {
   ACCOUNT_SHELL_REFRESH_COMPLETED,
   REFRESH_ACCOUNT_SHELL,
   RESTORED_ACCOUNT_SHELLS,
+  REMAP_ACCOUNT_SHELLS,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -696,6 +697,12 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         accountShells: [...shellToMove, ...state.accountShells].map(
           updateDisplayOrderForSortedShell,
         ),
+      };
+
+    case REMAP_ACCOUNT_SHELLS:
+      return {
+        ...state,
+        accountShells: updateAccountShells(action.payload.services, []),
       };
 
     case REFRESH_ACCOUNT_SHELL:

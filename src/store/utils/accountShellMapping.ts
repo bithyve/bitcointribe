@@ -8,6 +8,7 @@ import {
   DonationDerivativeAccount,
 } from '../../bitcoin/utilities/Interface';
 import {
+  DONATION_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
@@ -25,37 +26,114 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind';
+import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo';
 
 const initAccountShells = (services) => {
   const testAcc: TestAccount = services[TEST_ACCOUNT];
   const regularAcc: RegularAccount = services[REGULAR_ACCOUNT];
   const secureAcc: SecureAccount = services[SECURE_ACCOUNT];
-  return [
-    new AccountShell({
-      primarySubAccount: new TestSubAccountInfo({
-        id: testAcc.getAccountId(),
-        instanceNumber: 0, // default instances(0)
-      }),
-      unit: BitcoinUnit.TSATS,
-      displayOrder: 1,
+
+  const accountShells = [];
+
+  // adding ejected accounts to accountShells (aids upgrade from version < 1.4.0)
+  for (const sourceKind of [
+    SourceAccountKind.REGULAR_ACCOUNT,
+    SourceAccountKind.SECURE_ACCOUNT,
+  ]) {
+    let derivativeAccounts;
+    switch (sourceKind) {
+      case SourceAccountKind.REGULAR_ACCOUNT:
+        derivativeAccounts = regularAcc.hdWallet.derivativeAccounts;
+        break;
+
+      case SourceAccountKind.SECURE_ACCOUNT:
+        derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts;
+        break;
+    }
+
+    const derivativeAccount: DonationDerivativeAccount =
+      derivativeAccounts[DONATION_ACCOUNT];
+
+    if (derivativeAccount && derivativeAccount.instance.using) {
+      for (
+        let accountNumber = 1;
+        accountNumber <= derivativeAccount.instance.using;
+        accountNumber++
+      ) {
+        let dervBalances: Balances = {
+          confirmed: 0,
+          unconfirmed: 0,
+        };
+        let dervTransactions: TransactionDescribing[] = [];
+
+        if (derivativeAccount[accountNumber].balances)
+          dervBalances = {
+            confirmed: derivativeAccount[accountNumber].balances.balance,
+            unconfirmed:
+              derivativeAccount[accountNumber].balances.unconfirmedBalance,
+          };
+
+        if (derivativeAccount[accountNumber].transactions)
+          dervTransactions =
+            derivativeAccount[accountNumber].transactions.transactionDetails;
+
+        const derivativeId = derivativeAccount[accountNumber].xpubId;
+        const { donee, subject, description } = derivativeAccount[
+          accountNumber
+        ];
+        const accShell = new AccountShell({
+          primarySubAccount: new DonationSubAccountInfo({
+            id: derivativeId,
+            instanceNumber: accountNumber,
+            balances: dervBalances,
+            transactions: dervTransactions,
+            doneeName: donee,
+            customDisplayName: subject,
+            customDescription: description,
+            isTFAEnabled:
+              sourceKind === SourceAccountKind.REGULAR_ACCOUNT ? false : true,
+            causeName: '',
+          }),
+          unit: BitcoinUnit.SATS,
+          displayOrder: 3,
+        });
+        accountShells.push(accShell);
+      }
+    }
+  }
+
+  // adding default account shells
+  const defaultTestShell = new AccountShell({
+    primarySubAccount: new TestSubAccountInfo({
+      id: testAcc.getAccountId(),
+      instanceNumber: 0, // default instances(0)
     }),
-    new AccountShell({
-      primarySubAccount: new CheckingSubAccountInfo({
-        id: regularAcc.getAccountId(),
-        instanceNumber: 0,
-      }),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 2,
+    unit: BitcoinUnit.TSATS,
+    displayOrder: 1,
+  });
+  const defaultCheckingShell = new AccountShell({
+    primarySubAccount: new CheckingSubAccountInfo({
+      id: regularAcc.getAccountId(),
+      instanceNumber: 0,
     }),
-    new AccountShell({
-      primarySubAccount: new SavingsSubAccountInfo({
-        id: secureAcc.getAccountId(),
-        instanceNumber: 0,
-      }),
-      unit: BitcoinUnit.SATS,
-      displayOrder: 3,
+    unit: BitcoinUnit.SATS,
+    displayOrder: 2,
+  });
+  const defaultSavingsShell = new AccountShell({
+    primarySubAccount: new SavingsSubAccountInfo({
+      id: secureAcc.getAccountId(),
+      instanceNumber: 0,
     }),
-  ];
+    unit: BitcoinUnit.SATS,
+    displayOrder: 3,
+  });
+  accountShells.push(
+    defaultTestShell,
+    defaultCheckingShell,
+    defaultSavingsShell,
+  );
+
+  return accountShells;
 };
 
 const updatePrimarySubAccounts = (
@@ -153,11 +231,13 @@ const updatePrimarySubAccounts = (
           derivativeAccounts[DerivativeAccountTypes.DONATION_ACCOUNT];
         const donationInstance = donationAccounts[instanceNumber];
 
-        balances = {
-          confirmed: donationInstance.balances.balance,
-          unconfirmed: donationInstance.balances.unconfirmedBalance,
-        };
-        transactions = donationInstance.transactions.transactionDetails;
+        if (donationInstance && donationInstance.balances) {
+          balances = {
+            confirmed: donationInstance.balances.balance,
+            unconfirmed: donationInstance.balances.unconfirmedBalance,
+          };
+          transactions = donationInstance.transactions.transactionDetails;
+        }
 
         break;
     }
@@ -282,7 +362,7 @@ export const updateAccountShells = (
   accountShells: AccountShell[],
 ): AccountShell[] => {
   // init out-of-the-box account shells
-  if (!accountShells.length) {
+  if (!accountShells || !accountShells.length) {
     accountShells = initAccountShells(services);
   }
 
