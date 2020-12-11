@@ -21,30 +21,34 @@ const listItems: SettingsListItem[] = [
     screenName: 'EditDisplayProperties',
     imageSource: require('../../../assets/images/icons/icon_checking_blue.png'),
   },
-  {
-    title: 'Reassign Transactions',
-    subtitle: 'Map from this account to another',
-    screenName: 'ReassignTransactionsMainOptions',
-    imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
-  },
-  {
-    title: 'Account Visibility',
-    subtitle: `Configure for different privacy-sensitive contexts`,
-    screenName: 'EditVisibility',
-    imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
-  },
-  {
-    title: 'Merge Account',
-    subtitle: `Move all transactions to another Hexa account`,
-    screenName: 'MergeAccounts',
-    imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
-  },
-  {
-    title: 'Archive Account',
-    subtitle: 'Move this account out of sight and out of mind',
-    screenName: '',
-    imageSource: require('../../../assets/images/icons/icon_archive.png'),
-  },
+
+  // 📝 These items are being commented out until their functionality is fully implemented.
+  // See: https://github.com/bithyve/hexa/issues/2243
+
+  // {
+  //   title: 'Reassign Transactions',
+  //   subtitle: 'Map from this account to another',
+  //   screenName: 'ReassignTransactionsMainOptions',
+  //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
+  // },
+  // {
+  //   title: 'Account Visibility',
+  //   subtitle: `Configure for different privacy-sensitive contexts`,
+  //   screenName: 'EditVisibility',
+  //   imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
+  // },
+  // {
+  //   title: 'Merge Account',
+  //   subtitle: `Move all transactions to another Hexa account`,
+  //   screenName: 'MergeAccounts',
+  //   imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
+  // },
+  // {
+  //   title: 'Archive Account',
+  //   subtitle: 'Move this account out of sight and out of mind',
+  //   screenName: '',
+  //   imageSource: require('../../../assets/images/icons/icon_archive.png'),
+  // },
 ];
 
 const listItemKeyExtractor = (item: SettingsListItem) => item.title;
