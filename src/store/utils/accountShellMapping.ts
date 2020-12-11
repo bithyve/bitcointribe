@@ -153,11 +153,13 @@ const updatePrimarySubAccounts = (
 
     switch (shell.primarySubAccount.kind) {
       case SubAccountKind.TEST_ACCOUNT:
+        transactions = testAcc.hdWallet.transactions.transactionDetails;
         balances = {
-          confirmed: testAcc.hdWallet.balances.balance,
+          confirmed: transactions.length
+            ? testAcc.hdWallet.balances.balance
+            : 10000, // hardcoding initial test balance while testnet faucet dispatches corresponding sats
           unconfirmed: testAcc.hdWallet.balances.unconfirmedBalance,
         };
-        transactions = testAcc.hdWallet.transactions.transactionDetails;
         break;
 
       case SubAccountKind.REGULAR_ACCOUNT:

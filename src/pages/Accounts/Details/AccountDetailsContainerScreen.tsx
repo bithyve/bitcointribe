@@ -269,6 +269,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           }}
           averageTxFees={averageTxFees}
           network={
+            config.APP_STAGE === 'dev' ||
             primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
               ? NetworkKind.TESTNET
               : NetworkKind.MAINNET
