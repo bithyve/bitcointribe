@@ -34,8 +34,6 @@ export default class TrustedContactsSubAccountInfo
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource: ImageSourcePropType;
-
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
@@ -63,8 +61,5 @@ export default class TrustedContactsSubAccountInfo
     this.isTFAEnabled = isTFAEnabled;
     this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
-
-    // TODO: Define some way to generate this from the address book avatar.
-    this.avatarImageSource = require('../../../../../assets/images/icons/icon_hexa.png');
   }
 }

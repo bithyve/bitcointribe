@@ -2,7 +2,7 @@ import { ImageSourcePropType } from 'react-native';
 import RecipientKind from '../../enums/RecipientKind';
 import { Satoshis } from '../../typealiases/UnitAliases';
 import ContactTrustKind from '../../enums/ContactTrustKind';
-import getAvatarForSubAccountKind from '../../../../utils/accounts/GetAvatarForSubAccountKind';
+import getAvatarForDeprecatedSubAccountKind from '../../../../utils/accounts/GetAvatarForDeprecatedSubAccountKind';
 
 export interface RecipientDescribing {
   id: string;
@@ -45,7 +45,7 @@ export function makeSubAccountRecipientDescription(
     id: data.id,
     kind: RecipientKind.SUB_ACCOUNT,
     displayedName: data.account_name || data.id,
-    avatarImageSource: getAvatarForSubAccountKind(accountKind),
+    avatarImageSource: getAvatarForDeprecatedSubAccountKind(accountKind),
     availableBalance: data.bitcoinAmount || data.amount || 0,
     initiatedAt: data.initiatedAt,
   };

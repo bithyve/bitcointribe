@@ -5,6 +5,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
 import ListStyles from '../../common/Styles/ListStyles';
 import ImageStyles from '../../common/Styles/ImageStyles';
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   subAccountInfo: SubAccountDescribing;
@@ -17,7 +18,7 @@ const DestinationAccountShellListItemContent: React.FC<Props> = ({
   return (
     <>
       <Image
-        source={subAccountInfo.avatarImageSource}
+        source={getAvatarForSubAccount(subAccountInfo)}
         style={styles.avatarImage}
         resizeMode="contain"
       />

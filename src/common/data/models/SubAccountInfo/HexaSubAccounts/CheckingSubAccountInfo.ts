@@ -31,8 +31,6 @@ export default class CheckingSubAccountInfo
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource = require('../../../../../assets/images/icons/icon_regular.png');
-
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;

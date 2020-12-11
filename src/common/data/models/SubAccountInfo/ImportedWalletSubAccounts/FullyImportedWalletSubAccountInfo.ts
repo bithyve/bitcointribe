@@ -33,8 +33,6 @@ export default class FullyImportedWalletSubAccountInfo
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource = require('../../../../../assets/images/icons/icon_wallet.png');
-
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;

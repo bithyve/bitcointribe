@@ -17,6 +17,7 @@ import { Button } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccountShell from '../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   accountShell: AccountShell;
@@ -75,7 +76,7 @@ const AccountDetailsCard: React.FC<Props> = ({
       <View style={styles.accountKindDetailsSection}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
           <Image
-            source={primarySubAccountInfo.avatarImageSource}
+            source={getAvatarForSubAccount(primarySubAccountInfo)}
             style={styles.accountKindBadgeImage}
           />
 
