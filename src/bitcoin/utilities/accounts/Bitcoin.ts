@@ -11,6 +11,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes';
+import { v4 as uuidv4 } from 'uuid';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
 const { TESTNET, MAINNET } = API_URLS;
@@ -120,8 +121,9 @@ export default class Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
+      const requestId = uuidv4();
       const accountToAddressMapping = {
-        ['mono-id']: {
+        [requestId]: {
           External: externalAddresses,
           Internal: internalAddresses,
           Owned: ownedAddresses,
@@ -141,12 +143,12 @@ export default class Bitcoin {
       }
 
       const accountToResponseMapping = res.data;
-      const { Utxos, Txs } = accountToResponseMapping['mono-id'];
+
+      const { Utxos, Txs } = accountToResponseMapping[requestId];
       let balances = {
         balance: 0,
         unconfirmedBalance: 0,
       };
-
       const UTXOs = [];
       if (Utxos)
         for (const addressSpecificUTXOs of Utxos) {
@@ -216,7 +218,10 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Sent',
                   amount: tx.SentAmount,
-                  accountType,
+                  accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -232,7 +237,10 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: 'Received',
                   amount: tx.ReceivedAmount,
-                  accountType,
+                  accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
                   primaryAccType,
                   senderAddresses: tx.SenderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -242,6 +250,18 @@ export default class Bitcoin {
                   ...[outgoingTx, incomingTx],
                 );
               } else {
+                let accType = accountType;
+                switch (accType) {
+                  case TRUSTED_CONTACTS:
+                    accType = contactName
+                      .split(' ')
+                      .map((word) => word[0].toUpperCase() + word.substring(1))
+                      .join(' ');
+
+                  case SUB_PRIMARY_ACCOUNT:
+                    accType = primaryAccType;
+                }
+
                 const transaction = {
                   txid: tx.txid,
                   confirmations:
@@ -258,15 +278,7 @@ export default class Bitcoin {
                     : new Date(Date.now()).toUTCString(),
                   transactionType: tx.TransactionType,
                   amount: tx.Amount,
-                  accountType:
-                    accountType === TRUSTED_CONTACTS
-                      ? contactName
-                          .split(' ')
-                          .map(
-                            (word) => word[0].toUpperCase() + word.substring(1),
-                          )
-                          .join(' ')
-                      : accountType,
+                  accountType: accType,
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   senderAddresses: tx.SenderAddresses,

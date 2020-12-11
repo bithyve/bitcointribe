@@ -1,7 +1,4 @@
-import React, {
-  PureComponent,
-  createRef,
-} from 'react';
+import React, { PureComponent, createRef } from 'react';
 import {
   View,
   Text,
@@ -56,9 +53,9 @@ import {
   EphemeralDataElements,
   MetaShare,
 } from '../../bitcoin/utilities/Interface';
-import {
-  removeTrustedContact,
-} from '../../store/actions/trustedContacts';
+import { removeTrustedContact } from '../../store/actions/trustedContacts';
+import AccountShell from '../../common/data/models/AccountShell';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
 
 const getImageIcon = (item) => {
   if (item) {
@@ -92,14 +89,14 @@ const getImageIcon = (item) => {
               <Text style={styles.headerImageInitialsText}>
                 {item
                   ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
+                      item.firstName && item.lastName
+                        ? item.firstName + ' ' + item.lastName
+                        : item.firstName && !item.lastName
                         ? item.firstName
                         : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                  )
+                        ? item.lastName
+                        : '',
+                    )
                   : ''}
               </Text>
             </View>
@@ -113,6 +110,7 @@ const getImageIcon = (item) => {
 interface ContactDetailsPropTypes {
   navigation: any;
   trustedContacts: TrustedContactsService;
+  accountShells: AccountShell[];
   uploading: any;
   errorSending: any;
   uploadSuccessfull: any;
@@ -148,7 +146,7 @@ interface ContactDetailsStateTypes {
 class ContactDetails extends PureComponent<
   ContactDetailsPropTypes,
   ContactDetailsStateTypes
-  > {
+> {
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
@@ -275,7 +273,7 @@ class ContactDetails extends PureComponent<
     if (this.Contact.firstName && SHARES_TRANSFER_DETAILS[this.index]) {
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -326,7 +324,19 @@ class ContactDetails extends PureComponent<
     this.props.addTransferDetails(REGULAR_ACCOUNT, {
       selectedContact: this.Contact,
     });
+
+    let defaultAccountShellId: string;
+    const { accountShells } = this.props;
+    accountShells.forEach((shell: AccountShell) => {
+      if (
+        shell.primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT &&
+        !shell.primarySubAccount.instanceNumber
+      )
+        defaultAccountShellId = shell.id;
+    });
+
     this.props.navigation.navigate('SendToContact', {
+      accountShellID: defaultAccountShellId,
       selectedContact: this.Contact,
       serviceType: REGULAR_ACCOUNT,
       isFromAddressBook: true,
@@ -466,7 +476,7 @@ class ContactDetails extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -488,7 +498,7 @@ class ContactDetails extends PureComponent<
       UNDER_CUSTODY[requester] &&
       UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
       Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
-      config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
     ) {
       const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
@@ -518,7 +528,7 @@ class ContactDetails extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -552,7 +562,7 @@ class ContactDetails extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -605,7 +615,7 @@ class ContactDetails extends PureComponent<
 
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
       let data: EphemeralDataElements = {
@@ -617,7 +627,7 @@ class ContactDetails extends PureComponent<
       if (
         !SHARES_TRANSFER_DETAILS[this.index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[this.index].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -630,7 +640,7 @@ class ContactDetails extends PureComponent<
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         this.setState({
           trustedLink: '',
@@ -687,7 +697,7 @@ class ContactDetails extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${
       this.Contact.lastName ? this.Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -982,12 +992,12 @@ class ContactDetails extends PureComponent<
                   numberOfLines={1}
                 >
                   {this.Contact.firstName === 'F&F request' &&
-                    this.Contact.contactsWalletName !== undefined &&
-                    this.Contact.contactsWalletName !== ''
+                  this.Contact.contactsWalletName !== undefined &&
+                  this.Contact.contactsWalletName !== ''
                     ? `${this.Contact.contactsWalletName}'s Wallet`
                     : this.Contact.contactName == 'Secondary Device'
-                      ? 'Keeper Device'
-                      : contact.contactName}
+                    ? 'Keeper Device'
+                    : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
                   <Text style={styles.phoneText}>
@@ -1000,42 +1010,42 @@ class ContactDetails extends PureComponent<
                 ) : null}
               </View>
               {this.Contact.hasTrustedChannel &&
+              !(
+                this.Contact.hasXpub || this.Contact.hasTrustedAddress
+              ) ? null : this.Contact.contactName === 'Secondary Device' &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                ) ? null : this.Contact.contactName === 'Secondary Device' &&
-                  !(
-                    this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                  ) ? null : (
-                    <TouchableOpacity
-                      disabled={isSendDisabled}
-                      onPress={() => {
-                        this.setState({
-                          isSendDisabled: true,
-                        });
+                ) ? null : (
+                <TouchableOpacity
+                  disabled={isSendDisabled}
+                  onPress={() => {
+                    this.setState({
+                      isSendDisabled: true,
+                    });
 
-                        this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                          ? this.onPressSend()
-                          : this.Contact.contactName != 'Secondary Device'
-                            ? this.onPressResendRequest()
-                            : null;
-                      }}
-                      style={styles.resendContainer}
-                    >
-                      {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
-                        <Image
-                          source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                          style={styles.bitcoinIconStyle}
-                        />
-                      ) : null}
-                      <Text style={styles.sendTextStyle}>
-                        {this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                          ? 'Send'
-                          : this.index < 3
-                            ? 'Reshare'
-                            : 'Resend Request'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                    this.Contact.hasXpub || this.Contact.hasTrustedAddress
+                      ? this.onPressSend()
+                      : this.Contact.contactName != 'Secondary Device'
+                      ? this.onPressResendRequest()
+                      : null;
+                  }}
+                  style={styles.resendContainer}
+                >
+                  {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
+                    <Image
+                      source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                      style={styles.bitcoinIconStyle}
+                    />
+                  ) : null}
+                  <Text style={styles.sendTextStyle}>
+                    {this.Contact.hasXpub || this.Contact.hasTrustedAddress
+                      ? 'Send'
+                      : this.index < 3
+                      ? 'Reshare'
+                      : 'Resend Request'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           {Loading ? (
@@ -1074,26 +1084,26 @@ class ContactDetails extends PureComponent<
               />
             </View>
           ) : (
-              <View style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1 }}>
-                  {this.sortedHistory(trustedContactHistory).map((value) => {
-                    if (SelectedOption == value.id) {
-                      return (
-                        <TouchableOpacity
-                          key={value.id}
-                          onPress={() => this.SelectOption(value.id)}
-                          style={styles.selectOptionContainer}
+            <View style={{ flex: 1 }}>
+              <ScrollView style={{ flex: 1 }}>
+                {this.sortedHistory(trustedContactHistory).map((value) => {
+                  if (SelectedOption == value.id) {
+                    return (
+                      <TouchableOpacity
+                        key={value.id}
+                        onPress={() => this.SelectOption(value.id)}
+                        style={styles.selectOptionContainer}
+                      >
+                        <Text
+                          style={{
+                            color: Colors.blue,
+                            fontSize: RFValue(13),
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}
                         >
-                          <Text
-                            style={{
-                              color: Colors.blue,
-                              fontSize: RFValue(13),
-                              fontFamily: Fonts.FiraSansRegular,
-                            }}
-                          >
-                            {value.title}
-                          </Text>
-                          {/* <Text
+                          {value.title}
+                        </Text>
+                        {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(10),
@@ -1103,33 +1113,33 @@ class ContactDetails extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                          <Text style={styles.dateTextStyle}>{value.date}</Text>
-                        </TouchableOpacity>
-                      );
-                    } else {
-                      return (
-                        <TouchableOpacity
-                          key={value.id}
-                          onPress={() => this.SelectOption(value.id)}
-                          style={styles.selectOptionSecond}
+                        <Text style={styles.dateTextStyle}>{value.date}</Text>
+                      </TouchableOpacity>
+                    );
+                  } else {
+                    return (
+                      <TouchableOpacity
+                        key={value.id}
+                        onPress={() => this.SelectOption(value.id)}
+                        style={styles.selectOptionSecond}
+                      >
+                        <View
+                          style={{ flexDirection: 'row', alignItems: 'center' }}
                         >
-                          <View
-                            style={{ flexDirection: 'row', alignItems: 'center' }}
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontSize: RFValue(10),
+                              fontFamily: Fonts.FiraSansRegular,
+                            }}
                           >
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontSize: RFValue(10),
-                                fontFamily: Fonts.FiraSansRegular,
-                              }}
-                            >
-                              {value.title}
-                            </Text>
-                            <Text style={styles.dateTextSecondStyle}>
-                              {value.date}
-                            </Text>
-                          </View>
-                          {/* <Text
+                            {value.title}
+                          </Text>
+                          <Text style={styles.dateTextSecondStyle}>
+                            {value.date}
+                          </Text>
+                        </View>
+                        {/* <Text
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(8),
@@ -1139,20 +1149,20 @@ class ContactDetails extends PureComponent<
                         >
                           {value.info}
                         </Text> */}
-                        </TouchableOpacity>
-                      );
-                    }
-                  })}
-                </ScrollView>
-                {this.sortedHistory(trustedContactHistory).length <= 1 && (
-                  <BottomInfoBox
-                    backgroundColor={Colors.white}
-                    title={'Note'}
-                    infoText={'The details of your contact will appear here.'}
-                  />
-                )}
-              </View>
-            )}
+                      </TouchableOpacity>
+                    );
+                  }
+                })}
+              </ScrollView>
+              {this.sortedHistory(trustedContactHistory).length <= 1 && (
+                <BottomInfoBox
+                  backgroundColor={Colors.white}
+                  title={'Note'}
+                  infoText={'The details of your contact will appear here.'}
+                />
+              )}
+            </View>
+          )}
           {this.contactsType == "I'm Keeper of" && (
             <View style={styles.keeperViewStyle}>
               <TouchableOpacity
@@ -1171,8 +1181,8 @@ class ContactDetails extends PureComponent<
                   {uploading ? (
                     <ActivityIndicator size="small" />
                   ) : (
-                      <Text style={styles.buttonText}>Help Restore</Text>
-                    )}
+                    <Text style={styles.buttonText}>Help Restore</Text>
+                  )}
                   {/* <Text numberOfLines={1} style={styles.buttonInfo}>
                     Lorem ipsum dolor
                   </Text> */}
@@ -1231,7 +1241,7 @@ class ContactDetails extends PureComponent<
                     },
                     {
                       text: 'Cancel',
-                      onPress: () => { },
+                      onPress: () => {},
                       style: 'cancel',
                     },
                   ],
@@ -1333,6 +1343,7 @@ const mapStateToProps = (state) => {
     errorSending: idx(state, (_) => _.sss.errorSending),
     uploadSuccessfull: idx(state, (_) => _.sss.uploadSuccessfully),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
     UNDER_CUSTODY: idx(
       state,
       (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,

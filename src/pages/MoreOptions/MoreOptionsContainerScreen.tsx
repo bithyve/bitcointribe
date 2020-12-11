@@ -21,6 +21,12 @@ interface MenuOption {
 
 const menuOptions: MenuOption[] = [
   {
+    title: 'Account Management',
+    imageSource: require('../../assets/images/icons/icon_hexa.png'),
+    subtitle: `View and manage your accounts`,
+    screenName: 'AccountManagement',
+  },
+  {
     title: 'Friends and Family',
     imageSource: require('../../assets/images/icons/addressbook.png'),
     subtitle: `View and manage your contacts`,

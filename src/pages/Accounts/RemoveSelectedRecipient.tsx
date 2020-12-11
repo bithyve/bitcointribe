@@ -17,8 +17,17 @@ export default function RemoveSelectedRecipient(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
 
   const recipient = useMemo(() => {
-    const selectedContactData = props.selectedContact;
-
+    const selectedContactData = props.selectedContact.selectedContact;
+    let newItem = {
+      ...selectedContactData,
+      bitcoinAmount: props.prefersBitcoin
+        ? props.selectedContact.bitcoinAmount
+          ? props.selectedContact.bitcoinAmount
+          : 0
+        : props.selectedContact.currencyAmount
+        ? props.selectedContact.currencyAmount
+        : 0,
+    };
     // TODO: This should already be computed
     // ahead of time in the data passed to this screen.
     let recipient: RecipientDescribing;
@@ -35,11 +44,11 @@ export default function RemoveSelectedRecipient(props) {
 
     if (selectedContactData.account_name != null) {
       recipient = makeSubAccountRecipientDescription(
-        selectedContactData,
+        newItem,
         accountKind,
       );
     } else {
-      recipient = makeContactRecipientDescription(selectedContactData);
+      recipient = makeContactRecipientDescription(newItem);
     }
 
     return recipient;

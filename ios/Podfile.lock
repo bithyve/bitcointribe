@@ -1,5 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
+  - BVLinearGradient (2.5.6):
+    - React
   - Crashlytics (3.14.0):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
@@ -109,7 +111,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PDFGenerator (3.1.0)
-  - Protobuf (3.13.0)
+  - Protobuf (3.14.0)
   - QRCoder (1.1.0)
   - RCTRequired (0.63.3)
   - RCTTypeSafety (0.63.3):
@@ -427,6 +429,7 @@ PODS:
   - Yoga (1.14.0)
 
 DEPENDENCIES:
+  - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
@@ -440,7 +443,6 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
   - Firebase/Core (~> 5.20.1)
-  - Firebase/Messaging
   - Firebase/Messaging (~> 5.20.1)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
@@ -529,6 +531,8 @@ SPEC REPOS:
     - QRCoder
 
 EXTERNAL SOURCES:
+  BVLinearGradient:
+    :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   EXConstants:
@@ -678,6 +682,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   EXConstants: f907b3b6ce16e20d1750f22af1e095e924574bcb
@@ -703,7 +708,7 @@ SPEC CHECKSUMS:
   jail-monkey: 80c9e34da2cd54023e5ad08bf7051ec75bd43d5b
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
-  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
+  Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
   RCTTypeSafety: edf4b618033c2f1c5b7bc3d90d8e085ed95ba2ab
@@ -766,6 +771,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: 279deb7c90ee99b9e9635a4d96384f01abccfee3
+PODFILE CHECKSUM: 579ac7919977593ab0196f9f26d3bc979b90364a
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.8.4

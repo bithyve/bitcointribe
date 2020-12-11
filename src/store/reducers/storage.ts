@@ -26,7 +26,9 @@ const initialState: {
 export default (state = initialState, action) => {
   switch (action.type) {
     case DB_INITIALIZED:
-      return chain(state).setIn(["databaseInitialized"], action.payload.initialized).value()
+      return chain(state)
+        .setIn(["databaseInitialized"], action.payload.initialized)
+        .value();
 
 
     case DB_FETCHED:

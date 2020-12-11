@@ -3,12 +3,12 @@ enum CurrencyKind {
   /**
    * Sound Money
    */
-  BITCOIN,
+  BITCOIN = 'BITCOIN',
 
   /**
    * 💩
    */
-  FIAT,
+  FIAT = 'FIAT',
 };
 
 export default CurrencyKind;
