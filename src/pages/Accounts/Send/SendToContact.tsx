@@ -144,7 +144,7 @@ class SendToContact extends Component<
       exchangeRates: null,
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: accountKind,
-      averageTxFees: this.props.navigation.getParam('averageTxFees'),
+      averageTxFees: null,
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
@@ -493,12 +493,13 @@ class SendToContact extends Component<
   // own data fetching if it can't find what's SUPPOSED to be passed in
   // as navigation props.
   setAverageTxFees = async () => {
-    const { accountsState } = this.props;
     const { serviceType } = this.state;
 
-    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
-      ? 'MAINNET'
-      : 'TESTNET';
+    const network =
+      config.APP_STAGE !== 'dev' &&
+      [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+        ? 'MAINNET'
+        : 'TESTNET';
 
     this.setState({ averageTxFees: this.props.averageTxFees[network] });
   };
@@ -988,15 +989,20 @@ class SendToContact extends Component<
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
-                  currencyCode= {prefersBitcoin
-                    ? serviceType == TEST_ACCOUNT
-                    ? ' t-sats' : ' sats' : ''}
+                  currencyCode={
+                    prefersBitcoin
+                      ? serviceType == TEST_ACCOUNT
+                        ? ' t-sats'
+                        : ' sats'
+                      : ''
+                  }
                   onRemove={() => {
-                    let recipientItemToRemove = accountsState[
-                      serviceType
-                    ].transfer.details[accountsState[
-                      serviceType
-                    ].transfer.details.length - 1 - index];
+                    let recipientItemToRemove =
+                      accountsState[serviceType].transfer.details[
+                        accountsState[serviceType].transfer.details.length -
+                          1 -
+                          index
+                      ];
                     if (recipientItemToRemove) {
                       this.setState(
                         {

@@ -19,7 +19,6 @@ import {
   addTransferDetails,
   clearTransfer,
   removeTwoFA,
-  setAverageTxFee,
 } from '../../../store/actions/accounts';
 import BottomInfoBox from '../../../components/BottomInfoBox';
 import SendHelpContents from '../../../components/Helper/SendHelpContents';
@@ -85,7 +84,6 @@ interface SendPropsTypes {
   isTwoFASetupDone: boolean;
   hasShownInitialKnowMoreSendSheet: boolean;
   setTwoFASetup: any;
-  setAverageTxFee: any;
   initialKnowMoreSendSheetShown: Function;
 }
 
@@ -100,7 +98,6 @@ interface SendStateTypes {
   sweepSecure: any;
   spendableBalance: any;
   derivativeAccountDetails: { type: string; number: number };
-  averageTxFees: any;
   selectedContacts: ContactRecipientDescribing[];
   selectedSubAccounts: AccountRecipientDescribing[];
 }
@@ -120,7 +117,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       serviceType: accountKind,
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       spendableBalance: this.props.navigation.getParam('spendableBalance'),
-      averageTxFees: this.props.navigation.getParam('averageTxFees'),
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
       ),
@@ -160,7 +156,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     });
     this.updateAccountData();
     this.getAccountBalances();
-    console.log({ avgTxFee: this.state.averageTxFees });
     if (this.state.serviceType === SECURE_ACCOUNT) {
       this.twoFASetupMethod();
     }
@@ -959,7 +954,6 @@ export default withNavigationFocus(
     addTransferDetails,
     clearTransfer,
     setTwoFASetup,
-    setAverageTxFee,
     initialKnowMoreSendSheetShown,
   })(Send),
 );
