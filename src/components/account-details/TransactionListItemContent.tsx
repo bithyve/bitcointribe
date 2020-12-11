@@ -52,6 +52,12 @@ const TransactionListItemContent: React.FC<Props> = ({
     return moment(transaction.date).format('DD MMMM YYYY');
   }, [transaction.transactionType]);
 
+  const confirmationsText = useMemo(() => {
+    return transaction.confirmations > 6 ?
+      `6+`
+      : `${transaction.confirmations}`
+  }, [transaction.confirmations]);
+
   return (
     <>
       <Icon
@@ -82,6 +88,12 @@ const TransactionListItemContent: React.FC<Props> = ({
           bitcoinIconColor="gray"
           textColor="gray"
         />
+      </ListItem.Content>
+
+      <ListItem.Content style={styles.confirmationsSection}>
+        <ListItem.Subtitle style={styles.confirmationsText}>
+          {confirmationsText}
+        </ListItem.Subtitle>
       </ListItem.Content>
     </>
   );
@@ -119,6 +131,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     marginLeft: 16,
+  },
+
+  confirmationsSection: {
+    flex: 0,
+    marginLeft: 4,
+  },
+
+  confirmationsText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12),
+    marginTop: RFValue(4),
   },
 
   amountText: {
