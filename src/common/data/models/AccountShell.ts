@@ -87,10 +87,12 @@ export default class AccountShell {
    * Spendable balance of all sub-accounts in Satoshis.
    */
   static getSpendableBalance = (shell: AccountShell): Satoshis => {
-    return AccountShell.getSubAccounts(shell).reduce(
-      (accumulated, current) => accumulated + current.balances.confirmed,
-      0,
-    );
+    return AccountShell
+      .getSubAccounts(shell)
+      .reduce(
+        (accumulated, current) => accumulated + current.balances.confirmed,
+        0
+      );
   };
 
   /**
