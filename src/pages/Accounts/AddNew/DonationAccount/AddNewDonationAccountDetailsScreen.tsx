@@ -101,7 +101,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter An Account Name'}
+          placeholder={'Enter donation name'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}
@@ -118,21 +118,20 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter A Donee Name'}
+          placeholder={'Organised by'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
           value={doneeName}
           numberOfLines={1}
           onChangeText={setDoneeName}
         />
-
         <Input
           inputContainerStyle={[
             FormStyles.textInputContainer,
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter A Description'}
+          placeholder={'Donation cause or description'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountDescription}
