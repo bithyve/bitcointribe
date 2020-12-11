@@ -104,7 +104,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
           placeholder={'Enter donation name'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
-          // value={accountName}
+          value={accountName}
           maxLength={24}
           numberOfLines={1}
           textContentType="name"
@@ -121,7 +121,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
           placeholder={'Organised by'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
-          // value={doneeName}
+          value={doneeName}
           numberOfLines={1}
           onChangeText={setDoneeName}
         />
@@ -134,7 +134,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
           placeholder={'Donation cause or description'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
-          // value={accountDescription}
+          value={accountDescription}
           numberOfLines={2}
           onChangeText={setAccountDescription}
         />
