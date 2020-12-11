@@ -190,7 +190,7 @@ const VoucherScanner = (props) => {
     });
     return ref.current;
   };
-  const prevFBTCAccount_Data = usePrevious({ FBTCAccount_Data });
+   const prevFBTCAccount_Data = usePrevious({ FBTCAccount_Data });
 
   useEffect(() => {
     check();
@@ -198,7 +198,7 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     (async () => {
-      if (prevFBTCAccount_Data && prevFBTCAccount_Data.FBTCAccount_Data !== FBTCAccount_Data) {
+      if (prevFBTCAccount_Data.FBTCAccount_Data !== FBTCAccount_Data) {
         check();
       }
     })();
@@ -420,7 +420,7 @@ const VoucherScanner = (props) => {
         fBTCAccount[accountType].voucher.push({
           voucherCode: voucherCode,
         });
-        if (fBTCAccount.redeem_vouchers && voucherCode) {
+        if (fBTCAccount.redeem_vouchers && voucherCode && !userKey1) {
           setShowLoader(true);
           getQuoteDetailsMethod();
         }
@@ -453,7 +453,7 @@ const VoucherScanner = (props) => {
         defaultAccountShellId = shell.id;
     });
 
-    props.navigation.navigate('AccountDetails', {
+    props.navigation.replace('AccountDetails', {
       accountShellID: defaultAccountShellId,
     });
   };
@@ -521,13 +521,14 @@ const VoucherScanner = (props) => {
             sell_bitcoins: accountSyncDetails.sell_bitcoins,
           };
           dispatch(storeFbtcData(obj));
-          await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
+          //await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
         }
         if (accountSyncDetails.redeem_vouchers) {
           setTimeout(() => {
-            (RegistrationSuccessBottomSheet as any).current.snapTo(1);
-          }, 2);
           setShowLoader(false);
+          }, 2);
+          (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+          
           dispatch(ClearAccountSyncData());
         }
       })();
@@ -648,7 +649,7 @@ const VoucherScanner = (props) => {
           'Congratulations, your wallet has been successfully linked to your FastBitcoins account. Now you can proceed to redeem your vouchers'
         }
         proceedButtonText={'Redeem Voucher'}
-        onPressProceed={async () => {
+        onPressProceed={() => {
           let FBTCAccountData = FBTCAccount_Data;
           if (FBTCAccountData.redeem_vouchers && voucherCode) {
             setTimeout(() => {

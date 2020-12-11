@@ -766,7 +766,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
       );
     } else if (userKey) {
-      this.props.navigation.navigate('PairNewWallet', { userKey });
+      this.props.navigation.navigate('VoucherScanner', { userKey });
     }
   };
 
@@ -938,7 +938,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     if (url.includes('fastbitcoins')) {
       const userKey = url.substr(url.lastIndexOf('/') + 1);
-      this.props.navigation.navigate('PairNewWallet', { userKey });
+      this.props.navigation.navigate("VoucherScanner", { userKey });
     }
   };
 
