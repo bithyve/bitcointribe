@@ -38,8 +38,6 @@ export default class ExternalServiceSubAccountInfo
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource: ImageSourcePropType;
-
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
@@ -71,20 +69,5 @@ export default class ExternalServiceSubAccountInfo
     this.visibility = visibility;
     this.transactions = transactions;
     this.utxoCompatibilityGroup = utxoCompatibilityGroup;
-
-    this.avatarImageSource = getAvatarImageSource(serviceAccountKind);
-  }
-}
-
-function getAvatarImageSource(
-  serviceAccountKind: ServiceAccountKind,
-): ImageSourcePropType {
-  switch (serviceAccountKind) {
-    case ServiceAccountKind.FAST_BITCOINS:
-      return require('../../../../assets/images/icons/icon_fastbitcoins_hex_dark.png');
-    case ServiceAccountKind.SWAN:
-      return require('../../../../assets/images/icons/icon_swan.png');
-    default:
-      return require('../../../../assets/images/icons/icon_hexa.png');
   }
 }

@@ -5,6 +5,7 @@ import AccountShell from '../../common/data/models/AccountShell';
 import ListStyles from '../../common/Styles/ListStyles';
 import ImageStyles from '../../common/Styles/ImageStyles';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   accountShell: AccountShell;
@@ -18,7 +19,7 @@ const AccountMergeDestinationListItemContent: React.FC<Props> = ({
   return (
     <>
       <Image
-        source={primarySubAccount.avatarImageSource}
+        source={getAvatarForSubAccount(primarySubAccount)}
         style={styles.avatarImage}
         resizeMode="contain"
       />
