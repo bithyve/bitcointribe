@@ -44,6 +44,7 @@ export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT';
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL';
 export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED';
+export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS';
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
@@ -279,6 +280,10 @@ export const updateDonationPreferences = (
     type: UPDATE_DONATION_PREFERENCES,
     payload: { serviceType, accountNumber, preferences },
   };
+};
+
+export const remapAccountShells = (services) => {
+  return { type: REMAP_ACCOUNT_SHELLS, payload: { services } };
 };
 
 export const refreshAccountShell = (

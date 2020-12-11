@@ -87,9 +87,14 @@ import Toast from '../../components/Toast';
 import Mailer from 'react-native-mail';
 import config from '../../bitcoin/HexaConfig';
 import idx from 'idx';
-import { failedST3, restoredAccountShells } from '../actions/accounts';
+import {
+  failedST3,
+  remapAccountShells,
+  restoredAccountShells,
+} from '../actions/accounts';
 import RelayServices from '../../bitcoin/services/RelayService';
 import AccountShell from '../../common/data/models/AccountShell';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const sendNotification = (recipient, notification) => {
   const receivers = [];
@@ -1586,24 +1591,23 @@ function* recoverWalletWorker({ payload }) {
         DYNAMIC_NONPMDD = dynamicNonPMDD;
       }
 
-      const DECENTRALIZED_BACKUP = {
-        RECOVERY_SHARES: {},
-        SHARES_TRANSFER_DETAILS: {},
-        UNDER_CUSTODY,
-        DYNAMIC_NONPMDD,
-      };
-      console.log({ DECENTRALIZED_BACKUP });
+      // const DECENTRALIZED_BACKUP = {
+      //   RECOVERY_SHARES: {},
+      //   SHARES_TRANSFER_DETAILS: {},
+      //   UNDER_CUSTODY,
+      //   DYNAMIC_NONPMDD,
+      // };
 
-      const SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-        TEST_ACCOUNT: JSON.stringify(testAcc),
-        SECURE_ACCOUNT: JSON.stringify(secureAcc),
-        S3_SERVICE: JSON.stringify(s3Service),
-        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-      };
-      const payload = { SERVICES, DECENTRALIZED_BACKUP };
-      yield call(insertDBWorker, { payload });
-      yield put(fetchWalletImage());
+      // const SERVICES = {
+      //   REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+      //   TEST_ACCOUNT: JSON.stringify(testAcc),
+      //   SECURE_ACCOUNT: JSON.stringify(secureAcc),
+      //   S3_SERVICE: JSON.stringify(s3Service),
+      //   TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      // };
+      // const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      // yield call(insertDBWorker, { payload });
+      yield put(fetchWalletImage(s3Service));
 
       yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
       const current = Date.now();
@@ -1819,7 +1823,7 @@ export const updateWalletImageWatcher = createWatcher(
 );
 
 function* fetchWalletImageWorker({ payload }) {
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const s3Service: S3Service = payload.s3Service;
 
   const res = yield call(s3Service.fetchWalletImage);
   console.log({ res });
@@ -1861,6 +1865,25 @@ function* fetchWalletImageWorker({ payload }) {
 
     const payload = { SERVICES, DECENTRALIZED_BACKUP };
     yield call(insertDBWorker, { payload }); // synchronously update db
+
+    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
+    const {
+      REGULAR_ACCOUNT,
+      TEST_ACCOUNT,
+      SECURE_ACCOUNT,
+      S3_SERVICE,
+      TRUSTED_CONTACTS,
+    } = SERVICES;
+    const services = {
+      REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+      TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+      SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+      S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+      TRUSTED_CONTACTS: TRUSTED_CONTACTS
+        ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+        : new TrustedContactsService(),
+    };
+    yield put(remapAccountShells(services));
 
     // update hashes
     const hashesWI = {};
