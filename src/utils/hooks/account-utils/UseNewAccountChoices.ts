@@ -4,13 +4,10 @@ import DonationSubAccountInfo from '../../../common/data/models/SubAccountInfo/D
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import CheckingSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
 import SavingsSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
-import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
-import TrustedContactsSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo';
 import FullyImportedWalletSubAccountInfo from '../../../common/data/models/SubAccountInfo/ImportedWalletSubAccounts/FullyImportedWalletSubAccountInfo';
 import WatchOnlyImportedWalletSubAccountInfo from '../../../common/data/models/SubAccountInfo/ImportedWalletSubAccounts/WatchOnlyImportedWalletSubAccountInfo';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import useActiveAccountShells from '../state-selectors/accounts/UseActiveAccountShells';
-import TestAccount from '../../../bitcoin/services/accounts/TestAccount';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 
 type Choices = {
@@ -49,11 +46,13 @@ export default function useNewAccountChoices() {
   return useMemo<Choices>(() => {
     return {
       hexaAccounts: [
-        new TestSubAccountInfo({
-          defaultTitle: `Test Account${
-            testAccountCount > 0 ? ` ${testAccountCount + 1}` : ''
-          }`,
-        }),
+        // 📝 Holding off on allowing multiple test accounts for now.
+        // (See: https://github.com/bithyve/hexa/issues/2236#issuecomment-743180907)
+        // new TestSubAccountInfo({
+        //   defaultTitle: `Test Account${
+        //     testAccountCount > 0 ? ` ${testAccountCount + 1}` : ''
+        //   }`,
+        // }),
         new SavingsSubAccountInfo({
           defaultTitle: `Savings Account${
             savingsAccountCount > 0 ? ` ${savingsAccountCount + 1}` : ''
