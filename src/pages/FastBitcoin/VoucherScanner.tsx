@@ -72,7 +72,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind';
 
 const VoucherScanner = (props) => {
   //const FBTCVoucher = useSelector((state) => state.fbtc.FBTCVoucher);
-
+  const cameraRef = useRef<RNCamera>();
   const [FBTCAccount_Data, setFBTCAccount_Data] = useState({});
   const [TextHideShow, setTextHideShow] = useState(true);
   const userKey1 = props.navigation.state.params
@@ -89,7 +89,6 @@ const VoucherScanner = (props) => {
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [voucherCode, setVoucherCode] = useState('');
-  //const [voucherCodeAsync, setVoucherCodeAsync] = useState({});
   const [userKey, setUserKey] = useState(userKey1);
   const accounts1 = useSelector((state) => state.accounts);
   const accountsSyncFail = useSelector((state) => state.fbtc.accountSyncFail);
@@ -183,12 +182,7 @@ const VoucherScanner = (props) => {
     }
   }, [FBTCAccountData]);
 
-  // useEffect(() => {
-  //   if(FBTCVoucher){
-  //     console.log("FBTCVoucher ----", FBTCVoucher);
-  //     setVoucherCodeAsync(FBTCVoucher);
-  //   }
-  // }, [FBTCVoucher]);
+
   const usePrevious = <T extends {}>(value: T): T | undefined => {
     const ref = useRef<T>();
     useEffect(() => {
@@ -204,7 +198,7 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     (async () => {
-      if (prevFBTCAccount_Data.FBTCAccount_Data !== FBTCAccount_Data) {
+      if (prevFBTCAccount_Data && prevFBTCAccount_Data.FBTCAccount_Data !== FBTCAccount_Data) {
         check();
       }
     })();
@@ -212,16 +206,11 @@ const VoucherScanner = (props) => {
 
   const check = async () => {
     let FBTCAccountData = FBTCAccount_Data;
-    // console.log("FBTCAccountData", FBTCAccountData);
-    // JSON.parse(
-    //   await AsyncStorage.getItem('FBTCAccount'),
-    // );
-    // console.log("FBTCAccountData start", FBTCAccountData);
+   console.log("FBTCAccountData", FBTCAccountData);
     if (FBTCAccountData && FBTCAccountData.user_key) {
       setIsUserRegistered(true);
     }
     if (userKey1 || (FBTCAccountData && FBTCAccountData.user_key)) {
-      //let voucherCodeTemp = voucherCodeAsync;
       let voucherCodeTemp = JSON.parse(
         await AsyncStorage.getItem('voucherData'),
       );
@@ -338,7 +327,6 @@ const VoucherScanner = (props) => {
     if (voucherCode) {
       if (selectedAccount && selectedAccount.accountType != '') {
         (async () => {
-          // let voucherDataTemp = voucherCodeAsync;
           let voucherDataTemp = JSON.parse(
             await AsyncStorage.getItem('voucherData'),
           );
@@ -381,7 +369,6 @@ const VoucherScanner = (props) => {
 
   const saveVoucherCodeToAccount = async (selectedAccount, voucherCode) => {
     let fBTCAccount = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     if (!isEmpty(fBTCAccount)) {
       //console.log("inside if saveVoucherCodeToAccount", voucherCode,selectedAccount)
       let temp = true;
@@ -477,9 +464,6 @@ const VoucherScanner = (props) => {
 
   const createFBTCAccount = async () => {
     let FBTCAccountData = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    //let voucherData = voucherCodeAsync;
-
     let obj;
     if (isEmpty(FBTCAccountData)) {
       obj = {
@@ -528,9 +512,6 @@ const VoucherScanner = (props) => {
     if (accountSyncDetails) {
       (async () => {
         let FBTCAccountData = FBTCAccount_Data;
-        // JSON.parse(
-        //   await AsyncStorage.getItem('FBTCAccount'),
-        // );
         let obj;
         if (!isEmpty(FBTCAccountData)) {
           obj = {
@@ -557,7 +538,6 @@ const VoucherScanner = (props) => {
     //let voucherData = voucherCodeAsync;
     let voucherData = JSON.parse(await AsyncStorage.getItem('voucherData'));
     let FBTCAccountData = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     let data = {
       user_key: FBTCAccountData.user_key,
       quote_type: 'voucher',
@@ -582,12 +562,10 @@ const VoucherScanner = (props) => {
   }, [QuoteDetails]);
 
   const storeQuotesDetails = async () => {
-    //let voucherFromAsync = voucherCodeAsync;
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
     let fBTCAccountData = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     if (
       voucherFromAsync &&
       voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT
@@ -672,9 +650,6 @@ const VoucherScanner = (props) => {
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {
           let FBTCAccountData = FBTCAccount_Data;
-          // JSON.parse(
-          //   await AsyncStorage.getItem('FBTCAccount'),
-          // );
           if (FBTCAccountData.redeem_vouchers && voucherCode) {
             setTimeout(() => {
               setShowLoader(true);
@@ -710,8 +685,6 @@ const VoucherScanner = (props) => {
 
   const storeOrderResponse = async () => {
     let fBTCAccountData = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    // let voucherFromAsync = voucherCodeAsync;
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
@@ -783,8 +756,6 @@ const VoucherScanner = (props) => {
   const executeOrderMethod = async () => {
     let quoteData = JSON.parse(await AsyncStorage.getItem('quoteData'));
     let fBTCAccountData = FBTCAccount_Data;
-    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    // let voucherFromAsync = voucherCodeAsync;
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
@@ -976,7 +947,7 @@ const VoucherScanner = (props) => {
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack();
@@ -992,18 +963,16 @@ const VoucherScanner = (props) => {
         </View>
       </View>
       <KeyboardAvoidingView
-        style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}
-        behavior={Platform.OS == 'ios' ? 'padding' : ''}
+        style={{ flex: 1, paddingTop: wp("5%"), position: "relative" }}
+        behavior={Platform.OS == "ios" ? "padding" : ""}
         enabled
       >
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ height: '100%' }}>
+          <View style={{ height: "100%" }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
                 <RNCamera
-                  ref={(ref) => {
-                    this.cameraRef = ref;
-                  }}
+                  ref={cameraRef}
                   style={styles.camera}
                   onBarCodeRead={barcodeRecognized}
                   captureAudio={false}
@@ -1043,7 +1012,7 @@ const VoucherScanner = (props) => {
               </TouchableOpacity>
             )}
             <TextInput
-              placeholder={'Enter Voucher Code'}
+              placeholder={"Enter Voucher Code"}
               placeholderTextColor={Colors.borderColor}
               style={styles.qrModalTextInput}
               autoCorrect={false}
@@ -1059,7 +1028,7 @@ const VoucherScanner = (props) => {
               value={voucherCode}
               autoCompleteType="off"
               keyboardType={
-                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                Platform.OS == "ios" ? "ascii-capable" : "visible-password"
               }
             />
           </View>
@@ -1076,26 +1045,26 @@ const VoucherScanner = (props) => {
                   }}
                   style={styles.dropDownElement}
                 >
-                  {value.accountType != '' && (
+                  {value.accountType != "" && (
                     <Image
                       source={value.image}
-                      style={{ width: wp('8%'), height: wp('8%') }}
+                      style={{ width: wp("8%"), height: wp("8%") }}
                     />
                   )}
                   <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={styles.dropDownElementTitleText}>
                       {value.accountName}
                     </Text>
-                    {value.accountType != '' && (
+                    {value.accountType != "" && (
                       <View
                         style={{
-                          flexDirection: 'row',
-                          alignItems: 'flex-end',
+                          flexDirection: "row",
+                          alignItems: "flex-end",
                         }}
                       >
                         <Image
                           style={styles.cardBitCoinImage}
-                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                          source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
                         />
                         <Text style={styles.cardAmountText}>
                           {value.accountType === REGULAR_ACCOUNT
@@ -1108,12 +1077,12 @@ const VoucherScanner = (props) => {
                   </View>
                   <View
                     style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
                     <Entypo
-                      name={'dots-three-horizontal'}
+                      name={"dots-three-horizontal"}
                       color={Colors.borderColor}
                       size={RFValue(13)}
                     />
@@ -1170,7 +1139,7 @@ const VoucherScanner = (props) => {
         ) : null}
         <Text
           style={{
-            marginTop: 'auto',
+            marginTop: "auto",
             marginBottom: 10,
             paddingLeft: 20,
             paddingRight: 15,
@@ -1179,12 +1148,12 @@ const VoucherScanner = (props) => {
             color: Colors.textColorGrey,
           }}
         >
-          {TextHideShow ? 'Deposit Account' : ''}
+          {TextHideShow ? "Deposit Account" : ""}
         </Text>
       </KeyboardAvoidingView>
       <View
         style={{
-          marginBottom: hp('2%'),
+          marginBottom: hp("2%"),
         }}
       >
         <TouchableOpacity
@@ -1200,28 +1169,28 @@ const VoucherScanner = (props) => {
             marginBottom: 20,
           }}
         >
-          {selectedAccount && selectedAccount.accountType != '' && (
+          {selectedAccount && selectedAccount.accountType != "" && (
             <Image
               source={selectedAccount.image}
-              style={{ width: wp('8%'), height: wp('8%') }}
+              style={{ width: wp("8%"), height: wp("8%") }}
             />
           )}
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.dropDownElementTitleText}>
               {selectedAccount && selectedAccount.accountName
                 ? selectedAccount.accountName
-                : ''}
+                : ""}
             </Text>
-            {selectedAccount && selectedAccount.accountType != '' && (
+            {selectedAccount && selectedAccount.accountType != "" && (
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
+                  flexDirection: "row",
+                  alignItems: "flex-end",
                 }}
               >
                 <Image
                   style={styles.cardBitCoinImage}
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                  source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
                 />
                 <Text style={styles.cardAmountText}>
                   {selectedAccount &&
@@ -1233,9 +1202,9 @@ const VoucherScanner = (props) => {
               </View>
             )}
           </View>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Entypo
-              name={'dots-three-horizontal'}
+              name={"dots-three-horizontal"}
               color={Colors.borderColor}
               size={RFValue(13)}
             />
@@ -1249,7 +1218,7 @@ const VoucherScanner = (props) => {
         ref={RegistrationSuccessBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("35%") : hp("40%"),
         ]}
         renderContent={renderRegistrationSuccessModalContent}
         renderHeader={renderRegistrationSuccessModalHeader}
@@ -1260,7 +1229,7 @@ const VoucherScanner = (props) => {
         ref={ErrorModalBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("35%") : hp("40%"),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
@@ -1272,9 +1241,9 @@ const VoucherScanner = (props) => {
           ref={QuoteBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('55%')
-              : hp('60%'),
+            Platform.OS == "ios" && DeviceInfo.hasNotch()
+              ? hp("55%")
+              : hp("60%"),
           ]}
           renderContent={renderQuoteModalContent}
           renderHeader={renderQuoteModalHeader}
@@ -1286,7 +1255,7 @@ const VoucherScanner = (props) => {
         ref={VoucherRedeemSuccessBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("55%") : hp("60%"),
         ]}
         renderContent={renderVoucherRedeemSuccessModalContent}
         renderHeader={renderVoucherRedeemSuccessModalHeader}
@@ -1297,7 +1266,7 @@ const VoucherScanner = (props) => {
         ref={AccountVerificationBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("35%") : hp("40%"),
         ]}
         renderContent={renderAccountVerificationModalContent}
         renderHeader={renderAccountVerificationModalHeader}
