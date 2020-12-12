@@ -5,7 +5,8 @@
   "editor.formatOnPaste": true,
   "eslint.validate": [
     "javascript",
-    "typescript"
+    "typescript",
+    "typescriptreact"
   ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "cSpell.words": [
