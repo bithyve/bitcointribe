@@ -190,6 +190,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   return (
+    <View style={{ paddingVertical: 20 }}>
     <ScrollView
       style={styles.rootContainer}
       refreshControl={
@@ -199,13 +200,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         />
       }
     >
-      <View style={{ paddingVertical: 20 }}>
         <AccountDetailsCard
           accountShell={accountShell}
           onKnowMorePressed={showKnowMoreSheet}
           onSettingsPressed={navigateToAccountSettings}
         />
-      </View>
 
       <View style={{ paddingVertical: 20 }}>
         <TransactionPreviewHeader
@@ -254,6 +253,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         />
       </View>
     </ScrollView>
+    </View>
   );
 };
 
