@@ -1,25 +1,24 @@
 module.exports = {
-  
-  env: {
-    browser: true,
-    es2021: true,
-    node: true
+  'env': {
+    'browser': true,
+    'es2021': true,
+    'node': true
   },
-  extends: [
+  'extends': [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended'
   ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true
+  'parser': '@typescript-eslint/parser',
+  'parserOptions': {
+    'ecmaFeatures': {
+      'jsx': true 
     },
-    ecmaVersion: 12,
-    sourceType: 'module'
+    'ecmaVersion': 2018,
+    'sourceType': 'module'
   },
-  plugins: [ 'react', '@typescript-eslint' ],
-  rules: {
+  'plugins': [ 'react', '@typescript-eslint' ],
+  'rules': {
     'computed-property-spacing': [ 'error', 'always' ],
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
@@ -35,17 +34,16 @@ module.exports = {
     'indent': [ 'error', 2, {
       'SwitchCase': 2 
     } ],
-
     'object-curly-newline': [ 'error', {
-      'multiline': true 
-    }, {
       'ObjectExpression': 'always',
       'ObjectPattern': {
         'multiline': true 
       },
+      'ImportDeclaration': 'never',
       'ExportDeclaration': {
         'multiline': true, 'minProperties': 3 
       }
     } ]
+
   }
 }
