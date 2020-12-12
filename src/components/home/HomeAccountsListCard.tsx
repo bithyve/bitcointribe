@@ -12,6 +12,7 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/UseSecondarySubAccountForShell';
 import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
 
 
 export type Props = {
@@ -29,14 +30,15 @@ const HeaderSection: React.FC<HeaderProps> = ({
   const secondarySubAccounts = useSecondarySubAccountsForShell(accountShell);
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo(() => {
-    return secondarySubAccounts.map(subAccount => subAccount.avatarImageSource);
+    return secondarySubAccounts
+      .map(subAccount => getAvatarForSubAccount(subAccount));
   }, [secondarySubAccounts])
 
   return (
     <View style={styles.headerSectionContainer}>
       <Image
         style={styles.headerAccountImage}
-        source={primarySubAccount.avatarImageSource}
+        source={getAvatarForSubAccount(primarySubAccount)}
       />
 
       <View style={styles.headerBadgeContainer}>

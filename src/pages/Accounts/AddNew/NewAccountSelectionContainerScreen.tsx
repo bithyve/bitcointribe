@@ -90,6 +90,8 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
         break;
       case SubAccountKind.DONATION_ACCOUNT:
         // TODO: Implement alongside Re-integrating current "Add donation account" UI.
+        selectedChoice.defaultTitle = ''
+        selectedChoice.defaultDescription = ''
         navigation.navigate('AddNewDonationAccountDetails', {
           currentSubAccountInfo: selectedChoice,
         });

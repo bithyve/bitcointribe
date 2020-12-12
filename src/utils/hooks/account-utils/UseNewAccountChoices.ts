@@ -1,16 +1,13 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
 import DonationSubAccountInfo from '../../../common/data/models/SubAccountInfo/DonationSubAccountInfo';
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
 import CheckingSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
 import SavingsSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
-import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo';
-import TrustedContactsSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo';
 import FullyImportedWalletSubAccountInfo from '../../../common/data/models/SubAccountInfo/ImportedWalletSubAccounts/FullyImportedWalletSubAccountInfo';
 import WatchOnlyImportedWalletSubAccountInfo from '../../../common/data/models/SubAccountInfo/ImportedWalletSubAccounts/WatchOnlyImportedWalletSubAccountInfo';
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
 import useActiveAccountShells from '../state-selectors/accounts/UseActiveAccountShells';
-import TestAccount from '../../../bitcoin/services/accounts/TestAccount';
 import SubAccountKind from '../../../common/data/enums/SubAccountKind';
 
 type Choices = {
@@ -19,59 +16,81 @@ type Choices = {
   importedWalletAccounts: SubAccountDescribing[];
 };
 
+type Counts = Record<string, number>;
+
 export default function useNewAccountChoices() {
   const accountShells = useActiveAccountShells();
 
-  let testAccountCount = 0;
-  let checkingAccountCount = 0;
-  let savingsAccountCount = 0;
-  let donationAccountCount = 0;
+  const hexaAccountCounts: Counts = {
+    [SubAccountKind.SECURE_ACCOUNT]: 0,
+    [SubAccountKind.REGULAR_ACCOUNT]: 0,
+    [SubAccountKind.TEST_ACCOUNT]: 0,
+    [SubAccountKind.DONATION_ACCOUNT]: 0,
+  };
 
   accountShells.forEach((shell) => {
     switch (shell.primarySubAccount.kind) {
       case SubAccountKind.TEST_ACCOUNT:
-        testAccountCount += 1;
+        hexaAccountCounts[SubAccountKind.TEST_ACCOUNT] += 1;
         break;
       case SubAccountKind.REGULAR_ACCOUNT:
-        checkingAccountCount += 1;
+        hexaAccountCounts[SubAccountKind.REGULAR_ACCOUNT] += 1;
         break;
       case SubAccountKind.SECURE_ACCOUNT:
-        savingsAccountCount += 1;
+        hexaAccountCounts[SubAccountKind.SECURE_ACCOUNT] += 1;
         break;
       case SubAccountKind.DONATION_ACCOUNT:
-        donationAccountCount += 1;
+        hexaAccountCounts[SubAccountKind.DONATION_ACCOUNT] += 1;
         break;
       default:
         break;
     }
   });
 
+  const sortHexaAccountChoices = useCallback((subAccountA, _subAccountB) => {
+    if (hexaAccountCounts[subAccountA.kind] == 0) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }, [accountShells]);
+
   return useMemo<Choices>(() => {
     return {
       hexaAccounts: [
-        new TestSubAccountInfo({
-          defaultTitle: `Test Account${
-            testAccountCount > 0 ? ` ${testAccountCount + 1}` : ''
-          }`,
-        }),
+        // 📝 Holding off on allowing multiple test accounts for now.
+        // (See: https://github.com/bithyve/hexa/issues/2236#issuecomment-743180907)
+        // new TestSubAccountInfo({
+        //   defaultTitle: `Test Account${
+        //     hexaAccountCounts[SubAccountKind.TEST_ACCOUNT] > 0 ?
+        //     ` ${hexaAccountCounts[SubAccountKind.TEST_ACCOUNT] + 1}`
+        //     : ''
+        //   }`,
+        // }),
         new SavingsSubAccountInfo({
           defaultTitle: `Savings Account${
-            savingsAccountCount > 0 ? ` ${savingsAccountCount + 1}` : ''
+            hexaAccountCounts[SubAccountKind.SECURE_ACCOUNT] > 0 ?
+            ` ${hexaAccountCounts[SubAccountKind.SECURE_ACCOUNT] + 1}`
+            : ''
           }`,
         }),
         new CheckingSubAccountInfo({
           defaultTitle: `Checking Account${
-            checkingAccountCount > 0 ? ` ${checkingAccountCount + 1}` : ''
+            hexaAccountCounts[SubAccountKind.REGULAR_ACCOUNT] > 0 ?
+            ` ${hexaAccountCounts[SubAccountKind.REGULAR_ACCOUNT] + 1}`
+            : ''
           }`,
         }),
         new DonationSubAccountInfo({
           defaultTitle: `Donation Account${
-            donationAccountCount > 0 ? ` ${donationAccountCount + 1}` : ''
+            hexaAccountCounts[SubAccountKind.DONATION_ACCOUNT] > 0 ?
+            ` ${hexaAccountCounts[SubAccountKind.DONATION_ACCOUNT] + 1}`
+            : ''
           }`,
           doneeName: '',
           causeName: '',
         }),
-      ],
+      ].sort(sortHexaAccountChoices),
 
       serviceAccounts: [
         new ExternalServiceSubAccountInfo({

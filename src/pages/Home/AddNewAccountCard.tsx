@@ -46,8 +46,7 @@ const AddNewAccountCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    opacity: 0.75,
-    backgroundColor: Colors.borderColor,
+    backgroundColor: Colors.white,
     width: widthPercentageToDP(42.6),
     height: heightPercentageToDP(20.1),
     borderColor: Colors.borderColor,

@@ -31,8 +31,6 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   customDisplayName: string | null;
   customDescription: string | null;
 
-  avatarImageSource = require('../../../../../assets/images/icons/icon_secureaccount.png');
-
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;

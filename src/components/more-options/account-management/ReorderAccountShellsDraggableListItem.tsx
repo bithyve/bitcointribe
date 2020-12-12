@@ -5,6 +5,7 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import { ListItem } from 'react-native-elements';
 import ListStyles from '../../../common/Styles/ListStyles';
 import ImageStyles from '../../../common/Styles/ImageStyles';
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   accountShell: AccountShell;
@@ -22,7 +23,7 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ({
   return (
     <ListItem onLongPress={onLongPress} style={containerStyle}>
       <Image
-        source={primarySubAccount.avatarImageSource}
+        source={getAvatarForSubAccount(primarySubAccount)}
         style={ImageStyles.thumbnailImageMedium}
         resizeMode="contain"
       />

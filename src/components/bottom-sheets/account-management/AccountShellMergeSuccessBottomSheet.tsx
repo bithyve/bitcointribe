@@ -10,6 +10,7 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
 import AccountShell from '../../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import { RFValue } from 'react-native-responsive-fontsize';
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
 
 
 export type Props = {
@@ -30,7 +31,7 @@ const AccountShellItem: React.FC<ItemProps> = ({
   return (
     <ListItem>
       <Image
-        source={primarySubAccount.avatarImageSource}
+        source={getAvatarForSubAccount(primarySubAccount)}
         style={styles.avatarImage}
         resizeMode="contain"
       />

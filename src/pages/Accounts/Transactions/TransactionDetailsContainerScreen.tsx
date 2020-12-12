@@ -10,7 +10,6 @@ import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText';
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
 import TransactionDetailsHeader from './TransactionDetailsHeader';
 
 export type Props = {

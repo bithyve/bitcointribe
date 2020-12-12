@@ -10,6 +10,7 @@ import ImageStyles from '../../../common/Styles/ImageStyles';
 import ListStyles from '../../../common/Styles/ListStyles';
 import { Icon } from 'react-native-elements';
 import TransactionKind from '../../../common/data/enums/TransactionKind';
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -48,7 +49,7 @@ const TransactionDetailsHeader: React.FC<Props> = ({
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
         <Image
-          source={primarySubAccount.avatarImageSource}
+          source={getAvatarForSubAccount(primarySubAccount)}
           style={styles.avatarImage}
           resizeMode="contain"
         />
