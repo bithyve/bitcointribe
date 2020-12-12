@@ -38,10 +38,6 @@ module.exports = {
       'ObjectExpression': 'always',
       'ObjectPattern': {
         'multiline': true 
-      },
-      'ImportDeclaration': 'never',
-      'ExportDeclaration': {
-        'multiline': true, 'minProperties': 3 
       }
     } ],
     'eol-last': [ 'error', 'always' ]
