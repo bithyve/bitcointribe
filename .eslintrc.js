@@ -43,7 +43,8 @@ module.exports = {
       'ExportDeclaration': {
         'multiline': true, 'minProperties': 3 
       }
-    } ]
+    } ],
+    'eol-last': [ 'error', 'always' ]
 
   }
 }
