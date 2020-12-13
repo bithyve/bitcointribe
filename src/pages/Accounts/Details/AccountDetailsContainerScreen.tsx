@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
 
   footerSection: {
     paddingVertical: 38,
+    marginBottom: 100
   },
 });
 
