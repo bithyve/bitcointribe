@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   Text,
@@ -12,138 +12,140 @@ import {
   TextInput,
   KeyboardAvoidingView,
   BackHandler,
-} from 'react-native';
-import Fonts from '../../common/Fonts';
-import DeviceInfo from 'react-native-device-info';
-import NavStyles from '../../common/Styles/NavStyles';
+} from 'react-native'
+import Fonts from '../../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
+import NavStyles from '../../common/Styles/NavStyles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Colors from '../../common/Colors';
-import BottomSheet from 'reanimated-bottom-sheet';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { RNCamera } from 'react-native-camera';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import ModalHeader from '../../components/ModalHeader';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useDispatch, useSelector } from 'react-redux';
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../common/Colors'
+import BottomSheet from 'reanimated-bottom-sheet'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { RNCamera } from 'react-native-camera'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalHeader from '../../components/ModalHeader'
+import { ScrollView } from 'react-native-gesture-handler'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   accountSync,
   ClearAccountSyncData,
   accountSyncFail,
-} from '../../store/actions/fbtc';
-import Loader from '../../components/loader';
-import moment from 'moment';
-import BottomInfoBox from '../../components/BottomInfoBox';
+} from '../../store/actions/fbtc'
+import Loader from '../../components/loader'
+import moment from 'moment'
+import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   storeFbtcData
-} from '../../store/actions/fbtc';
+} from '../../store/actions/fbtc'
 
-import { isEmpty } from '../../common/CommonFunctions/index';
+import { isEmpty } from '../../common/CommonFunctions/index'
 
-const PairNewWallet = (props) => {
-  const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
-  const [FBTCAccount_Data, setFBTCAccount_Data] = useState({});
+const PairNewWallet = ( props ) => {
+  const FBTCAccountData = useSelector( ( state ) => state.fbtc.FBTCAccountData )
+  const [ FBTCAccount_Data, setFBTCAccount_Data ] = useState( {
+  } )
   const userKey1 = props.navigation.state.params
     ? props.navigation.state.params.userKey
-    : '';
-  const [isUserRegistered, setIsUserRegistered] = useState(false);
-  const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  const [voucherCode, setVoucherCode] = useState('');
-  const [userKey, setUserKey] = useState(userKey1);
-  const accountsSyncFail = useSelector((state) => state.fbtc.accountSyncFail);
+    : ''
+  const [ isUserRegistered, setIsUserRegistered ] = useState( false )
+  const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
+  const [ voucherCode, setVoucherCode ] = useState( '' )
+  const [ userKey, setUserKey ] = useState( userKey1 )
+  const accountsSyncFail = useSelector( ( state ) => state.fbtc.accountSyncFail )
   const accountSyncFailMessage = useSelector(
-    (state) => state.fbtc.accountSyncFailMessage,
-  );
-  const dispatch = useDispatch();
+    ( state ) => state.fbtc.accountSyncFailMessage,
+  )
+  const dispatch = useDispatch()
   const accountSyncDetails = useSelector(
-    (state) => state.fbtc.accountSyncDetails,
-  );
-  const [errorTitle, setErrorTitle] = useState('');
-  const [errorInfo] = useState('');
-  const [errorNote] = useState('');
-  const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
-  const [showLoader, setShowLoader] = useState(false);
+    ( state ) => state.fbtc.accountSyncDetails,
+  )
+  const [ errorTitle, setErrorTitle ] = useState( '' )
+  const [ errorInfo ] = useState( '' )
+  const [ errorNote ] = useState( '' )
+  const [ errorProccedButtonText, setErrorProccedButtonText ] = useState( '' )
+  const [ showLoader, setShowLoader ] = useState( false )
 
 
-  const [ErrorModalBottomSheet] = useState(
+  const [ ErrorModalBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
-  );
+  )
   const [
     RegistrationSuccessBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
+  ] = useState( React.createRef<BottomSheet>() )
 
-  const [] = useState({});
+  const [] = useState( {
+  } )
 
-  useEffect(() => {
-    if (FBTCAccountData) {
+  useEffect( () => {
+    if ( FBTCAccountData ) {
       //console.log("FBTCAccountData------- in useEffect", FBTCAccountData)
-      setFBTCAccount_Data(FBTCAccountData);
+      setFBTCAccount_Data( FBTCAccountData )
     }
-  }, [FBTCAccountData]);
+  }, [ FBTCAccountData ] )
 
-  useEffect(() => {
-    (async () => {
-      let FBTCAccountData = FBTCAccount_Data;
+  useEffect( () => {
+    ( async () => {
+      const FBTCAccountData = FBTCAccount_Data
       // JSON.parse(
       //   await AsyncStorage.getItem('FBTCAccount'),
       // );
-      if (FBTCAccountData && FBTCAccountData.user_key) {
-        setIsUserRegistered(true);
+      if ( FBTCAccountData && FBTCAccountData.user_key ) {
+        setIsUserRegistered( true )
       }
-      if (!userKey && FBTCAccountData) {
-        setUserKey(FBTCAccountData.user_key);
+      if ( !userKey && FBTCAccountData ) {
+        setUserKey( FBTCAccountData.user_key )
       }
-      if (userKey1 && !isUserRegistered) {
-        setUserKey(userKey1);
+      if ( userKey1 && !isUserRegistered ) {
+        setUserKey( userKey1 )
       }
-    })();
-    BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
+    } )()
+    BackHandler.addEventListener( 'hardwareBackPress', hardwareBackHandler )
     return () =>
       BackHandler.removeEventListener(
         'hardwareBackPress',
         hardwareBackHandler,
-      );
-  }, []);
+      )
+  }, [] )
 
   const hardwareBackHandler = () => {
-    props.navigation.pop(2);
-  };
+    props.navigation.pop( 2 )
+  }
 
-  useEffect(() => {
-    if (voucherCode) {
-      if (isUserRegistered) return;
+  useEffect( () => {
+    if ( voucherCode ) {
+      if ( isUserRegistered ) return
       else {
-        if (voucherCode.length == 36 && !isUserRegistered)
-          setUserKey(voucherCode);
-        else return;
+        if ( voucherCode.length == 36 && !isUserRegistered )
+          setUserKey( voucherCode )
+        else return
       }
     }
-  }, [voucherCode]);
+  }, [ voucherCode ] )
 
-  const barcodeRecognized = async (barcodes) => {
-    if (barcodes.data && barcodes.data.length == 36) {
-      setVoucherCode(barcodes.data);
+  const barcodeRecognized = async ( barcodes ) => {
+    if ( barcodes.data && barcodes.data.length == 36 ) {
+      setVoucherCode( barcodes.data )
     }
-    setOpenCameraFlag(false);
-  };
+    setOpenCameraFlag( false )
+  }
 
-  useEffect(() => {
-    if (userKey) createFBTCAccount();
-  }, [userKey]);
+  useEffect( () => {
+    if ( userKey ) createFBTCAccount()
+  }, [ userKey ] )
 
   const createFBTCAccount = async () => {
-    let FBTCAccountData = FBTCAccount_Data;
+    const FBTCAccountData = FBTCAccount_Data
     //console.log('FBTCAccountData', FBTCAccountData);
 
     //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    let obj;
-    if (isEmpty(FBTCAccountData)) {
+    let obj
+    if ( isEmpty( FBTCAccountData ) ) {
       obj = {
         user_key: userKey,
-        registrationDate: moment(new Date()).valueOf(),
+        registrationDate: moment( new Date() ).valueOf(),
         test_account: {
           voucher: [],
         },
@@ -153,61 +155,61 @@ const PairNewWallet = (props) => {
         saving_account: {
           voucher: [],
         },
-      };
+      }
     } else {
       //console.log('FBTCAccountData in else', FBTCAccountData);
-      obj = FBTCAccountData;
+      obj = FBTCAccountData
     }
     //console.log('obj', obj);
-    dispatch(storeFbtcData(obj));
-    await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
+    dispatch( storeFbtcData( obj ) )
+    await AsyncStorage.setItem( 'FBTCAccount', JSON.stringify( obj ) )
     if (
-      !obj.hasOwnProperty('redeem_vouchers') &&
-      !obj.hasOwnProperty('exchange_balances') &&
-      !obj.hasOwnProperty('sell_bitcoins')
+      !obj.hasOwnProperty( 'redeem_vouchers' ) &&
+      !obj.hasOwnProperty( 'exchange_balances' ) &&
+      !obj.hasOwnProperty( 'sell_bitcoins' )
     )
-      checkAuth();
-  };
+      checkAuth()
+  }
 
   const checkAuth = () => {
-    let data = {
+    const data = {
       userKey: userKey,
-    };
-    setShowLoader(true);
-    dispatch(accountSync(data));
-  };
+    }
+    setShowLoader( true )
+    dispatch( accountSync( data ) )
+  }
 
-  useEffect(() => {
-    if (accountSyncDetails) {
+  useEffect( () => {
+    if ( accountSyncDetails ) {
       //console.log("FBTCAccount_Data accountSync", FBTCAccount_Data);
-      (async () => {
-        let FBTCAccountData = FBTCAccount_Data;
+      ( async () => {
+        const FBTCAccountData = FBTCAccount_Data
         // JSON.parse(
         //   await AsyncStorage.getItem('FBTCAccount'),
         // );
-        let obj;
-        if (FBTCAccountData) {
+        let obj
+        if ( FBTCAccountData ) {
           obj = {
             ...FBTCAccountData,
             redeem_vouchers: accountSyncDetails.redeem_vouchers,
             exchange_balances: accountSyncDetails.exchange_balances,
             sell_bitcoins: accountSyncDetails.sell_bitcoins,
-          };
-          dispatch(storeFbtcData(obj));
-          await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
+          }
+          dispatch( storeFbtcData( obj ) )
+          await AsyncStorage.setItem( 'FBTCAccount', JSON.stringify( obj ) )
         }
-        if (accountSyncDetails.redeem_vouchers) {
-          setTimeout(() => {
-            (RegistrationSuccessBottomSheet as any).current.snapTo(1);
-          }, 2);
-          setShowLoader(false);
-          dispatch(ClearAccountSyncData());
+        if ( accountSyncDetails.redeem_vouchers ) {
+          setTimeout( () => {
+            ( RegistrationSuccessBottomSheet as any ).current.snapTo( 1 )
+          }, 2 )
+          setShowLoader( false )
+          dispatch( ClearAccountSyncData() )
         }
-      })();
+      } )()
     }
-  }, [accountSyncDetails, FBTCAccount_Data]);
+  }, [ accountSyncDetails, FBTCAccount_Data ] )
 
-  const renderRegistrationSuccessModalContent = useCallback(() => {
+  const renderRegistrationSuccessModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={RegistrationSuccessBottomSheet}
@@ -218,50 +220,50 @@ const PairNewWallet = (props) => {
         }
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {
-          let FBTCAccountData = FBTCAccount_Data;
+          const FBTCAccountData = FBTCAccount_Data
           // JSON.parse(
           //   await AsyncStorage.getItem('FBTCAccount'),
           // );
-          if (FBTCAccountData && FBTCAccountData.redeem_vouchers) {
-            (RegistrationSuccessBottomSheet as any).current.snapTo(0);
-            props.navigation.replace("VoucherScanner");
+          if ( FBTCAccountData && FBTCAccountData.redeem_vouchers ) {
+            ( RegistrationSuccessBottomSheet as any ).current.snapTo( 0 )
+            props.navigation.replace( 'VoucherScanner' )
           }
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
         onPressIgnore={() => { }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/illustration.png')}
+        bottomImage={require( '../../assets/images/icons/illustration.png' )}
       />
-    );
-  }, [FBTCAccount_Data]);
+    )
+  }, [ FBTCAccount_Data ] )
 
-  const renderRegistrationSuccessModalHeader = useCallback(() => {
+  const renderRegistrationSuccessModalHeader = useCallback( () => {
     return (
       <ModalHeader
       // onPressHeader={() => {
       //   (RegistrationSuccessBottomSheet as any).current.snapTo(0);
       // }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
-  useEffect(() => {
-    if (accountsSyncFail && accountSyncFailMessage) {
-      setTimeout(() => {
-        setErrorTitle(accountSyncFailMessage);
-        setErrorProccedButtonText('Done');
-      }, 2);
-      (ErrorModalBottomSheet as any).current.snapTo(1);
-      let data = {
+  useEffect( () => {
+    if ( accountsSyncFail && accountSyncFailMessage ) {
+      setTimeout( () => {
+        setErrorTitle( accountSyncFailMessage )
+        setErrorProccedButtonText( 'Done' )
+      }, 2 );
+      ( ErrorModalBottomSheet as any ).current.snapTo( 1 )
+      const data = {
         accountSyncFail: false,
         accountSyncFailMessage: '',
-      };
-      dispatch(accountSyncFail(data));
+      }
+      dispatch( accountSyncFail( data ) )
     }
-  }, [accountsSyncFail, accountSyncFailMessage]);
+  }, [ accountsSyncFail, accountSyncFailMessage ] )
 
-  const renderErrorModalContent = useCallback(() => {
+  const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={ErrorModalBottomSheet}
@@ -270,38 +272,44 @@ const PairNewWallet = (props) => {
         note={errorNote}
         proceedButtonText={errorProccedButtonText}
         onPressProceed={() => {
-          (ErrorModalBottomSheet as any).current.snapTo(0);
+          ( ErrorModalBottomSheet as any ).current.snapTo( 0 )
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
         onPressIgnore={() => {
-          (ErrorModalBottomSheet as any).current.snapTo(0);
+          ( ErrorModalBottomSheet as any ).current.snapTo( 0 )
         }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/reject.png')}
+        bottomImage={require( '../../assets/images/icons/reject.png' )}
       />
-    );
-  }, [errorTitle, errorInfo, errorNote, errorProccedButtonText]);
+    )
+  }, [ errorTitle, errorInfo, errorNote, errorProccedButtonText ] )
 
-  const renderErrorModalHeader = useCallback(() => {
+  const renderErrorModalHeader = useCallback( () => {
     return (
       <ModalHeader
       // onPressHeader={() => {
       //   (ErrorModalBottomSheet as any).current.snapTo(0);
       // }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 0 }} />
+    <View style={{
+      flex: 1 
+    }}>
+      <SafeAreaView style={{
+        flex: 0 
+      }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center' 
+        }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.pop(2);
+              props.navigation.pop( 2 )
             }}
             style={styles.backArrowView}
           >
@@ -313,23 +321,31 @@ const PairNewWallet = (props) => {
         </View>
       </View>
       <KeyboardAvoidingView
-        style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}
+        style={{
+          flex: 1, paddingTop: wp( '5%' ), position: 'relative' 
+        }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <ScrollView style={{ flex: 1 }}>
-          <View style={{ height: '100%' }}>
+        <ScrollView style={{
+          flex: 1 
+        }}>
+          <View style={{
+            height: '100%' 
+          }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
                 <RNCamera
-                  ref={(ref) => {
-                    this.cameraRef = ref;
+                  ref={( ref ) => {
+                    this.cameraRef = ref
                   }}
                   style={styles.camera}
                   onBarCodeRead={barcodeRecognized}
                   captureAudio={false}
                 >
-                  <View style={{ flex: 1 }}>
+                  <View style={{
+                    flex: 1 
+                  }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
                       <View style={styles.topRightCornerView} />
@@ -342,34 +358,38 @@ const PairNewWallet = (props) => {
                 </RNCamera>
               </View>
             ) : (
-                <TouchableOpacity
-                  onPress={() => setOpenCameraFlag(true)}
-                  style={{ alignSelf: 'center' }}
+              <TouchableOpacity
+                onPress={() => setOpenCameraFlag( true )}
+                style={{
+                  alignSelf: 'center' 
+                }}
+              >
+                <ImageBackground
+                  source={require( '../../assets/images/icons/iPhone-QR.png' )}
+                  style={styles.cameraImage}
                 >
-                  <ImageBackground
-                    source={require('../../assets/images/icons/iPhone-QR.png')}
-                    style={styles.cameraImage}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <View style={styles.topCornerView}>
-                        <View style={styles.topLeftCornerView} />
-                        <View style={styles.topRightCornerView} />
-                      </View>
-                      <View style={styles.bottomCornerView}>
-                        <View style={styles.bottomLeftCornerView} />
-                        <View style={styles.bottomRightCornerView} />
-                      </View>
+                  <View style={{
+                    flex: 1 
+                  }}>
+                    <View style={styles.topCornerView}>
+                      <View style={styles.topLeftCornerView} />
+                      <View style={styles.topRightCornerView} />
                     </View>
-                  </ImageBackground>
-                </TouchableOpacity>
-              )}
+                    <View style={styles.bottomCornerView}>
+                      <View style={styles.bottomLeftCornerView} />
+                      <View style={styles.bottomRightCornerView} />
+                    </View>
+                  </View>
+                </ImageBackground>
+              </TouchableOpacity>
+            )}
             <TextInput
               placeholder={'Enter the code'}
               placeholderTextColor={Colors.borderColor}
               style={styles.qrModalTextInput}
               autoCorrect={false}
-              onChangeText={(text) => {
-                setVoucherCode(text);
+              onChangeText={( text ) => {
+                setVoucherCode( text )
               }}
               value={voucherCode}
             />
@@ -390,7 +410,7 @@ const PairNewWallet = (props) => {
           ref={RegistrationSuccessBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
           ]}
           renderContent={renderRegistrationSuccessModalContent}
           renderHeader={renderRegistrationSuccessModalHeader}
@@ -401,32 +421,32 @@ const PairNewWallet = (props) => {
           ref={ErrorModalBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
           ]}
           renderContent={renderErrorModalContent}
           renderHeader={renderErrorModalHeader}
         />
       </KeyboardAvoidingView>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   backArrowView: {
     height: 30,
     width: 30,
     justifyContent: 'center',
   },
   cameraView: {
-    width: wp('90%'),
-    height: wp('90%'),
+    width: wp( '90%' ),
+    height: wp( '90%' ),
     overflow: 'hidden',
     borderRadius: 20,
     alignSelf: 'center',
   },
   camera: {
-    width: wp('90%'),
-    height: wp('90%'),
+    width: wp( '90%' ),
+    height: wp( '90%' ),
   },
   topCornerView: {
     flexDirection: 'row',
@@ -447,8 +467,8 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderTopColor: 'white',
     borderLeftColor: 'white',
-    height: hp('5%'),
-    width: hp('5%'),
+    height: hp( '5%' ),
+    width: hp( '5%' ),
     borderTopWidth: 1,
   },
   topRightCornerView: {
@@ -456,16 +476,16 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: 'white',
     borderTopColor: 'white',
-    height: hp('5%'),
-    width: hp('5%'),
+    height: hp( '5%' ),
+    width: hp( '5%' ),
     marginLeft: 'auto',
   },
   bottomLeftCornerView: {
     borderLeftWidth: 1,
     borderBottomColor: 'white',
     borderLeftColor: 'white',
-    height: hp('5%'),
-    width: hp('5%'),
+    height: hp( '5%' ),
+    width: hp( '5%' ),
     borderBottomWidth: 1,
   },
   bottomRightCornerView: {
@@ -473,13 +493,13 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: 'white',
     borderBottomColor: 'white',
-    height: hp('5%'),
-    width: hp('5%'),
+    height: hp( '5%' ),
+    width: hp( '5%' ),
     marginLeft: 'auto',
   },
   cameraImage: {
-    width: wp('90%'),
-    height: wp('90%'),
+    width: wp( '90%' ),
+    height: wp( '90%' ),
     overflow: 'hidden',
     borderRadius: 20,
   },
@@ -492,10 +512,10 @@ const styles = StyleSheet.create({
     margin: 20,
     paddingLeft: 15,
     paddingRight: 15,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansMedium,
-    marginTop: wp('10%'),
+    marginTop: wp( '10%' ),
   },
-});
+} )
 
-export default PairNewWallet;
+export default PairNewWallet

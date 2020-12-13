@@ -1,25 +1,29 @@
-import React from 'react';
-import { View, Text, StyleSheet, Linking } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React from 'react'
+import { View, Text, StyleSheet, Linking } from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import CopyThisText from '../../components/CopyThisText';
+} from 'react-native-responsive-screen'
+import CopyThisText from '../../components/CopyThisText'
 
-export default function AccountVerification(props) {
+export default function AccountVerification( props ) {
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View style={{ height: '100%' }}>
+    <View style={{
+      ...styles.modalContentContainer, height: '100%' 
+    }}>
+      <View style={{
+        height: '100%' 
+      }}>
         <View style={styles.successModalHeaderView}>
           <Text
             style={{
               color: props.headerTextColor
                 ? props.headerTextColor
                 : Colors.blue,
-              fontSize: RFValue(18),
+              fontSize: RFValue( 18 ),
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
@@ -28,7 +32,7 @@ export default function AccountVerification(props) {
           <Text
             style={{
               ...styles.modalInfoText,
-              marginTop: wp('1.5%'),
+              marginTop: wp( '1.5%' ),
               color: Colors.lightTextColor,
             }}
           >
@@ -39,7 +43,7 @@ export default function AccountVerification(props) {
           <Text
             style={{
               ...styles.modalInfoText,
-              marginBottom: hp('1%'),
+              marginBottom: hp( '1%' ),
               marginTop: 'auto',
             }}
           >
@@ -48,36 +52,36 @@ export default function AccountVerification(props) {
             }
           </Text>
         </View>
-          <CopyThisText
-            text={props.link}
-            openLink={() => {
-              props.openLinkVerification();
-            }}
-          />
+        <CopyThisText
+          text={props.link}
+          openLink={() => {
+            props.openLinkVerification()
+          }}
+        />
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: wp('5%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '5%' ),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: hp('2%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: hp( '2%' ),
   }
-});
+} )
