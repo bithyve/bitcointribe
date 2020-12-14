@@ -145,18 +145,18 @@ class SendToContact extends Component<
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: accountKind,
       averageTxFees: null,
-      spendableBalance: this.props.navigation.getParam('spendableBalance'),
+      spendableBalance: this.props.navigation.getParam('spendableBalance') ? this.props.navigation.getParam('spendableBalance') : null,
       derivativeAccountDetails: this.props.navigation.getParam(
-        'derivativeAccountDetails',
-      ),
-      sweepSecure: this.props.navigation.getParam('sweepSecure'),
+        'derivativeAccountDetails') ? this.props.navigation.getParam(
+        'derivativeAccountDetails') : null,
+      sweepSecure: this.props.navigation.getParam('sweepSecure') ? this.props.navigation.getParam('sweepSecure') : '',
       removeItem: {},
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
         ? props.navigation.getParam('bitcoinAmount')
         : '',
-      donationId: props.navigation.getParam('donationId'),
+      donationId: props.navigation.getParam('donationId') ? props.navigation.getParam('donationId') : '',
       currencyAmount: '',
       isConfirmDisabled: true,
       note: '',
@@ -332,7 +332,7 @@ class SendToContact extends Component<
             {
               text: 'Okay ',
               onPress: () => {
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               },
             },
           ],
@@ -535,7 +535,7 @@ class SendToContact extends Component<
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!accountsState[serviceType].transfer.details.length) {
-        this.props.navigation.goBack();
+        this.props.navigation.pop();
       }
     }
   };
@@ -724,6 +724,7 @@ class SendToContact extends Component<
   };
 
   onConfirm = () => {
+    console.log("INSIDE onconfirm")
     const {
       clearTransfer,
       accountsState,
@@ -850,7 +851,7 @@ class SendToContact extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.checkRecordsHavingPrice();
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               }}
               style={styles.backArrow}
               hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
@@ -1377,7 +1378,7 @@ class SendToContact extends Component<
                         currencyAmount,
                         note,
                       });
-                      this.props.navigation.goBack();
+                      this.props.navigation.pop();
                     }
                   }}
                 >
@@ -1465,6 +1466,8 @@ class SendToContact extends Component<
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
               }}
               onPressCancel={() => {
+                    console.log("INSIDE onPressCancel");
+
                 clearTransfer(serviceType);
                 if (this.refs.SendUnSuccessBottomSheet)
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);

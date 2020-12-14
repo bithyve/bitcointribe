@@ -56,6 +56,7 @@ import {
 import { removeTrustedContact } from '../../store/actions/trustedContacts';
 import AccountShell from '../../common/data/models/AccountShell';
 import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import { resetStackToSend } from '../../navigation/actions/NavigationActions';
 
 const getImageIcon = (item) => {
   if (item) {
@@ -335,12 +336,14 @@ class ContactDetails extends PureComponent<
         defaultAccountShellId = shell.id;
     });
 
-    this.props.navigation.navigate('SendToContact', {
-      accountShellID: defaultAccountShellId,
-      selectedContact: this.Contact,
-      serviceType: REGULAR_ACCOUNT,
-      isFromAddressBook: true,
-    });
+    this.props.navigation.dispatch(
+      resetStackToSend({
+        accountShellID: defaultAccountShellId,
+        selectedContact: this.Contact,
+        serviceType: REGULAR_ACCOUNT,
+        isFromAddressBook: true,
+      })
+    );
   };
 
   onPressResendRequest = () => {
