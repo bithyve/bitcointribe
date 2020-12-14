@@ -29,7 +29,10 @@ import defaultBottomSheetConfigs from "../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from "react-navigation";
 import { NavigationStackOptions } from "react-navigation-stack";
 
-import { refreshAccountShell } from "../../../store/actions/accounts";
+import {
+  fetchFeeAndExchangeRates,
+  refreshAccountShell,
+} from "../../../store/actions/accounts";
 import SourceAccountKind from "../../../common/data/enums/SourceAccountKind";
 import NetworkKind from "../../../common/data/enums/NetworkKind";
 import config from "../../../bitcoin/HexaConfig";
@@ -58,6 +61,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountTransactions = AccountShell.getAllTransactions(accountShell);
   const spendableBalance = useSpendableBalanceForAccountShell(accountShell);
   const averageTxFees = accountsState.averageTxFees;
+  const exchangeRates = accountsState.exchangeRates;
+
+  useEffect(() => {
+    // missing fee & exchange rates patch(restore & upgrade)
+    if (
+      !averageTxFees ||
+      !Object.keys(averageTxFees).length ||
+      !exchangeRates ||
+      !Object.keys(exchangeRates).length
+    )
+      dispatch(fetchFeeAndExchangeRates());
+  }, []);
 
   let derivativeAccountKind: any = primarySubAccount.kind;
 
@@ -205,6 +220,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   return (
+
     <View style={styles.rootContainer}>
       <ScrollView
         style={styles.scrollViewContainer}
@@ -220,6 +236,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onKnowMorePressed={showKnowMoreSheet}
           onSettingsPressed={navigateToAccountSettings}
         />
+
 
         <View
           style={{
@@ -239,6 +256,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         {/* <TransactionPreviewTabs  */}
 
         {/* /> */}
+
 
         <View
           style={{

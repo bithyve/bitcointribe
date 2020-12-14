@@ -1,14 +1,14 @@
-import { AxiosResponse } from 'axios';
-import config from '../HexaConfig';
-import { INotification, EncryptedImage } from './Interface';
-import { BH_AXIOS } from '../../services/api';
-import idx from 'idx';
+import { AxiosResponse } from "axios";
+import config from "../HexaConfig";
+import { INotification, EncryptedImage } from "./Interface";
+import { BH_AXIOS } from "../../services/api";
+import idx from "idx";
 
 const { HEXA_ID } = config;
 export default class Relay {
   public static checkCompatibility = async (
     method: string,
-    version: string,
+    version: string
   ): Promise<{
     compatible: boolean;
     alternatives: {
@@ -18,7 +18,7 @@ export default class Relay {
   }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('checkCompatibility', {
+      res = await BH_AXIOS.post("checkCompatibility", {
         HEXA_ID,
         method,
         version,
@@ -32,13 +32,13 @@ export default class Relay {
   };
 
   public static fetchReleases = async (
-    build: string,
+    build: string
   ): Promise<{
     releases: any[];
   }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('fetchReleases', {
+      res = await BH_AXIOS.post("fetchReleases", {
         HEXA_ID,
         build,
       });
@@ -52,14 +52,14 @@ export default class Relay {
 
   public static updateFCMTokens = async (
     walletID: string,
-    FCMs: string[],
+    FCMs: string[]
   ): Promise<{
     updated: Boolean;
   }> => {
     try {
       let res: AxiosResponse;
       try {
-        res = await BH_AXIOS.post('updateFCMTokens', {
+        res = await BH_AXIOS.post("updateFCMTokens", {
           HEXA_ID,
           walletID,
           FCMs,
@@ -71,24 +71,24 @@ export default class Relay {
       const { updated } = res.data;
       return { updated };
     } catch (err) {
-      throw new Error('Failed to fetch GetBittr Details');
+      throw new Error("Failed to fetch GetBittr Details");
     }
   };
 
   public static fetchNotifications = async (
-    walletID: string,
+    walletID: string
   ): Promise<{
     notifications: INotification[];
     DHInfos: [{ address: string; publicKey: string }];
   }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('fetchNotifications', {
+      res = await BH_AXIOS.post("fetchNotifications", {
         HEXA_ID,
         walletID,
       });
     } catch (err) {
-      console.log({ err })
+      console.log({ err });
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
     }
@@ -99,7 +99,7 @@ export default class Relay {
 
   public static sendNotifications = async (
     receivers: { walletId: string; FCMs: string[] }[],
-    notification: INotification,
+    notification: INotification
   ): Promise<{
     sent: Boolean;
   }> => {
@@ -107,10 +107,10 @@ export default class Relay {
       let res: AxiosResponse;
 
       if (!receivers.length)
-        throw new Error('Failed to deliver notification: receivers missing');
+        throw new Error("Failed to deliver notification: receivers missing");
 
       try {
-        res = await BH_AXIOS.post('sendNotifications', {
+        res = await BH_AXIOS.post("sendNotifications", {
           HEXA_ID,
           receivers,
           notification,
@@ -126,13 +126,13 @@ export default class Relay {
 
       return { sent };
     } catch (err) {
-      throw new Error('Failed to deliver notification');
+      throw new Error("Failed to deliver notification");
     }
   };
 
   public static sendDonationNote = async (
     donationId: string,
-    txNote: { txId: string; note: string },
+    txNote: { txId: string; note: string }
   ): Promise<{
     added: Boolean;
   }> => {
@@ -140,10 +140,10 @@ export default class Relay {
       let res: AxiosResponse;
 
       if (!txNote || !txNote.txId || !txNote.note)
-        throw new Error('Failed to send donation note: txid|note missing');
+        throw new Error("Failed to send donation note: txid|note missing");
 
       try {
-        res = await BH_AXIOS.post('addDonationTxNote', {
+        res = await BH_AXIOS.post("addDonationTxNote", {
           HEXA_ID,
           donationId,
           txNote,
@@ -159,7 +159,31 @@ export default class Relay {
 
       return { added };
     } catch (err) {
-      throw new Error('Failed to deliver donation note');
+      throw new Error("Failed to deliver donation note");
+    }
+  };
+
+  public static fetchFeeAndExchangeRates = async (): Promise<{
+    exchangeRates: any;
+    averageTxFees: any;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post("fetchFeeAndExchangeRates", {
+          HEXA_ID,
+        });
+        // console.log({ res });
+      } catch (err) {
+        // console.log({ err });
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { exchangeRates, averageTxFees } = res.data;
+
+      return { exchangeRates, averageTxFees };
+    } catch (err) {
+      throw new Error("Failed to deliver donation note");
     }
   };
 }
