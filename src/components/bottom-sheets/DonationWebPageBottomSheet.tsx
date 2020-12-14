@@ -1,38 +1,39 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react'
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  Clipboard,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Toast from '../components/Toast';
-import config from '../bitcoin/HexaConfig';
-import CopyThisText from './CopyThisText';
-import { ScrollView } from 'react-native-gesture-handler';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import config from '../../bitcoin/HexaConfig'
+import CopyThisText from '../CopyThisText'
+import { ScrollView } from 'react-native-gesture-handler'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 
-export default function DonationWebPageModalContents(props) {
+export default function DonationWebPageBottomSheet( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <ScrollView style={styles.modalContainer}>
-        <View style={{ height: '100%', marginHorizontal: wp('7%') }}>
+        <View style={{
+          height: '100%', marginHorizontal: wp( '7%' )
+        }}>
           <View
-            style={{ ...styles.successModalHeaderView, flexDirection: 'row' }}
+            style={{
+              ...styles.successModalHeaderView, flexDirection: 'row'
+            }}
           >
             <View>
               <Text
                 style={{
                   color: Colors.blue,
-                  fontSize: RFValue(18),
+                  fontSize: RFValue( 18 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -41,7 +42,7 @@ export default function DonationWebPageModalContents(props) {
               <Text
                 style={{
                   ...styles.modalInfoText,
-                  marginTop: wp('1.5%'),
+                  marginTop: wp( '1.5%' ),
                   color: Colors.lightTextColor,
                 }}
               >
@@ -56,11 +57,11 @@ export default function DonationWebPageModalContents(props) {
                 justifyContent: 'center',
               }}
               onPress={() => {
-                props.onClickSetting();
+                props.onClickSetting()
               }}
             >
               <Image
-                source={require('../assets/images/icons/settings.png')}
+                source={require( '../../assets/images/icons/settings.png' )}
                 style={styles.image}
               />
             </AppBottomSheetTouchableWrapper>
@@ -110,20 +111,20 @@ export default function DonationWebPageModalContents(props) {
           >
             <CopyThisText
               text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === 'app'
-                  ? 'donate'
-                  : config.APP_STAGE === 'sta'
-                    ? 'donate-stage'
-                    : 'donate-test'
-                }/?donationid=${props.account.id
-                }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
+                ? 'donate'
+                : config.APP_STAGE === 'sta'
+                  ? 'donate-stage'
+                  : 'donate-test'
+              }/?donationid=${props.account.id
+              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>
         </View>
       </ScrollView>
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -134,16 +135,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   successModalHeaderView: {
-    marginTop: wp('6%'),
+    marginTop: wp( '6%' ),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   titleTextStyle: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   rowContainer: {
@@ -155,15 +156,15 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    marginHorizontal: hp('1.2%'),
+    marginHorizontal: hp( '1.2%' ),
   },
   infoTextContainer: {
     marginTop: 20,
-    marginHorizontal: hp('1.5%'),
+    marginHorizontal: hp( '1.5%' ),
   },
   buttonStyle: {
     height: 50,
-    width: wp('40%'),
+    width: wp( '40%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',
@@ -171,13 +172,15 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     marginBottom: 20,
   },
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
   deeplinkContainerStyle: {
     flexDirection: 'row',
@@ -201,8 +204,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   image: {
-    width: wp('5%'),
-    height: wp('5%'),
+    width: wp( '5%' ),
+    height: wp( '5%' ),
     resizeMode: 'contain',
   },
-});
+} )

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   Alert,
   RefreshControl,
@@ -33,15 +32,13 @@ import { refreshAccountShell } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
-import { DerivativeAccount, DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
+import { DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import useTransactionsForAccountShell from '../../../utils/hooks/state-selectors/accounts/UseTransactionsForAccountShell'
 import TransactionPreviewHeader from './TransactionPreviewHeader'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import { Button } from 'react-native-elements'
-import DonationWebPageModalContents from '../../../components/DonationWebPageModalContents'
-import SettingDonationWebPageContents from '../../../components/SettingDonationWebpageContents'
+import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
 import { DONATION_ACCOUNT } from '../../../common/constants/serviceTypes'
 
 export type Props = {
@@ -108,6 +105,27 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   function navigateToAccountSettings() {
     navigation.navigate( 'SubAccountSettings', {
       accountShellID,
+    } )
+  }
+
+  function navigateToDonationAccountWebViewSettings() {
+    const accountNumber = primarySubAccount.instanceNumber
+    const serviceType = primarySubAccount.sourceKind
+
+    let derivativeAccounts: DerivativeAccounts
+
+    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
+    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
+    }
+
+    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
+
+    navigation.navigate( 'DonationAccountWebViewSettings', {
+      account: donationAccount,
+      accountNumber,
+      serviceType,
     } )
   }
 
@@ -199,37 +217,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   const showDonationWebViewSheet = useCallback( () => {
     presentBottomSheet(
-      <DonationWebPageModalContents
+      <DonationWebPageBottomSheet
         account={primarySubAccount}
-        onClickSetting={()=>{
+        onClickSetting={() => {
           dismissBottomSheet()
-          showDonationWebViewSettingSheet()}}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '65%' ],
-      },
-    )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
-
-
-  const showDonationWebViewSettingSheet = useCallback( () => {
-    const accountNumber = primarySubAccount.instanceNumber;
-    const serviceType = primarySubAccount.sourceKind;
-
-    let derivativeAccounts: DerivativeAccounts;
-    if(serviceType === SourceAccountKind.REGULAR_ACCOUNT)
-     derivativeAccounts = accountsState[serviceType].service.hdWallet.derivativeAccounts
-    else if (serviceType === SourceAccountKind.SECURE_ACCOUNT)
-     derivativeAccounts = accountsState[serviceType].service.secureHDWallet.derivativeAccounts
-    
-    const donationAccount =  derivativeAccounts[DONATION_ACCOUNT][accountNumber] ;
-  
-    presentBottomSheet(
-      <SettingDonationWebPageContents
-            account={donationAccount}
-                accountNumber={accountNumber}
-                serviceType={serviceType} 
+          navigateToDonationAccountWebViewSettings()
+        }}
       />,
       {
         ...defaultBottomSheetConfigs,
@@ -278,9 +271,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           />
 
         </View>
-        {primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT &&
+
+        {primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT && (
           <View style={{
-            alignItems: 'center', 
+            alignItems: 'center',
           }}>
             <Button
               raised
@@ -289,7 +283,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               titleStyle={ButtonStyles.actionButtonText}
               onPress={showDonationWebViewSheet}
             />
-          </View>}
+          </View>
+        )}
+
         {/* <TransactionPreviewTabs  */}
 
         {/* /> */}
