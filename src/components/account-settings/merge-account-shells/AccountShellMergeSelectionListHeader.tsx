@@ -8,6 +8,7 @@ import Fonts from '../../../common/Fonts';
 import AccountShell from '../../../common/data/models/AccountShell';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import { RFValue } from 'react-native-responsive-fontsize';
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
 
 export type Props = {
   sourceShell: AccountShell;
@@ -24,7 +25,7 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({
       <ListItem pad={4} containerStyle={{ marginBottom: 36 }}>
 
         <Image
-          source={primarySubAccount.avatarImageSource}
+          source={getAvatarForSubAccount(primarySubAccount)}
           style={styles.avatarImage}
           resizeMode="contain"
         />

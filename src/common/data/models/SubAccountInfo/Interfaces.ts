@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import SubAccountKind from '../../enums/SubAccountKind';
 import ServiceAccountKind from '../../enums/ServiceAccountKind';
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
@@ -58,8 +57,6 @@ interface SubAccountDescribing {
    */
   isTFAEnabled: boolean;
 
-  avatarImageSource: ImageSourcePropType;
-
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
   // transactionIDs: string[];
   transactions: TransactionDetails[];
@@ -90,7 +87,6 @@ export type SubAccountDescribingConstructorProps = {
   balances?: Balances;
   visibility?: AccountVisibility;
   isTFAEnabled?: boolean;
-  avatarImageSource?: ImageSourcePropType;
   secondaryAccountUUIDs?: string[];
   utxoCompatibilityGroup?: UTXOCompatibilityGroup;
   transactions?: TransactionDetails[];

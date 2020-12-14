@@ -1,5 +1,6 @@
 // types and action creators: dispatched by components and sagas
 
+import S3Service from '../../bitcoin/services/sss/S3Service';
 import {
   EphemeralDataElements,
   WalletImage,
@@ -139,8 +140,8 @@ export const updateWalletImage = () => {
   return { type: UPDATE_WALLET_IMAGE };
 };
 
-export const fetchWalletImage = () => {
-  return { type: FETCH_WALLET_IMAGE };
+export const fetchWalletImage = (s3Service: S3Service) => {
+  return { type: FETCH_WALLET_IMAGE, payload: { s3Service } };
 };
 
 // types and action creators (saga): dispatched by saga workers

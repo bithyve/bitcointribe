@@ -6,8 +6,8 @@ import AccountSettingsMainScreen from "../../../pages/Accounts/AccountSettings/A
 import ReassignTransactionsMainOptionsScreen from "../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen";
 import SelectReassignableTransactionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectReassignableTransactionsScreen';
 import AccountDetailsContainerScreen from "../../../pages/Accounts/Details/AccountDetailsContainerScreen";
-import TransactionDetailsContainerScreen from "../../../pages/Accounts/Transactions/TransactionDetailsScreenContainer";
-import TransactionsListContainerScreen from "../../../pages/Accounts/Transactions/TransactionsListScreenContainer";
+import TransactionDetailsContainerScreen from "../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen";
+import TransactionsListContainerScreen from "../../../pages/Accounts/Transactions/TransactionsListContainerScreen";
 import ReassignTransactionsSelectDestinationScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen';
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen';
 import AccountSettingsEditVisibilityScreen from '../../../pages/Accounts/AccountSettings/EditVisibilityScreen';

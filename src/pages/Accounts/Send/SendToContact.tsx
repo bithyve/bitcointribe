@@ -144,19 +144,19 @@ class SendToContact extends Component<
       exchangeRates: null,
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: accountKind,
-      averageTxFees: this.props.navigation.getParam('averageTxFees'),
-      spendableBalance: this.props.navigation.getParam('spendableBalance'),
+      averageTxFees: null,
+      spendableBalance: this.props.navigation.getParam('spendableBalance') ? this.props.navigation.getParam('spendableBalance') : null,
       derivativeAccountDetails: this.props.navigation.getParam(
-        'derivativeAccountDetails',
-      ),
-      sweepSecure: this.props.navigation.getParam('sweepSecure'),
+        'derivativeAccountDetails') ? this.props.navigation.getParam(
+        'derivativeAccountDetails') : null,
+      sweepSecure: this.props.navigation.getParam('sweepSecure') ? this.props.navigation.getParam('sweepSecure') : '',
       removeItem: {},
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
         ? props.navigation.getParam('bitcoinAmount')
         : '',
-      donationId: props.navigation.getParam('donationId'),
+      donationId: props.navigation.getParam('donationId') ? props.navigation.getParam('donationId') : '',
       currencyAmount: '',
       isConfirmDisabled: true,
       note: '',
@@ -332,7 +332,7 @@ class SendToContact extends Component<
             {
               text: 'Okay ',
               onPress: () => {
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               },
             },
           ],
@@ -496,9 +496,11 @@ class SendToContact extends Component<
     const { accountsState } = this.props;
     const { serviceType } = this.state;
 
-    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
-      ? 'MAINNET'
-      : 'TESTNET';
+    const network =
+      config.APP_STAGE !== 'dev' &&
+      [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+        ? 'MAINNET'
+        : 'TESTNET';
 
     this.setState({ averageTxFees: this.props.averageTxFees[network] });
   };
@@ -534,7 +536,7 @@ class SendToContact extends Component<
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!accountsState[serviceType].transfer.details.length) {
-        this.props.navigation.goBack();
+        this.props.navigation.pop();
       }
     }
   };
@@ -723,6 +725,7 @@ class SendToContact extends Component<
   };
 
   onConfirm = () => {
+    console.log("INSIDE onconfirm")
     const {
       clearTransfer,
       accountsState,
@@ -849,7 +852,7 @@ class SendToContact extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.checkRecordsHavingPrice();
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               }}
               style={styles.backArrow}
               hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
@@ -988,15 +991,20 @@ class SendToContact extends Component<
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
-                  currencyCode= {prefersBitcoin
-                    ? serviceType == TEST_ACCOUNT
-                    ? ' t-sats' : ' sats' : ''}
+                  currencyCode={
+                    prefersBitcoin
+                      ? serviceType == TEST_ACCOUNT
+                        ? ' t-sats'
+                        : ' sats'
+                      : ''
+                  }
                   onRemove={() => {
-                    let recipientItemToRemove = accountsState[
-                      serviceType
-                    ].transfer.details[accountsState[
-                      serviceType
-                    ].transfer.details.length - 1 - index];
+                    let recipientItemToRemove =
+                      accountsState[serviceType].transfer.details[
+                        accountsState[serviceType].transfer.details.length -
+                          1 -
+                          index
+                      ];
                     if (recipientItemToRemove) {
                       this.setState(
                         {
@@ -1371,7 +1379,7 @@ class SendToContact extends Component<
                         currencyAmount,
                         note,
                       });
-                      this.props.navigation.goBack();
+                      this.props.navigation.pop();
                     }
                   }}
                 >
@@ -1459,6 +1467,8 @@ class SendToContact extends Component<
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
               }}
               onPressCancel={() => {
+                    console.log("INSIDE onPressCancel");
+
                 clearTransfer(serviceType);
                 if (this.refs.SendUnSuccessBottomSheet)
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);

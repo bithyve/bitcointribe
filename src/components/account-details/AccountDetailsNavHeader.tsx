@@ -11,7 +11,7 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
-import useAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountShell';
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 
 
@@ -25,7 +25,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   onBackPressed,
 }: Props) => {
   const dispatch = useDispatch();
-  const accountShell = useAccountShell(accountShellID);
+  const accountShell = useAccountShellForID(accountShellID);
   const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
   const currencyCode = useCurrencyCode();

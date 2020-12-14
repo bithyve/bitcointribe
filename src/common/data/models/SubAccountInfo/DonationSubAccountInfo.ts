@@ -38,8 +38,6 @@ export default class DonationSubAccountInfo
   doneeName: string;
   causeName: string;
 
-  avatarImageSource = require('../../../../assets/images/icons/icon_donation_hexa.png');
-
   transactions: TransactionDetails[];
 
   /**

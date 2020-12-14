@@ -1,20 +1,16 @@
 import React, { ReactElement } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
 } from 'react-native';
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
-import Colors from '../../common/Colors';
 import TransactionsListItem from './AccountDetailsTransactionsListItem';
 
 const keyExtractor = (item: TransactionDescribing) => item.txid;
 
 export type Props = {
   transactions: TransactionDescribing[];
-  onTransactionSelected: (TransactionDescribing) => void;
+  onTransactionSelected: (transaction: TransactionDescribing) => void;
 };
 
 const AccountDetailsTransactionsList: React.FC<Props> = ({

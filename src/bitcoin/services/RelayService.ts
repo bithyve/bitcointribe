@@ -1,11 +1,11 @@
-import Relay from '../utilities/Relay';
-import config from '../HexaConfig';
-import { INotification, EncryptedImage } from '../utilities/Interface';
+import Relay from "../utilities/Relay";
+import config from "../HexaConfig";
+import { INotification, EncryptedImage } from "../utilities/Interface";
 
 export default class RelayServices {
   public static checkCompatibility = async (
     method: string,
-    version: string,
+    version: string
   ): Promise<
     | {
         status: number;
@@ -35,13 +35,13 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to check the compatibility',
+        message: "Failed to check the compatibility",
       };
     }
   };
 
   public static fetchReleases = async (
-    build: string,
+    build: string
   ): Promise<
     | {
         status: number;
@@ -67,14 +67,14 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to fetch release notes',
+        message: "Failed to fetch release notes",
       };
     }
   };
 
   public static updateFCMTokens = async (
     walletID: string,
-    FCMs: string[],
+    FCMs: string[]
   ): Promise<
     | {
         status: number;
@@ -100,13 +100,13 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to update the FCMs on the server',
+        message: "Failed to update the FCMs on the server",
       };
     }
   };
 
   public static fetchNotifications = async (
-    walletID: string,
+    walletID: string
   ): Promise<
     | {
         status: number;
@@ -133,14 +133,14 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to fetch notifications',
+        message: "Failed to fetch notifications",
       };
     }
   };
 
   public static sendNotifications = async (
     receivers: { walletId: string; FCMs: string[] }[],
-    notification: INotification,
+    notification: INotification
   ): Promise<
     | {
         status: number;
@@ -166,14 +166,14 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to deliver notifications',
+        message: "Failed to deliver notifications",
       };
     }
   };
 
   public static sendDonationNote = async (
     donationId: string,
-    txNote: { txId: string; note: string },
+    txNote: { txId: string; note: string }
   ): Promise<
     | {
         status: number;
@@ -199,7 +199,22 @@ export default class RelayServices {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to deliver donation note',
+        message: "Failed to deliver donation note",
+      };
+    }
+  };
+
+  public static fetchFeeAndExchangeRates = async () => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.fetchFeeAndExchangeRates(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: "Failed to fetch fee and exchange rates",
       };
     }
   };

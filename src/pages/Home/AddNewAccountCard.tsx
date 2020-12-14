@@ -5,15 +5,17 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 
-export interface Props {
+export type Props = {
   onPress: () => void;
+  containerStyle?: Record<string, unknown>;
 }
 
 const AddNewAccountCard: React.FC<Props> = ({
   onPress,
+  containerStyle = {},
 }: Props) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} style={containerStyle}>
       <CardView cornerRadius={10} style={styles.cardContainer}>
         <View
           style={{
@@ -44,16 +46,11 @@ const AddNewAccountCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    opacity: 0.4,
-    backgroundColor: Colors.borderColor,
-    margin: 0,
+    backgroundColor: Colors.white,
     width: widthPercentageToDP(42.6),
     height: heightPercentageToDP(20.1),
     borderColor: Colors.borderColor,
     borderWidth: 1,
-    marginRight: widthPercentageToDP(2),
-    marginBottom: widthPercentageToDP(2),
-    padding: widthPercentageToDP(3),
   },
 });
 

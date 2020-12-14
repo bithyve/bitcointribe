@@ -6,6 +6,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import CardStyles from '../../common/Styles/Cards.js';
 import LinearGradient from 'react-native-linear-gradient';
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
@@ -73,7 +74,7 @@ const SubAccountOptionCard: React.FC<Props> = ({
       >
         <Image
           style={styles.image}
-          source={subAccountInfo.avatarImageSource}
+          source={getAvatarForSubAccount(subAccountInfo)}
         />
 
         <View style={styles.descriptionTextContainer}>
