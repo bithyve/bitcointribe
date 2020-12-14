@@ -1,11 +1,18 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { View, Text, StyleSheet, Alert, RefreshControl, ScrollView } from 'react-native'
-import { useDispatch } from 'react-redux'
-import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
-import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
-import TransactionsList from '../../../components/account-details/AccountDetailsTransactionsList'
-import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import React, { useCallback, useEffect, useMemo } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  RefreshControl,
+  ScrollView,
+} from "react-native";
+import { useDispatch } from "react-redux";
+import NavHeader from "../../../components/account-details/AccountDetailsNavHeader";
+import AccountDetailsCard from "../../../components/account-details/AccountDetailsCard";
+import TransactionsList from "../../../components/account-details/AccountDetailsTransactionsList";
+import SendAndReceiveButtonsFooter from "./SendAndReceiveButtonsFooter";
+import { useBottomSheetModal } from "@gorhom/bottom-sheet";
 import KnowMoreBottomSheet, {
   KnowMoreBottomSheetHandle,
 } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet'
@@ -53,7 +60,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const accountTransactions = AccountShell.getAllTransactions(accountShell)
   const spendableBalance = useSpendableBalanceForAccountShell(accountShell)
   const averageTxFees = accountsState.averageTxFees
-  console.log("accountShell", accountShell);
   let derivativeAccountKind: any = primarySubAccount.kind
 
   if (
@@ -83,7 +89,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
+  } = useBottomSheetModal();
 
   function handleTransactionSelection(transaction: TransactionDescribing) {
     navigation.navigate('TransactionDetails', {
@@ -129,7 +135,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       presentBottomSheet(
         <TransactionReassignmentSuccessBottomSheet
           onViewAccountDetailsPressed={() => {
-            dismissBottomSheet()
+            dismissBottomSheet();
             navigation.dispatch(
               resetStackToAccountDetails({
                 accountShellID: destinationID,
@@ -153,7 +159,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           sourceAccountShell={source}
           destinationAccountShell={destination}
           onViewAccountDetailsPressed={() => {
-            dismissBottomSheet()
+            dismissBottomSheet();
             navigation.dispatch(
               resetStackToAccountDetails({
                 accountShellID: destination.id,
@@ -174,9 +180,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     onSuccess: showReassignmentConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
-        'Transaction Reassignment Error',
-        'An error occurred while attempting to reassign transactions',
-      )
+        "Transaction Reassignment Error",
+        "An error occurred while attempting to reassign transactions"
+      );
     },
   })
 
@@ -184,9 +190,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     onSuccess: showMergeConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
-        'Account Merge Error',
-        'An error occurred while attempting to merge accounts.',
-      )
+        "Account Merge Error",
+        "An error occurred while attempting to merge accounts."
+      );
     },
   })
 
@@ -224,6 +230,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   }, [])
 
   return (
+
     <View style={styles.rootContainer}>
       <ScrollView
         style={styles.scrollViewContainer}
@@ -240,13 +247,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onSettingsPressed={navigateToAccountSettings}
         />
 
-        <View style={{
-          paddingVertical: 20
-        }}>
+
+        <View
+          style={{
+            paddingVertical: 20,
+          }}
+        >
           <TransactionPreviewHeader
             availableBalance={spendableBalance}
             bitcoinUnit={accountShell.unit}
-            isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
+            isTestAccount={
+              primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT
+            }
             onViewMorePressed={navigateToTransactionsList}
           />
 
@@ -265,9 +277,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* /> */}
 
-        <View style={{
-          marginBottom: 20
-        }}>
+
+        <View
+          style={{
+            marginBottom: 20,
+          }}
+        >
           <TransactionsList
             transactions={accountTransactions.slice(0, 3)}
             onTransactionSelected={handleTransactionSelection}
@@ -302,8 +317,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </ScrollView>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -323,16 +338,15 @@ const styles = StyleSheet.create({
 AccountDetailsContainerScreen.navigationOptions = ({ navigation, }): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
     header() {
-      const { accountShellID } = navigation.state.params
-
+      const { accountShellID } = navigation.state.params;
       return (
         <NavHeader
           accountShellID={accountShellID}
           onBackPressed={() => navigation.pop()}
         />
-      )
+      );
     },
-  }
-}
+  };
+};
 
-export default AccountDetailsContainerScreen
+export default AccountDetailsContainerScreen;

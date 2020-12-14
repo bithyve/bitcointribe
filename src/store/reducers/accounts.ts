@@ -40,18 +40,18 @@ import {
   REFRESH_ACCOUNT_SHELL,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
-} from '../actions/accounts';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SERVICES_ENRICHED } from '../actions/storage';
+} from "../actions/accounts";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SERVICES_ENRICHED } from "../actions/storage";
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes';
-import AccountShell from '../../common/data/models/AccountShell';
-import { updateAccountShells } from '../utils/accountShellMapping';
+} from "../../common/constants/serviceTypes";
+import AccountShell from "../../common/data/models/AccountShell";
+import { updateAccountShells } from "../utils/accountShellMapping";
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {
@@ -85,7 +85,7 @@ const ACCOUNT_VARS: {
   };
 } = {
   service: null,
-  receivingAddress: '',
+  receivingAddress: "",
   balances: {
     balance: 0,
     unconfirmedBalance: 0,
@@ -93,11 +93,11 @@ const ACCOUNT_VARS: {
   transactions: {},
   transfer: {
     details: [],
-    executed: '',
+    executed: "",
     stage1: {},
     stage2: {},
     stage3: {},
-    txid: '',
+    txid: "",
   },
   loading: {
     receivingAddress: false,
@@ -227,7 +227,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
           transfer: {
             ...state[accountType].transfer,
             stage1: { ...action.payload.result },
-            executed: 'ST1',
+            executed: "ST1",
           },
           loading: {
             ...state[accountType].loading,
@@ -257,6 +257,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       };
 
     case ADD_TRANSFER_DETAILS:
+      console.log("state[accountType].transfer", state[accountType]);
       return {
         ...state,
         [accountType]: {
@@ -271,6 +272,8 @@ export default (state: AccountsState = initialState, action): AccountsState => {
         },
       };
 
+
+      
     case REMOVE_TRANSFER_DETAILS:
       return {
         ...state,
@@ -279,14 +282,14 @@ export default (state: AccountsState = initialState, action): AccountsState => {
           transfer: {
             ...state[accountType].transfer,
             details: [...state[accountType].transfer.details].filter(
-              (item) => item !== action.payload.recipientData,
+              (item) => item !== action.payload.recipientData
             ),
           },
         },
       };
 
     case CLEAR_TRANSFER:
-      if (!action.payload.stage)
+      if (!action.payload.stage && initialState[accountType])
         return {
           ...state,
           [accountType]: {
@@ -296,7 +299,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
             },
           },
         };
-      else if (action.payload.stage === 'stage1')
+      else if (action.payload.stage === "stage1")
         return {
           ...state,
           [accountType]: {
@@ -306,11 +309,11 @@ export default (state: AccountsState = initialState, action): AccountsState => {
               stage1: {},
               stage2: {},
               stage3: {},
-              executed: '',
+              executed: "",
             },
           },
         };
-      else if (action.payload.stage === 'stage2')
+      else if (action.payload.stage === "stage2")
         return {
           ...state,
           [accountType]: {
@@ -319,11 +322,11 @@ export default (state: AccountsState = initialState, action): AccountsState => {
               ...state[accountType].transfer,
               stage2: {},
               stage3: {},
-              executed: 'ST1',
+              executed: "ST1",
             },
           },
         };
-      else if (action.payload.stage === 'stage3')
+      else if (action.payload.stage === "stage3")
         return {
           ...state,
           [accountType]: {
@@ -331,7 +334,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
             transfer: {
               ...state[accountType].transfer,
               stage3: {},
-              executed: 'ST2',
+              executed: "ST2",
             },
           },
         };
@@ -346,7 +349,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
               transfer: {
                 ...state[accountType].transfer,
                 txid: action.payload.result,
-                executed: 'ST2',
+                executed: "ST2",
               },
               loading: {
                 ...state[accountType].loading,
@@ -363,7 +366,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
               transfer: {
                 ...state[accountType].transfer,
                 stage2: { ...action.payload.result },
-                executed: 'ST2',
+                executed: "ST2",
               },
               loading: {
                 ...state[accountType].loading,
@@ -374,113 +377,118 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       }
 
     case ALTERNATE_TRANSFER_ST2_EXECUTED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            txid: action.payload.result,
-            executed: 'ST2',
+      if (state[accountType] && state[accountType].transfer)
+        return {
+          ...state,
+          [accountType]: {
+            ...state[accountType],
+            transfer: {
+              ...state[accountType].transfer,
+              txid: action.payload.result,
+              executed: "ST2",
+            },
+            loading: {
+              ...state[accountType].loading,
+              transfer: false,
+            },
           },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
-          },
-        },
-      };
+        };
 
     case TRANSFER_ST2_FAILED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            stage2: {
-              ...state[accountType].transfer.stage2,
-              failed: true,
-              ...action.payload.errorDetails,
+      if (state[accountType] && state[accountType].transfer)
+        return {
+          ...state,
+          [accountType]: {
+            ...state[accountType],
+            transfer: {
+              ...state[accountType].transfer,
+              stage2: {
+                ...state[accountType].transfer.stage2,
+                failed: true,
+                ...action.payload.errorDetails,
+              },
+            },
+            loading: {
+              ...state[accountType].loading,
+              transfer: false,
             },
           },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
-          },
-        },
-      };
+        };
 
     case TRANSFER_ST3_EXECUTED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            txid: action.payload.result,
-            executing: false,
-          },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
-          },
-        },
-      };
-
-    case TRANSFER_ST3_FAILED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            stage3: {
-              ...state[accountType].transfer.stage3,
-              failed: true,
-              ...action.payload.errorDetails,
+      if (state[accountType] && state[accountType].transfer)
+        return {
+          ...state,
+          [accountType]: {
+            ...state[accountType],
+            transfer: {
+              ...state[accountType].transfer,
+              txid: action.payload.result,
+              executing: false,
+            },
+            loading: {
+              ...state[accountType].loading,
+              transfer: false,
             },
           },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
+        };
+
+    case TRANSFER_ST3_FAILED:
+      if (state[accountType] && state[accountType].transfer)
+        return {
+          ...state,
+          [accountType]: {
+            ...state[accountType],
+            transfer: {
+              ...state[accountType].transfer,
+              stage3: {
+                ...state[accountType].transfer.stage3,
+                failed: true,
+                ...action.payload.errorDetails,
+              },
+            },
+            loading: {
+              ...state[accountType].loading,
+              transfer: false,
+            },
           },
-        },
-      };
+        };
 
     case SERVICES_ENRICHED:
       const { services } = action.payload;
-
-      return {
-        ...state,
-        [REGULAR_ACCOUNT]: {
-          ...state[REGULAR_ACCOUNT],
-          service: action.payload.services[REGULAR_ACCOUNT],
-        },
-        [TEST_ACCOUNT]: {
-          ...state[TEST_ACCOUNT],
-          service: action.payload.services[TEST_ACCOUNT],
-        },
-        [SECURE_ACCOUNT]: {
-          ...state[SECURE_ACCOUNT],
-          service: action.payload.services[SECURE_ACCOUNT],
-        },
-        servicesEnriched: true,
-        accountShells: updateAccountShells(services, state.accountShells),
-      };
+      if (action.payload.services)
+        return {
+          ...state,
+          [REGULAR_ACCOUNT]: {
+            ...state[REGULAR_ACCOUNT],
+            service: action.payload.services[REGULAR_ACCOUNT],
+          },
+          [TEST_ACCOUNT]: {
+            ...state[TEST_ACCOUNT],
+            service: action.payload.services[TEST_ACCOUNT],
+          },
+          [SECURE_ACCOUNT]: {
+            ...state[SECURE_ACCOUNT],
+            service: action.payload.services[SECURE_ACCOUNT],
+          },
+          servicesEnriched: true,
+          accountShells: updateAccountShells(services, state.accountShells),
+        };
 
     case ACCOUNTS_LOADING:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          loading: {
-            ...state[accountType].loading,
-            [action.payload.beingLoaded]: !state[accountType].loading[
-              action.payload.beingLoaded
-            ],
+      if (state[accountType])
+        return {
+          ...state,
+          [accountType]: {
+            ...state[accountType],
+            loading: {
+              ...state[accountType].loading,
+              [action.payload.beingLoaded]: !state[accountType].loading[
+                action.payload.beingLoaded
+              ],
+            },
           },
-        },
-      };
+        };
 
     case ACCOUNTS_SYNCHED:
       return {
@@ -687,7 +695,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
 
     case ACCOUNT_SHELL_ORDERED_TO_FRONT:
       const index = state.accountShells.findIndex(
-        (shell) => shell.id == action.payload.id,
+        (shell) => shell.id == action.payload.id
       );
 
       const shellToMove = state.accountShells.splice(index);
@@ -695,7 +703,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
       return {
         ...state,
         accountShells: [...shellToMove, ...state.accountShells].map(
-          updateDisplayOrderForSortedShell,
+          updateDisplayOrderForSortedShell
         ),
       };
 
@@ -707,7 +715,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
 
     case REFRESH_ACCOUNT_SHELL:
       state.accountShells.find(
-        (shell) => shell.id == action.payload.shell.id,
+        (shell) => shell.id == action.payload.shell.id
       ).isSyncInProgress = true;
 
       return {
@@ -716,7 +724,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
 
     case ACCOUNT_SHELL_REFRESH_COMPLETED:
       state.accountShells.find(
-        (shell) => shell.id == action.payload.id,
+        (shell) => shell.id == action.payload.id
       ).isSyncInProgress = false;
 
       return {
@@ -730,7 +738,7 @@ export default (state: AccountsState = initialState, action): AccountsState => {
 
 function updateDisplayOrderForSortedShell(
   accountShell: AccountShell,
-  sortedIndex: number,
+  sortedIndex: number
 ): AccountShell {
   accountShell.displayOrder = sortedIndex + 1;
 
