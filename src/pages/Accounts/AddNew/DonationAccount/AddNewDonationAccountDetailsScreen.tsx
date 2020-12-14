@@ -76,7 +76,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
 
   function handleProceedButtonPress() {
     currentSubAccountInfo.customDisplayName = accountName;
-    currentSubAccountInfo.doneeName = accountDescription;
+    currentSubAccountInfo.doneeName = doneeName;
     currentSubAccountInfo.customDescription = accountDescription;
     currentSubAccountInfo.isTFAEnabled = isTFAEnabled;
     currentSubAccountInfo.sourceKind = currentSubAccountInfo.isTFAEnabled

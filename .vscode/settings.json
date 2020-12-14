@@ -3,6 +3,11 @@
     "source.fixAll.eslint": true
   },
   "editor.formatOnPaste": true,
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact"
+  ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "cSpell.words": [
     "Hexa",
