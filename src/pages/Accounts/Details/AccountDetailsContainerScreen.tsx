@@ -39,6 +39,7 @@ export type Props = {
 
 const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch();
+  const navigationOptions = makeNavigationOptions;
 
   const accountShellID = useMemo(() => {
     return navigation.getParam('accountShellID');
@@ -268,11 +269,12 @@ const styles = StyleSheet.create({
   },
 });
 
-AccountDetailsContainerScreen.navigationOptions = ({
+const makeNavigationOptions = ({
   navigation,
 }): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
     header() {
+      console.log("navigation.state", navigation.state);
       const { accountShellID } = navigation.state.params;
 
       return (
