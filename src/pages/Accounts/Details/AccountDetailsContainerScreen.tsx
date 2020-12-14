@@ -49,6 +49,7 @@ export type Props = {
 
 const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch();
+  const navigationOptions = makeNavigationOptions;
 
   const accountShellID = useMemo(() => {
     return navigation.getParam("accountShellID");
@@ -123,7 +124,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   function performRefreshOnPullDown() {
-    dispatch(refreshAccountShell(accountShell, { autoSync: false }));
+    dispatch(
+      refreshAccountShell(accountShell, {
+        autoSync: false,
+      })
+    );
   }
 
   const showKnowMoreSheet = useCallback(() => {
@@ -207,13 +212,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   });
 
   useEffect(() => {
-    dispatch(refreshAccountShell(accountShell, { autoSync: true }));
+    dispatch(
+      refreshAccountShell(accountShell, {
+        autoSync: true,
+      })
+    );
   }, []);
 
   return (
-    <View style={{ paddingVertical: 20 }}>
+
+    <View style={styles.rootContainer}>
       <ScrollView
-        style={styles.rootContainer}
+        style={styles.scrollViewContainer}
         refreshControl={
           <RefreshControl
             onRefresh={performRefreshOnPullDown}
@@ -227,7 +237,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onSettingsPressed={navigateToAccountSettings}
         />
 
-        <View style={{ paddingVertical: 20 }}>
+
+        <View
+          style={{
+            paddingVertical: 20,
+          }}
+        >
           <TransactionPreviewHeader
             availableBalance={spendableBalance}
             bitcoinUnit={accountShell.unit}
@@ -242,7 +257,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* /> */}
 
-        <View style={{ marginBottom: 20 }}>
+
+        <View
+          style={{
+            marginBottom: 20,
+          }}
+        >
           <TransactionsList
             transactions={accountTransactions.slice(0, 3)}
             onTransactionSelected={handleTransactionSelection}
@@ -284,22 +304,25 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   rootContainer: {
+    paddingTop: 20,
+    flex: 1,
+  },
+
+  scrollViewContainer: {
     paddingHorizontal: 24,
   },
 
   footerSection: {
     paddingVertical: 38,
-    marginBottom: 100,
   },
 });
 
-AccountDetailsContainerScreen.navigationOptions = ({
+const makeNavigationOptions = ({
   navigation,
 }): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
     header() {
       const { accountShellID } = navigation.state.params;
-
       return (
         <NavHeader
           accountShellID={accountShellID}

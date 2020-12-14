@@ -52,10 +52,11 @@ import SendShareModal from "../ManageBackup/SendShareModal";
 import {
   EphemeralDataElements,
   MetaShare,
-} from "../../bitcoin/utilities/Interface";
-import { removeTrustedContact } from "../../store/actions/trustedContacts";
-import AccountShell from "../../common/data/models/AccountShell";
-import SubAccountKind from "../../common/data/enums/SubAccountKind";
+} from '../../bitcoin/utilities/Interface';
+import { removeTrustedContact } from '../../store/actions/trustedContacts';
+import AccountShell from '../../common/data/models/AccountShell';
+import SubAccountKind from '../../common/data/enums/SubAccountKind';
+import { resetStackToSend } from '../../navigation/actions/NavigationActions';
 
 const getImageIcon = (item) => {
   if (item) {
@@ -342,6 +343,7 @@ class ContactDetails extends PureComponent<
       serviceType: REGULAR_ACCOUNT,
       isFromAddressBook: true,
     });
+
   };
 
   onPressResendRequest = () => {
