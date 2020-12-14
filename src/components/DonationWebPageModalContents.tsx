@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Clipboard,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -84,10 +83,9 @@ export default function DonationWebPageModalContents(props) {
           >
             <CopyThisText
               text={
-                `https://hexawallet.io/${
-                  config.APP_STAGE === 'app'
-                    ? 'donate'
-                    : config.APP_STAGE === 'sta'
+                `https://hexawallet.io/${config.APP_STAGE === 'app'
+                  ? 'donate'
+                  : config.APP_STAGE === 'sta'
                     ? 'donate-stage'
                     : 'donate-test'
                 }/?donationid=` + props.account.id
@@ -111,15 +109,13 @@ export default function DonationWebPageModalContents(props) {
             }}
           >
             <CopyThisText
-              text={`<iframe src="https://hexawallet.io/${
-                config.APP_STAGE === 'app'
+              text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === 'app'
                   ? 'donate'
                   : config.APP_STAGE === 'sta'
-                  ? 'donate-stage'
-                  : 'donate-test'
-              }/?donationid=${
-                props.account.id
-              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
+                    ? 'donate-stage'
+                    : 'donate-test'
+                }/?donationid=${props.account.id
+                }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>
         </View>
