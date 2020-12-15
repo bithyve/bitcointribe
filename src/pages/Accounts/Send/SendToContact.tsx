@@ -12,9 +12,9 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
-  Alert,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from 'react-native';
 import Colors from '../../../common/Colors';
 import Fonts from '../../../common/Fonts';
@@ -24,16 +24,13 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../../../components/ToggleSwitch';
 import {
   transferST1,
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
 } from '../../../store/actions/accounts';
-import { currencyKindSet } from '../../../store/actions/preferences';
-import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
-import { UsNumberFormat } from '../../../common/utilities';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -47,41 +44,35 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import AccountSelectionModalContents from '../AccountSelectionModalContents';
-import SmallHeaderModal from '../../../components/SmallHeaderModal';
-import BottomInfoBox from '../../../components/BottomInfoBox';
-import FiatCurrencies from '../../../common/FiatCurrencies';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getCurrencyImageByRegion } from '../../../common/CommonFunctions/index';
-import { getCurrencyImageName } from '../../../common/CommonFunctions/index';
-import config from '../../../bitcoin/HexaConfig';
-import { connect } from 'react-redux';
-import { withNavigationFocus } from 'react-navigation';
-import idx from 'idx';
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
-import CurrencyKind from '../../../common/data/enums/CurrencyKind';
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem';
 import {
   RecipientDescribing,
+  ContactRecipientDescribing,
+  AccountRecipientDescribing,
   makeContactRecipientDescription,
   makeSubAccountRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing';
+import { connect } from 'react-redux';
+import idx from 'idx';
+import { withNavigationFocus } from 'react-navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import { currencyKindSet } from '../../../store/actions/preferences';
+import { syncTrustedChannels } from '../../../store/actions/trustedContacts';
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from '../../../components/MaterialCurrencyCodeIcon';
+import { getCurrencyImageByRegion } from '../../../common/CommonFunctions';
+import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwitch';
+import BottomInfoBox from '../../../components/BottomInfoBox';
+import AccountSelectionModalContents from '../AccountSelectionModalContents';
+import SmallHeaderModal from '../../../components/SmallHeaderModal';
+import FiatCurrencies from '../../../common/FiatCurrencies';
 import Loader from '../../../components/loader';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
-
-
-const currencyCode = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
-];
+import { UsNumberFormat } from '../../../common/utilities';
+import config from '../../../bitcoin/HexaConfig';
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -133,7 +124,7 @@ interface SendToContactStateTypes {
 class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
-  > {
+> {
   removeItemBottomSheetRef = React.createRef<BottomSheet>();
 
   constructor(props) {
@@ -153,19 +144,19 @@ class SendToContact extends Component<
       exchangeRates: null,
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: accountKind,
-      averageTxFees: this.props.navigation.getParam('averageTxFees'),
-      spendableBalance: this.props.navigation.getParam('spendableBalance'),
+      averageTxFees: null,
+      spendableBalance: this.props.navigation.getParam('spendableBalance') ? this.props.navigation.getParam('spendableBalance') : null,
       derivativeAccountDetails: this.props.navigation.getParam(
-        'derivativeAccountDetails',
-      ),
-      sweepSecure: this.props.navigation.getParam('sweepSecure'),
+        'derivativeAccountDetails') ? this.props.navigation.getParam(
+        'derivativeAccountDetails') : null,
+      sweepSecure: this.props.navigation.getParam('sweepSecure') ? this.props.navigation.getParam('sweepSecure') : '',
       removeItem: {},
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
       bitcoinAmount: props.navigation.getParam('bitcoinAmount')
         ? props.navigation.getParam('bitcoinAmount')
         : '',
-      donationId: props.navigation.getParam('donationId'),
+      donationId: props.navigation.getParam('donationId') ? props.navigation.getParam('donationId') : '',
       currencyAmount: '',
       isConfirmDisabled: true,
       note: '',
@@ -205,9 +196,10 @@ class SendToContact extends Component<
       this.props.syncTrustedChannels(contacts);
     }
 
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      this.checkRecordsHavingPrice();
-    });
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.checkRecordsHavingPrice,
+    );
 
     this.setState(
       { exchangeRates: accountsState && accountsState.exchangeRates },
@@ -215,9 +207,9 @@ class SendToContact extends Component<
         if (bitcoinAmount) {
           const currency = this.state.exchangeRates
             ? (
-              (parseInt(bitcoinAmount) / SATOSHIS_IN_BTC) *
-              this.state.exchangeRates[this.state.CurrencyCode].last
-            ).toFixed(2)
+                (parseInt(bitcoinAmount) / SATOSHIS_IN_BTC) *
+                this.state.exchangeRates[this.state.CurrencyCode].last
+              ).toFixed(2)
             : 0;
 
           this.setState({
@@ -294,7 +286,7 @@ class SendToContact extends Component<
       prevState.spendableBalance !== this.state.spendableBalance ||
       prevProps.accountsState[this.state.serviceType].transfer.details
         .length !==
-      this.props.accountsState[this.state.serviceType].transfer.details.length
+        this.props.accountsState[this.state.serviceType].transfer.details.length
     ) {
       this.amountCalculation();
     }
@@ -340,7 +332,7 @@ class SendToContact extends Component<
             {
               text: 'Okay ',
               onPress: () => {
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               },
             },
           ],
@@ -350,7 +342,7 @@ class SendToContact extends Component<
 
         const toRemove =
           accountsState[serviceType].transfer.details[
-          accountsState[serviceType].transfer.details.length - 1
+            accountsState[serviceType].transfer.details.length - 1
           ];
 
         this.props.removeTransferDetails(serviceType, toRemove);
@@ -364,18 +356,18 @@ class SendToContact extends Component<
     const testBalance = accountsState[TEST_ACCOUNT].service
       ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance
       : // +  accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      0;
+        0;
 
     let regularBalance = accountsState[REGULAR_ACCOUNT].service
       ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance
       : // +  accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      0;
+        0;
 
     // regular derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
       const derivativeAccount =
         accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -394,8 +386,8 @@ class SendToContact extends Component<
     let secureBalance = accountsState[SECURE_ACCOUNT].service
       ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
       : // + accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-      //      .unconfirmedBalance
-      0;
+        //      .unconfirmedBalance
+        0;
 
     // secure derivative accounts
     for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
@@ -403,7 +395,7 @@ class SendToContact extends Component<
 
       const derivativeAccount =
         accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount && derivativeAccount.instance.using) {
         for (
@@ -427,11 +419,8 @@ class SendToContact extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
     let currencyCodeTmp = this.props.currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
+
     this.setState({
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
     });
@@ -445,6 +434,7 @@ class SendToContact extends Component<
   checkRecordsHavingPrice = () => {
     const { accountsState, removeTransferDetails } = this.props;
     const { serviceType, selectedContact } = this.state;
+
     if (
       accountsState[serviceType].transfer.details &&
       accountsState[serviceType].transfer.details.length
@@ -462,23 +452,28 @@ class SendToContact extends Component<
             i
           ].selectedContact.hasOwnProperty('currencyAmount') &&
           selectedContact.id ==
-          accountsState[serviceType].transfer.details[i].selectedContact.id
+            accountsState[serviceType].transfer.details[i].selectedContact.id
         ) {
           removeTransferDetails(
             serviceType,
             accountsState[serviceType].transfer.details[i],
           );
+          return true;
         }
       }
     }
   };
 
   convertBitCoinToCurrency = (value) => {
-    const { prefersBitcoin, exchangeRates, CurrencyCode } = this.state;
+    const { exchangeRates, CurrencyCode, prefersBitcoin } = this.state;
+
     let temp = value;
     if (prefersBitcoin) {
       let result = exchangeRates
-        ? ((value / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
+        ? (
+            (value / SATOSHIS_IN_BTC) *
+            exchangeRates[CurrencyCode].last
+          ).toFixed(2)
         : 0;
       this.setState({ bitcoinAmount: temp, currencyAmount: result.toString() });
     } else {
@@ -493,12 +488,18 @@ class SendToContact extends Component<
     }
   };
 
+  // TODO: I don't think averageTxFees should be a wallet-wide concern.
+  // I also don't think this component should be concerned about dong its
+  // own data fetching if it can't find what's SUPPOSED to be passed in
+  // as navigation props.
   setAverageTxFees = async () => {
     const { serviceType } = this.state;
 
-    const network = [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
-      ? 'MAINNET'
-      : 'TESTNET';
+    const network =
+      config.APP_STAGE !== 'dev' &&
+      [REGULAR_ACCOUNT, SECURE_ACCOUNT].includes(serviceType)
+        ? 'MAINNET'
+        : 'TESTNET';
 
     this.setState({ averageTxFees: this.props.averageTxFees[network] });
   };
@@ -534,7 +535,7 @@ class SendToContact extends Component<
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!accountsState[serviceType].transfer.details.length) {
-        this.props.navigation.goBack();
+        this.props.navigation.pop();
       }
     }
   };
@@ -560,7 +561,10 @@ class SendToContact extends Component<
     } else if (accountsState[serviceType].transfer.executed === 'ST1') {
       if (accountsState[serviceType].transfer.details.length) {
         this.setState({ isConfirmDisabled: false, showLoader: false });
+        const accountShellID = this.props.navigation.getParam('accountShellID');
+
         this.props.navigation.navigate('SendConfirmation', {
+          accountShellID,
           serviceType,
           sweepSecure,
           spendableBalance,
@@ -617,6 +621,7 @@ class SendToContact extends Component<
           isSendMax: true,
         },
         () => {
+          currencyKindSet(CurrencyKind.BITCOIN);
           this.convertBitCoinToCurrency(max.toString());
         },
       );
@@ -656,7 +661,7 @@ class SendToContact extends Component<
         if (config.EJECTED_ACCOUNTS.includes(selectedContact.id)) {
           if (
             instance.selectedContact.account_number ===
-            selectedContact.account_number &&
+              selectedContact.account_number &&
             instance.selectedContact.type === selectedContact.type
           ) {
             // skip (current donation instance), get added as currentRecipientInstance
@@ -700,6 +705,7 @@ class SendToContact extends Component<
           const contactName = `${item.selectedContact.displayedName}`
             .toLowerCase()
             .trim();
+
           recipients.push({
             id: contactName,
             address: null,
@@ -718,6 +724,7 @@ class SendToContact extends Component<
   };
 
   onConfirm = () => {
+    console.log("INSIDE onconfirm")
     const {
       clearTransfer,
       accountsState,
@@ -786,10 +793,13 @@ class SendToContact extends Component<
     return serviceType == TEST_ACCOUNT
       ? UsNumberFormat(spendableBalance)
       : prefersBitcoin
-        ? UsNumberFormat(spendableBalance)
-        : exchangeRates
-          ? ((spendableBalance / SATOSHIS_IN_BTC) * exchangeRates[CurrencyCode].last).toFixed(2)
-          : null;
+      ? UsNumberFormat(spendableBalance)
+      : exchangeRates
+      ? (
+          (spendableBalance / SATOSHIS_IN_BTC) *
+          exchangeRates[CurrencyCode].last
+        ).toFixed(2)
+      : null;
   };
 
   getIsMinimumAllowedStatus = () => {
@@ -822,7 +832,7 @@ class SendToContact extends Component<
       InputStyleNote,
       isInvalidBalance,
       spendableBalances,
-      showLoader
+      showLoader,
     } = this.state;
 
     const {
@@ -841,7 +851,7 @@ class SendToContact extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.checkRecordsHavingPrice();
-                this.props.navigation.goBack();
+                this.props.navigation.pop();
               }}
               style={styles.backArrow}
               hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
@@ -855,13 +865,13 @@ class SendToContact extends Component<
             <Image
               source={
                 this.state.derivativeAccountDetails &&
-                  this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                   ? require('../../../assets/images/icons/icon_donation_hexa.png')
                   : serviceType == TEST_ACCOUNT
-                    ? require('../../../assets/images/icons/icon_test.png')
-                    : serviceType == REGULAR_ACCOUNT
-                      ? require('../../../assets/images/icons/icon_regular.png')
-                      : require('../../../assets/images/icons/icon_secureaccount.png')
+                  ? require('../../../assets/images/icons/icon_test.png')
+                  : serviceType == REGULAR_ACCOUNT
+                  ? require('../../../assets/images/icons/icon_regular.png')
+                  : require('../../../assets/images/icons/icon_secureaccount.png')
               }
               style={{ width: wp('10%'), height: wp('10%') }}
             />
@@ -889,15 +899,15 @@ class SendToContact extends Component<
               }}
             >
               {this.state.derivativeAccountDetails &&
-                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
+              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
                 ? 'Donation Account'
                 : serviceType == 'TEST_ACCOUNT'
-                  ? 'Test Account'
-                  : serviceType == 'SECURE_ACCOUNT'
-                    ? 'Savings Account'
-                    : serviceType == 'REGULAR_ACCOUNT'
-                      ? 'Checking Account'
-                      : ''}
+                ? 'Test Account'
+                : serviceType == 'SECURE_ACCOUNT'
+                ? 'Savings Account'
+                : serviceType == 'REGULAR_ACCOUNT'
+                ? 'Checking Account'
+                : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -906,8 +916,8 @@ class SendToContact extends Component<
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
                   : prefersBitcoin
-                    ? ' sats )'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                  ? ' sats )'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
               </Text>
             </Text>
             {isFromAddressBook && (
@@ -943,8 +953,8 @@ class SendToContact extends Component<
                     ? item.bitcoinAmount
                     : bitcoinAmount
                   : item.currencyAmount
-                    ? item.currencyAmount
-                    : currencyAmount,
+                  ? item.currencyAmount
+                  : currencyAmount,
               };
 
               // 🔑 This seems to be the way the backend is defining the "account kind".
@@ -957,10 +967,17 @@ class SendToContact extends Component<
                 'Donation Account': DONATION_ACCOUNT,
               }[item.selectedContact.account_name || 'Checking Account'];
 
-
               // 🔑 This seems to be the way the backend is distinguishing between
               // accounts and contacts.
               if (item.selectedContact.account_name != null) {
+                // 🔑 This seems to be the way the backend is defining the "account kind".
+                const accountKind = {
+                  'Checking Account': REGULAR_ACCOUNT,
+                  'Savings Account': SECURE_ACCOUNT,
+                  'Test Account': TEST_ACCOUNT,
+                  'Donation Account': DONATION_ACCOUNT,
+                }[item.selectedContact.account_name || 'Checking Account'];
+
                 recipient = makeSubAccountRecipientDescription(
                   newItem,
                   accountKind,
@@ -973,18 +990,24 @@ class SendToContact extends Component<
                 <SelectedRecipientCarouselItem
                   containerStyle={{ marginHorizontal: 12 }}
                   recipient={recipient}
+                  currencyCode={
+                    prefersBitcoin
+                      ? serviceType == TEST_ACCOUNT
+                        ? ' t-sats'
+                        : ' sats'
+                      : ''
+                  }
                   onRemove={() => {
-                    let recipientItemToRemove = accountsState[serviceType]
-                      .transfer
-                      .details
-                      .find((recipientInfo) => {
-                        return recipientInfo.selectedContact.id === recipient.id;
-                      });
-
+                    let recipientItemToRemove =
+                      accountsState[serviceType].transfer.details[
+                        accountsState[serviceType].transfer.details.length -
+                          1 -
+                          index
+                      ];
                     if (recipientItemToRemove) {
                       this.setState(
                         {
-                          removeItem: recipientItemToRemove
+                          removeItem: recipientItemToRemove,
                         },
                         () => {
                           this.removeItemBottomSheetRef.current?.snapTo(1);
@@ -1025,25 +1048,25 @@ class SendToContact extends Component<
                     onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
-                      {currencyCode.includes(CurrencyCode) ? (
+                      {materialIconCurrencyCodes.includes(CurrencyCode) ? (
                         <View style={styles.currencyImageView}>
-                          <MaterialCommunityIcons
-                            name={getCurrencyImageName(CurrencyCode)}
+                          <MaterialCurrencyCodeIcon
+                            currencyCode={CurrencyCode}
                             color={Colors.currencyGray}
                             size={wp('6%')}
                           />
                         </View>
                       ) : (
-                          <Image
-                            style={{
-                              ...styles.textBoxImage,
-                            }}
-                            source={getCurrencyImageByRegion(
-                              CurrencyCode,
-                              'gray',
-                            )}
-                          />
-                        )}
+                        <Image
+                          style={{
+                            ...styles.textBoxImage,
+                          }}
+                          source={getCurrencyImageByRegion(
+                            CurrencyCode,
+                            'gray',
+                          )}
+                        />
+                      )}
                     </View>
                     <View style={styles.convertText} />
                     <TextInput
@@ -1151,8 +1174,8 @@ class SendToContact extends Component<
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
                           : serviceType == TEST_ACCOUNT
-                            ? 'Converted amount in t-sats'
-                            : 'Converted amount in sats'
+                          ? 'Converted amount in t-sats'
+                          : 'Converted amount in sats'
                       }
                       editable={prefersBitcoin}
                       value={bitcoinAmount}
@@ -1199,8 +1222,8 @@ class SendToContact extends Component<
                 </View>
 
                 <View style={styles.toggleSwitchView}>
-                  <ToggleSwitch
-                    currencyCodeValue={CurrencyCode}
+                  <CurrencyKindToggleSwitch
+                    fiatCurrencyCode={CurrencyCode}
                     onpress={() => {
                       const newValue = prefersBitcoin
                         ? CurrencyKind.FIAT
@@ -1213,8 +1236,8 @@ class SendToContact extends Component<
                         },
                       );
                     }}
-                    toggle={prefersBitcoin}
-                    transform={true}
+                    isOn={prefersBitcoin}
+                    isVertical={true}
                   />
                 </View>
               </View>
@@ -1276,7 +1299,10 @@ class SendToContact extends Component<
               <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({ isConfirmDisabled: true, showLoader: true });
+                    this.setState({
+                      isConfirmDisabled: true,
+                      showLoader: true,
+                    });
                     this.onConfirm();
                   }}
                   disabled={
@@ -1295,12 +1321,12 @@ class SendToContact extends Component<
                 >
                   {(!isConfirmDisabled &&
                     accountsState[serviceType].loading.transfer) ||
-                    (isConfirmDisabled &&
-                      accountsState[serviceType].loading.transfer) ? (
-                      <ActivityIndicator size="small" />
-                    ) : (
-                      <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
-                    )}
+                  (isConfirmDisabled &&
+                    accountsState[serviceType].loading.transfer) ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                  )}
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -1330,7 +1356,7 @@ class SendToContact extends Component<
                             if (
                               accountsState[serviceType].transfer.details[i]
                                 .selectedContact.account_number ===
-                              selectedContact.account_number &&
+                                selectedContact.account_number &&
                               accountsState[serviceType].transfer.details[i]
                                 .selectedContact.type === selectedContact.type
                             )
@@ -1352,7 +1378,7 @@ class SendToContact extends Component<
                         currencyAmount,
                         note,
                       });
-                      this.props.navigation.goBack();
+                      this.props.navigation.pop();
                     }
                   }}
                 >
@@ -1370,7 +1396,7 @@ class SendToContact extends Component<
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
-        {showLoader ? <Loader isLoading={true}/> : null}
+        {showLoader ? <Loader isLoading={true} /> : null}
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1383,7 +1409,8 @@ class SendToContact extends Component<
             ) {
               return (
                 <RemoveSelectedRecipient
-                  selectedContact={removeItem.selectedContact}
+                  selectedContact={removeItem}
+                  prefersBitcoin={prefersBitcoin}
                   onPressBack={() => {
                     this.removeItemBottomSheetRef.current?.snapTo(0);
                   }}
@@ -1417,16 +1444,16 @@ class SendToContact extends Component<
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
             <SendConfirmationContent
-              title={'Send Unsuccessful'}
+              title={'Sent Unsuccessful'}
               info={
                 'There seems to be a problem' +
-                  '\n' +
-                  accountsState[serviceType].transfer.stage1.failed
+                '\n' +
+                accountsState[serviceType].transfer.stage1.failed
                   ? accountsState[serviceType].transfer.stage1.err ===
                     'Insufficient balance'
                     ? 'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
                     : 'Something went wrong; ' +
-                    accountsState[serviceType].transfer.stage1.err
+                      accountsState[serviceType].transfer.stage1.err
                   : 'Something went wrong; error in transfer state'
               }
               userInfo={accountsState[serviceType].transfer.details}
@@ -1439,6 +1466,8 @@ class SendToContact extends Component<
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
               }}
               onPressCancel={() => {
+                    console.log("INSIDE onPressCancel");
+
                 clearTransfer(serviceType);
                 if (this.refs.SendUnSuccessBottomSheet)
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
