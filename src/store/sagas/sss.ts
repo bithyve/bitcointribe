@@ -1689,10 +1689,12 @@ const asyncDataToBackup = async () => {
     [, TrustedContactsInfo],
     [, personalCopyDetails],
     [, FBTCAccount],
+    [, OwnNodes]
   ] = await AsyncStorage.multiGet([
     'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
+    'OwnNodes'
   ]);
   const ASYNC_DATA = {};
   if (TrustedContactsInfo)
@@ -1700,6 +1702,7 @@ const asyncDataToBackup = async () => {
   if (personalCopyDetails)
     ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
   if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+  if(OwnNodes) ASYNC_DATA['OwnNodes'] = OwnNodes;
 
   return ASYNC_DATA;
 };
@@ -1793,7 +1796,7 @@ function* updateWalletImageWorker({ payload }) {
     }
 
     const STATE_DATA = yield call(stateDataToBackup);
-    console.log({ STATE_DATA });
+
     if (Object.keys(STATE_DATA).length) {
       walletImage['STATE_DATA'] = STATE_DATA;
       hashesWI['STATE_DATA'] = hash(STATE_DATA);
