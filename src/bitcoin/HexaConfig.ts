@@ -274,7 +274,7 @@ class HexaConfig {
   };
 
   public connectToOwnNode =  async () => {
-    let ownNodes:any = await AsyncStorage.getItem('ownNodes')
+    let ownNodes:any = await AsyncStorage.getItem('OwnNodes')
 
     if(ownNodes){
       ownNodes = JSON.parse(ownNodes);

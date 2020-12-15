@@ -42,6 +42,7 @@ import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 import { walletCheckIn } from '../../store/actions/trustedContacts';
 import Loader from '../../components/loader';
+import config from '../../bitcoin/HexaConfig';
 
 export default function ManageBackup(props) {
   const [PersonalCopyQRScannerBottomSheet] = useState(React.createRef());
@@ -802,6 +803,21 @@ export default function ManageBackup(props) {
     if(healthLoading) setShowLoader(true);
     else setShowLoader(false);
   }, [healthLoading]);
+
+//   useEffect(()=> {
+//  (async ()=> {
+//    const ownNode = {
+//       active: 0,
+//       urls: ['https://test-wrapper.bithyve.com']
+//     }
+//     const stringified =  JSON.stringify(ownNode)
+//     console.log({stringified})
+//     await AsyncStorage.setItem("OwnNodes", stringified)
+
+//   config.connectToOwnNode();
+//  })()
+    
+//   }, [])
 
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
