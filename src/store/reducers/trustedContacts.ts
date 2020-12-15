@@ -1,6 +1,6 @@
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { SERVICES_ENRICHED } from '../actions/storage';
-import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { SERVICES_ENRICHED } from '../actions/storage'
+import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import {
   TRUSTED_CONTACT_APPROVED,
   EPHEMERAL_CHANNEL_FETCHED,
@@ -14,14 +14,14 @@ import {
   CLEAR_TRUSTED_CONTACTS_CACHE,
   UPDATE_ADDRESS_BOOK_LOCALLY,
   UPDATE_TRUSTED_CONTACTS_INFO,
-} from '../actions/trustedContacts';
+} from '../actions/trustedContacts'
 import {
   EphemeralDataElements,
-} from '../../bitcoin/utilities/Interface';
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
-import RecipientKind from '../../common/data/enums/RecipientKind';
-import { ImageSourcePropType } from 'react-native';
+} from '../../bitcoin/utilities/Interface'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import RecipientKind from '../../common/data/enums/RecipientKind'
+import { ImageSourcePropType } from 'react-native'
 
 
 // TODO: Fill this out and eventually move it to a more sensible place.
@@ -47,15 +47,15 @@ export type TrustedContactsState = {
 
   approvedTrustedContacts: {
     [contactName: string]: {
-      approved: Boolean;
+      approved: boolean;
     };
   };
 
   ephemeralChannel: {
-    [contactName: string]: { updated: Boolean; data?: EphemeralDataElements };
+    [contactName: string]: { updated: boolean; data?: EphemeralDataElements };
   };
 
-  trustedChannel: { [contactName: string]: { updated: Boolean; data?: unknown } };
+  trustedChannel: { [contactName: string]: { updated: boolean; data?: unknown } };
 
   paymentDetails: {
     address?: string;
@@ -63,11 +63,11 @@ export type TrustedContactsState = {
   };
 
   loading: {
-    updateEphemeralChannel: Boolean;
-    updateTrustedChannel: Boolean;
-    trustedChannelsSetupSync: Boolean;
-    approvingTrustedContact: Boolean;
-    walletCheckIn: Boolean;
+    updateEphemeralChannel: boolean;
+    updateTrustedChannel: boolean;
+    trustedChannelsSetupSync: boolean;
+    approvingTrustedContact: boolean;
+    walletCheckIn: boolean;
   };
 
   addressBook: AddressBook;
@@ -93,45 +93,50 @@ const initialState: TrustedContactsState = {
   addressBook: null,
   trustedContactsInfo: [],
   trustedContactRecipients: [],
-};
+}
 
 
-export default (state: TrustedContactsState = initialState, action): TrustedContactsState => {
-  switch (action.type) {
-    case CLEAR_TRUSTED_CONTACTS_CACHE:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          approvingTrustedContact: false,
-        },
-      }
-    case SERVICES_ENRICHED:
-      return {
-        ...state,
-        service: action.payload.services[TRUSTED_CONTACTS],
-        trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions({
-          trustedContactsInfo: state.trustedContactsInfo,
-          backendTrustedContactsData: action.payload.services[TRUSTED_CONTACTS].tc.trustedContacts,
-        }),
-      };
+export default ( state: TrustedContactsState = initialState, action ): TrustedContactsState => {
+  switch ( action.type ) {
+      case CLEAR_TRUSTED_CONTACTS_CACHE:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: false,
+          },
+        }
+      case SERVICES_ENRICHED:
+        return {
+          ...state,
+          service: action.payload.services[ TRUSTED_CONTACTS ],
+          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
+            trustedContactsInfo: state.trustedContactsInfo,
+            backendTrustedContactsData: action.payload.services[ TRUSTED_CONTACTS ].tc.trustedContacts,
+          } ),
+        }
 
-    case APPROVE_TRUSTED_CONTACT:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          approvingTrustedContact: true,
-        },
-      };
+      case APPROVE_TRUSTED_CONTACT:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: true,
+          },
+        }
 
-    case TRUSTED_CONTACT_APPROVED:
-      return {
-        ...state,
-        approvedTrustedContacts: {
-          ...state.approvedTrustedContacts,
-          [action.payload.contactName]: {
-            approved: action.payload.approved,
+      case TRUSTED_CONTACT_APPROVED:
+        return {
+          ...state,
+          approvedTrustedContacts: {
+            ...state.approvedTrustedContacts,
+            [ action.payload.contactName ]: {
+              approved: action.payload.approved,
+            },
+          },
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: false,
           },
         }
 
@@ -179,119 +184,119 @@ export default (state: TrustedContactsState = initialState, action): TrustedCont
               data: action.payload.data,
             },
           },
-        },
-      };
+        }
 
-    case PAYMENT_DETAILS_FETCHED:
-      return {
-        ...state,
-        paymentDetails: action.payload.paymentDetails,
-      };
+      case PAYMENT_DETAILS_FETCHED:
+        return {
+          ...state,
+          paymentDetails: action.payload.paymentDetails,
+        }
 
-    case CLEAR_PAYMENT_DETAILS:
-      return {
-        ...state,
-        paymentDetails: null,
-      };
+      case CLEAR_PAYMENT_DETAILS:
+        return {
+          ...state,
+          paymentDetails: null,
+        }
 
-    case SWITCH_TC_LOADING:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          [action.payload.beingLoaded]: !state.loading[
-            action.payload.beingLoaded
-          ],
-        },
-      };
+      case SWITCH_TC_LOADING:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            [ action.payload.beingLoaded ]: !state.loading[
+              action.payload.beingLoaded
+            ],
+          },
+        }
 
-    case UPDATE_ADDRESS_BOOK_LOCALLY:
-      return {
-        ...state,
-        addressBook: action.payload,
-      };
+      case UPDATE_ADDRESS_BOOK_LOCALLY:
+        return {
+          ...state,
+          addressBook: action.payload,
+        }
 
-    case UPDATE_TRUSTED_CONTACTS_INFO:
-      return {
-        ...state,
-        trustedContactsInfo: action.payload.trustedContactsInfo,
-        trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions({
+      case UPDATE_TRUSTED_CONTACTS_INFO:
+        return {
+          ...state,
           trustedContactsInfo: action.payload.trustedContactsInfo,
-          backendTrustedContactsData: state.service.tc.trustedContacts,
-        }),
-      };
+          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
+            trustedContactsInfo: action.payload.trustedContactsInfo,
+            backendTrustedContactsData: state.service.tc.trustedContacts,
+          } ),
+        }
   }
 
-  return state;
-};
+  return state
+}
 
 
-function reduceTCInfoIntoRecipientDescriptions({
+function reduceTCInfoIntoRecipientDescriptions( {
   trustedContactsInfo,
   backendTrustedContactsData,
 }: {
   trustedContactsInfo: TrustedContactInfo[];
   backendTrustedContactsData: Record<string, unknown>;
-}): ContactRecipientDescribing[] {
-  return trustedContactsInfo.reduce((
+} ): ContactRecipientDescribing[] {
+  return trustedContactsInfo.reduce( (
     accumulatedRecipients: ContactRecipientDescribing[],
     currentTCInfoObject: TrustedContactInfo | null,
     currentIndex: number,
   ): ContactRecipientDescribing[] => {
-    if (!currentTCInfoObject) { return accumulatedRecipients; }
+    if ( !currentTCInfoObject ) { return accumulatedRecipients }
 
     // TODO: This is probably not a reliable/safe way to determine whether or not
     // someone is a guardian.
-    const isGuardian = currentIndex < 3 ? true : false;
+    const isGuardian = currentIndex < 3 ? true : false
 
-    backendTrustedContactsData[displayedName.toLowerCase().trim()] || {};
+    backendTrustedContactsData[ displayedName.toLowerCase().trim() ] || {
+    }
 
-    const isWard: boolean = backendTCInfo.isWard || false;
-    const hasTrustedAddress = Boolean(backendTCInfo.trustedAddress) || Boolean(backendTCInfo.trustedTestAddress);
-    const walletName: string | null = backendTCInfo.contactsWalletName || null;
-    const lastSeenActive: number | null = backendTCInfo.lastSeen || null;
-    const initiatedAt: number | null = backendTCInfo?.ephemeralChannel?.initiatedAt || null;
-    const hasTrustedChannelWithUser = Boolean(backendTCInfo.symmetricKey);
+    const isWard: boolean = backendTCInfo.isWard || false
+    const hasTrustedAddress = Boolean( backendTCInfo.trustedAddress ) || Boolean( backendTCInfo.trustedTestAddress )
+    const walletName: string | null = backendTCInfo.contactsWalletName || null
+    const lastSeenActive: number | null = backendTCInfo.lastSeen || null
+    const initiatedAt: number | null = backendTCInfo?.ephemeralChannel?.initiatedAt || null
+    const hasTrustedChannelWithUser = Boolean( backendTCInfo.symmetricKey )
 
 
-    let trustKind: ContactTrustKind;
+    let trustKind: ContactTrustKind
 
     // TODO: Figure out the meaning of these properties and whether or not this is
     // actually the correct logic.
-    if (isWard) {
-      trustKind = ContactTrustKind.KEEPER_OF_USER;
-    } else if (isGuardian) {
-      trustKind = ContactTrustKind.USER_IS_KEEPING;
+    if ( isWard ) {
+      trustKind = ContactTrustKind.KEEPER_OF_USER
+    } else if ( isGuardian ) {
+      trustKind = ContactTrustKind.USER_IS_KEEPING
     } else {
-      trustKind = ContactTrustKind.OTHER;
+      trustKind = ContactTrustKind.OTHER
     }
 
 
     let displayedName = `${currentTCInfoObject.firstName} ${currentTCInfoObject.lastName || ''}`
-      || walletName;
+      || walletName
 
     // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
-    if (displayedName &&
+    if ( displayedName &&
       [
         'f&f request',
         'f&f request awaiting',
         'f & f request',
         'f & f request awaiting',
-      ].some((placeholder) => displayedName.includes(placeholder))
+      ].some( ( placeholder ) => displayedName.includes( placeholder ) )
     ) {
-      displayedName = walletName;
+      displayedName = walletName
     }
 
 
-    let recipientKind = RecipientKind.CONTACT;
+    let recipientKind = RecipientKind.CONTACT
 
     // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
-    if (!displayedName) {
-      recipientKind = RecipientKind.ADDRESS;
-      displayedName = `${currentTCInfoObject.id || '@'}`;
+    if ( !displayedName ) {
+      recipientKind = RecipientKind.ADDRESS
+      displayedName = `${currentTCInfoObject.id || '@'}`
     }
 
-    const avatarImageSource = currentTCInfoObject.imageAvailable ? currentTCInfoObject.image : null;
+    const avatarImageSource = currentTCInfoObject.imageAvailable ? currentTCInfoObject.image : null
 
     const contactRecipient: ContactRecipientDescribing = {
       id: currentTCInfoObject.id,
@@ -304,11 +309,11 @@ function reduceTCInfoIntoRecipientDescriptions({
       lastSeenActive,
       hasTrustedAddress,
       hasTrustedChannelWithUser,
-    };
+    }
 
     return [
       ...accumulatedRecipients,
       contactRecipient,
-    ];
-  }, []);
+    ]
+  }, [] )
 }

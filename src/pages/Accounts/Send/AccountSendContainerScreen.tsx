@@ -1,6 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useEffect, ReactElement, useMemo } from 'react'
-import { View, Text, StyleSheet, Alert } from 'react-native'
+import React, { useCallback, useEffect } from 'react'
+import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
@@ -11,16 +11,7 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
 import useTrustedContactRecipients from '../../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContactRecipients'
-import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view'
-import Colors from '../../../common/Colors'
-import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
-import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection'
-import RecipientSelectionStrip from '../../../components/send/RecipientSelectionStrip'
-import BottomInfoBox from '../../../components/BottomInfoBox'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { NavigationScreenComponent } from 'react-navigation'
-import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
@@ -30,10 +21,10 @@ import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface'
 import Toast from '../../../components/Toast'
 import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
-import { makeAddressRecipientDescription, makeAccountRecipientDescription } from '../../../utils/sending/RecipientFactories'
+import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
-import RecipientKind from '../../../common/data/enums/RecipientKind'
+import AccountSendScreen from './AccountSendScreen'
 
 export type Props = {
   navigation: any;
@@ -43,28 +34,6 @@ export type NavigationParams = {
   accountShellID: string;
 };
 
-export enum SectionKind {
-  SCAN_QR,
-  ENTER_ADDRESS,
-  SELECT_CONTACTS,
-  SELECT_ACCOUNT_SHELLS,
-}
-
-const sectionListItemKeyExtractor = ( index ) => String( index )
-
-function renderSectionHeader(
-  sectionKind: SectionKind,
-  subAccountKind: SubAccountKind,
-): ReactElement | null {
-  switch ( sectionKind ) {
-      case SectionKind.SELECT_CONTACTS:
-        return <Text style={styles.listSectionHeading}>Send To Contacts</Text>
-      case SectionKind.SELECT_ACCOUNT_SHELLS:
-        if ( subAccountKind != SubAccountKind.TEST_ACCOUNT ) {
-          return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
-        }
-  }
-}
 
 const AccountSendContainerScreen: NavigationScreenComponent<
   NavigationOptions,
@@ -86,34 +55,11 @@ const AccountSendContainerScreen: NavigationScreenComponent<
     hasShownInitialKnowMoreSendSheet,
   } = usePreferencesState()
 
-  const accountRecipients = useMemo( () => {
-    return sendableAccountShells.map( makeAccountRecipientDescription )
-  }, [ sendableAccountShells ] )
-
-  const isShowingSelectableAccountsSection = useMemo( () => {
-    return primarySubAccount.kind != SubAccountKind.TEST_ACCOUNT && sendableAccountShells.length
-  }, [ sendableAccountShells, primarySubAccount.kind ] )
-
-
-  const selectedContactRecipients = useMemo( () => {
-    return sendingState
-      .selectedRecipients
-      .filter( recipient => recipient.kind == RecipientKind.CONTACT )
-  }, [ sendingState ] )
-
-
-  const selectedAccountRecipients = useMemo( () => {
-    return sendingState
-      .selectedRecipients
-      .filter( recipient => recipient.kind == RecipientKind.ACCOUNT_SHELL )
-  }, [ sendingState ] )
-
-
   const isRecipientSelectedForSending = useCallback( ( recipient: RecipientDescribing ) => {
     return (
       sendingState
         .selectedRecipients
-        .some( recipient => recipient.id == recipient.id )
+        .some( r => r.id == recipient.id )
     )
   }, [ sendingState ] )
 
@@ -130,7 +76,6 @@ const AccountSendContainerScreen: NavigationScreenComponent<
       accountShellID: accountShell.id,
     } )
   }
-
 
   function handlePaymentURIEntry( uri: string ) {
     let address: string
@@ -195,89 +140,6 @@ const AccountSendContainerScreen: NavigationScreenComponent<
     }
   }
 
-  const sections = useMemo( () => {
-    return [
-      ...[
-        {
-          kind: SectionKind.SCAN_QR,
-          data: [ null ],
-          renderItem: () => {
-            return (
-              <View style={styles.viewSectionContainer}>
-                <CoveredQRCodeScanner
-                  onCodeScanned={handleQRScan}
-                  containerStyle={styles.qrScannerContainer}
-                />
-              </View>
-            )
-          },
-        },
-        {
-          kind: SectionKind.ENTER_ADDRESS,
-          data: [ null ],
-          renderItem: () => {
-            return (
-              <View style={styles.viewSectionContainer}>
-                <RecipientAddressTextInputSection
-                  containerStyle={{
-                    ...styles.viewSectionContentContainer, margin: 0
-                  }}
-                  placeholder="Enter Address Manually"
-                  subAccountKind={primarySubAccount.kind}
-                  onAddressEntered={handleManualAddressSubmit}
-                  onPaymentURIEntered={handlePaymentURIEntry}
-                />
-              </View>
-            )
-          },
-        },
-        {
-          kind: SectionKind.SELECT_CONTACTS,
-          data: [ null ],
-          renderItem: () => {
-            return (
-              <View style={styles.viewSectionContainer}>
-                <View style={styles.viewSectionContentContainer}>
-                  {( sendableContacts.length && (
-                    <RecipientSelectionStrip
-                      accountKind={primarySubAccount.kind}
-                      recipients={sendableContacts}
-                      selectedRecipients={selectedContactRecipients}
-                      onRecipientSelected={handleRecipientSelection}
-                    />
-                  ) ) || (
-                    <BottomInfoBox
-                      containerStyle={styles.infoBoxContainer}
-                      title="You have not added any Contacts"
-                      infoText="Add a Contact to send them sats without having to scan an address"
-                    />
-                  )}
-                </View>
-              </View>
-            )
-          },
-        },
-      ],
-      ...( isShowingSelectableAccountsSection ? [ {
-        kind: SectionKind.SELECT_ACCOUNT_SHELLS,
-        data: [ null ],
-        renderItem: () => {
-          return (
-            <View style={styles.viewSectionContainer}>
-              <View style={styles.viewSectionContentContainer}>
-                <RecipientSelectionStrip
-                  accountKind={primarySubAccount.kind}
-                  recipients={accountRecipients}
-                  selectedRecipients={selectedAccountRecipients}
-                  onRecipientSelected={handleRecipientSelection}
-                />
-              </View>
-            </View>
-          )
-        },
-      } ] : [] ),
-    ]
-  }, [] )
 
   const showKnowMoreBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -313,74 +175,17 @@ const AccountSendContainerScreen: NavigationScreenComponent<
 
 
   return (
-    <View style={styles.rootContainer}>
-      <KeyboardAwareSectionList
-        extraData={[
-          sendableContacts,
-          sendableAccountShells,
-        ]}
-        showsVerticalScrollIndicator={false}
-        sections={sections}
-        keyExtractor={sectionListItemKeyExtractor}
-        renderSectionHeader={( { section } ) => {
-          return renderSectionHeader( section.kind, primarySubAccount.kind )
-        }}
-        stickySectionHeadersEnabled={false}
-      />
-    </View>
+    <AccountSendScreen
+      primarySubAccount={primarySubAccount}
+      sendableContacts={sendableContacts}
+      sendableAccountShells={sendableAccountShells}
+      onQRScanned={handleQRScan}
+      onAddressSubmitted={handleManualAddressSubmit}
+      onPaymentURIEntered={handlePaymentURIEntry}
+      onRecipientSelected={handleRecipientSelection}
+    />
   )
 }
-
-
-const qrScannerHeight = heightPercentageToDP( 35 )
-
-const styles = StyleSheet.create( {
-  rootContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-
-  navHeaderTitleContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  viewSectionContainer: {
-    marginBottom: 16,
-  },
-
-  viewSectionContentContainer: {
-    paddingHorizontal: 22,
-  },
-
-  listSectionHeading: {
-    ...HeadingStyles.listSectionHeading,
-    marginBottom: 9,
-    paddingHorizontal: 28,
-    fontSize: RFValue( 13 ),
-  },
-
-  qrScannerContainer: {
-    width: '100%',
-    maxWidth: qrScannerHeight * ( 1.31 ),
-    height: qrScannerHeight,
-    marginBottom: 9,
-  },
-
-  // Undo the info box component's coupling to margin
-  infoBoxContainer: {
-    marginTop: 0,
-    marginRight: 0,
-    marginBottom: 0,
-    marginLeft: 0,
-  },
-
-  iconBackView: {
-    borderRadius: 10,
-    backgroundColor: Colors.backgroundColor,
-  },
-} )
 
 
 AccountSendContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {

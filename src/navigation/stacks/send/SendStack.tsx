@@ -1,21 +1,21 @@
-import React from 'react';
-import { createStackNavigator } from "react-navigation-stack";
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
-import SendToContactScreen from '../../../pages/Accounts/Send/_Old_SendToContact';
-import SendConfirmationScreen from '../../../pages/Accounts/Send/_Old_SendConfirmation';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen';
-import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen';
+import React from 'react'
+import { createStackNavigator } from 'react-navigation-stack'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+// import SendToContactScreen from '../../../pages/Accounts/Send/_Old_SendToContact';
+import SendConfirmationScreen from '../../../pages/Accounts/Send/_Old_SendConfirmation'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
+import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
 
 
-const SubAccountTFAHelpStack = createStackNavigator({
+const SubAccountTFAHelpStack = createStackNavigator( {
   SubAccountTFAHelpRoot: {
     screen: SubAccountTFAHelpScreen,
     navigationOptions: {
-      title: "2FA Help"
+      title: '2FA Help'
     },
   },
-})
+} )
 
 
 const SendStack = createStackNavigator(
@@ -42,15 +42,15 @@ const SendStack = createStackNavigator(
   },
   {
     initialRouteName: 'SendRoot',
-    defaultNavigationOptions: ({ navigation }) => {
+    defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.goBack(); }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
         },
-      };
+      }
     },
   },
-);
+)
 
-export default SendStack;
+export default SendStack
