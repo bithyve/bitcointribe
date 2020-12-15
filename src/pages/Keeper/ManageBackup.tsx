@@ -46,6 +46,9 @@ import {
   getKeeperInfoFromShareId,
   getLevelInfo,
 } from '../../common/CommonFunctions';
+import {
+  trustedChannelsSetupSync,
+} from '../../store/actions/trustedContacts';
 import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import {
   generateMetaShare,
@@ -116,6 +119,9 @@ interface ManageBackupPropsTypes {
   metaShares: MetaShare[];
   reShareWithSameKeeper: any;
   autoShareContact: any;
+  trustedChannelsSetupSync: any;
+  trustedChannelsSetupSyncing: any;
+
 }
 
 class ManageBackup extends Component<
@@ -618,6 +624,7 @@ class ManageBackup extends Component<
 
   onRefresh = async () => {
     this.props.checkMSharesHealth();
+    this.props.trustedChannelsSetupSync();
   };
 
   getImageIcon = (chosenContact) => {
@@ -681,6 +688,7 @@ class ManageBackup extends Component<
       healthLoading,
       keeperApproveStatus,
       currentLevel,
+      trustedChannelsSetupSyncing
     } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -712,7 +720,7 @@ class ManageBackup extends Component<
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={healthLoading}
+              refreshing={healthLoading || trustedChannelsSetupSyncing}
               onRefresh={() => this.onRefresh()}
             />
           }
@@ -1381,6 +1389,10 @@ const mapStateToProps = (state) => {
     service: idx(state, (_) => _.keeper.service),
     secureAccount: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),
     keeperApproveStatus: idx(state, (_) => _.health.keeperApproveStatus),
+    trustedChannelsSetupSyncing: idx(
+      state,
+      (_) => _.trustedContacts.loading.trustedChannelsSetupSync,
+    ),
   };
 };
 
@@ -1397,7 +1409,8 @@ export default withNavigationFocus(
     onApprovalStatusChange,
     fetchKeeperTrustedChannel,
     reShareWithSameKeeper,
-    autoShareContact
+    autoShareContact,
+    trustedChannelsSetupSync
   })(ManageBackup),
 );
 

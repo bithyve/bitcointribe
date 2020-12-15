@@ -853,7 +853,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.levelHealth != this.props.levelHealth) {
+    if (JSON.stringify(prevProps.levelHealth) !== JSON.stringify(this.props.levelHealth)) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&

@@ -196,7 +196,7 @@ class RestoreWithICloud extends Component<
     }
 
     if(prevProps.walletRecoveryFailed !== walletRecoveryFailed){
-      (this.refs.loaderBottomSheet as any).snapTo(0);
+        (this.refs.loaderBottomSheet as any).snapTo(0);
     }
 
   };
@@ -204,6 +204,7 @@ class RestoreWithICloud extends Component<
   updateList = () => {
     console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state;
+
     let KeeperData = JSON.parse(selectedBackup.keeperData);
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
@@ -221,10 +222,14 @@ class RestoreWithICloud extends Component<
       }
     });
     updatedListData = [...listData];
-    for(var i = 0 ; i < Object.keys(updatedListData).length; i++){
+    console.log("updatedListData shares", shares);
+
+    for(var i = 0 ; i < updatedListData.length; i++){
        if(shares.findIndex(value=>value.shareId == updatedListData[i].shareId)>-1) updatedListData[i].status = "received";
         //console.log("inside if jasjhadkhsdak",listData[i]);}
     }
+    console.log("updatedListData sefsgsg", updatedListData);
+
     if (shares.length) {
       if(shares.length === 2 && selectedBackup.levelStatus === 2){
         console.log("INSIDE IF SHARES",shares.length, selectedBackup.levelStatus);
@@ -235,9 +240,9 @@ class RestoreWithICloud extends Component<
         (this.refs.loaderBottomSheet as any).snapTo(1);
         this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
       }
-      this.setState({metaShares: shares});
+      
     }
-    this.setState({listData: updatedListData});
+    this.setState({ listData: updatedListData, metaShares: shares });
   }
 
 recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
@@ -284,7 +289,7 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
      let KeeperData = JSON.parse(selectedBackup.keeperData);
      let levelStatus = selectedBackup.levelStatus;
      if(levelStatus === 2) KeeperData = KeeperData.slice(0, 2);
-     if(levelStatus === 3) KeeperData = KeeperData.slice(2, 6);
+    if (levelStatus === 3 && KeeperData.length > 4) KeeperData = KeeperData.slice(2);
      let obj;
      console.log("KEEPERDATA slice", KeeperData)
      for(let i = 0 ; i < KeeperData.length; i++){
@@ -616,7 +621,7 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
             let name;
             if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
-            console.log("SELECTED BACKUP", selectedBackup);
+           // console.log("SELECTED BACKUP", selectedBackup);
             return (
               <RestoreFromICloud
                 title={'Restore from ' + name}
