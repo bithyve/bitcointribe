@@ -10,6 +10,8 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import ReassignTransactionsSelectDestinationScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen'
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen'
 import ReassignTransactionsMainOptionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 
 const SubAccountSettingsStack = createStackNavigator(
   {
