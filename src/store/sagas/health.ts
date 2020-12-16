@@ -1765,27 +1765,6 @@ function* reShareWithSameKeeperWorker({ payload }) {
             false
           );
           if (updateRes.status == 200) {
-            const updatedSERVICES = {
-              ...SERVICES,
-              S3_SERVICE: JSON.stringify(s3Service),
-              KEEPERS_INFO: JSON.stringify(keeper),
-            };
-            yield call(insertDBWorker, {
-              payload: { SERVICES: updatedSERVICES },
-            });
-
-            let shareArray = [
-              {
-                walletId: s3Service.getWalletId().data.walletId,
-                shareId: selectedShareId,
-                reshareVersion: share.meta.reshareVersion,
-                updatedAt: moment(new Date()).valueOf(),
-                shareType: type,
-                name,
-                status: "accessible",
-              },
-            ];
-            yield put(updateMSharesHealth(shareArray));
             let keeperInfo: any[] = yield select(
               (state) => state.health.keeperInfo
             );
@@ -1824,6 +1803,27 @@ function* reShareWithSameKeeperWorker({ payload }) {
               }
               yield put(updatedKeeperInfo(keeperInfo));
             }
+            const updatedSERVICES = {
+              ...SERVICES,
+              S3_SERVICE: JSON.stringify(s3Service),
+              KEEPERS_INFO: JSON.stringify(keeper),
+            };
+            yield call(insertDBWorker, {
+              payload: { SERVICES: updatedSERVICES },
+            });
+
+            let shareArray = [
+              {
+                walletId: s3Service.getWalletId().data.walletId,
+                shareId: selectedShareId,
+                reshareVersion: share.meta.reshareVersion,
+                updatedAt: moment(new Date()).valueOf(),
+                shareType: type,
+                name,
+                status: "accessible",
+              },
+            ];
+            yield put(updateMSharesHealth(shareArray));
           }
 
           if (oldKeeperInfo.keeperUUID) {
@@ -1896,30 +1896,7 @@ function* autoShareContactWorker({ payload }) {
         data,
         false
       );
-
-      console.log("updateTrustedChannel saga res", res);
       if (res.status == 200) {
-        const updatedSERVICES = {
-          ...SERVICES,
-          S3_SERVICE: JSON.stringify(s3Service),
-          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-        };
-        yield call(insertDBWorker, {
-          payload: { SERVICES: updatedSERVICES },
-        });
-
-        let shareArray = [
-          {
-            walletId: walletId,
-            shareId: selectedShareId,
-            reshareVersion: share.meta.reshareVersion,
-            updatedAt: moment(new Date()).valueOf(),
-            shareType: type,
-            name,
-            status: "accessible",
-          },
-        ];
-        yield put(updateMSharesHealth(shareArray));
         let keeperInfo: any[] = yield select(
           (state) => state.health.keeperInfo
         );
@@ -1958,6 +1935,27 @@ function* autoShareContactWorker({ payload }) {
           }
           yield put(updatedKeeperInfo(keeperInfo));
         }
+        const updatedSERVICES = {
+          ...SERVICES,
+          S3_SERVICE: JSON.stringify(s3Service),
+          TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+        };
+        yield call(insertDBWorker, {
+          payload: { SERVICES: updatedSERVICES },
+        });
+
+        let shareArray = [
+          {
+            walletId: walletId,
+            shareId: selectedShareId,
+            reshareVersion: share.meta.reshareVersion,
+            updatedAt: moment(new Date()).valueOf(),
+            shareType: type,
+            name,
+            status: "accessible",
+          },
+        ];
+        yield put(updateMSharesHealth(shareArray));
         const notification: INotification = {
           notificationType: notificationType.reShare,
           title: "New share uploaded",
