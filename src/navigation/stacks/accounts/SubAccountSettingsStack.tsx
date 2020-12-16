@@ -10,12 +10,14 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import ReassignTransactionsSelectDestinationScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectDestinationAccountScreen'
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen'
 import ReassignTransactionsMainOptionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 
 const SubAccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      navigationOptions: ( { navigation } ) => {
+      navigationOptions: ({ navigation }) => {
         return {
           title: 'Account Settings',
           headerLeft: () => {
@@ -50,8 +52,8 @@ const SubAccountSettingsStack = createStackNavigator(
     },
     ReassignTransactionsSelectDestination: {
       screen: ReassignTransactionsSelectDestinationScreen,
-      navigationOptions: ( { navigation } ) => {
-        const reassignmentKind = navigation.getParam( 'reassignmentKind' )
+      navigationOptions: ({ navigation }) => {
+        const reassignmentKind = navigation.getParam('reassignmentKind')
         const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
 
         return {
@@ -74,7 +76,7 @@ const SubAccountSettingsStack = createStackNavigator(
   },
   {
     initialRouteName: 'AccountSettingsMain',
-    defaultNavigationOptions: ( { navigation } ) => {
+    defaultNavigationOptions: ({ navigation }) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {

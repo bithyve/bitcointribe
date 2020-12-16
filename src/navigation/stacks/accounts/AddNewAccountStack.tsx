@@ -1,7 +1,7 @@
 import React from 'react';
-import { createStackNavigator } from "react-navigation-stack";
-import NewAccountSelectionContainerScreen from "../../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen";
-import AddNewHexaAccountDetailsScreen from "../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen";
+import { createStackNavigator } from 'react-navigation-stack';
+import NewAccountSelectionContainerScreen from '../../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen';
+import AddNewHexaAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen';
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
@@ -14,7 +14,7 @@ const AddNewAccountStack = createStackNavigator(
       screen: NewAccountSelectionContainerScreen,
       navigationOptions: ({ navigation }) => {
         return {
-          title: "Add New Account",
+          title: 'Add New Account',
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop(); }} />;
           },
@@ -24,13 +24,13 @@ const AddNewAccountStack = createStackNavigator(
     AddNewHexaAccountDetails: {
       screen: AddNewHexaAccountDetailsScreen,
       navigationOptions: {
-        title: "Account Details"
+        title: 'Account Details'
       }
     },
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
-        title: "Account Details"
+        title: 'Account Details'
       }
     },
   },

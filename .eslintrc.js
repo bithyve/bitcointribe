@@ -12,7 +12,7 @@ module.exports = {
   'parser': '@typescript-eslint/parser',
   'parserOptions': {
     'ecmaFeatures': {
-      'jsx': true 
+      'jsx': true
     },
     'ecmaVersion': 2018,
     'sourceType': 'module'
@@ -26,21 +26,22 @@ module.exports = {
     'quotes': [ 'error', 'single' ],
 
     'comma-spacing': [ 'error', {
-      'before': false, 'after': true 
+      'before': false, 'after': true
     } ],
 
     'semi': [ 'error', 'never' ],
 
     'indent': [ 'error', 2, {
-      'SwitchCase': 2 
+      'SwitchCase': 2
     } ],
     'object-curly-newline': [ 'error', {
       'ObjectExpression': 'always',
       'ObjectPattern': {
-        'multiline': true 
+        'multiline': true
       }
     } ],
-    'eol-last': [ 'error', 'always' ]
-
+    'eol-last': [ 'error', 'always' ],
+    'react/display-name': 'off',
+    'react/prop-types': 'off'
   }
 }
