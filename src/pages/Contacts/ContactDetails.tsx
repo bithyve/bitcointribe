@@ -338,7 +338,7 @@ class ContactDetails extends PureComponent<
         defaultAccountShell = shell
     } )
 
-    this.props.navigation.navigate( 'SendToContact', {
+    this.props.navigation.navigate( 'SentAmountForContactForm', {
       accountShellID: defaultAccountShell.id,
       spendableBalance: AccountShell.getSpendableBalance( defaultAccountShell ),
       selectedContact: this.Contact,

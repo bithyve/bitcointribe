@@ -5,10 +5,6 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 // types and action creators: dispatched by components and sagas
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS'
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
-export const TRANSFER_ST1 = 'TRANSFER_ST1'
-export const TRANSFER_ST2 = 'TRANSFER_ST2'
-export const ALTERNATE_TRANSFER_ST2 = 'ALTERNATE_TRANSFER_ST2'
-export const TRANSFER_ST3 = 'TRANSFER_ST3'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -71,70 +67,6 @@ export const fetchBalanceTx = (
   return {
     type: FETCH_BALANCE_TX, payload: {
       serviceType, options
-    }
-  }
-}
-
-export const transferST1 = (
-  serviceType,
-  recipients,
-  averageTxFees,
-  derivativeAccountDetails?: { type: string; number: number }
-) => {
-  return {
-    type: TRANSFER_ST1,
-    payload: {
-      serviceType,
-      recipients,
-      averageTxFees,
-      derivativeAccountDetails,
-    },
-  }
-}
-
-export const transferST2 = (
-  serviceType,
-  txnPriority,
-  customTxPrerequisites?,
-  derivativeAccountDetails?: { type: string; number: number },
-  nSequence?
-) => {
-  return {
-    type: TRANSFER_ST2,
-    payload: {
-      serviceType,
-      txnPriority,
-      customTxPrerequisites,
-      derivativeAccountDetails,
-      nSequence,
-    },
-  }
-}
-
-export const alternateTransferST2 = (
-  serviceType,
-  txnPriority,
-  customTxPrerequisites?,
-  derivativeAccountDetails?: { type: string; number: number },
-  nSequence?
-) => {
-  return {
-    type: ALTERNATE_TRANSFER_ST2,
-    payload: {
-      serviceType,
-      txnPriority,
-      customTxPrerequisites,
-      derivativeAccountDetails,
-      nSequence,
-    },
-  }
-}
-
-export const transferST3 = ( serviceType, token ) => {
-  //Secure account specific
-  return {
-    type: TRANSFER_ST3, payload: {
-      serviceType, token
     }
   }
 }
@@ -515,17 +447,9 @@ export const accountShellOrderedToFront = (
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
-export const TRANSFER_ST1_EXECUTED = 'TRANSFER_ST1_EXECUTED'
-export const TRANSFER_ST1_FAILED = 'TRANSFER_ST1_FAILED'
-export const TRANSFER_ST2_EXECUTED = 'TRANSFER_ST2_EXECUTED'
-export const TRANSFER_ST2_FAILED = 'TRANSFER_ST2_FAILED'
-export const TRANSFER_ST3_EXECUTED = 'TRANSFER_SECURE_ST3_EXECUTED'
-export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED'
 export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING'
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED'
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
-export const ALTERNATE_TRANSFER_ST2_EXECUTED =
-  'ALTERNATE_TRANSFER_ST2_EXECUTED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
@@ -558,55 +482,6 @@ export const transactionsFetched = ( serviceType, transactions ) => {
   }
 }
 
-export const executedST1 = ( serviceType, result ) => {
-  return {
-    type: TRANSFER_ST1_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST1 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST1_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
-export const executedST2 = ( serviceType, result ) => {
-  return {
-    type: TRANSFER_ST2_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST2 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST2_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
-export const executedST3 = ( serviceType, result ) => {
-  // Secure account specific
-  return {
-    type: TRANSFER_ST3_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST3 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST3_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
 export const switchLoader = ( serviceType, beingLoaded ) => {
   return {
     type: ACCOUNTS_LOADING, payload: {
@@ -628,15 +503,6 @@ export const exchangeRatesCalculated = ( exchangeRates ) => {
     type: EXCHANGE_RATE_CALCULATED, payload: {
       exchangeRates
     }
-  }
-}
-
-export const alternateTransferST2Executed = ( serviceType, result ) => {
-  return {
-    type: ALTERNATE_TRANSFER_ST2_EXECUTED,
-    payload: {
-      serviceType, result
-    },
   }
 }
 

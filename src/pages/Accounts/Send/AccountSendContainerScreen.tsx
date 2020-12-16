@@ -25,24 +25,17 @@ import { makeAddressRecipientDescription } from '../../../utils/sending/Recipien
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
 import AccountSendScreen from './AccountSendScreen'
+import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 export type Props = {
   navigation: any;
 };
 
-export type NavigationParams = {
-  accountShellID: string;
-};
-
-
-const AccountSendContainerScreen: NavigationScreenComponent<
-  NavigationOptions,
-  NavigationParams
-> = ( { navigation, }: Props ) => {
+const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
 
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useSourceAccountShellForSending()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useCompatibleAccountShells( accountShell )
   const sendableContacts = useTrustedContactRecipients()
@@ -72,9 +65,7 @@ const AccountSendContainerScreen: NavigationScreenComponent<
   }
 
   function navigateToSendDetails() {
-    navigation.navigate( 'SendToContact', {
-      accountShellID: accountShell.id,
-    } )
+    navigation.navigate( 'SentAmountForContactForm' )
   }
 
   function handlePaymentURIEntry( uri: string ) {

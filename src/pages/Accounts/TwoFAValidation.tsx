@@ -47,7 +47,7 @@ export default function TwoFAValidation( props ) {
       }
     }
   }, [ additional ] )
- 
+
 
   function onPressNumber( text ) {
     const tmpToken = [ ...tokenArray ]
@@ -86,7 +86,7 @@ export default function TwoFAValidation( props ) {
     return (
       <SendConfirmationContent
         title={'2FA Validation Unsuccessful'}
-        info={      
+        info={
           'Invalid 2FA token, please retry.'
         }
         userInfo={[]}
@@ -115,7 +115,6 @@ export default function TwoFAValidation( props ) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
           if ( SendUnSuccessBottomSheet.current )
             SendUnSuccessBottomSheet.current.snapTo( 0 )
         }}
@@ -125,7 +124,7 @@ export default function TwoFAValidation( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={commonStyle.headerContainer}>
@@ -135,7 +134,7 @@ export default function TwoFAValidation( props ) {
             props.navigation.goBack()
           }}
           hitSlop={{
-            top: 20, left: 20, bottom: 20, right: 20 
+            top: 20, left: 20, bottom: 20, right: 20
           }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
@@ -144,7 +143,7 @@ export default function TwoFAValidation( props ) {
         </TouchableOpacity>
       </View>
       <View style={{
-        ...styles.modalContentContainer, height: '100%' 
+        ...styles.modalContentContainer, height: '100%'
       }}>
         <View
           style={{
@@ -153,13 +152,13 @@ export default function TwoFAValidation( props ) {
           }}
         >
           <View style={{
-            ...styles.otpRequestHeaderView 
+            ...styles.otpRequestHeaderView
           }}>
             <Text style={styles.modalTitleText}>
               {'Enter OTP to authenticate'}
             </Text>
             <Text style={{
-              ...styles.modalInfoText, marginTop: hp( '1.5%' ) 
+              ...styles.modalInfoText, marginTop: hp( '1.5%' )
             }}>
               {
                 'Please enter the OTP from the authenticator that you have set up'
@@ -167,7 +166,7 @@ export default function TwoFAValidation( props ) {
             </Text>
           </View>
           <View style={{
-            marginBottom: hp( '2%' ) 
+            marginBottom: hp( '2%' )
           }}>
             <View style={styles.passcodeTextInputView}>
               <TextInput
@@ -333,7 +332,7 @@ export default function TwoFAValidation( props ) {
             }}
           >
             <Text style={{
-              ...styles.modalInfoText 
+              ...styles.modalInfoText
             }}>
               {
                 'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'
@@ -341,7 +340,7 @@ export default function TwoFAValidation( props ) {
             </Text>
           </View>
           <View style={{
-            flexDirection: 'row', marginTop: 'auto' 
+            flexDirection: 'row', marginTop: 'auto'
           }}>
             <TouchableOpacity
               disabled={isConfirmDisabled}
@@ -419,7 +418,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     borderColor: Colors.borderColor,
     alignItems: 'center',
@@ -466,7 +465,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

@@ -33,7 +33,7 @@ import { createRandomString } from '../../../common/CommonFunctions/timeFormatte
 import moment from 'moment'
 import DeviceInfo from 'react-native-device-info'
 import SendStatusModalContents from '../../../components/SendStatusModalContents'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 
 export default function TwoFAToken( props ) {
   const [ Elevation, setElevation ] = useState( 10 )

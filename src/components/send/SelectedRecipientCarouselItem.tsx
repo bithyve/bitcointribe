@@ -1,49 +1,57 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import ImageStyles from '../../common/Styles/ImageStyles';
-import HeadingStyles from '../../common/Styles/HeadingStyles';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RecipientDescribing, ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
-import LastSeenActiveIndicator from '../LastSeenActiveIndicator';
-import RecipientKind from '../../common/data/enums/RecipientKind';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
-import ContactAvatar from '../ContactAvatar';
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import { Satoshis } from '../../common/data/typealiases/UnitAliases';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import HeadingStyles from '../../common/Styles/HeadingStyles'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RecipientDescribing, ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
+import RecipientKind from '../../common/data/enums/RecipientKind'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import RecipientAvatar from '../RecipientAvatar'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { Satoshis } from '../../common/data/typealiases/UnitAliases'
+import useAmountBeingSentToRecipient from '../../utils/hooks/state-selectors/sending/UseAmountBeingSentToRecipient'
 
 
 export type Props = {
   recipient: RecipientDescribing;
-  designatedAmount: Satoshis;
   onRemove: () => void;
   currencyCode?: string;
   containerStyle?: Record<string, unknown>;
 };
 
-const SelectedRecipientCarouselItem: React.FC<Props> = ({
+const SelectedRecipientCarouselItem: React.FC<Props> = ( {
   recipient,
-  designatedAmount,
   onRemove,
   currencyCode = '',
-  containerStyle = {},
-}: Props) => {
-  const unitText = !currencyCode ? useFormattedUnitText({ currencyKind: CurrencyKind.FIAT }) : currencyCode;
+  containerStyle = {
+  },
+}: Props ) => {
+  const designatedAmount = useAmountBeingSentToRecipient( recipient )
+
+  const unitText = !currencyCode ? useFormattedUnitText( {
+    currencyKind: CurrencyKind.FIAT
+  } ) : currencyCode
 
   return (
-    <View style={{ ...styles.rootContainer, ...containerStyle }}>
+    <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
       <View style={styles.contentContainer}>
 
         <View style={styles.circledAvatarContainer}>
 
-          <ContactAvatar contact={recipient} />
+          <RecipientAvatar recipient={recipient} />
 
           {recipient.kind == RecipientKind.CONTACT && (
             <LastSeenActiveIndicator
-              style={{ position: 'absolute', top: -4, right: -4 }}
-              timeSinceActive={(recipient as ContactRecipientDescribing).lastSeenActive}
+              style={{
+                position: 'absolute', top: -4, right: -4
+              }}
+              timeSinceActive={( recipient as ContactRecipientDescribing ).lastSeenActive}
             />
           )}
         </View>
@@ -79,13 +87,13 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ({
       </TouchableOpacity>
 
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
 
   rootContainer: {
-    width: widthPercentageToDP(40),
+    width: widthPercentageToDP( 40 ),
     padding: 10,
     backgroundColor: Colors.white,
     borderRadius: 10,
@@ -133,6 +141,6 @@ const styles = StyleSheet.create({
     top: -4,
     right: -4,
   },
-});
+} )
 
-export default SelectedRecipientCarouselItem;
+export default SelectedRecipientCarouselItem

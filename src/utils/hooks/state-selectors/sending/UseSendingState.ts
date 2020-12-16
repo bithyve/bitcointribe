@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux';
-import { SendingState } from '../../../../store/reducers/sending';
+import { useSelector } from 'react-redux'
+import { SendingState } from '../../../../store/reducers/sending'
 
 
 export default function useSendingState(): SendingState {
-  return useSelector(state => state.sending);
+  return useSelector( state => state.sending )
 }

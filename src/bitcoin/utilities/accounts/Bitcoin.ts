@@ -568,8 +568,8 @@ export default class Bitcoin {
   ): Promise<{
     txid: string;
   }> => {
+    let res: AxiosResponse
     try {
-      let res: AxiosResponse
       if ( this.network === bitcoinJS.networks.testnet ) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
@@ -595,22 +595,11 @@ export default class Bitcoin {
         txid: res.data
       }
     } catch ( err ) {
-      // console.log(
-      //  `An error occurred while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
-      //);
-      try {
-        let res: AxiosResponse
-        if ( this.network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post( TESTNET.BROADCAST, {
-            hex: txHex
-          } )
-        } else {
-          res = await bitcoinAxios.post( MAINNET.BROADCAST, {
-            hex: txHex
-          } )
-        }
+      console.log(
+        `An error occurred while broadcasting via current node. ${err}`,
+      )
 
-      if( config.USE_ESPLORA_FALLBACK ){
+      if ( config.USE_ESPLORA_FALLBACK ) {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( this.network === bitcoinJS.networks.testnet ) {
@@ -640,7 +629,7 @@ export default class Bitcoin {
             txid: res.data
           }
         } catch ( err ) {
-        // console.log(err.message);
+          // console.log(err.message);
           throw new Error( 'Transaction broadcasting failed' )
         }
       } else {

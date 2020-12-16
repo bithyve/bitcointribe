@@ -7,7 +7,6 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import SubAccountSettingsStack from './SubAccountSettingsStack'
 import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
-// import SendStack from '../send/_Old_SendStack';
 import SendStack from '../send/SendStack'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'

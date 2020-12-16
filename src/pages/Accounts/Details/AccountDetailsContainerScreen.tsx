@@ -40,11 +40,12 @@ import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wall
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
+import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
+import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 
 export type Props = {
   navigation: any;
 };
-
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -66,9 +67,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
+  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
+  let derivativeAccountKind: any = primarySubAccount.kind
 
-  let derivativeAccountKind
   switch( primarySubAccount.kind ){
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
@@ -332,12 +334,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
+                    dispatch( sourceAccountSelectedForSending( accountShell ) )
+
                     navigation.navigate( 'Send', {
-                      serviceType: primarySubAccount.sourceKind,
-                      averageTxFees,
-                      spendableBalance: AccountShell.getSpendableBalance( accountShell ),
-                      derivativeAccountDetails,
-                      accountShellID,
+                      subAccountKind: primarySubAccount.kind,
                     } )
                   }}
                   onReceivePressed={() => {

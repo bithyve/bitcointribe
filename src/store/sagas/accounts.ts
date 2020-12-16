@@ -4,25 +4,14 @@ import {
   FETCH_TRANSACTIONS,
   transactionsFetched,
   switchLoader,
-  TRANSFER_ST1,
-  TRANSFER_ST2,
-  executedST1,
-  executedST2,
   GET_TESTCOINS,
-  TRANSFER_ST3,
-  executedST3,
   ACCUMULATIVE_BAL_AND_TX,
-  failedST1,
-  failedST2,
-  failedST3,
   testcoinsReceived,
   accountsSynched,
   settedDonationAccount,
   FETCH_BALANCE_TX,
-  ALTERNATE_TRANSFER_ST2,
   secondaryXprivGenerated,
   GENERATE_SECONDARY_XPRIV,
-  alternateTransferST2Executed,
   RESET_TWO_FA,
   twoFAResetted,
   FETCH_DERIVATIVE_ACC_XPUB,
@@ -62,27 +51,27 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
   DerivativeAccountTypes,
-  TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setAutoAccountSync } from '../actions/loaders'
-import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
-import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
 import { RescannedTransactionData } from '../reducers/wallet-rescanning'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import { insertDBWorker } from './storage'
+import config from '../../bitcoin/HexaConfig'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -451,229 +440,6 @@ export const syncViaXpubAgentWatcher = createWatcher(
   SYNC_VIA_XPUB_AGENT
 )
 
-export const processRecipients = async(
-  recipients: [
-    {
-      id: string;
-      address: string;
-      amount: number;
-      type?: string;
-      accountNumber?: number;
-    }
-  ],
-  serviceType: string
-) {
-  const addressedRecipients = []
-  const testAccount: TestAccount = yield select(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service
-  )
-  const regularAccount: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service
-  )
-  const secureAccount: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-  )
-
-  const trustedContactsServices: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service
-  )
-  for ( const recipient of recipients ) {
-    if ( recipient.address ) addressedRecipients.push( recipient )
-    // recipient: explicit address
-    else {
-      if ( !recipient.id ) throw new Error( 'Invalid recipient' )
-      if (
-        recipient.id === REGULAR_ACCOUNT ||
-        recipient.id === SECURE_ACCOUNT ||
-        config.EJECTED_ACCOUNTS.includes( recipient.id )
-      ) {
-        // recipient: account
-        const subInstance =
-          recipient.type === REGULAR_ACCOUNT
-            ? regularAccount.hdWallet
-            : secureAccount.secureHDWallet
-
-        let receivingAddress
-        if ( config.EJECTED_ACCOUNTS.includes( recipient.id ) ) {
-          receivingAddress = subInstance.getReceivingAddress(
-            recipient.id,
-            recipient.accountNumber
-          )
-        } else receivingAddress = subInstance.getReceivingAddress() // available based on serviceType
-        if ( !receivingAddress ) {
-          throw new Error(
-            `Failed to generate receiving address for recipient: ${recipient.id}`
-          )
-        }
-        recipient.address = receivingAddress
-        addressedRecipients.push( recipient )
-      } else {
-        // recipient: Trusted Contact
-        const contactName = recipient.id
-        let res
-
-        const accountNumber =
-          regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
-          ]
-        if ( accountNumber ) {
-          const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
-            TRUSTED_CONTACTS
-          ][ accountNumber ] as TrustedContactDerivativeAccountElements
-
-          if ( serviceType !== TEST_ACCOUNT ) {
-            if ( contactDetails && contactDetails.xpub ) {
-              res = yield call(
-                regularAccount.getDerivativeAccAddress,
-                TRUSTED_CONTACTS,
-                null,
-                contactName
-              )
-            } else {
-              const { trustedAddress, } = trustedContactsServices.tc.trustedContacts[
-                contactName.toLowerCase().trim()
-              ]
-              if ( trustedAddress )
-                res = {
-                  status: 200, data: {
-                    address: trustedAddress
-                  }
-                }
-              else
-                throw new Error( 'Failed fetch contact address, xpub missing' )
-            }
-          } else {
-            if ( contactDetails && contactDetails.tpub ) {
-              res = yield call(
-                testAccount.deriveReceivingAddress,
-                contactDetails.tpub
-              )
-            } else {
-              const { trustedTestAddress, } = trustedContactsServices.tc.trustedContacts[
-                contactName.toLowerCase().trim()
-              ]
-              if ( trustedTestAddress )
-                res = {
-                  status: 200, data: {
-                    address: trustedTestAddress
-                  }
-                }
-              else
-                throw new Error(
-                  'Failed fetch contact testnet address, tpub missing'
-                )
-            }
-          }
-        } else {
-          throw new Error(
-            'Failed fetch testnet address, accountNumber missing'
-          )
-        }
-
-        // console.log( { res } )
-        if ( res.status === 200 ) {
-          const receivingAddress = res.data.address
-          recipient.address = receivingAddress
-          addressedRecipients.push( recipient )
-        } else {
-          throw new Error(
-            `Failed to generate receiving address for recipient: ${recipient.id}`
-          )
-        }
-      }
-    }
-  }
-
-  return addressedRecipients
-}
-
-function* transferST1Worker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'transfer' ) )
-  let { recipients, averageTxFees, derivativeAccountDetails } = payload
-  console.log( {
-    recipients
-  } )
-
-  try {
-    recipients = yield call( processRecipients, recipients, payload.serviceType )
-  } catch ( err ) {
-    yield put( failedST1( payload.serviceType, {
-      err
-    } ) )
-    return
-  }
-  console.log( {
-    recipients
-  } )
-  const service = yield select(
-    ( state ) => state.accounts[ payload.serviceType ].service
-  )
-  const res = yield call(
-    service.transferST1,
-    recipients,
-    averageTxFees,
-    derivativeAccountDetails
-  )
-  if ( res.status === 200 ) yield put( executedST1( payload.serviceType, res.data ) )
-  else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST1( payload.serviceType, {
-      ...res
-    } ) )
-    // yield put(switchLoader(payload.serviceType, 'transfer'));
-  }
-}
-
-export const transferST1Watcher = createWatcher(
-  transferST1Worker,
-  TRANSFER_ST1
-)
-
-function* transferST2Worker( { payload } ) {
-  const {
-    serviceType,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-    nSequence,
-  } = payload
-
-  yield put( switchLoader( serviceType, 'transfer' ) )
-  const { service, transfer } = yield select(
-    ( state ) => state.accounts[ serviceType ]
-  )
-
-  const { txPrerequisites } = transfer.stage1
-  if ( !txPrerequisites ) {
-    console.log( 'Transaction prerequisites missing' )
-    return
-  }
-  const res = yield call(
-    service.transferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-    nSequence
-  )
-  if ( res.status === 200 ) {
-    if ( serviceType === SECURE_ACCOUNT ) {
-      // console.log( { res } )
-      yield put( executedST2( serviceType, res.data ) )
-    } else yield put( executedST2( serviceType, res.data.txid ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST2( serviceType, {
-      ...res
-    } ) )
-    // yield put(switchLoader(serviceType, 'transfer'));
-  }
-}
-
-export const transferST2Watcher = createWatcher(
-  transferST2Worker,
-  TRANSFER_ST2
-)
 
 function* generateSecondaryXprivWorker( { payload } ) {
   const service = yield select(
@@ -706,81 +472,6 @@ export const generateSecondaryXprivWatcher = createWatcher(
   GENERATE_SECONDARY_XPRIV
 )
 
-function* alternateTransferST2Worker( { payload } ) {
-  const {
-    serviceType,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-    nSequence,
-  } = payload
-  if ( serviceType !== SECURE_ACCOUNT ) return
-
-  yield put( switchLoader( serviceType, 'transfer' ) )
-  const { service, transfer } = yield select(
-    ( state ) => state.accounts[ serviceType ]
-  )
-
-  const { txPrerequisites } = transfer.stage1
-  if ( !txPrerequisites ) {
-    console.log( 'Transaction prerequisites missing' )
-    return
-  }
-
-  const res = yield call(
-    service.alternateTransferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-    nSequence
-  )
-  if ( res.status === 200 ) {
-    yield put( alternateTransferST2Executed( serviceType, res.data.txid ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST2( serviceType, {
-      ...res
-    } ) )
-    // yield put(switchLoader(serviceType, 'transfer'));
-  }
-}
-
-export const alternateTransferST2Watcher = createWatcher(
-  alternateTransferST2Worker,
-  ALTERNATE_TRANSFER_ST2
-)
-
-function* transferST3Worker( { payload } ) {
-  if ( payload.serviceType !== SECURE_ACCOUNT ) return
-
-  yield put( switchLoader( payload.serviceType, 'transfer' ) )
-  const { token } = payload
-  const { service, transfer } = yield select(
-    ( state ) => state.accounts[ payload.serviceType ]
-  )
-
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = transfer.stage2
-  if ( !txHex || !childIndexArray || !inputs ) {
-    console.log( 'TxHex/child-index/inputs missing' )
-  }
-
-  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
-  if ( res.status === 200 ) {
-    yield put( executedST3( payload.serviceType, res.data.txid ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST3( payload.serviceType, {
-      ...res
-    } ) )
-    // yield put(switchLoader(payload.serviceType, 'transfer'));
-  }
-}
-
-export const transferST3Watcher = createWatcher(
-  transferST3Worker,
-  TRANSFER_ST3
-)
 
 function* testcoinsWorker( { payload } ) {
   yield put( switchLoader( payload.serviceType, 'testcoins' ) )

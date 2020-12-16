@@ -1,11 +1,10 @@
 import React from 'react'
 import { createStackNavigator } from 'react-navigation-stack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-// import SendToContactScreen from '../../../pages/Accounts/Send/_Old_SendToContact';
-import SendConfirmationScreen from '../../../pages/Accounts/Send/_Old_SendConfirmation'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
+import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
 
 
 const SubAccountTFAHelpStack = createStackNavigator( {
@@ -21,18 +20,18 @@ const SubAccountTFAHelpStack = createStackNavigator( {
 const SendStack = createStackNavigator(
   {
     SendRoot: AccountSendContainerScreen,
-    SendToContact: {
-      screen: SendToContactScreen,
+    SentAmountForContactForm: {
+      screen: SentAmountForContactFormScreen,
       navigationOptions: {
-        header: null,
+        title: 'Send To Contact'
       },
     },
-    SendConfirmation: {
-      screen: SendConfirmationScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    // SendConfirmation: {
+    //   screen: SendConfirmationScreen,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     SubAccountTFAHelp: {
       screen: SubAccountTFAHelpStack,
       navigationOptions: {

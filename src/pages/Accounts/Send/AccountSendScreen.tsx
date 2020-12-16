@@ -17,6 +17,7 @@ import { makeAccountRecipientDescription } from '../../../utils/sending/Recipien
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
+import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
 
 export type Props = {
   primarySubAccount: SubAccountDescribing;
@@ -60,7 +61,7 @@ const AccountSendScreen: React.FC<Props> = ( {
   onPaymentURIEntered,
   onRecipientSelected,
 }: Props ) => {
-  const sendingState = useSendingState()
+  const selectedRecipients = useSelectedRecipientsForSending()
 
   const accountRecipients = useMemo( () => {
     return sendableAccountShells.map( makeAccountRecipientDescription )
@@ -71,17 +72,12 @@ const AccountSendScreen: React.FC<Props> = ( {
   }, [ sendableAccountShells, primarySubAccount.kind ] )
 
   const selectedContactRecipients = useMemo( () => {
-    return sendingState
-      .selectedRecipients
-      .filter( recipient => recipient.kind == RecipientKind.CONTACT )
-  }, [ sendingState ] )
-
+    return selectedRecipients.filter( recipient => recipient.kind == RecipientKind.CONTACT )
+  }, [ selectedRecipients ] )
 
   const selectedAccountRecipients = useMemo( () => {
-    return sendingState
-      .selectedRecipients
-      .filter( recipient => recipient.kind == RecipientKind.ACCOUNT_SHELL )
-  }, [ sendingState ] )
+    return selectedRecipients.filter( recipient => recipient.kind == RecipientKind.ACCOUNT_SHELL )
+  }, [ selectedRecipients ] )
 
   const sections = useMemo( () => {
     return [

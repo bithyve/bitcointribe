@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import ContactAvatar from '../ContactAvatar';
-import ImageStyles from '../../common/Styles/ImageStyles';
-import HeadingStyles from '../../common/Styles/HeadingStyles';
-import Colors from '../../common/Colors';
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
-import Entypo from 'react-native-vector-icons/Entypo';
-import LastSeenActiveIndicator from '../LastSeenActiveIndicator';
+import React, { useMemo } from 'react'
+import { View, StyleSheet, Text } from 'react-native'
+import RecipientAvatar from '../RecipientAvatar'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import HeadingStyles from '../../common/Styles/HeadingStyles'
+import Colors from '../../common/Colors'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import Entypo from 'react-native-vector-icons/Entypo'
+import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
 
 export type Props = {
   contact: ContactRecipientDescribing;
@@ -14,18 +14,23 @@ export type Props = {
   containerStyle?: Record<string, unknown>;
 };
 
-const SendableContactCarouselItem: React.FC<Props> = ({
+const SendableContactCarouselItem: React.FC<Props> = ( {
   contact,
   isSelected = false,
-  containerStyle = {},
-}: Props) => {
+  containerStyle = {
+  },
+}: Props ) => {
   return (
-    <View style={{ ...styles.rootContainer, ...containerStyle }}>
+    <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
       <View style={styles.circledAvatarContainer}>
-        <ContactAvatar contact={contact} />
+        <RecipientAvatar recipient={contact} />
 
         {isSelected && (
-          <View style={{ ...styles.circledView, position: 'absolute' }}>
+          <View style={{
+            ...styles.circledView, position: 'absolute'
+          }}>
             <View style={styles.checkmarkOverlayBackground} />
             <Entypo
               style={styles.checkmarkIcon}
@@ -37,7 +42,9 @@ const SendableContactCarouselItem: React.FC<Props> = ({
         )}
 
         <LastSeenActiveIndicator
-          style={{ position: 'absolute', right: -4, top: -4 }}
+          style={{
+            position: 'absolute', right: -4, top: -4
+          }}
           timeSinceActive={contact.lastSeenActive}
         />
       </View>
@@ -46,10 +53,10 @@ const SendableContactCarouselItem: React.FC<Props> = ({
         {contact.displayedName}
       </Text>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     alignItems: 'center',
   },
@@ -84,6 +91,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
     borderRadius: 9999,
   },
-});
+} )
 
-export default SendableContactCarouselItem;
+export default SendableContactCarouselItem

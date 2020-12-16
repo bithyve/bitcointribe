@@ -326,8 +326,8 @@ PODS:
     - React-Core
   - react-native-print (0.6.0):
     - React
-  - react-native-randombytes (3.5.3):
-    - React
+  - react-native-randombytes (3.6.0):
+    - React-Core
   - react-native-safe-area-context (3.1.9):
     - React-Core
   - react-native-sqlite-storage (5.0.0):
@@ -401,6 +401,8 @@ PODS:
     - React-jsi (= 0.63.3)
   - RNCMaskedView (0.1.10):
     - React
+  - RNCPushNotificationIOS (1.8.0):
+    - React-Core
   - RNDeviceInfo (5.6.5):
     - React
   - RNFBAnalytics (10.4.0):
@@ -515,6 +517,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
@@ -664,6 +667,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFBAnalytics:
@@ -775,7 +780,7 @@ SPEC CHECKSUMS:
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
-  react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
+  react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-sqlite-storage: 418ef4afc5e6df6ce3574c4617e5f0b65cffde55
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
@@ -791,6 +796,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
+  RNCPushNotificationIOS: 61a7c72bd1ebad3568025957d001e0f0e7b32191
   RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
   RNFBAnalytics: dbe60bec27fa2d4876983581f98a1ebdd46a3c95
   RNFBApp: a9af8372c9c2b2135ffa78817fd2d8baf3ee632e
@@ -822,6 +828,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: 94734b08e626c38b7c913b6aa922b379a0cbfc14
+PODFILE CHECKSUM: 370484a399c3c3c779f26a833847f9e152d907c5
 
 COCOAPODS: 1.8.4
