@@ -28,7 +28,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -54,10 +54,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
   const accountShell = useAccountShellFromNavigation(navigation)
   const accountsState = useAccountsState()
-  const primarySubAccount = usePrimarySubAccountForShell(accountShell)
-  const accountTransactions = AccountShell.getAllTransactions(accountShell)
-  const spendableBalance = useSpendableBalanceForAccountShell(accountShell)
-  const averageTxFees = accountsState.averageTxFees
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const accountTransactions = AccountShell.getAllTransactions( accountShell )
+  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
+  const {averageTxFees, exchangeRates} = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
   if (
@@ -108,21 +108,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     })
   }
 
-  function navigateToDonationAccountWebViewSettings() {
-    const accountNumber = primarySubAccount.instanceNumber
-    const serviceType = primarySubAccount.sourceKind
-
-    let derivativeAccounts: DerivativeAccounts
-
-    if (serviceType === SourceAccountKind.REGULAR_ACCOUNT) {
-      derivativeAccounts = accountsState[serviceType].service.hdWallet.derivativeAccounts
-    } else if (serviceType === SourceAccountKind.SECURE_ACCOUNT) {
-      derivativeAccounts = accountsState[serviceType].service.secureHDWallet.derivativeAccounts
-    }
-
-    const donationAccount = derivativeAccounts[DONATION_ACCOUNT][accountNumber]
-
-    navigation.navigate('DonationAccountWebViewSettings', {
+  function navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType) {
+    
+    navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
       serviceType,
@@ -215,13 +203,26 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     },
   })
 
-  const showDonationWebViewSheet = useCallback(() => {
+  const showDonationWebViewSheet = useCallback( () => {
+     const accountNumber = primarySubAccount.instanceNumber
+    const serviceType = primarySubAccount.sourceKind
+
+    let derivativeAccounts: DerivativeAccounts
+
+    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
+    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
+    }
+
+    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
+
     presentBottomSheet(
       <DonationWebPageBottomSheet
-        account={primarySubAccount}
+        account={donationAccount}
         onClickSetting={() => {
           dismissBottomSheet()
-          navigateToDonationAccountWebViewSettings()
+          navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType)
         }}
       />,
       {
@@ -236,6 +237,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       autoSync: true
     }))
   }, [])
+
+  
+  useEffect(() => {
+    // missing fee & exchange rates patch(restore & upgrade)
+    if (
+      !averageTxFees ||
+      !Object.keys(averageTxFees).length ||
+      !exchangeRates ||
+      !Object.keys(exchangeRates).length
+    )
+      dispatch(fetchFeeAndExchangeRates());
+  }, []);
 
   return (
 
@@ -340,6 +353,7 @@ const styles = StyleSheet.create({
 
   scrollViewContainer: {
     paddingHorizontal: 24,
+    height: '100%',
   },
 
   footerSection: {
