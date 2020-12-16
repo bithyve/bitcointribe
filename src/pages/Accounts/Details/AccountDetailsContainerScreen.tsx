@@ -54,10 +54,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
 
   const accountShell = useAccountShellFromNavigation(navigation)
   const accountsState = useAccountsState()
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const accountTransactions = AccountShell.getAllTransactions( accountShell )
-  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
-  const {averageTxFees, exchangeRates} = accountsState
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell)
+  const accountTransactions = AccountShell.getAllTransactions(accountShell)
+  const spendableBalance = useSpendableBalanceForAccountShell(accountShell)
+  const { averageTxFees, exchangeRates } = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
   if (
@@ -109,8 +109,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   function navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType) {
-    
-    navigation.navigate( 'DonationAccountWebViewSettings', {
+
+    navigation.navigate('DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
       serviceType,
@@ -203,19 +203,19 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     },
   })
 
-  const showDonationWebViewSheet = useCallback( () => {
-     const accountNumber = primarySubAccount.instanceNumber
+  const showDonationWebViewSheet = useCallback(() => {
+    const accountNumber = primarySubAccount.instanceNumber
     const serviceType = primarySubAccount.sourceKind
 
     let derivativeAccounts: DerivativeAccounts
 
-    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
-    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
+    if (serviceType === SourceAccountKind.REGULAR_ACCOUNT) {
+      derivativeAccounts = accountsState[serviceType].service.hdWallet.derivativeAccounts
+    } else if (serviceType === SourceAccountKind.SECURE_ACCOUNT) {
+      derivativeAccounts = accountsState[serviceType].service.secureHDWallet.derivativeAccounts
     }
 
-    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
+    const donationAccount = derivativeAccounts[DONATION_ACCOUNT][accountNumber]
 
     presentBottomSheet(
       <DonationWebPageBottomSheet
@@ -238,7 +238,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     }))
   }, [])
 
-  
+
   useEffect(() => {
     // missing fee & exchange rates patch(restore & upgrade)
     if (
@@ -353,11 +353,11 @@ const styles = StyleSheet.create({
 
   scrollViewContainer: {
     paddingHorizontal: 24,
-    height: '100%',
   },
 
   footerSection: {
     paddingVertical: 38,
+    marginBottom: 25
   },
 })
 
