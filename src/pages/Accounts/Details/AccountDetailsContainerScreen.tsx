@@ -28,7 +28,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -57,7 +57,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
   const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
-  const averageTxFees = accountsState.averageTxFees
+  const {averageTxFees, exchangeRates} = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
   if (
@@ -237,6 +237,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       autoSync: true
     } ) )
   }, [] )
+
+  
+  useEffect(() => {
+    // missing fee & exchange rates patch(restore & upgrade)
+    if (
+      !averageTxFees ||
+      !Object.keys(averageTxFees).length ||
+      !exchangeRates ||
+      !Object.keys(exchangeRates).length
+    )
+      dispatch(fetchFeeAndExchangeRates());
+  }, []);
 
   return (
 
