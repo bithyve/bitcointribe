@@ -108,20 +108,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } )
   }
 
-  function navigateToDonationAccountWebViewSettings() {
-    const accountNumber = primarySubAccount.instanceNumber
-    const serviceType = primarySubAccount.sourceKind
-
-    let derivativeAccounts: DerivativeAccounts
-
-    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
-    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
-    }
-
-    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-
+  function navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType) {
+    
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
@@ -216,12 +204,25 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   } )
 
   const showDonationWebViewSheet = useCallback( () => {
+     const accountNumber = primarySubAccount.instanceNumber
+    const serviceType = primarySubAccount.sourceKind
+
+    let derivativeAccounts: DerivativeAccounts
+
+    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
+    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
+    }
+
+    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
+
     presentBottomSheet(
       <DonationWebPageBottomSheet
-        account={primarySubAccount}
+        account={donationAccount}
         onClickSetting={() => {
           dismissBottomSheet()
-          navigateToDonationAccountWebViewSettings()
+          navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType)
         }}
       />,
       {
