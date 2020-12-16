@@ -235,6 +235,7 @@ class ManageBackup extends Component<
   };
 
   componentDidMount = async () => {
+    console.log('keeperInfo', this.props.keeperInfo);
     await this.onRefresh();
     this.createNotificationListeners();
     this.modifyLevelData();
