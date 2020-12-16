@@ -40,11 +40,16 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
       />
 
       <View style={styles.headerBadgeContainer}>
-        {secondarySubAccountBadgeIcons.map( iconSource => {
+
+        {/*
+          📝 Disabling secondary sub-account icons for now until a design is finalized.
+          (See: https://github.com/bithyve/hexa/issues/2312)
+        */}
+        {/* {secondarySubAccountBadgeIcons.map( iconSource => {
           return (
             <Image style={styles.headerBadgeIcon} source={iconSource} />
           )
-        } )}
+        } )} */}
 
         {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
