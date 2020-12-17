@@ -58,7 +58,7 @@ const HomeHeader = ({
   const currencyKind: CurrencyKind = useCurrencyKind();
 
   const prefersBitcoin = useMemo(() => {
-    if (!currencyKind && !CurrencyKind.BITCOIN) return true
+    if (!currencyKind) return true;
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
