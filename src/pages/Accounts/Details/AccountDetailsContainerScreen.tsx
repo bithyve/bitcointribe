@@ -45,18 +45,18 @@ export type Props = {
   navigation: any;
 };
 
-const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
+const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
 
-  const accountShellID = useMemo(() => {
-    return navigation.getParam('accountShellID')
-  }, [navigation])
+  const accountShellID = useMemo( () => {
+    return navigation.getParam( 'accountShellID' )
+  }, [ navigation ] )
 
-  const accountShell = useAccountShellFromNavigation(navigation)
+  const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
-  const primarySubAccount = usePrimarySubAccountForShell(accountShell)
-  const accountTransactions = AccountShell.getAllTransactions(accountShell)
-  const spendableBalance = useSpendableBalanceForAccountShell(accountShell)
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const accountTransactions = AccountShell.getAllTransactions( accountShell )
+  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
@@ -64,7 +64,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
     primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
     primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
   ) {
-    if (primarySubAccount.instanceNumber) {
+    if ( primarySubAccount.instanceNumber ) {
       derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
     }
   }
@@ -72,58 +72,58 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   const derivativeAccountDetails: {
     type: string;
     number: number;
-  } = config.EJECTED_ACCOUNTS.includes(derivativeAccountKind) ?
-      {
-        type: derivativeAccountKind,
-        number: primarySubAccount.instanceNumber,
-      }
-      : null
+  } = config.EJECTED_ACCOUNTS.includes( derivativeAccountKind ) ?
+    {
+      type: derivativeAccountKind,
+      number: primarySubAccount.instanceNumber,
+    }
+    : null
 
 
-  const isRefreshing = useMemo(() => {
+  const isRefreshing = useMemo( () => {
     return accountShell.isSyncInProgress
-  }, [accountShell.isSyncInProgress])
+  }, [ accountShell.isSyncInProgress ] )
 
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
 
-  function handleTransactionSelection(transaction: TransactionDescribing) {
-    navigation.navigate('TransactionDetails', {
+  function handleTransactionSelection( transaction: TransactionDescribing ) {
+    navigation.navigate( 'TransactionDetails', {
       transaction,
       accountShellID: accountShell.id,
-    })
+    } )
   }
 
   function navigateToTransactionsList() {
-    navigation.navigate('TransactionsList', {
+    navigation.navigate( 'TransactionsList', {
       accountShellID,
-    })
+    } )
   }
 
   function navigateToAccountSettings() {
-    navigation.navigate('SubAccountSettings', {
+    navigation.navigate( 'SubAccountSettings', {
       accountShellID,
-    })
+    } )
   }
 
-  function navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType) {
+  function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
 
-    navigation.navigate('DonationAccountWebViewSettings', {
+    navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
       serviceType,
-    })
+    } )
   }
 
   function performRefreshOnPullDown() {
-    dispatch(refreshAccountShell(accountShell, {
+    dispatch( refreshAccountShell( accountShell, {
       autoSync: false
-    }))
+    } ) )
   }
 
-  const showKnowMoreSheet = useCallback(() => {
+  const showKnowMoreSheet = useCallback( () => {
     presentBottomSheet(
       <KnowMoreBottomSheet
         accountKind={primarySubAccount.kind}
@@ -131,36 +131,36 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [0, '95%'],
+        snapPoints: [ 0, '95%' ],
         handleComponent: KnowMoreBottomSheetHandle,
       },
     )
-  }, [presentBottomSheet, dismissBottomSheet])
+  }, [ presentBottomSheet, dismissBottomSheet ] )
 
   const showReassignmentConfirmationBottomSheet = useCallback(
-    (destinationID) => {
+    ( destinationID ) => {
       presentBottomSheet(
         <TransactionReassignmentSuccessBottomSheet
           onViewAccountDetailsPressed={() => {
             dismissBottomSheet()
             navigation.dispatch(
-              resetStackToAccountDetails({
+              resetStackToAccountDetails( {
                 accountShellID: destinationID,
-              }),
+              } ),
             )
           }}
         />,
         {
           ...defaultBottomSheetConfigs,
-          snapPoints: [0, '40%'],
+          snapPoints: [ 0, '40%' ],
         },
       )
     },
-    [presentBottomSheet, dismissBottomSheet],
+    [ presentBottomSheet, dismissBottomSheet ],
   )
 
   const showMergeConfirmationBottomSheet = useCallback(
-    ({ source, destination }) => {
+    ( { source, destination } ) => {
       presentBottomSheet(
         <AccountShellMergeSuccessBottomSheet
           sourceAccountShell={source}
@@ -168,22 +168,22 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onViewAccountDetailsPressed={() => {
             dismissBottomSheet()
             navigation.dispatch(
-              resetStackToAccountDetails({
+              resetStackToAccountDetails( {
                 accountShellID: destination.id,
-              }),
+              } ),
             )
           }}
         />,
         {
           ...defaultBottomSheetConfigs,
-          snapPoints: [0, '67%'],
+          snapPoints: [ 0, '67%' ],
         },
       )
     },
-    [presentBottomSheet, dismissBottomSheet],
+    [ presentBottomSheet, dismissBottomSheet ],
   )
 
-  useTransactionReassignmentCompletedEffect({
+  useTransactionReassignmentCompletedEffect( {
     onSuccess: showReassignmentConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
@@ -191,9 +191,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         'An error occurred while attempting to reassign transactions'
       )
     },
-  })
+  } )
 
-  useAccountShellMergeCompletionEffect({
+  useAccountShellMergeCompletionEffect( {
     onSuccess: showMergeConfirmationBottomSheet,
     onError: () => {
       Alert.alert(
@@ -201,54 +201,54 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         'An error occurred while attempting to merge accounts.'
       )
     },
-  })
+  } )
 
-  const showDonationWebViewSheet = useCallback(() => {
+  const showDonationWebViewSheet = useCallback( () => {
     const accountNumber = primarySubAccount.instanceNumber
     const serviceType = primarySubAccount.sourceKind
 
     let derivativeAccounts: DerivativeAccounts
 
-    if (serviceType === SourceAccountKind.REGULAR_ACCOUNT) {
-      derivativeAccounts = accountsState[serviceType].service.hdWallet.derivativeAccounts
-    } else if (serviceType === SourceAccountKind.SECURE_ACCOUNT) {
-      derivativeAccounts = accountsState[serviceType].service.secureHDWallet.derivativeAccounts
+    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
+    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
+      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
     }
 
-    const donationAccount = derivativeAccounts[DONATION_ACCOUNT][accountNumber]
+    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
 
     presentBottomSheet(
       <DonationWebPageBottomSheet
         account={donationAccount}
         onClickSetting={() => {
           dismissBottomSheet()
-          navigateToDonationAccountWebViewSettings(donationAccount, accountNumber, serviceType)
+          navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType )
         }}
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [0, '65%'],
+        snapPoints: [ 0, '65%' ],
       },
     )
-  }, [presentBottomSheet, dismissBottomSheet])
+  }, [ presentBottomSheet, dismissBottomSheet ] )
 
-  useEffect(() => {
-    dispatch(refreshAccountShell(accountShell, {
+  useEffect( () => {
+    dispatch( refreshAccountShell( accountShell, {
       autoSync: true
-    }))
-  }, [])
+    } ) )
+  }, [] )
 
 
-  useEffect(() => {
+  useEffect( () => {
     // missing fee & exchange rates patch(restore & upgrade)
     if (
       !averageTxFees ||
-      !Object.keys(averageTxFees).length ||
+      !Object.keys( averageTxFees ).length ||
       !exchangeRates ||
-      !Object.keys(exchangeRates).length
+      !Object.keys( exchangeRates ).length
     )
-      dispatch(fetchFeeAndExchangeRates());
-  }, []);
+      dispatch( fetchFeeAndExchangeRates() )
+  }, [] )
 
   return (
 
@@ -267,7 +267,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           onKnowMorePressed={showKnowMoreSheet}
           onSettingsPressed={navigateToAccountSettings}
         />
-
 
         <View
           style={{
@@ -310,7 +309,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
           }}
         >
           <TransactionsList
-            transactions={accountTransactions.slice(0, 3)}
+            transactions={accountTransactions.slice( 0, 3 )}
             onTransactionSelected={handleTransactionSelection}
           />
         </View>
@@ -318,19 +317,19 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              navigation.navigate('Send', {
+              navigation.navigate( 'Send', {
                 serviceType: primarySubAccount.sourceKind,
                 averageTxFees,
-                spendableBalance: AccountShell.getSpendableBalance(accountShell),
+                spendableBalance: AccountShell.getSpendableBalance( accountShell ),
                 derivativeAccountDetails,
                 accountShellID,
-              })
+              } )
             }}
             onReceivePressed={() => {
-              navigation.navigate('Receive', {
+              navigation.navigate( 'Receive', {
                 serviceType: primarySubAccount.sourceKind,
                 derivativeAccountDetails,
-              })
+              } )
             }}
             averageTxFees={averageTxFees}
             network={
@@ -346,7 +345,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({ navigation }) => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     paddingTop: 20,
   },
@@ -359,9 +358,9 @@ const styles = StyleSheet.create({
     paddingVertical: 38,
     marginBottom: 25
   },
-})
+} )
 
-AccountDetailsContainerScreen.navigationOptions = ({ navigation, }): NavigationScreenConfig<NavigationStackOptions, any> => {
+AccountDetailsContainerScreen.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
   return {
     header() {
       const { accountShellID } = navigation.state.params
