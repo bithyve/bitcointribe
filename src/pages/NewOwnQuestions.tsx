@@ -43,6 +43,7 @@ import {
 
 import DeviceInfo from 'react-native-device-info';
 import { walletCheckIn } from '../store/actions/trustedContacts';
+import CloudBackup from '../common/CommonFunctions/CloudBackup';
 
 export default function NewOwnQuestions(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -175,6 +176,10 @@ export default function NewOwnQuestions(props) {
   }, [confirmAnswer]);
 
   const onPressConfirm = () => {
+    if (Platform.OS === 'android') {
+      let cloudObject = new CloudBackup({ googlePermissionCall: true });
+      cloudObject.GoogleDriveLogin({ googlePermissionCall: true });
+    }
     (loaderBottomSheet as any).current.snapTo(1);
     seLoaderMessages();
     setTimeout(() => {

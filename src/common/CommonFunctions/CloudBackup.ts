@@ -9,18 +9,22 @@ export default class CloudBackup {
   public share;
   public recoveryCallback;
   public isNotReading = true;
+  public googlePermissionCall = false;
 
   constructor(stateVars?: {
     dataObject?: any;
     callBack?: any;
     share?: any;
     recoveryCallback?: any;
+    googlePermissionCall?: any;
   }) {
-    let { recoveryCallback, share, callBack, dataObject } = stateVars;
+    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall } = stateVars;
     if (dataObject) this.dataObject = dataObject;
     if (callBack) this.callBack = callBack;
     if (share) this.share = share;
     if (recoveryCallback) this.recoveryCallback = recoveryCallback;
+    if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
+
   }
 
   // check storage permission
@@ -80,13 +84,24 @@ export default class CloudBackup {
   public GoogleDriveLogin = (params: {
     checkDataIsBackedup?: boolean;
     share?: any;
+    googlePermissionCall? : any
   }) => {
-    console.log('isNotReading GoogleDriveLogin', this.isNotReading);
-    let { checkDataIsBackedup, share } = params;
+    let { checkDataIsBackedup, share, googlePermissionCall } = params;
     GoogleDrive.setup()
       .then(() => {
-        GoogleDrive.login((err, data) => {
+        GoogleDrive.login(async (err, data) => {
+          if (!googlePermissionCall)
           this.handleLogin({ err, data, checkDataIsBackedup, share });
+          else{
+            const result = err || data;
+            console.log('GOOGLE ReSULT', data);
+            // console.log('Error', e);
+            if (result.eventName == 'onLogin') {
+              if (!(await this.checkPermission())) {
+                throw new Error('Storage Permission Denied');
+              }
+            }
+          }
         });
       })
       .catch((err) => {

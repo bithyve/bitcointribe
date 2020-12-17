@@ -39,6 +39,7 @@ import { TEST_ACCOUNT } from '../common/constants/serviceTypes';
 
 import DeviceInfo from 'react-native-device-info';
 import { walletCheckIn } from '../store/actions/trustedContacts';
+import CloudBackup from '../common/CommonFunctions/CloudBackup';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
@@ -166,6 +167,10 @@ export default function NewWalletQuestion(props) {
     return (
       <TouchableOpacity
         onPress={() => {
+          if (Platform.OS === 'android') {
+            let cloudObject = new CloudBackup({ googlePermissionCall: true });
+            cloudObject.GoogleDriveLogin({ googlePermissionCall: true });
+          }
           (loaderBottomSheet as any).current.snapTo(1);
           seLoaderMessages();
           setTimeout(() => {
