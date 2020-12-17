@@ -144,8 +144,7 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.nextFreeChangeAddressIndex
         ? stateVars.nextFreeChangeAddressIndex
         : 0;
-    this.gapLimit =
-      stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
+    this.gapLimit = config.GAP_LIMIT;
     this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT;
     this.primaryXpriv =
       stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
@@ -389,19 +388,18 @@ export default class SecureHDWallet extends Bitcoin {
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = [];
-    for (let itr = 0; itr <= this.nextFreeAddressIndex; itr++) {
+    for (let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++) {
       const { address } = this.createSecureMultiSig(itr);
       externalAddresses.push(address);
       ownedAddresses.push(address);
     }
 
     const internalAddresses = [];
-    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex; itr++) {
+    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++) {
       const { address } = this.createSecureMultiSig(itr, true);
       internalAddresses.push(address);
       ownedAddresses.push(address);
     }
-
     this.usedAddresses = [...externalAddresses, ...internalAddresses];
 
     const batchedDerivativeAddresses = [];
