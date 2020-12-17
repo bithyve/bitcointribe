@@ -213,8 +213,10 @@ class RestoreWithICloud extends Component<
 
     let updatedListData = [];
     const shares: MetaShare[] = [];
+    updatedListData = [...listData];
     //console.log("this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES", this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES);
     //console.log("type of", typeof this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)
+    shares.push(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0].META_SHARE);
     Object.keys(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
       const META_SHARE: MetaShare = this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES[key].META_SHARE;
       if (META_SHARE) {
@@ -223,25 +225,25 @@ class RestoreWithICloud extends Component<
           if (share.shareId === META_SHARE.shareId) insert = false;
         }, []);
 
-        if (insert) shares.push(META_SHARE);
+        if (insert){
+          for (var i = 0; i < updatedListData.length; i++) {
+            if (META_SHARE.shareId === updatedListData[i].shareId) {
+              updatedListData[i].status = "received";
+              shares.push(META_SHARE);
+              break;
+            }
+          }
+        } 
       }
     });
-    updatedListData = [...listData];
+    this.setState({ listData: updatedListData, showLoader: false }, () => {
+      console.log("listData inside setState", this.state.listData, this.state.showLoader);
+    });
     //console.log("updatedListData shares", shares);
-
-    for (var i = 0; i < updatedListData.length; i++) {
-      if (shares.findIndex(value => value.shareId === updatedListData[i].shareId) > -1) {
-        updatedListData[i].status = "received";
-      }
+    if (shares.length === 2 || shares.length === 3) {
+      this.checkForRecoverWallet(shares, selectedBackup);
     }
     //console.log("updatedListData sefsgsg", updatedListData);
-    this.setState({ listData: updatedListData, showLoader: false }, () => {
-      //console.log("listData inside setState", this.state.listData, this.state.showLoader);
-  });
-      if (shares.length === 2 || shares.length === 3) {
-          this.checkForRecoverWallet(shares, selectedBackup);
-        }
-    
   }
 
   checkForRecoverWallet = (shares, selectedBackup) => {
@@ -254,7 +256,7 @@ class RestoreWithICloud extends Component<
       (this.refs.loaderBottomSheet as any).snapTo(1);
       this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
     } else if (shares.length === 3 && selectedBackup.levelStatus === 3) {
-      //console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
+     // console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
       (this.refs.loaderBottomSheet as any).snapTo(1);
       this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
     }

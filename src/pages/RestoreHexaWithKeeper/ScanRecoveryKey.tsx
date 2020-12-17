@@ -36,6 +36,7 @@ interface ScanRecoveryKeyStateTypes {
 
 interface ScanRecoveryKeyPropsTypes {
   navigation: any;
+  walletName: any;
 }
 
 class ScanRecoveryKey extends Component<
@@ -107,7 +108,7 @@ class ScanRecoveryKey extends Component<
               <Text style={{ ...styles.greyBoxText, fontSize: RFValue(11) }}>
                 Recovering Wallet
               </Text>
-              <Text style={styles.greyBoxText}>Pam’s Wallet</Text>
+              <Text style={styles.greyBoxText}>{this.props.walletName + "’s Wallet"}</Text>
               <Text style={{ ...styles.greyBoxText, fontSize: RFValue(10) }}>
                 Lorem ipsum dolor
               </Text>
