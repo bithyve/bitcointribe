@@ -102,7 +102,7 @@ interface RestoreWithICloudPropsTypes {
   downloadMShare: any;
   metaShare: any;
   DECENTRALIZED_BACKUP: any;
-  recoverWallet:any;
+  recoverWallet: any;
   updateCloudMShare: any;
   walletRecoveryFailed: boolean;
 
@@ -111,7 +111,7 @@ interface RestoreWithICloudPropsTypes {
 class RestoreWithICloud extends Component<
   RestoreWithICloudPropsTypes,
   RestoreWithICloudStateTypes
-> {
+  > {
   constructor(props) {
     super(props);
     this.state = {
@@ -164,12 +164,14 @@ class RestoreWithICloud extends Component<
   // image: require('../../assets/images/icons/icon_contact.png'),
   // image: require('../../assets/images/icons/icon_secondarydevice.png'),
 
-  componentDidMount = async () => {
-    await this.cloudData();
+  componentDidMount = () => {
+    this.cloudData();
   };
 
-  cloudData = async () => {
-    let cloudObject = new CloudBackup({recoveryCallback: (result) => this.getData(result)});
+  cloudData = () => {
+    console.log("INSIDE cloudData componentDidMount");
+    this.setState({ showLoader: true });
+    let cloudObject = new CloudBackup({ recoveryCallback: (result) => this.getData(result) });
     cloudObject.CheckCloudDataBackup((result) => this.getData(result));
   };
 
@@ -186,16 +188,20 @@ class RestoreWithICloud extends Component<
       await AsyncStorage.setItem('walletExists', 'true');
       await AsyncStorage.setItem('walletRecovered', 'true');
       checkMSharesHealth();
-      (this.refs.loaderBottomSheet as any).snapTo(0);
-        this.props.navigation.navigate('Home');
+      if (this.refs.loaderBottomSheet as any)
+        (this.refs.loaderBottomSheet as any).snapTo(0);
+      this.props.navigation.navigate('Home');
     }
 
-    if (prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES !== this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES) {
+    if (JSON.stringify(prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES) !== JSON.stringify(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) {
       console.log("INSIDE prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES");
-      if(!isEmpty(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) this.updateList();
+      if (!isEmpty(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) {
+        this.updateList();
+      }
     }
 
-    if(prevProps.walletRecoveryFailed !== walletRecoveryFailed){
+    if (prevProps.walletRecoveryFailed !== walletRecoveryFailed) {
+      if (this.refs.loaderBottomSheet as any)
         (this.refs.loaderBottomSheet as any).snapTo(0);
     }
 
@@ -205,11 +211,10 @@ class RestoreWithICloud extends Component<
     console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state;
 
-    let KeeperData = JSON.parse(selectedBackup.keeperData);
-    let key = SSS.strechKey(this.props.security.answer);
-    const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     let updatedListData = [];
     const shares: MetaShare[] = [];
+    console.log("this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES", this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES);
+    console.log("type of", typeof this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)
     Object.keys(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
       const META_SHARE: MetaShare = this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES[key].META_SHARE;
       if (META_SHARE) {
@@ -224,103 +229,118 @@ class RestoreWithICloud extends Component<
     updatedListData = [...listData];
     console.log("updatedListData shares", shares);
 
-    for(var i = 0 ; i < updatedListData.length; i++){
-       if(shares.findIndex(value=>value.shareId == updatedListData[i].shareId)>-1) updatedListData[i].status = "received";
-        //console.log("inside if jasjhadkhsdak",listData[i]);}
+    for (var i = 0; i < updatedListData.length; i++) {
+      if (shares.findIndex(value => value.shareId === updatedListData[i].shareId) > -1) {
+        updatedListData[i].status = "received";
+      }
     }
     console.log("updatedListData sefsgsg", updatedListData);
-
-    if (shares.length) {
-      if(shares.length === 2 && selectedBackup.levelStatus === 2){
-        console.log("INSIDE IF SHARES",shares.length, selectedBackup.levelStatus);
-        (this.refs.loaderBottomSheet as any).snapTo(1);
-        this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
-        } else if(shares.length === 3 && selectedBackup.levelStatus === 3){
-        console.log("INSIDE IF SHARES ### 3",shares.length, selectedBackup.levelStatus);
-        (this.refs.loaderBottomSheet as any).snapTo(1);
-        this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
-      }
-      
-    }
-    this.setState({ listData: updatedListData, metaShares: shares });
+    this.setState({ listData: updatedListData, showLoader: false }, () => {
+      console.log("listData inside setState", this.state.listData, this.state.showLoader);
+  });
+      if (shares.length === 2 || shares.length === 3) {
+          this.checkForRecoverWallet(shares, selectedBackup);
+        }
+    
   }
 
-recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
-  this.props.recoverWallet(levelStatus, KeeperData, decryptedCloudDataJson);
-}
+  checkForRecoverWallet = (shares, selectedBackup) => {
+    let key = SSS.strechKey(this.props.security.answer);
+    let KeeperData = JSON.parse(selectedBackup.keeperData);
+    const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
+
+    if (shares.length === 2 && selectedBackup.levelStatus === 2) {
+      console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
+      (this.refs.loaderBottomSheet as any).snapTo(1);
+      this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
+    } else if (shares.length === 3 && selectedBackup.levelStatus === 3) {
+      console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
+      (this.refs.loaderBottomSheet as any).snapTo(1);
+      this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
+    }
+
+   
+  }
+
+  recoverWallet = (levelStatus, KeeperData, decryptedCloudDataJson) => {
+    setTimeout(() => {
+      this.props.recoverWallet(levelStatus, KeeperData, decryptedCloudDataJson);
+    }, 2);
+  }
 
   getData = (result) => {
     console.log('FILE DATA', result);
-    if(result){
+    if (result) {
       var arr = [];
-    var newArray = [];
-    try {
-      arr = JSON.parse(result);
-    } catch (error) {
-      console.log('ERROR', error);
-    }
-    if (arr && arr.length) {
-      for (var i = 0; i < arr.length; i++) {
-        newArray.push(arr[i]);
+      var newArray = [];
+      try {
+        arr = JSON.parse(result);
+      } catch (error) {
+        console.log('ERROR', error);
       }
+      if (arr && arr.length) {
+        for (var i = 0; i < arr.length; i++) {
+          newArray.push(arr[i]);
+        }
+      }
+      console.log('ARR', newArray);
+      this.setState(state => ({
+        selectedBackup: newArray[0], walletsArray: newArray, showLoader: false
+      }));
+      //this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
+      (this.refs.RestoreFromICloud as any).snapTo(1);
+    } else {
+      (this.refs.BackupNotFound as any).snapTo(1);
     }
-    console.log('ARR', newArray);
-    this.setState(state => ({
-      selectedBackup: newArray[0], walletsArray: newArray}));
-    //this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
-    (this.refs.RestoreFromICloud as any).snapTo(1);
-  }else{
-    (this.refs.BackupNotFound as any).snapTo(1);
-  }
   };
 
   restoreWallet = () => {
     let listDataArray = [];
     const { selectedBackup } = this.state;
-    console.log("selectedBackup",selectedBackup);
+    console.log("selectedBackup", selectedBackup);
     const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
     console.log('decryptedCloudDataJson', decryptedCloudDataJson);
 
-    if(decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData){
-      this.setState({cloudBackup : true});
+    if (decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData) {
+      this.setState({ cloudBackup: true });
       this.props.updateCloudMShare(JSON.parse(selectedBackup.shares), 0);
-     let KeeperData = JSON.parse(selectedBackup.keeperData);
-     let levelStatus = selectedBackup.levelStatus;
-     if(levelStatus === 2) KeeperData = KeeperData.slice(0, 2);
-    if (levelStatus === 3 && KeeperData.length > 4) KeeperData = KeeperData.slice(2);
-     let obj;
-     console.log("KEEPERDATA slice", KeeperData)
-     for(let i = 0 ; i < KeeperData.length; i++){
-      obj = {
-        type:  KeeperData[i].type,
-        title: KeeperData[i].name,
-        info: '',
-        time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
-        status: 'waiting',
-        image: null,
-        shareId: KeeperData[i].shareId
+      let KeeperData = JSON.parse(selectedBackup.keeperData);
+      let levelStatus = selectedBackup.levelStatus;
+      if (levelStatus === 2) KeeperData = KeeperData.slice(0, 2);
+      if (levelStatus === 3) KeeperData = KeeperData.slice(2, 6);
+      let obj;
+      console.log("KEEPERDATA slice", KeeperData)
+      for (let i = 0; i < KeeperData.length; i++) {
+        obj = {
+          type: KeeperData[i].type,
+          title: KeeperData[i].name,
+          info: '',
+          time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
+          status: 'waiting',
+          image: null,
+          shareId: KeeperData[i].shareId
+        }
+        listDataArray.push(obj);
       }
-      listDataArray.push(obj);
-     }
-     this.setState({listData: listDataArray});
-       // if(selectedBackup.type == "device"){
+      this.setState({ listData: listDataArray });
+      // if(selectedBackup.type == "device"){
       (this.refs.RestoreFromICloud as any).snapTo(0);
-    } else if(decryptedCloudDataJson && !selectedBackup.shares){
-          (this.refs.loaderBottomSheet as any).snapTo(1);
-          recoverWalletUsingIcloud(decryptedCloudDataJson); 
-    } else{
+    } else if (decryptedCloudDataJson && !selectedBackup.shares) {
+      (this.refs.loaderBottomSheet as any).snapTo(1);
+      recoverWalletUsingIcloud(decryptedCloudDataJson);
+    } else {
       (this.refs.ErrorBottomSheet as any).snapTo(1);
-     }
-  //   
+    }
+    //   
   };
 
   handleScannedData = async (scannedData) => {
-    const {DECENTRALIZED_BACKUP} = this.props;
+    const { DECENTRALIZED_BACKUP } = this.props;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
     console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
-    if(scannedData && scannedData.type && scannedData.type === "ReverseRecoveryQR"){
+    if (scannedData && scannedData.type && scannedData.type === "ReverseRecoveryQR") {
       const recoveryRequest = {
         requester: scannedData.requester,
         publicKey: scannedData.publicKey,
@@ -334,16 +354,16 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
       ) {
         Alert.alert(
           `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
-          `Please ask your Guardian to initiate a new ${
-            recoveryRequest.isQR ? 'QR' : 'Link'
+          `Please ask your Guardian to initiate a new ${recoveryRequest.isQR ? 'QR' : 'Link'
           }`,
         );
       }
-      this.props.downloadMShare({encryptedKey: recoveryRequest.publicKey, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length});
+      this.props.downloadMShare({ encryptedKey: recoveryRequest.publicKey, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length });
     }
-    else{
-      this.props.downloadMShare({encryptedKey: scannedData.encryptedKey, otp: scannedData.otp, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length});
+    else {
+      this.props.downloadMShare({ encryptedKey: scannedData.encryptedKey, otp: scannedData.otp, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length });
     }
+    this.setState({ showLoader: true });
   }
 
   render() {
@@ -355,12 +375,13 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
       selectedBackup,
       showLoader
     } = this.state;
+    console.log("INSIDE render", showLoader);
     const { navigation } = this.props;
     let name;
     if (Platform.OS == 'ios') name = 'iCloud';
     else name = 'GDrive';
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1, position: 'relative'}}>
+      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1, position: 'relative' }}>
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
@@ -428,22 +449,22 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
                       />
                     </View>
                   ) : (
-                    <ImageBackground
-                      source={require('../../assets/images/icons/Ellipse.png')}
-                      style={{ ...styles.cardsImageView, marginRight: 10 }}
-                    >
-                      <Image
-                        source={
-                          item.type == 'contact'
-                            ? require('../../assets/images/icons/icon_contact.png')
-                            : item.type == 'device'
-                            ? require('../../assets/images/icons/icon_secondarydevice.png')
-                            : require('../../assets/images/icons/icon_contact.png')
-                        }
-                        style={styles.cardImage}
-                      />
-                    </ImageBackground>
-                  )}
+                      <ImageBackground
+                        source={require('../../assets/images/icons/Ellipse.png')}
+                        style={{ ...styles.cardsImageView, marginRight: 10 }}
+                      >
+                        <Image
+                          source={
+                            item.type == 'contact'
+                              ? require('../../assets/images/icons/icon_contact.png')
+                              : item.type == 'device'
+                                ? require('../../assets/images/icons/icon_secondarydevice.png')
+                                : require('../../assets/images/icons/icon_contact.png')
+                          }
+                          style={styles.cardImage}
+                        />
+                      </ImageBackground>
+                    )}
                   <View style={{}}>
                     <Text
                       style={{
@@ -493,10 +514,10 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
                       </View>
                     </View>
                   ) : (
-                    <View style={styles.statusTextView}>
-                      <Text style={styles.statusText}>Waiting for Key</Text>
-                    </View>
-                  )}
+                      <View style={styles.statusTextView}>
+                        <Text style={styles.statusText}>Waiting for Key</Text>
+                      </View>
+                    )}
                 </TouchableOpacity>
               );
             })}
@@ -509,7 +530,7 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
             borderRadius: 10,
             marginLeft: 25,
             marginRight: 25,
-            marginTop:'auto',
+            marginTop: 'auto',
             marginBottom: hp('4%'),
             justifyContent: 'space-evenly',
             alignItems: 'center',
@@ -534,7 +555,7 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              navigation.navigate("ScanRecoveryKey", {scannedData : (scannedData) => this.handleScannedData(scannedData)});
+              navigation.navigate("ScanRecoveryKey", { scannedData: (scannedData) => this.handleScannedData(scannedData) });
             }}
           >
             <Image
@@ -544,70 +565,69 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
             <Text style={styles.buttonText}>Scan Key</Text>
           </TouchableOpacity>
         </View>
-        {showLoader ? <Loader /> : null}
+        {showLoader ? <Loader isLoading={true} /> : null}
         {hideShow ? (
           <View style={styles.dropDownView}>
             <ScrollView>
-            {walletsArray.map((value) => {
-              return (
-                <AppBottomSheetTouchableWrapper
-                  activeOpacity={10}
-                  onPress={() => {
-                    this.setState({ hideShow: false });
-                    this.setState({ selectedBackup: value });
-                  }}
-                  style={styles.dropDownElement}
-                >
-                  {value.data && (
-                    <View style={styles.greyBox}>
-                      <View style={styles.greyBoxImage}>
-                        <MaterialCommunityIcons
-                          name={'restore'}
-                          size={RFValue(25)}
-                          color={Colors.blue}
-                        />
-                      </View>
-                      <View style={{ marginLeft: 10 }}>
-                        <Text style={styles.greyBoxText}>
-                          {'Restoring Wallet from'}
-                        </Text>
-                        <Text
-                          style={{
-                            ...styles.greyBoxText,
-                            fontSize: RFValue(20),
-                          }}
-                        >
-                          {value.walletName}
-                        </Text>
-                        <Text
-                          style={{
-                            ...styles.greyBoxText,
-                            fontSize: RFValue(10),
-                          }}
-                        >
-                          {'Last backup : ' +
-                            timeFormatter(moment(new Date()), moment(value.dateTime).valueOf())}
-                        </Text>
+              {walletsArray.map((value) => {
+                return (
+                  <AppBottomSheetTouchableWrapper
+                    activeOpacity={10}
+                    onPress={() => {
+                      this.setState({ hideShow: false });
+                      this.setState({ selectedBackup: value });
+                    }}
+                    style={styles.dropDownElement}
+                  >
+                    {value.data && (
+                      <View style={styles.greyBox}>
+                        <View style={styles.greyBoxImage}>
+                          <MaterialCommunityIcons
+                            name={'restore'}
+                            size={RFValue(25)}
+                            color={Colors.blue}
+                          />
+                        </View>
+                        <View style={{ marginLeft: 10 }}>
+                          <Text style={styles.greyBoxText}>
+                            {'Restoring Wallet from'}
+                          </Text>
+                          <Text
+                            style={{
+                              ...styles.greyBoxText,
+                              fontSize: RFValue(20),
+                            }}
+                          >
+                            {value.walletName}
+                          </Text>
+                          <Text
+                            style={{
+                              ...styles.greyBoxText,
+                              fontSize: RFValue(10),
+                            }}
+                          >
+                            {'Last backup : ' +
+                              timeFormatter(moment(new Date()), moment(value.dateTime).valueOf())}
+                          </Text>
 
-                        <Text
-                          style={{
-                            ...styles.greyBoxText,
-                            fontSize: RFValue(10),
-                          }}
-                        >
-                          {'Backup at level : ' +
-                            value.levelStatus}
-                        </Text>
+                          <Text
+                            style={{
+                              ...styles.greyBoxText,
+                              fontSize: RFValue(10),
+                            }}
+                          >
+                            {'Backup at level : ' +
+                              value.levelStatus}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </AppBottomSheetTouchableWrapper>
-              );
-            })}
+                    )}
+                  </AppBottomSheetTouchableWrapper>
+                );
+              })}
             </ScrollView>
           </View>
         ) : null}
-        
         <BottomSheet
           enabledInnerScrolling={true}
           ref={'RestoreFromICloud'}
@@ -621,7 +641,7 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
             let name;
             if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
-           // console.log("SELECTED BACKUP", selectedBackup);
+            // console.log("SELECTED BACKUP", selectedBackup);
             return (
               <RestoreFromICloud
                 title={'Restore from ' + name}
@@ -769,35 +789,35 @@ recoverWallet = (levelStatus,KeeperData, decryptedCloudDataJson) =>{
           )}
         />
 
-<BottomSheet
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={false}
-        ref={'ErrorBottomSheet'}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={()=>(
-          <ErrorModalContents
-            modalRef={this.refs.ErrorBottomSheet}
-            title={"Error receiving Recovery Key"}
-            info={'There was an error while receiving your Recovery Key, please try again'}
-            proceedButtonText={'Try again'}
-            onPressProceed={() => {
-              (this.refs.ErrorBottomSheet as any).snapTo(0);
-            }}
-            isBottomImage={true}
-            bottomImage={require('../../assets/images/icons/errorImage.png')}
-          />
-        )}
-        renderHeader={() => (
-          <ModalHeader
-          // onPressHeader={() => {
-          //   (this.refs.ErrorBottomSheet as any).snapTo(0);
-          // }}
-          />
-        )}
-      />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
+          ref={'ErrorBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          ]}
+          renderContent={() => (
+            <ErrorModalContents
+              modalRef={this.refs.ErrorBottomSheet}
+              title={"Error receiving Recovery Key"}
+              info={'There was an error while receiving your Recovery Key, please try again'}
+              proceedButtonText={'Try again'}
+              onPressProceed={() => {
+                (this.refs.ErrorBottomSheet as any).snapTo(0);
+              }}
+              isBottomImage={true}
+              bottomImage={require('../../assets/images/icons/errorImage.png')}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+            // onPressHeader={() => {
+            //   (this.refs.ErrorBottomSheet as any).snapTo(0);
+            // }}
+            />
+          )}
+        />
       </View>
     );
   }
