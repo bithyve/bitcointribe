@@ -1,5 +1,6 @@
 export const UsNumberFormat = (amount, decimalCount = 0, decimal = ".", thousands = ",") => {
     try {
+        alert(`amount: ${amount} decimalCount: ${decimalCount} decimal ${decimal} thousands ${thousands}`)
         decimalCount = Math.abs(decimalCount);
         decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
         const negativeSign = amount < 0 ? "-" : "";
@@ -8,6 +9,7 @@ export const UsNumberFormat = (amount, decimalCount = 0, decimal = ".", thousand
         return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
     } catch (e) {
         // console.log(e)
+        alert(`error in UsNumberFormat ${e}`)
     }
 };
 

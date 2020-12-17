@@ -53,10 +53,12 @@ const HomeHeader = ({
   navigation,
   overallHealth,
 }) => {
+  alert(`balances ${balances.accumulativeBalance} UsNumberFormat(balances.accumulativeBalance): ${UsNumberFormat(balances.accumulativeBalance)}`)
   const dispatch = useDispatch();
   const currencyKind: CurrencyKind = useCurrencyKind();
 
   const prefersBitcoin = useMemo(() => {
+    if (!currencyKind && !CurrencyKind.BITCOIN) return true
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
@@ -164,9 +166,24 @@ const HomeHeader = ({
           <CurrencyKindToggleSwitch
             fiatCurrencyCode={CurrencyCode}
             onpress={() => {
-              dispatch(currencyKindSet(
-                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-              ));
+
+              try {
+
+                alert(`CurrencyCode: ${CurrencyCode} exchangeRates:${exchangeRates[CurrencyCode].last} I am in home-header try prefersBitcoin:${prefersBitcoin}, CurrencyKind.FIAT: ${CurrencyKind.FIAT}, CurrencyKind.BITCOIN:${CurrencyKind.BITCOIN}`)
+
+                // const j = undefined;
+                // const k = j.a.b;
+                dispatch(currencyKindSet(
+                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                ));
+
+              }
+              catch (e) {
+                alert(`I an in catch ${e}`);
+              }
+
+
+
             }}
             isOn={prefersBitcoin}
           />
