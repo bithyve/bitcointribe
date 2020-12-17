@@ -724,7 +724,7 @@ class SendToContact extends Component<
   };
 
   onConfirm = () => {
-    console.log("INSIDE onconfirm")
+
     const {
       clearTransfer,
       accountsState,
@@ -1046,6 +1046,7 @@ class SendToContact extends Component<
                         : Colors.backgroundColor,
                     }}
                     onPress={this.sendMaxHandler}
+                    disabled={this.state.averageTxFees? false: true}
                   >
                     <View style={styles.amountInputImage}>
                       {materialIconCurrencyCodes.includes(CurrencyCode) ? (
@@ -1113,7 +1114,7 @@ class SendToContact extends Component<
                     {!prefersBitcoin && (
                       <Text
                         style={{
-                          color: Colors.blue,
+                          color: this.state.averageTxFees? Colors.blue: Colors.lightBlue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue(10),
@@ -1152,6 +1153,7 @@ class SendToContact extends Component<
                         : Colors.backgroundColor,
                     }}
                     onPress={this.sendMaxHandler}
+                    disabled={this.state.averageTxFees? false: true}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1208,7 +1210,7 @@ class SendToContact extends Component<
                     {prefersBitcoin && (
                       <Text
                         style={{
-                          color: Colors.blue,
+                          color: this.state.averageTxFees? Colors.blue: Colors.lightBlue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue(10),
