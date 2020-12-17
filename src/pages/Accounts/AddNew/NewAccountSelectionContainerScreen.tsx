@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, SectionList } from 'react-native'
+import { View, Text, StyleSheet, SectionList, SafeAreaView } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import { Button } from 'react-native-elements'
@@ -13,6 +13,7 @@ import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -128,7 +129,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
       <SectionList
         contentContainerStyle={{
           paddingVertical: 25
@@ -186,7 +187,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
       ></SectionList>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -196,11 +197,14 @@ const styles = StyleSheet.create( {
   },
 
   listSectionHeading: {
+    fontSize: RFValue( 14 ),
     marginBottom: 12,
+    paddingHorizontal: 24,
   },
 
   viewSectionContainer: {
     marginBottom: 22,
+    marginHorizontal: 24,
   },
 
   listFooterSection: {

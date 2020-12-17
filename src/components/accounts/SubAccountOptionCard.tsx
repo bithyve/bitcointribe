@@ -95,7 +95,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         {specialTag && (
           <Card.Title
             style={styles.specialTagText}
-            numberOfLines={1}
+            numberOfLines={2}
           >
             {specialTag}
           </Card.Title>
@@ -193,6 +193,8 @@ const styles = StyleSheet.create( {
     top: -RFValue( 2 ),
     fontSize: RFValue( 10 ),
     color: Colors.blue,
+    textAlign: 'right',
+    width: '50%',
   }
 } )
 
