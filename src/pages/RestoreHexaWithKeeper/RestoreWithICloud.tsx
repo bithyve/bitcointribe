@@ -169,7 +169,7 @@ class RestoreWithICloud extends Component<
   };
 
   cloudData = () => {
-    console.log("INSIDE cloudData componentDidMount");
+    //console.log("INSIDE cloudData componentDidMount");
     this.setState({ showLoader: true });
     let cloudObject = new CloudBackup({ recoveryCallback: (result) => this.getData(result) });
     cloudObject.CheckCloudDataBackup((result) => this.getData(result));
@@ -194,7 +194,7 @@ class RestoreWithICloud extends Component<
     }
 
     if (JSON.stringify(prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES) !== JSON.stringify(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) {
-      console.log("INSIDE prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES");
+      //console.log("INSIDE prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES");
       if (!isEmpty(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)) {
         this.updateList();
       }
@@ -208,13 +208,13 @@ class RestoreWithICloud extends Component<
   };
 
   updateList = () => {
-    console.log("INSIDE updateList");
+    //console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state;
 
     let updatedListData = [];
     const shares: MetaShare[] = [];
-    console.log("this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES", this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES);
-    console.log("type of", typeof this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)
+    //console.log("this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES", this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES);
+    //console.log("type of", typeof this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)
     Object.keys(this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
       const META_SHARE: MetaShare = this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES[key].META_SHARE;
       if (META_SHARE) {
@@ -227,16 +227,16 @@ class RestoreWithICloud extends Component<
       }
     });
     updatedListData = [...listData];
-    console.log("updatedListData shares", shares);
+    //console.log("updatedListData shares", shares);
 
     for (var i = 0; i < updatedListData.length; i++) {
       if (shares.findIndex(value => value.shareId === updatedListData[i].shareId) > -1) {
         updatedListData[i].status = "received";
       }
     }
-    console.log("updatedListData sefsgsg", updatedListData);
+    //console.log("updatedListData sefsgsg", updatedListData);
     this.setState({ listData: updatedListData, showLoader: false }, () => {
-      console.log("listData inside setState", this.state.listData, this.state.showLoader);
+      //console.log("listData inside setState", this.state.listData, this.state.showLoader);
   });
       if (shares.length === 2 || shares.length === 3) {
           this.checkForRecoverWallet(shares, selectedBackup);
@@ -250,11 +250,11 @@ class RestoreWithICloud extends Component<
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
 
     if (shares.length === 2 && selectedBackup.levelStatus === 2) {
-      console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
+      //console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
       (this.refs.loaderBottomSheet as any).snapTo(1);
       this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
     } else if (shares.length === 3 && selectedBackup.levelStatus === 3) {
-      console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
+      //console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
       (this.refs.loaderBottomSheet as any).snapTo(1);
       this.recoverWallet(selectedBackup.levelStatus, KeeperData, decryptedCloudDataJson);
     }
@@ -269,25 +269,24 @@ class RestoreWithICloud extends Component<
   }
 
   getData = (result) => {
-    console.log('FILE DATA', result);
+    //console.log('FILE DATA', result);
     if (result) {
       var arr = [];
       var newArray = [];
       try {
         arr = JSON.parse(result);
       } catch (error) {
-        console.log('ERROR', error);
+        //console.log('ERROR', error);
       }
       if (arr && arr.length) {
         for (var i = 0; i < arr.length; i++) {
           newArray.push(arr[i]);
         }
       }
-      console.log('ARR', newArray);
+      //console.log('ARR', newArray);
       this.setState(state => ({
         selectedBackup: newArray[0], walletsArray: newArray, showLoader: false
       }));
-      //this.setState({ selectedBackup: newArray[0], walletsArray: newArray });
       (this.refs.RestoreFromICloud as any).snapTo(1);
     } else {
       (this.refs.BackupNotFound as any).snapTo(1);
@@ -297,11 +296,11 @@ class RestoreWithICloud extends Component<
   restoreWallet = () => {
     let listDataArray = [];
     const { selectedBackup } = this.state;
-    console.log("selectedBackup", selectedBackup);
+    //console.log("selectedBackup", selectedBackup);
     const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
-    console.log('decryptedCloudDataJson', decryptedCloudDataJson);
+    //console.log('decryptedCloudDataJson', decryptedCloudDataJson);
 
     if (decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData) {
       this.setState({ cloudBackup: true });
@@ -311,7 +310,7 @@ class RestoreWithICloud extends Component<
       if (levelStatus === 2) KeeperData = KeeperData.slice(0, 2);
       if (levelStatus === 3) KeeperData = KeeperData.slice(2, 6);
       let obj;
-      console.log("KEEPERDATA slice", KeeperData)
+      //console.log("KEEPERDATA slice", KeeperData)
       for (let i = 0; i < KeeperData.length; i++) {
         obj = {
           type: KeeperData[i].type,
@@ -339,7 +338,7 @@ class RestoreWithICloud extends Component<
   handleScannedData = async (scannedData) => {
     const { DECENTRALIZED_BACKUP } = this.props;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-    console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
+    //console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
     if (scannedData && scannedData.type && scannedData.type === "ReverseRecoveryQR") {
       const recoveryRequest = {
         requester: scannedData.requester,
@@ -375,7 +374,7 @@ class RestoreWithICloud extends Component<
       selectedBackup,
       showLoader
     } = this.state;
-    console.log("INSIDE render", showLoader);
+    //console.log("INSIDE render", showLoader);
     const { navigation } = this.props;
     let name;
     if (Platform.OS == 'ios') name = 'iCloud';
@@ -641,7 +640,6 @@ class RestoreWithICloud extends Component<
             let name;
             if (Platform.OS == 'ios') name = 'iCloud';
             else name = 'GDrive';
-            // console.log("SELECTED BACKUP", selectedBackup);
             return (
               <RestoreFromICloud
                 title={'Restore from ' + name}
