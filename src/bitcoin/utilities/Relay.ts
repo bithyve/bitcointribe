@@ -183,7 +183,7 @@ export default class Relay {
 
       return { exchangeRates, averageTxFees };
     } catch (err) {
-      throw new Error("Failed to deliver donation note");
+      throw new Error("Failed fetch fee and exchange rates");
     }
   };
 }

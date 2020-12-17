@@ -168,6 +168,7 @@ const HomeHeader = ({
                 prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
               ));
             }}
+            disabled={exchangeRates? false: true}
             isOn={prefersBitcoin}
           />
           <TouchableOpacity

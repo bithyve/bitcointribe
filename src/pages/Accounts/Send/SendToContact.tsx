@@ -1238,6 +1238,7 @@ class SendToContact extends Component<
                     }}
                     isOn={prefersBitcoin}
                     isVertical={true}
+                    disabled={this.state.exchangeRates? false: true}
                   />
                 </View>
               </View>
