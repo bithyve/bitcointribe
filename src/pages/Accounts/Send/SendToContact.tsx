@@ -715,12 +715,40 @@ class SendToContact extends Component<
       }
     });
     this.setState({ recipients: recipients });
-    transferST1(
-      serviceType,
-      recipients,
-      averageTxFees,
-      this.state.derivativeAccountDetails,
-    );
+
+
+    if(averageTxFees){
+      transferST1(
+        serviceType,
+        recipients,
+        averageTxFees,
+        this.state.derivativeAccountDetails,
+      );
+    } else {
+      // custom fee-fallback (missing txn fee intel)
+      const {
+        sweepSecure,
+        spendableBalance,
+        averageTxFees,
+        isSendMax,
+        derivativeAccountDetails,
+        donationId,
+      } = this.state;
+
+      const accountShellID = this.props.navigation.getParam('accountShellID');
+      this.props.navigation.navigate('SendConfirmation', {
+        accountShellID,
+        serviceType,
+        sweepSecure,
+        spendableBalance,
+        recipients,
+        averageTxFees,
+        isSendMax,
+        derivativeAccountDetails,
+        donationId,
+        feeIntelAbsent: true,
+      });
+    }
   };
 
   onConfirm = () => {
@@ -777,7 +805,7 @@ class SendToContact extends Component<
       });
     }
     setTimeout(() => {
-      this.handleTransferST1();
+        this.handleTransferST1();
     }, 10);
   };
 

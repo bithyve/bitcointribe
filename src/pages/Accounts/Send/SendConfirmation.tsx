@@ -67,6 +67,8 @@ import {
 import ConfirmedRecipientCarouselItem from '../../../components/send/ConfirmedRecipientCarouselItem';
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+import { processRecipients } from '../../../store/sagas/accounts';
+import { AccountsState } from '../../../store/reducers/accounts';
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -88,7 +90,7 @@ interface SendConfirmationStateTypes {
 
 interface SendConfirmationPropsTypes {
   navigation: any;
-  accounts: any[];
+  accounts: AccountsState;
   WALLET_SETUP: any;
   trustedContactsService: any;
   exchangeRates: any;
@@ -112,7 +114,7 @@ class SendConfirmation extends Component<
   NoInternetBottomSheet: any;
   unsubscribe: any;
   serviceType: any;
-  recipients: unknown[];
+  recipients: any;
   sweepSecure: any;
   donationId: string;
   spendableBalance: any;
@@ -120,6 +122,7 @@ class SendConfirmation extends Component<
   loading: any;
   viewRef: any;
   isSendMax: boolean;
+  feeIntelAbsent: boolean;
 
   constructor(props) {
     super(props);
@@ -129,7 +132,9 @@ class SendConfirmation extends Component<
     this.spendableBalance = props.navigation.getParam('spendableBalance');
     this.isSendMax = props.navigation.getParam('isSendMax');
     this.donationId = props.navigation.getParam('donationId');
-
+    this.feeIntelAbsent =  this.props.navigation.getParam(
+      'feeIntelAbsent',
+    );
     if (this.isSendMax) {
       setTimeout(() => {
         this.onPrioritySelect('Low Fee');
@@ -338,7 +343,7 @@ class SendConfirmation extends Component<
     }
   };
 
-  handleCustomFee = (amount, customEstimatedBlock) => {
+  handleCustomFee = async (amount, customEstimatedBlock) => {
     if (parseInt(amount) < 1) {
       this.setState({
         customFeePerByte: '',
@@ -348,9 +353,25 @@ class SendConfirmation extends Component<
     }
 
     const { service, transfer } = this.props.accounts[this.serviceType];
-    const outputs = transfer.stage1.txPrerequisites['high'].outputs.filter(
-      (output) => output.address,
-    );
+
+    let outputs;
+    if(this.feeIntelAbsent){
+        // process recipients & generate outputs(normally handled by transfer ST1 saga)
+        const processedRecipients = await processRecipients(this.recipients,this.serviceType, this.props.accounts, this.props.trustedContactsService)
+        const outputsArray = []
+        for (const recipient of processedRecipients) {
+          outputsArray.push({
+            address: recipient.address,
+            value: Math.round(recipient.amount) ,
+          });
+        }
+        outputs = outputsArray;
+      } else {
+       outputs = transfer.stage1.txPrerequisites['low'].outputs.filter(
+        (output) => output.address,
+      );
+    }
+   
     const customTxPrerequisites = service.calculateCustomFee(
       outputs,
       parseInt(amount),
@@ -735,7 +756,8 @@ class SendConfirmation extends Component<
             </View>
           </View>
 
-          <View style={styles.transactionPriorityView}>
+         <View style={styles.transactionPriorityView}>
+          {this.feeIntelAbsent? null: <View>
             <Text style={styles.transactionPriorityText}>
               Transaction Priority
             </Text>
@@ -903,6 +925,7 @@ class SendConfirmation extends Component<
                 </Text>
               </View>
             </View>
+            </View>} 
 
             {this.state.customFeePerByte !== '' && (
               <View
