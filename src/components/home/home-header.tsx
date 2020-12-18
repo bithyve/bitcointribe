@@ -57,6 +57,7 @@ const HomeHeader = ({
   const currencyKind: CurrencyKind = useCurrencyKind();
 
   const prefersBitcoin = useMemo(() => {
+    if (!currencyKind) return true;
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
@@ -164,9 +165,13 @@ const HomeHeader = ({
           <CurrencyKindToggleSwitch
             fiatCurrencyCode={CurrencyCode}
             onpress={() => {
-              dispatch(currencyKindSet(
-                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-              ));
+              try {
+                dispatch(currencyKindSet(
+                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                ));
+              }
+              catch (e) {
+              }
             }}
             isOn={prefersBitcoin}
           />
