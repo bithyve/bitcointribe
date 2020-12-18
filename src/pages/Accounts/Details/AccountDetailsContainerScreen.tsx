@@ -268,7 +268,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           onSettingsPressed={navigateToAccountSettings}
         />
 
-
         <View
           style={{
             paddingVertical: 20,
