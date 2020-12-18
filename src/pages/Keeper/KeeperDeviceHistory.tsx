@@ -152,6 +152,7 @@ const KeeperDeviceHistory = (props) => {
   useEffect(() => {
     (async () => {
       if (!isReshare) {
+        setQrBottomSheetsFlag(true);
         (QrBottomSheet as any).current.snapTo(1);
       }
       const shareHistory = JSON.parse(
@@ -312,6 +313,7 @@ const KeeperDeviceHistory = (props) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           if (isPrimaryKeeper) {
+            setQrBottomSheetsFlag(true);
             (QrBottomSheet as any).current.snapTo(1);
           } else {
             sendApprovalRequestToPK();
@@ -356,6 +358,7 @@ const KeeperDeviceHistory = (props) => {
           changeButtonText={'Change Keeper'}
           onPressChange={() => {
             if (isPrimaryKeeper) {
+              setQrBottomSheetsFlag(true);
               (QrBottomSheet as any).current.snapTo(1);
             } else {
               sendApprovalRequestToPK();
@@ -376,7 +379,7 @@ const KeeperDeviceHistory = (props) => {
       />
       <BottomSheet
         onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
+            setQrBottomSheetsFlag(true);
         }}
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
