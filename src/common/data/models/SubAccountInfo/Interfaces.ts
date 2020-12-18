@@ -81,6 +81,7 @@ export type SubAccountDescribingConstructorProps = {
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
+  defaultDescription?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;
   balances?: Balances;

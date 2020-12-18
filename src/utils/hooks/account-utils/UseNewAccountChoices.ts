@@ -86,6 +86,7 @@ export default function useNewAccountChoices() {
               ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
               : ''
           }`,
+          defaultDescription: 'Directly Accept Donations',
           doneeName: '',
           causeName: '',
         } ),
