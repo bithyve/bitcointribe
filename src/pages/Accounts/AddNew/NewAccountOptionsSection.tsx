@@ -117,6 +117,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.secondaryBackgroundColor,
+    borderRadius: 12,
   },
 
   listContentContainer: {
