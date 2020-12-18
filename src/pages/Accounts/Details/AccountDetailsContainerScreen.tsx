@@ -79,10 +79,13 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     }
     : null
 
-
   const isRefreshing = useMemo( () => {
     return accountShell.isSyncInProgress
   }, [ accountShell.isSyncInProgress ] )
+
+  const isShowingDonationButton = useMemo( () => {
+    return primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT
+  }, [ primarySubAccount.kind ] )
 
   const {
     present: presentBottomSheet,
@@ -238,7 +241,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } ) )
   }, [] )
 
-
   useEffect( () => {
     // missing fee & exchange rates patch(restore & upgrade)
     if (
@@ -284,20 +286,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
         </View>
 
-        {primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT && (
-          <View style={{
-            alignItems: 'center',
-          }}>
-            <Button
-              raised
-              buttonStyle={ButtonStyles.primaryActionButton}
-              title="Donation Webpage"
-              titleStyle={ButtonStyles.actionButtonText}
-              onPress={showDonationWebViewSheet}
-            />
-          </View>
-        )}
-
         {/* <TransactionPreviewTabs  */}
 
         {/* /> */}
@@ -315,6 +303,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         </View>
 
         <View style={styles.footerSection}>
+
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
               navigation.navigate( 'Send', {
@@ -339,6 +328,21 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                 : NetworkKind.MAINNET
             }
           />
+
+          {isShowingDonationButton && (
+            <View style={{
+              alignItems: 'center',
+              marginTop: 36,
+            }}>
+              <Button
+                raised
+                buttonStyle={ButtonStyles.floatingActionButton}
+                title="Donation Webpage"
+                titleStyle={ButtonStyles.actionButtonText}
+                onPress={showDonationWebViewSheet}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -358,6 +362,7 @@ const styles = StyleSheet.create( {
     paddingVertical: 38,
     marginBottom: 25
   },
+
 } )
 
 AccountDetailsContainerScreen.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {

@@ -28,7 +28,8 @@ export type Props = {
 };
 
 const FooterButton: React.FC<FooterButtonProps> = ( {
-  style,
+  style = {
+  },
   title,
   subtitle,
   imageSource,
@@ -38,7 +39,8 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
     <TouchableOpacity
       onPress={onPress}
       style={{
-        ...styles.buttonContainer, ...style
+        ...styles.buttonContainer,
+        ...style
       }}
     >
       <View style={styles.buttonImageContainer}>
@@ -94,8 +96,9 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 18,
+    paddingHorizontal: 24,
     borderRadius: 15,
-    borderColor: Colors.borderColor,
+    borderColor: '#E3E3E3',
     borderWidth: 1,
     backgroundColor: Colors.white,
   },

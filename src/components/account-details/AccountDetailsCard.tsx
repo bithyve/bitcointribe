@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   View,
   Text,
@@ -6,18 +6,18 @@ import {
   ImageBackground,
   Image,
   ImageSourcePropType,
-} from 'react-native';
-import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import Fonts from '../../common/Fonts';
-import Colors from '../../common/Colors';
-import ButtonStyles from '../../common/Styles/ButtonStyles';
-import { RFValue } from 'react-native-responsive-fontsize';
-import LabeledBalanceDisplay from '../LabeledBalanceDisplay';
-import { Button } from 'react-native-elements';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import AccountShell from '../../common/data/models/AccountShell';
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
+} from 'react-native'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import Fonts from '../../common/Fonts'
+import Colors from '../../common/Colors'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import { RFValue } from 'react-native-responsive-fontsize'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
+import { Button } from 'react-native-elements'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import AccountShell from '../../common/data/models/AccountShell'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   accountShell: AccountShell;
@@ -28,96 +28,98 @@ export type Props = {
 function backgroundImageForAccountKind(
   accountKind: SubAccountKind,
 ): ImageSourcePropType {
-  switch (accountKind) {
-    case SubAccountKind.TEST_ACCOUNT:
-      return require('../../assets/images/carouselImages/test_account_background.png');
-    case SubAccountKind.REGULAR_ACCOUNT:
-      return require('../../assets/images/carouselImages/regular_account_background.png');
-    case SubAccountKind.SECURE_ACCOUNT:
-      return require('../../assets/images/carouselImages/savings_account_background.png');
-    case SubAccountKind.DONATION_ACCOUNT:
-      return require('../../assets/images/carouselImages/donation_account_background.png');
-    default:
-      return require('../../assets/images/carouselImages/savings_account_background.png');
+  switch ( accountKind ) {
+      case SubAccountKind.TEST_ACCOUNT:
+        return require( '../../assets/images/carouselImages/test_account_background.png' )
+      case SubAccountKind.REGULAR_ACCOUNT:
+        return require( '../../assets/images/carouselImages/regular_account_background.png' )
+      case SubAccountKind.SECURE_ACCOUNT:
+        return require( '../../assets/images/carouselImages/savings_account_background.png' )
+      case SubAccountKind.DONATION_ACCOUNT:
+        return require( '../../assets/images/carouselImages/donation_account_background.png' )
+      default:
+        return require( '../../assets/images/carouselImages/savings_account_background.png' )
   }
 }
 
-function shadowColorForAccountKind(accountKind: SubAccountKind): string {
-  switch (accountKind) {
-    case SubAccountKind.TEST_ACCOUNT:
-      return Colors.blue;
-    case SubAccountKind.REGULAR_ACCOUNT:
-      return Colors.yellow;
-    case SubAccountKind.SECURE_ACCOUNT:
-      return Colors.green;
-    case SubAccountKind.DONATION_ACCOUNT:
-      return Colors.borderColor;
-    default:
-      return Colors.borderColor;
+function shadowColorForAccountKind( accountKind: SubAccountKind ): string {
+  switch ( accountKind ) {
+      case SubAccountKind.TEST_ACCOUNT:
+        return Colors.blue
+      case SubAccountKind.REGULAR_ACCOUNT:
+        return Colors.yellow
+      case SubAccountKind.SECURE_ACCOUNT:
+        return Colors.green
+      case SubAccountKind.DONATION_ACCOUNT:
+        return Colors.borderColor
+      default:
+        return Colors.borderColor
   }
 }
 
-const AccountDetailsCard: React.FC<Props> = ({
+const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
-}: Props) => {
-  const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
+}: Props ) => {
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
-  const rootContainerStyle = useMemo(() => {
+  const rootContainerStyle = useMemo( () => {
     return {
       ...styles.rootContainer,
-      shadowColor: shadowColorForAccountKind(primarySubAccountInfo?.kind),
-    };
-  }, [primarySubAccountInfo]);
+      shadowColor: shadowColorForAccountKind( primarySubAccount?.kind ),
+    }
+  }, [ primarySubAccount ] )
+
 
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+
+        <View style={{
+          flexDirection: 'row', alignItems: 'flex-start'
+        }}>
           <Image
-            source={getAvatarForSubAccount(primarySubAccountInfo)}
+            source={getAvatarForSubAccount( primarySubAccount )}
             style={styles.accountKindBadgeImage}
           />
 
-          <View style={{ marginLeft: 'auto' }}>
+          <View style={{
+            marginLeft: 'auto'
+          }}>
             <SettingsButton />
           </View>
         </View>
 
-        <View>
-          <Text
-            style={{
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(15),
-              color: Colors.white,
-            }}
-          >
-            {primarySubAccountInfo.customDisplayName ||
-              primarySubAccountInfo.defaultTitle}
-          </Text>
 
-          <Text
-            style={{
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12),
-              color: Colors.white,
-              marginTop: 2,
-            }}
-          >
-            {primarySubAccountInfo.customDescription ||
-              primarySubAccountInfo.defaultDescription}
-          </Text>
+        <View style={{
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+        }}>
+          <View>
+            <Text style={styles.title1Text}>
+              {primarySubAccount.customDisplayName ||
+              primarySubAccount.defaultTitle}
+            </Text>
+
+            <Text style={styles.title2Text}>
+              {primarySubAccount.customDescription ||
+              primarySubAccount.defaultDescription}
+            </Text>
+          </View>
+
+          {primarySubAccount.isTFAEnabled && (
+            <Text style={styles.title1Text}>2FA</Text>
+          )}
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   const FooterSection: React.FC = () => {
     return (
       <View style={styles.footerSection}>
         <LabeledBalanceDisplay
-          balance={AccountShell.getTotalBalance(accountShell)}
+          balance={AccountShell.getTotalBalance( accountShell )}
           bitcoinUnit={accountShell.unit}
           amountTextStyle={styles.balanceAmountText}
           unitTextStyle={styles.balanceUnitText}
@@ -128,8 +130,8 @@ const AccountDetailsCard: React.FC<Props> = ({
 
         <KnowMoreButton />
       </View>
-    );
-  };
+    )
+  }
 
   const KnowMoreButton: React.FC = () => {
     return (
@@ -148,8 +150,8 @@ const AccountDetailsCard: React.FC<Props> = ({
         titleStyle={ButtonStyles.actionButtonText}
         onPress={onKnowMorePressed}
       />
-    );
-  };
+    )
+  }
 
   const SettingsButton: React.FC = () => {
     return (
@@ -158,17 +160,17 @@ const AccountDetailsCard: React.FC<Props> = ({
         onPress={onSettingsPressed}
       >
         <Image
-          source={require('../../assets/images/icons/icon_settings.png')}
+          source={require( '../../assets/images/icons/icon_settings.png' )}
           style={styles.settingsButtonImage}
         />
       </TouchableOpacity>
-    );
-  };
+    )
+  }
 
   return (
     <View style={rootContainerStyle}>
       <ImageBackground
-        source={backgroundImageForAccountKind(primarySubAccountInfo?.kind)}
+        source={backgroundImageForAccountKind( primarySubAccount?.kind )}
         style={{
           ...StyleSheet.absoluteFillObject,
         }}
@@ -180,12 +182,12 @@ const AccountDetailsCard: React.FC<Props> = ({
         </View>
       </ImageBackground>
     </View>
-  );
-};
+  )
+}
 
-const cardBorderRadius = 15;
+const cardBorderRadius = 15
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
     maxWidth: 440,
@@ -194,7 +196,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     shadowOpacity: 0.62,
     shadowRadius: 14,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0, height: 10
+    },
     position: 'relative',
   },
 
@@ -224,6 +228,19 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     resizeMode: 'contain',
+  },
+
+  title1Text: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 15 ),
+    color: Colors.white,
+  },
+
+  title2Text: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    color: Colors.white,
+    marginTop: 2,
   },
 
   footerSection: {
@@ -260,6 +277,6 @@ const styles = StyleSheet.create({
     height: 24,
     width: 24,
   },
-});
+} )
 
-export default AccountDetailsCard;
+export default AccountDetailsCard
