@@ -17,28 +17,19 @@ export default function NoInternetModalContents(props) {
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%' }}>
             <View style={styles.successModalHeaderView}>
-                <Text style={styles.modalTitleText}>No Internet{"\n"}Connection</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
+                <Text style={styles.modalTitleText}>Currency Converter{"\n"}Not Available</Text>
+                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem fetching {"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>bitcoin exchange rates</Text></Text>
             </View>
             <View style={styles.successModalAmountView}>
-                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>Some of the features will not work as expected in your Hexa app, including:</Text>
-                <View style={{  }}>
+                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>Balance and transaction amounts will be displayed in sats while this problem persists. Please check your internet connection or try after sometime</Text>
+                <View style={{}}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={{ ...styles.modalInfoText, }}>fetching your balance and transactions</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                        <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={styles.modalInfoText}>sending sats</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                        <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={styles.modalInfoText}>contact requests
-</Text>
+                        <Text style={{ ...styles.modalInfoText, }}>Switching currency to USD or other currency on home page</Text>
                     </View>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems:'center' }} >
+            <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems: 'center' }} >
                 <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
                     style={{ ...styles.successModalButtonView }}
