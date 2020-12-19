@@ -5,24 +5,24 @@ import {
     Text,
     StyleSheet,
 } from 'react-native';
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from '../common/Colors';
+import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Entypo from "react-native-vector-icons/Entypo"
-import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import Entypo from 'react-native-vector-icons/Entypo'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function NoInternetModalContents(props) {
 
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%' }}>
             <View style={styles.successModalHeaderView}>
-                <Text style={styles.modalTitleText}>No Internet{"\n"}Connection</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
+                <Text style={styles.modalTitleText}>No Internet{'\n'}Connection</Text>
+                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{'\n'}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
             </View>
             <View style={styles.successModalAmountView}>
                 <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>Some of the features will not work as expected in your Hexa app, including:</Text>
-                <View style={{  }}>
+                <View style={{}}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
                         <Text style={{ ...styles.modalInfoText, }}>fetching your balance and transactions</Text>
@@ -38,7 +38,7 @@ export default function NoInternetModalContents(props) {
                     </View>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems:'center' }} >
+            <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems: 'center' }} >
                 <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
                     style={{ ...styles.successModalButtonView }}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         width: wp('25%'),
         height: hp('18%'),
         marginLeft: 'auto',
-        resizeMode: "cover"
+        resizeMode: 'cover'
     },
     proceedButtonText: {
         color: Colors.white,
