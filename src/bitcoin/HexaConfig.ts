@@ -11,6 +11,7 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../common/constants/serviceTypes';
+import { AsyncStorage } from 'react-native';
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -260,6 +261,8 @@ class HexaConfig {
     } else {
       this.APP_STAGE = 'app';
     }
+
+    this.connectToOwnNode();
   }
 
   public setNetwork = (): void => {
@@ -269,6 +272,31 @@ class HexaConfig {
       this.NETWORK = bitcoinJS.networks.testnet;
     }
   };
+
+  public connectToOwnNode =  async () => {
+    let ownNodes:any = await AsyncStorage.getItem('OwnNodes')
+
+    if(ownNodes){
+      ownNodes = JSON.parse(ownNodes);
+      const ownNodeURL = ownNodes.urls[ownNodes.active];
+      if(ownNodeURL){
+        this.ESPLORA_API_ENDPOINTS = {
+          ...this.ESPLORA_API_ENDPOINTS,
+           MAINNET: {
+              MULTIBALANCE: ownNodeURL + '/balances',
+              MULTIUTXO:  ownNodeURL + '/utxos',
+              MULTITXN: ownNodeURL + '/data',
+              MULTIBALANCETXN: ownNodeURL + '/baltxs',
+              MULTIUTXOTXN: ownNodeURL + '/utxotxs', 
+              NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
+              TXN_FEE: ownNodeURL  + 'fee-estimates',
+              TXNDETAILS: ownNodeURL + '/tx',
+              BROADCAST_TX: ownNodeURL + '/tx',
+          },
+        }
+      }
+    }
+  }
 }
 
 export default new HexaConfig(Config.BIT_ENVIRONMENT.trim());
