@@ -1,18 +1,19 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, SectionList } from 'react-native';
-import NewAccountOptionsSection from './NewAccountOptionsSection';
-import HeadingStyles from '../../../common/Styles/HeadingStyles';
-import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../common/Styles/ButtonStyles';
-import SubAccountKind from '../../../common/data/enums/SubAccountKind';
-import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
-import { addNewAccountShell } from '../../../store/actions/accounts';
-import { useDispatch } from 'react-redux';
-import { resetToHomeAction } from '../../../navigation/actions/NavigationActions';
-import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind';
-import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
-import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices';
+import React, { useMemo, useState } from 'react'
+import { View, Text, StyleSheet, SectionList, SafeAreaView } from 'react-native'
+import NewAccountOptionsSection from './NewAccountOptionsSection'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
+import { Button } from 'react-native-elements'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
+import { addNewAccountShell } from '../../../store/actions/accounts'
+import { useDispatch } from 'react-redux'
+import { resetToHomeAction } from '../../../navigation/actions/NavigationActions'
+import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
+import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -20,96 +21,96 @@ export enum SectionKind {
   IMPORT_WALLET,
 }
 
-const sectionListItemKeyExtractor = (index) => index;
+const sectionListItemKeyExtractor = ( index ) => index
 
-function titleForSectionHeader(kind: SectionKind) {
-  switch (kind) {
-    case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-      return 'Create a Hexa Account';
-    case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-      return 'Integrate a Service';
-    case SectionKind.IMPORT_WALLET:
-      return 'Import a Wallet';
+function titleForSectionHeader( kind: SectionKind ) {
+  switch ( kind ) {
+      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+        return 'Create a Hexa Account'
+      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+        return 'Integrate a Service'
+      case SectionKind.IMPORT_WALLET:
+        return 'Import a Wallet'
   }
 }
 
-function renderSectionHeader({ section }) {
-  const kind: SectionKind = section.kind;
+function renderSectionHeader( { section } ) {
+  const kind: SectionKind = section.kind
 
   return (
-    <Text style={[HeadingStyles.listSectionHeading, styles.listSectionHeading]}>
-      {titleForSectionHeader(kind)}
+    <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
+      {titleForSectionHeader( kind )}
     </Text>
-  );
+  )
 }
 
 export interface Props {
   navigation: any;
 }
 
-const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
-  useAccountShellCreationCompletionEffect(() => {
-    console.log('dispatching resetToHomeAction');
-    navigation.dispatch(resetToHomeAction());
-  });
+const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  useAccountShellCreationCompletionEffect( () => {
+    console.log( 'dispatching resetToHomeAction' )
+    navigation.dispatch( resetToHomeAction() )
+  } )
 
-  const dispatch = useDispatch();
-  const newAccountChoices = useNewAccountChoices();
-  const [selectedChoice, setSelectedChoice] = useState<SubAccountDescribing>(
+  const dispatch = useDispatch()
+  const newAccountChoices = useNewAccountChoices()
+  const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
-  );
+  )
 
-  const canProceed = useMemo(() => {
-    return selectedChoice !== null;
-  }, [selectedChoice]);
+  const canProceed = useMemo( () => {
+    return selectedChoice !== null
+  }, [ selectedChoice ] )
 
   function handleProceedButtonPress() {
-    if (selectedChoice.kind === SubAccountKind.SERVICE) {
+    if ( selectedChoice.kind === SubAccountKind.SERVICE ) {
       // TODO: Implement alongside supporting Service integration from "Add New".
       //  - Present options for choosing b/w a standalone
       //    service account or adding it to a Hexa
       //    account (e.g. Checking or Savings account).
       switch (
-        (selectedChoice as ExternalServiceSubAccountInfo).serviceAccountKind
+        ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind
       ) {
-        case ServiceAccountKind.FAST_BITCOINS:
-          dispatch(addNewAccountShell(selectedChoice));
-          break;
-        default:
-          break;
+          case ServiceAccountKind.FAST_BITCOINS:
+            dispatch( addNewAccountShell( selectedChoice ) )
+            break
+          default:
+            break
       }
     }
 
-    switch (selectedChoice.kind) {
-      case SubAccountKind.TEST_ACCOUNT:
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        navigation.navigate('AddNewHexaAccountDetails', {
-          currentSubAccountInfo: selectedChoice,
-        });
-        break;
-      case SubAccountKind.DONATION_ACCOUNT:
+    switch ( selectedChoice.kind ) {
+        case SubAccountKind.TEST_ACCOUNT:
+        case SubAccountKind.REGULAR_ACCOUNT:
+        case SubAccountKind.SECURE_ACCOUNT:
+          navigation.navigate( 'AddNewHexaAccountDetails', {
+            currentSubAccountInfo: selectedChoice,
+          } )
+          break
+        case SubAccountKind.DONATION_ACCOUNT:
         // TODO: Implement alongside Re-integrating current "Add donation account" UI.
-        selectedChoice.defaultTitle = ''
-        selectedChoice.defaultDescription = ''
-        navigation.navigate('AddNewDonationAccountDetails', {
-          currentSubAccountInfo: selectedChoice,
-        });
-        break;
-      case SubAccountKind.TRUSTED_CONTACTS:
-        dispatch(addNewAccountShell(selectedChoice));
-        break;
-      case SubAccountKind.FULLY_IMPORTED_WALLET:
-      case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
+          selectedChoice.defaultTitle = ''
+          selectedChoice.defaultDescription = ''
+          navigation.navigate( 'AddNewDonationAccountDetails', {
+            currentSubAccountInfo: selectedChoice,
+          } )
+          break
+        case SubAccountKind.TRUSTED_CONTACTS:
+          dispatch( addNewAccountShell( selectedChoice ) )
+          break
+        case SubAccountKind.FULLY_IMPORTED_WALLET:
+        case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         // TODO: Implement alongside supporting Import integration from "Add New".
-        break;
-      default:
-        break;
+          break
+        default:
+          break
     }
   }
 
-  function handleChoiceSelection(choice: SubAccountDescribing) {
-    setSelectedChoice(choice);
+  function handleChoiceSelection( choice: SubAccountDescribing ) {
+    setSelectedChoice( choice )
   }
 
   const ListFooter: React.FC = () => {
@@ -124,19 +125,21 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
           disabled={canProceed === false}
         />
       </View>
-    );
-  };
+    )
+  }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
       <SectionList
-        contentContainerStyle={{ paddingVertical: 25 }}
+        contentContainerStyle={{
+          paddingVertical: 25
+        }}
         ListFooterComponent={<ListFooter />}
-        extraData={[selectedChoice]}
+        extraData={[ selectedChoice ]}
         sections={[
           {
             kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
-            data: [newAccountChoices.hexaAccounts],
+            data: [ newAccountChoices.hexaAccounts ],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
@@ -146,12 +149,12 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
                     onOptionSelected={handleChoiceSelection}
                   />
                 </View>
-              );
+              )
             },
           },
           {
             kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
-            data: [newAccountChoices.serviceAccounts],
+            data: [ newAccountChoices.serviceAccounts ],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
@@ -161,12 +164,12 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
                     onOptionSelected={handleChoiceSelection}
                   />
                 </View>
-              );
+              )
             },
           },
           {
             kind: SectionKind.IMPORT_WALLET,
-            data: [newAccountChoices.importedWalletAccounts],
+            data: [ newAccountChoices.importedWalletAccounts ],
             renderItem: () => {
               return (
                 <View style={styles.viewSectionContainer}>
@@ -176,7 +179,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
                     onOptionSelected={handleChoiceSelection}
                   />
                 </View>
-              );
+              )
             },
           },
         ]}
@@ -184,21 +187,24 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ({ navigation }: Pro
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
       ></SectionList>
-    </View>
-  );
-};
+    </SafeAreaView>
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
 
   listSectionHeading: {
+    fontSize: RFValue( 14 ),
     marginBottom: 12,
+    paddingHorizontal: 24,
   },
 
   viewSectionContainer: {
-    marginBottom: 32,
+    marginBottom: 22,
+    marginHorizontal: 24,
   },
 
   listFooterSection: {
@@ -206,6 +212,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     alignItems: 'flex-start',
   },
-});
+} )
 
-export default NewAccountSelectionContainerScreen;
+export default NewAccountSelectionContainerScreen
