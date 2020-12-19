@@ -715,16 +715,44 @@ class SendToContact extends Component<
       }
     });
     this.setState({ recipients: recipients });
-    transferST1(
-      serviceType,
-      recipients,
-      averageTxFees,
-      this.state.derivativeAccountDetails,
-    );
+
+
+    if(averageTxFees){
+      transferST1(
+        serviceType,
+        recipients,
+        averageTxFees,
+        this.state.derivativeAccountDetails,
+      );
+    } else {
+      // custom fee-fallback (missing txn fee intel)
+      const {
+        sweepSecure,
+        spendableBalance,
+        averageTxFees,
+        isSendMax,
+        derivativeAccountDetails,
+        donationId,
+      } = this.state;
+
+      const accountShellID = this.props.navigation.getParam('accountShellID');
+      this.props.navigation.navigate('SendConfirmation', {
+        accountShellID,
+        serviceType,
+        sweepSecure,
+        spendableBalance,
+        recipients,
+        averageTxFees,
+        isSendMax,
+        derivativeAccountDetails,
+        donationId,
+        feeIntelAbsent: true,
+      });
+    }
   };
 
   onConfirm = () => {
-    console.log("INSIDE onconfirm")
+
     const {
       clearTransfer,
       accountsState,
@@ -777,7 +805,7 @@ class SendToContact extends Component<
       });
     }
     setTimeout(() => {
-      this.handleTransferST1();
+        this.handleTransferST1();
     }, 10);
   };
 
@@ -1046,6 +1074,7 @@ class SendToContact extends Component<
                         : Colors.backgroundColor,
                     }}
                     onPress={this.sendMaxHandler}
+                    disabled={this.state.averageTxFees? false: true}
                   >
                     <View style={styles.amountInputImage}>
                       {materialIconCurrencyCodes.includes(CurrencyCode) ? (
@@ -1113,7 +1142,7 @@ class SendToContact extends Component<
                     {!prefersBitcoin && (
                       <Text
                         style={{
-                          color: Colors.blue,
+                          color: this.state.averageTxFees? Colors.blue: Colors.lightBlue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue(10),
@@ -1152,6 +1181,7 @@ class SendToContact extends Component<
                         : Colors.backgroundColor,
                     }}
                     onPress={this.sendMaxHandler}
+                    disabled={this.state.averageTxFees? false: true}
                   >
                     <View style={styles.amountInputImage}>
                       <Image
@@ -1208,7 +1238,7 @@ class SendToContact extends Component<
                     {prefersBitcoin && (
                       <Text
                         style={{
-                          color: Colors.blue,
+                          color: this.state.averageTxFees? Colors.blue: Colors.lightBlue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue(10),
@@ -1238,6 +1268,7 @@ class SendToContact extends Component<
                     }}
                     isOn={prefersBitcoin}
                     isVertical={true}
+                    disabled={this.state.exchangeRates? false: true}
                   />
                 </View>
               </View>

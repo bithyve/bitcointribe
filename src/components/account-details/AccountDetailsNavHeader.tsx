@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native';
 import Colors from '../../common/Colors';
@@ -13,6 +13,7 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
 
 
 export type Props = {
@@ -28,6 +29,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   const accountShell = useAccountShellForID(accountShellID);
   const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
+  const {exchangeRates} = useAccountsState()
   const currencyCode = useCurrencyCode();
   const currencyKind = useCurrencyKind();
 
@@ -97,6 +99,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
                 ));
               }}
               isOn={prefersBitcoin}
+              disabled={exchangeRates? false: true}
             />
           </View>
         </View>
