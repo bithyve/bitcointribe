@@ -79,6 +79,7 @@ import BitcoinUnit from "../../common/data/enums/BitcoinUnit";
 import SubAccountKind from "../../common/data/enums/SubAccountKind";
 import Relay from "../../bitcoin/utilities/Relay";
 import RelayServices from "../../bitcoin/services/RelayService";
+import { AccountsState } from "../reducers/accounts";
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -423,7 +424,7 @@ export const syncViaXpubAgentWatcher = createWatcher(
   SYNC_VIA_XPUB_AGENT
 );
 
-function* processRecipients(
+export const processRecipients = async(
   recipients: [
     {
       id: string;
@@ -433,22 +434,15 @@ function* processRecipients(
       accountNumber?: number;
     }
   ],
-  serviceType: string
-) {
+  serviceType: string,
+  accounts: AccountsState,
+  trustedContactsServices: TrustedContactsService
+)  => {
   const addressedRecipients = [];
-  const testAccount: TestAccount = yield select(
-    (state) => state.accounts[TEST_ACCOUNT].service
-  );
-  const regularAccount: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service
-  );
-  const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service
-  );
-
-  const trustedContactsServices: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service
-  );
+  const testAccount: TestAccount = accounts[TEST_ACCOUNT].service
+  const regularAccount: RegularAccount = accounts[REGULAR_ACCOUNT].service
+  const secureAccount: SecureAccount = accounts[SECURE_ACCOUNT].service
+  
   for (const recipient of recipients) {
     if (recipient.address) addressedRecipients.push(recipient);
     // recipient: explicit address
@@ -495,12 +489,10 @@ function* processRecipients(
 
           if (serviceType !== TEST_ACCOUNT) {
             if (contactDetails && contactDetails.xpub) {
-              res = yield call(
-                regularAccount.getDerivativeAccAddress,
-                TRUSTED_CONTACTS,
-                null,
-                contactName
-              );
+              res = await
+                regularAccount.getDerivativeAccAddress( TRUSTED_CONTACTS,
+                  null,
+                  contactName);
             } else {
               const {
                 trustedAddress,
@@ -514,10 +506,7 @@ function* processRecipients(
             }
           } else {
             if (contactDetails && contactDetails.tpub) {
-              res = yield call(
-                testAccount.deriveReceivingAddress,
-                contactDetails.tpub
-              );
+              res = await testAccount.deriveReceivingAddress(contactDetails.tpub);
             } else {
               const {
                 trustedTestAddress,
@@ -560,16 +549,24 @@ function* transferST1Worker({ payload }) {
   let { recipients, averageTxFees, derivativeAccountDetails } = payload;
   console.log({ recipients });
 
+  const accounts: AccountsState = yield select(
+    (state) => state.accounts
+  );
+
+  const trustedContactsServices: TrustedContactsService = 
+  yield select(
+    (state) => state.trustedContacts.service
+  );
+
   try {
-    recipients = yield call(processRecipients, recipients, payload.serviceType);
+    recipients = yield call(processRecipients, recipients, payload.serviceType, accounts, trustedContactsServices);
   } catch (err) {
     yield put(failedST1(payload.serviceType, { err }));
     return;
   }
   console.log({ recipients });
-  const service = yield select(
-    (state) => state.accounts[payload.serviceType].service
-  );
+  const service = accounts[payload.serviceType].service;
+
   const res = yield call(
     service.transferST1,
     recipients,
@@ -603,8 +600,8 @@ function* transferST2Worker({ payload }) {
     (state) => state.accounts[serviceType]
   );
 
-  const { txPrerequisites } = transfer.stage1;
-  if (!txPrerequisites) {
+  const { txPrerequisites } = transfer.stage1? transfer.stage1: {txPrerequisites: null};
+  if (!txPrerequisites && !customTxPrerequisites) {
     console.log("Transaction prerequisites missing");
     return;
   }

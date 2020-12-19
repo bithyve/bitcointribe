@@ -173,6 +173,7 @@ const HomeHeader = ({
               catch (e) {
               }
             }}
+            disabled={exchangeRates? false: true}
             isOn={prefersBitcoin}
           />
           <TouchableOpacity
