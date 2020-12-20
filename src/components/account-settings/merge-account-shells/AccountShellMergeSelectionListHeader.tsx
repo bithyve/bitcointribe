@@ -1,28 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import ListStyles from '../../../common/Styles/ListStyles';
-import ImageStyles from '../../../common/Styles/ImageStyles';
-import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
-import AccountShell from '../../../common/data/models/AccountShell';
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import { RFValue } from 'react-native-responsive-fontsize';
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
+import React from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import ListStyles from '../../../common/Styles/ListStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import AccountShell from '../../../common/data/models/AccountShell'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { RFValue } from 'react-native-responsive-fontsize'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   sourceShell: AccountShell;
 };
 
-const AccountShellMergeSelectionListHeader: React.FC<Props> = ({
-  sourceShell,
-}: Props) => {
-  const primarySubAccount = usePrimarySubAccountForShell(sourceShell);
+const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }: Props) => {
+  const primarySubAccount = usePrimarySubAccountForShell(sourceShell)
 
   return (
     <View style={styles.rootContainer}>
 
-      <ListItem pad={4} containerStyle={{ marginBottom: 36 }}>
+      <ListItem pad={4} containerStyle={{
+        marginBottom: 36 
+      }}>
 
         <Image
           source={getAvatarForSubAccount(primarySubAccount)}
@@ -50,7 +50,7 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({
             numberOfLines={1}
           >
             {primarySubAccount.balance} Sats
-        </ListItem.Subtitle>
+          </ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
 
@@ -58,8 +58,8 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({
         Choose a destination to merge this account's sub-accounts into.
       </Text>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
     ...ImageStyles.thumbnailImageXLarge,
     marginRight: 8,
   },
-});
+})
 
-export default AccountShellMergeSelectionListHeader;
+export default AccountShellMergeSelectionListHeader
