@@ -1,16 +1,16 @@
-import { v4 as uuid } from 'uuid';
-import SubAccountKind from '../../enums/SubAccountKind';
+import { v4 as uuid } from 'uuid'
+import SubAccountKind from '../../enums/SubAccountKind'
 import {
   DonationSubAccountDescribing,
   SubAccountDescribingConstructorProps,
-} from './Interfaces';
-import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
-import AccountVisibility from '../../enums/AccountVisibility';
+} from './Interfaces'
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
+import AccountVisibility from '../../enums/AccountVisibility'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../bitcoin/utilities/Interface';
-import SourceAccountKind from '../../enums/SourceAccountKind';
+} from '../../../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../enums/SourceAccountKind'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   doneeName: string;
@@ -18,7 +18,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 };
 
 export default class DonationSubAccountInfo
-  implements DonationSubAccountDescribing {
+implements DonationSubAccountDescribing {
   id: string;
   accountShellID: string | null;
   instanceNumber: number;
@@ -31,7 +31,7 @@ export default class DonationSubAccountInfo
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = 'Directly Accept Donations';
+  defaultDescription = 'Directly Accept Donations';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -51,7 +51,9 @@ export default class DonationSubAccountInfo
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Donation Account',
-    balances = { confirmed: 0, unconfirmed: 0 },
+    balances = {
+      confirmed: 0, unconfirmed: 0 
+    },
     customDisplayName = null,
     customDescription = null,
     doneeName,
@@ -61,21 +63,21 @@ export default class DonationSubAccountInfo
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps) {
-    this.id = id;
-    this.accountShellID = accountShellID;
-    this.instanceNumber = instanceNumber;
-    this.defaultTitle = defaultTitle;
-    this.balances = balances;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
-    this.visibility = visibility;
-    this.isTFAEnabled = isTFAEnabled;
+    this.id = id
+    this.accountShellID = accountShellID
+    this.instanceNumber = instanceNumber
+    this.defaultTitle = defaultTitle
+    this.balances = balances
+    this.customDisplayName = customDisplayName
+    this.customDescription = customDescription
+    this.visibility = visibility
+    this.isTFAEnabled = isTFAEnabled
     this.sourceKind = isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
-      : SourceAccountKind.REGULAR_ACCOUNT;
-    this.doneeName = doneeName;
-    this.causeName = causeName;
-    this.transactions = transactions;
-    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
+      : SourceAccountKind.REGULAR_ACCOUNT
+    this.doneeName = doneeName
+    this.causeName = causeName
+    this.transactions = transactions
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup
   }
 }
