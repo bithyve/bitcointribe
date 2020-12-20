@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import Colors from "../Colors";
-import Fonts from "../Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const HeadingStyles = StyleSheet.create({
@@ -25,6 +25,6 @@ const HeadingStyles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.gray6,
   },
-});
+})
 
-export default HeadingStyles;
+export default HeadingStyles

@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import Colors from "../Colors";
-import Fonts from "../Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const BottomSheetStyles = StyleSheet.create({
@@ -11,6 +11,6 @@ const BottomSheetStyles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
     color: Colors.blue,
   },
-});
+})
 
-export default BottomSheetStyles;
+export default BottomSheetStyles

@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import Colors from "../Colors";
-import Fonts from "../Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const ListStyles = StyleSheet.create({
@@ -37,6 +37,6 @@ const ListStyles = StyleSheet.create({
     width: 44,
     height: 44,
   },
-});
+})
 
-export default ListStyles;
+export default ListStyles
