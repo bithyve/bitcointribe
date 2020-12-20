@@ -4,4 +4,4 @@ enum SourceAccountKind {
   SECURE_ACCOUNT = 'SECURE_ACCOUNT',
 }
 
-export default SourceAccountKind;
+export default SourceAccountKind

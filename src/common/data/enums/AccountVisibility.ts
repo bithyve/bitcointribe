@@ -28,4 +28,4 @@ enum AccountVisibility {
   ARCHIVED,
 }
 
-export default AccountVisibility;
+export default AccountVisibility
