@@ -1,17 +1,17 @@
-import Client from 'bitcoin-core';
-import * as bitcoinJS from 'bitcoinjs-lib';
+import Client from 'bitcoin-core'
+import * as bitcoinJS from 'bitcoinjs-lib'
 import {
   DerivativeAccount,
   DerivativeAccounts,
   TrustedContactDerivativeAccount,
   DonationDerivativeAccount,
-} from './utilities/Interface';
-import Config from 'react-native-config';
+} from './utilities/Interface'
+import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-} from '../common/constants/serviceTypes';
-import { AsyncStorage } from 'react-native';
+} from '../common/constants/serviceTypes'
+import { AsyncStorage } from 'react-native'
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -27,7 +27,7 @@ class HexaConfig {
     10,
   );
   public GAP_LIMIT: number = parseInt(Config.BIT_GAP_LIMIT.trim(), 10);
-  public DERIVATIVE_GAP_LIMIT: number = 5;
+  public DERIVATIVE_GAP_LIMIT = 5;
   public CIPHER_SPEC: {
     algorithm: string;
     salt: string;
@@ -213,34 +213,34 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
     (account) => !this.EJECTED_ACCOUNTS.includes(account),
   );
 
   constructor(env: string) {
-    this.ENVIRONMENT = env;
+    this.ENVIRONMENT = env
     // console.log({ env });
 
     // console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
 
-    this.RELAY = this.BH_SERVERS.RELAY;
-    this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER;
+    this.RELAY = this.BH_SERVERS.RELAY
+    this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER
     this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(
       Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(),
       10,
-    );
+    )
     this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 = parseInt(
       Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(),
       10,
-    );
+    )
 
     // console.log(this.HEALTH_STATUS.TIME_SLOTS);
     // console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
 
     // console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
-    this.setNetwork();
+    this.setNetwork()
 
     this.BITCOIN_NODE = new Client({
       network:
@@ -249,27 +249,27 @@ class HexaConfig {
       username: Config.BIT_RPC_USERNAME.trim(),
       password: Config.BIT_RPC_PASSWORD.trim(),
       host: Config.BIT_HOST_IP.trim(),
-    });
+    })
 
     if (
       Config.BIT_SERVER_MODE.trim() === 'LOCAL' ||
       Config.BIT_SERVER_MODE.trim() === 'DEV'
     ) {
-      this.APP_STAGE = 'dev';
+      this.APP_STAGE = 'dev'
     } else if (Config.BIT_SERVER_MODE.trim() === 'STA') {
-      this.APP_STAGE = 'sta';
+      this.APP_STAGE = 'sta'
     } else {
-      this.APP_STAGE = 'app';
+      this.APP_STAGE = 'app'
     }
 
-    this.connectToOwnNode();
+    this.connectToOwnNode()
   }
 
   public setNetwork = (): void => {
     if (this.ENVIRONMENT === 'MAIN') {
-      this.NETWORK = bitcoinJS.networks.bitcoin;
+      this.NETWORK = bitcoinJS.networks.bitcoin
     } else {
-      this.NETWORK = bitcoinJS.networks.testnet;
+      this.NETWORK = bitcoinJS.networks.testnet
     }
   };
 
@@ -277,21 +277,21 @@ class HexaConfig {
     let ownNodes:any = await AsyncStorage.getItem('OwnNodes')
 
     if(ownNodes){
-      ownNodes = JSON.parse(ownNodes);
-      const ownNodeURL = ownNodes.urls[ownNodes.active];
+      ownNodes = JSON.parse(ownNodes)
+      const ownNodeURL = ownNodes.urls[ ownNodes.active ]
       if(ownNodeURL){
         this.ESPLORA_API_ENDPOINTS = {
           ...this.ESPLORA_API_ENDPOINTS,
-           MAINNET: {
-              MULTIBALANCE: ownNodeURL + '/balances',
-              MULTIUTXO:  ownNodeURL + '/utxos',
-              MULTITXN: ownNodeURL + '/data',
-              MULTIBALANCETXN: ownNodeURL + '/baltxs',
-              MULTIUTXOTXN: ownNodeURL + '/utxotxs', 
-              NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
-              TXN_FEE: ownNodeURL  + 'fee-estimates',
-              TXNDETAILS: ownNodeURL + '/tx',
-              BROADCAST_TX: ownNodeURL + '/tx',
+          MAINNET: {
+            MULTIBALANCE: ownNodeURL + '/balances',
+            MULTIUTXO:  ownNodeURL + '/utxos',
+            MULTITXN: ownNodeURL + '/data',
+            MULTIBALANCETXN: ownNodeURL + '/baltxs',
+            MULTIUTXOTXN: ownNodeURL + '/utxotxs', 
+            NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
+            TXN_FEE: ownNodeURL  + 'fee-estimates',
+            TXNDETAILS: ownNodeURL + '/tx',
+            BROADCAST_TX: ownNodeURL + '/tx',
           },
         }
       }
@@ -299,4 +299,4 @@ class HexaConfig {
   }
 }
 
-export default new HexaConfig(Config.BIT_ENVIRONMENT.trim());
+export default new HexaConfig(Config.BIT_ENVIRONMENT.trim())
