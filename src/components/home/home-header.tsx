@@ -24,6 +24,10 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import { useBottomSheetModal } from '@gorhom/bottom-sheet';
+import NoExchangeRateBottomSheet from '../bottom-sheets/NoExchangeRateBottomSheet';
+import { useCallback } from 'react';
+import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
@@ -60,6 +64,26 @@ const HomeHeader = ({
     if (!currencyKind) return true;
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
+
+
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+  const showNoExchangeRateBottomSheet = useCallback(() => {
+    presentBottomSheet(
+      <NoExchangeRateBottomSheet
+        onClickSetting={() => {
+          dismissBottomSheet()
+        }}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [0, '40%'],
+      },
+    )
+  }, [presentBottomSheet, dismissBottomSheet])
 
   return (
     <View style={{ ...styles.headerViewContainer, flex: 1 }}>
@@ -165,15 +189,14 @@ const HomeHeader = ({
           <CurrencyKindToggleSwitch
             fiatCurrencyCode={CurrencyCode}
             onpress={() => {
-              try {
-                dispatch(currencyKindSet(
+              console.log('exchangeRates && exchangeRates[CurrencyCode] ', exchangeRates, exchangeRates[CurrencyCode]);
+              (exchangeRates && !exchangeRates[CurrencyCode])
+                ? dispatch(currencyKindSet(
                   prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                ));
-              }
-              catch (e) {
-              }
+                ))
+                : showNoExchangeRateBottomSheet()
             }}
-            disabled={exchangeRates? false: true}
+            disabled={exchangeRates ? false : true}
             isOn={prefersBitcoin}
           />
           <TouchableOpacity
