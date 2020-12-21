@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import TestAccountKnowMoreSheetContents from '../know-more-sheets/TestAccountKnowMoreSheetContents';
-import Colors from '../../common/Colors';
-import SavingsAccountKnowMoreSheetContents from '../know-more-sheets/SavingsAccountKnowMoreSheetContents';
-import CheckingAccountKnowMoreSheetContents from '../know-more-sheets/CheckingAccountKnowMoreSheetContents';
-import DonationAccountKnowMoreSheetContents from '../know-more-sheets/DonationAccountKnowMoreSheetContents';
-import BottomSheetHandle from '../bottom-sheets/BottomSheetHandle';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import TestAccountKnowMoreSheetContents from '../know-more-sheets/TestAccountKnowMoreSheetContents'
+import Colors from '../../common/Colors'
+import SavingsAccountKnowMoreSheetContents from '../know-more-sheets/SavingsAccountKnowMoreSheetContents'
+import CheckingAccountKnowMoreSheetContents from '../know-more-sheets/CheckingAccountKnowMoreSheetContents'
+import DonationAccountKnowMoreSheetContents from '../know-more-sheets/DonationAccountKnowMoreSheetContents'
+import BottomSheetHandle from '../bottom-sheets/BottomSheetHandle'
 
 export type Props = {
   accountKind: SubAccountKind;
@@ -14,8 +14,8 @@ export type Props = {
 };
 
 export const KnowMoreBottomSheetHandle: React.FC = () => {
-  return <BottomSheetHandle containerStyle={styles.handleContainer} />;
-};
+  return <BottomSheetHandle containerStyle={styles.handleContainer} />
+}
 
 const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
   accountKind,
@@ -23,45 +23,45 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
 }: Props) => {
   const BottomSheetContent = () => {
     switch (accountKind) {
-      case SubAccountKind.TEST_ACCOUNT:
-        return (
-          <TestAccountKnowMoreSheetContents
-            titleClicked={onClose}
-            containerStyle={styles.contentContainer}
-          />
-        );
-      case SubAccountKind.SECURE_ACCOUNT:
-        return (
-          <SavingsAccountKnowMoreSheetContents
-            titleClicked={onClose}
-            containerStyle={styles.contentContainer}
-          />
-        );
-      case SubAccountKind.REGULAR_ACCOUNT:
-        return (
-          <CheckingAccountKnowMoreSheetContents
-            titleClicked={onClose}
-            containerStyle={styles.contentContainer}
-          />
-        );
-      case SubAccountKind.DONATION_ACCOUNT:
-        return (
-          <DonationAccountKnowMoreSheetContents
-            titleClicked={onClose}
-            containerStyle={styles.contentContainer}
-          />
-        );
-      default:
-        return null;
+        case SubAccountKind.TEST_ACCOUNT:
+          return (
+            <TestAccountKnowMoreSheetContents
+              titleClicked={onClose}
+              containerStyle={styles.contentContainer}
+            />
+          )
+        case SubAccountKind.SECURE_ACCOUNT:
+          return (
+            <SavingsAccountKnowMoreSheetContents
+              titleClicked={onClose}
+              containerStyle={styles.contentContainer}
+            />
+          )
+        case SubAccountKind.REGULAR_ACCOUNT:
+          return (
+            <CheckingAccountKnowMoreSheetContents
+              titleClicked={onClose}
+              containerStyle={styles.contentContainer}
+            />
+          )
+        case SubAccountKind.DONATION_ACCOUNT:
+          return (
+            <DonationAccountKnowMoreSheetContents
+              titleClicked={onClose}
+              containerStyle={styles.contentContainer}
+            />
+          )
+        default:
+          return null
     }
-  };
+  }
 
   return (
     <View style={styles.rootContainer}>
       <BottomSheetContent />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     shadowOpacity: 0,
   },
-});
+})
 
-export default AccountDetailsKnowMoreBottomSheet;
+export default AccountDetailsKnowMoreBottomSheet

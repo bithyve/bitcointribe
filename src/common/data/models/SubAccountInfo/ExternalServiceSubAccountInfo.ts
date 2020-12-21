@@ -1,25 +1,25 @@
-import { v4 as uuid } from 'uuid';
-import AccountVisibility from '../../enums/AccountVisibility';
-import ServiceAccountKind from '../../enums/ServiceAccountKind';
-import SubAccountKind from '../../enums/SubAccountKind';
-import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
+import { v4 as uuid } from 'uuid'
+import AccountVisibility from '../../enums/AccountVisibility'
+import ServiceAccountKind from '../../enums/ServiceAccountKind'
+import SubAccountKind from '../../enums/SubAccountKind'
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
 import {
   ExternalServiceSubAccountDescribing,
   SubAccountDescribingConstructorProps,
-} from './Interfaces';
-import { ImageSourcePropType } from 'react-native';
+} from './Interfaces'
+import { ImageSourcePropType } from 'react-native'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../bitcoin/utilities/Interface';
-import SourceAccountKind from '../../enums/SourceAccountKind';
+} from '../../../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../enums/SourceAccountKind'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultDescription?: string;
   serviceAccountKind: ServiceAccountKind;
 };
 export default class ExternalServiceSubAccountInfo
-  implements ExternalServiceSubAccountDescribing {
+implements ExternalServiceSubAccountDescribing {
   id: string;
   accountShellID: string | null;
   instanceNumber: number;
@@ -48,7 +48,9 @@ export default class ExternalServiceSubAccountInfo
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
-    balances = { confirmed: 0, unconfirmed: 0 },
+    balances = {
+      confirmed: 0, unconfirmed: 0 
+    },
     customDisplayName = null,
     customDescription = null,
     transactions = [],
@@ -56,18 +58,18 @@ export default class ExternalServiceSubAccountInfo
     isTFAEnabled = false,
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
-    this.id = id;
-    this.accountShellID = accountShellID;
-    this.instanceNumber = instanceNumber;
-    this.defaultTitle = defaultTitle;
-    this.defaultDescription = defaultDescription;
-    this.serviceAccountKind = serviceAccountKind;
-    this.balances = balances;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
-    this.isTFAEnabled = isTFAEnabled;
-    this.visibility = visibility;
-    this.transactions = transactions;
-    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
+    this.id = id
+    this.accountShellID = accountShellID
+    this.instanceNumber = instanceNumber
+    this.defaultTitle = defaultTitle
+    this.defaultDescription = defaultDescription
+    this.serviceAccountKind = serviceAccountKind
+    this.balances = balances
+    this.customDisplayName = customDisplayName
+    this.customDescription = customDescription
+    this.isTFAEnabled = isTFAEnabled
+    this.visibility = visibility
+    this.transactions = transactions
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup
   }
 }

@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
-import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText';
-import { RFValue } from 'react-native-responsive-fontsize';
-import AccountShell from '../../../common/data/models/AccountShell';
-import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
-import BitcoinUnit from '../../../common/data/enums/BitcoinUnit';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
+import { RFValue } from 'react-native-responsive-fontsize'
+import AccountShell from '../../../common/data/models/AccountShell'
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 
 export type Props = {
   accountShell: AccountShell;
@@ -21,22 +21,22 @@ const CurrentTotalHeader: React.FC<Props> = ({
     return selectedTransactions.reduce(
       (accumulated, current) => accumulated + current.amount,
       0
-    );
-  }, [selectedTransactions]);
+    )
+  }, [ selectedTransactions ])
 
-  const formattedAmountText = useFormattedAmountText(totalAmount);
+  const formattedAmountText = useFormattedAmountText(totalAmount)
 
   const countDescriptionText = useMemo(() => {
-    const count = selectedTransactions.length;
-    return `${count} transaction${count == 1 ? '' : 's'} selected`;
-  }, [selectedTransactions]);
+    const count = selectedTransactions.length
+    return `${count} transaction${count == 1 ? '' : 's'} selected`
+  }, [ selectedTransactions ])
 
   const formattedUnitText = useMemo(() => {
-    const prefix = accountShell.unit === BitcoinUnit.SATS ? 'Sat' : 'T-Sat';
-    const suffix = totalAmount == 1 ? '' : 's';
+    const prefix = accountShell.unit === BitcoinUnit.SATS ? 'Sat' : 'T-Sat'
+    const suffix = totalAmount == 1 ? '' : 's'
 
-    return `${prefix}${suffix}`;
-  }, [accountShell.unit, totalAmount]);
+    return `${prefix}${suffix}`
+  }, [ accountShell.unit, totalAmount ])
 
 
   return (
@@ -63,8 +63,8 @@ const CurrentTotalHeader: React.FC<Props> = ({
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -126,6 +126,6 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
   },
-});
+})
 
-export default CurrentTotalHeader;
+export default CurrentTotalHeader

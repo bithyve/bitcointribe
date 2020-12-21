@@ -1,7 +1,7 @@
 import {
   MetaShare,
   EncDynamicNonPMDD,
-} from '../../bitcoin/utilities/Interface';
+} from '../../bitcoin/utilities/Interface'
 
 export interface DynamicNonPMDD {
   META_SHARES?: MetaShare[];
@@ -50,5 +50,5 @@ export interface Database {
   };
   DECENTRALIZED_BACKUP: DecentralizedBackup;
   SERVICES?: ServicesJSON;
-  VERSION: String;
+  VERSION: string;
 }

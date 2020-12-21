@@ -3,4 +3,4 @@ enum TransactionConfirmationStatus {
   UNCONFIRMED,
 }
 
-export default TransactionConfirmationStatus;
+export default TransactionConfirmationStatus

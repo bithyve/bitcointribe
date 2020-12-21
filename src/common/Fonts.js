@@ -4,4 +4,4 @@ export default {
   FiraSansMedium: 'FiraSans-Medium',
   FiraSansMediumItalic: 'FiraSans-MediumItalic',
   OpenSans: 'OpenSans'
-};
+}
