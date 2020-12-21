@@ -13,7 +13,7 @@ import Fonts from './../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { UsNumberFormat } from '../../common/utilities'
-import MessageAsPerHealth from '../../components/home/messgae-health'
+import HealthStatusMessage from './HealthStatusMessage'
 import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch'
 import HomePageShield from '../../components/HomePageShield'
 const currencyCode = [ 'BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR', 'EUR' ]
@@ -180,7 +180,7 @@ const HomeHeader = ( {
                 {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
               </Text>
             </View>
-            <MessageAsPerHealth
+            <HealthStatusMessage
               health={
                 overallHealth ? ( overallHealth as any ).overallStatus : 0
               }
@@ -252,20 +252,22 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
     marginBottom: wp( '0.7%' ),
   },
+
   headerButton: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: hp( '5%' ),
-    width: wp( '35%' ),
-    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 8,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   headerButtonText: {
+    padding: 11,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
     color: Colors.white,
   },
+
   headerToggleSwitchContainer: {
     flex: 3,
     alignItems: 'flex-end',
