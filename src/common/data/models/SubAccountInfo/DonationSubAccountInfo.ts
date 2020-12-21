@@ -31,7 +31,7 @@ implements DonationSubAccountDescribing {
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription = 'Directly Accept Donations';
+  defaultDescription: string;
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -46,13 +46,14 @@ implements DonationSubAccountDescribing {
    */
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
-  constructor({
+  constructor( {
     id = uuid(),
     accountShellID = null,
     instanceNumber = null,
-    defaultTitle = 'Donation Account',
+    defaultTitle = '',
+    defaultDescription = '',
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
@@ -62,11 +63,12 @@ implements DonationSubAccountDescribing {
     isTFAEnabled = false,
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle
+    this.defaultDescription = defaultDescription
     this.balances = balances
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription

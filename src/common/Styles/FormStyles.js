@@ -16,12 +16,17 @@ const FormStyles = StyleSheet.create( {
     height: 50,
   },
 
+  textAreaInputContainer: {
+    height: 100,
+  },
+
   inputText: {
     flex: 1,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
+    textAlign: 'left',
   },
 
   placeholderText: {
