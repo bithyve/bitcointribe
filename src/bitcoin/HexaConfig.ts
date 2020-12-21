@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import {
@@ -34,11 +35,11 @@ class HexaConfig {
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
-    salt: Config.BIT_CIPHER_SALT.trim(),
-    keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
-    iv: Buffer.alloc(16, 0),
-  };
+      algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
+      salt: Config.BIT_CIPHER_SALT.trim(),
+      keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
+      iv: Buffer.alloc(16, 0),
+    };
   public KEY_STRETCH_ITERATIONS = parseInt(
     Config.BIT_KEY_STRETCH_ITERATIONS.trim(),
     10,
@@ -213,7 +214,7 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT ];
+  public EJECTED_ACCOUNTS = [SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys(this.DERIVATIVE_ACC).filter(
     (account) => !this.EJECTED_ACCOUNTS.includes(account),
@@ -273,27 +274,35 @@ class HexaConfig {
     }
   };
 
-  public connectToOwnNode =  async () => {
-    let ownNodes:any = await AsyncStorage.getItem('OwnNodes')
+  public connectToOwnNode = async () => {
+    let ownNodes: any = await AsyncStorage.getItem('OwnNodes')
 
-    if(ownNodes){
+    if (ownNodes) {
       ownNodes = JSON.parse(ownNodes)
-      const ownNodeURL = ownNodes.urls[ ownNodes.active ]
-      if(ownNodeURL){
-        this.ESPLORA_API_ENDPOINTS = {
-          ...this.ESPLORA_API_ENDPOINTS,
-          MAINNET: {
-            MULTIBALANCE: ownNodeURL + '/balances',
-            MULTIUTXO:  ownNodeURL + '/utxos',
-            MULTITXN: ownNodeURL + '/data',
-            MULTIBALANCETXN: ownNodeURL + '/baltxs',
-            MULTIUTXOTXN: ownNodeURL + '/utxotxs', 
-            NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
-            TXN_FEE: ownNodeURL  + 'fee-estimates',
-            TXNDETAILS: ownNodeURL + '/tx',
-            BROADCAST_TX: ownNodeURL + '/tx',
-          },
+      const ownNodeURL = ownNodes.urls[ownNodes.active]
+      if (ownNodeURL) {
+        const ownNodeEPs = {
+          MULTIBALANCE: ownNodeURL + '/balances',
+          MULTIUTXO: ownNodeURL + '/utxos',
+          MULTITXN: ownNodeURL + '/data',
+          MULTIBALANCETXN: ownNodeURL + '/baltxs',
+          MULTIUTXOTXN: ownNodeURL + '/utxotxs',
+          NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
+          TXN_FEE: ownNodeURL + 'fee-estimates',
+          TXNDETAILS: ownNodeURL + '/tx',
+          BROADCAST_TX: ownNodeURL + '/tx',
         }
+
+        if (this.ENVIRONMENT === 'MAIN')
+          this.ESPLORA_API_ENDPOINTS = {
+            ...this.ESPLORA_API_ENDPOINTS,
+            MAINNET: ownNodeEPs
+          }
+        else
+          this.ESPLORA_API_ENDPOINTS = {
+            ...this.ESPLORA_API_ENDPOINTS,
+            TESTNET: ownNodeEPs,
+          }
       }
     }
   }
