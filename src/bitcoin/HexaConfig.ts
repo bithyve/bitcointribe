@@ -13,6 +13,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../common/constants/serviceTypes'
 import { AsyncStorage } from 'react-native'
+import PersonalNode from '../common/data/models/PersonalNode'
 
 class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -263,7 +264,7 @@ class HexaConfig {
       this.APP_STAGE = 'app'
     }
 
-    this.connectToOwnNode()
+    this.connectToPersonalNode()
   }
 
   public setNetwork = (): void => {
@@ -274,23 +275,24 @@ class HexaConfig {
     }
   };
 
-  public connectToOwnNode =  async () => {
-    let ownNodes:any = await AsyncStorage.getItem( 'OwnNodes' )
+  public connectToPersonalNode =  async () => {
+    const personalNodeData = await AsyncStorage.getItem( 'PersonalNode' )
 
-    if( ownNodes ){
-      ownNodes = JSON.parse( ownNodes )
-      const ownNodeURL = ownNodes.urls[ ownNodes.active ]
-      if( ownNodeURL ){
+    if( personalNodeData ){
+      const personalNode: PersonalNode = JSON.parse( personalNodeData )
+      const personalNodeURL = personalNode.activeNodeURL
+
+      if( personalNodeURL ){
         const ownNodeEPs = {
-          MULTIBALANCE: ownNodeURL + '/balances',
-          MULTIUTXO:  ownNodeURL + '/utxos',
-          MULTITXN: ownNodeURL + '/data',
-          MULTIBALANCETXN: ownNodeURL + '/baltxs',
-          MULTIUTXOTXN: ownNodeURL + '/utxotxs', 
-          NEWMULTIUTXOTXN: ownNodeURL + '/nutxotxs',
-          TXN_FEE: ownNodeURL  + 'fee-estimates',
-          TXNDETAILS: ownNodeURL + '/tx',
-          BROADCAST_TX: ownNodeURL + '/tx',
+          MULTIBALANCE: personalNodeURL + '/balances',
+          MULTIUTXO:  personalNodeURL + '/utxos',
+          MULTITXN: personalNodeURL + '/data',
+          MULTIBALANCETXN: personalNodeURL + '/baltxs',
+          MULTIUTXOTXN: personalNodeURL + '/utxotxs',
+          NEWMULTIUTXOTXN: personalNodeURL + '/nutxotxs',
+          TXN_FEE: personalNodeURL  + 'fee-estimates',
+          TXNDETAILS: personalNodeURL + '/tx',
+          BROADCAST_TX: personalNodeURL + '/tx',
         }
 
         if( this.ENVIRONMENT === 'MAIN' )
