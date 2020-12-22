@@ -432,7 +432,7 @@ class ManageBackup extends Component<
       this.setState({
         selectedKeeper: obj,
       });
-      this.sendApprovalRequestToPK();
+      this.sendApprovalRequestToPK(this.state.selectedKeeperType);
       (this.refs.keeperTypeBottomSheet as any).snapTo(0);
     }
   };
@@ -565,7 +565,7 @@ class ManageBackup extends Component<
     }
   };
 
-  sendApprovalRequestToPK = () => {
+  sendApprovalRequestToPK = (type) => {
     let {
       levelHealth,
       currentLevel,
@@ -578,11 +578,10 @@ class ManageBackup extends Component<
         : currentLevel == 3
         ? levelHealth[2].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
-
     sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
-      this.state.selectedKeeperType == 'pdf'
+      type == 'pdf'
         ? notificationType.uploadPDFShare
         : notificationType.approveKeeper,
     );
@@ -1220,7 +1219,7 @@ class ManageBackup extends Component<
                 ) {
                   alert('Please complete Level 2');
                 } else {
-                  this.sendApprovalRequestToPK();
+                  this.sendApprovalRequestToPK(type);
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
                 }
               }}

@@ -47,6 +47,10 @@ import {
   RESHARE_WITH_SAME_KEEPER,
   AUTO_SHARE_CONTACT,
   AUTO_DOWNLOAD_SHARE_CONTACT,
+  GET_PDF_DATA,
+  setPDFInfo,
+  SHARE_PDF,
+  CONFIRM_PDF_SHARED,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -57,7 +61,7 @@ import {
   GENERATE_META_SHARE,
 } from "../actions/health";
 import { insertDBWorker } from "./storage";
-import { AsyncStorage } from "react-native";
+import { AsyncStorage, NativeModules, Platform } from "react-native";
 import TrustedContactsService from "../../bitcoin/services/TrustedContactsService";
 import DeviceInfo from "react-native-device-info";
 import config from "../../bitcoin/HexaConfig";
@@ -95,6 +99,13 @@ import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import RelayServices from "../../bitcoin/services/RelayService";
 import generatePDFKeeper from "../utils/generatePDFKeeper";
 import { getKeeperInfoFromShareId } from "../../common/CommonFunctions";
+import Keeper from "../../bitcoin/utilities/Keeper";
+import { ec as EC } from "elliptic";
+var ec = new EC("curve25519");
+import Mailer from "react-native-mail";
+import Share from "react-native-share";
+import RNPrint from "react-native-print";
+import idx from "idx";
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -1305,9 +1316,13 @@ function* sendApprovalRequestWorker({ payload }) {
   let keeper = yield select((state) => state.keeper.service);
   let keeperInfo: Keepers = keeper.keeper.keepers;
   if (keeperInfo[PkShareId].keeperUUID) {
+    let title =
+      notificationType == "uploadPDFShare"
+        ? "Approval Request for PDF Keeper"
+        : "Approval Request for Keeper";
     const notification: INotification = {
       notificationType: notificationType,
-      title: "Approval Request for Keeper",
+      title: title,
       body: "Approval Keeper setup",
       data: JSON.stringify({ shareID }),
       tag: notificationTag.IMP,
@@ -1774,7 +1789,7 @@ function* reShareWithSameKeeperWorker({ payload }) {
               );
               let object;
               if (index > -1) {
-                object = {...keeperInfo[index]};
+                object = { ...keeperInfo[index] };
                 object.shareId = selectedShareId;
               }
               let flag = false;
@@ -1906,7 +1921,7 @@ function* autoShareContactWorker({ payload }) {
           );
           let object;
           if (index > -1) {
-            object = {...keeperInfo[index]};
+            object = { ...keeperInfo[index] };
             object.shareId = selectedShareId;
           }
           let flag = false;
@@ -2085,4 +2100,334 @@ function* autoDownloadShareContactWorker({ payload }) {
 export const autoDownloadShareContactWatcher = createWatcher(
   autoDownloadShareContactWorker,
   AUTO_DOWNLOAD_SHARE_CONTACT
+);
+
+function* getPDFDataWorker({ payload }) {
+  try {
+    console.log("getPdfData payload", payload);
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    let { shareId, isReShare } = payload;
+    let { WALLET_SETUP } = yield select((state) => state.storage.database);
+    let s3Service: S3Service = yield select((state) => state.health.service);
+    let levelHealth: LevelHealthInterface[] = yield select(
+      (state) => state.health.levelHealth
+    );
+    let currentLevel: number = yield select(
+      (state) => state.health.currentLevel
+    );
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    const keeper: KeeperService = yield select((state) => state.keeper.service);
+    // TODO get primaryKeeper shareID
+
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+    console.log("PKShareId", PKShareId);
+    const res = yield call(
+      keeper.fetchTrustedChannel,
+      PKShareId,
+      WALLET_SETUP.walletName
+    );
+    if (res.status == 200) {
+      let data: TrustedDataElements = res.data.data;
+      let pdfInfo: {
+        filePath: string;
+        publicKey: string;
+        privateKey: string;
+      } = yield select((state) => state.health.pdfInfo);
+      let walletId = s3Service.levelhealth.walletId;
+
+      let shareIndex = 3;
+      if (
+        shareId &&
+        s3Service.levelhealth.metaShares.length &&
+        metaShare.findIndex((value) => value.shareId == shareId) > -1
+      ) {
+        shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
+      }
+      if (isReShare) {
+        yield call(s3Service.reshareMetaShare, shareIndex);
+      }
+      let publicKey = pdfInfo.publicKey;
+      let privateKey = pdfInfo.privateKey;
+      if (pdfInfo.publicKey === "" && pdfInfo.privateKey === "") {
+        console.log("INSIDE IF");
+        let keyPair = ec.genKeyPair();
+        publicKey = keyPair.getPublic("hex");
+        privateKey = keyPair.getPrivate("hex");
+      }
+
+      let primaryShare = metaShare[shareIndex];
+      let secondaryShare = data.pdfShare;
+      let primaryShareKey = Keeper.getDerivedKey(privateKey);
+      let secondaryShareKey = Keeper.getDerivedKey(walletId);
+
+      const secondaryData = LevelHealth.encryptMetaShare(
+        secondaryShare,
+        secondaryShareKey
+      );
+      const primaryData = LevelHealth.encryptMetaShare(
+        primaryShare,
+        primaryShareKey
+      );
+      let primaryShareObject = JSON.stringify({
+        key: primaryShareKey,
+        messageId: primaryData.messageId,
+      });
+      let secondaryShareObject = JSON.stringify({
+        key: secondaryShareKey,
+        messageId: secondaryData.messageId,
+      });
+
+      console.log("primaryShareObject", primaryShareObject);
+      console.log("secondaryShareObject", secondaryShareObject);
+
+      // TODO upload Data
+      let res1 = yield call(
+        LevelHealth.uploadPDFPrimaryShare,
+        primaryData.encryptedMetaShare,
+        primaryData.messageId
+      );
+      let res2 = yield call(
+        LevelHealth.uploadPDFSecondaryShare,
+        secondaryData.encryptedMetaShare,
+        secondaryData.messageId
+      );
+      console.log("res1", res1);
+      console.log("res2", res2);
+      if (res1.success && res2.success) {
+        const qrData = [
+          LevelHealth.encryptWithAnswer(
+            primaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+          LevelHealth.encryptWithAnswer(
+            secondaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+        ];
+        const pdfData = {
+          qrData: qrData,
+        };
+        const pdfPath = yield call(
+          generatePDFKeeper,
+          pdfData,
+          `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
+          `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
+        );
+        console.log("pdfPath", pdfPath);
+        yield put(setPDFInfo({ filePath: pdfPath, publicKey, privateKey }));
+        yield put(onApprovalStatusChange(false, 0, ""));
+      }
+    }
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+  } catch (error) {
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    console.log("Error EF channel", error);
+  }
+}
+
+export const getPDFDataWatcher = createWatcher(getPDFDataWorker, GET_PDF_DATA);
+
+function* sharePDFWorker({ payload }) {
+  yield put(switchS3LoaderKeeper("pdfShare"));
+  const { shareVia, isEmailOtherOptions } = payload;
+  let pdfInfo: {
+    filePath: string;
+    publicKey: string;
+    privateKey: string;
+  } = yield select((state) => state.health.pdfInfo);
+  try {
+    if (!pdfInfo.filePath) throw new Error("Personal copy not found/generated");
+
+    const { security } = yield select(
+      (state) => state.storage.database.WALLET_SETUP
+    );
+
+    switch (shareVia) {
+      case "Email":
+        if (!isEmailOtherOptions) {
+          yield call(
+            Mailer.mail,
+            {
+              subject: "test",
+              body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
+              isHTML: true,
+              attachment: {
+                path:
+                  Platform.OS == "android"
+                    ? "file://" + pdfInfo.filePath
+                    : pdfInfo.filePath, // The absolute path of the file from which to read data.
+                type: "pdf", // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                name: "test", // Optional: Custom filename for attachment
+              },
+            },
+            (err, event) => {
+              console.log({ event, err });
+              // on delayed error (rollback the changes that happened post switch case)
+            }
+          );
+        } else {
+          let shareOptions = {
+            title: "test",
+            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+            url:
+              Platform.OS == "android"
+                ? "file://" + pdfInfo.filePath
+                : pdfInfo.filePath,
+            type: "application/pdf",
+            showAppsToView: true,
+            subject: "test",
+          };
+
+          try {
+            yield call(Share.open, shareOptions);
+          } catch (err) {
+            let errorMessage = idx(err, (_) => _.message);
+            if (errorMessage !== "User did not share") {
+              throw new Error(`Share failed: ${err}`);
+            }
+          }
+        }
+        break;
+
+      case "Print":
+        let pdfDecr = {
+          path: pdfInfo.filePath,
+          filename: "RecoverySharePdf.pdf",
+          password: security.answer,
+        };
+        if (Platform.OS == "android") {
+          var PdfPassword = yield NativeModules.PdfPassword;
+          yield call(
+            PdfPassword.print,
+            JSON.stringify(pdfDecr),
+            (err: any) => {
+              console.log({ err });
+              // on delayed error (rollback the changes that happened post switch case)
+            },
+            async (res: any) => {
+              await RNPrint.print({
+                filePath: "file://" + res,
+              });
+              console.log({ res });
+            }
+          );
+        } else {
+          try {
+            yield call(RNPrint.print, {
+              filePath: pdfInfo.filePath,
+            });
+          } catch (err) {
+            console.log(err);
+            throw new Error(`Print failed: ${err}`);
+          }
+        }
+        break;
+
+      case "Other":
+        let shareOptions = {
+          title: "test",
+          message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+          url:
+            Platform.OS == "android"
+              ? "file://" + pdfInfo.filePath
+              : pdfInfo.filePath,
+          type: "application/pdf",
+          showAppsToView: true,
+          subject: "test",
+        };
+
+        try {
+          yield call(Share.open, shareOptions);
+        } catch (err) {
+          let errorMessage = idx(err, (_) => _.message);
+          if (errorMessage !== "User did not share") {
+            throw new Error(`Share failed: ${err}`);
+          }
+        }
+        break;
+
+      default:
+        throw new Error("Invalid sharing option");
+    }
+
+    yield put(switchS3LoaderKeeper("pdfShare"));
+  } catch (err) {
+    console.log({ err });
+    yield put(switchS3LoaderKeeper("pdfShare"));
+  }
+}
+
+export const sharePDFWatcher = createWatcher(sharePDFWorker, SHARE_PDF);
+
+function* confirmPDFSharedWorker({ payload }) {
+  try {
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    let { shareId } = payload;
+    let s3Service: S3Service = yield select((state) => state.health.service);
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    let walletId = s3Service.levelhealth.walletId;
+    let shareIndex = 3;
+    if (
+      shareId &&
+      s3Service.levelhealth.metaShares.length &&
+      metaShare.findIndex((value) => value.shareId == shareId) > -1
+    ) {
+      shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
+    }
+
+    let shareArray = [
+      {
+        walletId: walletId,
+        shareId: shareId,
+        reshareVersion: metaShare[shareIndex].meta.reshareVersion,
+        updatedAt: moment(new Date()).valueOf(),
+        name: "Keeper PDF",
+        shareType: "pdf",
+        status: "accessible",
+      },
+    ];
+    yield put(updateMSharesHealth(shareArray));
+    let keeperInfo = yield select((state) => state.health.keeperInfo);
+    let flag = false;
+    if (keeperInfo.length > 0) {
+      for (let i = 0; i < keeperInfo.length; i++) {
+        const element = keeperInfo[i];
+        if (element.shareId == shareId) {
+          keeperInfo[i].name = "Keeper PDF";
+          keeperInfo[i].type = "pdf";
+          break;
+        } else {
+          flag = true;
+          break;
+        }
+      }
+    } else {
+      flag = true;
+    }
+    if (flag) {
+      let obj = {
+        shareId: shareId,
+        name: "Keeper PDF",
+        uuid: "",
+        publicKey: "",
+        ephemeralAddress: "",
+        type: "pdf",
+      };
+      keeperInfo.push(obj);
+    }
+    yield put(updatedKeeperInfo(keeperInfo));
+    yield put(onApprovalStatusChange(false, 0, ""));
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+  } catch (error) {
+    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    console.log("Error EF channel", error);
+  }
+}
+
+export const confirmPDFSharedWatcher = createWatcher(
+  confirmPDFSharedWorker,
+  CONFIRM_PDF_SHARED
 );

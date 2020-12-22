@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,107 +10,102 @@ import {
   AsyncStorage,
   Platform,
   Alert,
-} from 'react-native';
-import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
+} from "react-native";
+import Fonts from "../../common/Fonts";
+import BackupStyles from "./Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { getIconByStatus } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ModalHeader from '../../components/ModalHeader';
-import HistoryPageComponent from './HistoryPageComponent';
-import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
-import moment from 'moment';
-import _ from 'underscore';
-import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
-import HistoryHeaderComponent from './HistoryHeaderComponent';
+} from "react-native-responsive-screen";
+import { getIconByStatus } from "./utils";
+import { useDispatch, useSelector } from "react-redux";
+import Colors from "../../common/Colors";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { RFValue } from "react-native-responsive-fontsize";
+import BottomSheet from "reanimated-bottom-sheet";
+import ModalHeader from "../../components/ModalHeader";
+import HistoryPageComponent from "./HistoryPageComponent";
+import PersonalCopyShareModal from "../../components/PersonalCopyShareModal";
+import moment from "moment";
+import _ from "underscore";
+import DeviceInfo, { getFirstInstallTime } from "react-native-device-info";
+import ErrorModalContents from "../../components/ErrorModalContents";
+import KnowMoreButton from "../../components/KnowMoreButton";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import SmallHeaderModal from "../../components/SmallHeaderModal";
+import PersonalCopyHelpContents from "../../components/Helper/PersonalCopyHelpContents";
+import HistoryHeaderComponent from "./HistoryHeaderComponent";
+import { getPDFData, confirmPDFShared } from '../../store/actions/health';
 
 const PersonalCopyHistory = (props) => {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessageHeader, setErrorMessageHeader] = useState('');
- 
-  const [blockReshare, setBlockReshare] = useState('');
-  
+  const dispatch = useDispatch();
+  const ErrorBottomSheet = React.createRef();
+  const HelpBottomSheet = React.createRef();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessageHeader, setErrorMessageHeader] = useState("");
+
+  const [blockReshare, setBlockReshare] = useState("");
+
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Key created',
+      title: "Recovery Key created",
       date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit",
     },
     {
       id: 2,
-      title: 'Recovery Key in-transit',
+      title: "Recovery Key in-transit",
       date: null,
       info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
+        "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet",
     },
     {
       id: 3,
-      title: 'Recovery Key accessible',
+      title: "Recovery Key accessible",
       date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit",
     },
     {
       id: 4,
-      title: 'Recovery Key not accessible',
+      title: "Recovery Key not accessible",
       date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
+      info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet",
     },
   ]);
-  const [
-    PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
-  ] = useState(React.createRef());
+  const PersonalCopyShareBottomSheet = React.createRef();
 
   const secureAccount: SecureAccount = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].service
   );
 
   const selectedPersonalCopy = props.navigation.getParam(
-    'selectedPersonalCopy',
+    "selectedPersonalCopy"
   );
-  
+
   const [personalCopyDetails, setPersonalCopyDetails] = useState(null);
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
-    props.navigation.state.params.isPrimaryKeeper,
+    props.navigation.state.params.isPrimaryKeeper
   );
   const [selectedLevelId, setSelectedLevelId] = useState(
-    props.navigation.state.params.selectedLevelId,
+    props.navigation.state.params.selectedLevelId
   );
   const [selectedKeeper, setSelectedKeeper] = useState(
-    props.navigation.state.params.selectedKeeper,
+    props.navigation.state.params.selectedKeeper
   );
   const [isReshare, setIsReshare] = useState(
-    props.navigation.state.params.selectedTitle == 'Pdf Keeper'
-      ? false
-      : true,
+    props.navigation.state.params.selectedTitle == "Pdf Keeper" ? false : true
   );
   const levelHealth = useSelector((state) => state.health.levelHealth);
   const currentLevel = useSelector((state) => state.health.currentLevel);
-
+  const pdfInfo = useSelector((state) => state.health.pdfInfo);
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
-      props.navigation.state.params.selectedTitle == 'Pdf Keeper'
-        ? false
-        : true,
+      props.navigation.state.params.selectedTitle == "Pdf Keeper" ? false : true
     );
   }, [
     props.navigation.state.params.selectedLevelId,
@@ -120,7 +115,7 @@ const PersonalCopyHistory = (props) => {
   ]);
 
   const saveInTransitHistory = async () => {
-    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    const shareHistory = JSON.parse(await AsyncStorage.getItem("shareHistory"));
     if (shareHistory) {
       let updatedShareHistory = [...shareHistory];
       updatedShareHistory = {
@@ -129,8 +124,8 @@ const PersonalCopyHistory = (props) => {
       };
       updateHistory(updatedShareHistory);
       await AsyncStorage.setItem(
-        'shareHistory',
-        JSON.stringify(updatedShareHistory),
+        "shareHistory",
+        JSON.stringify(updatedShareHistory)
       );
     }
   };
@@ -140,12 +135,12 @@ const PersonalCopyHistory = (props) => {
       if (element.date) return element;
     });
 
-    const sortedHistory = _.sortBy(currentHistory, 'date');
+    const sortedHistory = _.sortBy(currentHistory, "date");
     sortedHistory.forEach((element) => {
       element.date = moment(element.date)
         .utc()
         .local()
-        .format('DD MMMM YYYY HH:mm');
+        .format("DD MMMM YYYY HH:mm");
     });
 
     return sortedHistory;
@@ -169,25 +164,31 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     (async () => {
+      console.log('useEffect pdfInfo', pdfInfo);
+      if(!pdfInfo.filePath) getPdfData();
       const shareHistory = JSON.parse(
-        await AsyncStorage.getItem('shareHistory'),
+        await AsyncStorage.getItem("shareHistory")
       );
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
 
-   const renderErrorModalContent = useCallback(() => {
+  const getPdfData = () => {
+    dispatch(getPDFData(selectedKeeper.shareId))
+  };
+
+  const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
+        proceedButtonText={"Try again"}
         onPressProceed={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/errorImage.png')}
+        bottomImage={require("../../assets/images/icons/errorImage.png")}
       />
     );
   }, [errorMessage, errorMessageHeader]);
@@ -195,9 +196,9 @@ const PersonalCopyHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -213,15 +214,16 @@ const PersonalCopyHistory = (props) => {
         }}
         onPressShare={() => {}}
         onPressConfirm={async () => {
-          let personalCopyDetails = JSON.parse(
-            await AsyncStorage.getItem('personalCopyDetails'),
-          );
-          personalCopyDetails[selectedPersonalCopy.type].shared = true;
-          AsyncStorage.setItem(
-            'personalCopyDetails',
-            JSON.stringify(personalCopyDetails),
-          );
-          setPersonalCopyDetails(personalCopyDetails);
+          dispatch(confirmPDFShared(selectedKeeper.shareId))
+          // let personalCopyDetails = JSON.parse(
+          //   await AsyncStorage.getItem("personalCopyDetails")
+          // );
+          // personalCopyDetails[selectedPersonalCopy.type].shared = true;
+          // AsyncStorage.setItem(
+          //   "personalCopyDetails",
+          //   JSON.stringify(personalCopyDetails)
+          // );
+          // setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
@@ -253,16 +255,17 @@ const PersonalCopyHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <PersonalCopyHelpContents 
-    titleClicked={()=>{
-      if (HelpBottomSheet.current)
+    return (
+      <PersonalCopyHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
             (HelpBottomSheet as any).current.snapTo(0);
-    }}/>;
+        }}
+      />
+    );
   };
 
-  const confirmClick = () => {
-    
-  }
+  const confirmClick = () => {};
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -276,22 +279,22 @@ const PersonalCopyHistory = (props) => {
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={props.navigation.state.params.selectedTitle}
-        headerImage={require('../../assets/images/icons/note.png')}
+        headerImage={require("../../assets/images/icons/note.png")}
       />
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
-          type={'copy'}
+          type={"copy"}
           IsReshare={isReshare}
           data={sortedHistory(personalCopyHistory)}
-          confirmButtonText={'Confirm'}
+          confirmButtonText={"Confirm"}
           onPressConfirm={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
-          reshareButtonText={'Restore Keeper'}
+          reshareButtonText={"Restore Keeper"}
           onPressReshare={async () => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
-          changeButtonText={'Change Keeper'}
+          changeButtonText={"Change Keeper"}
           onPressChange={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
@@ -300,7 +303,7 @@ const PersonalCopyHistory = (props) => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet as any}
-        snapPoints={[-50, hp('85%')]}
+        snapPoints={[-50, hp("85%")]}
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
       />
@@ -310,18 +313,18 @@ const PersonalCopyHistory = (props) => {
         ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("35%") : hp("40%"),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       />
-    
+
       <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("87%") : hp("89%"),
         ]}
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
@@ -332,5 +335,4 @@ const PersonalCopyHistory = (props) => {
 
 export default PersonalCopyHistory;
 
-const styles = StyleSheet.create({
-});
+const styles = StyleSheet.create({});

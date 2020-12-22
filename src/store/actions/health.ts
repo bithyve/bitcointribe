@@ -55,6 +55,10 @@ export const REMOVE_SN = 'REMOVE_SN';
 export const RESHARE_WITH_SAME_KEEPER = 'RESHARE_WITH_SAME_KEEPER';
 export const AUTO_SHARE_CONTACT = 'AUTO_SHARE_CONTACT';
 export const AUTO_DOWNLOAD_SHARE_CONTACT = 'AUTO_DOWNLOAD_SHARE_CONTACT';
+export const GET_PDF_DATA = 'GET_PDF_DATA';
+export const SET_PDF_INFO = 'SET_PDF_INFO';
+export const SHARE_PDF = 'SHARE_PDF';
+export const CONFIRM_PDF_SHARED = 'CONFIRM_PDF_SHARED';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -339,5 +343,39 @@ export const autoDownloadShareContact = (
   return {
     type: AUTO_DOWNLOAD_SHARE_CONTACT,
     payload: { shareId, walletId },
+  };
+};
+
+
+export const getPDFData = (shareId) => {
+  return {
+    type: GET_PDF_DATA,
+    payload: { shareId },
+  };
+};
+
+export const setPDFInfo = (data) => {
+  return {
+    type: SET_PDF_INFO,
+    payload: { data },
+  };
+};
+
+export const sharePDF = (
+  shareVia: string,
+  isEmailOtherOptions,
+) => {
+  return {
+    type: SHARE_PDF,
+    payload: { shareVia, isEmailOtherOptions },
+  };
+};
+
+export const confirmPDFShared = (
+  shareId: string,
+) => {
+  return {
+    type: CONFIRM_PDF_SHARED,
+    payload: { shareId },
   };
 };

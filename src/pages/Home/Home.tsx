@@ -1912,7 +1912,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         }
         if (element.notificationType == 'uploadPDFShare') {
-          let data = element.data;
+          let data = JSON.parse(element.data);
           if (data.shareID == keeperApproveStatus.shareId) {
             onApprovalStatusChange(
               true,
@@ -1927,7 +1927,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           fetchKeeperTrustedChannel(shareId, element.notificationType, share.name);
         }
         if (element.notificationType == 'reShare') {
-          this.props.autoDownloadShareContact(JSON.parse(element.data).selectedShareId, '4608de092e3112b7321ab5612f94ded1cc5328694ddb918d21d8d1ce2563c55a');
+          this.props.autoDownloadShareContact(JSON.parse(element.data).selectedShareId, this.props.s3Service.getWalletId().data.walletId);
         }
         if (
           asyncNotificationList.findIndex(

@@ -134,7 +134,7 @@ export default class Keeper {
     return { decryptedPub: decryptedPub.slice(5) };
   };
 
-  private static getDerivedKey = (psuedoKey: string): string => {
+  public static getDerivedKey = (psuedoKey: string): string => {
     const hashRounds = 1048;
     let key = psuedoKey;
     for (let itr = 0; itr < hashRounds; itr++) {

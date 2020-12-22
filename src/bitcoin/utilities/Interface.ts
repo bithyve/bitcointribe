@@ -334,6 +334,7 @@ export interface TrustedDataElements {
   xPub?: any;
   securityQuestion?: any;
   metaShare? : MetaShare;
+  pdfShare? : MetaShare;
 }
 export interface TrustedData {
   publicKey: string;

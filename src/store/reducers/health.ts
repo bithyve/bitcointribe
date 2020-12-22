@@ -28,6 +28,7 @@ import {
   MNEMONIC_RECOVERED_HEALTH,
   DOWNLOADED_SM_SHARES,
   REMOVE_SN,
+  SET_PDF_INFO
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -45,6 +46,8 @@ const initialState: {
     reshareWithSameKeeper: Boolean;
     keeperSetupStatus: Boolean;
     autoShareContact: Boolean;
+    pdfDataProcess: Boolean;
+    pdfShare: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -84,8 +87,14 @@ const initialState: {
     status: Boolean;
     initiatedAt: number;
     shareId: string;
+    secondaryShare: MetaShare;
   }
   secondaryShareDownloaded: any;
+  pdfInfo: {
+    filePath: string;
+    publicKey: string;
+    privateKey: string;
+  }
 } = {
   mnemonic: '',
   service: null,
@@ -100,6 +109,8 @@ const initialState: {
     reshareWithSameKeeper: false,
     keeperSetupStatus: false,
     autoShareContact: false,
+    pdfDataProcess: false,
+    pdfShare: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -118,9 +129,15 @@ const initialState: {
   keeperApproveStatus: {
     status: false,
     initiatedAt: 0,
-    shareId: ''
+    shareId: '',
+    secondaryShare: null
   },
-  secondaryShareDownloaded: null
+  secondaryShareDownloaded: null,
+  pdfInfo: {
+    filePath: '',
+    publicKey: '',
+    privateKey: ''
+  }
 };
 
 export default (state = initialState, action) => {
@@ -322,6 +339,12 @@ export default (state = initialState, action) => {
         return {
           ...state,
           secondaryShareDownloaded: action.payload.metaShare,
+        };
+
+      case SET_PDF_INFO:
+        return {
+          ...state,
+          pdfInfo: action.payload.data,
         };
   }
   return state;

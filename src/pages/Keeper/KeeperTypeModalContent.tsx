@@ -72,7 +72,6 @@ export default function KeeperTypeModalContents(props) {
             if(selectedLevelId == 2 && value.type === 'pdf'){return;}
             return (
               <AppBottomSheetTouchableWrapper
-                disabled={value.type === 'pdf' ? true : false}
                 activeOpacity={10}
                 onPress={() => onKeeperSelect(value)}
                 style={styles.keeperTypeElementView}

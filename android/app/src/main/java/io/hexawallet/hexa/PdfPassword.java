@@ -340,27 +340,13 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         // part 1
         preface = new Paragraph();
         preface.add(new Paragraph(
-                "Part 1:",
+                "Recovery Key:",
                 subFont));
         document.add(preface);
         BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int)qrImageSize, (int)qrImageSize, null);
         Image codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-
-        //part 2
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                "Part 2:",
-                subFont));
-        document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
-        codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
-        document.add(codeQrImage);
-
-        document.newPage();
-
 
         // Exit Key and BitHyve Xpub
         preface = new Paragraph();
@@ -371,7 +357,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Use this key to reset the 2FA if you have lost your authenticator app or for transferring your funds from Savings account if the BitHyve server is not responding",
                 smallBold));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);

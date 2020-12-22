@@ -1498,4 +1498,80 @@ export default class LevelHealth {
     console.log('updateGuardianInMetaShare outside for', this.metaShares);
     return {data: this.metaShares};
   }
+
+  public static encryptWithAnswer = (
+    secretsToEncrypt: string,
+    answer: string,
+  ): {
+    encryptedString: string;
+  } => {
+    const key = LevelHealth.getDerivedKey(answer);
+    const cipher = crypto.createCipheriv(
+      LevelHealth.cipherSpec.algorithm,
+      key,
+      LevelHealth.cipherSpec.iv,
+    );
+    let encrypted = cipher.update(secretsToEncrypt, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { encryptedString: encrypted };
+  };
+
+  public static decryptWithAnswer = (
+    secretsToDecrypt: string,
+    answer: string,
+  ): {
+    decryptedString: string;
+  } => {
+    const key = LevelHealth.getDerivedKey(answer);
+    const decryptedSecrets: string[] = [];
+    const decipher = crypto.createDecipheriv(
+      LevelHealth.cipherSpec.algorithm,
+      key,
+      LevelHealth.cipherSpec.iv,
+    );
+    let decrypted = decipher.update(secretsToDecrypt, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    return { decryptedString: decrypted };
+  };
+
+  public static uploadPDFPrimaryShare = async (
+    share: string,
+    messageId?: string,
+  ): Promise<{success : Boolean}> => {
+    console.log('uploadPDFPrimaryShare messageId', messageId)
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('uploadPDFShare', {
+        HEXA_ID,
+        share,
+        messageId
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+    console.log('uploadPDFPrimaryShare res', res)
+    return res.data;
+  };
+
+   public static uploadPDFSecondaryShare = async (
+    share: string,
+    messageId?: string,
+  ): Promise<{success : Boolean}> => {
+    console.log('uploadPDFSecondaryShare messageId', messageId)
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('uploadPDFSecondaryShare', {
+        HEXA_ID,
+        share,
+        messageId
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+    console.log('uploadPDFSecondaryShare res', res)
+    return res.data;
+  };
 }
