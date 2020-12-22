@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
-import ListStyles from '../../common/Styles/ListStyles';
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
+import ListStyles from '../../common/Styles/ListStyles'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 
 // TODO: The patterns here are meant to be the starting point for the way other
 // other screens that render QRCode scanners should lay out their components and
@@ -16,25 +16,23 @@ export type Props = {
 const HeaderSection: React.FC = () => {
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderText}>
+      <Text style={ListStyles.infoHeaderSubtitleText}>
         Scan a Bitcoin address or any Hexa QR
       </Text>
     </View>
-  );
+  )
 }
 
-const HomeQRScannerScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
+const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
-  function handleBarcodeRecognized({ data: dataString }: { data: string }) {
-    const onCodeScanned = navigation.getParam('onCodeScanned');
-    if (typeof onCodeScanned === 'function') {
-      let data = getFormattedStringFromQRString(dataString);
-      onCodeScanned(data);
+  function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
+    const onCodeScanned = navigation.getParam( 'onCodeScanned' )
+    if ( typeof onCodeScanned === 'function' ) {
+      const data = getFormattedStringFromQRString( dataString )
+      onCodeScanned( data )
     }
 
-    navigation.goBack();
+    navigation.goBack()
   }
 
   return (
@@ -43,7 +41,9 @@ const HomeQRScannerScreen: React.FC<Props> = ({
 
       <CoveredQRCodeScanner
         onCodeScanned={handleBarcodeRecognized}
-        containerStyle={{ marginBottom: 16 }}
+        containerStyle={{
+          marginBottom: 16
+        }}
       />
 
       <BottomInfoBox
@@ -54,10 +54,10 @@ const HomeQRScannerScreen: React.FC<Props> = ({
         "
       />
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
   //   width: widthPercentageToDP(90),
   //   height: widthPercentageToDP(90),
   // },
-});
+} )
 
-export default HomeQRScannerScreen;
+export default HomeQRScannerScreen

@@ -21,7 +21,7 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }:
     <View style={styles.rootContainer}>
 
       <ListItem pad={4} containerStyle={{
-        marginBottom: 36 
+        marginBottom: 36
       }}>
 
         <Image
@@ -54,7 +54,7 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }:
         </ListItem.Content>
       </ListItem>
 
-      <Text style={ListStyles.infoHeaderText}>
+      <Text style={ListStyles.infoHeaderSubtitleText}>
         Choose a destination to merge this account's sub-accounts into.
       </Text>
     </View>
