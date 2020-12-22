@@ -1,4 +1,7 @@
-import axios, { AxiosResponse, AxiosInstance } from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable no-case-declarations */
+import axios, { AxiosResponse } from 'axios'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
@@ -7,13 +10,11 @@ import crypto from 'crypto'
 import config from '../../HexaConfig'
 import {
   Transactions,
-  DerivativeAccount,
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
-  DerivativeAccountTypes,
   SubPrimaryDerivativeAccountElements,
   SubPrimaryDerivativeAccount,
 } from '../Interface'
@@ -26,10 +27,10 @@ import {
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 
-const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config
-const bitcoinAxios = axios.create({
+const { HEXA_ID, REQUEST_TIMEOUT } = config
+const bitcoinAxios = axios.create( {
   timeout: REQUEST_TIMEOUT 
-})
+} )
 
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
@@ -85,7 +86,7 @@ export default class SecureHDWallet extends Bitcoin {
     algorithm: 'aes-192-cbc',
     salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
     keyLength: 24,
-    iv: Buffer.alloc(16, 0),
+    iv: Buffer.alloc( 16, 0 ),
   };
 
   constructor(
@@ -124,14 +125,14 @@ export default class SecureHDWallet extends Bitcoin {
     },
     network?: bitcoinJS.Network,
   ) {
-    super(network)
+    super( network )
     this.primaryMnemonic = primaryMnemonic
     const { walletId } = this.getWalletId()
     this.walletID = walletId
-    this.initializeStateVars(stateVars)
+    this.initializeStateVars( stateVars )
   }
 
-  public initializeStateVars = (stateVars) => {
+  public initializeStateVars = ( stateVars ) => {
     this.secondaryMnemonic =
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
@@ -198,14 +199,14 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post('importBHXpub', {
+      res = await SIGNING_AXIOS.post( 'importBHXpub', {
         HEXA_ID,
         token,
         walletID: walletId,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     return {
@@ -214,16 +215,16 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getWalletId = (): { walletId: string } => {
-    const hash = crypto.createHash('sha256')
-    const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic)
-    hash.update(seed)
+    const hash = crypto.createHash( 'sha256' )
+    const seed = bip39.mnemonicToSeedSync( this.primaryMnemonic )
+    hash.update( seed )
     return {
-      walletId: hash.digest('hex') 
+      walletId: hash.digest( 'hex' ) 
     }
   };
 
   public getInitialReceivingAddress = (): string => {
-    if (this.xpubs) return this.createSecureMultiSig(0).address
+    if ( this.xpubs ) return this.createSecureMultiSig( 0 ).address
   };
 
   public getReceivingAddress = (
@@ -231,7 +232,7 @@ export default class SecureHDWallet extends Bitcoin {
     accountNumber?: number,
   ): string => {
     let receivingAddress
-    switch (derivativeAccountType) {
+    switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
           const donationAcc: DonationDerivativeAccountElements = this
             .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
@@ -254,16 +255,16 @@ export default class SecureHDWallet extends Bitcoin {
   public getSecondaryID = (
     secondaryMnemonic: string,
   ): { secondaryID: string } => {
-    if (!secondaryMnemonic) {
+    if ( !secondaryMnemonic ) {
       throw new Error(
         'SecondaryID generation failed; missing secondary mnemonic',
       )
     }
-    const hash = crypto.createHash('sha256')
-    const seed = bip39.mnemonicToSeedSync(secondaryMnemonic)
-    hash.update(seed)
+    const hash = crypto.createHash( 'sha256' )
+    const seed = bip39.mnemonicToSeedSync( secondaryMnemonic )
+    hash.update( seed )
     return {
-      secondaryID: hash.digest('hex') 
+      secondaryID: hash.digest( 'hex' ) 
     }
   };
 
@@ -281,10 +282,10 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public isSecondaryMnemonic = (secondaryMnemonic: string) => {
-    const path = this.derivePath(this.xpubs.bh)
-    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path)
-    if (currentXpub !== this.xpubs.secondary) {
+  public isSecondaryMnemonic = ( secondaryMnemonic: string ) => {
+    const path = this.derivePath( this.xpubs.bh )
+    const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
+    if ( currentXpub !== this.xpubs.secondary ) {
       return false
     }
     return true
@@ -295,9 +296,9 @@ export default class SecureHDWallet extends Bitcoin {
   ): {
     restored: boolean;
   } => {
-    const path = this.derivePath(this.xpubs.bh)
-    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path)
-    if (currentXpub !== this.xpubs.secondary) {
+    const path = this.derivePath( this.xpubs.bh )
+    const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
+    if ( currentXpub !== this.xpubs.secondary ) {
       return {
         restored: false 
       }
@@ -316,28 +317,28 @@ export default class SecureHDWallet extends Bitcoin {
 
   public getAccountId = (): string => {
     const xpub = this.xpubs.secondary
-    return crypto.createHash('sha256').update(xpub).digest('hex')
+    return crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
   };
 
-  public decryptSecondaryXpub = (encryptedSecXpub: string) => {
+  public decryptSecondaryXpub = ( encryptedSecXpub: string ) => {
     const key = this.generateKey(
-      bip39.mnemonicToSeedSync(this.primaryMnemonic).toString('hex'),
+      bip39.mnemonicToSeedSync( this.primaryMnemonic ).toString( 'hex' ),
     )
     const decipher = crypto.createDecipheriv(
       this.cipherSpec.algorithm,
       key,
       this.cipherSpec.iv,
     )
-    let decrypted = decipher.update(encryptedSecXpub, 'hex', 'utf8')
-    decrypted += decipher.final('utf8')
+    let decrypted = decipher.update( encryptedSecXpub, 'hex', 'utf8' )
+    decrypted += decipher.final( 'utf8' )
 
     const secondaryXpub = decrypted
-    if (this.validateXpub(secondaryXpub)) {
+    if ( this.validateXpub( secondaryXpub ) ) {
       return {
         secondaryXpub 
       }
     } else {
-      throw new Error('Secondary Xpub is either tampered or is invalid')
+      throw new Error( 'Secondary Xpub is either tampered or is invalid' )
     }
   };
 
@@ -345,22 +346,22 @@ export default class SecureHDWallet extends Bitcoin {
     chunk: string,
     pos: number,
   ): Promise<{ isValid: boolean }> => {
-    if (chunk.length !== config.CHUNK_SIZE) {
-      throw new Error('Invalid number of characters')
+    if ( chunk.length !== config.CHUNK_SIZE ) {
+      throw new Error( 'Invalid number of characters' )
     }
 
     const { walletId } = this.getWalletId()
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post('checkSecureHealth', {
+      res = await SIGNING_AXIOS.post( 'checkSecureHealth', {
         HEXA_ID,
         chunk,
         pos,
         walletID: walletId,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     return {
@@ -368,17 +369,17 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public setNewTransactions = (transactions: Transactions) => {
+  public setNewTransactions = ( transactions: Transactions ) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync
     let latestSyncTime = this.lastBalTxSync
     this.newTransactions = [] // delta transactions
-    for (const tx of transactions.transactionDetails) {
-      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
-        if (tx.blockTime > lastSyncTime) {
-          this.newTransactions.push(tx)
+    for ( const tx of transactions.transactionDetails ) {
+      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+        if ( tx.blockTime > lastSyncTime ) {
+          this.newTransactions.push( tx )
         }
-        if (tx.blockTime > latestSyncTime) {
+        if ( tx.blockTime > latestSyncTime ) {
           latestSyncTime = tx.blockTime
         }
       }
@@ -386,16 +387,16 @@ export default class SecureHDWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async (options?: {
+  public fetchBalanceTransaction = async ( options?: {
     restore?;
-  }): Promise<{
+  } ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
     };
     transactions: Transactions;
   }> => {
-    if (options && options.restore) {
+    if ( options && options.restore ) {
       // WI helps with restoration
     }
 
@@ -410,26 +411,26 @@ export default class SecureHDWallet extends Bitcoin {
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
     const externalAddresses = []
-    for (let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++) {
-      const { address } = this.createSecureMultiSig(itr)
-      externalAddresses.push(address)
-      ownedAddresses.push(address)
+    for ( let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++ ) {
+      const { address } = this.createSecureMultiSig( itr )
+      externalAddresses.push( address )
+      ownedAddresses.push( address )
     }
 
     const internalAddresses = []
-    for (let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++) {
-      const { address } = this.createSecureMultiSig(itr, true)
-      internalAddresses.push(address)
-      ownedAddresses.push(address)
+    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++ ) {
+      const { address } = this.createSecureMultiSig( itr, true )
+      internalAddresses.push( address )
+      ownedAddresses.push( address )
     }
     this.usedAddresses = [ ...externalAddresses, ...internalAddresses ]
 
     const batchedDerivativeAddresses = []
 
-    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-      if (dAccountType === TRUSTED_CONTACTS) continue
+    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
+      if ( dAccountType === TRUSTED_CONTACTS ) continue
       const derivativeAccount = this.derivativeAccounts[ dAccountType ]
-      if (derivativeAccount.instance.using) {
+      if ( derivativeAccount.instance.using ) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -443,7 +444,7 @@ export default class SecureHDWallet extends Bitcoin {
             batchedDerivativeAddresses.push(
               ...derivativeInstance.usedAddresses,
             )
-            ownedAddresses.push(...derivativeInstance.usedAddresses)
+            ownedAddresses.push( ...derivativeInstance.usedAddresses )
           }
         }
       }
@@ -465,18 +466,18 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     const confirmedUTXOs = []
-    for (const utxo of UTXOs) {
-      if (utxo.status) {
-        if (utxo.status.confirmed) confirmedUTXOs.push(utxo)
+    for ( const utxo of UTXOs ) {
+      if ( utxo.status ) {
+        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
         else {
-          if (internalAddresses.includes(utxo.address)) {
+          if ( internalAddresses.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
-            confirmedUTXOs.push(utxo)
+            confirmedUTXOs.push( utxo )
           }
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push(utxo)
+        confirmedUTXOs.push( utxo )
       }
     }
     this.confirmedUTXOs = confirmedUTXOs
@@ -486,7 +487,7 @@ export default class SecureHDWallet extends Bitcoin {
       this.nextFreeAddressIndex,
     ).address
 
-    this.setNewTransactions(transactions)
+    this.setNewTransactions( transactions )
 
     this.balances = balances
     this.transactions = transactions
@@ -502,24 +503,24 @@ export default class SecureHDWallet extends Bitcoin {
     accountName?: string,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
-    if (!this.derivativeAccounts[ accountType ])
-      if (config[ accountType ])
+    if ( !this.derivativeAccounts[ accountType ] )
+      if ( config[ accountType ] )
         this.derivativeAccounts = {
           ...this.derivativeAccounts,
           [ accountType ]: config[ accountType ],
         }
-      else throw new Error(`${accountType} does not exists`)
+      else throw new Error( `${accountType} does not exists` )
 
-    switch (accountType) {
+    switch ( accountType ) {
         case DONATION_ACCOUNT:
-          if (!this.derivativeAccounts[ accountType ][ accountNumber ])
-            throw new Error(`Donation account(${accountNumber}) doesn't exist`)
+          if ( !this.derivativeAccounts[ accountType ][ accountNumber ] )
+            throw new Error( `Donation account(${accountNumber}) doesn't exist` )
 
           break
 
         default:
-          if (!this.derivativeAccounts[ accountType ][ accountNumber ])
-            this.generateDerivativeXpub(accountType, accountNumber, accountName)
+          if ( !this.derivativeAccounts[ accountType ][ accountNumber ] )
+            this.generateDerivativeXpub( accountType, accountNumber, accountName )
 
           break
     }
@@ -541,11 +542,11 @@ export default class SecureHDWallet extends Bitcoin {
     };
     transactions: Transactions;
   }> => {
-    if (!this.derivativeAccounts[ accountType ])
-      throw new Error(`${accountType} does not exists`)
+    if ( !this.derivativeAccounts[ accountType ] )
+      throw new Error( `${accountType} does not exists` )
 
-    if (!this.derivativeAccounts[ accountType ][ accountNumber ]) {
-      this.generateDerivativeXpub(accountType, accountNumber)
+    if ( !this.derivativeAccounts[ accountType ][ accountNumber ] ) {
+      this.generateDerivativeXpub( accountType, accountNumber )
     }
 
     // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
@@ -555,9 +556,9 @@ export default class SecureHDWallet extends Bitcoin {
       nextFreeChangeAddressIndex,
     } = this.derivativeAccounts[ accountType ][ accountNumber ]
     // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
-    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
       nextFreeAddressIndex = 0
-    if (nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex)
+    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
       nextFreeChangeAddressIndex = 0
 
     const externalAddresses = []
@@ -573,8 +574,8 @@ export default class SecureHDWallet extends Bitcoin {
         false,
         this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
       )
-      externalAddresses.push(address)
-      ownedAddresses.push(address)
+      externalAddresses.push( address )
+      ownedAddresses.push( address )
     }
 
     for (
@@ -587,8 +588,8 @@ export default class SecureHDWallet extends Bitcoin {
         true,
         this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
       )
-      internalAddresses.push(address)
-      ownedAddresses.push(address)
+      internalAddresses.push( address )
+      ownedAddresses.push( address )
     }
 
     const usedAddresses = [ ...externalAddresses, ...internalAddresses ]
@@ -612,18 +613,18 @@ export default class SecureHDWallet extends Bitcoin {
     const { balances, transactions, UTXOs } = res
 
     const confirmedUTXOs = []
-    for (const utxo of UTXOs) {
-      if (utxo.status) {
-        if (utxo.status.confirmed) confirmedUTXOs.push(utxo)
+    for ( const utxo of UTXOs ) {
+      if ( utxo.status ) {
+        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
         else {
-          if (internalAddresses.includes(utxo.address)) {
+          if ( internalAddresses.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
-            confirmedUTXOs.push(utxo)
+            confirmedUTXOs.push( utxo )
           }
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push(utxo)
+        confirmedUTXOs.push( utxo )
       }
     }
 
@@ -632,12 +633,12 @@ export default class SecureHDWallet extends Bitcoin {
     let latestSyncTime =
       this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
     const newTransactions: Array<TransactionDetails> = [] // delta transactions
-    for (const tx of transactions.transactionDetails) {
-      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
-        if (tx.blockTime > lastSyncTime) {
-          newTransactions.push(tx)
+    for ( const tx of transactions.transactionDetails ) {
+      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+        if ( tx.blockTime > lastSyncTime ) {
+          newTransactions.push( tx )
         }
-        if (tx.blockTime > latestSyncTime) {
+        if ( tx.blockTime > latestSyncTime ) {
           latestSyncTime = tx.blockTime
         }
       }
@@ -672,12 +673,12 @@ export default class SecureHDWallet extends Bitcoin {
     const accountsToAddressMapping = {
     }
 
-    for (const dAccountType of accountTypes) {
-      if (dAccountType === TRUSTED_CONTACTS) continue
+    for ( const dAccountType of accountTypes ) {
+      if ( dAccountType === TRUSTED_CONTACTS ) continue
 
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
-      if (!derivativeAccounts.instance.using) continue
+      if ( !derivativeAccounts.instance.using ) continue
       for (
         let accountNumber = 1;
         accountNumber <= derivativeAccounts.instance.using;
@@ -687,12 +688,12 @@ export default class SecureHDWallet extends Bitcoin {
         let {
           nextFreeAddressIndex,
           nextFreeChangeAddressIndex,
-          xpubId,
         } = this.derivativeAccounts[ dAccountType ][ accountNumber ]
+
         // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
-        if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+        if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
           nextFreeAddressIndex = 0
-        if (nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex)
+        if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
           nextFreeChangeAddressIndex = 0
 
         const externalAddresses = []
@@ -732,6 +733,9 @@ export default class SecureHDWallet extends Bitcoin {
           'usedAddresses'
         ] = usedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
         // console.log({ derivativeAccUsedAddresses: usedAddresses });
+      
+        const { xpubId } = this.derivativeAccounts[ dAccountType ][ accountNumber ]
+
         accountsToAddressMapping[ xpubId ] = {
           External: externalAddresses,
           Internal: internalAddresses,
@@ -740,11 +744,11 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    if (!Object.keys(accountsToAddressMapping).length) return
+    if ( !Object.keys( accountsToAddressMapping ).length ) return
 
     let res: AxiosResponse
     try {
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
           accountsToAddressMapping,
@@ -757,10 +761,10 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       const accountsToResponseMapping = res.data
-      if (!Object.keys(accountsToResponseMapping).length) return
+      if ( !Object.keys( accountsToResponseMapping ).length ) return
 
-      for (const dAccountType of accountTypes) {
-        if (dAccountType === TRUSTED_CONTACTS) continue
+      for ( const dAccountType of accountTypes ) {
+        if ( dAccountType === TRUSTED_CONTACTS ) continue
 
         const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
@@ -776,9 +780,9 @@ export default class SecureHDWallet extends Bitcoin {
             xpubId,
           } = derivativeAccounts[ accountNumber ]
 
-          if (!accountsToResponseMapping[ xpubId ]) continue
+          if ( !accountsToResponseMapping[ xpubId ] ) continue
           const { Utxos, Txs } = accountsToResponseMapping[ xpubId ]
-          if (!Utxos && !Txs) continue
+          if ( !Utxos && !Txs ) continue
 
           const balances = {
             balance: 0,
@@ -799,7 +803,7 @@ export default class SecureHDWallet extends Bitcoin {
               false,
               this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
             )
-            externalAddresses.push(address)
+            externalAddresses.push( address )
             ownedAddresses[ address ] = true
           }
 
@@ -813,27 +817,27 @@ export default class SecureHDWallet extends Bitcoin {
               true,
               this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
             )
-            internalAddresses.push(address)
+            internalAddresses.push( address )
             ownedAddresses[ address ] = true
           }
 
           const UTXOs = []
-          if (Utxos)
-            for (const addressSpecificUTXOs of Utxos) {
-              for (const utxo of addressSpecificUTXOs) {
+          if ( Utxos )
+            for ( const addressSpecificUTXOs of Utxos ) {
+              for ( const utxo of addressSpecificUTXOs ) {
                 const { value, Address, status, vout, txid } = utxo
 
-                if (addressInUse.includes(Address)) {
-                  UTXOs.push({
+                if ( addressInUse.includes( Address ) ) {
+                  UTXOs.push( {
                     txId: txid,
                     vout,
                     value,
                     address: Address,
                     status,
-                  })
+                  } )
 
-                  if (status.confirmed) balances.balance += value
-                  else if (internalAddresses.includes(Address))
+                  if ( status.confirmed ) balances.balance += value
+                  else if ( internalAddresses.includes( Address ) )
                     balances.balance += value
                   else balances.unconfirmedBalance += value
                 }
@@ -841,18 +845,18 @@ export default class SecureHDWallet extends Bitcoin {
             }
 
           const confirmedUTXOs = []
-          for (const utxo of UTXOs) {
-            if (utxo.status) {
-              if (utxo.status.confirmed) confirmedUTXOs.push(utxo)
+          for ( const utxo of UTXOs ) {
+            if ( utxo.status ) {
+              if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
               else {
-                if (internalAddresses.includes(utxo.address)) {
+                if ( internalAddresses.includes( utxo.address ) ) {
                   // defaulting utxo's on the change branch to confirmed
-                  confirmedUTXOs.push(utxo)
+                  confirmedUTXOs.push( utxo )
                 }
               }
             } else {
               // utxo's from fallback won't contain status var (defaulting them as confirmed)
-              confirmedUTXOs.push(utxo)
+              confirmedUTXOs.push( utxo )
             }
           }
 
@@ -869,9 +873,9 @@ export default class SecureHDWallet extends Bitcoin {
           let lastUsedAddressIndex = nextFreeAddressIndex - 1
           let lastUsedChangeAddressIndex = nextFreeChangeAddressIndex - 1
 
-          if (addressesInfo)
-            for (const addressInfo of addressesInfo) {
-              if (addressInfo.TotalTransactions === 0) continue
+          if ( addressesInfo )
+            for ( const addressInfo of addressesInfo ) {
+              if ( addressInfo.TotalTransactions === 0 ) continue
 
               transactions.totalTransactions += addressInfo.TotalTransactions
               transactions.confirmedTransactions +=
@@ -879,13 +883,13 @@ export default class SecureHDWallet extends Bitcoin {
               transactions.unconfirmedTransactions +=
                 addressInfo.UnconfirmedTransactions
 
-              addressInfo.Transactions.forEach((tx) => {
-                if (!txMap.has(tx.txid)) {
+              addressInfo.Transactions.forEach( ( tx ) => {
+                if ( !txMap.has( tx.txid ) ) {
                   // check for duplicate tx (fetched against sending and then again for change address)
-                  txMap.set(tx.txid, true)
+                  txMap.set( tx.txid, true )
 
                   let accType = dAccountType
-                  switch (accType) {
+                  switch ( accType ) {
                       case SUB_PRIMARY_ACCOUNT:
                         accType = 'Savings Account'
                   }
@@ -896,8 +900,8 @@ export default class SecureHDWallet extends Bitcoin {
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
                     fee: tx.fee,
                     date: tx.Status.block_time
-                      ? new Date(tx.Status.block_time * 1000).toUTCString()
-                      : new Date(Date.now()).toUTCString(),
+                      ? new Date( tx.Status.block_time * 1000 ).toUTCString()
+                      : new Date( Date.now() ).toUTCString(),
                     transactionType: tx.TransactionType,
                     amount:
                       tx.TransactionType === 'Sent'
@@ -907,21 +911,22 @@ export default class SecureHDWallet extends Bitcoin {
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    address: addressInfo.Address
                   }
 
                   // over-ride sent transaction's accountType variable for derivative accounts
                   // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
-                  if (transaction.transactionType === 'Sent')
+                  if ( transaction.transactionType === 'Sent' )
                     transaction.accountType = 'Savings Account'
 
-                  transactions.transactionDetails.push(transaction)
+                  transactions.transactionDetails.push( transaction )
                 }
-              })
+              } )
 
               const addressIndex = externalAddresses.indexOf(
                 addressInfo.Address,
               )
-              if (addressIndex > -1) {
+              if ( addressIndex > -1 ) {
                 lastUsedAddressIndex =
                   addressIndex > lastUsedAddressIndex
                     ? addressIndex
@@ -930,7 +935,7 @@ export default class SecureHDWallet extends Bitcoin {
                 const changeAddressIndex = internalAddresses.indexOf(
                   addressInfo.Address,
                 )
-                if (changeAddressIndex > -1) {
+                if ( changeAddressIndex > -1 ) {
                   lastUsedChangeAddressIndex =
                     changeAddressIndex > lastUsedChangeAddressIndex
                       ? changeAddressIndex
@@ -946,15 +951,15 @@ export default class SecureHDWallet extends Bitcoin {
             this.derivativeAccounts[ dAccountType ][ accountNumber ]
               .lastBalTxSync || 0
           const newTransactions: Array<TransactionDetails> = [] // delta transactions
-          for (const tx of transactions.transactionDetails) {
+          for ( const tx of transactions.transactionDetails ) {
             if (
               tx.status === 'Confirmed' &&
               tx.transactionType === 'Received'
             ) {
-              if (tx.blockTime > lastSyncTime) {
-                newTransactions.push(tx)
+              if ( tx.blockTime > lastSyncTime ) {
+                newTransactions.push( tx )
               }
-              if (tx.blockTime > latestSyncTime) {
+              if ( tx.blockTime > latestSyncTime ) {
                 latestSyncTime = tx.blockTime
               }
             }
@@ -981,11 +986,11 @@ export default class SecureHDWallet extends Bitcoin {
       return {
         synched: true 
       }
-    } catch (err) {
+    } catch ( err ) {
       // console.log(
       //  `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
       //);
-      throw new Error('Fetching balance-txn by addresses failed')
+      throw new Error( 'Fetching balance-txn by addresses failed' )
     }
   };
 
@@ -999,44 +1004,41 @@ export default class SecureHDWallet extends Bitcoin {
       !this.derivativeAccounts[ accountType ] ||
       !this.derivativeAccounts[ accountType ][ accountNumber ]
     ) {
-      throw new Error(`${accountType}:${accountNumber} does not exists`)
+      throw new Error( `${accountType}:${accountNumber} does not exists` )
     }
 
     let accountDetails
-    if (accountType === DONATION_ACCOUNT) {
+    if ( accountType === DONATION_ACCOUNT ) {
       const { id } = this.derivativeAccounts[ accountType ][ accountNumber ]
-      if (id) accountDetails = {
+      if ( id ) accountDetails = {
         donationId: id 
       }
     }
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('fetchXpubInfo', {
+      res = await BH_AXIOS.post( 'fetchXpubInfo', {
         HEXA_ID,
         xpubId: this.derivativeAccounts[ accountType ][ accountNumber ].xpubId,
         accountType,
         accountDetails,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const {
-      availableAddresses,
       usedAddresses,
-      receivingAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       utxos,
       balances,
       transactions,
-      lastSynched,
     } = res.data
 
     const internalAddresses = []
-    for (let itr = 0; itr < nextFreeChangeAddressIndex + this.gapLimit; itr++) {
+    for ( let itr = 0; itr < nextFreeChangeAddressIndex + this.gapLimit; itr++ ) {
       internalAddresses.push(
         this.createSecureMultiSig(
           itr,
@@ -1047,18 +1049,18 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     const confirmedUTXOs = []
-    for (const utxo of utxos) {
-      if (utxo.status) {
-        if (utxo.status.confirmed) confirmedUTXOs.push(utxo)
+    for ( const utxo of utxos ) {
+      if ( utxo.status ) {
+        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
         else {
-          if (internalAddresses.includes(utxo.address)) {
+          if ( internalAddresses.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
-            confirmedUTXOs.push(utxo)
+            confirmedUTXOs.push( utxo )
           }
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push(utxo)
+        confirmedUTXOs.push( utxo )
       }
     }
 
@@ -1067,12 +1069,12 @@ export default class SecureHDWallet extends Bitcoin {
     let latestSyncTime =
       this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
     const newTransactions: Array<TransactionDetails> = [] // delta transactions
-    for (const tx of transactions.transactionDetails) {
-      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
-        if (tx.blockTime > lastSyncTime) {
-          newTransactions.push(tx)
+    for ( const tx of transactions.transactionDetails ) {
+      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+        if ( tx.blockTime > lastSyncTime ) {
+          newTransactions.push( tx )
         }
-        if (tx.blockTime > latestSyncTime) {
+        if ( tx.blockTime > latestSyncTime ) {
           latestSyncTime = tx.blockTime
         }
       }
@@ -1122,13 +1124,13 @@ export default class SecureHDWallet extends Bitcoin {
   } => {
     let accountId: string
     let accountNumber: number
-    switch (accountType) {
+    switch ( accountType ) {
         case SUB_PRIMARY_ACCOUNT:
           const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
             .derivativeAccounts[ accountType ]
           const inUse = subPrimaryAccounts.instance.using
           accountNumber = inUse + 1
-          this.generateDerivativeXpub(accountType, accountNumber)
+          this.generateDerivativeXpub( accountType, accountNumber )
           const subPrimInstance: SubPrimaryDerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
           const updatedSubPrimInstance = {
@@ -1143,7 +1145,7 @@ export default class SecureHDWallet extends Bitcoin {
           break
     }
 
-    if (!accountId) throw new Error(`Failed to setup ${accountType} account`)
+    if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
       accountId, accountNumber 
     }
@@ -1169,7 +1171,7 @@ export default class SecureHDWallet extends Bitcoin {
       accountType
     ]
 
-    if (!donationAccounts) {
+    if ( !donationAccounts ) {
       this.derivativeAccounts = {
         ...this.derivativeAccounts,
         [ DONATION_ACCOUNT ]: config.DONATION_ACCOUNT,
@@ -1180,17 +1182,17 @@ export default class SecureHDWallet extends Bitcoin {
     const inUse = donationAccounts.instance.using
     const accountNumber = inUse + 1
 
-    const xpub = this.generateDerivativeXpub(accountType, accountNumber)
+    const xpub = this.generateDerivativeXpub( accountType, accountNumber )
     let xpubId = this.derivativeAccounts[ accountType ][ accountNumber ].xpubId
-    if (!xpubId) {
+    if ( !xpubId ) {
       xpubId = crypto
-        .createHash('sha256')
-        .update(xpub + this.xpubs.secondary + this.xpubs.bh)
-        .digest('hex')
+        .createHash( 'sha256' )
+        .update( xpub + this.xpubs.secondary + this.xpubs.bh )
+        .digest( 'hex' )
       this.derivativeAccounts[ accountType ][ accountNumber ].xpubId = xpubId
     }
 
-    const id = xpubId.slice(0, 15)
+    const id = xpubId.slice( 0, 15 )
 
     this.derivativeAccounts[ accountType ][ accountNumber ] = {
       ...this.derivativeAccounts[ accountType ][ accountNumber ],
@@ -1204,7 +1206,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('setupDonationAccount', {
+      res = await BH_AXIOS.post( 'setupDonationAccount', {
         HEXA_ID,
         donationId: id,
         walletID: this.getWalletId().walletId,
@@ -1216,17 +1218,17 @@ export default class SecureHDWallet extends Bitcoin {
           xpubId,
           configuration,
         },
-      })
-    } catch (err) {
+      } )
+    } catch ( err ) {
       delete this.derivativeAccounts[ accountType ][ accountNumber ]
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const { setupSuccessful } = res.data
-    if (!setupSuccessful) {
+    if ( !setupSuccessful ) {
       delete this.derivativeAccounts[ accountType ][ accountNumber ]
-      throw new Error('Donation account setup failed')
+      throw new Error( 'Donation account setup failed' )
     }
 
     return {
@@ -1243,25 +1245,25 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     // invoked once per wallet (during initial setup)
     let res: AxiosResponse
-    this.secondaryMnemonic = bip39.generateMnemonic(256)
-    const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic)
+    this.secondaryMnemonic = bip39.generateMnemonic( 256 )
+    const { secondaryID } = this.getSecondaryID( this.secondaryMnemonic )
     try {
-      res = await SIGNING_AXIOS.post('setupSecureAccount', {
+      res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
     // console.log({ res });
     const { setupSuccessful, setupData } = res.data
-    if (!setupSuccessful) {
-      throw new Error('Secure account setup failed')
+    if ( !setupSuccessful ) {
+      throw new Error( 'Secure account setup failed' )
     } else {
-      const { prepared } = this.prepareSecureAccount(setupData.bhXpub)
-      if (prepared) {
+      const { prepared } = this.prepareSecureAccount( setupData.bhXpub )
+      if ( prepared ) {
         this.twoFASetup = setupData
         return {
           setupData 
@@ -1292,7 +1294,7 @@ export default class SecureHDWallet extends Bitcoin {
   ): Promise<{ updated: boolean }> => {
     const donationAcc: DonationDerivativeAccountElements = this
       .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-    if (!donationAcc) {
+    if ( !donationAcc ) {
       throw new Error(
         `Donation account do not exist (instance id:${accountNumber})`,
       )
@@ -1300,34 +1302,34 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('updatePreferences', {
+      res = await BH_AXIOS.post( 'updatePreferences', {
         HEXA_ID,
         donationId: donationAcc.id,
         walletID: this.getWalletId().walletId,
         preferences,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const { updated } = res.data
-    if (!updated) {
-      throw new Error('Preference updation failed')
+    if ( !updated ) {
+      throw new Error( 'Preference updation failed' )
     }
 
     const { configuration, disableAccount, accountDetails } = preferences
-    if (configuration)
+    if ( configuration )
       this.derivativeAccounts[ DONATION_ACCOUNT ][
         accountNumber
       ].configuration = configuration
 
-    if (disableAccount !== undefined)
+    if ( disableAccount !== undefined )
       this.derivativeAccounts[ DONATION_ACCOUNT ][
         accountNumber
       ].disableAccount = disableAccount
 
-    if (accountDetails) {
+    if ( accountDetails ) {
       this.derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ].donee =
         accountDetails.donee
       this.derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ].subject =
@@ -1347,23 +1349,23 @@ export default class SecureHDWallet extends Bitcoin {
     qrData: any;
     secret: any;
   }> => {
-    const path = this.derivePath(this.xpubs.bh)
-    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path)
-    if (currentXpub !== this.xpubs.secondary) {
-      throw new Error('Invaild secondary mnemonic')
+    const path = this.derivePath( this.xpubs.bh )
+    const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
+    if ( currentXpub !== this.xpubs.secondary ) {
+      throw new Error( 'Invaild secondary mnemonic' )
     }
 
     let res: AxiosResponse
-    const { secondaryID } = this.getSecondaryID(secondaryMnemonic)
+    const { secondaryID } = this.getSecondaryID( secondaryMnemonic )
     try {
-      res = await SIGNING_AXIOS.post('resetTwoFA', {
+      res = await SIGNING_AXIOS.post( 'resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
     const { qrData, secret } = res.data
     this.twoFASetup = {
@@ -1375,13 +1377,13 @@ export default class SecureHDWallet extends Bitcoin {
   public isActive = async (): Promise<{ isActive: boolean }> => {
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post('isSecureActive', {
+      res = await SIGNING_AXIOS.post( 'isSecureActive', {
         HEXA_ID,
         walletID: this.walletID,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
     return res.data
   };
@@ -1398,10 +1400,10 @@ export default class SecureHDWallet extends Bitcoin {
       value: number;
     }>
   > => {
-    for (const output of outputs) {
-      if (!output.address) {
+    for ( const output of outputs ) {
+      if ( !output.address ) {
         let changeAddress
-        if (derivativeAccountDetails) {
+        if ( derivativeAccountDetails ) {
           const { xpub, nextFreeChangeAddressIndex } = this.derivativeAccounts[
             derivativeAccountDetails.type
           ][ derivativeAccountDetails.number ]
@@ -1423,15 +1425,15 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    outputs.sort((out1, out2) => {
-      if (out1.address < out2.address) {
+    outputs.sort( ( out1, out2 ) => {
+      if ( out1.address < out2.address ) {
         return -1
       }
-      if (out1.address > out2.address) {
+      if ( out1.address > out2.address ) {
         return 1
       }
       return 0
-    })
+    } )
     // console.log({ sortedOutputs: outputs });
 
     return outputs
@@ -1443,16 +1445,16 @@ export default class SecureHDWallet extends Bitcoin {
     derivativeAccountDetails?: { type: string; number: number },
   ): { fee: number } => {
     let inputUTXOs
-    if (derivativeAccountDetails) {
+    if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
         derivativeAccountDetails.type
       ][ derivativeAccountDetails.number ].confirmedUTXOs
       inputUTXOs = derivativeUtxos ? derivativeUtxos : []
     } else {
       const derivativeUTXOs = []
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
         const derivativeAccount = this.derivativeAccounts[ dAccountType ]
-        if (derivativeAccount.instance.using) {
+        if ( derivativeAccount.instance.using ) {
           for (
             let accountNumber = 1;
             accountNumber <= derivativeAccount.instance.using;
@@ -1463,7 +1465,7 @@ export default class SecureHDWallet extends Bitcoin {
               derivativeInstance.confirmedUTXOs &&
               derivativeInstance.confirmedUTXOs.length
             )
-              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs)
+              derivativeUTXOs.push( ...derivativeInstance.confirmedUTXOs )
           }
         }
       }
@@ -1472,23 +1474,23 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     let confirmedBalance = 0
-    inputUTXOs.forEach((utxo) => {
+    inputUTXOs.forEach( ( utxo ) => {
       confirmedBalance += utxo.value
-    })
+    } )
 
     const outputUTXOs = []
-    for (let index = 0; index < numberOfRecipients; index++) {
+    for ( let index = 0; index < numberOfRecipients; index++ ) {
       // using random outputs for send all fee calculation
-      outputUTXOs.push({
-        address: bitcoinJS.payments.p2sh({
-          redeem: bitcoinJS.payments.p2wpkh({
+      outputUTXOs.push( {
+        address: bitcoinJS.payments.p2sh( {
+          redeem: bitcoinJS.payments.p2wpkh( {
             pubkey: bitcoinJS.ECPair.makeRandom().publicKey,
             network: this.network,
-          }),
+          } ),
           network: this.network,
-        }).address,
-        value: Math.floor(confirmedBalance / numberOfRecipients),
-      })
+        } ).address,
+        value: Math.floor( confirmedBalance / numberOfRecipients ),
+      } )
     }
     const { fee } = coinselect(
       inputUTXOs,
@@ -1511,16 +1513,16 @@ export default class SecureHDWallet extends Bitcoin {
     derivativeAccountDetails?: { type: string; number: number },
   ) => {
     let inputUTXOs
-    if (derivativeAccountDetails) {
+    if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
         derivativeAccountDetails.type
       ][ derivativeAccountDetails.number ].confirmedUTXOs
       inputUTXOs = derivativeUtxos ? derivativeUtxos : []
     } else {
       const derivativeUTXOs = []
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
+      for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
         const derivativeAccount = this.derivativeAccounts[ dAccountType ]
-        if (derivativeAccount.instance.using) {
+        if ( derivativeAccount.instance.using ) {
           for (
             let accountNumber = 1;
             accountNumber <= derivativeAccount.instance.using;
@@ -1531,7 +1533,7 @@ export default class SecureHDWallet extends Bitcoin {
               derivativeInstance.confirmedUTXOs &&
               derivativeInstance.confirmedUTXOs.length
             )
-              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs)
+              derivativeUTXOs.push( ...derivativeInstance.confirmedUTXOs )
           }
         }
       }
@@ -1541,16 +1543,16 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log({ inputUTXOs });
 
     let confirmedBalance = 0
-    inputUTXOs.forEach((confirmedUtxo) => {
+    inputUTXOs.forEach( ( confirmedUtxo ) => {
       confirmedBalance += confirmedUtxo.value
-    })
+    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       customTxFeePerByte,
     )
 
-    if (!inputs) return {
+    if ( !inputs ) return {
       fee, balance: confirmedBalance 
     }
     return {
@@ -1578,18 +1580,18 @@ export default class SecureHDWallet extends Bitcoin {
       }
   > => {
     let inputUTXOs
-    if (derivativeAccountDetails) {
+    if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
         derivativeAccountDetails.type
       ][ derivativeAccountDetails.number ].confirmedUTXOs
       inputUTXOs = derivativeUtxos ? derivativeUtxos : []
     } else {
       const derivativeUTXOs = []
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-        if (dAccountType === TRUSTED_CONTACTS) continue
+      for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
+        if ( dAccountType === TRUSTED_CONTACTS ) continue
 
         const derivativeAccount = this.derivativeAccounts[ dAccountType ]
-        if (derivativeAccount.instance.using) {
+        if ( derivativeAccount.instance.using ) {
           for (
             let accountNumber = 1;
             accountNumber <= derivativeAccount.instance.using;
@@ -1600,7 +1602,7 @@ export default class SecureHDWallet extends Bitcoin {
               derivativeInstance.confirmedUTXOs &&
               derivativeInstance.confirmedUTXOs.length
             )
-              derivativeUTXOs.push(...derivativeInstance.confirmedUTXOs)
+              derivativeUTXOs.push( ...derivativeInstance.confirmedUTXOs )
           }
         }
       }
@@ -1610,16 +1612,16 @@ export default class SecureHDWallet extends Bitcoin {
 
     // console.log('Input UTXOs:', inputUTXOs);
     let confirmedBalance = 0
-    inputUTXOs.forEach((confirmedUtxo) => {
+    inputUTXOs.forEach( ( confirmedUtxo ) => {
       confirmedBalance += confirmedUtxo.value
-    })
+    } )
 
     const outputUTXOs = []
-    for (const recipient of recipients) {
-      outputUTXOs.push({
+    for ( const recipient of recipients ) {
+      outputUTXOs.push( {
         address: recipient.address,
         value: recipient.amount,
-      })
+      } )
     }
     // console.log('Output UTXOs:', outputUTXOs);
 
@@ -1630,7 +1632,7 @@ export default class SecureHDWallet extends Bitcoin {
     const defaultEstimatedBlocks =
       averageTxFees[ defaultTxPriority ].estimatedBlocks
 
-    const assets = coinselect(inputUTXOs, outputUTXOs, defaultFeePerByte)
+    const assets = coinselect( inputUTXOs, outputUTXOs, defaultFeePerByte )
     const defaultPriorityInputs = assets.inputs
     const defaultPriorityOutputs = assets.outputs
     const defaultPriorityFee = assets.fee
@@ -1641,11 +1643,11 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log('\tOutputs:', defaultPriorityOutputs);
 
     let netAmount = 0
-    recipients.forEach((recipient) => {
+    recipients.forEach( ( recipient ) => {
       netAmount += recipient.amount
-    })
+    } )
     const defaultDebitedAmount = netAmount + defaultPriorityFee
-    if (!defaultPriorityInputs || defaultDebitedAmount > confirmedBalance) {
+    if ( !defaultPriorityInputs || defaultDebitedAmount > confirmedBalance ) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return {
         fee: defaultPriorityFee, balance: confirmedBalance 
@@ -1654,7 +1656,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     const txPrerequisites: TransactionPrerequisite = {
     }
-    for (const priority of [ 'low', 'medium', 'high' ]) {
+    for ( const priority of [ 'low', 'medium', 'high' ] ) {
       if (
         priority === defaultTxPriority ||
         defaultDebitedAmount === confirmedBalance
@@ -1673,13 +1675,13 @@ export default class SecureHDWallet extends Bitcoin {
           averageTxFees[ priority ].feePerByte,
         )
         const debitedAmount = netAmount + fee
-        if (!inputs || debitedAmount > confirmedBalance) {
+        if ( !inputs || debitedAmount > confirmedBalance ) {
           // to previous priority assets
-          if (priority === 'medium')
+          if ( priority === 'medium' )
             txPrerequisites[ priority ] = {
               ...txPrerequisites[ 'low' ] 
             }
-          if (priority === 'high')
+          if ( priority === 'high' )
             txPrerequisites[ priority ] = {
               ...txPrerequisites[ 'medium' ] 
             }
@@ -1711,7 +1713,7 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     try {
       let inputs, outputs
-      if (txnPriority === 'custom' && customTxPrerequisites) {
+      if ( txnPriority === 'custom' && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
         outputs = customTxPrerequisites.outputs
       } else {
@@ -1724,8 +1726,8 @@ export default class SecureHDWallet extends Bitcoin {
       )
       // console.log({ txb });
 
-      for (const input of inputs) {
-        txb.addInput(input.txId, input.vout, nSequence)
+      for ( const input of inputs ) {
+        txb.addInput( input.txId, input.vout, nSequence )
       }
 
       const sortedOuts = await this.sortOutputs(
@@ -1733,15 +1735,15 @@ export default class SecureHDWallet extends Bitcoin {
         derivativeAccountDetails,
       )
 
-      for (const output of sortedOuts) {
-        txb.addOutput(output.address, output.value)
+      for ( const output of sortedOuts ) {
+        txb.addOutput( output.address, output.value )
       }
 
       return {
         txb,
       }
-    } catch (err) {
-      throw new Error(`Transaction creation failed: ${err.message}`)
+    } catch ( err ) {
+      throw new Error( `Transaction creation failed: ${err.message}` )
     }
   };
 
@@ -1764,34 +1766,34 @@ export default class SecureHDWallet extends Bitcoin {
       let vin = 0
       const childIndexArray = []
 
-      for (const input of inputs) {
+      for ( const input of inputs ) {
         const { multiSig, primaryPriv, childIndex } = this.getSigningEssentials(
           input.address,
         )
         txb.sign(
           vin,
-          bip32.fromBase58(primaryPriv, this.network),
-          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          bip32.fromBase58( primaryPriv, this.network ),
+          Buffer.from( multiSig.scripts.redeem, 'hex' ),
           null,
           input.value,
-          Buffer.from(multiSig.scripts.witness, 'hex'),
+          Buffer.from( multiSig.scripts.witness, 'hex' ),
         )
-        childIndexArray.push({
+        childIndexArray.push( {
           childIndex,
           inputIdentifier: {
             txId: input.txId,
             vout: input.vout,
             value: input.value,
           },
-        })
+        } )
         vin++
       }
 
       return {
         signedTxb: txb, childIndexArray 
       }
-    } catch (err) {
-      throw new Error(`Transaction signing failed: ${err.message}`)
+    } catch ( err ) {
+      throw new Error( `Transaction signing failed: ${err.message}` )
     }
   };
 
@@ -1811,16 +1813,16 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       let res: AxiosResponse
       try {
-        res = await SIGNING_AXIOS.post('secureHDTransaction', {
+        res = await SIGNING_AXIOS.post( 'secureHDTransaction', {
           HEXA_ID,
           walletID: this.walletID,
           token,
           txHex,
           childIndexArray,
-        })
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err)
-        if (err.code) throw new Error(err.code)
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
 
       // console.log(
@@ -1830,14 +1832,14 @@ export default class SecureHDWallet extends Bitcoin {
       // console.log({ txHex: res.data.txHex });
       // console.log('------ Broadcasting Transaction --------');
 
-      const { txid } = await this.broadcastTransaction(res.data.txHex)
+      const { txid } = await this.broadcastTransaction( res.data.txHex )
       // console.log({ txid });
 
       return {
         txid 
       }
-    } catch (err) {
-      throw new Error(`Unable to transfer: ${err.message}`)
+    } catch ( err ) {
+      throw new Error( `Unable to transfer: ${err.message}` )
     }
   };
 
@@ -1851,42 +1853,42 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       // console.log('------ Transaction Signing ----------');
       let vin = 0
-      inputs.forEach((input) => {
+      inputs.forEach( ( input ) => {
         // console.log('Signing Input:', input);
         const {
           multiSig,
           primaryPriv,
           secondaryPriv,
-        } = this.getSigningEssentials(input.address)
+        } = this.getSigningEssentials( input.address )
 
         txb.sign(
           vin,
-          bip32.fromBase58(primaryPriv, this.network),
-          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          bip32.fromBase58( primaryPriv, this.network ),
+          Buffer.from( multiSig.scripts.redeem, 'hex' ),
           null,
           input.value,
-          Buffer.from(multiSig.scripts.witness, 'hex'),
+          Buffer.from( multiSig.scripts.witness, 'hex' ),
         )
 
-        if (!secondaryPriv) {
-          throw new Error('Private key from secondary mnemonic is missing')
+        if ( !secondaryPriv ) {
+          throw new Error( 'Private key from secondary mnemonic is missing' )
         }
         txb.sign(
           vin,
-          bip32.fromBase58(secondaryPriv, this.network),
-          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          bip32.fromBase58( secondaryPriv, this.network ),
+          Buffer.from( multiSig.scripts.redeem, 'hex' ),
           null,
           input.value,
-          Buffer.from(multiSig.scripts.witness, 'hex'),
+          Buffer.from( multiSig.scripts.witness, 'hex' ),
         )
         vin += 1
-      })
+      } )
 
       return {
         signedTxb: txb 
       }
-    } catch (err) {
-      throw new Error(`Transaction signing failed: ${err.message}`)
+    } catch ( err ) {
+      throw new Error( `Transaction signing failed: ${err.message}` )
     }
   };
 
@@ -1906,13 +1908,13 @@ export default class SecureHDWallet extends Bitcoin {
         true,
       )
 
-      if (!secondaryXpub) {
-        if (!this.secondaryMnemonic)
+      if ( !secondaryXpub ) {
+        if ( !this.secondaryMnemonic )
           throw new Error(
             'SecondaryXpub required; secondary mnemonic missing ',
           )
-        const path = this.derivePath(bhXpub)
-        secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path)
+        const path = this.derivePath( bhXpub )
+        secondaryXpub = this.getRecoverableXKey( this.secondaryMnemonic, path )
       }
 
       this.xpubs = {
@@ -1924,7 +1926,7 @@ export default class SecureHDWallet extends Bitcoin {
       return {
         prepared: true,
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         prepared: false,
       }
@@ -1946,11 +1948,11 @@ export default class SecureHDWallet extends Bitcoin {
     return true
   };
 
-  public generateSecondaryXpriv = (secondaryMnemonic: string): boolean => {
-    const path = this.derivePath(this.xpubs.bh)
-    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path)
-    if (currentXpub !== this.xpubs.secondary) {
-      throw new Error('Invaild secondary mnemonic')
+  public generateSecondaryXpriv = ( secondaryMnemonic: string ): boolean => {
+    const path = this.derivePath( this.xpubs.bh )
+    const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
+    if ( currentXpub !== this.xpubs.secondary ) {
+      throw new Error( 'Invaild secondary mnemonic' )
     }
 
     this.secondaryXpriv = this.getRecoverableXKey(
@@ -1965,15 +1967,15 @@ export default class SecureHDWallet extends Bitcoin {
     this.secondaryXpriv = null
   };
 
-  private getSigningEssentials = (address: string) => {
+  private getSigningEssentials = ( address: string ) => {
     for (
       let itr = 0;
       itr <= this.nextFreeChangeAddressIndex + this.gapLimit;
       itr++
     ) {
       const internal = true
-      const multiSig = this.createSecureMultiSig(itr, internal)
-      if (multiSig.address === address) {
+      const multiSig = this.createSecureMultiSig( itr, internal )
+      if ( multiSig.address === address ) {
         return {
           multiSig,
           primaryPriv: this.derivePrimaryChildXKey(
@@ -1982,31 +1984,31 @@ export default class SecureHDWallet extends Bitcoin {
             internal,
           ),
           secondaryPriv: this.secondaryXpriv
-            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            ? this.deriveChildXKey( this.secondaryXpriv, itr )
             : null,
           childIndex: itr,
         }
       }
     }
 
-    for (let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++) {
-      const multiSig = this.createSecureMultiSig(itr)
-      if (multiSig.address === address) {
+    for ( let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++ ) {
+      const multiSig = this.createSecureMultiSig( itr )
+      if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: this.derivePrimaryChildXKey(this.primaryXpriv, itr),
+          primaryPriv: this.derivePrimaryChildXKey( this.primaryXpriv, itr ),
           secondaryPriv: this.secondaryXpriv
-            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            ? this.deriveChildXKey( this.secondaryXpriv, itr )
             : null,
           childIndex: itr,
         }
       }
     }
 
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-      if (dAccountType === TRUSTED_CONTACTS) continue
+    for ( const dAccountType of Object.keys( config.DERIVATIVE_ACC ) ) {
+      if ( dAccountType === TRUSTED_CONTACTS ) continue
       const derivativeAccount = this.derivativeAccounts[ dAccountType ]
-      if (derivativeAccount.instance.using) {
+      if ( derivativeAccount.instance.using ) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
@@ -2029,7 +2031,7 @@ export default class SecureHDWallet extends Bitcoin {
                 derivativeInstance.xpub,
               )
               const possibleAddress = multiSig.address
-              if (possibleAddress === address) {
+              if ( possibleAddress === address ) {
                 return {
                   multiSig,
                   primaryPriv: this.deriveDerivativeChildXKey(
@@ -2037,7 +2039,7 @@ export default class SecureHDWallet extends Bitcoin {
                     itr,
                   ),
                   secondaryPriv: this.secondaryXpriv
-                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    ? this.deriveChildXKey( this.secondaryXpriv, itr )
                     : null,
                   childIndex: itr,
                 }
@@ -2057,7 +2059,7 @@ export default class SecureHDWallet extends Bitcoin {
                 derivativeInstance.xpub,
               )
               const possibleAddress = multiSig.address
-              if (possibleAddress === address) {
+              if ( possibleAddress === address ) {
                 return {
                   multiSig,
                   primaryPriv: this.deriveDerivativeChildXKey(
@@ -2066,7 +2068,7 @@ export default class SecureHDWallet extends Bitcoin {
                     true,
                   ),
                   secondaryPriv: this.secondaryXpriv
-                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    ? this.deriveChildXKey( this.secondaryXpriv, itr )
                     : null,
                   childIndex: itr,
                 }
@@ -2077,7 +2079,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    throw new Error('Could not find signing essentials for ' + address)
+    throw new Error( 'Could not find signing essentials for ' + address )
   };
 
   private getRecoverableXKey = (
@@ -2085,23 +2087,23 @@ export default class SecureHDWallet extends Bitcoin {
     path: string,
     priv?: boolean,
   ): string => {
-    const seed = bip39.mnemonicToSeedSync(mnemonic)
-    const root = bip32.fromSeed(seed, this.network)
-    if (!priv) {
+    const seed = bip39.mnemonicToSeedSync( mnemonic )
+    const root = bip32.fromSeed( seed, this.network )
+    if ( !priv ) {
       const xpub = root
-        .derivePath('m/' + path)
+        .derivePath( 'm/' + path )
         .neutered()
         .toBase58()
       return xpub
     } else {
-      const xpriv = root.derivePath('m/' + path).toBase58()
+      const xpriv = root.derivePath( 'm/' + path ).toBase58()
       return xpriv
     }
   };
 
-  private getPub = (extendedKey: string): string => {
-    const xKey = bip32.fromBase58(extendedKey, this.network)
-    return xKey.publicKey.toString('hex')
+  private getPub = ( extendedKey: string ): string => {
+    const xKey = bip32.fromBase58( extendedKey, this.network )
+    return xKey.publicKey.toString( 'hex' )
   };
 
   private derivePrimaryChildXKey = (
@@ -2109,8 +2111,8 @@ export default class SecureHDWallet extends Bitcoin {
     childIndex: number,
     internal = false,
   ): string => {
-    const xKey = bip32.fromBase58(extendedKey, this.network)
-    const childXKey = xKey.derive(internal ? 1 : 0).derive(childIndex)
+    const xKey = bip32.fromBase58( extendedKey, this.network )
+    const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
     return childXKey.toBase58()
   };
 
@@ -2118,8 +2120,8 @@ export default class SecureHDWallet extends Bitcoin {
     extendedKey: string,
     childIndex: number,
   ): string => {
-    const xKey = bip32.fromBase58(extendedKey, this.network)
-    const childXKey = xKey.derive(childIndex)
+    const xKey = bip32.fromBase58( extendedKey, this.network )
+    const childXKey = xKey.derive( childIndex )
     return childXKey.toBase58()
   };
 
@@ -2128,24 +2130,24 @@ export default class SecureHDWallet extends Bitcoin {
     childIndex: number,
     internal = false,
   ): string => {
-    const xKey = bip32.fromBase58(extendedKey, this.network)
-    const childXKey = xKey.derive(internal ? 1 : 0).derive(childIndex) // deriving on external chain
+    const xKey = bip32.fromBase58( extendedKey, this.network )
+    const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex ) // deriving on external chain
     return childXKey.toBase58()
   };
 
-  private validateXpub = async (xpub: string) => {
+  private validateXpub = async ( xpub: string ) => {
     try {
-      bip32.fromBase58(xpub, this.network)
+      bip32.fromBase58( xpub, this.network )
       return true
-    } catch (err) {
+    } catch ( err ) {
       return false
     }
   };
 
-  private derivePath = (bhXpub: string): string => {
-    const bhxpub = bip32.fromBase58(bhXpub, this.network)
+  private derivePath = ( bhXpub: string ): string => {
+    const bhxpub = bip32.fromBase58( bhXpub, this.network )
     let path
-    if (bhxpub.index === 0) {
+    if ( bhxpub.index === 0 ) {
       path = config.SECURE_DERIVATION_BRANCH
     } else {
       path = config.SECURE_WALLET_XPUB_PATH + config.SECURE_DERIVATION_BRANCH
@@ -2165,32 +2167,32 @@ export default class SecureHDWallet extends Bitcoin {
     address: string;
   } => {
     let childPrimaryPub
-    if (!derivativeXpub)
+    if ( !derivativeXpub )
       childPrimaryPub = this.getPub(
-        this.derivePrimaryChildXKey(this.xpubs.primary, childIndex, internal),
+        this.derivePrimaryChildXKey( this.xpubs.primary, childIndex, internal ),
       )
     else
       childPrimaryPub = this.getPub(
-        this.deriveDerivativeChildXKey(derivativeXpub, childIndex, internal),
+        this.deriveDerivativeChildXKey( derivativeXpub, childIndex, internal ),
       )
 
     const childRecoveryPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.secondary, childIndex),
+      this.deriveChildXKey( this.xpubs.secondary, childIndex ),
     )
     const childBHPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.bh, childIndex),
+      this.deriveChildXKey( this.xpubs.bh, childIndex ),
     )
 
     // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
     // for generating ga_recovery based recoverable multiSigs
     const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ]
     // console.log({ pubs });
-    const multiSig = this.generateMultiSig(2, pubs)
+    const multiSig = this.generateMultiSig( 2, pubs )
 
     const construct = {
       scripts: {
-        redeem: multiSig.p2sh.redeem.output.toString('hex'),
-        witness: multiSig.p2wsh.redeem.output.toString('hex'),
+        redeem: multiSig.p2sh.redeem.output.toString( 'hex' ),
+        witness: multiSig.p2wsh.redeem.output.toString( 'hex' ),
       },
       address: multiSig.address,
     }
@@ -2198,14 +2200,14 @@ export default class SecureHDWallet extends Bitcoin {
     return construct
   };
 
-  private generateKey = (psuedoKey: string): string => {
+  private generateKey = ( psuedoKey: string ): string => {
     const hashRounds = 5048
     let key = psuedoKey
-    for (let itr = 0; itr < hashRounds; itr++) {
-      const hash = crypto.createHash('sha512')
-      key = hash.update(key).digest('hex')
+    for ( let itr = 0; itr < hashRounds; itr++ ) {
+      const hash = crypto.createHash( 'sha512' )
+      key = hash.update( key ).digest( 'hex' )
     }
-    return key.slice(key.length - this.cipherSpec.keyLength)
+    return key.slice( key.length - this.cipherSpec.keyLength )
   };
 
   private generateDerivativeXpub = (
@@ -2213,34 +2215,34 @@ export default class SecureHDWallet extends Bitcoin {
     accountNumber = 1,
     accountName?: string,
   ) => {
-    if (accountType === TRUSTED_CONTACTS)
+    if ( accountType === TRUSTED_CONTACTS )
       throw new Error(
         `Secure a/c doesn't support account-type: ${accountType} yet`,
       )
 
-    if (!this.derivativeAccounts[ accountType ])
-      throw new Error('Unsupported dervative account')
-    if (accountNumber > this.derivativeAccounts[ accountType ].instance.max)
+    if ( !this.derivativeAccounts[ accountType ] )
+      throw new Error( 'Unsupported dervative account' )
+    if ( accountNumber > this.derivativeAccounts[ accountType ].instance.max )
       throw Error(
         `Cannot create more than ${this.derivativeAccounts[ accountType ].instance.max} ${accountType} derivative accounts`,
       )
-    if (this.derivativeAccounts[ accountType ][ accountNumber ]) {
+    if ( this.derivativeAccounts[ accountType ][ accountNumber ] ) {
       return this.derivativeAccounts[ accountType ][ accountNumber ][ 'xpub' ]
     } else {
-      const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic)
-      const root = bip32.fromSeed(seed, this.network)
+      const seed = bip39.mnemonicToSeedSync( this.primaryMnemonic )
+      const root = bip32.fromSeed( seed, this.network )
       const path = `m/${config.DPATH_PURPOSE}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
       }'/${this.derivativeAccounts[ accountType ][ 'series' ] + accountNumber}'`
       // console.log({ path });
-      const xpriv = root.derivePath(path).toBase58()
-      const xpub = root.derivePath(path).neutered().toBase58()
+      const xpriv = root.derivePath( path ).toBase58()
+      const xpub = root.derivePath( path ).neutered().toBase58()
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
         xpub,
         xpubId: crypto
-          .createHash('sha256')
-          .update(xpub + this.xpubs.secondary + this.xpubs.bh)
-          .digest('hex'),
+          .createHash( 'sha256' )
+          .update( xpub + this.xpubs.secondary + this.xpubs.bh )
+          .digest( 'hex' ),
         xpriv,
         nextFreeAddressIndex: 0,
         nextFreeChangeAddressIndex: 0,
