@@ -15,7 +15,6 @@ export default class RegularAccount extends BaseAccount {
       mnemonic,
       passphrase,
       purpose,
-      usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       gapLimit,
@@ -32,7 +31,6 @@ export default class RegularAccount extends BaseAccount {
       mnemonic: string;
       passphrase: string;
       purpose: number;
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       internalAddresssesCache: {};
@@ -57,7 +55,6 @@ export default class RegularAccount extends BaseAccount {
     } = hdWallet
 
     return new RegularAccount( mnemonic, passphrase, purpose, {
-      usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       gapLimit,
@@ -78,7 +75,6 @@ export default class RegularAccount extends BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       gapLimit: number;

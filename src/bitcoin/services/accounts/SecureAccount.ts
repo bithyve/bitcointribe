@@ -16,7 +16,6 @@ export default class SecureAccount {
     const {
       primaryMnemonic,
       secondaryMnemonic,
-      usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
@@ -35,7 +34,6 @@ export default class SecureAccount {
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
@@ -68,7 +66,6 @@ export default class SecureAccount {
 
     return new SecureAccount( primaryMnemonic, {
       secondaryMnemonic,
-      usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       primaryXpriv,
@@ -93,7 +90,6 @@ export default class SecureAccount {
     primaryMnemonic: string,
     stateVars?: {
       secondaryMnemonic: string;
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
@@ -410,9 +406,7 @@ export default class SecureAccount {
       accountNumber,
     );
 
-  public getBalanceTransactions = async ( options?: {
-    restore?;
-  } ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?:boolean ): Promise<
     | {
         status: number;
         data: {
@@ -451,7 +445,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalanceTransaction( options ),
+        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh ),
       }
     } catch ( err ) {
       return {

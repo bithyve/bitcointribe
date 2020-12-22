@@ -20,7 +20,6 @@ export default class BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       gapLimit: number;
@@ -506,9 +505,7 @@ export default class BaseAccount {
   public isValidAddress = ( recipientAddress: string ): boolean =>
     this.hdWallet.isValidAddress( recipientAddress );
 
-  public getBalanceTransactions = async ( options?: {
-    restore?;
-  } ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -547,7 +544,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalanceTransaction( options ),
+        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh ),
       }
     } catch ( err ) {
       return {
