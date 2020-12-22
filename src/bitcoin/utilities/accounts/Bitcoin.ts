@@ -100,8 +100,10 @@ export default class Bitcoin {
   };
 
   public fetchBalanceTransactionsByAddresses = async (
-    externalAddresses: string[],
-    internalAddresses: string[],
+    externalAddressSet: string[], // external range set (soft/hard)
+    internalAddressSet: string[], // internal range set (soft/hard)
+    externalAddresses: string[],  // all external addresses(till nextFreeAddressIndex)
+    internalAddresses: string[],  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
@@ -126,8 +128,8 @@ export default class Bitcoin {
       const requestId = uuidv4()
       const accountToAddressMapping = {
         [ requestId ]: {
-          External: externalAddresses,
-          Internal: internalAddresses,
+          External: externalAddressSet,
+          Internal: internalAddressSet,
           Owned: ownedAddresses,
         },
       }
@@ -175,8 +177,8 @@ export default class Bitcoin {
 
             if ( status.confirmed ) balances.balance += value
             else if (
-              internalAddresses.length &&
-              internalAddresses.includes( Address )
+              internalAddressSet.length &&
+              internalAddressSet.includes( Address )
             )
               balances.balance += value
             else balances.unconfirmedBalance += value

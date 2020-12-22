@@ -70,7 +70,6 @@ export default class SecureHDWallet extends Bitcoin {
   }> = [];
   private primaryMnemonic: string;
   private walletID: string;
-  private usedAddresses: string[];
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
@@ -93,7 +92,6 @@ export default class SecureHDWallet extends Bitcoin {
     primaryMnemonic: string,
     stateVars?: {
       secondaryMnemonic: string;
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
@@ -137,8 +135,6 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
         : null
-    this.usedAddresses =
-      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : []
     this.nextFreeAddressIndex =
       stateVars && stateVars.nextFreeAddressIndex
         ? stateVars.nextFreeAddressIndex
@@ -387,19 +383,13 @@ export default class SecureHDWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( options?: {
-    restore?;
-  } ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?:boolean ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
     };
     transactions: Transactions;
   }> => {
-    if ( options && options.restore ) {
-      // WI helps with restoration
-    }
-
     // this.consumedAddresses = [];
     // generating all consumed addresses:
     // for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
@@ -410,23 +400,41 @@ export default class SecureHDWallet extends Bitcoin {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
-    const externalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++ ) {
+    let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+    if( hardRefresh ){
+      const hardGapLimit  = 10
+      startingExtIndex = 0
+      closingExtIndex = this.nextFreeAddressIndex + hardGapLimit
+      startingIntIndex = 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + hardGapLimit
+    } 
+    else {
+      const softGapLimit = 5
+      startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+      closingExtIndex = this.nextFreeAddressIndex + softGapLimit
+      startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
+    } 
+
+    const externalAddresses = [] // all external addresses(till closingExtIndex)
+    const externalAddressSet = [] // external address range set
+    for ( let itr = 0; itr < closingExtIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr )
       externalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingExtIndex ) externalAddressSet.push( address )
     }
 
-    const internalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++ ) {
+    const internalAddresses = [] // all internal addresses(till closingIntIndex)
+    const internalAddressSet = [] // internal address range set
+    for ( let itr = 0; itr < closingIntIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr, true )
       internalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingIntIndex ) internalAddressSet.push( address )
     }
-    this.usedAddresses = [ ...externalAddresses, ...internalAddresses ]
 
     const batchedDerivativeAddresses = []
-
     for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
       if ( dAccountType === TRUSTED_CONTACTS ) continue
       const derivativeAccount = this.derivativeAccounts[ dAccountType ]
@@ -457,6 +465,8 @@ export default class SecureHDWallet extends Bitcoin {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
@@ -597,7 +607,11 @@ export default class SecureHDWallet extends Bitcoin {
       accountNumber
     ].usedAddresses = usedAddresses
 
+    const externalAddressSet = externalAddresses
+    const internalAddressSet = internalAddresses
     const res = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
