@@ -1,16 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
-import { Avatar, Button, ListItem } from 'react-native-elements';
-import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
-import ButtonStyles from '../../../common/Styles/ButtonStyles';
-import ImageStyles from '../../../common/Styles/ImageStyles';
-import HeadingStyles from '../../../common/Styles/HeadingStyles';
-import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
-import AccountShell from '../../../common/data/models/AccountShell';
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import { RFValue } from 'react-native-responsive-fontsize';
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind';
+import React from 'react'
+import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native'
+import { Avatar, Button, ListItem } from 'react-native-elements'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
+import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
+import AccountShell from '../../../common/data/models/AccountShell'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { RFValue } from 'react-native-responsive-fontsize'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 
 
 export type Props = {
@@ -23,15 +23,13 @@ type ItemProps = {
   accountShell: AccountShell;
 };
 
-const AccountShellItem: React.FC<ItemProps> = ({
-  accountShell,
-}: ItemProps) => {
-  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
+const AccountShellItem: React.FC<ItemProps> = ( { accountShell, }: ItemProps ) => {
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
   return (
     <ListItem>
       <Image
-        source={getAvatarForSubAccount(primarySubAccount)}
+        source={getAvatarForSubAccount( primarySubAccount )}
         style={styles.avatarImage}
         resizeMode="contain"
       />
@@ -52,19 +50,19 @@ const AccountShellItem: React.FC<ItemProps> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
-  );
-};
+  )
+}
 
-const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ({
+const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ( {
   sourceAccountShell,
   destinationAccountShell,
   onViewAccountDetailsPressed,
-}: Props) => {
+}: Props ) => {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
         <Image
-          source={require('../../../assets/images/BottomSheetMessages/success-stars.png')}
+          source={require( '../../../assets/images/BottomSheetMessages/success-stars.png' )}
           style={{
             width: 103,
             height: 128,
@@ -82,12 +80,16 @@ const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ({
 
         <View>
           <View style={styles.accountShellItem}>
-            <Text style={{...HeadingStyles.listSectionHeading, marginBottom: 0 }}>Source</Text>
+            <Text style={{
+              ...HeadingStyles.listSectionHeading, marginBottom: 0
+            }}>Source</Text>
             <AccountShellItem accountShell={sourceAccountShell} />
           </View>
 
           <View style={styles.accountShellItem}>
-            <Text style={{ ...HeadingStyles.listSectionHeading, marginBottom: 0 }}>Destination</Text>
+            <Text style={{
+              ...HeadingStyles.listSectionHeading, marginBottom: 0
+            }}>Destination</Text>
             <AccountShellItem accountShell={destinationAccountShell} />
           </View>
 
@@ -104,10 +106,10 @@ const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ({
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
     backgroundColor: Colors.white,
@@ -135,12 +137,12 @@ const styles = StyleSheet.create({
   },
 
   accountShellItemTitleText: {
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
   },
 
   balanceCaptionText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMediumItalic,
   },
@@ -160,6 +162,6 @@ const styles = StyleSheet.create({
   titleSection: {
     flex: 1,
   },
-});
+} )
 
-export default AccountShellMergeSuccessBottomSheet;
+export default AccountShellMergeSuccessBottomSheet

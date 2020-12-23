@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { View, Text, StyleSheet, AsyncStorage, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
 import PersonalNodeSettingsHeader from './PersonalNodeSettingsHeader'
 import PersonalNode from '../../../common/data/models/PersonalNode'
 import BottomInfoBox from '../../../components/BottomInfoBox'
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import PersonalNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionSuccessBottomSheet'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 
 export type Props = {
   navigation: any;
 };
 
 const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
   const [ personalNode, setPersonalNode ] = useState<PersonalNode>( {
   } )
 
@@ -38,6 +47,34 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     }
   }
 
+  const showConnectionSucceededBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <PersonalNodeConnectionSuccessBottomSheet
+        onViewNodeDetailsPressed={dismissBottomSheet}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ],
+  )
+
+  const showConnectionFailedBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <PersonalNodeConnectionFailureBottomSheet
+        onTryAgainPressed={dismissBottomSheet}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ],
+  )
+
   async function handleSettingsSubmission( {
     ipAddress,
     portNumber,
@@ -56,6 +93,8 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     setIsEditingPersonalNodeConnection( false )
     setIsPersonalNodeConnectionEnabled( true )
     setPersonalNode( newPersonalNodeConfig )
+
+    showConnectionSucceededBottomSheet()
   }
 
 
