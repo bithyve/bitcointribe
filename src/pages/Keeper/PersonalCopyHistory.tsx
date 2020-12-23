@@ -165,17 +165,13 @@ const PersonalCopyHistory = (props) => {
   useEffect(() => {
     (async () => {
       console.log('useEffect pdfInfo', pdfInfo);
-      if(!pdfInfo.filePath) getPdfData();
+      if(!pdfInfo.filePath) dispatch(getPDFData(selectedKeeper.shareId))
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem("shareHistory")
       );
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
-
-  const getPdfData = () => {
-    dispatch(getPDFData(selectedKeeper.shareId))
-  };
 
   const renderErrorModalContent = useCallback(() => {
     return (

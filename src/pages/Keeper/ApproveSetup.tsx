@@ -69,7 +69,7 @@ export default function ApproveSetup(props) {
               style={{
                 ...styles.successModalButtonView,
                 shadowColor: Colors.shadowBlue,
-                backgroundColor: Colors.blue,
+                backgroundColor: props.isContinueDisabled ? Colors.lightBlue : Colors.blue,
               }}
             >
               <Text

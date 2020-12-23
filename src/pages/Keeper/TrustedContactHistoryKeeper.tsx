@@ -42,6 +42,7 @@ import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
   EphemeralDataElements,
+  LevelHealthInterface,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
@@ -188,7 +189,9 @@ const TrustedContactHistoryKeeper = (props) => {
       ? false
       : true,
   );
-  const levelHealth = useSelector((state) => state.health.levelHealth);
+  const [selectedShareId, setSelectedShareId] = useState(props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '');
+
+  const levelHealth:LevelHealthInterface[] = useSelector((state) => state.health.levelHealth);
   const currentLevel = useSelector((state) => state.health.currentLevel);
   useEffect(() => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
@@ -203,6 +206,8 @@ const TrustedContactHistoryKeeper = (props) => {
     setSelectedTitle(props.navigation.state.params.selectedTitle);
     setIndex(props.navigation.state.params.index);
     setChosenContact(props.navigation.state.params.selectedContact);
+    let shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[2].levelInfo[4].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '';
+    setSelectedShareId(shareId);
   }, [
     props.navigation.state.params.selectedLevelId,
     props.navigation.state.params.selectedKeeper,
@@ -215,6 +220,8 @@ const TrustedContactHistoryKeeper = (props) => {
         await AsyncStorage.getItem('shareHistory'),
       );
       if (shareHistory) updateHistory(shareHistory);
+      let shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[2].levelInfo[4].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '';
+      setSelectedShareId(shareId);
     })();
     setContactInfo();
   }, []);
@@ -223,7 +230,7 @@ const TrustedContactHistoryKeeper = (props) => {
     let keeperInfoTemp: any[] = keeperInfo;
     if (keeperInfoTemp.length > 0) {
       let keeperInfoIndex = keeperInfoTemp.findIndex(
-        (value) => value.shareId == selectedKeeper.shareId,
+        (value) => value.shareId == selectedShareId,
       );
       if (keeperInfoIndex > -1) {
         setSelectedContacts(keeperInfoTemp[keeperInfoIndex].data);
@@ -701,11 +708,11 @@ const TrustedContactHistoryKeeper = (props) => {
       await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
 
       dispatch(updateTrustedContactInfoLocally(tcInfo));
-      console.log('AFTER RESHARE selectedKeeper.shareId', selectedKeeper.shareId);
+      console.log('AFTER RESHARE selectedKeeper.shareId', selectedShareId);
       let shareArray = [
         {
           walletId: s3Service.getWalletId().data.walletId,
-          shareId: selectedKeeper.shareId,
+          shareId: selectedShareId,
           reshareVersion: 0,
           updatedAt: moment(new Date()).valueOf(),
           name: contact.name,
@@ -718,7 +725,7 @@ const TrustedContactHistoryKeeper = (props) => {
       if (keeperInfoTemp.length > 0) {
         for (let i = 0; i < keeperInfoTemp.length; i++) {
           const element = keeperInfoTemp[i];
-          if (element.shareId == selectedKeeper.shareId) {
+          if (element.shareId == selectedShareId) {
             keeperInfoTemp[i].name = contact.name;
             keeperInfoTemp[i].uuid = contact.id;
             keeperInfoTemp[i].publicKey = '';
@@ -736,7 +743,7 @@ const TrustedContactHistoryKeeper = (props) => {
       }
       if (flag) {
         let obj = {
-          shareId: selectedKeeper.shareId,
+          shareId: selectedShareId,
           name: contact.name,
           uuid: contact.id,
           publicKey: '',
@@ -833,7 +840,7 @@ const TrustedContactHistoryKeeper = (props) => {
       dispatch(
         uploadEncMShareKeeper(
           index,
-          selectedKeeper.shareId,
+          selectedShareId,
           contactInfo,
           data,
           true,
@@ -852,7 +859,7 @@ const TrustedContactHistoryKeeper = (props) => {
       setTrustedLink('');
       setTrustedQR('');
       dispatch(
-        uploadEncMShareKeeper(index, selectedKeeper.shareId, contactInfo, data),
+        uploadEncMShareKeeper(index, selectedShareId, contactInfo, data),
       );
       updateTrustedContactsInfo(chosenContact);
       onOTPShare(index); // enables reshare
@@ -1059,7 +1066,7 @@ const TrustedContactHistoryKeeper = (props) => {
                 isReshare: false,
                 qrScannedData: qrData,
                 isPrimaryKeeper: false,
-                selectedShareId: selectedKeeper.shareId,
+                selectedShareId: selectedShareId,
                 selectedLevelId,
                 isChange: true
               });
@@ -1088,7 +1095,7 @@ const TrustedContactHistoryKeeper = (props) => {
             isReshare: false,
             qrScannedData,
             isPrimaryKeeper: false,
-            selectedShareId: selectedKeeper.shareId,
+            selectedShareId: selectedShareId,
             selectedLevelId: selectedLevelId,
             isChange: true
           });

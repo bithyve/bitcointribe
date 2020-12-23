@@ -2295,7 +2295,7 @@ function* sharePDFWorker({ payload }) {
       case "Print":
         let pdfDecr = {
           path: pdfInfo.filePath,
-          filename: "RecoverySharePdf.pdf",
+          filename: "PersonalCopy2.pdf",
           password: security.answer,
         };
         if (Platform.OS == "android") {
