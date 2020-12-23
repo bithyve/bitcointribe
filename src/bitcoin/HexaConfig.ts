@@ -16,6 +16,8 @@ import { AsyncStorage } from 'react-native'
 import PersonalNode from '../common/data/models/PersonalNode'
 
 class HexaConfig {
+  public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://testapi.bithyve.com'
+  public MAINNET_BASE_URL: string = Config.BIT_MAINNET_BASE_URL ? Config.BIT_MAINNET_BASE_URL.trim() : 'https://api.bithyve.com'
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
@@ -23,7 +25,7 @@ class HexaConfig {
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH.trim() || '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH.trim() || '1';
   public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN.trim();
-  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH.trim();
+  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
   public DERIVATIVE_GAP_LIMIT = 5;
@@ -33,15 +35,12 @@ class HexaConfig {
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
-    salt: Config.BIT_CIPHER_SALT.trim(),
-    keyLength: parseInt( Config.BIT_CIPHER_KEYLENGTH.trim(), 10 ),
+    algorithm: Config.BIT_CIPHER_ALGORITHM ? Config.BIT_CIPHER_ALGORITHM.trim() : 'aes-192-cbc',
+    salt: Config.BIT_CIPHER_SALT ? Config.BIT_CIPHER_SALT.trim() : 'bithyeSalt',
+    keyLength: Config.BIT_CIPHER_KEYLENGTH ? parseInt( Config.BIT_CIPHER_KEYLENGTH.trim(), 10 ) : 24,
     iv: Buffer.alloc( 16, 0 ),
   };
-  public KEY_STRETCH_ITERATIONS = parseInt(
-    Config.BIT_KEY_STRETCH_ITERATIONS.trim(),
-    10,
-  );
+  public KEY_STRETCH_ITERATIONS = parseInt( Config.BIT_KEY_STRETCH_ITERATIONS.trim(), 10, );
 
   public LAST_SEEN_ACTIVE_DURATION: number = parseInt(
     Config.LAST_SEEN_ACTIVE_DURATION.trim(),
@@ -65,17 +64,14 @@ class HexaConfig {
       LIMIT: Config.BIT_BSI_DEPTH_LIMIT ? parseInt( Config.BIT_BSI_DEPTH_LIMIT.trim(), 10 ) : 20,
     },
   };
-  public SSS_TOTAL: number = parseInt( Config.BIT_SSS_TOTAL.trim(), 10 );
-  public SSS_THRESHOLD: number = parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 );
-  public MSG_ID_LENGTH: number = parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 );
+  public SSS_TOTAL: number = Config.BIT_SSS_TOTAL ? parseInt( Config.BIT_SSS_TOTAL.trim(), 10 ) : 5;
+  public SSS_THRESHOLD: number = Config.BIT_SSS_THRESHOLD ? parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 ) : 3;
+  public MSG_ID_LENGTH: number = Config.BIT_MSG_ID_LENGTH ? parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 ) : 12;
   public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
-  public CHECKSUM_ITR: number = parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 );
+  public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
   public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
   public DPATH_PURPOSE: number = Config.BIT_DPATH_PURPOSE ? parseInt( Config.BIT_DPATH_PURPOSE.trim(), 10 ) : 49;
-  public SSS_METASHARE_SPLITS: number = parseInt(
-    Config.BIT_SSS_METASHARE_SPLITS.trim(),
-    10,
-  );
+  public SSS_METASHARE_SPLITS: number = Config.BIT_SSS_METASHARE_SPLITS ? parseInt( Config.BIT_SSS_METASHARE_SPLITS.trim(), 10 ) : 8;
   public STATUS = {
     SUCCESS: Config.BIT_SUCCESS_STATUS_CODE ? parseInt( Config.BIT_SUCCESS_STATUS_CODE.trim(), 10 ) : 200,
     ERROR: Config.BIT_ERROR_STATUS_CODE ? parseInt( Config.BIT_ERROR_STATUS_CODE.trim(), 10 ) : 400,
@@ -115,24 +111,24 @@ class HexaConfig {
 
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
-      MULTIBALANCE: Config.BIT_ESPLORA_TESTNET_MULTIBALANCE ? Config.BIT_ESPLORA_TESTNET_MULTIBALANCE.trim() : 'https://testapi.bithyve.com/balances',
-      MULTIUTXO: Config.BIT_ESPLORA_TESTNET_MULTIUTXO ? Config.BIT_ESPLORA_TESTNET_MULTIUTXO.trim() : 'https://testapi.bithyve.com/utxos',
-      MULTITXN: Config.BIT_ESPLORA_TESTNET_MULTITXN ? Config.BIT_ESPLORA_TESTNET_MULTITXN.trim() : 'https://testapi.bithyve.com/data',
-      MULTIBALANCETXN: Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN ? Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN.trim() : 'https://testapi.bithyve.com/baltxs',
-      NEWMULTIUTXOTXN: Config.BIT_ESPLORA_TESTNET_NEW_MULTIUTXOTXN ? Config.BIT_ESPLORA_TESTNET_NEW_MULTIUTXOTXN.trim() : 'https://test-wrapper.bithyve.com/nutxotxs',
-      TXN_FEE: Config.BIT_ESPLORA_TESTNET_TXNFEE ? Config.BIT_ESPLORA_TESTNET_TXNFEE.trim() : 'https://testapi.bithyve.com/fee-estimates',
-      TXNDETAILS: Config.BIT_ESPLORA_TESTNET_TXNDETAILS ? Config.BIT_ESPLORA_TESTNET_TXNDETAILS.trim() : 'https://testapi.bithyve.com/tx',
-      BROADCAST_TX: Config.BIT_ESPLORA_TESTNET_BROADCAST_TX ? Config.BIT_ESPLORA_TESTNET_BROADCAST_TX.trim() : 'https://testapi.bithyve.com/tx',
+      MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
+      MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
+      MULTITXN: this.TESTNET_BASE_URL + '/data',
+      MULTIBALANCETXN: this.TESTNET_BASE_URL + '/baltxs',
+      NEWMULTIUTXOTXN: this.TESTNET_BASE_URL + '/nutxotxs',
+      TXN_FEE: this.TESTNET_BASE_URL + '/fee-estimates',
+      TXNDETAILS: this.TESTNET_BASE_URL + '/tx',
+      BROADCAST_TX: this.TESTNET_BASE_URL + '/tx',
     },
     MAINNET: {
-      MULTIBALANCE: Config.BIT_ESPLORA_MAINNET_MULTIBALANCE ? Config.BIT_ESPLORA_MAINNET_MULTIBALANCE.trim() : 'https://api.bithyve.com/balances',
-      MULTIUTXO: Config.BIT_ESPLORA_MAINNET_MULTIUTXO ? Config.BIT_ESPLORA_MAINNET_MULTIUTXO.trim() : 'https://api.bithyve.com/utxos',
-      MULTITXN: Config.BIT_ESPLORA_MAINNET_MULTITXN ? Config.BIT_ESPLORA_MAINNET_MULTITXN.trim() : 'https://api.bithyve.com/data',
-      MULTIBALANCETXN: Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN ? Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN.trim() : 'https://api.bithyve.com/baltxs',
-      NEWMULTIUTXOTXN: Config.BIT_ESPLORA_MAINNET_NEW_MULTIUTXOTXN ? Config.BIT_ESPLORA_MAINNET_NEW_MULTIUTXOTXN.trim() : 'https://api.bithyve.com/nutxotxs',
-      TXN_FEE: Config.BIT_ESPLORA_MAINNET_TXNFEE ? Config.BIT_ESPLORA_MAINNET_TXNFEE.trim() : 'https://api.bithyve.com/fee-estimates',
-      TXNDETAILS: Config.BIT_ESPLORA_MAINNET_TXNDETAILS ? Config.BIT_ESPLORA_MAINNET_TXNDETAILS.trim() : 'https://api.bithyve.com/tx',
-      BROADCAST_TX: Config.BIT_ESPLORA_MAINNET_BROADCAST_TX ? Config.BIT_ESPLORA_MAINNET_BROADCAST_TX.trim() : 'https://api.bithyve.com/tx',
+      MULTIBALANCE: this.MAINNET_BASE_URL + '/balances',
+      MULTIUTXO: this.MAINNET_BASE_URL + '/utxos',
+      MULTITXN: this.MAINNET_BASE_URL + '/data',
+      MULTIBALANCETXN: this.MAINNET_BASE_URL + '/baltxs',
+      NEWMULTIUTXOTXN: this.MAINNET_BASE_URL + '/nutxotxs',
+      TXN_FEE: this.MAINNET_BASE_URL + '/fee-estimates',
+      TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
+      BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
     },
   };
 
