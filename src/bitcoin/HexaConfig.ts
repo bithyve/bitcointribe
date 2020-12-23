@@ -22,8 +22,8 @@ class HexaConfig {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public BITCOIN_NODE: Client;
-  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH.trim() || '2147483651/2147483649/';
-  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH.trim() || '1';
+  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
+  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
   public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN.trim();
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
