@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import PersonalNode from '../../../common/data/models/PersonalNode'
 import ListStyles from '../../../common/Styles/ListStyles'
@@ -7,7 +7,7 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { Button, Input } from 'react-native-elements'
 
 export type Props = {
-  personalNode: PersonalNode;
+  personalNode: PersonalNode | null;
   onEditButtonPressed: () => void;
 };
 
@@ -26,7 +26,9 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
         }}>
           <Text style={{
             ...ListStyles.infoHeaderTitleText, flex: 1
-          }}>Personal Node Details</Text>
+          }}>
+            Personal Node Details
+          </Text>
 
           <Button
             raised
@@ -45,7 +47,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          value={personalNode.activeNodeIPAddress}
+          value={personalNode?.activeNodeIPAddress || ''}
           disabled
         />
 
@@ -56,7 +58,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           ]}
           inputStyle={FormStyles.inputText}
           underlineColorAndroid={'transparent'}
-          value={String( personalNode.activeNodePortNumber )}
+          value={String( personalNode?.activeNodePortNumber || '' )}
           numberOfLines={1}
           disabled
         />

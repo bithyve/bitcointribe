@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { View, Text, StyleSheet, AsyncStorage, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { useDispatch } from 'react-redux'
 import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
 import PersonalNodeSettingsHeader from './PersonalNodeSettingsHeader'
@@ -9,43 +10,29 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import PersonalNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionSuccessBottomSheet'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
+import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
+import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
+import { connectToPersonalNode, personalNodePreferenceToggled, savePersonalNodeConfiguration, savePersonalNodeSettings } from '../../../store/actions/nodeSettings'
 
 export type Props = {
   navigation: any;
 };
 
 const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
+  const dispatch = useDispatch()
+  const nodeSettingsState = useNodeSettingsState()
+  const activePersonalNode = useActivePersonalNode()
+
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
 
-  const [ personalNode, setPersonalNode ] = useState<PersonalNode>( {
-  } )
+  const isPersonalNodeConnectionEnabled = useMemo( () => {
+    return nodeSettingsState.prefersPersonalNodeConnection
+  }, [ nodeSettingsState.prefersPersonalNodeConnection ] )
 
-  const [ isPersonalNodeConnectionEnabled, setIsPersonalNodeConnectionEnabled ] = useState( false )
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )
-
-  async function getPersonalNodeData() {
-    const personalNodeData = await AsyncStorage.getItem( 'PersonalNode' )
-
-    if ( personalNodeData ) {
-      const personalNode: PersonalNode = JSON.parse( personalNodeData )
-
-      setIsPersonalNodeConnectionEnabled( personalNode.isConnectionActive )
-      setIsEditingPersonalNodeConnection( personalNode.activeNodeURL == null )
-      setPersonalNode( personalNode )
-    } else {
-      setIsPersonalNodeConnectionEnabled( false )
-      setIsEditingPersonalNodeConnection( true )
-      setPersonalNode( {
-        isConnectionActive: false,
-        activeNodeIPAddress: null,
-        activeNodePortNumber: null,
-        activeNodeURL: null,
-      } )
-    }
-  }
 
   const showConnectionSucceededBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -79,10 +66,6 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     ipAddress,
     portNumber,
   }: PersonalNodeFormData ) {
-    // TODO: How would the UI dispatch some kind of action here that would be handled
-    // on the back-end if we're using AsyncStorage for PersonalNode data?
-
-    // For now, just mock out the completion process...
     const newPersonalNodeConfig: PersonalNode = {
       isConnectionActive: true,
       activeNodeIPAddress: ipAddress,
@@ -91,19 +74,18 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     }
 
     setIsEditingPersonalNodeConnection( false )
-    setIsPersonalNodeConnectionEnabled( true )
-    setPersonalNode( newPersonalNodeConfig )
-
-    showConnectionSucceededBottomSheet()
+    dispatch( savePersonalNodeConfiguration( newPersonalNodeConfig ) )
   }
 
-
   useEffect( () => {
-    getPersonalNodeData()
-  }, [] )
+    if ( nodeSettingsState.hasConnectionSucceeded ) {
+      showConnectionSucceededBottomSheet()
+    } else if ( nodeSettingsState.hasConnectionFailed ) {
+      showConnectionFailedBottomSheet()
+    }
+  }, [ nodeSettingsState.hasConnectionSucceeded, nodeSettingsState.hasConnectionFailed ] )
 
   return (
-
     <View style={styles.rootContainer}>
       <KeyboardAvoidingView
         style={styles.rootContainer}
@@ -120,7 +102,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
               }}
               isConnectionEnabled={isPersonalNodeConnectionEnabled}
               onToggle={() => {
-                setIsPersonalNodeConnectionEnabled( !isPersonalNodeConnectionEnabled )
+                dispatch( personalNodePreferenceToggled( !isPersonalNodeConnectionEnabled ) )
               }}
             />
 
@@ -130,7 +112,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
               />
             ) || ( isPersonalNodeConnectionEnabled ) && (
               <PersonalNodeDetailsSection
-                personalNode={personalNode}
+                personalNode={activePersonalNode}
                 onEditButtonPressed={() => setIsEditingPersonalNodeConnection( true ) }
               />
             )

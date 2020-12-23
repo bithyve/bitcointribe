@@ -1,33 +1,33 @@
-import { applyMiddleware, createStore, combineReducers } from "redux";
-import { AsyncStorage as storage } from "react-native";
-import thunk from "redux-thunk";
-import createSagaMiddleware from "redux-saga";
-import { call, all, spawn } from "redux-saga/effects";
-import { composeWithDevTools } from "redux-devtools-extension";
+import { applyMiddleware, createStore, combineReducers } from 'redux'
+import { AsyncStorage as storage } from 'react-native'
+import thunk from 'redux-thunk'
+import createSagaMiddleware from 'redux-saga'
+import { call, all, spawn } from 'redux-saga/effects'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
-import storageReducer from "./reducers/storage";
-import setupAndAuthReducer from "./reducers/setupAndAuth";
-import accountsReducer from "./reducers/accounts";
-import sssReducer from "./reducers/sss";
-import fBTCReducers from "./reducers/fbtc";
-import notificationsReducer from "./reducers/notifications";
-import trustedContactsReducer from "./reducers/trustedContacts";
-import { persistStore, persistReducer } from "redux-persist";
-import preferencesReducer from "./reducers/preferences";
-import loaders from "./reducers/loaders";
+import storageReducer from './reducers/storage'
+import setupAndAuthReducer from './reducers/setupAndAuth'
+import accountsReducer from './reducers/accounts'
+import sssReducer from './reducers/sss'
+import fBTCReducers from './reducers/fbtc'
+import notificationsReducer from './reducers/notifications'
+import trustedContactsReducer from './reducers/trustedContacts'
+import { persistStore, persistReducer } from 'redux-persist'
+import preferencesReducer from './reducers/preferences'
+import loaders from './reducers/loaders'
 
 const config = {
-  key: "root", // key is required
+  key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ["setupAndAuth", "loaders"],
-};
+  blacklist: [ 'setupAndAuth', 'loaders' ],
+}
 
 import {
   initDBWatcher,
   fetchDBWatcher,
   insertDBWatcher,
   servicesEnricherWatcher,
-} from "./sagas/storage";
+} from './sagas/storage'
 
 import {
   initSetupWatcher,
@@ -35,7 +35,7 @@ import {
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
-} from "./sagas/setupAndAuth";
+} from './sagas/setupAndAuth'
 
 import {
   fetchTransactionsWatcher,
@@ -63,7 +63,7 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
-} from "./sagas/accounts";
+} from './sagas/accounts'
 
 import {
   initHCWatcher,
@@ -87,19 +87,19 @@ import {
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
   sharePersonalCopyWatcher,
-} from "./sagas/sss";
+} from './sagas/sss'
 
 import {
   accountSyncWatcher,
   getQuoteWatcher,
   executeOrderWatcher,
   getBalancesWatcher,
-} from "./sagas/fbtc";
+} from './sagas/fbtc'
 
 import {
   updateFCMTokensWatcher,
   fetchNotificationsWatcher,
-} from "./sagas/notifications";
+} from './sagas/notifications'
 
 import {
   initializedTrustedContactWatcher,
@@ -113,7 +113,8 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
-} from "./sagas/trustedContacts";
+} from './sagas/trustedContacts'
+import nodeSettingsReducer from './reducers/nodeSettings'
 
 const rootSaga = function* () {
   const sagas = [
@@ -202,47 +203,48 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
-  ];
+  ]
 
   yield all(
-    sagas.map((saga) =>
-      spawn(function* () {
-        while (true) {
+    sagas.map( ( saga ) =>
+      spawn( function* () {
+        while ( true ) {
           try {
-            yield call(saga);
-            break;
-          } catch (e) {
-            console.log(e);
+            yield call( saga )
+            break
+          } catch ( e ) {
+            console.log( e )
           }
         }
-      })
+      } )
     )
-  );
-};
+  )
+}
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
   fbtc: fBTCReducers,
+  nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,
-});
+} )
 
 export default function makeStore() {
-  const sagaMiddleware = createSagaMiddleware();
-  const reducers = persistReducer(config, rootReducer);
+  const sagaMiddleware = createSagaMiddleware()
+  const reducers = persistReducer( config, rootReducer )
   const storeMiddleware = composeWithDevTools(
-    applyMiddleware(sagaMiddleware, thunk)
-  );
+    applyMiddleware( sagaMiddleware, thunk )
+  )
 
-  const store = createStore(reducers, storeMiddleware);
+  const store = createStore( reducers, storeMiddleware )
 
-  persistStore(store);
-  sagaMiddleware.run(rootSaga);
+  persistStore( store )
+  sagaMiddleware.run( rootSaga )
 
-  return store;
+  return store
 }
