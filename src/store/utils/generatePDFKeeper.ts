@@ -42,12 +42,15 @@ export default async (pdfData, fileName, title) => {
     qrCodeString,
   };
   let pdfPath = await getPdfPath(pdfDatas);
-  // console.log({ pdfPath });
+   console.log({ pdfPath });
   return pdfPath;
 };
 const getPdfPath = async (pdfData: any) => {
+  if(pdfData){
+    console.log("PDFDATA", pdfData);
   if (Platform.OS == 'ios') {
-    const PdfPassword = NativeModules.PdfPassword;
+    const PdfPassword = await NativeModules.PdfPasswordKeeper;
+    console.log("PADFPASSWORD", PdfPassword);
     return await PdfPassword.createPdfKeeper(JSON.stringify(pdfData));
   } else {
     if (!(await requestStoragePermission())) {
@@ -66,4 +69,5 @@ const getPdfPath = async (pdfData: any) => {
     );
     return '/storage/emulated/0/' + pdfData.fileName;
   }
+}
 };
