@@ -63,6 +63,7 @@ class HexaConfig {
   public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
   public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
   public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
+  public ENC_KEY_STORAGE_IDENTIFIER: string = Config.ENC_KEY_STORAGE_IDENTIFIER.trim();
   public DPATH_PURPOSE: number = Config.BIT_DPATH_PURPOSE ? parseInt( Config.BIT_DPATH_PURPOSE.trim(), 10 ) : 49;
   public SSS_METASHARE_SPLITS: number = Config.BIT_SSS_METASHARE_SPLITS ? parseInt( Config.BIT_SSS_METASHARE_SPLITS.trim(), 10 ) : 8;
   public STATUS = {
