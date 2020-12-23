@@ -102,7 +102,7 @@ class HexaConfig {
 
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
-
+  
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
@@ -267,8 +267,8 @@ class HexaConfig {
       const personalNode: PersonalNode = JSON.parse( personalNodeData )
       const personalNodeURL = personalNode.activeNodeURL
 
-      if( personalNodeURL ){
-        const ownNodeEPs = {
+      if( personalNodeURL && personalNode.isConnectionActive ){
+        const personalNodeEPs = {
           MULTIBALANCE: personalNodeURL + '/balances',
           MULTIUTXO:  personalNodeURL + '/utxos',
           MULTITXN: personalNodeURL + '/data',
@@ -283,14 +283,47 @@ class HexaConfig {
         if( this.ENVIRONMENT === 'MAIN' )
           this.ESPLORA_API_ENDPOINTS = {
             ...this.ESPLORA_API_ENDPOINTS,
-            MAINNET: ownNodeEPs
+            MAINNET: personalNodeEPs
           }
         else
           this.ESPLORA_API_ENDPOINTS = {
             ...this.ESPLORA_API_ENDPOINTS,
-            TESTNET: ownNodeEPs,
+            TESTNET: personalNodeEPs,
           }
       }
+    }
+  }
+
+  public connectToDefaultNode =  async () => {
+    const personalNodeData = await AsyncStorage.getItem( 'PersonalNode' )
+
+    if( personalNodeData ){
+      // deactivate personal node connection
+      const personalNode: PersonalNode = JSON.parse( personalNodeData )
+      personalNode.isConnectionActive = false
+      await AsyncStorage.setItem( 'PersonalNode', JSON.stringify( personalNode ) )
+    }
+    this.ESPLORA_API_ENDPOINTS = {
+      TESTNET: {
+        MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
+        MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
+        MULTITXN: this.TESTNET_BASE_URL + '/data',
+        MULTIBALANCETXN: this.TESTNET_BASE_URL + '/baltxs',
+        NEWMULTIUTXOTXN: this.TESTNET_BASE_URL + '/nutxotxs',
+        TXN_FEE: this.TESTNET_BASE_URL + '/fee-estimates',
+        TXNDETAILS: this.TESTNET_BASE_URL + '/tx',
+        BROADCAST_TX: this.TESTNET_BASE_URL + '/tx',
+      },
+      MAINNET: {
+        MULTIBALANCE: this.MAINNET_BASE_URL + '/balances',
+        MULTIUTXO: this.MAINNET_BASE_URL + '/utxos',
+        MULTITXN: this.MAINNET_BASE_URL + '/data',
+        MULTIBALANCETXN: this.MAINNET_BASE_URL + '/baltxs',
+        NEWMULTIUTXOTXN: this.MAINNET_BASE_URL + '/nutxotxs',
+        TXN_FEE: this.MAINNET_BASE_URL + '/fee-estimates',
+        TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
+        BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
+      },
     }
   }
 }
