@@ -36,21 +36,14 @@ class HexaConfig {
     keyLength: number;
   } = {
     algorithm: Config.BIT_CIPHER_ALGORITHM ? Config.BIT_CIPHER_ALGORITHM.trim() : 'aes-192-cbc',
-    salt: Config.BIT_CIPHER_SALT ? Config.BIT_CIPHER_SALT.trim() : 'bithyeSalt',
+    salt: Config.BIT_CIPHER_SALT ? Config.BIT_CIPHER_SALT.trim() : '',
     keyLength: Config.BIT_CIPHER_KEYLENGTH ? parseInt( Config.BIT_CIPHER_KEYLENGTH.trim(), 10 ) : 24,
     iv: Buffer.alloc( 16, 0 ),
   };
-  public KEY_STRETCH_ITERATIONS = parseInt( Config.BIT_KEY_STRETCH_ITERATIONS.trim(), 10, );
+  public KEY_STRETCH_ITERATIONS = Config.BIT_KEY_STRETCH_ITERATIONS ? parseInt( Config.BIT_KEY_STRETCH_ITERATIONS.trim(), 10 ) : 10000;
 
-  public LAST_SEEN_ACTIVE_DURATION: number = parseInt(
-    Config.LAST_SEEN_ACTIVE_DURATION.trim(),
-    10,
-  );
-  public LAST_SEEN_AWAY_DURATION: number = parseInt(
-    Config.LAST_SEEN_AWAY_DURATION.trim(),
-    10,
-  );
-
+  public LAST_SEEN_ACTIVE_DURATION: number = Config.BIT_LAST_SEEN_ACTIVE_DURATION ? parseInt( Config.BIT_LAST_SEEN_ACTIVE_DURATION.trim(), 10 ) : 21600;
+  public LAST_SEEN_AWAY_DURATION: number = Config.BIT_LAST_SEEN_AWAY_DURATION ? parseInt( Config.BIT_LAST_SEEN_AWAY_DURATION.trim(), 10 ) : 64800;
   public BH_SERVERS = {
     RELAY: Config.BIT_API_URLS_RELAY.trim(),
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
@@ -84,30 +77,30 @@ class HexaConfig {
 
   public HEALTH_STATUS = {
     HEXA_HEALTH: {
-      STAGE1: Config.BIT_HEXA_HEALTH_STAGE1.trim(),
-      STAGE2: Config.BIT_HEXA_HEALTH_STAGE2.trim(),
-      STAGE3: Config.BIT_HEXA_HEALTH_STAGE3.trim(),
-      STAGE4: Config.BIT_HEXA_HEALTH_STAGE4.trim(),
-      STAGE5: Config.BIT_HEXA_HEALTH_STAGE5.trim(),
+      STAGE1: Config.BIT_HEXA_HEALTH_STAGE1 ? Config.BIT_HEXA_HEALTH_STAGE1.trim() : 0,
+      STAGE2: Config.BIT_HEXA_HEALTH_STAGE2 ? Config.BIT_HEXA_HEALTH_STAGE2.trim() : 20,
+      STAGE3: Config.BIT_HEXA_HEALTH_STAGE3 ? Config.BIT_HEXA_HEALTH_STAGE3.trim() : 50,
+      STAGE4: Config.BIT_HEXA_HEALTH_STAGE4 ? Config.BIT_HEXA_HEALTH_STAGE4.trim() : 75,
+      STAGE5: Config.BIT_HEXA_HEALTH_STAGE5 ? Config.BIT_HEXA_HEALTH_STAGE5.trim() : 100,
     },
 
     ENTITY_HEALTH: {
-      STAGE1: Config.BIT_ENTITY_HEALTH_STAGE1.trim(),
-      STAGE2: Config.BIT_ENTITY_HEALTH_STAGE2.trim(),
-      STAGE3: Config.BIT_ENTITY_HEALTH_STAGE3.trim(),
+      STAGE1: Config.BIT_ENTITY_HEALTH_STAGE1 ? Config.BIT_ENTITY_HEALTH_STAGE1.trim() : 'Ugly',
+      STAGE2: Config.BIT_ENTITY_HEALTH_STAGE2 ? Config.BIT_ENTITY_HEALTH_STAGE2.trim() : 'Bad',
+      STAGE3: Config.BIT_ENTITY_HEALTH_STAGE3 ? Config.BIT_ENTITY_HEALTH_STAGE3.trim() : 'Good',
     },
 
     TIME_SLOTS: {
-      SHARE_SLOT1: parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ),
-      SHARE_SLOT2: parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ),
+      // 2 weeks in minutes: 20160
+      SHARE_SLOT1: Config.BIT_SHARE_HEALTH_TIME_SLOT1 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ) : 20160,
+      
+      //4 weeks in minutes: 40320
+      SHARE_SLOT2: Config.BIT_SHARE_HEALTH_TIME_SLOT2 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ) : 40320,
     },
   };
 
-  public LEGACY_TC_REQUEST_EXPIRY = parseInt(
-    Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(),
-    10,
-  );
-  public TC_REQUEST_EXPIRY = parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 );
+  public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
+  public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
 
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
@@ -167,34 +160,34 @@ class HexaConfig {
   };
 
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
-    series: parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ),
+    series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
     instance: {
-      max: parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ),
+      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
       using: 0,
     },
   };
 
   public FAST_BITCOINS: DerivativeAccount = {
-    series: parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ),
+    series: Config.BIT_FAST_BITCOINS_SERIES ? parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ) : 11,
     instance: {
-      max: parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ),
+      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 10,
       using: 0,
     },
   };
 
   public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
-    series: parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ),
+    series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
     instance: {
-      max: parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ),
+      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 1000,
       using: 0,
     },
   };
 
   public DONATION_ACCOUNT: DonationDerivativeAccount = {
-    series: parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ),
+    series: Config.BIT_DONATION_ACCOUNT_SERIES ? parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ) : 101,
     instance: {
-      max: parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ),
+      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
       using: 0,
     },
   };
