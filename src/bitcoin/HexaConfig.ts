@@ -24,7 +24,7 @@ class HexaConfig {
   public BITCOIN_NODE: Client;
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
-  public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN.trim();
+  public TOKEN = 'notUsed';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
@@ -45,8 +45,8 @@ class HexaConfig {
   public LAST_SEEN_ACTIVE_DURATION: number = Config.BIT_LAST_SEEN_ACTIVE_DURATION ? parseInt( Config.BIT_LAST_SEEN_ACTIVE_DURATION.trim(), 10 ) : 21600;
   public LAST_SEEN_AWAY_DURATION: number = Config.BIT_LAST_SEEN_AWAY_DURATION ? parseInt( Config.BIT_LAST_SEEN_AWAY_DURATION.trim(), 10 ) : 64800;
   public BH_SERVERS = {
-    RELAY: Config.BIT_API_URLS_RELAY.trim(),
-    SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
+    RELAY: Config.BIT_API_URLS_RELAY ? Config.BIT_API_URLS_RELAY.trim() : '',
+    SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER ? Config.BIT_API_URLS_SIGNING_SERVER.trim() : '',
   };
   public BSI = {
     INIT_INDEX: Config.BIT_BSI_INIT_INDEX ? parseInt( Config.BIT_BSI_INIT_INDEX.trim(), 10 ) : 100,
@@ -132,32 +132,13 @@ class HexaConfig {
 
   public API_URLS = {
     TESTNET: {
-      BASE: Config.BIT_API_URLS_TESTNET_BASE.trim(),
-      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_TESTNET_BASE.trim(),
-      BALANCE_CHECK: Config.BIT_API_URLS_TESTNET_BALANCE_CHECK.trim(),
-      UNSPENT_OUTPUTS: Config.BIT_API_URLS_TESTNET_UNSPENT_OUTPUTS.trim(),
-      BROADCAST: Config.BIT_API_URLS_TESTNET_BROADCAST.trim(),
-      TX_DECODE: Config.BIT_API_URLS_TESTNET_TX_DECODE.trim(),
-      TX_FETCH: {
-        URL: Config.BIT_API_URLS_TESTNET_TX_FETCH_URL.trim(),
-        LIMIT: Config.BIT_API_URLS_TESTNET_TX_LIMIT.trim(),
-      },
-      FUND: {
-        URL: Config.BIT_API_URLS_TESTNET_FUND_URL.trim(),
-      },
+      BASE: 'notUsed',
+      UNSPENT_OUTPUTS: 'notUsed'
     },
     MAINNET: {
-      BASE: Config.BIT_API_URLS_MAINNET_BASE.trim(),
-      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_MAINNET_BASE.trim(),
-      BALANCE_CHECK: Config.BIT_API_URLS_MAINNET_BALANCE_CHECK.trim(),
-      UNSPENT_OUTPUTS: Config.BIT_API_URLS_MAINNET_UNSPENT_OUTPUTS.trim(),
-      BROADCAST: Config.BIT_API_URLS_MAINNET_BROADCAST.trim(),
-      TX_DECODE: Config.BIT_API_URLS_MAINNET_TX_DECODE.trim(),
-      TX_FETCH: {
-        URL: Config.BIT_API_URLS_MAINNET_TX_FETCH_URL.trim(),
-        LIMIT: Config.BIT_API_URLS_MAINNET_TX_LIMIT.trim(),
-      },
-    },
+      BASE: 'notUsed',
+      UNSPENT_OUTPUTS: 'notUsed'
+    }
   };
 
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
@@ -223,19 +204,16 @@ class HexaConfig {
       10,
     )
 
-    // console.log(this.HEALTH_STATUS.TIME_SLOTS);
-    // console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
-
-    // console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork()
 
+    // TODO:: Refactor Bitcoin folder to remove Client
     this.BITCOIN_NODE = new Client( {
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
       timeout: 10000,
-      username: Config.BIT_RPC_USERNAME.trim(),
-      password: Config.BIT_RPC_PASSWORD.trim(),
-      host: Config.BIT_HOST_IP.trim(),
+      username: 'notUsed',
+      password: 'noUsed',
+      host: 'notUsed',
     } )
 
     if (
