@@ -12,40 +12,40 @@ export type PersonalNodeFormData = {
 }
 
 export type Props = {
-  onSubmit: ( formData: PersonalNodeFormData ) => void;
+  onSubmit: (formData: PersonalNodeFormData) => void;
 };
 
 
-const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => {
+const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
   const activePersonalNode = useActivePersonalNode()
 
-  const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState(
+  const [currentIPAddressValue, setCurrentIPAddressValue] = useState(
     activePersonalNode?.ipAddress || ''
   )
 
-  const [ currentPortNumberValue, setCurrentPortNumberValue ] = useState(
-    String( activePersonalNode?.portNumber || 8332 )
+  const [currentPortNumberValue, setCurrentPortNumberValue] = useState(
+    String(activePersonalNode?.portNumber || '')
   )
 
-  const ipAddressInputRef = useRef<Input>( null )
+  const ipAddressInputRef = useRef<Input>(null)
 
-  const canProceed = useMemo( () => {
+  const canProceed = useMemo(() => {
     return (
       currentIPAddressValue.length != 0 &&
-      Boolean( Number( currentPortNumberValue ) )
+      Boolean(Number(currentPortNumberValue))
     )
-  }, [ currentIPAddressValue, currentPortNumberValue ] )
+  }, [currentIPAddressValue, currentPortNumberValue])
 
   function handleProceedButtonPress() {
-    onSubmit( {
+    onSubmit({
       ipAddress: currentIPAddressValue,
-      portNumber: Number( currentPortNumberValue ),
-    } )
+      portNumber: Number(currentPortNumberValue),
+    })
   }
 
-  useEffect( () => {
+  useEffect(() => {
     ipAddressInputRef.current?.focus()
-  }, [] )
+  }, [])
 
   return (
     <View style={styles.rootContainer}>
@@ -102,7 +102,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   rootContainer: {
 
   },
@@ -121,6 +121,6 @@ const styles = StyleSheet.create( {
     alignItems: 'flex-start',
   },
 
-} )
+})
 
 export default PersonalNodeConnectionForm
