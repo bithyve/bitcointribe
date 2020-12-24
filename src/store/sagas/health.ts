@@ -512,6 +512,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
               updatedAt: moment(new Date()).valueOf(),
               name: ScannedData.walletName,
               shareType: type,
+              status: "notAccessible",
             },
           ];
           yield put(updateMSharesHealth(shareArray));
@@ -521,6 +522,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             for (let i = 0; i < keeperInfo.length; i++) {
               const element = keeperInfo[i];
               if (element.shareId == share.shareId) {
+                flag = false;
                 keeperInfo[i].name = ScannedData.walletName;
                 keeperInfo[i].uuid = ScannedData.uuid;
                 keeperInfo[i].publicKey = ScannedData.publicKey;
@@ -529,7 +531,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
                 break;
               } else {
                 flag = true;
-                break;
               }
             }
           } else {
@@ -2198,14 +2199,20 @@ function* getPDFDataWorker({ payload }) {
       console.log("res2", res2);
       if (res1.success && res2.success) {
         const qrData = [
-          LevelHealth.encryptWithAnswer(
-            primaryShareObject,
-            WALLET_SETUP.security.answer
-          ).encryptedString,
-          LevelHealth.encryptWithAnswer(
-            secondaryShareObject,
-            WALLET_SETUP.security.answer
-          ).encryptedString,
+          JSON.stringify({
+            type: "pdf",
+            encryptedData: LevelHealth.encryptWithAnswer(
+              primaryShareObject,
+              WALLET_SETUP.security.answer
+            ).encryptedString,
+          }),
+          JSON.stringify({
+            type: "pdf",
+            encryptedData: LevelHealth.encryptWithAnswer(
+              secondaryShareObject,
+              WALLET_SETUP.security.answer
+            ).encryptedString,
+          }),
         ];
         const pdfData = {
           qrData: qrData,
