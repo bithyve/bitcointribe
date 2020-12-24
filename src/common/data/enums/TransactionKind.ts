@@ -4,4 +4,4 @@ enum TransactionKind {
   SELF = 'SELF',
 }
 
-export default TransactionKind;
+export default TransactionKind

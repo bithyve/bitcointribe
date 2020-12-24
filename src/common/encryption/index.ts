@@ -1,10 +1,10 @@
-import cryptoJS from "crypto-js";
-import 'react-native-get-random-values';
+import cryptoJS from 'crypto-js'
+import 'react-native-get-random-values'
 
 export const encrypt = (data, key) => {
-  const ciphertext = cryptoJS.AES.encrypt(JSON.stringify(data), key);
-  return ciphertext.toString();
-};
+  const ciphertext = cryptoJS.AES.encrypt(JSON.stringify(data), key)
+  return ciphertext.toString()
+}
 
 export const decrypt = (ciphertext, key) => {
   try{
@@ -24,6 +24,6 @@ export const decrypt1 = (ciphertext, key) => {
 export const hash = data => cryptoJS.SHA512(data).toString();
 
 export const generateKey = async () => {
-  const randomBytes = await crypto.getRandomValues(new Uint8Array(16));
-  return hash(randomBytes.toString());
-};
+  const randomBytes = await crypto.getRandomValues(new Uint8Array(16))
+  return hash(randomBytes.toString())
+}

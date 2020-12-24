@@ -29,7 +29,7 @@ export type Props = {
   activeOffImage?: ImageSourcePropType;
   inactiveOnImage?: ImageSourcePropType;
   inactiveOffImage?: ImageSourcePropType;
-
+  disabled?: boolean;
   onpress: () => void;
 };
 
@@ -60,6 +60,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ({
   inactiveOffImage,
   isVertical,
   changeSettingToggle,
+  disabled,
   onpress,
 }: Props) => {
 
@@ -67,6 +68,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ({
     <TouchableWrapper
       activeOpacity={1}
       onPress={onpress}
+      disabled={disabled}
       style={{
         flexDirection: isVertical ? 'column' : 'row',
         backgroundColor: trackColor || '#1E82C2',

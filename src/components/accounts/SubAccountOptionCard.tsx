@@ -1,60 +1,75 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { Card, Overlay } from 'react-native-elements';
-import Colors from '../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import CardStyles from '../../common/Styles/Cards.js';
-import LinearGradient from 'react-native-linear-gradient';
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import { Card, Overlay } from 'react-native-elements'
+import Colors from '../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import CardStyles from '../../common/Styles/Cards.js'
+import LinearGradient from 'react-native-linear-gradient'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
   isDisabled: boolean;
   isSelected: boolean;
+  specialTag: string | null;
   containerStyle?: Record<string, unknown>;
 }
 
-const SubAccountOptionCard: React.FC<Props> = ({
+const SubAccountOptionCard: React.FC<Props> = ( {
   subAccountInfo,
   isDisabled,
   isSelected,
-  containerStyle = {},
-}: Props) => {
+  specialTag = null,
+  containerStyle = {
+  },
+}: Props ) => {
 
-  const selectionIndicatorContainerStyle = useMemo(() => {
+  const selectionIndicatorContainerStyle = useMemo( () => {
     return {
       ...styles.selectionIndicatorContainer,
       borderColor: isSelected ? Colors.blue : Colors.borderColor,
       backgroundColor: isSelected ? Colors.blue : 'transparent',
-    };
-  }, [isSelected]);
+    }
+  }, [ isSelected ] )
 
-  const cardContainerStyle = useMemo(() => {
+  const cardContainerStyle = useMemo( () => {
     return {
       ...styles.cardContainer,
       backgroundColor: isSelected ? 'transparent' : Colors.white,
       opacity: isDisabled ? 0.35 : 1.0,
-    };
-  }, [isSelected]);
+    }
+  }, [ isSelected ] )
 
-  const titleTextStyle = useMemo(() => {
+  const titleTextStyle = useMemo( () => {
     return {
       ...styles.titleText,
       color: isSelected ? Colors.white : Colors.primaryText,
-    };
-  }, [isSelected]);
+    }
+  }, [ isSelected ] )
 
-  const subtitleTextStyle = useMemo(() => {
+  const subtitleTextStyle = useMemo( () => {
     return {
       ...styles.subtitleText,
       color: isSelected ? Colors.offWhite : Colors.secondaryText,
-    };
-  }, [isSelected]);
+    }
+  }, [ isSelected ] )
+
+
+  const descriptionTextContainerStyle = useMemo( () => {
+    return {
+      ...styles.descriptionTextContainer,
+      marginBottom: isDisabled ? -8 : 8,
+    }
+  }, [ isSelected ] )
+
+
 
 
   return (
-    <View style={{ ...styles.rootContainer, ...containerStyle }}>
+    <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
       {isSelected &&  (
         <LinearGradient
           colors={[
@@ -62,8 +77,12 @@ const SubAccountOptionCard: React.FC<Props> = ({
             Colors.primaryAccentLighter2,
             Colors.primaryAccent,
           ]}
-          start={{ x: 0.0, y: 0.0 }}
-          end={{ x: 1.0, y: 1.0 }}
+          start={{
+            x: 0.0, y: 0.0
+          }}
+          end={{
+            x: 1.0, y: 1.0
+          }}
           style={styles.backgroundGradient}
         />
       )}
@@ -72,30 +91,42 @@ const SubAccountOptionCard: React.FC<Props> = ({
         containerStyle={cardContainerStyle}
         wrapperStyle={styles.cardContentWrapper}
       >
+
+        {specialTag && (
+          <Card.Title
+            style={styles.specialTagText}
+            numberOfLines={2}
+          >
+            {specialTag}
+          </Card.Title>
+        )}
+
         <Image
           style={styles.image}
-          source={getAvatarForSubAccount(subAccountInfo)}
+          source={getAvatarForSubAccount( subAccountInfo )}
         />
 
-        <View style={styles.descriptionTextContainer}>
+        <View style={descriptionTextContainerStyle}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
           <Card.Title style={subtitleTextStyle}>{subAccountInfo.defaultDescription}</Card.Title>
         </View>
 
-        <View style={selectionIndicatorContainerStyle}>
-          {isSelected && (
-            <Image
-              style={styles.selectionIndicatorImage}
-              source={require('../../assets/images/icons/checkmark.png')}
-            />
-          )}
-        </View>
+        {isDisabled == false && (
+          <View style={selectionIndicatorContainerStyle}>
+            {isSelected && (
+              <Image
+                style={styles.selectionIndicatorImage}
+                source={require( '../../assets/images/icons/checkmark.png' )}
+              />
+            )}
+          </View>
+        )}
       </Card>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -120,24 +151,23 @@ const styles = StyleSheet.create({
 
   cardContentWrapper: {
     ...CardStyles.horizontalScrollViewCardContent,
-    paddingVertical: 10,
+    paddingVertical: 0,
     backgroundColor: 'transparent',
   },
 
   descriptionTextContainer: {
-    marginBottom: 8,
     alignItems: 'center',
   },
 
   titleText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 2,
   },
 
   subtitleText: {
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 2,
@@ -156,6 +186,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-});
 
-export default SubAccountOptionCard;
+  specialTagText: {
+    position: 'absolute',
+    right: -RFValue( 2 ),
+    top: -RFValue( 2 ),
+    fontSize: RFValue( 10 ),
+    color: Colors.blue,
+    textAlign: 'right',
+    width: '50%',
+  }
+} )
+
+export default SubAccountOptionCard

@@ -3,4 +3,4 @@ enum NetworkKind {
   TESTNET = 'TESTNET',
 }
 
-export default NetworkKind;
+export default NetworkKind

@@ -1,8 +1,8 @@
-import SubAccountKind from '../../enums/SubAccountKind';
-import ServiceAccountKind from '../../enums/ServiceAccountKind';
-import TransactionConfirmationStatus from '../../enums/TransactionConfirmationStatus';
-import TransactionKind from '../../enums/TransactionKind';
-import { TransactionDetails } from '../../../../bitcoin/utilities/Interface';
+import SubAccountKind from '../../enums/SubAccountKind'
+import ServiceAccountKind from '../../enums/ServiceAccountKind'
+import TransactionConfirmationStatus from '../../enums/TransactionConfirmationStatus'
+import TransactionKind from '../../enums/TransactionKind'
+import { TransactionDetails } from '../../../../bitcoin/utilities/Interface'
 
 export interface BaseTransactionDescribing {
   txID: string;
@@ -65,4 +65,4 @@ type TransactionDescribing = TransactionDetails; // tx-describing now stands for
 // InboundTransactionDescribing |
 // OutboundTransactionDescribing;
 
-export default TransactionDescribing;
+export default TransactionDescribing

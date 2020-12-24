@@ -2,11 +2,11 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "editor.formatOnPaste": true,
   "eslint.validate": [
     "javascript",
     "typescript",
-    "typescriptreact"
+    "typescriptreact",
+    "jsx"
   ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "cSpell.words": [

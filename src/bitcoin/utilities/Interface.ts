@@ -1,7 +1,7 @@
 import {
   DecentralizedBackup,
   ServicesJSON,
-} from '../../common/interfaces/Interfaces';
+} from '../../common/interfaces/Interfaces'
 
 export interface InputUTXOs {
   txId: string;
@@ -360,8 +360,8 @@ export interface Contacts {
     secondaryKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;
-    isWard?: Boolean;
-    isGuardian?: Boolean;
+    isWard?: boolean;
+    isGuardian?: boolean;
     walletID?: string;
     FCMs?: string[];
     ephemeralChannel?: {
@@ -373,7 +373,7 @@ export interface Contacts {
       address: string;
       data?: TrustedData[];
     };
-    lastSeen?: Number;
+    lastSeen?: number;
     trustedAddress?: string;
     trustedTestAddress?: string;
   };

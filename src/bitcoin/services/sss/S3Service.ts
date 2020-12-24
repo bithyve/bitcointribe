@@ -1,5 +1,5 @@
-import config from '../../HexaConfig';
-import { ErrMap } from '../../utilities/ErrMap';
+import config from '../../HexaConfig'
+import { ErrMap } from '../../utilities/ErrMap'
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
@@ -44,7 +44,7 @@ export default class S3Service {
       walletId,
       healthCheckStatus,
       pdfHealth,
-    });
+    })
   };
 
   public static recoverFromSecrets = (
@@ -71,7 +71,9 @@ export default class S3Service {
       const { mnemonic } = LevelHealth.recoverFromSecrets(decryptedSecrets, level);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
     } catch (err) {
-      return { status: 501, err: err.message, message: ErrMap[501] };
+      return {
+        status: 501, err: err.message, message: ErrMap[ 501 ] 
+      }
     }
   };
 
@@ -106,7 +108,9 @@ export default class S3Service {
         data: await LevelHealth.downloadShare(encryptedKey, otp),
       };
     } catch (err) {
-      return { status: 502, err: err.message, message: ErrMap[502] };
+      return {
+        status: 502, err: err.message, message: ErrMap[ 502 ] 
+      }
     }
   };
 
@@ -134,7 +138,9 @@ export default class S3Service {
         data: await LevelHealth.downloadDynamicNonPMDD(walletId),
       };
     } catch (err) {
-      return { status: 516, err: err.message, message: ErrMap[516] };
+      return {
+        status: 516, err: err.message, message: ErrMap[ 516 ] 
+      }
     }
   };
 
@@ -164,7 +170,9 @@ export default class S3Service {
         data: LevelHealth.encryptMetaShare(metaShare, key),
       };
     } catch (err) {
-      return { status: 522, err: err.message, message: ErrMap[522] };
+      return {
+        status: 522, err: err.message, message: ErrMap[ 522 ] 
+      }
     }
   };
 
@@ -202,9 +210,11 @@ export default class S3Service {
           metaShare,
           encryptedDynamicNonPMDD,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 503, err: err.message, message: ErrMap[503] };
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
     }
   };
 
@@ -239,9 +249,11 @@ export default class S3Service {
           existingShares,
           walletId,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 503, err: err.message, message: ErrMap[503] };
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
     }
   };
 
@@ -269,7 +281,9 @@ export default class S3Service {
         data: LevelHealth.decryptViaOTP(otpEncryptedData, otp),
       };
     } catch (err) {
-      return { status: 504, err: err.message, message: ErrMap[504] };
+      return {
+        status: 504, err: err.message, message: ErrMap[ 504 ] 
+      }
     }
   };
 
@@ -296,7 +310,9 @@ export default class S3Service {
         data: LevelHealth.recoverMetaShareFromQR(qrData),
       };
     } catch (err) {
-      return { status: 505, err: err.message, message: ErrMap[505] };
+      return {
+        status: 505, err: err.message, message: ErrMap[ 505 ] 
+      }
     }
   };
 
@@ -355,7 +371,9 @@ export default class S3Service {
         data: await LevelHealth.updateHealth(shares),
       };
     } catch (err) {
-      return { status: 506, err: err.message, message: ErrMap[506] };
+      return {
+        status: 506, err: err.message, message: ErrMap[ 506 ] 
+      }
     }
   };
 
@@ -382,7 +400,9 @@ export default class S3Service {
         data: { shareId: LevelHealth.getShareId(encryptedShare) },
       };
     } catch (err) {
-      return { status: 507, err: err.message, message: ErrMap[507] };
+      return {
+        status: 507, err: err.message, message: ErrMap[ 507 ] 
+      }
     }
   };
 
@@ -407,7 +427,9 @@ export default class S3Service {
         data: { key: LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength) },
       };
     } catch (err) {
-      return { status: 508, err: err.message, message: ErrMap[508] };
+      return {
+        status: 508, err: err.message, message: ErrMap[ 508 ] 
+      }
     }
   };
 
@@ -435,7 +457,9 @@ export default class S3Service {
         data: LevelHealth.encryptViaOTP(key),
       };
     } catch (err) {
-      return { status: 509, err: err.message, message: ErrMap[509] };
+      return {
+        status: 509, err: err.message, message: ErrMap[ 509 ] 
+      }
     }
   };
 
@@ -481,7 +505,9 @@ export default class S3Service {
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
-      return { status: 510, err: err.message, message: ErrMap[510] };
+      return {
+        status: 510, err: err.message, message: ErrMap[ 510 ] 
+      }
     }
   };
 
@@ -580,13 +606,17 @@ export default class S3Service {
     try {
       const { encryptedStaticNonPMDD } = this.levelhealth.encryptStaticNonPMDD(
         staticNonPMDD,
-      );
+      )
       return {
         status: config.STATUS.SUCCESS,
-        data: { encryptedStaticNonPMDD },
-      };
+        data: {
+          encryptedStaticNonPMDD 
+        },
+      }
     } catch (err) {
-      return { status: 511, err: err.message, message: ErrMap[511] };
+      return {
+        status: 511, err: err.message, message: ErrMap[ 511 ] 
+      }
     }
   };
 
@@ -611,7 +641,9 @@ export default class S3Service {
         data: { walletId: this.levelhealth.walletId },
       };
     } catch (err) {
-      return { status: 512, err: err.message, message: ErrMap[512] };
+      return {
+        status: 512, err: err.message, message: ErrMap[ 512 ] 
+      }
     }
   };
 
@@ -637,7 +669,9 @@ export default class S3Service {
         data: await this.levelhealth.initializeHealth(),
       };
     } catch (err) {
-      return { status: 513, err: err.message, message: ErrMap[513] };
+      return {
+        status: 513, err: err.message, message: ErrMap[ 513 ] 
+      }
     }
   };
 
@@ -687,7 +721,9 @@ export default class S3Service {
         data: (await this.levelhealth.checkHealth2()).data,
       };
     } catch (err) {
-      return { status: 514, err: err.message, message: ErrMap[514] };
+      return {
+        status: 514, err: err.message, message: ErrMap[ 514 ] 
+      }
     }
   };
 
@@ -697,7 +733,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          resetted: Boolean;
+          resetted: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -713,9 +749,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.resetSharesHealth(shareIndex),
-      };
+      }
     } catch (err) {
-      return { status: 514, err: err.message, message: ErrMap[514] };
+      return {
+        status: 514, err: err.message, message: ErrMap[ 514 ] 
+      }
     }
   };
 
@@ -743,7 +781,9 @@ export default class S3Service {
         data: await this.levelhealth.updateDynamicNonPMDD(dynamicNonPMDD),
       };
     } catch (err) {
-      return { status: 515, err: err.message, message: ErrMap[515] };
+      return {
+        status: 515, err: err.message, message: ErrMap[ 515 ] 
+      }
     }
   };
 
@@ -770,7 +810,9 @@ export default class S3Service {
         data: this.levelhealth.decryptDynamicNonPMDD(encryptedDynamicNonPMDD),
       };
     } catch (err) {
-      return { status: 518, err: err.message, message: ErrMap[518] };
+      return {
+        status: 518, err: err.message, message: ErrMap[ 518 ] 
+      }
     }
   };
 
@@ -794,15 +836,17 @@ export default class S3Service {
     try {
       const { decryptedDynamicNonPMDD } = this.levelhealth.restoreDynamicNonPMDD(
         dynamicNonPMDDs,
-      );
+      )
       return {
         status: config.STATUS.SUCCESS,
         data: {
           latestDynamicNonPMDD: decryptedDynamicNonPMDD,
         },
-      };
+      }
     } catch (err) {
-      return { status: 517, err: err.message, message: ErrMap[517] };
+      return {
+        status: 517, err: err.message, message: ErrMap[ 517 ] 
+      }
     }
   };
 
@@ -829,7 +873,9 @@ export default class S3Service {
         data: this.levelhealth.decryptStaticNonPMDD(encryptedNonPMDD),
       };
     } catch (err) {
-      return { status: 519, err: err.message, message: ErrMap[519] };
+      return {
+        status: 519, err: err.message, message: ErrMap[ 519 ] 
+      }
     }
   };
 
@@ -863,7 +909,9 @@ export default class S3Service {
         data: this.levelhealth.createMetaShares(secureAssets, tag, version),
       };
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -888,7 +936,9 @@ export default class S3Service {
       const metaShare = this.levelhealth.reshareMetaShare(index);
       return { status: config.STATUS.SUCCESS, data: { metaShare } };
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -898,7 +948,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          restored: Boolean;
+          restored: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -913,7 +963,9 @@ export default class S3Service {
       const { restored } = this.levelhealth.restoreMetaShares(metaShares);
       return { status: config.STATUS.SUCCESS, data: { restored } };
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -938,7 +990,9 @@ export default class S3Service {
         data: this.levelhealth.createQR(index),
       };
     } catch (err) {
-      return { status: 521, err: err.message, message: ErrMap[521] };
+      return {
+        status: 521, err: err.message, message: ErrMap[ 521 ] 
+      }
     }
   };
 
@@ -973,9 +1027,11 @@ export default class S3Service {
           contactName,
           dynamicNonPMDD,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 523, err: err.message, message: ErrMap[523] };
+      return {
+        status: 523, err: err.message, message: ErrMap[ 523 ] 
+      }
     }
   };
 
@@ -985,7 +1041,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -1007,7 +1063,7 @@ export default class S3Service {
         status: 0o1,
         err: err.message,
         message: 'Failed to update Wallet Image',
-      };
+      }
     }
   };
 
@@ -1037,7 +1093,7 @@ export default class S3Service {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch Wallet Image',
-      };
+      }
     }
   };
 

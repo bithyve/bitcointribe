@@ -14,4 +14,4 @@ enum XPubSourceKind {
 }
 
 
-export default XPubSourceKind;
+export default XPubSourceKind

@@ -1,197 +1,202 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import FormStyles from '../../../../common/Styles/FormStyles';
-import ButtonStyles from '../../../../common/Styles/ButtonStyles';
-import Colors from '../../../../common/Colors';
-import Fonts from '../../../../common/Fonts';
-import ListStyles from '../../../../common/Styles/ListStyles';
-import { Input, Button, CheckBox } from 'react-native-elements';
-import { useDispatch } from 'react-redux';
-import { addNewAccountShell } from '../../../../store/actions/accounts';
-import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect';
-import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions';
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { View, StyleSheet, Text, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
+import FormStyles from '../../../../common/Styles/FormStyles'
+import ButtonStyles from '../../../../common/Styles/ButtonStyles'
+import Colors from '../../../../common/Colors'
+import Fonts from '../../../../common/Fonts'
+import ListStyles from '../../../../common/Styles/ListStyles'
+import { Input, Button, CheckBox } from 'react-native-elements'
+import { useDispatch } from 'react-redux'
+import { addNewAccountShell } from '../../../../store/actions/accounts'
+import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
+import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import SubAccountDescribing, {
   DonationSubAccountDescribing,
-} from '../../../../common/data/models/SubAccountInfo/Interfaces';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { RFValue } from 'react-native-responsive-fontsize';
-import openLink from '../../../../utils/OpenLink';
-import SubAccountKind from '../../../../common/data/enums/SubAccountKind';
-import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind';
+} from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import openLink from '../../../../utils/OpenLink'
+import SubAccountKind from '../../../../common/data/enums/SubAccountKind'
+import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
 
 export type Props = {
   navigation: any;
 };
 
-type HeaderSectionProps = {
-  subAccountInfo: SubAccountDescribing;
-};
+const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dispatch = useDispatch()
+  const nameInputRef = useRef<Input>( null )
 
-const HeaderSection: React.FC<HeaderSectionProps> = ({ subAccountInfo }) => {
-  const title = useMemo(() => {
-    return `Enter details for the new ${subAccountInfo.defaultTitle}`;
-  }, [subAccountInfo.defaultTitle]);
+  const currentSubAccountInfo: DonationSubAccountDescribing = useMemo( () => {
+    return navigation.getParam( 'currentSubAccountInfo' )
+  }, [ navigation.state.params ] )
 
-  return (
-    <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderText}>{title}</Text>
-    </View>
-  );
-};
-
-const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const dispatch = useDispatch();
-  const nameInputRef = useRef<Input>(null);
-
-  const currentSubAccountInfo: DonationSubAccountDescribing = useMemo(() => {
-    return navigation.getParam('currentSubAccountInfo');
-  }, [navigation.state.params]);
-
-  const [accountName, setAccountName] = useState(
-    currentSubAccountInfo.defaultTitle,
-  );
-  const [doneeName, setDoneeName] = useState(currentSubAccountInfo.doneeName);
-  const [accountDescription, setAccountDescription] = useState(
-    currentSubAccountInfo.defaultDescription,
-  );
-  const [isTFAEnabled, setIsTFAEnabled] = useState(
+  const [ accountName, setAccountName ] = useState( '' )
+  const [ doneeName, setDoneeName ] = useState( currentSubAccountInfo.doneeName )
+  const [ accountDescription, setAccountDescription ] = useState( '' )
+  const [ isTFAEnabled, setIsTFAEnabled ] = useState(
     currentSubAccountInfo.isTFAEnabled,
-  );
+  )
 
-  const canProceed = useMemo(() => {
-    return accountName.length > 0 && accountDescription.length > 0;
-  }, [accountName, doneeName, accountDescription]);
+  const canProceed = useMemo( () => {
+    return accountName.length > 0 && accountDescription.length > 0
+  }, [ accountName, doneeName, accountDescription ] )
 
-  useEffect(() => {
-    nameInputRef.current?.focus();
-  }, []);
+  useEffect( () => {
+    nameInputRef.current?.focus()
+  }, [] )
 
-  useAccountShellCreationCompletionEffect(() => {
-    console.log('dispatching resetToHomeAction');
-    navigation.dispatch(resetToHomeAction());
-    // TODO: Navigate to account details screen with the ID for this account shell
-  });
+  useAccountShellCreationCompletionEffect( () => {
+    navigation.dispatch( resetToHomeAction() )
+  } )
 
   function handleProceedButtonPress() {
-    currentSubAccountInfo.customDisplayName = accountName;
-    currentSubAccountInfo.doneeName = accountDescription;
-    currentSubAccountInfo.customDescription = accountDescription;
-    currentSubAccountInfo.isTFAEnabled = isTFAEnabled;
+    currentSubAccountInfo.customDisplayName = accountName
+    currentSubAccountInfo.doneeName = doneeName
+    currentSubAccountInfo.customDescription = accountDescription
+    currentSubAccountInfo.isTFAEnabled = isTFAEnabled
     currentSubAccountInfo.sourceKind = currentSubAccountInfo.isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
-      : SourceAccountKind.REGULAR_ACCOUNT;
+      : SourceAccountKind.REGULAR_ACCOUNT
 
-    dispatch(addNewAccountShell(currentSubAccountInfo));
+    dispatch( addNewAccountShell( currentSubAccountInfo ) )
   }
 
   async function openTermsAndConditions() {
-    await openLink('https://hexawallet.io/donee-terms-conditions/');
+    await openLink( 'https://hexawallet.io/donee-terms-conditions/' )
   }
 
   return (
-    <View style={styles.rootContainer}>
-      <HeaderSection subAccountInfo={currentSubAccountInfo} />
+    <KeyboardAvoidingView
+      style={styles.rootContainer}
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView style={{
+        flex: 1
+      }}>
+        <View style={styles.rootContentContainer}>
 
-      <View style={styles.formContainer}>
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Enter donation name'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
-          value={accountName}
-          maxLength={24}
-          numberOfLines={1}
-          textContentType="name"
-          onChangeText={setAccountName}
-          ref={nameInputRef}
-        />
+          <View style={ListStyles.infoHeaderSection}>
+            <Text style={ListStyles.infoHeaderText}>Enter details for the new Donation Account</Text>
+          </View>
 
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Organised by'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
-          value={doneeName}
-          numberOfLines={1}
-          onChangeText={setDoneeName}
-        />
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Donation cause or description'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
-          value={accountDescription}
-          numberOfLines={2}
-          onChangeText={setAccountDescription}
-        />
+          <View style={styles.formContainer}>
+            <Input
+              inputContainerStyle={[
+                FormStyles.textInputContainer,
+                styles.textInputContainer,
+              ]}
+              inputStyle={FormStyles.inputText}
+              placeholder={'Enter donation name'}
+              placeholderTextColor={FormStyles.placeholderText.color}
+              underlineColorAndroid={'transparent'}
+              value={accountName}
+              maxLength={24}
+              numberOfLines={1}
+              textContentType="name"
+              onChangeText={setAccountName}
+              ref={nameInputRef}
+            />
 
-        <TouchableOpacity
-          style={styles.tfaSelectionField}
-          onPress={() => setIsTFAEnabled(!isTFAEnabled)}
-          activeOpacity={1}
-        >
-          <View style={styles.tfaSelectionFieldContentContainer}>
-            <Text style={styles.smallInfoLabelText}>
+            <Input
+              inputContainerStyle={[
+                FormStyles.textInputContainer,
+                styles.textInputContainer,
+              ]}
+              inputStyle={FormStyles.inputText}
+              placeholder={'Organised by'}
+              placeholderTextColor={FormStyles.placeholderText.color}
+              underlineColorAndroid={'transparent'}
+              value={doneeName}
+              numberOfLines={1}
+              onChangeText={setDoneeName}
+            />
+            <Input
+              inputContainerStyle={[
+                FormStyles.textInputContainer,
+                FormStyles.textAreaInputContainer,
+                styles.textInputContainer,
+              ]}
+              inputStyle={{
+                ...FormStyles.inputText,
+                alignSelf: 'flex-start'
+              }}
+              placeholder={'Donation cause or description'}
+              placeholderTextColor={FormStyles.placeholderText.color}
+              underlineColorAndroid={'transparent'}
+              value={accountDescription}
+              multiline
+              numberOfLines={4}
+              onChangeText={setAccountDescription}
+            />
+
+            <TouchableOpacity
+              style={styles.tfaSelectionField}
+              onPress={() => setIsTFAEnabled( !isTFAEnabled )}
+              activeOpacity={1}
+            >
+              <View style={styles.tfaSelectionFieldContentContainer}>
+                <Text style={{
+                  ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                }}>
               Enable 2-Factor Authentication
-            </Text>
+                </Text>
 
-            <CheckBox
-              checkedIcon="check-square"
-              uncheckedIcon="square-o"
-              size={28}
-              checkedColor={Colors.darkGreen}
-              uncheckedColor={Colors.white}
-              checked={isTFAEnabled}
-              onIconPress={() => setIsTFAEnabled(!isTFAEnabled)}
+                <CheckBox
+                  checkedIcon="check"
+                  uncheckedIcon="square-o"
+                  size={24}
+                  checkedColor={Colors.darkGreen}
+                  uncheckedColor={Colors.white}
+                  checked={isTFAEnabled}
+                  onIconPress={() => setIsTFAEnabled( !isTFAEnabled )}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <View style={{
+              marginBottom: 24, paddingHorizontal: 14
+            }}>
+              <Text style={styles.smallInfoLabelText}>
+            By clicking proceed you agree to our{' '}
+                <Text onPress={openTermsAndConditions} style={styles.linkText}>
+              Terms and Conditions
+                </Text>
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.footerSection}>
+            <Button
+              raised
+              buttonStyle={ButtonStyles.primaryActionButton}
+              title="Proceed"
+              titleStyle={ButtonStyles.actionButtonText}
+              onPress={handleProceedButtonPress}
+              disabled={canProceed === false}
             />
           </View>
-        </TouchableOpacity>
-
-        <View style={{ marginBottom: 24, paddingHorizontal: 14 }}>
-          <Text style={styles.smallInfoLabelText}>
-            By clicking proceed you agree to our{' '}
-            <Text onPress={openTermsAndConditions} style={styles.linkText}>
-              Terms and Conditions
-            </Text>
-          </Text>
         </View>
-      </View>
 
-      <View style={styles.footerSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
-        />
-      </View>
-    </View>
-  );
-};
+      </ScrollView>
+    </KeyboardAvoidingView>
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
 
+  rootContentContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 36,
+  },
+
   formContainer: {
     paddingHorizontal: 16,
+    flex: 1,
   },
 
   textInputContainer: {
@@ -200,12 +205,11 @@ const styles = StyleSheet.create({
 
   tfaSelectionField: {
     borderRadius: 10,
-    backgroundColor: Colors.secondaryBackgroundColor,
+    backgroundColor: Colors.backgroundColor,
     justifyContent: 'center',
     marginBottom: 36,
     marginHorizontal: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingHorizontal: 10,
   },
 
   tfaSelectionFieldContentContainer: {
@@ -216,20 +220,21 @@ const styles = StyleSheet.create({
 
   smallInfoLabelText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
 
   linkText: {
     fontFamily: Fonts.FiraSansItalic,
     color: Colors.blue,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
+    fontWeight: 'bold',
   },
 
   footerSection: {
     paddingHorizontal: 26,
     alignItems: 'flex-start',
   },
-});
+} )
 
-export default AddNewDonationAccountDetailsScreen;
+export default AddNewDonationAccountDetailsScreen

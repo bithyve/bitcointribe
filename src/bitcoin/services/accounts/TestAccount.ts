@@ -1,14 +1,14 @@
-import * as bitcoinJS from 'bitcoinjs-lib';
-import BaseAccount from '../../utilities/accounts/BaseAccount';
+import * as bitcoinJS from 'bitcoinjs-lib'
+import BaseAccount from '../../utilities/accounts/BaseAccount'
 import {
   Transactions,
   DerivativeAccounts,
   TransactionDetails,
-} from '../../utilities/Interface';
+} from '../../utilities/Interface'
 
 export default class TestAccount extends BaseAccount {
   public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json);
+    const { hdWallet } = JSON.parse(json)
     const {
       mnemonic,
       passphrase,
@@ -55,7 +55,7 @@ export default class TestAccount extends BaseAccount {
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
       feeRates: any;
-    } = hdWallet;
+    } = hdWallet
 
     return new TestAccount(mnemonic, passphrase, purpose, {
       usedAddresses,
@@ -74,7 +74,7 @@ export default class TestAccount extends BaseAccount {
       newTransactions,
       trustedContactToDA,
       feeRates,
-    });
+    })
   };
 
   constructor(
@@ -106,7 +106,7 @@ export default class TestAccount extends BaseAccount {
       feeRates: any;
     },
   ) {
-    const network: bitcoinJS.Network = bitcoinJS.networks.testnet;
-    super(mnemonic, passphrase, dPathPurpose, stateVars, network);
+    const network: bitcoinJS.Network = bitcoinJS.networks.testnet
+    super(mnemonic, passphrase, dPathPurpose, stateVars, network)
   }
 }

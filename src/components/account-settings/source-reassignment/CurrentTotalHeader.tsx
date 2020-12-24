@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
-import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText';
-import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText';
-import { RFValue } from 'react-native-responsive-fontsize';
-import AccountShell from '../../../common/data/models/AccountShell';
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces';
-import CurrencyKind from '../../../common/data/enums/CurrencyKind';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import { RFValue } from 'react-native-responsive-fontsize'
+import AccountShell from '../../../common/data/models/AccountShell'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 
 export type Props = {
   accountShell: AccountShell;
@@ -19,19 +19,19 @@ const CurrentTotalHeader: React.FC<Props> = ({
   selectedSources,
 }: Props) => {
   const totalAmount = useMemo(() => {
-    return selectedSources.reduce((accumulated, current) => accumulated + current.balance, 0);
-  }, [selectedSources]);
+    return selectedSources.reduce((accumulated, current) => accumulated + current.balance, 0)
+  }, [ selectedSources ])
 
-  const formattedAmountText = useFormattedAmountText(totalAmount);
+  const formattedAmountText = useFormattedAmountText(totalAmount)
   const formattedUnitText = useFormattedUnitText({
     bitcoinUnit: accountShell.unit,
     currencyKind: CurrencyKind.BITCOIN
-  });
+  })
 
   const countDescriptionText = useMemo(() => {
-    const count = selectedSources.length;
-    return `${count} source${count == 1 ? '' : 's'} selected`;
-  }, [selectedSources]);
+    const count = selectedSources.length
+    return `${count} source${count == 1 ? '' : 's'} selected`
+  }, [ selectedSources ])
 
 
   return (
@@ -58,8 +58,8 @@ const CurrentTotalHeader: React.FC<Props> = ({
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -119,6 +119,6 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
   },
-});
+})
 
-export default CurrentTotalHeader;
+export default CurrentTotalHeader

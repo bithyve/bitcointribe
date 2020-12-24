@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   View,
   Text,
@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   Image,
   ImageSourcePropType,
-} from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Colors from '../../../common/Colors';
-import NetworkKind from '../../../common/data/enums/NetworkKind';
-import Fonts from '../../../common/Fonts';
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors'
+import NetworkKind from '../../../common/data/enums/NetworkKind'
+import Fonts from '../../../common/Fonts'
 
 type FooterButtonProps = {
   style?: Record<string, unknown>;
@@ -27,17 +27,21 @@ export type Props = {
   network: NetworkKind;
 };
 
-const FooterButton: React.FC<FooterButtonProps> = ({
-  style,
+const FooterButton: React.FC<FooterButtonProps> = ( {
+  style = {
+  },
   title,
   subtitle,
   imageSource,
   onPress,
-}) => {
+} ) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{ ...styles.buttonContainer, ...style }}
+      style={{
+        ...styles.buttonContainer,
+        ...style
+      }}
     >
       <View style={styles.buttonImageContainer}>
         <Image source={imageSource} style={styles.buttonImage} />
@@ -48,37 +52,39 @@ const FooterButton: React.FC<FooterButtonProps> = ({
         <Text style={styles.buttonSubtitleText}>{subtitle}</Text>
       </View>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
-const SendAndReceiveButtonsFooter: React.FC<Props> = ({
+const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   onSendPressed,
   onReceivePressed,
   averageTxFees,
   network,
-}) => {
+} ) => {
   return (
     <View style={styles.rootContainer}>
       <FooterButton
-        style={{ marginRight: 8 }}
+        style={{
+          marginRight: 8
+        }}
         onPress={onSendPressed}
         title="Send"
-        subtitle={`Tran Fee: ${
-          averageTxFees ? averageTxFees[network].low.averageTxFee : 0
+        subtitle={`Tran Fee: ~${
+          averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
         } (${network === NetworkKind.TESTNET ? 't-sats' : 'sats'})`}
-        imageSource={require('../../../assets/images/icons/icon_send.png')}
+        imageSource={require( '../../../assets/images/icons/icon_send.png' )}
       />
       <FooterButton
         onPress={onReceivePressed}
         title="Receive"
         subtitle={''}
-        imageSource={require('../../../assets/images/icons/icon_receive_translucent.png')}
+        imageSource={require( '../../../assets/images/icons/icon_receive_translucent.png' )}
       />
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -90,8 +96,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 18,
+    paddingHorizontal: 24,
     borderRadius: 15,
-    borderColor: Colors.borderColor,
+    borderColor: '#E3E3E3',
     borderWidth: 1,
     backgroundColor: Colors.white,
   },
@@ -105,19 +112,20 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  buttonTextContainer: {},
+  buttonTextContainer: {
+  },
 
   buttonTitleText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(15),
+    fontSize: RFValue( 15 ),
   },
 
   buttonSubtitleText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
   },
-});
+} )
 
-export default SendAndReceiveButtonsFooter;
+export default SendAndReceiveButtonsFooter
