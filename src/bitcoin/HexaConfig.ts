@@ -94,7 +94,7 @@ class HexaConfig {
     TIME_SLOTS: {
       // 2 weeks in minutes: 20160
       SHARE_SLOT1: Config.BIT_SHARE_HEALTH_TIME_SLOT1 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ) : 20160,
-      
+
       //4 weeks in minutes: 40320
       SHARE_SLOT2: Config.BIT_SHARE_HEALTH_TIME_SLOT2 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ) : 40320,
     },
@@ -102,7 +102,7 @@ class HexaConfig {
 
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
-  
+
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
@@ -265,7 +265,7 @@ class HexaConfig {
 
     if( personalNodeData ){
       const personalNode: PersonalNode = JSON.parse( personalNodeData )
-      const personalNodeURL = personalNode.activeNodeURL
+      const personalNodeURL = personalNode.urlPath
 
       if( personalNodeURL && personalNode.isConnectionActive ){
         const personalNodeEPs = {

@@ -9,6 +9,7 @@ export const PERSONAL_NODE_CONFIGURATION_SET = 'PERSONAL_NODE_CONFIGURATION_SET'
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
 export const PERSONAL_NODE_CONNECTING_SUCCEEDED = 'PERSONAL_NODE_CONNECTING_SUCCEEDED'
+export const PERSONAL_NODE_CONNECTING_COMPLETED = 'PERSONAL_NODE_CONNECTING_COMPLETED'
 
 
 export interface PersonalNodePreferenceToggledAction extends Action {
@@ -91,5 +92,15 @@ export const personalNodeConnectionFailed = (
   return {
     type: PERSONAL_NODE_CONNECTING_FAILED,
     payload: errorMessage,
+  }
+}
+
+export interface PersonalNodeConnectionCompletionAction extends Action {
+  type: typeof PERSONAL_NODE_CONNECTING_COMPLETED;
+}
+
+export const personalNodeConnectionCompleted = (): PersonalNodeConnectionCompletionAction => {
+  return {
+    type: PERSONAL_NODE_CONNECTING_COMPLETED
   }
 }

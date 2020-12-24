@@ -47,7 +47,8 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          value={personalNode?.activeNodeIPAddress || ''}
+          value={personalNode?.ipAddress || 'No IP Address Configured'}
+          numberOfLines={1}
           disabled
         />
 
@@ -58,7 +59,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           ]}
           inputStyle={FormStyles.inputText}
           underlineColorAndroid={'transparent'}
-          value={String( personalNode?.activeNodePortNumber || '' )}
+          value={String( personalNode?.portNumber || 'No Port Configured' )}
           numberOfLines={1}
           disabled
         />

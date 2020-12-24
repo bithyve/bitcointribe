@@ -114,7 +114,9 @@ import {
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
 } from './sagas/trustedContacts'
+
 import nodeSettingsReducer from './reducers/nodeSettings'
+import { savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 
 const rootSaga = function* () {
   const sagas = [
@@ -186,6 +188,9 @@ const rootSaga = function* () {
     getQuoteWatcher,
     executeOrderWatcher,
     getBalancesWatcher,
+
+    // Node Settings
+    savePersonalNodeConfigurationWatcher,
 
     // Notifications
     updateFCMTokensWatcher,

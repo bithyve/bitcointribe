@@ -4,6 +4,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { Button, Input } from 'react-native-elements'
+import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
@@ -16,8 +17,15 @@ export type Props = {
 
 
 const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => {
-  const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState( '' )
-  const [ currentPortNumberValue, setCurrentPortNumberValue ] = useState( '8332' )
+  const activePersonalNode = useActivePersonalNode()
+
+  const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState(
+    activePersonalNode?.ipAddress || ''
+  )
+
+  const [ currentPortNumberValue, setCurrentPortNumberValue ] = useState(
+    String( activePersonalNode?.portNumber || 8332 )
+  )
 
   const ipAddressInputRef = useRef<Input>( null )
 

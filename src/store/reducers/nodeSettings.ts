@@ -1,5 +1,5 @@
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET } from '../actions/nodeSettings'
+import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED } from '../actions/nodeSettings'
 
 export type NodeSettingsState = {
   isConnectionActive: boolean;
@@ -26,7 +26,6 @@ const INITIAL_STATE: NodeSettingsState = {
   hasConnectionFailed: false,
   connectionFailureErrorMessage: null,
 }
-
 
 
 const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action ): NodeSettingsState => {
@@ -68,6 +67,15 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
           hasConnectionSucceeded: false,
           hasConnectionFailed: true,
           connectionFailureErrorMessage: action.payload,
+        }
+
+      case PERSONAL_NODE_CONNECTING_COMPLETED:
+        return {
+          ...state,
+          isConnectionInProgress: false,
+          hasConnectionSucceeded: false,
+          hasConnectionFailed: false,
+          connectionFailureErrorMessage: null,
         }
       default:
         return state

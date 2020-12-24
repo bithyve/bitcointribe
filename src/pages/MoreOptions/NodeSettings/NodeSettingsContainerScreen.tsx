@@ -12,7 +12,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import { connectToPersonalNode, personalNodePreferenceToggled, savePersonalNodeConfiguration, savePersonalNodeSettings } from '../../../store/actions/nodeSettings'
+import { connectToPersonalNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 
 export type Props = {
   navigation: any;
@@ -37,7 +37,10 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   const showConnectionSucceededBottomSheet = useCallback( () => {
     presentBottomSheet(
       <PersonalNodeConnectionSuccessBottomSheet
-        onViewNodeDetailsPressed={dismissBottomSheet}
+        onViewNodeDetailsPressed={() => {
+          dispatch( personalNodeConnectionCompleted() )
+          dismissBottomSheet()
+        }}
       />,
       {
         ...defaultBottomSheetConfigs,
@@ -51,7 +54,10 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   const showConnectionFailedBottomSheet = useCallback( () => {
     presentBottomSheet(
       <PersonalNodeConnectionFailureBottomSheet
-        onTryAgainPressed={dismissBottomSheet}
+        onTryAgainPressed={() => {
+          dispatch( personalNodeConnectionCompleted() )
+          dismissBottomSheet()
+        }}
       />,
       {
         ...defaultBottomSheetConfigs,
@@ -68,9 +74,9 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   }: PersonalNodeFormData ) {
     const newPersonalNodeConfig: PersonalNode = {
       isConnectionActive: true,
-      activeNodeIPAddress: ipAddress,
-      activeNodePortNumber: portNumber,
-      activeNodeURL: `${ipAddress}:${portNumber}`,
+      ipAddress: ipAddress,
+      portNumber: portNumber,
+      urlPath: `${ipAddress}:${portNumber}`,
     }
 
     setIsEditingPersonalNodeConnection( false )
