@@ -19,6 +19,8 @@ module.exports = {
   },
   'plugins': [ 'react', '@typescript-eslint' ],
   'rules': {
+    'no-case-declarations': 'off',
+    'no-fallthrough': 'off',
     'computed-property-spacing': [ 'error', 'always' ],
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
@@ -42,6 +44,10 @@ module.exports = {
     } ],
     'eol-last': [ 'error', 'always' ],
     'react/display-name': 'off',
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    'prefer-const': [ 'warn', {
+      'destructuring': 'all',
+      'ignoreReadBeforeAssign': true
+    } ],
   }
 }
