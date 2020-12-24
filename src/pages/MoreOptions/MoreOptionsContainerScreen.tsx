@@ -33,6 +33,12 @@ const menuOptions: MenuOption[] = [
     screenName: 'FriendsAndFamily',
   },
   {
+    title: 'Node Settings',
+    imageSource: require( '../../assets/images/icons/own-node.png' ),
+    subtitle: 'Connect Hexa with your own Bitcoin Node',
+    screenName: 'NodeSettings',
+  },
+  {
     title: 'Funding Sources',
     imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
     subtitle: 'Buying methods integrated in your wallet',

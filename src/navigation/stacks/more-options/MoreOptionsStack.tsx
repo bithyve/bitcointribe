@@ -9,6 +9,7 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import WalletSettingsStack from './WalletSettingsStack'
 import AccountManagementStack from './AccountManagementStack'
+import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
 
 
 const MoreOptionsStack = createStackNavigator(
@@ -34,6 +35,12 @@ const MoreOptionsStack = createStackNavigator(
       screen: FriendsAndFamilyScreen,
       navigationOptions: {
         title: 'Friends and Family',
+      },
+    },
+    NodeSettings: {
+      screen: NodeSettingsContainerScreen,
+      navigationOptions: {
+        title: 'Node Settings',
       },
     },
     FundingSources: {

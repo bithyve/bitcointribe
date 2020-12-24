@@ -3,6 +3,21 @@ import Colors from '../Colors'
 import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 
+const miniNavButton = {
+  borderRadius: 5,
+  minHeight: 25,
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  backgroundColor: Colors.lightBlue,
+}
+
+const miniNavButtonText = {
+  color: Colors.white,
+  fontSize: RFValue( 12 ),
+  fontFamily: Fonts.FiraSansRegular,
+}
 
 const actionButton = {
   borderRadius: 10,
@@ -34,6 +49,7 @@ const actionButtonText = {
 
 const ButtonStyles = StyleSheet.create( {
   actionButton,
+  miniNavButton,
   primaryActionButton,
 
   floatingActionButton: {
@@ -49,6 +65,7 @@ const ButtonStyles = StyleSheet.create( {
   },
 
   actionButtonText,
+  miniNavButtonText,
 
   floatingActionButtonText: {
     ...actionButtonText,

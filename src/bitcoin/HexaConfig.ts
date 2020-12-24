@@ -94,7 +94,7 @@ class HexaConfig {
     TIME_SLOTS: {
       // 2 weeks in minutes: 20160
       SHARE_SLOT1: Config.BIT_SHARE_HEALTH_TIME_SLOT1 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ) : 20160,
-      
+
       //4 weeks in minutes: 40320
       SHARE_SLOT2: Config.BIT_SHARE_HEALTH_TIME_SLOT2 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10 ) : 40320,
     },
@@ -102,7 +102,7 @@ class HexaConfig {
 
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
-  
+
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
@@ -226,8 +226,6 @@ class HexaConfig {
     } else {
       this.APP_STAGE = 'app'
     }
-
-    this.connectToPersonalNode()
   }
 
   public setNetwork = (): void => {
@@ -238,49 +236,35 @@ class HexaConfig {
     }
   };
 
-  public connectToPersonalNode =  async () => {
-    const personalNodeData = await AsyncStorage.getItem( 'PersonalNode' )
-
-    if( personalNodeData ){
-      const personalNode: PersonalNode = JSON.parse( personalNodeData )
-      const personalNodeURL = personalNode.activeNodeURL
-
-      if( personalNodeURL && personalNode.isConnectionActive ){
-        const personalNodeEPs = {
-          MULTIBALANCE: personalNodeURL + '/balances',
-          MULTIUTXO:  personalNodeURL + '/utxos',
-          MULTITXN: personalNodeURL + '/data',
-          MULTIBALANCETXN: personalNodeURL + '/baltxs',
-          MULTIUTXOTXN: personalNodeURL + '/utxotxs',
-          NEWMULTIUTXOTXN: personalNodeURL + '/nutxotxs',
-          TXN_FEE: personalNodeURL  + 'fee-estimates',
-          TXNDETAILS: personalNodeURL + '/tx',
-          BROADCAST_TX: personalNodeURL + '/tx',
-        }
-
-        if( this.ENVIRONMENT === 'MAIN' )
-          this.ESPLORA_API_ENDPOINTS = {
-            ...this.ESPLORA_API_ENDPOINTS,
-            MAINNET: personalNodeEPs
-          }
-        else
-          this.ESPLORA_API_ENDPOINTS = {
-            ...this.ESPLORA_API_ENDPOINTS,
-            TESTNET: personalNodeEPs,
-          }
+  public connectToPersonalNode =  async ( personalNode: PersonalNode ) => {
+    const personalNodeURL = personalNode.urlPath
+    if( personalNodeURL && personalNode.isConnectionActive ){
+      const personalNodeEPs = {
+        MULTIBALANCE: personalNodeURL + '/balances',
+        MULTIUTXO:  personalNodeURL + '/utxos',
+        MULTITXN: personalNodeURL + '/data',
+        MULTIBALANCETXN: personalNodeURL + '/baltxs',
+        MULTIUTXOTXN: personalNodeURL + '/utxotxs',
+        NEWMULTIUTXOTXN: personalNodeURL + '/nutxotxs',
+        TXN_FEE: personalNodeURL  + 'fee-estimates',
+        TXNDETAILS: personalNodeURL + '/tx',
+        BROADCAST_TX: personalNodeURL + '/tx',
       }
+
+      if( this.ENVIRONMENT === 'MAIN' )
+        this.ESPLORA_API_ENDPOINTS = {
+          ...this.ESPLORA_API_ENDPOINTS,
+          MAINNET: personalNodeEPs
+        }
+      else
+        this.ESPLORA_API_ENDPOINTS = {
+          ...this.ESPLORA_API_ENDPOINTS,
+          TESTNET: personalNodeEPs,
+        }
     }
   }
 
-  public connectToDefaultNode =  async () => {
-    const personalNodeData = await AsyncStorage.getItem( 'PersonalNode' )
-
-    if( personalNodeData ){
-      // deactivate personal node connection
-      const personalNode: PersonalNode = JSON.parse( personalNodeData )
-      personalNode.isConnectionActive = false
-      await AsyncStorage.setItem( 'PersonalNode', JSON.stringify( personalNode ) )
-    }
+  public connectToBitHyveNode =  async () => {
     this.ESPLORA_API_ENDPOINTS = {
       TESTNET: {
         MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
