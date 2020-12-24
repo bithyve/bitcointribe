@@ -1,7 +1,4 @@
 module.exports = {
-  'editor.codeActionsOnSave': {
-    'source.fixAll.eslint': true
-  },
   'env': {
     'browser': true,
     'es2021': true,
