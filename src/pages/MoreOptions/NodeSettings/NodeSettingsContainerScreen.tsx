@@ -12,7 +12,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import { connectToPersonalNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import {  personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 
 export type Props = {
   navigation: any;
@@ -76,7 +76,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
       isConnectionActive: true,
       ipAddress: ipAddress,
       portNumber: portNumber,
-      urlPath: `${ipAddress}:${portNumber}`,
+      urlPath: `http://${ipAddress}:${portNumber}`,
     }
 
     setIsEditingPersonalNodeConnection( false )

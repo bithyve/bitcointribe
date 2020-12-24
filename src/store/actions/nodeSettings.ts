@@ -7,6 +7,7 @@ export const SAVE_PERSONAL_NODE_CONFIGURATION = 'SAVE_PERSONAL_NODE_CONFIGURATIO
 export const PERSONAL_NODE_CONFIGURATION_SET = 'PERSONAL_NODE_CONFIGURATION_SET'
 
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
+export const CONNECT_TO_BITHYVE_NODE = 'CONNECT_TO_BITHYVE_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
 export const PERSONAL_NODE_CONNECTING_SUCCEEDED = 'PERSONAL_NODE_CONNECTING_SUCCEEDED'
 export const PERSONAL_NODE_CONNECTING_COMPLETED = 'PERSONAL_NODE_CONNECTING_COMPLETED'
@@ -64,6 +65,18 @@ export const connectToPersonalNode = (
     payload,
   }
 }
+
+export interface BitHyveNodeConnectionAction extends Action {
+  type: typeof CONNECT_TO_BITHYVE_NODE;
+}
+
+export const connectToBitHyveNode = (
+): BitHyveNodeConnectionAction => {
+  return {
+    type: CONNECT_TO_BITHYVE_NODE,
+  }
+}
+
 
 
 export interface PersonalNodeConnectionSuccessAction extends Action {
