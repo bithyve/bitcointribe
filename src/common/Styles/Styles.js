@@ -1,8 +1,8 @@
-import { StyleSheet } from "react-native";
-import Colors from "../Colors";
-import Fonts from "../Fonts";
-import { widthPercentageToDP } from 'react-native-responsive-screen';
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export default StyleSheet.create({
   headerContainer: {
@@ -71,7 +71,7 @@ export default StyleSheet.create({
   cardIconImage: {
     width: 12,
     height: 14,
-    resizeMode: "contain",
-    marginLeft: "auto",
+    resizeMode: 'contain',
+    marginLeft: 'auto',
   },
-});
+})

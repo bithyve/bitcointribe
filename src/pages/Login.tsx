@@ -169,7 +169,7 @@ export default function Login(props) {
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseCases'),
         // );
-        console.log('Login>RelayServices.fetchReleases',res.data.releases)
+        console.log('Login>RelayServices.fetchReleases', res.data.releases)
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()
@@ -354,8 +354,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -383,8 +383,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -412,8 +412,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -441,8 +441,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -477,7 +477,7 @@ export default function Login(props) {
           ) : null}
         </View>
 
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{ marginTop: 'auto', marginBottom: 20 }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
               onPress={() => onPressNumber('1')}
@@ -612,7 +612,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

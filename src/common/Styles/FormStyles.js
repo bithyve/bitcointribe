@@ -1,9 +1,9 @@
-import { StyleSheet } from "react-native";
-import Colors from "../Colors";
-import Fonts from "../Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-const FormStyles = StyleSheet.create({
+const FormStyles = StyleSheet.create( {
   inputContainer: {
     borderBottomColor: Colors.grayScale1,
   },
@@ -16,30 +16,35 @@ const FormStyles = StyleSheet.create({
     height: 50,
   },
 
+  textAreaInputContainer: {
+    height: 100,
+  },
+
   inputText: {
     flex: 1,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
+    textAlign: 'left',
   },
 
   placeholderText: {
-    color: "#BCB6B6",
+    color: '#BCB6B6',
   },
 
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
 
   hintText: {
     fontFamily: Fonts.FiraSansItalic,
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
   },
-});
+} )
 
 
-export default FormStyles;
+export default FormStyles

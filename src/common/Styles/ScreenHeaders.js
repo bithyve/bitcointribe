@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import Colors from '../Colors';
-import Fonts from '../Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
+import Fonts from '../Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const ScreenHeaderStyles = StyleSheet.create({
@@ -17,6 +17,6 @@ const ScreenHeaderStyles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
   },
-});
+})
 
-export default ScreenHeaderStyles;
+export default ScreenHeaderStyles

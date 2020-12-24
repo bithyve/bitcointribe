@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import Colors from '../Colors';
+import { StyleSheet } from 'react-native'
+import Colors from '../Colors'
 
 const CardStyles = StyleSheet.create({
   horizontalScrollViewCardContainer: {
@@ -19,6 +19,6 @@ const CardStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})
 
-export default CardStyles;
+export default CardStyles

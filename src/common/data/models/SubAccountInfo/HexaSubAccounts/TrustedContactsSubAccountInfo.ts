@@ -1,22 +1,22 @@
-import { v4 as uuid } from 'uuid';
-import AccountVisibility from '../../../enums/AccountVisibility';
-import SubAccountKind from '../../../enums/SubAccountKind';
-import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
+import { v4 as uuid } from 'uuid'
+import AccountVisibility from '../../../enums/AccountVisibility'
+import SubAccountKind from '../../../enums/SubAccountKind'
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup'
 import {
   HexaSubAccountDescribing,
   SubAccountDescribingConstructorProps,
-} from '../Interfaces';
-import { ImageSourcePropType } from 'react-native';
+} from '../Interfaces'
+import { ImageSourcePropType } from 'react-native'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../../bitcoin/utilities/Interface';
-import SourceAccountKind from '../../../enums/SourceAccountKind';
+} from '../../../../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../../enums/SourceAccountKind'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TrustedContactsSubAccountInfo
-  implements HexaSubAccountDescribing {
+implements HexaSubAccountDescribing {
   id: string;
   accountShellID: string | null;
   instanceNumber: number;
@@ -30,7 +30,7 @@ export default class TrustedContactsSubAccountInfo
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = 'Account with Trusted Contacts';
+  defaultDescription = 'Account with Trusted Contacts';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -42,7 +42,9 @@ export default class TrustedContactsSubAccountInfo
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Trusted Contacts',
-    balances = { confirmed: 0, unconfirmed: 0 },
+    balances = {
+      confirmed: 0, unconfirmed: 0 
+    },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
@@ -50,16 +52,16 @@ export default class TrustedContactsSubAccountInfo
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps) {
-    this.id = id;
-    this.accountShellID = accountShellID;
-    this.instanceNumber = instanceNumber;
-    this.defaultTitle = defaultTitle;
-    this.balances = balances;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
-    this.visibility = visibility;
-    this.isTFAEnabled = isTFAEnabled;
-    this.transactions = transactions;
-    this.utxoCompatibilityGroup = utxoCompatibilityGroup;
+    this.id = id
+    this.accountShellID = accountShellID
+    this.instanceNumber = instanceNumber
+    this.defaultTitle = defaultTitle
+    this.balances = balances
+    this.customDisplayName = customDisplayName
+    this.customDescription = customDescription
+    this.visibility = visibility
+    this.isTFAEnabled = isTFAEnabled
+    this.transactions = transactions
+    this.utxoCompatibilityGroup = utxoCompatibilityGroup
   }
 }

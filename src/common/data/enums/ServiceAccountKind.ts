@@ -3,6 +3,6 @@ enum ServiceAccountKind {
   FAST_BITCOINS,
   SWAN,
   WHIRLPOOL,
-};
+}
 
-export default ServiceAccountKind;
+export default ServiceAccountKind

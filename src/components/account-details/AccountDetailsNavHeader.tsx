@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native';
 import Colors from '../../common/Colors';
@@ -13,7 +13,11 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import NoExchangeRateBottomSheet from '../../components/bottom-sheets/NoExchangeRateBottomSheet'
+import { useCallback } from 'react';
+import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 
 export type Props = {
   accountShellID: string;
@@ -28,6 +32,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   const accountShell = useAccountShellForID(accountShellID);
   const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
 
+  const { exchangeRates } = useAccountsState()
   const currencyCode = useCurrencyCode();
   const currencyKind = useCurrencyKind();
 
@@ -38,6 +43,26 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
   const title = useMemo(() => {
     return primarySubAccountInfo?.customDisplayName || primarySubAccountInfo?.defaultTitle || 'Account Details';
   }, [accountShellID]);
+
+
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+  const showNoExchangeRateBottomSheet = useCallback(() => {
+    presentBottomSheet(
+      <NoExchangeRateBottomSheet
+        onClickSetting={() => {
+          dismissBottomSheet()
+        }}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [0, '40%'],
+      },
+    )
+  }, [presentBottomSheet, dismissBottomSheet])
 
   return (
     <View>
@@ -92,11 +117,14 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
               trackColor={Colors.lightBlue}
               thumbColor={Colors.blue}
               onpress={() => {
-                dispatch(currencyKindSet(
-                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                ));
+                (exchangeRates && exchangeRates[currencyCode])
+                  ? dispatch(currencyKindSet(
+                    prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                  ))
+                  : showNoExchangeRateBottomSheet()
               }}
               isOn={prefersBitcoin}
+              disabled={exchangeRates ? false : true}
             />
           </View>
         </View>

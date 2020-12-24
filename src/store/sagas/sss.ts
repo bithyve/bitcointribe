@@ -1,9 +1,9 @@
-import { call, put, select, delay } from 'redux-saga/effects';
+import { call, put, select, delay } from 'redux-saga/effects'
 import {
   createWatcher,
   serviceGenerator,
   requestTimedout,
-} from '../utils/utilities';
+} from '../utils/utilities'
 import {
   INIT_HEALTH_CHECK,
   switchS3Loader,
@@ -46,14 +46,14 @@ import {
   personalCopyShared,
   pdfHealthCheckFailed,
   personalCopyGenerated,
-} from '../actions/sss';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+} from '../actions/sss'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/serviceTypes'
 import {
   EncDynamicNonPMDD,
   MetaShare,
@@ -66,10 +66,10 @@ import {
   INotification,
   notificationType,
   notificationTag,
-} from '../../bitcoin/utilities/Interface';
-import generatePDF from '../utils/generatePDF';
-import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
-import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
+} from '../../bitcoin/utilities/Interface'
+import generatePDF from '../utils/generatePDF'
+import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
+import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native'
 import {
   updateEphemeralChannel,
   trustedContactApproved,
@@ -92,31 +92,31 @@ import {
   failedST3,
   remapAccountShells,
   restoredAccountShells,
-} from '../actions/accounts';
-import RelayServices from '../../bitcoin/services/RelayService';
-import AccountShell from '../../common/data/models/AccountShell';
-import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+} from '../actions/accounts'
+import RelayServices from '../../bitcoin/services/RelayService'
+import AccountShell from '../../common/data/models/AccountShell'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 
-const sendNotification = (recipient, notification) => {
-  const receivers = [];
-  if (recipient.walletID && recipient.FCMs.length)
-    receivers.push({
+const sendNotification = ( recipient, notification ) => {
+  const receivers = []
+  if ( recipient.walletID && recipient.FCMs.length )
+    receivers.push( {
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,
-    });
+    } )
 
-  if (receivers.length)
-    RelayServices.sendNotifications(receivers, notification).then(console.log);
-};
+  if ( receivers.length )
+    RelayServices.sendNotifications( receivers, notification ).then( console.log )
+}
 
 function* generateMetaSharesWorker() {
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
   const { walletName } = yield select(
-    (state) => state.storage.database.WALLET_SETUP,
-  );
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
   const secureAccount: SecureAccount = yield select(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+  )
 
   // const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   // const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
@@ -132,7 +132,7 @@ function* generateMetaSharesWorker() {
     bhXpub: '',
   };
 
-  const appVersion = DeviceInfo.getVersion();
+  const appVersion = DeviceInfo.getVersion()
 
   if (s3Service.levelhealth.metaShares.length) return;
   const res = yield call(
@@ -140,9 +140,9 @@ function* generateMetaSharesWorker() {
     secureAssets,
     walletName,
     appVersion,
-  );
-  if (res.status === 200) {
-    return s3Service;
+  )
+  if ( res.status === 200 ) {
+    return s3Service
     // const { SERVICES } = yield select(state => state.storage.database);
     // const updatedSERVICES = {
     //   ...SERVICES,
@@ -150,15 +150,15 @@ function* generateMetaSharesWorker() {
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error(res.err);
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    throw new Error( res.err )
   }
 }
 
 export const generateMetaSharesWatcher = createWatcher(
   generateMetaSharesWorker,
   PREPARE_MSHARES,
-);
+)
 
 function* initHCWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
@@ -173,25 +173,31 @@ function* initHCWorker() {
   if (res.status === 200) {
     yield put(healthCheckInitialized());
 
-    const { SERVICES } = yield select((state) => state.storage.database);
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
-      S3_SERVICE: JSON.stringify(s3Service),
-    };
-    console.log('Health Check Initialized');
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+      S3_SERVICE: JSON.stringify( s3Service ),
+    }
+    console.log( 'Health Check Initialized' )
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log({ err: res.err });
-    yield put(switchS3Loader('initHC'));
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    console.log( {
+      err: res.err
+    } )
+    yield put( switchS3Loader( 'initHC' ) )
   }
 }
 
-export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
+export const initHCWatcher = createWatcher( initHCWorker, INIT_HEALTH_CHECK )
 
-function* uploadEncMetaShareWorker({ payload }) {
+function* uploadEncMetaShareWorker( { payload } ) {
   // Transfer: User >>> Guardian
-  yield put(switchS3Loader('uploadMetaShare'));
+  yield put( switchS3Loader( 'uploadMetaShare' ) )
 
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.levelhealth.metaShares.length) return;
@@ -202,86 +208,89 @@ function* uploadEncMetaShareWorker({ payload }) {
     (state) => state.keeper.service,
   );
   const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
+    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  )
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
-  if (payload.changingGuardian) {
-    if (payload.contactInfo.contactName === 'secondary device') {
+  if ( payload.changingGuardian ) {
+    if ( payload.contactInfo.contactName === 'secondary device' ) {
       delete trustedContacts.tc.trustedContacts[
         payload.contactInfo.contactName
-      ]; // removing secondary device's TC
+      ] // removing secondary device's TC
       const accountNumber =
         regularService.hdWallet.trustedContactToDA[
           payload.contactInfo.contactName
-        ];
-      if (accountNumber) {
-        delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+        ]
+      if ( accountNumber ) {
+        delete regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
           accountNumber
-        ].contactDetails; // removing previous SDs xpub
+        ].contactDetails // removing previous SDs xpub
       }
     }
 
-    yield call(s3Service.reshareMetaShare, payload.shareIndex);
-    if (payload.previousGuardianName) {
+    yield call( s3Service.reshareMetaShare, payload.shareIndex )
+    if ( payload.previousGuardianName ) {
       trustedContacts.tc.trustedContacts[
         payload.previousGuardianName
-      ].isGuardian = false;
+      ].isGuardian = false
 
       const {
         walletID,
         FCMs,
         trustedChannel,
-      } = trustedContacts.tc.trustedContacts[payload.previousGuardianName];
+      } = trustedContacts.tc.trustedContacts[ payload.previousGuardianName ]
 
-      if (trustedChannel) {
+      if ( trustedChannel ) {
         // dispatching remove share action to the previous guardian
-        const dataElements = { removeGuardian: true };
+        const dataElements = {
+          removeGuardian: true
+        }
 
         const res = yield call(
           trustedContacts.updateTrustedChannel,
           payload.previousGuardianName,
           dataElements,
-        );
+        )
 
-        if (res.status === 200) {
-          if (walletID && FCMs) {
+        if ( res.status === 200 ) {
+          if ( walletID && FCMs ) {
             const recipient = {
               walletID,
               FCMs,
-            };
+            }
             const { walletName } = yield select(
-              (state) => state.storage.database.WALLET_SETUP,
-            );
+              ( state ) => state.storage.database.WALLET_SETUP,
+            )
 
             const notification: INotification = {
               notificationType: notificationType.contact,
               title: 'Friends and Family notification',
               body: `Removed as a Keeper by ${walletName}`,
-              data: {},
+              data: {
+              },
               tag: notificationTag.IMP,
-            };
-            sendNotification(recipient, notification);
+            }
+            sendNotification( recipient, notification )
           }
         }
       }
     }
   } else {
     // preventing re-uploads till expiry
-    if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
+    if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ]
             .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
-        yield put(switchS3Loader('uploadMetaShare'));
+        yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-        return;
+        return
       }
     }
   }
@@ -301,22 +310,22 @@ function* uploadEncMetaShareWorker({ payload }) {
     s3Service.prepareShareUploadables,
     payload.shareIndex,
     payload.contactInfo.contactName,
-  ); // contact injection (requires database insertion)
+  ) // contact injection (requires database insertion)
 
-  if (res.status === 200) {
+  if ( res.status === 200 ) {
     const {
       otp,
       encryptedKey,
       encryptedMetaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    } = res.data;
+    } = res.data
 
     const shareUploadables: ShareUploadables = {
       encryptedMetaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    };
+    }
     const updatedSERVICES = {
       ...SERVICES,
       REGULAR_ACCOUNT: JSON.stringify(regularService),
@@ -329,13 +338,13 @@ function* uploadEncMetaShareWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [payload.shareIndex]: {
+        [ payload.shareIndex ]: {
           OTP: otp,
           ENCRYPTED_KEY: encryptedKey,
           UPLOADED_AT: Date.now(),
         },
       },
-    };
+    }
 
     // yield call(insertDBWorker, {
     //   payload: {
@@ -347,11 +356,11 @@ function* uploadEncMetaShareWorker({ payload }) {
     const updatedDB = {
       DECENTRALIZED_BACKUP: updatedBackup,
       SERVICES: updatedSERVICES,
-    };
+    }
 
     const contact =
-      trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
-    if (contact && contact.symmetricKey) {
+      trustedContacts.tc.trustedContacts[ payload.contactInfo.contactName ]
+    if ( contact && contact.symmetricKey ) {
       // has trusted channel
       const data: TrustedDataElements = {
         // won't include elements from payload.data
@@ -359,7 +368,7 @@ function* uploadEncMetaShareWorker({ payload }) {
           otp,
           encryptedKey,
         },
-      };
+      }
       yield put(
         updateTrustedChannel(
           payload.contactInfo,
@@ -368,7 +377,7 @@ function* uploadEncMetaShareWorker({ payload }) {
           shareUploadables,
           updatedDB,
         ),
-      );
+      )
     } else {
       // adding transfer details to he ephemeral data
 
@@ -378,7 +387,7 @@ function* uploadEncMetaShareWorker({ payload }) {
           otp,
           encryptedKey,
         },
-      };
+      }
 
       yield put(
         updateEphemeralChannel(
@@ -390,73 +399,77 @@ function* uploadEncMetaShareWorker({ payload }) {
           shareUploadables,
           updatedDB,
         ),
-      );
+      )
     }
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(ErrorSending(true));
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( ErrorSending( true ) )
     // Alert.alert('Upload Failed!', res.err);
-    console.log({ err: res.err });
+    console.log( {
+      err: res.err
+    } )
   }
-  yield put(switchS3Loader('uploadMetaShare'));
+  yield put( switchS3Loader( 'uploadMetaShare' ) )
 }
 
 export const uploadEncMetaShareWatcher = createWatcher(
   uploadEncMetaShareWorker,
   UPLOAD_ENC_MSHARE,
-);
+)
 
-function* requestShareWorker({ payload }) {
+function* requestShareWorker( { payload } ) {
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
   // if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
   //   console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
   //   return;
   // } // capping to 3 shares reception
 
-  const { key } = yield call(S3Service.generateRequestCreds);
+  const { key } = yield call( S3Service.generateRequestCreds )
 
   const updatedBackup = {
     ...DECENTRALIZED_BACKUP,
     RECOVERY_SHARES: {
       ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
-      [payload.shareIndex]: {
+      [ payload.shareIndex ]: {
         REQUEST_DETAILS: {
           TAG: WALLET_SETUP.walletName,
           KEY: key,
         },
       },
     },
-  };
+  }
 
-  yield call(insertDBWorker, {
-    payload: { DECENTRALIZED_BACKUP: updatedBackup },
-  });
+  yield call( insertDBWorker, {
+    payload: {
+      DECENTRALIZED_BACKUP: updatedBackup
+    },
+  } )
 }
 
 export const requestShareWatcher = createWatcher(
   requestShareWorker,
   REQUEST_SHARE,
-);
+)
 
-function* uploadRequestedShareWorker({ payload }) {
+function* uploadRequestedShareWorker( { payload } ) {
   // Transfer: Guardian >>> User
-  const { tag, encryptedKey, otp } = payload;
+  const { tag, encryptedKey, otp } = payload
   const { DECENTRALIZED_BACKUP } = yield select(
-    (state) => state.storage.database,
-  );
-  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+    ( state ) => state.storage.database,
+  )
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
 
-  if (!UNDER_CUSTODY[tag]) {
-    yield put(ErrorSending(true));
+  if ( !UNDER_CUSTODY[ tag ] ) {
+    yield put( ErrorSending( true ) )
     // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
   }
 
   const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
     tag
-  ];
+  ]
 
   // preventing re-uploads till expiry
   // if (TRANSFER_DETAILS) {
@@ -466,7 +479,7 @@ function* uploadRequestedShareWorker({ payload }) {
   // }
 
   // TODO: 10 min removal strategy
-  yield put(switchS3Loader('uploadRequestedShare'));
+  yield put( switchS3Loader( 'uploadRequestedShare' ) )
 
   const res = yield call(
     S3Service.uploadRequestedShare,
@@ -474,67 +487,69 @@ function* uploadRequestedShareWorker({ payload }) {
     otp,
     META_SHARE,
     ENC_DYNAMIC_NONPMDD,
-  );
+  )
 
-  if (res.status === 200 && res.data.success === true) {
+  if ( res.status === 200 && res.data.success === true ) {
     // yield success
-    console.log('Upload successful!');
+    console.log( 'Upload successful!' )
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       UNDER_CUSTODY: {
         ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
-        [tag]: {
-          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[tag],
+        [ tag ]: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
           TRANSFER_DETAILS: {
             KEY: encryptedKey,
             UPLOADED_AT: Date.now(),
           },
         },
       },
-    };
+    }
 
-    yield call(insertDBWorker, {
-      payload: { DECENTRALIZED_BACKUP: updatedBackup },
-    });
+    yield call( insertDBWorker, {
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup
+      },
+    } )
 
-    yield put(requestedShareUploaded(tag, true));
-    yield put(UploadSuccessfully(true));
+    yield put( requestedShareUploaded( tag, true ) )
+    yield put( UploadSuccessfully( true ) )
     // Alert.alert(
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
-    Toast(`${tag}'s Recovery Key sent.`);
+    Toast( `${tag}'s Recovery Key sent.` )
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(requestedShareUploaded(tag, false, res.err));
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( requestedShareUploaded( tag, false, res.err ) )
   }
-  yield put(switchS3Loader('uploadRequestedShare'));
+  yield put( switchS3Loader( 'uploadRequestedShare' ) )
 }
 
 export const uploadRequestedShareWatcher = createWatcher(
   uploadRequestedShareWorker,
   UPLOAD_REQUESTED_SHARE,
-);
+)
 
-export function* downloadMetaShareWorker({ payload }) {
-  yield put(switchS3Loader('downloadMetaShare'));
+export function* downloadMetaShareWorker( { payload } ) {
+  yield put( switchS3Loader( 'downloadMetaShare' ) )
 
-  const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+  const { encryptedKey, otp } = payload // OTP is missing when the encryptedKey isn't OTP encrypted
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
 
   const { DECENTRALIZED_BACKUP } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
-  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
 
-  let res;
-  if (payload.downloadType !== 'recovery') {
-    let existingShares = [];
-    if (Object.keys(UNDER_CUSTODY).length) {
-      existingShares = Object.keys(UNDER_CUSTODY).map(
-        (tag) => UNDER_CUSTODY[tag].META_SHARE,
-      );
+  let res
+  if ( payload.downloadType !== 'recovery' ) {
+    let existingShares = []
+    if ( Object.keys( UNDER_CUSTODY ).length ) {
+      existingShares = Object.keys( UNDER_CUSTODY ).map(
+        ( tag ) => UNDER_CUSTODY[ tag ].META_SHARE,
+      )
     }
 
     res = yield call(
@@ -545,14 +560,16 @@ export function* downloadMetaShareWorker({ payload }) {
       s3Service.levelhealth.walletId,
     );
   } else {
-    res = yield call(S3Service.downloadAndValidateShare, encryptedKey);
+    res = yield call( S3Service.downloadAndValidateShare, encryptedKey )
   }
 
-  console.log({ res });
-  if (res.status === 200) {
-    const { metaShare, encryptedDynamicNonPMDD } = res.data;
-    let updatedBackup;
-    if (payload.downloadType !== 'recovery') {
+  console.log( {
+    res
+  } )
+  if ( res.status === 200 ) {
+    const { metaShare, encryptedDynamicNonPMDD } = res.data
+    let updatedBackup
+    if ( payload.downloadType !== 'recovery' ) {
       //TODO: activate DNP Transportation Layer for Hexa Premium
       // const dynamicNonPMDD = {
       //   ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
@@ -565,58 +582,63 @@ export function* downloadMetaShareWorker({ payload }) {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY: {
           ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
-          [metaShare.meta.tag]: {
+          [ metaShare.meta.tag ]: {
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
         },
         // DYNAMIC_NONPMDD: dynamicNonPMDD,
-      };
+      }
 
-      console.log({ updatedBackup });
-      yield call(insertDBWorker, {
+      console.log( {
+        updatedBackup
+      } )
+      yield call( insertDBWorker, {
         payload: {
           DECENTRALIZED_BACKUP: updatedBackup,
         },
-      });
+      } )
 
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
-      yield put(downloadedMShare(otp, true));
-      yield put(updateMSharesHealth());
+      yield put( downloadedMShare( otp, true ) )
+      yield put( updateMSharesHealth() )
     } else {
-      let updatedRecoveryShares = {};
-      let updated = false;
+      let updatedRecoveryShares = {
+      }
+      let updated = false
 
-      if (payload.replaceIndex === 0 || payload.replaceIndex) {
+      if ( payload.replaceIndex === 0 || payload.replaceIndex ) {
         // replacing stored key w/ scanned from Guardian's help-restore
         updatedRecoveryShares = {
           ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
-          [payload.replaceIndex]: {
-            REQUEST_DETAILS: { KEY: encryptedKey },
+          [ payload.replaceIndex ]: {
+            REQUEST_DETAILS: {
+              KEY: encryptedKey
+            },
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
-        };
+        }
       } else {
-        Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(
-          (objectKey) => {
+        Object.keys( DECENTRALIZED_BACKUP.RECOVERY_SHARES ).forEach(
+          ( objectKey ) => {
             const recoveryShare =
-              DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
+              DECENTRALIZED_BACKUP.RECOVERY_SHARES[ objectKey ]
             if (
               recoveryShare.REQUEST_DETAILS &&
               recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
             ) {
-              updatedRecoveryShares[objectKey] = {
+              updatedRecoveryShares[ objectKey ] = {
                 REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
                 META_SHARE: metaShare,
                 ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
-              };
-              updated = true;
+              }
+              updated = true
             } else {
-              updatedRecoveryShares[objectKey] = recoveryShare;
+              updatedRecoveryShares[ objectKey ] = recoveryShare
             }
           },
-        );
+        )
       }
 
       // if (!updated) {
@@ -637,11 +659,13 @@ export function* downloadMetaShareWorker({ payload }) {
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         RECOVERY_SHARES: updatedRecoveryShares,
-      };
+      }
       // yield put(downloadedMShare(otp, true));
-      yield call(insertDBWorker, {
-        payload: { DECENTRALIZED_BACKUP: updatedBackup },
-      });
+      yield call( insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup
+        },
+      } )
     }
     // yield put(
     //   insertIntoDB({
@@ -649,29 +673,33 @@ export function* downloadMetaShareWorker({ payload }) {
     //   }),
     // ); // connecting insertion at updateMSharesHealth
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log({ res });
-    yield put(ErrorReceiving(true));
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    console.log( {
+      res
+    } )
+    yield put( ErrorReceiving( true ) )
     // Alert.alert('Download Failed!', res.err);
-    yield put(downloadedMShare(otp, false, res.err));
+    yield put( downloadedMShare( otp, false, res.err ) )
   }
-  yield put(switchS3Loader('downloadMetaShare'));
+  yield put( switchS3Loader( 'downloadMetaShare' ) )
 }
 
 export const downloadMetaShareWatcher = createWatcher(
   downloadMetaShareWorker,
   DOWNLOAD_MSHARE,
-);
+)
 
-function* generatePersonalCopyWorker({ payload }) {
+function* generatePersonalCopyWorker( { payload } ) {
   // yield put(switchS3Loader('generatePDF'));
-  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
-  const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
-  const s3Service: S3Service = yield select((state) => state.sss.service);
-  const res = yield call(s3Service.createQR, shareIndex);
-  if (res.status !== 200) {
-    console.log({ err: res.err });
-    return;
+  const { selectedPersonalCopy } = payload // corresponds to metaShare index (3/4)
+  const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+  const res = yield call( s3Service.createQR, shareIndex )
+  if ( res.status !== 200 ) {
+    console.log( {
+      err: res.err
+    } )
+    return
   }
 
   const secureAccount: SecureAccount = yield select(
@@ -693,11 +721,11 @@ function* generatePersonalCopyWorker({ payload }) {
   const pdfData = {
     qrData: res.data.qrData,
     ...secureAssets,
-  };
+  }
 
   const { security, walletName } = yield select(
-    (state) => state.storage.database.WALLET_SETUP,
-  );
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
 
   try {
     const pdfPath = yield call(
@@ -708,68 +736,74 @@ function* generatePersonalCopyWorker({ payload }) {
       // `Hexa Share ${shareIndex + 1}`,
       `Hexa Recovery Key for ${walletName}'s Wallet`,
       security.answer,
-    );
+    )
 
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
-    );
+    )
     // console.log('/sagas/sss ', {personalCopyDetails})
-    if (!personalCopyDetails) {
+    if ( !personalCopyDetails ) {
       personalCopyDetails = {
-        [selectedPersonalCopy.type]: {
+        [ selectedPersonalCopy.type ]: {
           path: pdfPath,
           shared: false,
-          sharingDetails: {},
+          sharingDetails: {
+          },
         },
-      };
+      }
     } else {
-      personalCopyDetails = JSON.parse(personalCopyDetails);
+      personalCopyDetails = JSON.parse( personalCopyDetails )
       const originalSharedStatus = personalCopyDetails[
         selectedPersonalCopy.type
       ]
-        ? personalCopyDetails[selectedPersonalCopy.type].shared
-        : false;
+        ? personalCopyDetails[ selectedPersonalCopy.type ].shared
+        : false
       const originalSharingDetails =
-        personalCopyDetails[selectedPersonalCopy.type] &&
-        personalCopyDetails[selectedPersonalCopy.type].sharingDetails
-          ? personalCopyDetails[selectedPersonalCopy.type].sharingDetails
-          : {};
+        personalCopyDetails[ selectedPersonalCopy.type ] &&
+        personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
+          ? personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
+          : {
+          }
       personalCopyDetails = {
         ...personalCopyDetails,
-        [selectedPersonalCopy.type]: {
+        [ selectedPersonalCopy.type ]: {
           path: pdfPath,
           shared: !!originalSharedStatus,
           sharingDetails: originalSharingDetails,
         },
-      };
+      }
     }
     // console.log('/sagas/sss ', {personalCopyDetails})
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
-      JSON.stringify(personalCopyDetails),
-    );
+      JSON.stringify( personalCopyDetails ),
+    )
 
     // reset PDF health (if present) post reshare
-    let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    let storedPDFHealth = yield call( AsyncStorage.getItem, 'PDF Health' )
     // console.log('/sagas/sss ', {storedPDFHealth})
     if (storedPDFHealth) {
       const { pdfHealth } = s3Service.levelhealth;
       storedPDFHealth = JSON.parse(storedPDFHealth);
       storedPDFHealth = {
         ...storedPDFHealth,
-        [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
-      };
+        [ shareIndex ]: {
+          shareId: pdfHealth[ shareIndex ].shareId, updatedAt: 0
+        },
+      }
       // console.log('/sagas/sss ', {storedPDFHealth})
       yield call(
         AsyncStorage.setItem,
         'PDF Health',
-        JSON.stringify(storedPDFHealth),
-      );
+        JSON.stringify( storedPDFHealth ),
+      )
     }
 
-    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
+    yield put( personalCopyGenerated( {
+      [ selectedPersonalCopy.type ]: true
+    } ) )
 
     // if (Object.keys(personalCopyDetails).length == 2) {
     //   // remove sec-mne once both the personal copies are generated
@@ -788,17 +822,25 @@ function* generatePersonalCopyWorker({ payload }) {
     //   }
     // }
 
-    const { SERVICES } = yield select((state) => state.storage.database);
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
-      SECURE_ACCOUNT: JSON.stringify(secureAccount),
-      S3_SERVICE: JSON.stringify(s3Service),
-    };
+      SECURE_ACCOUNT: JSON.stringify( secureAccount ),
+      S3_SERVICE: JSON.stringify( s3Service ),
+    }
 
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } catch (err) {
-    console.log({ err });
-    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+  } catch ( err ) {
+    console.log( {
+      err
+    } )
+    yield put( personalCopyGenerated( {
+      [ selectedPersonalCopy.type ]: false
+    } ) )
   }
   //yield put(switchS3Loader('generatePDF'));
 }
@@ -806,217 +848,233 @@ function* generatePersonalCopyWorker({ payload }) {
 export const generatePersonalCopyWatcher = createWatcher(
   generatePersonalCopyWorker,
   GENERATE_PERSONAL_COPY,
-);
+)
 
-function* sharePersonalCopyWorker({ payload }) {
-  const { shareVia, selectedPersonalCopy, isEmailOtherOptions } = payload;
+function* sharePersonalCopyWorker( { payload } ) {
+  const { shareVia, selectedPersonalCopy, isEmailOtherOptions } = payload
 
   try {
     let personalCopyDetails = yield call(
       AsyncStorage.getItem,
       'personalCopyDetails',
-    );
-    if (!personalCopyDetails)
-      throw new Error('Personal copy not found/generated');
-    personalCopyDetails = JSON.parse(personalCopyDetails);
-    if (!personalCopyDetails[selectedPersonalCopy.type])
-      throw new Error('Personal copy not found/generated');
+    )
+    if ( !personalCopyDetails )
+      throw new Error( 'Personal copy not found/generated' )
+    personalCopyDetails = JSON.parse( personalCopyDetails )
+    if ( !personalCopyDetails[ selectedPersonalCopy.type ] )
+      throw new Error( 'Personal copy not found/generated' )
 
     const { security } = yield select(
-      (state) => state.storage.database.WALLET_SETUP,
-    );
+      ( state ) => state.storage.database.WALLET_SETUP,
+    )
 
-    switch (shareVia) {
-      case 'Email':
-        if (!isEmailOtherOptions) {
-          yield call(
-            Mailer.mail,
-            {
-              subject: selectedPersonalCopy.title,
-              body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
-              // body: `<b>Please find the attached personal copy ${
-              //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-              //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
-              isHTML: true,
-              attachment: {
-                path:
+    switch ( shareVia ) {
+        case 'Email':
+          if ( !isEmailOtherOptions ) {
+            yield call(
+              Mailer.mail,
+              {
+                subject: selectedPersonalCopy.title,
+                body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
+                // body: `<b>Please find the attached personal copy ${
+                //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+                //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.</b>`,
+                isHTML: true,
+                attachment: {
+                  path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[selectedPersonalCopy.type].path
-                    : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
-                type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+                      personalCopyDetails[ selectedPersonalCopy.type ].path
+                    : personalCopyDetails[ selectedPersonalCopy.type ].path, // The absolute path of the file from which to read data.
+                  type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                  name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+                },
               },
-            },
-            (err, event) => {
-              console.log({ event, err });
-              // on delayed error (rollback the changes that happened post switch case)
-              setTimeout(() => {
-                AsyncStorage.setItem(
-                  'personalCopyDetails',
-                  JSON.stringify(personalCopyDetails),
-                );
-              }, 1000);
-            },
-          );
-        } else {
-          let shareOptions = {
+              ( err, event ) => {
+                console.log( {
+                  event, err
+                } )
+                // on delayed error (rollback the changes that happened post switch case)
+                setTimeout( () => {
+                  AsyncStorage.setItem(
+                    'personalCopyDetails',
+                    JSON.stringify( personalCopyDetails ),
+                  )
+                }, 1000 )
+              },
+            )
+          } else {
+            const shareOptions = {
+              title: selectedPersonalCopy.title,
+              message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+              // message: `Please find the attached personal copy ${
+              //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+              //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
+              url:
+              Platform.OS == 'android'
+                ? 'file://' +
+                  personalCopyDetails[ selectedPersonalCopy.type ].path
+                : personalCopyDetails[ selectedPersonalCopy.type ].path,
+              type: 'application/pdf',
+              showAppsToView: true,
+              subject: selectedPersonalCopy.title,
+            }
+
+            try {
+              yield call( Share.open, shareOptions )
+            } catch ( err ) {
+              const errorMessage = idx( err, ( _ ) => _.message )
+              if ( errorMessage !== 'User did not share' ) {
+                throw new Error( `Share failed: ${err}` )
+              }
+            }
+          }
+          break
+
+        case 'Print':
+          const pdfDecr = {
+            path: personalCopyDetails[ selectedPersonalCopy.type ].path,
+            filename:
+            selectedPersonalCopy.type === 'copy1'
+              ? 'PersonalCopy1.pdf'
+              : 'PersonalCopy2.pdf',
+            password: security.answer,
+          }
+          if ( Platform.OS == 'android' ) {
+            const PdfPassword = yield NativeModules.PdfPassword
+            yield call(
+              PdfPassword.print,
+              JSON.stringify( pdfDecr ),
+              ( err: any ) => {
+                console.log( {
+                  err
+                } )
+                // on delayed error (rollback the changes that happened post switch case)
+                setTimeout( () => {
+                  AsyncStorage.setItem(
+                    'personalCopyDetails',
+                    JSON.stringify( personalCopyDetails ),
+                  )
+                }, 1000 )
+              },
+              async ( res: any ) => {
+                await RNPrint.print( {
+                  filePath: 'file://' + res,
+                } )
+                console.log( {
+                  res
+                } )
+              },
+            )
+          } else {
+            try {
+              yield call( RNPrint.print, {
+                filePath: personalCopyDetails[ selectedPersonalCopy.type ].path,
+              } )
+            } catch ( err ) {
+              console.log( err )
+              throw new Error( `Print failed: ${err}` )
+            }
+          }
+          break
+
+        case 'Other':
+          const shareOptions = {
             title: selectedPersonalCopy.title,
             message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
             // message: `Please find the attached personal copy ${
             //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
             //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
             url:
-              Platform.OS == 'android'
-                ? 'file://' +
-                  personalCopyDetails[selectedPersonalCopy.type].path
-                : personalCopyDetails[selectedPersonalCopy.type].path,
+            Platform.OS == 'android'
+              ? 'file://' + personalCopyDetails[ selectedPersonalCopy.type ].path
+              : personalCopyDetails[ selectedPersonalCopy.type ].path,
             type: 'application/pdf',
             showAppsToView: true,
             subject: selectedPersonalCopy.title,
-          };
+          }
 
           try {
-            yield call(Share.open, shareOptions);
-          } catch (err) {
-            let errorMessage = idx(err, (_) => _.message);
-            if (errorMessage !== 'User did not share') {
-              throw new Error(`Share failed: ${err}`);
+            yield call( Share.open, shareOptions )
+          } catch ( err ) {
+            const errorMessage = idx( err, ( _ ) => _.message )
+            if ( errorMessage !== 'User did not share' ) {
+              throw new Error( `Share failed: ${err}` )
             }
           }
-        }
-        break;
+          break
 
-      case 'Print':
-        let pdfDecr = {
-          path: personalCopyDetails[selectedPersonalCopy.type].path,
-          filename:
-            selectedPersonalCopy.type === 'copy1'
-              ? 'PersonalCopy1.pdf'
-              : 'PersonalCopy2.pdf',
-          password: security.answer,
-        };
-        if (Platform.OS == 'android') {
-          var PdfPassword = yield NativeModules.PdfPassword;
-          yield call(
-            PdfPassword.print,
-            JSON.stringify(pdfDecr),
-            (err: any) => {
-              console.log({ err });
-              // on delayed error (rollback the changes that happened post switch case)
-              setTimeout(() => {
-                AsyncStorage.setItem(
-                  'personalCopyDetails',
-                  JSON.stringify(personalCopyDetails),
-                );
-              }, 1000);
-            },
-            async (res: any) => {
-              await RNPrint.print({
-                filePath: 'file://' + res,
-              });
-              console.log({ res });
-            },
-          );
-        } else {
-          try {
-            yield call(RNPrint.print, {
-              filePath: personalCopyDetails[selectedPersonalCopy.type].path,
-            });
-          } catch (err) {
-            console.log(err);
-            throw new Error(`Print failed: ${err}`);
-          }
-        }
-        break;
-
-      case 'Other':
-        let shareOptions = {
-          title: selectedPersonalCopy.title,
-          message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
-          // message: `Please find the attached personal copy ${
-          //   selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-          //   } of your Recovery Keys is attached as a pdf. The answer to your security question () is used to password protect the PDF.`,
-          url:
-            Platform.OS == 'android'
-              ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
-              : personalCopyDetails[selectedPersonalCopy.type].path,
-          type: 'application/pdf',
-          showAppsToView: true,
-          subject: selectedPersonalCopy.title,
-        };
-
-        try {
-          yield call(Share.open, shareOptions);
-        } catch (err) {
-          let errorMessage = idx(err, (_) => _.message);
-          if (errorMessage !== 'User did not share') {
-            throw new Error(`Share failed: ${err}`);
-          }
-        }
-        break;
-
-      default:
-        throw new Error('Invalid sharing option');
+        default:
+          throw new Error( 'Invalid sharing option' )
     }
 
     const updatedPersonalCopyDetails = {
       ...personalCopyDetails,
-      [selectedPersonalCopy.type]: {
-        ...personalCopyDetails[selectedPersonalCopy.type],
+      [ selectedPersonalCopy.type ]: {
+        ...personalCopyDetails[ selectedPersonalCopy.type ],
         // shared: true,
-        sharingDetails: { shareVia, sharedAt: Date.now() },
+        sharingDetails: {
+          shareVia, sharedAt: Date.now()
+        },
       },
-    };
+    }
 
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
-      JSON.stringify(updatedPersonalCopyDetails),
-    );
+      JSON.stringify( updatedPersonalCopyDetails ),
+    )
 
-    yield put(personalCopyShared({ [selectedPersonalCopy.type]: true }));
-  } catch (err) {
-    console.log({ err });
-    yield put(personalCopyShared({ [selectedPersonalCopy.type]: false }));
+    yield put( personalCopyShared( {
+      [ selectedPersonalCopy.type ]: true
+    } ) )
+  } catch ( err ) {
+    console.log( {
+      err
+    } )
+    yield put( personalCopyShared( {
+      [ selectedPersonalCopy.type ]: false
+    } ) )
   }
 }
 
 export const sharePersonalCopyWatcher = createWatcher(
   sharePersonalCopyWorker,
   SHARE_PERSONAL_COPY,
-);
+)
 
 function* updateMSharesHealthWorker() {
   // set a timelapse for auto update and enable instantaneous manual update
-  yield put(switchS3Loader('updateMSharesHealth'));
+  yield put( switchS3Loader( 'updateMSharesHealth' ) )
 
   const trustedContactsService: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service,
-  );
+    ( state ) => state.trustedContacts.service,
+  )
 
   const DECENTRALIZED_BACKUP = yield select(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+    ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
+  )
 
-  const SERVICES = yield select((state) => state.storage.database.SERVICES);
+  const SERVICES = yield select( ( state ) => state.storage.database.SERVICES )
 
-  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
-  const metaShares = Object.keys(UNDER_CUSTODY).map(
-    (tag) => UNDER_CUSTODY[tag].META_SHARE,
-  );
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+  const metaShares = Object.keys( UNDER_CUSTODY ).map(
+    ( tag ) => UNDER_CUSTODY[ tag ].META_SHARE,
+  )
 
-  if (!metaShares.length) return;
-  const res = yield call(S3Service.updateHealth, metaShares);
-  if (res.status === 200) {
+  if ( !metaShares.length ) return
+  const res = yield call( S3Service.updateHealth, metaShares )
+  if ( res.status === 200 ) {
     // TODO: Use during selective updation
-    const { updationInfo } = res.data;
-    console.log({ updationInfo });
+    const { updationInfo } = res.data
+    console.log( {
+      updationInfo
+    } )
 
-    let removed = false;
-    Object.keys(UNDER_CUSTODY).forEach((tag) => {
-      for (let info of updationInfo) {
-        if (info.updated) {
+    let removed = false
+    Object.keys( UNDER_CUSTODY ).forEach( ( tag ) => {
+      for ( const info of updationInfo ) {
+        if ( info.updated ) {
           // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
           //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
           //   if (info.encryptedDynamicNonPMDD)
@@ -1024,54 +1082,56 @@ function* updateMSharesHealthWorker() {
           //       info.encryptedDynamicNonPMDD;
           // }
         } else {
-          if (info.removeShare) {
-            if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-              delete UNDER_CUSTODY[tag];
-              removed = true;
-              for (const contactName of Object.keys(
+          if ( info.removeShare ) {
+            if ( info.walletId === UNDER_CUSTODY[ tag ].META_SHARE.meta.walletId ) {
+              delete UNDER_CUSTODY[ tag ]
+              removed = true
+              for ( const contactName of Object.keys(
                 trustedContactsService.tc.trustedContacts,
-              )) {
+              ) ) {
                 const contact =
-                  trustedContactsService.tc.trustedContacts[contactName];
-                if (contact.walletID === info.walletId) {
-                  contact.isWard = false;
+                  trustedContactsService.tc.trustedContacts[ contactName ]
+                if ( contact.walletID === info.walletId ) {
+                  contact.isWard = false
                 }
               }
             }
           }
         }
       }
-    });
+    } )
 
-    if (removed) {
+    if ( removed ) {
       // update db post share removal
       const updatedSERVICES = {
         ...SERVICES,
-        TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
-      };
+        TRUSTED_CONTACTS: JSON.stringify( trustedContactsService ),
+      }
 
       const updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY,
-      };
-      yield call(insertDBWorker, {
+      }
+      yield call( insertDBWorker, {
         payload: {
           DECENTRALIZED_BACKUP: updatedBackup,
           SERVICES: updatedSERVICES,
         },
-      });
+      } )
     }
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log({ err: res.err });
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    console.log( {
+      err: res.err
+    } )
   }
-  yield put(switchS3Loader('updateMSharesHealth'));
+  yield put( switchS3Loader( 'updateMSharesHealth' ) )
 }
 
 export const updateMSharesHealthWatcher = createWatcher(
   updateMSharesHealthWorker,
   UPDATE_MSHARES_HEALTH,
-);
+)
 
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
@@ -1080,77 +1140,90 @@ function* checkMSharesHealthWorker() {
   const res = yield call(s3Service.checkHealth);
   const postFetchHealth = JSON.stringify(s3Service.levelhealth.healthCheckStatus);
 
-  yield put(calculateOverallHealth(s3Service));
+  yield put( calculateOverallHealth( s3Service ) )
 
-  if (res.status === 200) {
-    if (preFetchHealth != postFetchHealth) {
-      const { SERVICES } = yield select((state) => state.storage.database);
+  if ( res.status === 200 ) {
+    if ( preFetchHealth != postFetchHealth ) {
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
-        S3_SERVICE: JSON.stringify(s3Service),
-      };
-      console.log('Health Check updated');
-      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+        S3_SERVICE: JSON.stringify( s3Service ),
+      }
+      console.log( 'Health Check updated' )
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES
+        }
+      } )
     }
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log({ err: res.err });
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    console.log( {
+      err: res.err
+    } )
   }
 
-  yield put(switchS3Loader('checkMSharesHealth'));
+  yield put( switchS3Loader( 'checkMSharesHealth' ) )
 }
 
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH,
-);
+)
 
 function* checkPDFHealthWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
   const { pdfHealth } = s3Service.levelhealth;
   const { scannedQR, index } = payload;
 
-  if (scannedQR === pdfHealth[index].qrData) {
+  if ( scannedQR === pdfHealth[ index ].qrData ) {
     let storedPDFHealth = JSON.parse(
-      yield call(AsyncStorage.getItem, 'PDF Health'),
-    );
+      yield call( AsyncStorage.getItem, 'PDF Health' ),
+    )
 
-    storedPDFHealth = storedPDFHealth ? storedPDFHealth : {};
+    storedPDFHealth = storedPDFHealth ? storedPDFHealth : {
+    }
 
     let updatedPDFHealth = {
       ...storedPDFHealth,
-      [index]: { shareId: pdfHealth[index].shareId, updatedAt: Date.now() },
-    };
-
-    if (!updatedPDFHealth[3]) {
-      updatedPDFHealth = {
-        ...updatedPDFHealth,
-        [3]: {
-          shareId: pdfHealth[3] ? pdfHealth[3].shareId : 'placeHolderID3',
-          updatedAt: 0,
-        },
-      };
-    }
-    if (!updatedPDFHealth[4]) {
-      updatedPDFHealth = {
-        ...updatedPDFHealth,
-        [4]: {
-          shareId: pdfHealth[4] ? pdfHealth[4].shareId : 'placeHolderID4',
-          updatedAt: 0,
-        },
-      };
+      [ index ]: {
+        shareId: pdfHealth[ index ].shareId, updatedAt: Date.now()
+      },
     }
 
-    console.log({ updatedPDFHealth });
+    if ( !updatedPDFHealth[ 3 ] ) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [ 3 ]: {
+          shareId: pdfHealth[ 3 ] ? pdfHealth[ 3 ].shareId : 'placeHolderID3',
+          updatedAt: 0,
+        },
+      }
+    }
+    if ( !updatedPDFHealth[ 4 ] ) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [ 4 ]: {
+          shareId: pdfHealth[ 4 ] ? pdfHealth[ 4 ].shareId : 'placeHolderID4',
+          updatedAt: 0,
+        },
+      }
+    }
+
+    console.log( {
+      updatedPDFHealth
+    } )
     yield call(
       AsyncStorage.setItem,
       'PDF Health',
-      JSON.stringify(updatedPDFHealth),
-    );
-    yield put(pdfHealthChecked('pdfHealthChecked'));
+      JSON.stringify( updatedPDFHealth ),
+    )
+    yield put( pdfHealthChecked( 'pdfHealthChecked' ) )
   } else {
-    console.log({ pdfHealth, payload });
-    yield put(pdfHealthCheckFailed(true));
+    console.log( {
+      pdfHealth, payload
+    } )
+    yield put( pdfHealthCheckFailed( true ) )
     //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
@@ -1174,57 +1247,57 @@ function* checkPDFHealthWorker({ payload }) {
 export const checkPDFHealthWatcher = createWatcher(
   checkPDFHealthWorker,
   CHECK_PDF_HEALTH,
-);
+)
 
-function* shareHistoryUpdateWorker({ payload }) {
-  const { overallHealth } = payload;
+function* shareHistoryUpdateWorker( { payload } ) {
+  const { overallHealth } = payload
   const shareHistory = JSON.parse(
-    yield call(AsyncStorage.getItem, 'shareHistory'),
-  );
+    yield call( AsyncStorage.getItem, 'shareHistory' ),
+  )
 
-  if (shareHistory) {
-    const updatedShareHistory = [...shareHistory];
-    for (let index = 0; index < overallHealth.sharesInfo.length; index++) {
+  if ( shareHistory ) {
+    const updatedShareHistory = [ ...shareHistory ]
+    for ( let index = 0; index < overallHealth.sharesInfo.length; index++ ) {
       if (
-        overallHealth.sharesInfo[index] &&
-        overallHealth.sharesInfo[index].updatedAt
+        overallHealth.sharesInfo[ index ] &&
+        overallHealth.sharesInfo[ index ].updatedAt
       ) {
-        if (overallHealth.sharesInfo[index].shareStage !== 'Ugly') {
-          updatedShareHistory[index] = {
-            ...updatedShareHistory[index],
+        if ( overallHealth.sharesInfo[ index ].shareStage !== 'Ugly' ) {
+          updatedShareHistory[ index ] = {
+            ...updatedShareHistory[ index ],
             accessible: Date.now(),
-          };
+          }
         } else {
-          updatedShareHistory[index] = {
-            ...updatedShareHistory[index],
+          updatedShareHistory[ index ] = {
+            ...updatedShareHistory[ index ],
             notAccessible: Date.now(),
-          };
+          }
         }
       }
     }
     yield call(
       AsyncStorage.setItem,
       'shareHistory',
-      JSON.stringify(updatedShareHistory),
-    );
+      JSON.stringify( updatedShareHistory ),
+    )
   }
 
   const securityQuestionHistory = JSON.parse(
-    yield call(AsyncStorage.getItem, 'securityQuestionHistory'),
-  ); //TODO: use multiGet on async storage
+    yield call( AsyncStorage.getItem, 'securityQuestionHistory' ),
+  ) //TODO: use multiGet on async storage
 
-  if (securityQuestionHistory) {
-    if (overallHealth.qaStatus.stage === 'Ugly') {
+  if ( securityQuestionHistory ) {
+    if ( overallHealth.qaStatus.stage === 'Ugly' ) {
       const updatedSecurityQuestionHistory = {
         ...securityQuestionHistory,
         unconfirmed: Date.now(),
-      };
+      }
 
       yield call(
         AsyncStorage.setItem,
         'securityQuestionHistory',
-        JSON.stringify(updatedSecurityQuestionHistory),
-      );
+        JSON.stringify( updatedSecurityQuestionHistory ),
+      )
     }
   }
 }
@@ -1232,55 +1305,61 @@ function* shareHistoryUpdateWorker({ payload }) {
 export const shareHistoryUpdateWatcher = createWatcher(
   shareHistoryUpdateWorker,
   UPDATE_SHARE_HISTORY,
-);
+)
 
-function* overallHealthWorker({ payload }) {
+function* overallHealthWorker( { payload } ) {
   const service = payload.s3Service
     ? payload.s3Service
-    : yield select((state) => state.sss.service);
+    : yield select( ( state ) => state.sss.service )
 
-  const { healthCheckStatus } = service.sss;
-  let shareStatus = new Array(5);
-  Object.keys(healthCheckStatus).map((key) => {
-    shareStatus[key] = {
-      shareId: healthCheckStatus[key].shareId,
-      updatedAt: healthCheckStatus[key].updatedAt,
-    };
-  });
+  const { healthCheckStatus } = service.sss
+  const shareStatus = new Array( 5 )
+  Object.keys( healthCheckStatus ).map( ( key ) => {
+    shareStatus[ key ] = {
+      shareId: healthCheckStatus[ key ].shareId,
+      updatedAt: healthCheckStatus[ key ].updatedAt,
+    }
+  } )
 
   const securityTimestamp = yield call(
     AsyncStorage.getItem,
     'SecurityAnsTimestamp',
-  );
+  )
 
   let storedPDFHealth = JSON.parse(
-    yield call(AsyncStorage.getItem, 'PDF Health'),
-  );
+    yield call( AsyncStorage.getItem, 'PDF Health' ),
+  )
 
-  if (!storedPDFHealth) {
+  if ( !storedPDFHealth ) {
     storedPDFHealth = {
-      3: { shareId: 'placeHolderID3', updatedAt: 0 },
-      4: { shareId: 'placeHolderID4', updatedAt: 0 },
-    };
+      3: {
+        shareId: 'placeHolderID3', updatedAt: 0
+      },
+      4: {
+        shareId: 'placeHolderID4', updatedAt: 0
+      },
+    }
   }
-  shareStatus[3] = storedPDFHealth[3];
-  shareStatus[4] = storedPDFHealth[4];
-  console.log({ shareStatus });
-  const healthStatus = new HealthStatus();
+  shareStatus[ 3 ] = storedPDFHealth[ 3 ]
+  shareStatus[ 4 ] = storedPDFHealth[ 4 ]
+  console.log( {
+    shareStatus
+  } )
+  const healthStatus = new HealthStatus()
   const overallHealth = yield call(
     healthStatus.appHealthStatus,
-    JSON.parse(securityTimestamp) ? JSON.parse(securityTimestamp) : 0,
+    JSON.parse( securityTimestamp ) ? JSON.parse( securityTimestamp ) : 0,
     shareStatus,
-  );
+  )
 
-  if (overallHealth) {
+  if ( overallHealth ) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
-    overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
+    overallHealth.overallStatus = parseInt( overallHealth.overallStatus ) // Conversion: stages to percentage
 
-    if (overallHealth.overallStatus === 100) {
+    if ( overallHealth.overallStatus === 100 ) {
       const secureAccount: SecureAccount = yield select(
-        (state) => state.accounts[SECURE_ACCOUNT].service,
-      );
+        ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+      )
 
       // remove sec-mne once health approaches 100 (disable PC share)
       // if (secureAccount.secureHDWallet.secondaryMnemonic) {
@@ -1300,171 +1379,181 @@ function* overallHealthWorker({ payload }) {
       // }
     }
 
-    yield put(updateShareHistory(overallHealth));
+    yield put( updateShareHistory( overallHealth ) )
 
     yield call(
       AsyncStorage.setItem,
       'overallHealth',
-      JSON.stringify(overallHealth),
-    );
-    yield put(overallHealthCalculated(overallHealth));
+      JSON.stringify( overallHealth ),
+    )
+    yield put( overallHealthCalculated( overallHealth ) )
   } else {
-    throw new Error('Failed to calculate overall health');
+    throw new Error( 'Failed to calculate overall health' )
   }
 }
 
 export const overallHealthWatcher = createWatcher(
   overallHealthWorker,
   OVERALL_HEALTH,
-);
+)
 
-function* updateDynamicNonPMDDWorker({ payload }) {
-  yield put(switchS3Loader('updateDynamicNonPMDD'));
+function* updateDynamicNonPMDDWorker( { payload } ) {
+  yield put( switchS3Loader( 'updateDynamicNonPMDD' ) )
 
-  let dynamicNonPMDD = payload.dynamicNonPMDD;
-  console.log({ dynamicNonPMDD });
+  let dynamicNonPMDD = payload.dynamicNonPMDD
+  console.log( {
+    dynamicNonPMDD
+  } )
 
-  if (!dynamicNonPMDD) {
+  if ( !dynamicNonPMDD ) {
     const { DYNAMIC_NONPMDD } = yield select(
-      (state) => state.storage.database.DECENTRALIZED_BACKUP,
-    );
+      ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
+    )
 
-    if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
-    dynamicNonPMDD = DYNAMIC_NONPMDD;
+    if ( !Object.keys( DYNAMIC_NONPMDD ).length ) return // Nothing in DNP
+    dynamicNonPMDD = DYNAMIC_NONPMDD
   }
 
-  const s3Service: S3Service = yield select((state) => state.sss.service);
-  const res = yield call(s3Service.updateDynamicNonPMDD, dynamicNonPMDD);
-  console.log({ res });
-  if (res.status === 200) {
-    const { updated } = res.data;
-    if (!updated) {
-      yield put(switchS3Loader('updateDynamicNonPMDD'));
-      throw new Error('Failed to update dynamic nonPMDD');
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+  const res = yield call( s3Service.updateDynamicNonPMDD, dynamicNonPMDD )
+  console.log( {
+    res
+  } )
+  if ( res.status === 200 ) {
+    const { updated } = res.data
+    if ( !updated ) {
+      yield put( switchS3Loader( 'updateDynamicNonPMDD' ) )
+      throw new Error( 'Failed to update dynamic nonPMDD' )
     }
   } // yield success
   else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(switchS3Loader('updateDynamicNonPMDD'));
-    throw new Error(res.err);
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( switchS3Loader( 'updateDynamicNonPMDD' ) )
+    throw new Error( res.err )
   } // yield failure
 }
 
 export const updateDynamicNonPMDDWatcher = createWatcher(
   updateDynamicNonPMDDWorker,
   UPDATE_DYNAMINC_NONPMDD,
-);
+)
 
-function* downloadDynamicNonPMDDWorker({ payload }) {
-  yield put(switchS3Loader('downloadDynamicNonPMDD'));
-  const res = yield call(S3Service.downloadDynamicNonPMDD, payload.walletId);
-  if (res.status === 200) {
+function* downloadDynamicNonPMDDWorker( { payload } ) {
+  yield put( switchS3Loader( 'downloadDynamicNonPMDD' ) )
+  const res = yield call( S3Service.downloadDynamicNonPMDD, payload.walletId )
+  if ( res.status === 200 ) {
     // TODO: add functionality as per the requirements
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error(res.err);
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    throw new Error( res.err )
   }
-  yield put(switchS3Loader('downloadDynamicNonPMDD'));
+  yield put( switchS3Loader( 'downloadDynamicNonPMDD' ) )
 }
 
 export const downloadDynamicNonPMDDWatcher = createWatcher(
   downloadDynamicNonPMDDWorker,
   DOWNLOAD_DYNAMIC_NONPMDD,
-);
+)
 
 function* restoreDynamicNonPMDDWorker() {
-  yield put(switchS3Loader('restoreDynamicNonPMDD'));
+  yield put( switchS3Loader( 'restoreDynamicNonPMDD' ) )
 
   const { DECENTRALIZED_BACKUP } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
-  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-  const dynamicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
-    (key) => {
-      if (RECOVERY_SHARES.ENC_DYNAMIC_NONPMDD)
-        return RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD;
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
+  const dynamicNonPMDDs: EncDynamicNonPMDD[] = Object.keys( RECOVERY_SHARES ).map(
+    ( key ) => {
+      if ( RECOVERY_SHARES.ENC_DYNAMIC_NONPMDD )
+        return RECOVERY_SHARES[ key ].ENC_DYNAMIC_NONPMDD
     },
-  );
+  )
 
-  if (!dynamicNonPMDDs.length) {
-    console.log('DynamicNonPMDD not available');
-    return;
+  if ( !dynamicNonPMDDs.length ) {
+    console.log( 'DynamicNonPMDD not available' )
+    return
   }
-  const s3Service: S3Service = yield select((state) => state.sss.service);
-  const res = yield call(s3Service.restoreDynamicNonPMDD, dynamicNonPMDDs);
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+  const res = yield call( s3Service.restoreDynamicNonPMDD, dynamicNonPMDDs )
 
-  if (res.status === 200) {
-    const metaShares: MetaShare[] = res.data.latestDynamicNonPMDD; // sync the DNP structure across redux-saga and nodeAlpha
+  if ( res.status === 200 ) {
+    const metaShares: MetaShare[] = res.data.latestDynamicNonPMDD // sync the DNP structure across redux-saga and nodeAlpha
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       DYNAMIC_NONPMDD: {
         ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
         META_SHARES: metaShares,
       },
-    };
-    yield call(insertDBWorker, {
-      payload: { DECENTRALIZED_BACKUP: updatedBackup },
-    });
+    }
+    yield call( insertDBWorker, {
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup
+      },
+    } )
   } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error(res.err);
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    throw new Error( res.err )
   }
-  yield put(switchS3Loader('restoreDynamicNonPMDD'));
+  yield put( switchS3Loader( 'restoreDynamicNonPMDD' ) )
 }
 
 export const restoreDynamicNonPMDDWatcher = createWatcher(
   restoreDynamicNonPMDDWorker,
   RESTORE_DYNAMIC_NONPMDD,
-);
+)
 
-function* recoverMnemonicWorker({ payload }) {
-  const { securityAns, metaShares } = payload;
-  if (metaShares.length !== 3) return;
+function* recoverMnemonicWorker( { payload } ) {
+  const { securityAns, metaShares } = payload
+  if ( metaShares.length !== 3 ) return
 
   const encryptedSecrets: string[] = metaShares.map(
-    (metaShare) => metaShare.encryptedSecret,
-  );
+    ( metaShare ) => metaShare.encryptedSecret,
+  )
 
   const res = yield call(
     S3Service.recoverFromSecrets,
     encryptedSecrets,
     securityAns,
-  );
+  )
 
-  if (res.status === 200) {
+  if ( res.status === 200 ) {
     // TODO: recreate accounts and write to database
-    yield put(mnemonicRecovered(res.data.mnemonic)); // storing in redux state (for demo)
+    yield put( mnemonicRecovered( res.data.mnemonic ) ) // storing in redux state (for demo)
   } else {
-    console.log({ err: res.err });
+    console.log( {
+      err: res.err
+    } )
   }
 }
 
 export const recoverMnemonicWatcher = createWatcher(
   recoverMnemonicWorker,
   RECOVER_MNEMONIC,
-);
+)
 
-function* restoreShareFromQRWorker({ payload }) {
-  const { qrArray } = payload;
-  if (qrArray.length !== 8) {
-    throw new Error('QR array is not of appropriate length');
+function* restoreShareFromQRWorker( { payload } ) {
+  const { qrArray } = payload
+  if ( qrArray.length !== 8 ) {
+    throw new Error( 'QR array is not of appropriate length' )
   }
   const { DECENTRALIZED_BACKUP } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
-  const res = yield call(S3Service.recoverMetaShareFromQR, qrArray);
-  if (res.status == 200) {
-    const { metaShare } = res.data;
-    console.log({ metaShare });
-    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+  const res = yield call( S3Service.recoverMetaShareFromQR, qrArray )
+  if ( res.status == 200 ) {
+    const { metaShare } = res.data
+    console.log( {
+      metaShare
+    } )
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
     const updatedRecoveryShares = {
       ...RECOVERY_SHARES,
-      [metaShare.meta.index]: {
+      [ metaShare.meta.index ]: {
         META_SHARE: metaShare,
       },
-    };
+    }
 
     // let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
     // if (storedPDFHealth) {
@@ -1487,51 +1576,58 @@ function* restoreShareFromQRWorker({ payload }) {
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       RECOVERY_SHARES: updatedRecoveryShares,
-    };
-    console.log({ updatedBackup });
-    yield call(insertDBWorker, {
-      payload: { DECENTRALIZED_BACKUP: updatedBackup },
-    });
+    }
+    console.log( {
+      updatedBackup
+    } )
+    yield call( insertDBWorker, {
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup
+      },
+    } )
   } else {
-    yield put(UnableRecoverShareFromQR(true));
+    yield put( UnableRecoverShareFromQR( true ) )
     //Alert.alert('Unable to recover share from QR', res.err);
-    console.log({ err: res.err });
+    console.log( {
+      err: res.err
+    } )
   }
 }
 
 export const restoreShareFromQRWatcher = createWatcher(
   restoreShareFromQRWorker,
   RESTORE_SHARE_FROM_QR,
-);
+)
 
-function* recoverWalletWorker({ payload }) {
-  yield put(switchS3Loader('restoreWallet'));
+function* recoverWalletWorker( { payload } ) {
+  yield put( switchS3Loader( 'restoreWallet' ) )
 
   try {
     const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
-      (state) => state.storage.database,
-    );
+      ( state ) => state.storage.database,
+    )
 
-    const { security } = WALLET_SETUP;
-    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+    const { security } = WALLET_SETUP
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
-    let encDynamicNonPMDD;
-    const mappedMetaShares: { [walletId: string]: MetaShare[] } = {};
-    Object.keys(RECOVERY_SHARES).forEach((key) => {
-      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
-      if (META_SHARE) {
+    let encDynamicNonPMDD
+    const mappedMetaShares: { [walletId: string]: MetaShare[] } = {
+    }
+    Object.keys( RECOVERY_SHARES ).forEach( ( key ) => {
+      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[ key ]
+      if ( META_SHARE ) {
         // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
-        const shares = mappedMetaShares[META_SHARE.meta.walletId]
-          ? mappedMetaShares[META_SHARE.meta.walletId]
-          : [];
-        let insert = true;
-        shares.forEach((share) => {
-          if (share.shareId === META_SHARE.shareId) insert = false;
-        }, []);
+        const shares = mappedMetaShares[ META_SHARE.meta.walletId ]
+          ? mappedMetaShares[ META_SHARE.meta.walletId ]
+          : []
+        let insert = true
+        shares.forEach( ( share ) => {
+          if ( share.shareId === META_SHARE.shareId ) insert = false
+        }, [] )
 
-        if (insert) {
-          shares.push(META_SHARE);
-          mappedMetaShares[META_SHARE.meta.walletId] = shares;
+        if ( insert ) {
+          shares.push( META_SHARE )
+          mappedMetaShares[ META_SHARE.meta.walletId ] = shares
         }
       }
       // if (!encDynamicNonPMDD) { // retired due to wallet image
@@ -1541,31 +1637,33 @@ function* recoverWalletWorker({ payload }) {
       //     encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
       //   }
       // }
-    });
+    } )
 
-    console.log({ mappedMetaShares });
-    let restorationShares: MetaShare[] = [];
-    Object.keys(mappedMetaShares).forEach((walletId) => {
-      if (mappedMetaShares[walletId].length >= 3)
-        restorationShares = mappedMetaShares[walletId];
-    });
+    console.log( {
+      mappedMetaShares
+    } )
+    let restorationShares: MetaShare[] = []
+    Object.keys( mappedMetaShares ).forEach( ( walletId ) => {
+      if ( mappedMetaShares[ walletId ].length >= 3 )
+        restorationShares = mappedMetaShares[ walletId ]
+    } )
 
-    if (Object.keys(restorationShares).length !== 3) {
-      throw new Error(`Insufficient compatible shares to recover the wallet`);
+    if ( Object.keys( restorationShares ).length !== 3 ) {
+      throw new Error( 'Insufficient compatible shares to recover the wallet' )
     }
 
     const encryptedSecrets: string[] = restorationShares.map(
-      (share) => share.encryptedSecret,
-    );
+      ( share ) => share.encryptedSecret,
+    )
 
     const res = yield call(
       S3Service.recoverFromSecrets,
       encryptedSecrets,
       security.answer,
-    );
+    )
 
-    if (res.status === 200) {
-      const { mnemonic } = res.data;
+    if ( res.status === 200 ) {
+      const { mnemonic } = res.data
       const {
         regularAcc,
         testAcc,
@@ -1577,23 +1675,25 @@ function* recoverWalletWorker({ payload }) {
         security.answer,
         mnemonic,
         restorationShares,
-      );
+      )
 
-      const UNDER_CUSTODY = {};
-      let DYNAMIC_NONPMDD = {};
-      if (encDynamicNonPMDD) {
+      const UNDER_CUSTODY = {
+      }
+      let DYNAMIC_NONPMDD = {
+      }
+      if ( encDynamicNonPMDD ) {
         // decentralized restoration of Wards
-        const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
+        const res = s3Service.decryptDynamicNonPMDD( encDynamicNonPMDD )
 
-        if (res.status !== 200)
-          console.log('Failed to decrypt dynamic nonPMDD');
-        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
-        dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
-          UNDER_CUSTODY[metaShare.meta.tag] = {
+        if ( res.status !== 200 )
+          console.log( 'Failed to decrypt dynamic nonPMDD' )
+        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD
+        dynamicNonPMDD.META_SHARES.forEach( ( metaShare ) => {
+          UNDER_CUSTODY[ metaShare.meta.tag ] = {
             META_SHARE: metaShare,
-          };
-        });
-        DYNAMIC_NONPMDD = dynamicNonPMDD;
+          }
+        } )
+        DYNAMIC_NONPMDD = dynamicNonPMDD
       }
 
       // const DECENTRALIZED_BACKUP = {
@@ -1612,232 +1712,241 @@ function* recoverWalletWorker({ payload }) {
       // };
       // const payload = { SERVICES, DECENTRALIZED_BACKUP };
       // yield call(insertDBWorker, { payload });
-      yield put(fetchWalletImage(s3Service));
+      yield put( fetchWalletImage( s3Service ) )
 
       yield call(AsyncStorage.setItem, 'walletID', s3Service.levelhealth.walletId);
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
       const securityQuestionHistory = {
         confirmed: current,
-      };
+      }
       AsyncStorage.setItem(
         'securityQuestionHistory',
-        JSON.stringify(securityQuestionHistory),
-      );
+        JSON.stringify( securityQuestionHistory ),
+      )
 
       // personal copy health restoration
-      let updatedPDFHealth = {};
-      for (const share of restorationShares) {
-        if (share.meta.index > 2) {
+      let updatedPDFHealth = {
+      }
+      for ( const share of restorationShares ) {
+        if ( share.meta.index > 2 ) {
           updatedPDFHealth = {
             ...updatedPDFHealth,
-            [share.meta.index]: {
+            [ share.meta.index ]: {
               shareId: `placeHolderID${share.meta.index}`,
               updatedAt: Date.now(),
             },
-          };
+          }
         }
       }
 
-      if (!updatedPDFHealth[3]) {
+      if ( !updatedPDFHealth[ 3 ] ) {
         updatedPDFHealth = {
           ...updatedPDFHealth,
-          [3]: {
+          [ 3 ]: {
             shareId: 'placeHolderID3',
             updatedAt: 0,
           },
-        };
+        }
       }
-      if (!updatedPDFHealth[4]) {
+      if ( !updatedPDFHealth[ 4 ] ) {
         updatedPDFHealth = {
           ...updatedPDFHealth,
-          [4]: {
+          [ 4 ]: {
             shareId: 'placeHolderID4',
             updatedAt: 0,
           },
-        };
+        }
       }
-      if (Object.keys(updatedPDFHealth).length)
+      if ( Object.keys( updatedPDFHealth ).length )
         yield call(
           AsyncStorage.setItem,
           'PDF Health',
-          JSON.stringify(updatedPDFHealth),
-        );
+          JSON.stringify( updatedPDFHealth ),
+        )
     } else {
-      throw new Error(res.err);
+      throw new Error( res.err )
     }
-  } catch (err) {
-    console.log({ err: err.message });
-    yield put(walletRecoveryFailed(true));
+  } catch ( err ) {
+    console.log( {
+      err: err.message
+    } )
+    yield put( walletRecoveryFailed( true ) )
     // Alert.alert('Wallet recovery failed!', err.message);
   }
 
-  yield put(switchS3Loader('restoreWallet'));
+  yield put( switchS3Loader( 'restoreWallet' ) )
 }
 
 export const recoverWalletWatcher = createWatcher(
   recoverWalletWorker,
   RECOVER_WALLET,
-);
+)
 
-const sha256 = crypto.createHash('sha256');
-const hash = (element) => {
-  return sha256.update(JSON.stringify(element)).digest('hex');
-};
+const sha256 = crypto.createHash( 'sha256' )
+const hash = ( element ) => {
+  return sha256.update( JSON.stringify( element ) ).digest( 'hex' )
+}
 
 const asyncDataToBackup = async () => {
-  // ASYNC DATA to backup
-  // const FBTCAccount = select(
-  //   (state) => state.fbtc.FBTCAccountData,
-  // );
   const [
-    [, TrustedContactsInfo],
-    [, personalCopyDetails],
-    [, FBTCAccount],
-  ] = await AsyncStorage.multiGet([
+    [ , TrustedContactsInfo ],
+    [ , personalCopyDetails ],
+    [ , FBTCAccount ],
+    [ , PersonalNode ]
+  ] = await AsyncStorage.multiGet( [
     'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
-  ]);
-  const ASYNC_DATA = {};
-  if (TrustedContactsInfo)
-    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
-  if (personalCopyDetails)
-    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
-  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+    'PersonalNode'
+  ] )
+  const ASYNC_DATA = {
+  }
+  if ( TrustedContactsInfo )
+    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+  if ( personalCopyDetails )
+    ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
+  if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
+  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
-  return ASYNC_DATA;
-};
+  return ASYNC_DATA
+}
 
 function* stateDataToBackup() {
   // state data to backup
-  const accountShells = yield select((state) => state.accounts.accountShells);
-  const STATE_DATA = {};
-  if (accountShells && accountShells.length)
-    STATE_DATA['accountShells'] = JSON.stringify(accountShells);
+  const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const STATE_DATA = {
+  }
+  if ( accountShells && accountShells.length )
+    STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  return STATE_DATA;
+  return STATE_DATA
 }
 
-function* updateWalletImageWorker({ payload }) {
-  const s3Service: S3Service = yield select((state) => state.sss.service);
+function* updateWalletImageWorker( { payload } ) {
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
 
-  let walletImage: WalletImage = {};
+  let walletImage: WalletImage = {
+  }
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-    (state) => state.storage.database,
-  );
+    ( state ) => state.storage.database,
+  )
 
-  const walletImageHashes = yield call(AsyncStorage.getItem, 'WI_HASHES');
-  let hashesWI = JSON.parse(walletImageHashes);
+  const walletImageHashes = yield call( AsyncStorage.getItem, 'WI_HASHES' )
+  let hashesWI = JSON.parse( walletImageHashes )
 
-  if (walletImageHashes) {
-    const currentDBHash = hash(DECENTRALIZED_BACKUP);
-    console.log({
+  if ( walletImageHashes ) {
+    const currentDBHash = hash( DECENTRALIZED_BACKUP )
+    console.log( {
       previousDBHash: hashesWI.DECENTRALIZED_BACKUP,
       currentDBHash,
-    });
+    } )
     if (
       !hashesWI.DECENTRALIZED_BACKUP ||
       currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
     ) {
-      walletImage['DECENTRALIZED_BACKUP'] = DECENTRALIZED_BACKUP;
-      hashesWI.DECENTRALIZED_BACKUP = currentDBHash;
+      walletImage[ 'DECENTRALIZED_BACKUP' ] = DECENTRALIZED_BACKUP
+      hashesWI.DECENTRALIZED_BACKUP = currentDBHash
     }
 
-    const currentSHash = hash(SERVICES);
-    console.log({
+    const currentSHash = hash( SERVICES )
+    console.log( {
       previousSHash: hashesWI.SERVICES,
       currentSHash,
-    });
-    if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
-      walletImage['SERVICES'] = SERVICES;
-      hashesWI.SERVICES = currentSHash;
+    } )
+    if ( !hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES ) {
+      walletImage[ 'SERVICES' ] = SERVICES
+      hashesWI.SERVICES = currentSHash
     }
 
-    const ASYNC_DATA = yield call(asyncDataToBackup);
-    if (Object.keys(ASYNC_DATA).length) {
-      const currentAsyncHash = hash(ASYNC_DATA);
-      console.log({
+    const ASYNC_DATA = yield call( asyncDataToBackup )
+    if ( Object.keys( ASYNC_DATA ).length ) {
+      const currentAsyncHash = hash( ASYNC_DATA )
+      console.log( {
         previousAsyncHash: hashesWI.ASYNC_DATA,
         currentAsyncHash,
-      });
-      if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
-        walletImage['ASYNC_DATA'] = ASYNC_DATA;
-        hashesWI.ASYNC_DATA = currentAsyncHash;
+      } )
+      if ( !hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA ) {
+        walletImage[ 'ASYNC_DATA' ] = ASYNC_DATA
+        hashesWI.ASYNC_DATA = currentAsyncHash
       }
     }
 
-    const STATE_DATA = yield call(stateDataToBackup);
-    if (Object.keys(STATE_DATA).length) {
-      const currentStateHash = hash(STATE_DATA);
-      console.log({
+    const STATE_DATA = yield call( stateDataToBackup )
+    if ( Object.keys( STATE_DATA ).length ) {
+      const currentStateHash = hash( STATE_DATA )
+      console.log( {
         STATE_DATA,
         previousStateHash: hashesWI.STATE_DATA,
         currentStateHash,
-      });
-      if (!hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA) {
-        walletImage['STATE_DATA'] = STATE_DATA;
-        hashesWI.STATE_DATA = currentStateHash;
+      } )
+      if ( !hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA ) {
+        walletImage[ 'STATE_DATA' ] = STATE_DATA
+        hashesWI.STATE_DATA = currentStateHash
       }
     }
   } else {
     walletImage = {
       DECENTRALIZED_BACKUP,
       SERVICES,
-    };
-
-    hashesWI = {
-      DECENTRALIZED_BACKUP: hash(DECENTRALIZED_BACKUP),
-      SERVICES: hash(SERVICES),
-    };
-
-    const ASYNC_DATA = yield call(asyncDataToBackup);
-    if (Object.keys(ASYNC_DATA).length) {
-      walletImage['ASYNC_DATA'] = ASYNC_DATA;
-      hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
     }
 
-    const STATE_DATA = yield call(stateDataToBackup);
-    console.log({ STATE_DATA });
-    if (Object.keys(STATE_DATA).length) {
-      walletImage['STATE_DATA'] = STATE_DATA;
-      hashesWI['STATE_DATA'] = hash(STATE_DATA);
+    hashesWI = {
+      DECENTRALIZED_BACKUP: hash( DECENTRALIZED_BACKUP ),
+      SERVICES: hash( SERVICES ),
+    }
+
+    const ASYNC_DATA = yield call( asyncDataToBackup )
+    if ( Object.keys( ASYNC_DATA ).length ) {
+      walletImage[ 'ASYNC_DATA' ] = ASYNC_DATA
+      hashesWI[ 'ASYNC_DATA' ] = hash( ASYNC_DATA )
+    }
+
+    const STATE_DATA = yield call( stateDataToBackup )
+
+    if ( Object.keys( STATE_DATA ).length ) {
+      walletImage[ 'STATE_DATA' ] = STATE_DATA
+      hashesWI[ 'STATE_DATA' ] = hash( STATE_DATA )
     }
   }
 
   // console.log({ walletImage });
 
-  if (Object.keys(walletImage).length === 0) {
-    console.log('WI: nothing to update');
-    return;
+  if ( Object.keys( walletImage ).length === 0 ) {
+    console.log( 'WI: nothing to update' )
+    return
   }
 
-  const res = yield call(s3Service.updateWalletImage, walletImage);
-  if (res.status === 200) {
-    if (res.data.updated) console.log('Wallet Image updated');
-    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+  const res = yield call( s3Service.updateWalletImage, walletImage )
+  if ( res.status === 200 ) {
+    if ( res.data.updated ) console.log( 'Wallet Image updated' )
+    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
-    console.log({ err: res.err });
-    throw new Error('Failed to update Wallet Image');
+    console.log( {
+      err: res.err
+    } )
+    throw new Error( 'Failed to update Wallet Image' )
   }
 }
 
 export const updateWalletImageWatcher = createWatcher(
   updateWalletImageWorker,
   UPDATE_WALLET_IMAGE,
-);
+)
 
-function* fetchWalletImageWorker({ payload }) {
-  const s3Service: S3Service = payload.s3Service;
+function* fetchWalletImageWorker( { payload } ) {
+  const s3Service: S3Service = payload.s3Service
 
-  const res = yield call(s3Service.fetchWalletImage);
-  console.log({ res });
-  if (res.status === 200) {
-    const walletImage: WalletImage = res.data.walletImage;
+  const res = yield call( s3Service.fetchWalletImage )
+  console.log( {
+    res
+  } )
+  if ( res.status === 200 ) {
+    const walletImage: WalletImage = res.data.walletImage
     // console.log({ walletImage });
 
-    if (!Object.keys(walletImage).length)
-      console.log('Failed fetch: Empty Wallet Image');
+    if ( !Object.keys( walletImage ).length )
+      console.log( 'Failed fetch: Empty Wallet Image' )
 
     // restore DB, Async and State data
     const {
@@ -1845,31 +1954,37 @@ function* fetchWalletImageWorker({ payload }) {
       SERVICES,
       ASYNC_DATA,
       STATE_DATA,
-    } = walletImage;
+    } = walletImage
 
-    if (ASYNC_DATA) {
-      for (const key of Object.keys(ASYNC_DATA)) {
-        console.log('restoring to async: ', key);
-        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+    if ( ASYNC_DATA ) {
+      for ( const key of Object.keys( ASYNC_DATA ) ) {
+        console.log( 'restoring to async: ', key )
+        yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
 
-        if (key === 'TrustedContactsInfo' && ASYNC_DATA[key]) {
-          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
-          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
+          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
         }
       }
     }
 
-    if (STATE_DATA) {
-      for (const key of Object.keys(STATE_DATA)) {
-        if (key === 'accountShells' && STATE_DATA[key]) {
-          const accountShells: AccountShell[] = JSON.parse(STATE_DATA[key]);
-          yield put(restoredAccountShells({ accountShells }));
+    if ( STATE_DATA ) {
+      for ( const key of Object.keys( STATE_DATA ) ) {
+        if ( key === 'accountShells' && STATE_DATA[ key ] ) {
+          const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
+          yield put( restoredAccountShells( {
+            accountShells
+          } ) )
         }
       }
     }
 
-    const payload = { SERVICES, DECENTRALIZED_BACKUP };
-    yield call(insertDBWorker, { payload }); // synchronously update db
+    const payload = {
+      SERVICES, DECENTRALIZED_BACKUP
+    }
+    yield call( insertDBWorker, {
+      payload
+    } ) // synchronously update db
 
     // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
     const {
@@ -1878,32 +1993,35 @@ function* fetchWalletImageWorker({ payload }) {
       SECURE_ACCOUNT,
       S3_SERVICE,
       TRUSTED_CONTACTS,
-    } = SERVICES;
+    } = SERVICES
     const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-      TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-      SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-      S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
       TRUSTED_CONTACTS: TRUSTED_CONTACTS
-        ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
         : new TrustedContactsService(),
-    };
-    yield put(remapAccountShells(services));
+    }
+    yield put( remapAccountShells( services ) )
 
     // update hashes
-    const hashesWI = {};
-    Object.keys(walletImage).forEach((key) => {
-      hashesWI[key] = hash(walletImage[key]);
-    });
-    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+    const hashesWI = {
+    }
+    Object.keys( walletImage ).forEach( ( key ) => {
+      hashesWI[ key ] = hash( walletImage[ key ] )
+    } )
+    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
-    console.log({ err: res.err });
-    console.log('Failed to fetch Wallet Image');
+    console.log( {
+      err: res.err
+    } )
+    console.log( 'Failed to fetch Wallet Image' )
   }
-  yield put(walletImageChecked(true));
+  yield put( walletImageChecked( true ) )
 }
 
 export const fetchWalletImageWatcher = createWatcher(
   fetchWalletImageWorker,
   FETCH_WALLET_IMAGE,
-);
+)

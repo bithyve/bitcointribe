@@ -1,16 +1,16 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../../bitcoin/utilities/Interface';
-import AccountVisibility from '../../../enums/AccountVisibility';
-import SourceAccountKind from '../../../enums/SourceAccountKind';
-import SubAccountKind from '../../../enums/SubAccountKind';
-import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
+} from '../../../../../bitcoin/utilities/Interface'
+import AccountVisibility from '../../../enums/AccountVisibility'
+import SourceAccountKind from '../../../enums/SourceAccountKind'
+import SubAccountKind from '../../../enums/SubAccountKind'
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup'
 import {
   HexaSubAccountDescribing,
   SubAccountDescribingConstructorProps,
-} from '../Interfaces';
+} from '../Interfaces'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -24,10 +24,10 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
 
   balances: Balances;
   visibility: AccountVisibility;
-  isTFAEnabled: boolean = true;
+  isTFAEnabled = true;
 
   defaultTitle: string;
-  defaultDescription: string = 'Multi-factor security';
+  defaultDescription = 'Multi-factor security';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -40,20 +40,22 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Savings Account',
-    balances = { confirmed: 0, unconfirmed: 0 },
+    balances = {
+      confirmed: 0, unconfirmed: 0 
+    },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
   }: ConstructorProps) {
-    this.id = id;
-    this.accountShellID = accountShellID;
-    this.instanceNumber = instanceNumber;
-    this.defaultTitle = defaultTitle;
-    this.balances = balances;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
-    this.visibility = visibility;
-    this.transactions = transactions;
+    this.id = id
+    this.accountShellID = accountShellID
+    this.instanceNumber = instanceNumber
+    this.defaultTitle = defaultTitle
+    this.balances = balances
+    this.customDisplayName = customDisplayName
+    this.customDescription = customDescription
+    this.visibility = visibility
+    this.transactions = transactions
   }
 }
