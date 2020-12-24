@@ -59,10 +59,10 @@ class HexaConfig {
   };
   public SSS_TOTAL: number = Config.BIT_SSS_TOTAL ? parseInt( Config.BIT_SSS_TOTAL.trim(), 10 ) : 5;
   public SSS_THRESHOLD: number = Config.BIT_SSS_THRESHOLD ? parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 ) : 3;
-  public SSS_LEVEL1_TOTAL: number = parseInt(Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10);
-  public SSS_LEVEL1_THRESHOLD: number = parseInt(Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10);
-  public SSS_LEVEL2_TOTAL: number = parseInt(Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10);
-  public SSS_LEVEL2_THRESHOLD: number = parseInt(Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10);
+  public SSS_LEVEL1_TOTAL: number = Config.BIT_SSS_LEVEL1_TOTAL ? parseInt(Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10) : 3;
+  public SSS_LEVEL1_THRESHOLD: number = Config.BIT_SSS_LEVEL1_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10) : 2;
+  public SSS_LEVEL2_TOTAL: number = Config.BIT_SSS_LEVEL2_TOTAL ? parseInt(Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10) : 5;
+  public SSS_LEVEL2_THRESHOLD: number = Config.BIT_SSS_LEVEL2_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10) : 3;
   public MSG_ID_LENGTH: number = Config.BIT_MSG_ID_LENGTH ? parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 ) : 12;
   public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
   public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
