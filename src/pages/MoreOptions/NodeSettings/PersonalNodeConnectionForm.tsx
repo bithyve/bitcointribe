@@ -61,7 +61,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter an IP Address'}
+          placeholder={'Your Node Address ex: http://11.22.33.44'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
           value={currentIPAddressValue}
@@ -77,7 +77,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
             styles.textInputContainer,
           ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter a Port Number'}
+          placeholder={'Port Number ex: 8003'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
           value={currentPortNumberValue}
