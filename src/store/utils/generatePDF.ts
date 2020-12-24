@@ -34,9 +34,9 @@ export default async (pdfData, fileName, title, password) => {
   let pdfDatas = {
     title,
     fileName,
-    password,
     qrcode,
     qrCodeString,
+    password,
     secondaryXpub,
     secondaryMnemonic,
     bhXpub,

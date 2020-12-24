@@ -49,7 +49,7 @@ const getPdfPath = async (pdfData: any) => {
   if(pdfData){
     console.log("PDFDATA", pdfData);
   if (Platform.OS == 'ios') {
-    const PdfPassword = await NativeModules.PdfPasswordKeeper;
+    var PdfPassword = await NativeModules.PdfPassword;
     console.log("PADFPASSWORD", PdfPassword);
     return await PdfPassword.createPdfKeeper(JSON.stringify(pdfData));
   } else {
