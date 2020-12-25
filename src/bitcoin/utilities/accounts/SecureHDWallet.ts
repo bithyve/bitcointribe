@@ -1,6 +1,3 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse } from 'axios'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
