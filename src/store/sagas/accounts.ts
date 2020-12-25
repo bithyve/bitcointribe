@@ -80,6 +80,8 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import Relay from '../../bitcoin/utilities/Relay'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
+import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
+import { acc } from 'react-native-reanimated'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -291,6 +293,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
+  console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
   let { serviceType, accountNumber, accountType } = payload
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
 
@@ -1396,11 +1399,39 @@ function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
   try {
-    // TODO: Implement backend logic here for saving an account's properties
-    yield put( accountSettingsUpdated( {
-      account 
-    } ) )
-  } catch ( error ) {
+    const service = yield select(
+      ( state ) => state.accounts[ account.kind ].service
+    )
+
+    const result = yield call(
+      service.updateDerivativeAccount,
+      {
+        kind: account.kind,
+        instanceNumber: account.instanceNumber,
+        customDisplayName :account.customDisplayName,
+        customDescription: account.customDescription
+      }
+    )
+    if ( result.status === 200 ) {
+      const service = yield select(
+        ( state ) => state.accounts[ account.kind ].service
+      )
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const updatedSERVICES = {
+        ...SERVICES,
+        [ account.kind ]: JSON.stringify( service ),
+      }
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES 
+        } 
+      } )
+
+      yield put( accountSettingsUpdated( {
+        account 
+      } ) )
+    } 
+  }catch ( error ) {
     yield put( accountSettingsUpdateFailed( {
       account, error 
     } ) )
