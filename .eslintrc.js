@@ -21,6 +21,10 @@ module.exports = {
   'rules': {
     'no-case-declarations': 'off',
     'no-fallthrough': 'off',
+    'no-empty-pattern': 'off',
+    'eslint-disable no-case-declarations': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     'computed-property-spacing': [ 'error', 'always' ],
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
