@@ -21,6 +21,7 @@ module.exports = {
   'rules': {
     'no-case-declarations': 'off',
     'no-fallthrough': 'off',
+    '@typescript-eslint/ban-types': 'off',
     'no-empty-pattern': 'off',
     'eslint-disable no-case-declarations': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
