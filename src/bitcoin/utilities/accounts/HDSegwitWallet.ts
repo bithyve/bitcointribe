@@ -23,6 +23,8 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
   REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -1044,10 +1046,12 @@ export default class HDSegwitWallet extends Bitcoin {
   ): Promise<{
     updateSuccessful: boolean;
   }>  => {
+    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
+
     this
-      .derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ].accountName = account.customDisplayName
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
     this
-      .derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ].accountDescription = account.customDescription
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
 
     return { 
       updateSuccessful: true 

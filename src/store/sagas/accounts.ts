@@ -1398,11 +1398,26 @@ export const addNewAccountShellWatcher = createWatcher(
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
+  let accountType = ''
+  switch( account.kind )  {
+      case DONATION_ACCOUNT:
+        accountType = REGULAR_ACCOUNT
+        break
+      case REGULAR_ACCOUNT:
+        accountType = REGULAR_ACCOUNT
+        break
+      case SECURE_ACCOUNT:
+        accountType = SECURE_ACCOUNT
+        break
+      case TEST_ACCOUNT:
+        accountType = TEST_ACCOUNT
+        break
+  }
+  
   try {
     const service = yield select(
-      ( state ) => state.accounts[ account.kind ].service
+      ( state ) => state.accounts[ accountType ].service
     )
-
     const result = yield call(
       service.updateDerivativeAccount,
       {
@@ -1413,9 +1428,11 @@ function* updateAccountSettings( { payload: account, }: {
       }
     )
     if ( result.status === 200 ) {
+
       const service = yield select(
-        ( state ) => state.accounts[ account.kind ].service
+        ( state ) => state.accounts[ accountType ].service
       )
+
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
