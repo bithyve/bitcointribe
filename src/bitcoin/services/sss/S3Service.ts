@@ -1,5 +1,5 @@
-import config from '../../HexaConfig';
-import { ErrMap } from '../../utilities/ErrMap';
+import config from '../../HexaConfig'
+import { ErrMap } from '../../utilities/ErrMap'
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
@@ -7,12 +7,12 @@ import {
   SocialStaticNonPMDD,
   EncryptedImage,
   WalletImage,
-} from '../../utilities/Interface';
-import SSS from '../../utilities/sss/SSS';
+} from '../../utilities/Interface'
+import SSS from '../../utilities/sss/SSS'
 
 export default class S3Service {
   public static fromJSON = (json: string) => {
-    const { sss } = JSON.parse(json);
+    const { sss } = JSON.parse(json)
     const {
       mnemonic,
       encryptedSecrets,
@@ -31,7 +31,7 @@ export default class S3Service {
       walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
-    } = sss;
+    } = sss
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
@@ -41,7 +41,7 @@ export default class S3Service {
       walletId,
       healthCheckStatus,
       pdfHealth,
-    });
+    })
   };
 
   public static recoverFromSecrets = (
@@ -63,11 +63,17 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { decryptedSecrets } = SSS.decryptSecrets(encryptedSecrets, answer);
-      const { mnemonic } = SSS.recoverFromSecrets(decryptedSecrets);
-      return { status: config.STATUS.SUCCESS, data: { mnemonic } };
+      const { decryptedSecrets } = SSS.decryptSecrets(encryptedSecrets, answer)
+      const { mnemonic } = SSS.recoverFromSecrets(decryptedSecrets)
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          mnemonic 
+        } 
+      }
     } catch (err) {
-      return { status: 501, err: err.message, message: ErrMap[501] };
+      return {
+        status: 501, err: err.message, message: ErrMap[ 501 ] 
+      }
     }
   };
 
@@ -100,9 +106,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await SSS.downloadShare(encryptedKey, otp),
-      };
+      }
     } catch (err) {
-      return { status: 502, err: err.message, message: ErrMap[502] };
+      return {
+        status: 502, err: err.message, message: ErrMap[ 502 ] 
+      }
     }
   };
 
@@ -128,9 +136,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await SSS.downloadDynamicNonPMDD(walletId),
-      };
+      }
     } catch (err) {
-      return { status: 516, err: err.message, message: ErrMap[516] };
+      return {
+        status: 516, err: err.message, message: ErrMap[ 516 ] 
+      }
     }
   };
 
@@ -158,9 +168,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: SSS.encryptMetaShare(metaShare, key),
-      };
+      }
     } catch (err) {
-      return { status: 522, err: err.message, message: ErrMap[522] };
+      return {
+        status: 522, err: err.message, message: ErrMap[ 522 ] 
+      }
     }
   };
 
@@ -198,9 +210,11 @@ export default class S3Service {
           metaShare,
           encryptedDynamicNonPMDD,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 503, err: err.message, message: ErrMap[503] };
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
     }
   };
 
@@ -235,9 +249,11 @@ export default class S3Service {
           existingShares,
           walletId,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 503, err: err.message, message: ErrMap[503] };
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
     }
   };
 
@@ -263,9 +279,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: SSS.decryptViaOTP(otpEncryptedData, otp),
-      };
+      }
     } catch (err) {
-      return { status: 504, err: err.message, message: ErrMap[504] };
+      return {
+        status: 504, err: err.message, message: ErrMap[ 504 ] 
+      }
     }
   };
 
@@ -290,9 +308,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: SSS.recoverMetaShareFromQR(qrData),
-      };
+      }
     } catch (err) {
-      return { status: 505, err: err.message, message: ErrMap[505] };
+      return {
+        status: 505, err: err.message, message: ErrMap[ 505 ] 
+      }
     }
   };
 
@@ -325,9 +345,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await SSS.updateHealth(metaShares),
-      };
+      }
     } catch (err) {
-      return { status: 506, err: err.message, message: ErrMap[506] };
+      return {
+        status: 506, err: err.message, message: ErrMap[ 506 ] 
+      }
     }
   };
 
@@ -351,10 +373,14 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { shareId: SSS.getShareId(encryptedShare) },
-      };
+        data: {
+          shareId: SSS.getShareId(encryptedShare) 
+        },
+      }
     } catch (err) {
-      return { status: 507, err: err.message, message: ErrMap[507] };
+      return {
+        status: 507, err: err.message, message: ErrMap[ 507 ] 
+      }
     }
   };
 
@@ -376,10 +402,14 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { key: SSS.generateKey(SSS.cipherSpec.keyLength) },
-      };
+        data: {
+          key: SSS.generateKey(SSS.cipherSpec.keyLength) 
+        },
+      }
     } catch (err) {
-      return { status: 508, err: err.message, message: ErrMap[508] };
+      return {
+        status: 508, err: err.message, message: ErrMap[ 508 ] 
+      }
     }
   };
 
@@ -405,9 +435,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: SSS.encryptViaOTP(key),
-      };
+      }
     } catch (err) {
-      return { status: 509, err: err.message, message: ErrMap[509] };
+      return {
+        status: 509, err: err.message, message: ErrMap[ 509 ] 
+      }
     }
   };
 
@@ -424,7 +456,7 @@ export default class S3Service {
       pdfHealth: {};
     },
   ) {
-    this.sss = new SSS(mnemonic, stateVars);
+    this.sss = new SSS(mnemonic, stateVars)
   }
 
   public generateShares = (
@@ -445,11 +477,17 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { shares } = this.sss.generateShares();
-      const { encryptedSecrets } = this.sss.encryptSecrets(shares, answer);
-      return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
+      const { shares } = this.sss.generateShares()
+      const { encryptedSecrets } = this.sss.encryptSecrets(shares, answer)
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          encryptedSecrets 
+        } 
+      }
     } catch (err) {
-      return { status: 510, err: err.message, message: ErrMap[510] };
+      return {
+        status: 510, err: err.message, message: ErrMap[ 510 ] 
+      }
     }
   };
 
@@ -473,13 +511,17 @@ export default class S3Service {
     try {
       const { encryptedStaticNonPMDD } = this.sss.encryptStaticNonPMDD(
         staticNonPMDD,
-      );
+      )
       return {
         status: config.STATUS.SUCCESS,
-        data: { encryptedStaticNonPMDD },
-      };
+        data: {
+          encryptedStaticNonPMDD 
+        },
+      }
     } catch (err) {
-      return { status: 511, err: err.message, message: ErrMap[511] };
+      return {
+        status: 511, err: err.message, message: ErrMap[ 511 ] 
+      }
     }
   };
 
@@ -501,10 +543,14 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { walletId: this.sss.walletId },
-      };
+        data: {
+          walletId: this.sss.walletId 
+        },
+      }
     } catch (err) {
-      return { status: 512, err: err.message, message: ErrMap[512] };
+      return {
+        status: 512, err: err.message, message: ErrMap[ 512 ] 
+      }
     }
   };
 
@@ -528,9 +574,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.initializeHealthcheck(),
-      };
+      }
     } catch (err) {
-      return { status: 513, err: err.message, message: ErrMap[513] };
+      return {
+        status: 513, err: err.message, message: ErrMap[ 513 ] 
+      }
     }
   };
 
@@ -560,9 +608,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.checkHealth(),
-      };
+      }
     } catch (err) {
-      return { status: 514, err: err.message, message: ErrMap[514] };
+      return {
+        status: 514, err: err.message, message: ErrMap[ 514 ] 
+      }
     }
   };
 
@@ -572,7 +622,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          resetted: Boolean;
+          resetted: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -588,9 +638,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.resetSharesHealth(shareIndex),
-      };
+      }
     } catch (err) {
-      return { status: 514, err: err.message, message: ErrMap[514] };
+      return {
+        status: 514, err: err.message, message: ErrMap[ 514 ] 
+      }
     }
   };
 
@@ -616,9 +668,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.updateDynamicNonPMDD(dynamicNonPMDD),
-      };
+      }
     } catch (err) {
-      return { status: 515, err: err.message, message: ErrMap[515] };
+      return {
+        status: 515, err: err.message, message: ErrMap[ 515 ] 
+      }
     }
   };
 
@@ -643,9 +697,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: this.sss.decryptDynamicNonPMDD(encryptedDynamicNonPMDD),
-      };
+      }
     } catch (err) {
-      return { status: 518, err: err.message, message: ErrMap[518] };
+      return {
+        status: 518, err: err.message, message: ErrMap[ 518 ] 
+      }
     }
   };
 
@@ -669,15 +725,17 @@ export default class S3Service {
     try {
       const { decryptedDynamicNonPMDD } = this.sss.restoreDynamicNonPMDD(
         dynamicNonPMDDs,
-      );
+      )
       return {
         status: config.STATUS.SUCCESS,
         data: {
           latestDynamicNonPMDD: decryptedDynamicNonPMDD,
         },
-      };
+      }
     } catch (err) {
-      return { status: 517, err: err.message, message: ErrMap[517] };
+      return {
+        status: 517, err: err.message, message: ErrMap[ 517 ] 
+      }
     }
   };
 
@@ -702,9 +760,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: this.sss.decryptStaticNonPMDD(encryptedNonPMDD),
-      };
+      }
     } catch (err) {
-      return { status: 519, err: err.message, message: ErrMap[519] };
+      return {
+        status: 519, err: err.message, message: ErrMap[ 519 ] 
+      }
     }
   };
 
@@ -736,9 +796,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: this.sss.createMetaShares(secureAssets, tag, version),
-      };
+      }
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -760,10 +822,16 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const metaShare = this.sss.reshareMetaShare(index);
-      return { status: config.STATUS.SUCCESS, data: { metaShare } };
+      const metaShare = this.sss.reshareMetaShare(index)
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          metaShare 
+        } 
+      }
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -773,7 +841,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          restored: Boolean;
+          restored: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -785,10 +853,16 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { restored } = this.sss.restoreMetaShares(metaShares);
-      return { status: config.STATUS.SUCCESS, data: { restored } };
+      const { restored } = this.sss.restoreMetaShares(metaShares)
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          restored 
+        } 
+      }
     } catch (err) {
-      return { status: 520, err: err.message, message: ErrMap[520] };
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
     }
   };
 
@@ -811,9 +885,11 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: this.sss.createQR(index),
-      };
+      }
     } catch (err) {
-      return { status: 521, err: err.message, message: ErrMap[521] };
+      return {
+        status: 521, err: err.message, message: ErrMap[ 521 ] 
+      }
     }
   };
 
@@ -848,9 +924,11 @@ export default class S3Service {
           contactName,
           dynamicNonPMDD,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 523, err: err.message, message: ErrMap[523] };
+      return {
+        status: 523, err: err.message, message: ErrMap[ 523 ] 
+      }
     }
   };
 
@@ -860,7 +938,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -876,13 +954,13 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.updateWalletImage(walletImage),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to update Wallet Image',
-      };
+      }
     }
   };
 
@@ -906,13 +984,13 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.fetchWalletImage(),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch Wallet Image',
-      };
+      }
     }
   };
 }

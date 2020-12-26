@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import { FlatList } from 'react-native-gesture-handler';
-import AccountShell from '../../../common/data/models/AccountShell';
-import RadioButton from '../../RadioButton';
-import AccountMergeDestinationListItemContent from '../AccountMergeDestinationListItemContent';
+import React, { useCallback } from 'react'
+import { StyleSheet } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { FlatList } from 'react-native-gesture-handler'
+import AccountShell from '../../../common/data/models/AccountShell'
+import RadioButton from '../../RadioButton'
+import AccountMergeDestinationListItemContent from '../AccountMergeDestinationListItemContent'
 
 export type Props = {
   compatibleDestinations: AccountShell[];
@@ -12,7 +12,7 @@ export type Props = {
   onDestinationSelected: (accountShell: AccountShell) => void;
 };
 
-const listItemKeyExtractor = (item: AccountShell) => item.id;
+const listItemKeyExtractor = (item: AccountShell) => item.id
 
 const AccountShellMergeDestinationsList: React.FC<Props> = ({
   compatibleDestinations,
@@ -21,8 +21,8 @@ const AccountShellMergeDestinationsList: React.FC<Props> = ({
 }: Props) => {
 
   const isChecked = useCallback((accountShell: AccountShell) => {
-    return selectedDestinationID === accountShell.id;
-  }, [selectedDestinationID]);
+    return selectedDestinationID === accountShell.id
+  }, [ selectedDestinationID ])
 
   const renderItem = ({ item: accountShell }: { item: AccountShell }) => {
     return (
@@ -36,25 +36,27 @@ const AccountShellMergeDestinationsList: React.FC<Props> = ({
 
         <AccountMergeDestinationListItemContent accountShell={accountShell} />
       </ListItem>
-    );
-  };
+    )
+  }
 
   return (
     <FlatList
       style={styles.rootContainer}
-      contentContainerStyle={{ paddingHorizontal: 14 }}
+      contentContainerStyle={{
+        paddingHorizontal: 14 
+      }}
       extraData={selectedDestinationID}
       data={compatibleDestinations}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
   }
-});
+})
 
 
-export default AccountShellMergeDestinationsList;
+export default AccountShellMergeDestinationsList

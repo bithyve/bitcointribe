@@ -41,6 +41,7 @@ import moment from 'moment'
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
 import Loader from '../../components/loader'
+import config from '../../bitcoin/HexaConfig'
 
 export default function ManageBackup( props ) {
   const [ PersonalCopyQRScannerBottomSheet ] = useState( React.createRef() )

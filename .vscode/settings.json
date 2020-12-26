@@ -1,12 +1,12 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll": false,
     "source.fixAll.eslint": true
   },
   "eslint.validate": [
     "javascript",
     "typescript",
-    "typescriptreact"
+    "typescriptreact",
+    "jsx"
   ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "cSpell.words": [

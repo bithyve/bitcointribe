@@ -1,18 +1,18 @@
-import { TransactionBuilder } from 'bitcoinjs-lib';
-import config from '../../HexaConfig';
-import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
-import { ErrMap } from '../../utilities/ErrMap';
+import { TransactionBuilder } from 'bitcoinjs-lib'
+import config from '../../HexaConfig'
+import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
+import { ErrMap } from '../../utilities/ErrMap'
 import {
   Transactions,
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
   DerivativeAccountTypes,
-} from '../../utilities/Interface';
+} from '../../utilities/Interface'
 
 export default class SecureAccount {
   public static fromJSON = (json: string) => {
-    const { secureHDWallet } = JSON.parse(json);
+    const { secureHDWallet } = JSON.parse(json)
     const {
       primaryMnemonic,
       secondaryMnemonic,
@@ -64,7 +64,7 @@ export default class SecureAccount {
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       feeRates: any;
-    } = secureHDWallet;
+    } = secureHDWallet
 
     return new SecureAccount(primaryMnemonic, {
       secondaryMnemonic,
@@ -84,7 +84,7 @@ export default class SecureAccount {
       lastBalTxSync,
       newTransactions,
       feeRates,
-    });
+    })
   };
 
   public secureHDWallet: SecureHDWallet;
@@ -124,7 +124,7 @@ export default class SecureAccount {
       feeRates: any;
     },
   ) {
-    this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
+    this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars)
   }
 
   public setupSecureAccount = async (): Promise<
@@ -151,9 +151,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.setupSecureAccount(),
-      };
+      }
     } catch (err) {
-      return { status: 301, err: err.message, message: ErrMap[301] };
+      return {
+        status: 301, err: err.message, message: ErrMap[ 301 ] 
+      }
     }
   };
 
@@ -180,22 +182,28 @@ export default class SecureAccount {
     try {
       if (!bhXpub) {
         if (!token) {
-          throw new Error('Neither a bhXpub nor a token is provided');
+          throw new Error('Neither a bhXpub nor a token is provided')
         }
-        const res = await this.secureHDWallet.importBHXpub(token);
-        bhXpub = res.bhXpub;
+        const res = await this.secureHDWallet.importBHXpub(token)
+        bhXpub = res.bhXpub
       }
       const { prepared } = this.secureHDWallet.prepareSecureAccount(
         bhXpub,
         secondaryXpub,
-      );
+      )
 
       if (!prepared) {
-        throw new Error('Import failed: unable to prepare secure account.');
+        throw new Error('Import failed: unable to prepare secure account.')
       }
-      return { status: config.STATUS.SUCCESS, data: { imported: true } };
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          imported: true 
+        } 
+      }
     } catch (err) {
-      return { status: 302, err: err.message, message: ErrMap[302] };
+      return {
+        status: 302, err: err.message, message: ErrMap[ 302 ] 
+      }
     }
   };
 
@@ -220,9 +228,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: this.secureHDWallet.decryptSecondaryXpub(encryptedSecXpub),
-      };
+      }
     } catch (err) {
-      return { status: 303, err: err.message, message: ErrMap[303] };
+      return {
+        status: 303, err: err.message, message: ErrMap[ 303 ] 
+      }
     }
   };
 
@@ -249,9 +259,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.checkHealth(chunk, pos),
-      };
+      }
     } catch (err) {
-      return { status: 304, err: err.message, message: ErrMap[304] };
+      return {
+        status: 304, err: err.message, message: ErrMap[ 304 ] 
+      }
     }
   };
 
@@ -275,9 +287,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.isActive(),
-      };
+      }
     } catch (err) {
-      return { status: 305, err: err.message, message: ErrMap[305] };
+      return {
+        status: 305, err: err.message, message: ErrMap[ 305 ] 
+      }
     }
   };
 
@@ -304,16 +318,18 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
-      };
+      }
     } catch (err) {
-      return { status: 306, err: err.message, message: ErrMap[306] };
+      return {
+        status: 306, err: err.message, message: ErrMap[ 306 ] 
+      }
     }
   };
 
-  public removeSecondaryMnemonic = (): { removed: Boolean } =>
+  public removeSecondaryMnemonic = (): { removed: boolean } =>
     this.secureHDWallet.removeSecondaryMnemonic();
 
-  public removeTwoFADetails = (): { removed: Boolean } =>
+  public removeTwoFADetails = (): { removed: boolean } =>
     this.secureHDWallet.removeTwoFADetails();
 
   public isSecondaryMnemonic = (secondaryMnemonic: string) =>
@@ -344,9 +360,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: this.secureHDWallet.getSecondaryXpub(),
-      };
+      }
     } catch (err) {
-      return { status: 308, err: err.message, message: ErrMap[308] };
+      return {
+        status: 308, err: err.message, message: ErrMap[ 308 ] 
+      }
     }
   };
 
@@ -380,7 +398,7 @@ export default class SecureAccount {
     };
   } => this.secureHDWallet.decodePaymentURI(paymentURI);
 
-  public isValidAddress = (recipientAddress: string): Boolean =>
+  public isValidAddress = (recipientAddress: string): boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);
 
   public getReceivingAddress = (
@@ -434,9 +452,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.fetchBalanceTransaction(options),
-      };
+      }
     } catch (err) {
-      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+      return {
+        status: 0o3, err: err.message, message: ErrMap[ 0o3 ] 
+      }
     }
   };
 
@@ -464,13 +484,13 @@ export default class SecureAccount {
         data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
-        message: "Failed to sync derivative account's balance and transactions",
-      };
+        message: 'Failed to sync derivative account\'s balance and transactions',
+      }
     }
   };
 
@@ -481,7 +501,7 @@ export default class SecureAccount {
     | {
         status: number;
         data: {
-          synched: Boolean;
+          synched: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -500,13 +520,13 @@ export default class SecureAccount {
           accountType,
           accountNumber,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
         message: 'Failed to sync xpub via xpub agent',
-      };
+      }
     }
   };
 
@@ -536,13 +556,13 @@ export default class SecureAccount {
           accountType,
           accountDetails,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
         message: 'Failed to setup derivative acccount',
-      };
+      }
     }
   };
 
@@ -560,9 +580,9 @@ export default class SecureAccount {
     | {
         status: number;
         data: {
-          setupSuccessful: Boolean;
-          accountId: String;
-          accountNumber: Number;
+          setupSuccessful: boolean;
+          accountId: string;
+          accountNumber: number;
         };
         err?: undefined;
         message?: undefined;
@@ -584,13 +604,13 @@ export default class SecureAccount {
           configuration,
           disableAccount,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
         message: 'Failed to setup donation account',
-      };
+      }
     }
   };
 
@@ -613,7 +633,7 @@ export default class SecureAccount {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -632,13 +652,13 @@ export default class SecureAccount {
           accountNumber,
           preferences,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
         message: 'Failed to update donation account preferences',
-      };
+      }
     }
   };
 
@@ -662,23 +682,29 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.fetchTransactionDetails(txHash),
-      };
+      }
     } catch (err) {
-      return { status: 0o4, err: err.message, message: ErrMap[0o4] };
+      return {
+        status: 0o4, err: err.message, message: ErrMap[ 0o4 ] 
+      }
     }
   };
 
   public generateSecondaryXpriv = (
     secondaryMnemonic: string,
-  ): { generated: Boolean } => {
+  ): { generated: boolean } => {
     try {
       const generated = this.secureHDWallet.generateSecondaryXpriv(
         secondaryMnemonic,
-      );
-      return { generated };
+      )
+      return {
+        generated 
+      }
     } catch (err) {
       // console.log({ err });
-      return { generated: false };
+      return {
+        generated: false 
+      }
     }
   };
 
@@ -734,9 +760,9 @@ export default class SecureAccount {
   > => {
     try {
       recipients = recipients.map((recipient) => {
-        recipient.amount = Math.round(recipient.amount);
-        return recipient;
-      });
+        recipient.amount = Math.round(recipient.amount)
+        return recipient
+      })
 
       const {
         fee,
@@ -746,39 +772,43 @@ export default class SecureAccount {
         recipients,
         averageTxFees,
         derivativeAccountDetails,
-      );
+      )
 
-      let netAmount = 0;
+      let netAmount = 0
       recipients.forEach((recipient) => {
-        netAmount += recipient.amount;
-      });
+        netAmount += recipient.amount
+      })
 
       if (balance < netAmount + fee) {
         return {
           status: 0o6,
-          err: `Insufficient balance`,
+          err: 'Insufficient balance',
           fee,
           netAmount,
-          message: ErrMap[0o6],
-        };
+          message: ErrMap[ 0o6 ],
+        }
       }
 
       if (txPrerequisites) {
         return {
           status: config.STATUS.SUCCESS,
-          data: { txPrerequisites },
-        };
+          data: {
+            txPrerequisites 
+          },
+        }
       } else {
         throw new Error(
           'Unable to create transaction: inputs failed at coinselect',
-        );
+        )
       }
 
       // } else {
       //   throw new Error('Recipient address is wrong');
       // }
     } catch (err) {
-      return { status: 106, err: err.message, message: ErrMap[106] };
+      return {
+        status: 106, err: err.message, message: ErrMap[ 106 ] 
+      }
     }
   };
 
@@ -818,21 +848,21 @@ export default class SecureAccount {
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,
-      );
+      )
 
-      let inputs;
+      let inputs
       if (txnPriority === 'custom' && customTxPrerequisites) {
-        inputs = customTxPrerequisites.inputs;
+        inputs = customTxPrerequisites.inputs
       } else {
-        inputs = txPrerequisites[txnPriority.toLowerCase()].inputs;
+        inputs = txPrerequisites[ txnPriority.toLowerCase() ].inputs
       }
 
       const {
         signedTxb,
         childIndexArray,
-      } = await this.secureHDWallet.signHDTransaction(inputs, txb);
+      } = await this.secureHDWallet.signHDTransaction(inputs, txb)
 
-      const txHex = signedTxb.buildIncomplete().toHex();
+      const txHex = signedTxb.buildIncomplete().toHex()
 
       // console.log(
       //   '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
@@ -840,10 +870,14 @@ export default class SecureAccount {
 
       return {
         status: config.STATUS.SUCCESS,
-        data: { txHex, childIndexArray },
-      };
+        data: {
+          txHex, childIndexArray 
+        },
+      }
     } catch (err) {
-      return { status: 310, err: err.message, message: ErrMap[310] };
+      return {
+        status: 310, err: err.message, message: ErrMap[ 310 ] 
+      }
     }
   };
 
@@ -881,9 +915,11 @@ export default class SecureAccount {
           txHex,
           childIndexArray,
         ),
-      };
+      }
     } catch (err) {
-      return { status: 311, err: err.message, message: ErrMap[311] };
+      return {
+        status: 311, err: err.message, message: ErrMap[ 311 ] 
+      }
     }
   };
 
@@ -909,7 +945,7 @@ export default class SecureAccount {
         data?: undefined;
       }
   > => {
-    let executed = 'tx-init';
+    let executed = 'tx-init'
     try {
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
@@ -917,34 +953,38 @@ export default class SecureAccount {
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,
-      );
-      executed = 'tx-creation';
+      )
+      executed = 'tx-creation'
 
-      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+      const { inputs } = txPrerequisites[ txnPriority.toLowerCase() ]
 
       const { signedTxb } = this.secureHDWallet.dualSignHDTransaction(
         inputs,
         txb,
-      );
+      )
       // console.log('---- Transaction Signed ----');
-      executed = 'tx-signing';
+      executed = 'tx-signing'
 
-      const txHex = signedTxb.build().toHex();
+      const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
-      const { txid } = await this.secureHDWallet.broadcastTransaction(txHex);
-      executed = 'tx-broadcast';
+      const { txid } = await this.secureHDWallet.broadcastTransaction(txHex)
+      executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
 
-      this.secureHDWallet.removeSecondaryXpriv();
+      this.secureHDWallet.removeSecondaryXpriv()
 
-      return { status: config.STATUS.SUCCESS, data: { txid } };
+      return {
+        status: config.STATUS.SUCCESS, data: {
+          txid 
+        } 
+      }
     } catch (err) {
       return {
         status: 107,
         err: err.message + `(failed post: ${executed})`,
-        message: ErrMap[107],
-      };
+        message: ErrMap[ 107 ],
+      }
     }
   };
 
@@ -976,13 +1016,13 @@ export default class SecureAccount {
           contactName,
           accountName,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to generate derivative account's address",
-      };
+        message: 'Failed to generate derivative account\'s address',
+      }
     }
   };
 
@@ -1032,14 +1072,14 @@ export default class SecureAccount {
           accountType,
           accountNumber,
         ),
-      };
+      }
     } catch (err) {
       return {
         status: 0o3,
         err: err.message,
         message:
-          "Failed to generate derivative account's balance and transactions",
-      };
+          'Failed to generate derivative account\'s balance and transactions',
+      }
     }
   };
 }

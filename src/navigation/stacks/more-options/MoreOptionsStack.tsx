@@ -1,27 +1,28 @@
-import React from 'react';
-import { createStackNavigator } from "react-navigation-stack";
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
-import MoreOptionsContainerScreen from "../../../pages/MoreOptions/MoreOptionsContainerScreen";
-import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen';
-import FundingSourcesScreen from "../../../pages/FundingSources/FundingSourcesContainerScreen";
-import FundingSourceDetailsScreen from "../../../pages/FundingSources/FundingSourceDetailsScreen";
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-import WalletSettingsStack from './WalletSettingsStack';
-import AccountManagementStack from './AccountManagementStack';
+import React from 'react'
+import { createStackNavigator } from 'react-navigation-stack'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import MoreOptionsContainerScreen from '../../../pages/MoreOptions/MoreOptionsContainerScreen'
+import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+import FundingSourcesScreen from '../../../pages/FundingSources/FundingSourcesContainerScreen'
+import FundingSourceDetailsScreen from '../../../pages/FundingSources/FundingSourceDetailsScreen'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import WalletSettingsStack from './WalletSettingsStack'
+import AccountManagementStack from './AccountManagementStack'
+import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
 
 
 const MoreOptionsStack = createStackNavigator(
   {
     MoreOptionsRoot: {
       screen: MoreOptionsContainerScreen,
-      navigationOptions: ({ navigation }) => {
+      navigationOptions: ( { navigation } ) => {
         return {
-          title: "More",
+          title: 'More',
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
-        };
+        }
       },
     },
     AccountManagement: {
@@ -33,7 +34,13 @@ const MoreOptionsStack = createStackNavigator(
     FriendsAndFamily: {
       screen: FriendsAndFamilyScreen,
       navigationOptions: {
-        title: "Friends and Family",
+        title: 'Friends and Family',
+      },
+    },
+    NodeSettings: {
+      screen: NodeSettingsContainerScreen,
+      navigationOptions: {
+        title: 'Node Settings',
       },
     },
     FundingSources: {
@@ -54,16 +61,16 @@ const MoreOptionsStack = createStackNavigator(
   },
   {
     initialRouteName: 'MoreOptionsRoot',
-    defaultNavigationOptions: ({ navigation }) => {
+    defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
         },
-      };
+      }
     },
   },
-);
+)
 
 
-export default MoreOptionsStack;
+export default MoreOptionsStack

@@ -1,6 +1,6 @@
-import Relay from "../utilities/Relay";
-import config from "../HexaConfig";
-import { INotification, EncryptedImage } from "../utilities/Interface";
+import Relay from '../utilities/Relay'
+import config from '../HexaConfig'
+import { INotification, EncryptedImage } from '../utilities/Interface'
 
 export default class RelayServices {
   public static checkCompatibility = async (
@@ -30,13 +30,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.checkCompatibility(method, version),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to check the compatibility",
-      };
+        message: 'Failed to check the compatibility',
+      }
     }
   };
 
@@ -62,13 +62,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.fetchReleases(build),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to fetch release notes",
-      };
+        message: 'Failed to fetch release notes',
+      }
     }
   };
 
@@ -79,7 +79,7 @@ export default class RelayServices {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -95,13 +95,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.updateFCMTokens(walletID, FCMs),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to update the FCMs on the server",
-      };
+        message: 'Failed to update the FCMs on the server',
+      }
     }
   };
 
@@ -128,13 +128,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.fetchNotifications(walletID),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to fetch notifications",
-      };
+        message: 'Failed to fetch notifications',
+      }
     }
   };
 
@@ -145,7 +145,7 @@ export default class RelayServices {
     | {
         status: number;
         data: {
-          sent: Boolean;
+          sent: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -161,13 +161,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.sendNotifications(receivers, notification),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to deliver notifications",
-      };
+        message: 'Failed to deliver notifications',
+      }
     }
   };
 
@@ -178,7 +178,7 @@ export default class RelayServices {
     | {
         status: number;
         data: {
-          added: Boolean;
+          added: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -194,13 +194,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.sendDonationNote(donationId, txNote),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to deliver donation note",
-      };
+        message: 'Failed to deliver donation note',
+      }
     }
   };
 
@@ -209,13 +209,13 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.fetchFeeAndExchangeRates(),
-      };
+      }
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: "Failed to fetch fee and exchange rates",
-      };
+        message: 'Failed to fetch fee and exchange rates',
+      }
     }
   };
 }

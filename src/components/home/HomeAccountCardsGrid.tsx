@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { FlatList } from 'react-native';
-import AccountShell from '../../common/data/models/AccountShell';
-import AccountCardColumn from './AccountCardColumn';
+import React, { useMemo } from 'react'
+import { FlatList } from 'react-native'
+import AccountShell from '../../common/data/models/AccountShell'
+import AccountCardColumn from './AccountCardColumn'
 
 export type Props = {
   accountShells: AccountShell[];
-  onCardLongPressed: (accountShell: AccountShell) => void;
-  onAccountSelected: (accountShell: AccountShell) => void;
+  onCardLongPressed: ( accountShell: AccountShell ) => void;
+  onAccountSelected: ( accountShell: AccountShell ) => void;
   onAddNewSelected: () => void;
   contentContainerStyle?: Record<string, unknown>;
 };
@@ -17,52 +17,53 @@ type RenderItemProps = {
 };
 
 
-function keyExtractor(item: AccountShell[]): string {
-  return item[0].id;
+function keyExtractor( item: AccountShell[] ): string {
+  return item[ 0 ].id
 }
 
-const HomeAccountCardsGrid: React.FC<Props> = ({
+const HomeAccountCardsGrid: React.FC<Props> = ( {
   accountShells,
   onCardLongPressed,
   onAccountSelected,
   onAddNewSelected,
-  contentContainerStyle = {},
-}: Props) => {
+  contentContainerStyle = {
+  },
+}: Props ) => {
 
-  const columnData: Array<AccountShell[]> = useMemo(() => {
-    if (accountShells.length == 0) {
-      return [];
+  const columnData: Array<AccountShell[]> = useMemo( () => {
+    if ( accountShells.length == 0 ) {
+      return []
     }
 
-    if (accountShells.length == 1) {
-      return [accountShells];
+    if ( accountShells.length == 1 ) {
+      return [ accountShells ]
     }
 
-    const shellCount = accountShells.length;
-    let columns = [];
-    let currentColumn = [];
+    const shellCount = accountShells.length
+    const columns = []
+    let currentColumn = []
 
-    accountShells.forEach((accountShell, index) => {
-      currentColumn.push(accountShell);
+    accountShells.forEach( ( accountShell, index ) => {
+      currentColumn.push( accountShell )
 
       // Make a new column after adding two items -- or after adding the
       // very first item. This is because the first column
       // will only contain one item, since the "Add new" button will be placed
       // in front of everything.
-      if (currentColumn.length == 2 || index == 0) {
-        columns.push(currentColumn);
-        currentColumn = [];
+      if ( currentColumn.length == 2 || index == 0 ) {
+        columns.push( currentColumn )
+        currentColumn = []
       }
 
       // If we're at the end and a partially filled column still exists,
       // push it.
-      if (index == shellCount - 1 && currentColumn.length > 0) {
-        columns.push(currentColumn);
+      if ( index == shellCount - 1 && currentColumn.length > 0 ) {
+        columns.push( currentColumn )
       }
-    });
+    } )
 
-    return columns;
-  }, [accountShells]);
+    return columns
+  }, [ accountShells ] )
 
   return (
     <FlatList
@@ -71,7 +72,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
       showsHorizontalScrollIndicator={false}
       data={columnData}
       keyExtractor={keyExtractor}
-      renderItem={({ item, index }: RenderItemProps) => {
+      renderItem={( { item, index }: RenderItemProps ) => {
         return <AccountCardColumn
           cardData={item}
           prependsAddButton={index == 0}
@@ -81,8 +82,8 @@ const HomeAccountCardsGrid: React.FC<Props> = ({
         />
       }}
     />
-  );
-};
+  )
+}
 
 
-export default HomeAccountCardsGrid;
+export default HomeAccountCardsGrid

@@ -11,4 +11,4 @@ enum UTXOCompatibilityGroup {
   TESTNET = 'TESTNET',
 }
 
-export default UTXOCompatibilityGroup;
+export default UTXOCompatibilityGroup
