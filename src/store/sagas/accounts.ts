@@ -1418,6 +1418,7 @@ function* updateAccountSettings( { payload: account, }: {
     const service = yield select(
       ( state ) => state.accounts[ accountType ].service
     )
+
     const result = yield call(
       service.updateDerivativeAccount,
       {

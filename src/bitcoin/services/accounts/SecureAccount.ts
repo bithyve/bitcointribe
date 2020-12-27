@@ -566,6 +566,45 @@ export default class SecureAccount {
     }
   };
 
+  public updateDerivativeAccount = async (
+    account: {
+      kind: string,
+      instanceNumber: number,
+      customDescription: string,
+      customDisplayName: string
+    }
+  ): Promise<
+  | {
+      status: number;
+      data: {
+        updateSuccessful: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
+  | {
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
+> => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.updateDerivativeAccount(
+          account
+        ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: 'Failed to update account',
+      }
+    }
+  };
+
   public setupDonationAccount = async (
     donee: string,
     subject: string,
