@@ -17,12 +17,12 @@ export const KnowMoreBottomSheetHandle: React.FC = () => {
   return <BottomSheetHandle containerStyle={styles.handleContainer} />
 }
 
-const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
+const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ( {
   accountKind,
   onClose,
-}: Props) => {
+}: Props ) => {
   const BottomSheetContent = () => {
-    switch (accountKind) {
+    switch ( accountKind ) {
         case SubAccountKind.TEST_ACCOUNT:
           return (
             <TestAccountKnowMoreSheetContents
@@ -63,7 +63,7 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ({
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.blue,
     flex: 1,
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     shadowOpacity: 0,
   },
-})
+} )
 
 export default AccountDetailsKnowMoreBottomSheet
