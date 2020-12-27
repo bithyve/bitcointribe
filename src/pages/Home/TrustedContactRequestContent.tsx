@@ -1,28 +1,28 @@
-import React from 'react';
-import TrustedContactRequest from '../Contacts/TrustedContactRequest';
-import BottomSheet from '@gorhom/bottom-sheet';
+import React from 'react'
+import TrustedContactRequest from '../Contacts/TrustedContactRequest'
+import BottomSheet from '@gorhom/bottom-sheet'
 
 export interface Props {
   bottomSheetRef: React.RefObject<BottomSheet>;
   trustedContactRequest: any;
   recoveryRequest: any;
-  onPressAccept: (key: any) => void;
-  onPressReject: (key: any) => void;
-  onPhoneNumberChange: (key: any) => void;
+  onPressAccept: ( key: any ) => void;
+  onPressReject: ( key: any ) => void;
+  onPhoneNumberChange: ( key: any ) => void;
 }
 
-const TrustedContactRequestContent: React.FC<Props> = ({
+const TrustedContactRequestContent: React.FC<Props> = ( {
   bottomSheetRef,
   trustedContactRequest,
   recoveryRequest,
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
-}: Props) => {
-  if (!trustedContactRequest && !recoveryRequest) return;
+}: Props ) => {
+  if ( !trustedContactRequest && !recoveryRequest ) return
 
-  let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
-    trustedContactRequest || recoveryRequest;
+  const { requester, hintType, hint, isGuardian, isQR, isRecovery } =
+    trustedContactRequest || recoveryRequest
 
   return (
     <TrustedContactRequest
@@ -35,15 +35,15 @@ const TrustedContactRequestContent: React.FC<Props> = ({
       hint={hint}
       bottomSheetRef={bottomSheetRef}
       trustedContactName={requester}
-      onPressAccept={(key) => onPressAccept(key)}
-      onPressReject={(key) => {
-        onPressReject(key);
+      onPressAccept={( key ) => onPressAccept( key )}
+      onPressReject={( key ) => {
+        onPressReject( key )
       }}
-      onPhoneNumberChange={(text) => {
-        onPhoneNumberChange(text);
+      onPhoneNumberChange={( text ) => {
+        onPhoneNumberChange( text )
       }}
     />
-  );
-};
+  )
+}
 
-export default TrustedContactRequestContent;
+export default TrustedContactRequestContent
