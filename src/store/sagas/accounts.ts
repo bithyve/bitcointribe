@@ -77,11 +77,8 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import Relay from '../../bitcoin/utilities/Relay'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
-import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import { acc } from 'react-native-reanimated'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
