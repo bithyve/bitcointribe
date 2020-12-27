@@ -12,7 +12,6 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
 } from '../common/constants/serviceTypes'
-import { AsyncStorage } from 'react-native'
 import PersonalNode from '../common/data/models/PersonalNode'
 
 class HexaConfig {

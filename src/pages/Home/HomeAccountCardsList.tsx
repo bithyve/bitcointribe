@@ -1,60 +1,66 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
-import { Easing } from 'react-native-reanimated';
-import ButtonStyles from '../../common/Styles/ButtonStyles';
-import AccountShell from '../../common/data/models/AccountShell';
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground';
-import HomeAccountCardsDraggableList from '../../components/home/HomeAccountCardsDraggableList';
-import HomeAccountCardsGrid from '../../components/home/HomeAccountCardsGrid';
-import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells';
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { Button } from 'react-native-elements'
+import { Easing } from 'react-native-reanimated'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import AccountShell from '../../common/data/models/AccountShell'
+import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
+import HomeAccountCardsDraggableList from '../../components/home/HomeAccountCardsDraggableList'
+import HomeAccountCardsGrid from '../../components/home/HomeAccountCardsGrid'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
   contentContainerStyle?: Record<string, unknown>;
-  onCardSelected: (selectedAccount: AccountShell) => void;
+  onCardSelected: ( selectedAccount: AccountShell ) => void;
   onAddNewSelected: () => void;
-  onEditModeChanged?: (isActive: boolean) => void;
+  onEditModeChanged?: ( isActive: boolean ) => void;
 };
 
 const defaultBottomSheetConfigs = {
   initialSnapIndex: 1,
   animationDuration: 500,
-  animationEasing: Easing.out(Easing.exp),
+  animationEasing: Easing.out( Easing.exp ),
   dismissOnOverlayPress: true,
-};
+}
 
 const EditModeBottomSheetHeader: React.FC = () => {
   return (
     <View style={styles.editModeBottomSheetHeaderSection}>
 
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1 
+      }}>
         <Text style={styles.editModeBottomSheetHeadingText}>Rearrange Accounts</Text>
         <Text style={styles.editModeBottomSheetSubHeadingText}>Move the accounts to reorder them</Text>
       </View>
 
       <Button
-        containerStyle={{ flex: 0 }}
+        containerStyle={{
+          flex: 0 
+        }}
         buttonStyle={ButtonStyles.actionButton}
         title="All Accounts"
       />
     </View>
-  );
-};
+  )
+}
 
-const HomeAccountCardsList: React.FC<Props> = ({
-  containerStyle = {},
-  contentContainerStyle = {},
+const HomeAccountCardsList: React.FC<Props> = ( {
+  containerStyle = {
+  },
+  contentContainerStyle = {
+  },
   onCardSelected,
   onAddNewSelected,
-  onEditModeChanged = (_) => { },
-}: Props) => {
-  const accountShells = useActiveAccountShells();
-  const { present, dismiss } = useBottomSheetModal();
+  onEditModeChanged = ( _ ) => { },
+}: Props ) => {
+  const accountShells = useActiveAccountShells()
+  const { present, dismiss } = useBottomSheetModal()
 
-  function handleAccountReordering(orderedAccounts: AccountShell[]) {}
+  function handleAccountReordering( orderedAccounts: AccountShell[] ) {}
 
   function handleGridCardLongPress() {
     // 📝 For now, long-pressing to re-order is on the backburner
@@ -67,17 +73,17 @@ const HomeAccountCardsList: React.FC<Props> = ({
   const EditModeBottomSheetBackground = () => {
     return (
       <BottomSheetBackground isVisible onPress={() => {
-        onEditModeChanged(false);
-        dismiss();
+        onEditModeChanged( false )
+        dismiss()
       }} />
-    );
-  };
-
-  const EmptyView: React.FC = () => {
-    return <View />;
+    )
   }
 
-  const showEditModeBottomSheet = useCallback(() => {
+  const EmptyView: React.FC = () => {
+    return <View />
+  }
+
+  const showEditModeBottomSheet = useCallback( () => {
     present(
       <View style={containerStyle}>
         <EditModeBottomSheetHeader />
@@ -91,12 +97,12 @@ const HomeAccountCardsList: React.FC<Props> = ({
       </View>,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [0, '68%'],
+        snapPoints: [ 0, '68%' ],
         overlayComponent: EditModeBottomSheetBackground,
         handleComponent: EmptyView,
       },
-    );
-  }, [present, dismiss]);
+    )
+  }, [ present, dismiss ] )
 
 
   return (
@@ -109,10 +115,10 @@ const HomeAccountCardsList: React.FC<Props> = ({
         contentContainerStyle={contentContainerStyle}
       />
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   editModeBottomSheetHeaderSection: {
     flex: 0,
     marginTop: -100,
@@ -133,6 +139,6 @@ const styles = StyleSheet.create({
   editModeBottomSheetSubHeadingText: {
 
   },
-});
+} )
 
-export default HomeAccountCardsList;
+export default HomeAccountCardsList
