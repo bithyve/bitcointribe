@@ -528,7 +528,7 @@ class ManageBackup extends Component<
         ...navigationParams,
         index,
       });
-    } else if (shareType) {
+    } else if (shareType == 'pdf') {
       this.props.navigation.navigate(
         'PersonalCopyHistoryKeeper',
         navigationParams,

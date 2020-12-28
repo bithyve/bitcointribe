@@ -25,7 +25,7 @@ import ApproveSetup from "./ApproveSetup";
 import HistoryHeaderComponent from "./HistoryHeaderComponent";
 import _ from "underscore";
 import { useDispatch, useSelector } from "react-redux";
-import { sendApprovalRequest } from "../../store/actions/health";
+import { sendApprovalRequest, onApprovalStatusChange } from "../../store/actions/health";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import {
   LevelHealthInterface,
@@ -104,6 +104,8 @@ const KeeperDeviceHistory = (props) => {
   const levelHealth: LevelHealthInterface[] = useSelector(
     (state) => state.health.levelHealth
   );
+  const [selectedKeeperType, setSelectedKeeperType] = useState('');
+  const [selectedKeeperName, setSelectedKeeperName] = useState('');
   const keeperInfo: any[] = useSelector((state) => state.health.keeperInfo);
   const currentLevel = useSelector((state) => state.health.currentLevel);
   useEffect(() => {
@@ -288,20 +290,31 @@ const KeeperDeviceHistory = (props) => {
     );
   };
 
-  const sendApprovalRequestToPK = () => {
-    if (!isPrimaryKeeper) {
-      let PKShareId;
-      if (currentLevel == 2) PKShareId = levelHealth[1].levelInfo[2].shareId;
-      if (currentLevel == 3) PKShareId = levelHealth[2].levelInfo[2].shareId;
-      dispatch(
-        sendApprovalRequest(
-          selectedKeeper.shareId,
-          PKShareId,
-          notificationType.approveKeeper
-        )
-      );
-      (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+  const sendApprovalRequestToPK = (type) => {
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : currentLevel == 3
+        ? levelHealth[2].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+    dispatch(
+      sendApprovalRequest(
+        selectedKeeper.shareId,
+        PKShareId,
+        type == "pdf"
+          ? notificationType.uploadPDFShare
+          : notificationType.approveKeeper
+      )
+    );
+    if (type == "pdf") {
+      dispatch(onApprovalStatusChange(
+        false,
+        moment(new Date()).valueOf(),
+        selectedKeeper.shareId
+      ));
     }
+    (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+    (keeperTypeBottomSheet as any).current.snapTo(0);
   };
 
   const renderReshareContent = useCallback(() => {
@@ -321,7 +334,9 @@ const KeeperDeviceHistory = (props) => {
             setQrBottomSheetsFlag(true);
             (QrBottomSheet as any).current.snapTo(1);
           } else {
-            sendApprovalRequestToPK();
+            sendApprovalRequestToPK(
+              isPrimaryKeeper ? "primaryKeeper" : "device"
+            );
           }
           // onPressReshare();
         }}
@@ -398,6 +413,12 @@ const KeeperDeviceHistory = (props) => {
     if (type == "device") {
       (QrBottomSheet as any).current.snapTo(1);
     }
+    if (type == "pdf") {
+      props.navigation.navigate(
+        'PersonalCopyHistoryKeeper',
+        props.navigation.state.params,
+      );
+    }
   };
 
   return (
@@ -433,7 +454,7 @@ const KeeperDeviceHistory = (props) => {
               setQrBottomSheetsFlag(true);
               (QrBottomSheet as any).current.snapTo(1);
             } else {
-              sendApprovalRequestToPK();
+              (keeperTypeBottomSheet as any).current.snapTo(1);
             }
           }}
         />
@@ -523,7 +544,7 @@ const KeeperDeviceHistory = (props) => {
               if (isPrimaryKeeper) {
                 (QrBottomSheet.current as any).snapTo(1);
               } else {
-                (keeperTypeBottomSheet as any).current.snapTo(1);
+                onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
                 (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
               }
             }}
@@ -558,9 +579,11 @@ const KeeperDeviceHistory = (props) => {
         ]}
         renderContent={() => (
           <KeeperTypeModalContents
-            onPressSetup={async (type, name) =>
-              onPressChangeKeeperType(type, name)
-            }
+            onPressSetup={async (type, name) =>{
+              setSelectedKeeperType(type);
+              setSelectedKeeperName(name);
+              sendApprovalRequestToPK(type)
+            }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
             keeper={selectedKeeper}
