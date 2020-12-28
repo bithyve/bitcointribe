@@ -51,6 +51,17 @@ export const APP_LIST = {
     pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}' 
   }, // fa: facebook
 }
+export const getFormattedString = (qrString: string) => {
+  qrString = qrString.split('"').join('Dquote');
+  qrString = qrString.split(':').join('Qutation');
+  qrString = qrString.split('{').join('Lbrace');
+  qrString = qrString.split('}').join('Rbrace');
+  qrString = qrString.split('/').join('Slash');
+  qrString = qrString.split(',').join('Comma');
+  qrString = qrString.split("'").join('Squote');
+  qrString = qrString.split(' ').join('Space');
+  return qrString;
+};
 
 export const generateRandomString = (length: number): string => {
   let randomString: string = '';

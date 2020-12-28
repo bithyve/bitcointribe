@@ -28,7 +28,8 @@ import {
   MNEMONIC_RECOVERED_HEALTH,
   DOWNLOADED_SM_SHARES,
   REMOVE_SN,
-  SET_PDF_INFO
+  SET_PDF_INFO,
+  DOWNLOADED_PDFSHARE_HEALTH
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -82,6 +83,9 @@ const initialState: {
   downloadedMShare: {
     [otp: string]: { status: Boolean; err?: String };
   };
+  downloadedPdfShare: {
+    [otp: string]: { status: Boolean; err?: String };
+  };
   errorReceiving: Boolean;
   keeperApproveStatus: {
     status: Boolean;
@@ -125,6 +129,7 @@ const initialState: {
   keeperInfo: [],
   metaShare: null,
   downloadedMShare: {},
+  downloadedPdfShare: {},
   errorReceiving: false,
   keeperApproveStatus: {
     status: false,
@@ -262,6 +267,18 @@ export default (state = initialState, action) => {
         ...state,
         downloadedMShare: {
           ...state.downloadedMShare,
+          [action.payload.otp]: {
+            status: action.payload.status,
+            err: action.payload.err,
+          },
+        },
+      };
+
+      case DOWNLOADED_PDFSHARE_HEALTH:
+      return {
+        ...state,
+        downloadedPdfShare: {
+          ...state.downloadedPdfShare,
           [action.payload.otp]: {
             status: action.payload.status,
             err: action.payload.err,

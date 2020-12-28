@@ -29,6 +29,7 @@ import {
 import idx from 'idx';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
 
 interface ScanRecoveryKeyStateTypes {
   isScanned: any;
@@ -51,9 +52,11 @@ class ScanRecoveryKey extends Component<
   }
 
   barcodeRecognized = async (barcodes) => {
-    this.props.navigation.state.params.scannedData(JSON.parse(barcodes.data));
+    let barcode = getFormattedStringFromQRString(barcodes.data);
+    //console.log("barcodes1", barcode);
+    this.props.navigation.state.params.scannedData(JSON.parse(barcode));
     this.props.navigation.goBack();
-    if (barcodes.data) {
+    if (barcode) {
       this.setState({ isScanned: false });
     }
   };

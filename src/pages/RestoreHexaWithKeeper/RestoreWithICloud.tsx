@@ -55,10 +55,10 @@ import Loader from '../../components/loader';
 import {
   checkMSharesHealth,
   recoverWalletUsingIcloud,
-  downloadShares,
   downloadMShare,
   recoverWallet,
   updateCloudMShare,
+  downloadPdfShare,
 } from '../../store/actions/health';
 import axios from 'axios';
 import {
@@ -98,8 +98,8 @@ interface RestoreWithICloudPropsTypes {
   calculateExchangeRate: any;
   startupSync: any;
   initializeHealthSetup: any;
-  downloadShares: any;
   downloadMShare: any;
+  downloadPdfShare: any;
   metaShare: any;
   DECENTRALIZED_BACKUP: any;
   recoverWallet: any;
@@ -340,8 +340,12 @@ class RestoreWithICloud extends Component<
   handleScannedData = async (scannedData) => {
     const { DECENTRALIZED_BACKUP } = this.props;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-    //console.log("scannedData", scannedData, RECOVERY_SHARES, RECOVERY_SHARES.length);
-    if (scannedData && scannedData.type && scannedData.type === "ReverseRecoveryQR") {
+    console.log("scannedData", scannedData);
+    if(scannedData && scannedData.type === 'pdf' ) {
+      console.log("isndie if", scannedData.type);
+
+      this.props.downloadPdfShare({encryptedKey: scannedData.encryptedData, otp: this.props.security.answer, downloadType: 'recovery', replaceIndex: Object.keys(RECOVERY_SHARES).length})
+    } else if (scannedData && scannedData.type && scannedData.type === "ReverseRecoveryQR") {
       const recoveryRequest = {
         requester: scannedData.requester,
         publicKey: scannedData.publicKey,
@@ -852,9 +856,9 @@ export default withNavigationFocus(
     checkMSharesHealth,
     startupSync,
     initializeHealthSetup,
-    downloadShares,
     downloadMShare,
     recoverWallet,
+    downloadPdfShare,
     updateCloudMShare
   })(RestoreWithICloud),
 );

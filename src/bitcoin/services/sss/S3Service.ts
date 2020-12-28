@@ -114,6 +114,43 @@ export default class S3Service {
     }
   };
 
+  public static downloadPdfShare = async (
+    messageId: string,
+    key: string,
+  ): Promise<
+    | {
+        status: number;
+        data:
+          | {
+              metaShare: MetaShare;
+              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+            }
+          | {
+              metaShare: MetaShare;
+              encryptedDynamicNonPMDD?: undefined;
+            };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await LevelHealth.downloadPdfShare(messageId, key),
+      };
+    } catch (err) {
+      return {
+        status: 502, err: err.message, message: ErrMap[ 502 ] 
+      }
+    }
+  };
+
   public static downloadDynamicNonPMDD = async (
     walletId: string,
   ): Promise<

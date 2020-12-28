@@ -1,5 +1,6 @@
 import { Platform, NativeModules } from 'react-native';
 import { PermissionsAndroid } from 'react-native';
+import { getFormattedString } from '../../common/CommonFunctions';
 
 async function requestStoragePermission() {
   try {
@@ -14,18 +15,6 @@ async function requestStoragePermission() {
   return null;
 }
 
-
-const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
-  return qrString;
-};
 
 export default async (pdfData, fileName, title) => {
   const { qrData } = pdfData;

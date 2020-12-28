@@ -59,6 +59,8 @@ export const GET_PDF_DATA = 'GET_PDF_DATA';
 export const SET_PDF_INFO = 'SET_PDF_INFO';
 export const SHARE_PDF = 'SHARE_PDF';
 export const CONFIRM_PDF_SHARED = 'CONFIRM_PDF_SHARED';
+export const DOWNLOAD_PDFSHARE_HEALTH = 'DOWNLOAD_PDFSHARE_HEALTH';
+export const DOWNLOADED_PDFSHARE_HEALTH = 'DOWNLOADED_PDFSHARE_HEALTH';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -207,6 +209,26 @@ export const downloadMShare = (
     type: DOWNLOAD_MSHARE_HEALTH,
     payload: { otp, encryptedKey, downloadType, replaceIndex, walletName },
   };
+};
+
+export const downloadPdfShare = (
+  payload: {
+    encryptedKey: string;
+    otp: string;
+    downloadType?: string;
+    replaceIndex?: string;
+  }
+) => {
+  let { otp, encryptedKey, downloadType, replaceIndex} = payload;
+  console.log("INSIDE action", otp, encryptedKey, downloadType, replaceIndex);
+  return {
+    type: DOWNLOAD_PDFSHARE_HEALTH,
+    payload: { otp, encryptedKey, downloadType, replaceIndex },
+  };
+};
+
+export const downloadedPdfShare = (otp, status, err?) => {
+  return { type: DOWNLOADED_PDFSHARE_HEALTH, payload: { otp, status, err } };
 };
 
 export const downloadedMShare = (otp, status, err?) => {

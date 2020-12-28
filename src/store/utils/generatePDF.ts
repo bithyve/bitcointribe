@@ -1,4 +1,5 @@
 import { Platform, NativeModules, Alert } from 'react-native';
+import { getFormattedString } from '../../common/CommonFunctions';
 
 const chunkArray = (arr: any, n: any) => {
   var chunkLength = Math.max(arr.length / n, 1);
@@ -10,18 +11,6 @@ const chunkArray = (arr: any, n: any) => {
   return chunks;
 };
 
-
-const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
-  return qrString;
-};
 
 export default async (pdfData, fileName, title, password) => {
   const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData;
