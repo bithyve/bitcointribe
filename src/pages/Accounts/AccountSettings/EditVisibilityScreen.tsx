@@ -1,21 +1,21 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import { useDispatch } from 'react-redux';
-import { Button } from 'react-native-elements';
+import React, { useMemo, useState } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import { useDispatch } from 'react-redux'
+import { Button } from 'react-native-elements'
 
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import ButtonStyles from '../../../common/Styles/ButtonStyles';
-import ListStyles from '../../../common/Styles/ListStyles';
-import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList';
-import AccountVisibility from '../../../common/data/enums/AccountVisibility';
-import { updateSubAccountSettings } from '../../../store/actions/accounts';
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import ListStyles from '../../../common/Styles/ListStyles'
+import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { updateSubAccountSettings } from '../../../store/actions/accounts'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
   AccountVisibility.HIDDEN,
   AccountVisibility.DURESS,
-];
+]
 
 export type Props = {
   navigation: any;
@@ -24,31 +24,29 @@ export type Props = {
 const HeaderSection: React.FC = () => {
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderText}>Choose a visibility setting</Text>
+      <Text style={ListStyles.infoHeaderSubtitleText}>Choose a visibility setting</Text>
     </View>
-  );
+  )
 }
 
-const AccountSettingsEditVisibilityScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const dispatch = useDispatch();
-  const accountShell = useAccountShellFromNavigation(navigation);
-  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
+const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dispatch = useDispatch()
+  const accountShell = useAccountShellFromNavigation( navigation )
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
-  const [selectedVisibility, setSelectedVisibility] = useState(primarySubAccount.visibility);
+  const [ selectedVisibility, setSelectedVisibility ] = useState( primarySubAccount.visibility )
 
-  function handleSelection(visibilityOption: AccountVisibility) {
-    setSelectedVisibility(visibilityOption);
+  function handleSelection( visibilityOption: AccountVisibility ) {
+    setSelectedVisibility( visibilityOption )
   }
 
   function handleSaveButtonPress() {
-    dispatch(updateSubAccountSettings({
+    dispatch( updateSubAccountSettings( {
       ...primarySubAccount,
       visibility: selectedVisibility,
-    }));
+    } ) )
 
-    navigation.goBack();
+    navigation.goBack()
   }
 
   return (
@@ -73,10 +71,10 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ({
         />
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -88,6 +86,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: 'center',
   },
-});
+} )
 
-export default AccountSettingsEditVisibilityScreen;
+export default AccountSettingsEditVisibilityScreen

@@ -1,4 +1,4 @@
-export const timeFormatter=(current, previous) =>{
+export const timeFormatter=( current, previous ) =>{
 
   const msPerMinute = 60 * 1000
   const msPerHour = msPerMinute * 60
@@ -8,36 +8,36 @@ export const timeFormatter=(current, previous) =>{
 
   const elapsed = current - previous
 
-  if (elapsed < msPerMinute) {
-    return Math.floor(elapsed/1000) + ' seconds ago'   
+  if ( elapsed < msPerMinute ) {
+    return Math.floor( elapsed/1000 ) + ' seconds ago'   
   }
 
-  else if (elapsed < msPerHour) {
-    return Math.floor(elapsed/msPerMinute) + ' minutes ago'   
+  else if ( elapsed < msPerHour ) {
+    return Math.floor( elapsed/msPerMinute ) + ' minutes ago'   
   }
 
-  else if (elapsed < msPerDay ) {
-    return Math.floor(elapsed/msPerHour ) + ' hours ago'   
+  else if ( elapsed < msPerDay ) {
+    return Math.floor( elapsed/msPerHour ) + ' hours ago'   
   }
 
-  else if (elapsed < msPerMonth) {
-    return 'approximately ' + Math.floor(elapsed/msPerDay) + ' days ago'   
+  else if ( elapsed < msPerMonth ) {
+    return 'approximately ' + Math.floor( elapsed/msPerDay ) + ' days ago'   
   }
 
-  else if (elapsed < msPerYear) {
-    return 'approximately ' + Math.floor(elapsed/msPerMonth) + ' months ago'   
+  else if ( elapsed < msPerYear ) {
+    return 'approximately ' + Math.floor( elapsed/msPerMonth ) + ' months ago'   
   }
 
   else {
-    return 'approximately ' + Math.floor(elapsed/msPerYear ) + ' years ago'   
+    return 'approximately ' + Math.floor( elapsed/msPerYear ) + ' years ago'   
   }
 }
 
-export const createRandomString = (length, characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-') => {
+export const createRandomString = ( length, characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-' ) => {
   let result = ''
   const charactersLength = characters.length
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  for ( let i = 0; i < length; i++ ) {
+    result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
   }
   return result
 }

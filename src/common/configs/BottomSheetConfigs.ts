@@ -8,7 +8,7 @@ const defaultBottomSheetConfigs: BottomSheetModalConfigs = {
   snapPoints: [ 0, '60%' ],
   initialSnapIndex: 1,
   animationDuration: 425,
-  animationEasing: Easing.out(Easing.cubic),
+  animationEasing: Easing.out( Easing.cubic ),
   handleComponent: BottomSheetHandle,
   overlayComponent: BottomSheetOverlay,
   overlayOpacity: 0.75,

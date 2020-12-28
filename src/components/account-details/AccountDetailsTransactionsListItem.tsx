@@ -7,7 +7,7 @@ export type Props = {
   transaction: TransactionDescribing;
 };
 
-const AccountDetailsTransactionsListItem: React.FC<Props> = ({ transaction, }: Props) => {
+const AccountDetailsTransactionsListItem: React.FC<Props> = ( { transaction, }: Props ) => {
   return (
     <ListItem bottomDivider pad={4}>
       <TransactionListItemContent transaction={transaction} />

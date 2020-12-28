@@ -1,6 +1,8 @@
 type PersonalNode = {
   isConnectionActive: boolean;
-  activeNodeURL: string | null;
+  ipAddress: string | null;
+  portNumber: number | null;
+  urlPath: string | null;
 };
 
 

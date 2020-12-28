@@ -10,13 +10,12 @@ import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
-import SubAccountDescribing, {
+import {
   DonationSubAccountDescribing,
 } from '../../../../common/data/models/SubAccountInfo/Interfaces'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import openLink from '../../../../utils/OpenLink'
-import SubAccountKind from '../../../../common/data/enums/SubAccountKind'
 import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
 
 export type Props = {
@@ -77,7 +76,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
         <View style={styles.rootContentContainer}>
 
           <View style={ListStyles.infoHeaderSection}>
-            <Text style={ListStyles.infoHeaderText}>Enter details for the new Donation Account</Text>
+            <Text style={ListStyles.infoHeaderSubtitleText}>Enter details for the new Donation Account</Text>
           </View>
 
           <View style={styles.formContainer}>

@@ -1,4 +1,4 @@
-import React, { ReactElement, useRef, useCallback } from 'react'
+import React, { ReactElement, useCallback } from 'react'
 import {
   FlatList,
   TouchableOpacity,
