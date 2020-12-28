@@ -112,6 +112,39 @@ export default class LevelHealth {
     return { metaShare, encryptedDynamicNonPMDD, messageId };
   };
 
+  public static downloadPdfShare = async (
+    messageId: string,
+    key: string,
+  ): Promise<
+    | {
+        metaShare: MetaShare;
+        encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+        messageId: string;
+      }
+    | {
+        metaShare: MetaShare;
+        messageId: string;
+        encryptedDynamicNonPMDD?: undefined;
+      }
+  > => {
+    
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('downloadPDFShare', {
+        HEXA_ID,
+        messageId,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+
+    const { share, encryptedDynamicNonPMDD } = res.data;
+    const metaShare = LevelHealth.decryptMetaShare(share, key)
+      .decryptedMetaShare;
+    return { metaShare, encryptedDynamicNonPMDD, messageId };
+  };
+
   public static downloadSMShare = async (
     encryptedKey: string,
     otp?: string,

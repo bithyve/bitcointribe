@@ -1,72 +1,70 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../../common/Styles/ButtonStyles';
-import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
-import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces';
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader';
-import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo';
-import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList';
-import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo';
+import React, { useMemo, useState } from 'react'
+import { View, StyleSheet } from 'react-native'
+import { Button } from 'react-native-elements'
+import ButtonStyles from '../../../../common/Styles/ButtonStyles'
+import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
+import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader'
+import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
+import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList'
+import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
 
 // TODO: Remove these after testing UI.
 const sampleSources: SubAccountDescribing[] = [
-  new CheckingSubAccountInfo({
+  new CheckingSubAccountInfo( {
     balance: 23583,
-  }),
-  new SavingsSubAccountInfo({
+  } ),
+  new SavingsSubAccountInfo( {
     balance: 99121,
-  }),
-  new CheckingSubAccountInfo({
+  } ),
+  new CheckingSubAccountInfo( {
     balance: 11,
-  }),
-  new SavingsSubAccountInfo({
+  } ),
+  new SavingsSubAccountInfo( {
     balance: 82308,
-  }),
-];
+  } ),
+]
 
 
 export type Props = {
   navigation: any;
 };
 
-const SelectSubAccountSourcesScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const accountShell = useAccountShellFromNavigation(navigation);
-  const [selectedSourceIDs, setSelectedSourceIDs] = useState<Set<string>>(new Set());
+const SelectSubAccountSourcesScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const accountShell = useAccountShellFromNavigation( navigation )
+  const [ selectedSourceIDs, setSelectedSourceIDs ] = useState<Set<string>>( new Set() )
   // const selectableSources = useReassignableSourcesForAccountShell(accountShell);
-  const selectableSources = sampleSources;
+  const selectableSources = sampleSources
 
-  const canProceed = useMemo(() => {
-    return selectedSourceIDs.size > 0;
-  }, [selectedSourceIDs]);
+  const canProceed = useMemo( () => {
+    return selectedSourceIDs.size > 0
+  }, [ selectedSourceIDs ] )
 
-  const selectedSources = useMemo(() => {
-    return selectableSources.filter(source => selectedSourceIDs.has(source.id));
-  }, [selectedSourceIDs]);
+  const selectedSources = useMemo( () => {
+    return selectableSources.filter( source => selectedSourceIDs.has( source.id ) )
+  }, [ selectedSourceIDs ] )
 
-  const selectedTransactionIDs = useMemo(() => {
-    selectedSources.flatMap(subAccountInfo => subAccountInfo.transactionIDs);
-  }, [selectedSources]);
+  const selectedTransactionIDs = useMemo( () => {
+    selectedSources.flatMap( subAccountInfo => subAccountInfo.transactionIDs )
+  }, [ selectedSources ] )
 
-  function handleSourceSelection(source: SubAccountDescribing) {
-    if (selectedSourceIDs.has(source.id)) {
-      selectedSourceIDs.delete(source.id);
+  function handleSourceSelection( source: SubAccountDescribing ) {
+    if ( selectedSourceIDs.has( source.id ) ) {
+      selectedSourceIDs.delete( source.id )
     } else {
-      selectedSourceIDs.add(source.id);
+      selectedSourceIDs.add( source.id )
     }
 
-    setSelectedSourceIDs(new Set(selectedSourceIDs));
+    setSelectedSourceIDs( new Set( selectedSourceIDs ) )
   }
 
   function handleProceedButtonPress() {
-    navigation.navigate('ReassignTransactionsSelectDestination', {
+    navigation.navigate( 'ReassignTransactionsSelectDestination', {
       accountShellID: accountShell.id,
       reassignmentKind: XPubSourceKind.DESIGNATED,
       selectedTransactionIDs,
-    });
+    } )
   }
 
   return (
@@ -92,10 +90,10 @@ const SelectSubAccountSourcesScreen: React.FC<Props> = ({
         />
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -107,6 +105,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: 'center',
   },
-});
+} )
 
-export default SelectSubAccountSourcesScreen;
+export default SelectSubAccountSourcesScreen

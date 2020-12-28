@@ -26,7 +26,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ( { subAccountInfo, } ) => {
 
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderText}>{title}</Text>
+      <Text style={ListStyles.infoHeaderSubtitleText}>{title}</Text>
     </View>
   )
 }

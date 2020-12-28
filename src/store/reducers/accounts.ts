@@ -40,26 +40,26 @@ import {
   REFRESH_ACCOUNT_SHELL,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
-} from "../actions/accounts";
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import { SERVICES_ENRICHED } from "../actions/storage";
+} from '../actions/accounts'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import { SERVICES_ENRICHED } from '../actions/storage'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from "../../common/constants/serviceTypes";
-import AccountShell from "../../common/data/models/AccountShell";
-import { updateAccountShells } from "../utils/accountShellMapping";
+} from '../../common/constants/serviceTypes'
+import AccountShell from '../../common/data/models/AccountShell'
+import { updateAccountShells } from '../utils/accountShellMapping'
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
-  receivingAddress: String;
+  receivingAddress: string;
   balances: {
-    balance: Number;
-    unconfirmedBalance: Number;
+    balance: number;
+    unconfirmedBalance: number;
   };
   transactions: any;
   transfer: {
@@ -68,36 +68,40 @@ const ACCOUNT_VARS: {
     stage1: any;
     stage2: any;
     stage3: any;
-    txid: String;
+    txid: string;
   };
   loading: {
-    receivingAddress: Boolean;
-    balances: Boolean;
-    transactions: Boolean;
-    balanceTx: Boolean;
-    derivativeBalanceTx: Boolean;
-    transfer: Boolean;
-    testcoins: Boolean;
+    receivingAddress: boolean;
+    balances: boolean;
+    transactions: boolean;
+    balanceTx: boolean;
+    derivativeBalanceTx: boolean;
+    transfer: boolean;
+    testcoins: boolean;
   };
   donationAccount: {
-    settedup: Boolean;
-    loading: Boolean;
+    settedup: boolean;
+    loading: boolean;
   };
 } = {
   service: null,
-  receivingAddress: "",
+  receivingAddress: '',
   balances: {
     balance: 0,
     unconfirmedBalance: 0,
   },
-  transactions: {},
+  transactions: {
+  },
   transfer: {
     details: [],
-    executed: "",
-    stage1: {},
-    stage2: {},
-    stage3: {},
-    txid: "",
+    executed: '',
+    stage1: {
+    },
+    stage2: {
+    },
+    stage3: {
+    },
+    txid: '',
   },
   loading: {
     receivingAddress: false,
@@ -112,7 +116,7 @@ const ACCOUNT_VARS: {
     settedup: false,
     loading: false,
   },
-};
+}
 
 export type AccountsState = {
   servicesEnriched: boolean;
@@ -191,556 +195,566 @@ const initialState: AccountsState = {
   hasAccountShellMergeFailed: false,
   accountShellMergeSource: null,
   accountShellMergeDestination: null,
-};
+}
 
-export default (state: AccountsState = initialState, action): AccountsState => {
-  const accountType = action.payload ? action.payload.serviceType : null;
+export default ( state: AccountsState = initialState, action ): AccountsState => {
+  const accountType = action.payload ? action.payload.serviceType : null
 
-  switch (action.type) {
-    case TESTCOINS_RECEIVED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          service: action.payload.service,
-        },
-      };
-
-    case TRANSACTIONS_FETCHED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transactions: action.payload.transactions,
-          loading: {
-            ...state[accountType].loading,
-            transactions: false,
-          },
-        },
-      };
-
-    case TRANSFER_ST1_EXECUTED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            stage1: { ...action.payload.result },
-            executed: "ST1",
-          },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
-          },
-        },
-      };
-
-    case TRANSFER_ST1_FAILED:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            stage1: {
-              ...state[accountType].transfer.stage1,
-              failed: true,
-              ...action.payload.errorDetails,
-            },
-          },
-          loading: {
-            ...state[accountType].loading,
-            transfer: false,
-          },
-        },
-      };
-
-    case ADD_TRANSFER_DETAILS:
-      console.log("state[accountType].transfer", state[accountType]);
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            details: [
-              ...state[accountType].transfer.details,
-              action.payload.recipientData,
-            ],
-          },
-        },
-      };
-
-
-      
-    case REMOVE_TRANSFER_DETAILS:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          transfer: {
-            ...state[accountType].transfer,
-            details: [...state[accountType].transfer.details].filter(
-              (item) => item !== action.payload.recipientData
-            ),
-          },
-        },
-      };
-
-    case CLEAR_TRANSFER:
-      if (!action.payload.stage && initialState[accountType])
+  switch ( action.type ) {
+      case TESTCOINS_RECEIVED:
         return {
           ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...initialState[accountType].transfer,
-            },
+          [ accountType ]: {
+            ...state[ accountType ],
+            service: action.payload.service,
           },
-        };
-      else if (action.payload.stage === "stage1")
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...state[accountType].transfer,
-              stage1: {},
-              stage2: {},
-              stage3: {},
-              executed: "",
-            },
-          },
-        };
-      else if (action.payload.stage === "stage2")
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...state[accountType].transfer,
-              stage2: {},
-              stage3: {},
-              executed: "ST1",
-            },
-          },
-        };
-      else if (action.payload.stage === "stage3")
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...state[accountType].transfer,
-              stage3: {},
-              executed: "ST2",
-            },
-          },
-        };
+        }
 
-    case TRANSFER_ST2_EXECUTED:
-      switch (action.payload.serviceType) {
-        case REGULAR_ACCOUNT || TEST_ACCOUNT:
-          return {
-            ...state,
-            [accountType]: {
-              ...state[accountType],
-              transfer: {
-                ...state[accountType].transfer,
-                txid: action.payload.result,
-                executed: "ST2",
+      case TRANSACTIONS_FETCHED:
+        return {
+          ...state,
+          [ accountType ]: {
+            ...state[ accountType ],
+            transactions: action.payload.transactions,
+            loading: {
+              ...state[ accountType ].loading,
+              transactions: false,
+            },
+          },
+        }
+
+      case TRANSFER_ST1_EXECUTED:
+        return {
+          ...state,
+          [ accountType ]: {
+            ...state[ accountType ],
+            transfer: {
+              ...state[ accountType ].transfer,
+              stage1: {
+                ...action.payload.result 
               },
-              loading: {
-                ...state[accountType].loading,
-                transfer: false,
-              },
-            },
-          };
-
-        case SECURE_ACCOUNT:
-          return {
-            ...state,
-            [accountType]: {
-              ...state[accountType],
-              transfer: {
-                ...state[accountType].transfer,
-                stage2: { ...action.payload.result },
-                executed: "ST2",
-              },
-              loading: {
-                ...state[accountType].loading,
-                transfer: false,
-              },
-            },
-          };
-      }
-
-    case ALTERNATE_TRANSFER_ST2_EXECUTED:
-      if (state[accountType] && state[accountType].transfer)
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...state[accountType].transfer,
-              txid: action.payload.result,
-              executed: "ST2",
+              executed: 'ST1',
             },
             loading: {
-              ...state[accountType].loading,
+              ...state[ accountType ].loading,
               transfer: false,
             },
           },
-        };
+        }
 
-    case TRANSFER_ST2_FAILED:
-      if (state[accountType] && state[accountType].transfer)
+      case TRANSFER_ST1_FAILED:
         return {
           ...state,
-          [accountType]: {
-            ...state[accountType],
+          [ accountType ]: {
+            ...state[ accountType ],
             transfer: {
-              ...state[accountType].transfer,
-              stage2: {
-                ...state[accountType].transfer.stage2,
+              ...state[ accountType ].transfer,
+              stage1: {
+                ...state[ accountType ].transfer.stage1,
                 failed: true,
                 ...action.payload.errorDetails,
               },
             },
             loading: {
-              ...state[accountType].loading,
+              ...state[ accountType ].loading,
               transfer: false,
             },
           },
-        };
+        }
 
-    case TRANSFER_ST3_EXECUTED:
-      if (state[accountType] && state[accountType].transfer)
+      case ADD_TRANSFER_DETAILS:
+        console.log( 'state[accountType].transfer', state[ accountType ] )
         return {
           ...state,
-          [accountType]: {
-            ...state[accountType],
+          [ accountType ]: {
+            ...state[ accountType ],
             transfer: {
-              ...state[accountType].transfer,
-              txid: action.payload.result,
-              executing: false,
-            },
-            loading: {
-              ...state[accountType].loading,
-              transfer: false,
-            },
-          },
-        };
-
-    case TRANSFER_ST3_FAILED:
-      if (state[accountType] && state[accountType].transfer)
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            transfer: {
-              ...state[accountType].transfer,
-              stage3: {
-                ...state[accountType].transfer.stage3,
-                failed: true,
-                ...action.payload.errorDetails,
-              },
-            },
-            loading: {
-              ...state[accountType].loading,
-              transfer: false,
-            },
-          },
-        };
-
-    case SERVICES_ENRICHED:
-      const { services } = action.payload;
-      if (action.payload.services)
-        return {
-          ...state,
-          [REGULAR_ACCOUNT]: {
-            ...state[REGULAR_ACCOUNT],
-            service: action.payload.services[REGULAR_ACCOUNT],
-          },
-          [TEST_ACCOUNT]: {
-            ...state[TEST_ACCOUNT],
-            service: action.payload.services[TEST_ACCOUNT],
-          },
-          [SECURE_ACCOUNT]: {
-            ...state[SECURE_ACCOUNT],
-            service: action.payload.services[SECURE_ACCOUNT],
-          },
-          servicesEnriched: true,
-          accountShells: updateAccountShells(services, state.accountShells),
-        };
-
-    case ACCOUNTS_LOADING:
-      if (state[accountType])
-        return {
-          ...state,
-          [accountType]: {
-            ...state[accountType],
-            loading: {
-              ...state[accountType].loading,
-              [action.payload.beingLoaded]: !state[accountType].loading[
-                action.payload.beingLoaded
+              ...state[ accountType ].transfer,
+              details: [
+                ...state[ accountType ].transfer.details,
+                action.payload.recipientData,
               ],
             },
           },
-        };
+        }
 
-    case ACCOUNTS_SYNCHED:
-      return {
-        ...state,
-        accountsSynched: action.payload.synched,
-      };
 
-    case EXCHANGE_RATE_CALCULATED:
-      return {
-        ...state,
-        exchangeRates: action.payload.exchangeRates,
-      };
-
-    case SECONDARY_XPRIV_GENERATED:
-      return {
-        ...state,
-        additional: {
-          secure: {
-            xprivGenerated: action.payload.generated,
+      
+      case REMOVE_TRANSFER_DETAILS:
+        return {
+          ...state,
+          [ accountType ]: {
+            ...state[ accountType ],
+            transfer: {
+              ...state[ accountType ].transfer,
+              details: [ ...state[ accountType ].transfer.details ].filter(
+                ( item ) => item !== action.payload.recipientData
+              ),
+            },
           },
-        },
-      };
+        }
 
-    // case TWO_FA_RESETTED:
-    //   return {
-    //     ...state,
-    //     additional: {
-    //       secure: {
-    //         twoFAResetted: action.payload.resetted,
-    //       },
-    //     },
-    //   };
+      case CLEAR_TRANSFER:
+        if ( !action.payload.stage && initialState[ accountType ] )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...initialState[ accountType ].transfer,
+              },
+            },
+          }
+        else if ( action.payload.stage === 'stage1' )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                stage1: {
+                },
+                stage2: {
+                },
+                stage3: {
+                },
+                executed: '',
+              },
+            },
+          }
+        else if ( action.payload.stage === 'stage2' )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                stage2: {
+                },
+                stage3: {
+                },
+                executed: 'ST1',
+              },
+            },
+          }
+        else if ( action.payload.stage === 'stage3' )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                stage3: {
+                },
+                executed: 'ST2',
+              },
+            },
+          }
 
-    // TODO: I don't think averageTxFees should be a wallet-wide concern.
-    case AVERAGE_TX_FEE:
-      return {
-        ...state,
-        averageTxFees: action.payload.averageTxFees,
-      };
+      case TRANSFER_ST2_EXECUTED:
+        switch ( action.payload.serviceType ) {
+            case REGULAR_ACCOUNT || TEST_ACCOUNT:
+              return {
+                ...state,
+                [ accountType ]: {
+                  ...state[ accountType ],
+                  transfer: {
+                    ...state[ accountType ].transfer,
+                    txid: action.payload.result,
+                    executed: 'ST2',
+                  },
+                  loading: {
+                    ...state[ accountType ].loading,
+                    transfer: false,
+                  },
+                },
+              }
 
-    case SETUP_DONATION_ACCOUNT:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          donationAccount: {
-            settedup: false,
-            loading: true,
+            case SECURE_ACCOUNT:
+              return {
+                ...state,
+                [ accountType ]: {
+                  ...state[ accountType ],
+                  transfer: {
+                    ...state[ accountType ].transfer,
+                    stage2: {
+                      ...action.payload.result 
+                    },
+                    executed: 'ST2',
+                  },
+                  loading: {
+                    ...state[ accountType ].loading,
+                    transfer: false,
+                  },
+                },
+              }
+        }
+
+      case ALTERNATE_TRANSFER_ST2_EXECUTED:
+        if ( state[ accountType ] && state[ accountType ].transfer )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                txid: action.payload.result,
+                executed: 'ST2',
+              },
+              loading: {
+                ...state[ accountType ].loading,
+                transfer: false,
+              },
+            },
+          }
+
+      case TRANSFER_ST2_FAILED:
+        if ( state[ accountType ] && state[ accountType ].transfer )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                stage2: {
+                  ...state[ accountType ].transfer.stage2,
+                  failed: true,
+                  ...action.payload.errorDetails,
+                },
+              },
+              loading: {
+                ...state[ accountType ].loading,
+                transfer: false,
+              },
+            },
+          }
+
+      case TRANSFER_ST3_EXECUTED:
+        if ( state[ accountType ] && state[ accountType ].transfer )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                txid: action.payload.result,
+                executing: false,
+              },
+              loading: {
+                ...state[ accountType ].loading,
+                transfer: false,
+              },
+            },
+          }
+
+      case TRANSFER_ST3_FAILED:
+        if ( state[ accountType ] && state[ accountType ].transfer )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              transfer: {
+                ...state[ accountType ].transfer,
+                stage3: {
+                  ...state[ accountType ].transfer.stage3,
+                  failed: true,
+                  ...action.payload.errorDetails,
+                },
+              },
+              loading: {
+                ...state[ accountType ].loading,
+                transfer: false,
+              },
+            },
+          }
+
+      case SERVICES_ENRICHED:
+        const { services } = action.payload
+        if ( action.payload.services )
+          return {
+            ...state,
+            [ REGULAR_ACCOUNT ]: {
+              ...state[ REGULAR_ACCOUNT ],
+              service: action.payload.services[ REGULAR_ACCOUNT ],
+            },
+            [ TEST_ACCOUNT ]: {
+              ...state[ TEST_ACCOUNT ],
+              service: action.payload.services[ TEST_ACCOUNT ],
+            },
+            [ SECURE_ACCOUNT ]: {
+              ...state[ SECURE_ACCOUNT ],
+              service: action.payload.services[ SECURE_ACCOUNT ],
+            },
+            servicesEnriched: true,
+            accountShells: updateAccountShells( services, state.accountShells ),
+          }
+
+      case ACCOUNTS_LOADING:
+        if ( state[ accountType ] )
+          return {
+            ...state,
+            [ accountType ]: {
+              ...state[ accountType ],
+              loading: {
+                ...state[ accountType ].loading,
+                [ action.payload.beingLoaded ]: !state[ accountType ].loading[
+                  action.payload.beingLoaded
+                ],
+              },
+            },
+          }
+
+      case ACCOUNTS_SYNCHED:
+        return {
+          ...state,
+          accountsSynched: action.payload.synched,
+        }
+
+      case EXCHANGE_RATE_CALCULATED:
+        return {
+          ...state,
+          exchangeRates: action.payload.exchangeRates,
+        }
+
+      case SECONDARY_XPRIV_GENERATED:
+        return {
+          ...state,
+          additional: {
+            secure: {
+              xprivGenerated: action.payload.generated,
+            },
           },
-        },
-      };
+        }
 
-    case SETTED_DONATION_ACC:
-      return {
-        ...state,
-        [accountType]: {
-          ...state[accountType],
-          donationAccount: {
-            ...state[accountType].donationAccount,
-            settedup: action.payload.successful,
-            loading: false,
+      // case TWO_FA_RESETTED:
+      //   return {
+      //     ...state,
+      //     additional: {
+      //       secure: {
+      //         twoFAResetted: action.payload.resetted,
+      //       },
+      //     },
+      //   }
+
+        // TODO: I don't think averageTxFees should be a wallet-wide concern.
+      case AVERAGE_TX_FEE:
+        return {
+          ...state,
+          averageTxFees: action.payload.averageTxFees,
+        }
+
+      case SETUP_DONATION_ACCOUNT:
+        return {
+          ...state,
+          [ accountType ]: {
+            ...state[ accountType ],
+            donationAccount: {
+              settedup: false,
+              loading: true,
+            },
           },
-        },
-      };
+        }
 
-    case ADD_NEW_ACCOUNT_SHELL:
-      return {
-        ...state,
-        isGeneratingNewAccountShell: true,
-        hasNewAccountShellGenerationSucceeded: false,
-        hasNewAccountShellGenerationFailed: false,
-      };
+      case SETTED_DONATION_ACC:
+        return {
+          ...state,
+          [ accountType ]: {
+            ...state[ accountType ],
+            donationAccount: {
+              ...state[ accountType ].donationAccount,
+              settedup: action.payload.successful,
+              loading: false,
+            },
+          },
+        }
 
-    case NEW_ACCOUNT_SHELL_ADDED:
-      return {
-        ...state,
-        isGeneratingNewAccountShell: false,
-        hasNewAccountShellGenerationSucceeded: true,
-        accountShells: state.accountShells.concat(action.payload),
-      };
+      case ADD_NEW_ACCOUNT_SHELL:
+        return {
+          ...state,
+          isGeneratingNewAccountShell: true,
+          hasNewAccountShellGenerationSucceeded: false,
+          hasNewAccountShellGenerationFailed: false,
+        }
 
-    case NEW_ACCOUNT_ADD_FAILED:
-      return {
-        ...state,
-        isGeneratingNewAccountShell: false,
-        hasNewAccountShellGenerationSucceeded: false,
-        hasNewAccountShellGenerationFailed: true,
-      };
+      case NEW_ACCOUNT_SHELL_ADDED:
+        return {
+          ...state,
+          isGeneratingNewAccountShell: false,
+          hasNewAccountShellGenerationSucceeded: true,
+          accountShells: state.accountShells.concat( action.payload ),
+        }
 
-    case ADD_NEW_ACCOUNT_SHELL_COMPLETED:
-      return {
-        ...state,
-        isGeneratingNewAccountShell: false,
-        hasNewAccountShellGenerationSucceeded: false,
-        hasNewAccountShellGenerationFailed: false,
-      };
+      case NEW_ACCOUNT_ADD_FAILED:
+        return {
+          ...state,
+          isGeneratingNewAccountShell: false,
+          hasNewAccountShellGenerationSucceeded: false,
+          hasNewAccountShellGenerationFailed: true,
+        }
 
-    case RESTORED_ACCOUNT_SHELLS:
-      return {
-        ...state,
-        accountShells: action.payload.accountShells,
-      };
+      case ADD_NEW_ACCOUNT_SHELL_COMPLETED:
+        return {
+          ...state,
+          isGeneratingNewAccountShell: false,
+          hasNewAccountShellGenerationSucceeded: false,
+          hasNewAccountShellGenerationFailed: false,
+        }
 
-    case ACCOUNT_SETTINGS_UPDATED:
+      case RESTORED_ACCOUNT_SHELLS:
+        return {
+          ...state,
+          accountShells: action.payload.accountShells,
+        }
+
+      case ACCOUNT_SETTINGS_UPDATED:
       // TODO: Implement Logic for updating the list of account payloads
-      return {
-        ...state,
-        isUpdatingAccountSettings: false,
-        hasAccountSettingsUpdateSucceeded: true,
-        hasAccountSettingsUpdateFailed: false,
-      };
+        return {
+          ...state,
+          isUpdatingAccountSettings: false,
+          hasAccountSettingsUpdateSucceeded: true,
+          hasAccountSettingsUpdateFailed: false,
+        }
 
-    case ACCOUNT_SETTINGS_UPDATE_FAILED:
-      return {
-        ...state,
-        isUpdatingAccountSettings: false,
-        hasAccountSettingsUpdateSucceeded: false,
-        hasAccountSettingsUpdateFailed: true,
-      };
+      case ACCOUNT_SETTINGS_UPDATE_FAILED:
+        return {
+          ...state,
+          isUpdatingAccountSettings: false,
+          hasAccountSettingsUpdateSucceeded: false,
+          hasAccountSettingsUpdateFailed: true,
+        }
 
-    case SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED:
-      return {
-        ...state,
-        isUpdatingAccountSettings: false,
-        hasAccountSettingsUpdateSucceeded: false,
-        hasAccountSettingsUpdateFailed: false,
-      };
+      case SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED:
+        return {
+          ...state,
+          isUpdatingAccountSettings: false,
+          hasAccountSettingsUpdateSucceeded: false,
+          hasAccountSettingsUpdateFailed: false,
+        }
 
-    case REASSIGN_TRANSACTIONS:
-      return {
-        ...state,
-        transactionReassignmentDestinationID: action.payload.destinationID,
-        isTransactionReassignmentInProgress: true,
-        hasTransactionReassignmentSucceeded: false,
-        hasTransactionReassignmentFailed: false,
-      };
+      case REASSIGN_TRANSACTIONS:
+        return {
+          ...state,
+          transactionReassignmentDestinationID: action.payload.destinationID,
+          isTransactionReassignmentInProgress: true,
+          hasTransactionReassignmentSucceeded: false,
+          hasTransactionReassignmentFailed: false,
+        }
 
-    case TRANSACTION_REASSIGNMENT_SUCCEEDED:
-      return {
-        ...state,
-        isTransactionReassignmentInProgress: false,
-        hasTransactionReassignmentSucceeded: true,
-        hasTransactionReassignmentFailed: false,
-      };
+      case TRANSACTION_REASSIGNMENT_SUCCEEDED:
+        return {
+          ...state,
+          isTransactionReassignmentInProgress: false,
+          hasTransactionReassignmentSucceeded: true,
+          hasTransactionReassignmentFailed: false,
+        }
 
-    case TRANSACTION_REASSIGNMENT_FAILED:
-      return {
-        ...state,
-        isTransactionReassignmentInProgress: false,
-        hasTransactionReassignmentSucceeded: false,
-        hasTransactionReassignmentFailed: true,
-      };
+      case TRANSACTION_REASSIGNMENT_FAILED:
+        return {
+          ...state,
+          isTransactionReassignmentInProgress: false,
+          hasTransactionReassignmentSucceeded: false,
+          hasTransactionReassignmentFailed: true,
+        }
 
-    case TRANSACTION_REASSIGNMENT_COMPLETED:
-      return {
-        ...state,
-        transactionReassignmentDestinationID: null,
-        isTransactionReassignmentInProgress: false,
-        hasTransactionReassignmentSucceeded: false,
-        hasTransactionReassignmentFailed: false,
-      };
+      case TRANSACTION_REASSIGNMENT_COMPLETED:
+        return {
+          ...state,
+          transactionReassignmentDestinationID: null,
+          isTransactionReassignmentInProgress: false,
+          hasTransactionReassignmentSucceeded: false,
+          hasTransactionReassignmentFailed: false,
+        }
 
-    case MERGE_ACCOUNT_SHELLS:
-      return {
-        ...state,
-        accountShellMergeSource: action.payload.source,
-        accountShellMergeDestination: action.payload.destination,
-        isAccountShellMergeInProgress: true,
-        hasAccountShellMergeSucceeded: false,
-        hasAccountShellMergeFailed: false,
-      };
+      case MERGE_ACCOUNT_SHELLS:
+        return {
+          ...state,
+          accountShellMergeSource: action.payload.source,
+          accountShellMergeDestination: action.payload.destination,
+          isAccountShellMergeInProgress: true,
+          hasAccountShellMergeSucceeded: false,
+          hasAccountShellMergeFailed: false,
+        }
 
-    case ACCOUNT_SHELL_MERGE_SUCCEEDED:
-      return {
-        ...state,
-        isAccountShellMergeInProgress: false,
-        hasAccountShellMergeSucceeded: true,
-        hasAccountShellMergeFailed: false,
-      };
+      case ACCOUNT_SHELL_MERGE_SUCCEEDED:
+        return {
+          ...state,
+          isAccountShellMergeInProgress: false,
+          hasAccountShellMergeSucceeded: true,
+          hasAccountShellMergeFailed: false,
+        }
 
-    case ACCOUNT_SHELL_MERGE_FAILED:
-      return {
-        ...state,
-        isAccountShellMergeInProgress: false,
-        hasAccountShellMergeSucceeded: false,
-        hasAccountShellMergeFailed: true,
-      };
+      case ACCOUNT_SHELL_MERGE_FAILED:
+        return {
+          ...state,
+          isAccountShellMergeInProgress: false,
+          hasAccountShellMergeSucceeded: false,
+          hasAccountShellMergeFailed: true,
+        }
 
-    case ACCOUNT_SHELL_MERGE_COMPLETED:
-      return {
-        ...state,
-        accountShellMergeSource: null,
-        accountShellMergeDestination: null,
-        isAccountShellMergeInProgress: false,
-        hasAccountShellMergeSucceeded: false,
-        hasAccountShellMergeFailed: false,
-      };
+      case ACCOUNT_SHELL_MERGE_COMPLETED:
+        return {
+          ...state,
+          accountShellMergeSource: null,
+          accountShellMergeDestination: null,
+          isAccountShellMergeInProgress: false,
+          hasAccountShellMergeSucceeded: false,
+          hasAccountShellMergeFailed: false,
+        }
 
-    case ACCOUNT_SHELLS_ORDER_UPDATED:
-      return {
-        ...state,
-        accountShells: action.payload.map(updateDisplayOrderForSortedShell),
-      };
+      case ACCOUNT_SHELLS_ORDER_UPDATED:
+        return {
+          ...state,
+          accountShells: action.payload.map( updateDisplayOrderForSortedShell ),
+        }
 
-    case ACCOUNT_SHELL_ORDERED_TO_FRONT:
-      const index = state.accountShells.findIndex(
-        (shell) => shell.id == action.payload.id
-      );
+      case ACCOUNT_SHELL_ORDERED_TO_FRONT:
+        const index = state.accountShells.findIndex(
+          ( shell ) => shell.id == action.payload.id
+        )
 
-      const shellToMove = state.accountShells.splice(index);
+        const shellToMove = state.accountShells.splice( index )
 
-      return {
-        ...state,
-        accountShells: [...shellToMove, ...state.accountShells].map(
-          updateDisplayOrderForSortedShell
-        ),
-      };
+        return {
+          ...state,
+          accountShells: [ ...shellToMove, ...state.accountShells ].map(
+            updateDisplayOrderForSortedShell
+          ),
+        }
 
-    case REMAP_ACCOUNT_SHELLS:
-      return {
-        ...state,
-        accountShells: updateAccountShells(action.payload.services, []),
-      };
+      case REMAP_ACCOUNT_SHELLS:
+        return {
+          ...state,
+          accountShells: updateAccountShells( action.payload.services, [] ),
+        }
 
-    case REFRESH_ACCOUNT_SHELL:
-      state.accountShells.find(
-        (shell) => shell.id == action.payload.shell.id
-      ).isSyncInProgress = true;
+      case REFRESH_ACCOUNT_SHELL:
+        state.accountShells.find(
+          ( shell ) => shell.id == action.payload.shell.id
+        ).isSyncInProgress = true
 
-      return {
-        ...state,
-      };
+        return {
+          ...state,
+        }
 
-    case ACCOUNT_SHELL_REFRESH_COMPLETED:
-      state.accountShells.find(
-        (shell) => shell.id == action.payload.id
-      ).isSyncInProgress = false;
+      case ACCOUNT_SHELL_REFRESH_COMPLETED:
+        state.accountShells.find(
+          ( shell ) => shell.id == action.payload.id
+        ).isSyncInProgress = false
 
-      return {
-        ...state,
-      };
+        return {
+          ...state,
+        }
 
-    default:
-      return state;
+      default:
+        return state
   }
-};
+}
 
 function updateDisplayOrderForSortedShell(
   accountShell: AccountShell,
   sortedIndex: number
 ): AccountShell {
-  accountShell.displayOrder = sortedIndex + 1;
+  accountShell.displayOrder = sortedIndex + 1
 
-  return accountShell;
+  return accountShell
 }

@@ -51,6 +51,8 @@ import {
   setPDFInfo,
   SHARE_PDF,
   CONFIRM_PDF_SHARED,
+  DOWNLOAD_PDFSHARE_HEALTH,
+  downloadedPdfShare,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -845,6 +847,132 @@ export const downloadMetaShareHealthWatcher = createWatcher(
   downloadMetaShareWorker,
   DOWNLOAD_MSHARE_HEALTH
 );
+
+
+export function* downloadPdfShareWorker({ payload }) {
+  yield put(switchS3LoadingStatus("downloadPdfShare"));
+
+  const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
+  
+  const s3Service: S3Service = yield select((state) => state.health.service);
+
+  const { DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database
+  );
+
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+  const data = yield LevelHealth.decryptWithAnswer(encryptedKey, otp);
+  const data1 = JSON.parse(data.decryptedString);
+  let res = yield call(S3Service.downloadPdfShare, data1.messageId, data1.key);
+
+  console.log({ res });
+  if (res.status === 200) {
+    const { metaShare, encryptedDynamicNonPMDD } = res.data;
+    let updatedBackup;
+    if (payload.downloadType !== "recovery") {
+      //TODO: activate DNP Transportation Layer for Hexa Premium
+      // const dynamicNonPMDD = {
+      //   ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
+      //   META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
+      //     ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
+      //     : [metaShare],
+      // };
+
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+          [metaShare.meta.tag]: {
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
+        },
+        // DYNAMIC_NONPMDD: dynamicNonPMDD,
+      };
+
+      console.log({ updatedBackup });
+      yield call(insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup,
+        },
+      });
+
+      // if (payload.downloadType !== "recovery") {
+      //   let shareArray = [
+      //     {
+      //       walletId: walletID,
+      //       shareId: metaShare.shareId,
+      //       reshareVersion: metaShare.meta.reshareVersion,
+      //       updatedAt: moment(new Date()).valueOf(),
+      //       shareType: "contact",
+      //       status: "accessible",
+      //     },
+      //   ];
+      //   yield put(updateMSharesHealth(shareArray));
+      // }
+      // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
+      yield put(downloadedPdfShare(otp, true));
+      //yield put(updateMSharesHealth());
+    } else {
+      let updatedRecoveryShares = {};
+      let updated = false;
+      if (payload.replaceIndex === 0 || payload.replaceIndex) {
+        // replacing stored key w/ scanned from Guardian's help-restore
+        updatedRecoveryShares = {
+          ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+          [payload.replaceIndex]: {
+            REQUEST_DETAILS: { KEY: encryptedKey },
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
+        };
+      } else {
+        Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(
+          (objectKey) => {
+            const recoveryShare =
+              DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
+            console.log("recoveryShare", recoveryShare, objectKey);
+            if (
+              recoveryShare.REQUEST_DETAILS &&
+              recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+            ) {
+              updatedRecoveryShares[objectKey] = {
+                REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+                META_SHARE: metaShare,
+                ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+              };
+              updated = true;
+            } else {
+              updatedRecoveryShares[objectKey] = recoveryShare;
+            }
+          }
+        );
+      }
+      console.log("updatedRecoveryShares", updatedRecoveryShares);
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        RECOVERY_SHARES: updatedRecoveryShares,
+      };
+      console.log("updatedBackup", updatedBackup);
+      // yield put(downloadedMShare(otp, true));
+      yield call(insertDBWorker, {
+        payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      });
+    }
+  } else {
+    if (res.err === "ECONNABORTED") requestTimedout();
+    yield put(ErrorReceiving(true));
+    // Alert.alert('Download Failed!', res.err);
+    yield put(downloadedPdfShare(otp, false, res.err));
+  }
+  yield put(switchS3LoadingStatus("downloadPdfShare"));
+}
+
+export const downloadPdfShareHealthWatcher = createWatcher(
+  downloadPdfShareWorker,
+  DOWNLOAD_PDFSHARE_HEALTH
+);
+
 
 function* recoverWalletWorker({ payload }) {
   yield put(switchS3LoadingStatus("restoreWallet"));

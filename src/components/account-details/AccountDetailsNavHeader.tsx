@@ -1,22 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native';
-import Colors from '../../common/Colors';
-import ScreenHeaderStyles from '../../common/Styles/ScreenHeaders';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch';
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode';
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import { currencyKindSet } from '../../store/actions/preferences';
-import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState';
+import React, { useMemo } from 'react'
+import { useDispatch } from 'react-redux'
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native'
+import Colors from '../../common/Colors'
+import ScreenHeaderStyles from '../../common/Styles/ScreenHeaders'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../MaterialCurrencyCodeIcon'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { currencyKindSet } from '../../store/actions/preferences'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import NoExchangeRateBottomSheet from '../../components/bottom-sheets/NoExchangeRateBottomSheet'
-import { useCallback } from 'react';
+import { useCallback } from 'react'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 
 export type Props = {
@@ -24,25 +24,25 @@ export type Props = {
   onBackPressed: () => void;
 };
 
-const AccountDetailsNavHeader: React.FC<Props> = ({
+const AccountDetailsNavHeader: React.FC<Props> = ( {
   accountShellID,
   onBackPressed,
-}: Props) => {
-  const dispatch = useDispatch();
-  const accountShell = useAccountShellForID(accountShellID);
-  const primarySubAccountInfo = usePrimarySubAccountForShell(accountShell);
+}: Props ) => {
+  const dispatch = useDispatch()
+  const accountShell = useAccountShellForID( accountShellID )
+  const primarySubAccountInfo = usePrimarySubAccountForShell( accountShell )
 
   const { exchangeRates } = useAccountsState()
-  const currencyCode = useCurrencyCode();
-  const currencyKind = useCurrencyKind();
+  const currencyCode = useCurrencyCode()
+  const currencyKind = useCurrencyKind()
 
-  const prefersBitcoin = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
-  const title = useMemo(() => {
-    return primarySubAccountInfo?.customDisplayName || primarySubAccountInfo?.defaultTitle || 'Account Details';
-  }, [accountShellID]);
+  const title = useMemo( () => {
+    return primarySubAccountInfo?.customDisplayName || primarySubAccountInfo?.defaultTitle || 'Account Details'
+  }, [ accountShellID ] )
 
 
   const {
@@ -50,7 +50,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
 
-  const showNoExchangeRateBottomSheet = useCallback(() => {
+  const showNoExchangeRateBottomSheet = useCallback( () => {
     presentBottomSheet(
       <NoExchangeRateBottomSheet
         onClickSetting={() => {
@@ -59,14 +59,16 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [0, '40%'],
+        snapPoints: [ 0, '40%' ],
       },
     )
-  }, [presentBottomSheet, dismissBottomSheet])
+  }, [ presentBottomSheet, dismissBottomSheet ] )
 
   return (
     <View>
-      <SafeAreaView style={{ flex: 0 }} />
+      <SafeAreaView style={{
+        flex: 0 
+      }} />
 
       <StatusBar
         backgroundColor={Colors.backgroundColor}
@@ -77,8 +79,12 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
 
         <View style={styles.mainContentContainer}>
           <TouchableOpacity
-            style={{ height: '100%', justifyContent: 'center', alignItems: 'center', flex: 0 }}
-            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
+            style={{
+              height: '100%', justifyContent: 'center', alignItems: 'center', flex: 0 
+            }}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20 
+            }}
             onPress={onBackPressed}
           >
             <FontAwesome
@@ -94,33 +100,33 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
 
           <View style={styles.currencyKindToggleContainer}>
             <CurrencyKindToggleSwitch
-              activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
-              inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
+              activeOnImage={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+              inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_dark.png' )}
               activeOffImage={
-                materialIconCurrencyCodes.includes(currencyCode) ?
+                materialIconCurrencyCodes.includes( currencyCode ) ?
                   <MaterialCurrencyCodeIcon
                     currencyCode={currencyCode}
                     color={Colors.white}
                     size={14}
                   />
-                  : getCurrencyImageByRegion(currencyCode, 'light')
+                  : getCurrencyImageByRegion( currencyCode, 'light' )
               }
               inactiveOffImage={
-                materialIconCurrencyCodes.includes(currencyCode) ?
+                materialIconCurrencyCodes.includes( currencyCode ) ?
                   <MaterialCurrencyCodeIcon
                     currencyCode={currencyCode}
                     color={Colors.blue}
                     size={14}
                   />
-                  : getCurrencyImageByRegion(currencyCode, 'dark')
+                  : getCurrencyImageByRegion( currencyCode, 'dark' )
               }
               trackColor={Colors.lightBlue}
               thumbColor={Colors.blue}
               onpress={() => {
-                (exchangeRates && exchangeRates[currencyCode])
-                  ? dispatch(currencyKindSet(
+                ( exchangeRates && exchangeRates[ currencyCode ] )
+                  ? dispatch( currencyKindSet(
                     prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                  ))
+                  ) )
                   : showNoExchangeRateBottomSheet()
               }}
               isOn={prefersBitcoin}
@@ -130,11 +136,11 @@ const AccountDetailsNavHeader: React.FC<Props> = ({
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   mainContentContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -150,6 +156,6 @@ const styles = StyleSheet.create({
   currencyKindToggleContainer: {
     flex: 0,
   },
-});
+} )
 
-export default AccountDetailsNavHeader;
+export default AccountDetailsNavHeader

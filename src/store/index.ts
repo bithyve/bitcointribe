@@ -20,17 +20,17 @@ import keeper from './reducers/keeper';
 
 
 const config = {
-  key: "root", // key is required
+  key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ["setupAndAuth", "loaders"],
-};
+  blacklist: [ 'setupAndAuth', 'loaders' ],
+}
 
 import {
   initDBWatcher,
   fetchDBWatcher,
   insertDBWatcher,
   servicesEnricherWatcher,
-} from "./sagas/storage";
+} from './sagas/storage'
 
 import {
   initSetupWatcher,
@@ -38,7 +38,7 @@ import {
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
-} from "./sagas/setupAndAuth";
+} from './sagas/setupAndAuth'
 
 import {
   fetchTransactionsWatcher,
@@ -66,7 +66,7 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
-} from "./sagas/accounts";
+} from './sagas/accounts'
 
 import {
   initHCWatcher,
@@ -89,19 +89,19 @@ import {
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
   sharePersonalCopyWatcher,
-} from "./sagas/sss";
+} from './sagas/sss'
 
 import {
   accountSyncWatcher,
   getQuoteWatcher,
   executeOrderWatcher,
   getBalancesWatcher,
-} from "./sagas/fbtc";
+} from './sagas/fbtc'
 
 import {
   updateFCMTokensWatcher,
   fetchNotificationsWatcher,
-} from "./sagas/notifications";
+} from './sagas/notifications'
 
 import {
   initializedTrustedContactWatcher,
@@ -115,7 +115,10 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
-} from "./sagas/trustedContacts";
+} from './sagas/trustedContacts'
+
+import nodeSettingsReducer from './reducers/nodeSettings'
+import { connectToBitHyveNodeWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 
 import {
   initHealthWatcher,
@@ -140,6 +143,7 @@ import {
   getPDFDataWatcher,
   sharePDFWatcher,
   confirmPDFSharedWatcher,
+  downloadPdfShareHealthWatcher
 } from './sagas/health';
 
 import {
@@ -220,6 +224,10 @@ const rootSaga = function* () {
     executeOrderWatcher,
     getBalancesWatcher,
 
+    // Node Settings
+    savePersonalNodeConfigurationWatcher,
+    connectToBitHyveNodeWatcher,
+
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
@@ -260,34 +268,35 @@ const rootSaga = function* () {
     getPDFDataWatcher,
     sharePDFWatcher,
     confirmPDFSharedWatcher,
-
+    downloadPdfShareHealthWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher
   ];
 
   yield all(
-    sagas.map((saga) =>
-      spawn(function* () {
-        while (true) {
+    sagas.map( ( saga ) =>
+      spawn( function* () {
+        while ( true ) {
           try {
-            yield call(saga);
-            break;
-          } catch (e) {
-            console.log(e);
+            yield call( saga )
+            break
+          } catch ( e ) {
+            console.log( e )
           }
         }
-      })
+      } )
     )
-  );
-};
+  )
+}
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
   health: healthReducer,
   fbtc: fBTCReducers,
+  nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
@@ -296,16 +305,16 @@ const rootReducer = combineReducers({
 });
 
 export default function makeStore() {
-  const sagaMiddleware = createSagaMiddleware();
-  const reducers = persistReducer(config, rootReducer);
+  const sagaMiddleware = createSagaMiddleware()
+  const reducers = persistReducer( config, rootReducer )
   const storeMiddleware = composeWithDevTools(
-    applyMiddleware(sagaMiddleware, thunk)
-  );
+    applyMiddleware( sagaMiddleware, thunk )
+  )
 
-  const store = createStore(reducers, storeMiddleware);
+  const store = createStore( reducers, storeMiddleware )
 
-  persistStore(store);
-  sagaMiddleware.run(rootSaga);
+  persistStore( store )
+  sagaMiddleware.run( rootSaga )
 
-  return store;
+  return store
 }

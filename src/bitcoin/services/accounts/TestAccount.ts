@@ -7,8 +7,8 @@ import {
 } from '../../utilities/Interface'
 
 export default class TestAccount extends BaseAccount {
-  public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json)
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json )
     const {
       mnemonic,
       passphrase,
@@ -57,7 +57,7 @@ export default class TestAccount extends BaseAccount {
       feeRates: any;
     } = hdWallet
 
-    return new TestAccount(mnemonic, passphrase, purpose, {
+    return new TestAccount( mnemonic, passphrase, purpose, {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -74,7 +74,7 @@ export default class TestAccount extends BaseAccount {
       newTransactions,
       trustedContactToDA,
       feeRates,
-    })
+    } )
   };
 
   constructor(
@@ -107,6 +107,6 @@ export default class TestAccount extends BaseAccount {
     },
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet
-    super(mnemonic, passphrase, dPathPurpose, stateVars, network)
+    super( mnemonic, passphrase, dPathPurpose, stateVars, network )
   }
 }

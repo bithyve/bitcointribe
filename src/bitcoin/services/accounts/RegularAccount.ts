@@ -6,8 +6,8 @@ import {
 } from '../../utilities/Interface'
 
 export default class RegularAccount extends BaseAccount {
-  public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json)
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json )
     const {
       mnemonic,
       passphrase,
@@ -53,7 +53,7 @@ export default class RegularAccount extends BaseAccount {
       feeRates: any;
     } = hdWallet
 
-    return new RegularAccount(mnemonic, passphrase, purpose, {
+    return new RegularAccount( mnemonic, passphrase, purpose, {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -67,7 +67,7 @@ export default class RegularAccount extends BaseAccount {
       newTransactions,
       trustedContactToDA,
       feeRates,
-    })
+    } )
   };
 
   constructor(
@@ -96,6 +96,6 @@ export default class RegularAccount extends BaseAccount {
       feeRates: any;
     },
   ) {
-    super(mnemonic, passphrase, dPathPurpose, stateVars)
+    super( mnemonic, passphrase, dPathPurpose, stateVars )
   }
 }

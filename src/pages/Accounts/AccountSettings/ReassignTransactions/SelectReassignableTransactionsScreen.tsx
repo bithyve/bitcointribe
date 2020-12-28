@@ -1,58 +1,56 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import TransactionDescribing from '../../../../common/data/models/Transactions/Interfaces';
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import sampleTransactions from '../../Details/SampleTransactions';
-import { Button } from 'react-native-elements';
-import ButtonStyles from '../../../../common/Styles/ButtonStyles';
-import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader';
-import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList';
-import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind';
-import CurrencyKind from '../../../../common/data/enums/CurrencyKind';
+import React, { useEffect, useMemo, useState } from 'react'
+import { View, StyleSheet } from 'react-native'
+import TransactionDescribing from '../../../../common/data/models/Transactions/Interfaces'
+import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import sampleTransactions from '../../Details/SampleTransactions'
+import { Button } from 'react-native-elements'
+import ButtonStyles from '../../../../common/Styles/ButtonStyles'
+import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader'
+import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList'
+import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
+import CurrencyKind from '../../../../common/data/enums/CurrencyKind'
 
 export type Props = {
   navigation: any;
 };
 
-const SelectReassignableTransactionsScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const accountShell = useAccountShellFromNavigation(navigation);
-  const [selectedTransactionIDs, setSelectedTransactionIDs] = useState<Set<string>>(new Set());
-  const [selectableTransactions, setSelectableTransactions] = useState<TransactionDescribing[]>([]);
+const SelectReassignableTransactionsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const accountShell = useAccountShellFromNavigation( navigation )
+  const [ selectedTransactionIDs, setSelectedTransactionIDs ] = useState<Set<string>>( new Set() )
+  const [ selectableTransactions, setSelectableTransactions ] = useState<TransactionDescribing[]>( [] )
 
-  const canProceed = useMemo(() => {
-    return selectedTransactionIDs.size > 0;
-  }, [selectedTransactionIDs]);
+  const canProceed = useMemo( () => {
+    return selectedTransactionIDs.size > 0
+  }, [ selectedTransactionIDs ] )
 
-  const selectedTransactions = useMemo(() => {
-    return selectableTransactions.filter(transaction => selectedTransactionIDs.has(transaction.txID));
-  }, [selectedTransactionIDs]);
+  const selectedTransactions = useMemo( () => {
+    return selectableTransactions.filter( transaction => selectedTransactionIDs.has( transaction.txID ) )
+  }, [ selectedTransactionIDs ] )
 
 
-  useEffect(() => {
+  useEffect( () => {
     // TODO: Devise some way to load selectable "anonymous" transactions for the
     // current account shell.
-    setSelectableTransactions(sampleTransactions);
-  }, [accountShell]);
+    setSelectableTransactions( sampleTransactions )
+  }, [ accountShell ] )
 
 
-  function handleTransactionSelection(transaction: TransactionDescribing) {
-    if (selectedTransactionIDs.has(transaction.txID)) {
-      selectedTransactionIDs.delete(transaction.txID);
+  function handleTransactionSelection( transaction: TransactionDescribing ) {
+    if ( selectedTransactionIDs.has( transaction.txID ) ) {
+      selectedTransactionIDs.delete( transaction.txID )
     } else {
-      selectedTransactionIDs.add(transaction.txID);
+      selectedTransactionIDs.add( transaction.txID )
     }
 
-    setSelectedTransactionIDs(new Set(selectedTransactionIDs));
+    setSelectedTransactionIDs( new Set( selectedTransactionIDs ) )
   }
 
   function handleProceedButtonPress() {
-    navigation.navigate('ReassignTransactionsSelectDestination', {
+    navigation.navigate( 'ReassignTransactionsSelectDestination', {
       accountShellID: accountShell.id,
       reassignmentKind: XPubSourceKind.ANONYMOUS,
-      selectedTransactionIDs: Array.from(selectedTransactionIDs),
-    });
+      selectedTransactionIDs: Array.from( selectedTransactionIDs ),
+    } )
   }
 
   return (
@@ -79,10 +77,10 @@ const SelectReassignableTransactionsScreen: React.FC<Props> = ({
         />
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -94,6 +92,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: 'center',
   },
-});
+} )
 
-export default SelectReassignableTransactionsScreen;
+export default SelectReassignableTransactionsScreen

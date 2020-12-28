@@ -1,5 +1,5 @@
-import { call, delay, put, select } from 'redux-saga/effects';
-import { createWatcher } from '../utils/utilities';
+import { call, delay, put, select } from 'redux-saga/effects'
+import { createWatcher } from '../utils/utilities'
 import {
   INIT_DB,
   dbInitialized,
@@ -27,95 +27,103 @@ import { walletCheckIn } from '../actions/trustedContacts';
 
 function* initDBWorker() {
   try {
-    yield call(dataManager.initialize);
-    yield put(dbInitialized(true));
-  } catch (err) {
-    console.log(err);
-    yield put(dbInitialized(false));
+    yield call( dataManager.initialize )
+    yield put( dbInitialized( true ) )
+  } catch ( err ) {
+    console.log( err )
+    yield put( dbInitialized( false ) )
   }
 }
 
-export const initDBWatcher = createWatcher(initDBWorker, INIT_DB);
+export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 
 function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
-    const key = yield select((state) => state.storage.key);
-    const database = yield call(dataManager.fetch, key);
-    if (key && database) {
-      yield call(servicesEnricherWorker, { payload: { database } });
-      yield put(dbFetched(database));
+    const key = yield select( ( state ) => state.storage.key )
+    const database = yield call( dataManager.fetch, key )
+    if ( key && database ) {
+      yield call( servicesEnricherWorker, {
+        payload: {
+          database 
+        } 
+      } )
+      yield put( dbFetched( database ) )
 
-      if (yield call(AsyncStorage.getItem, 'walletExists')) {
+      if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
-        yield put(walletCheckIn());
-        yield put(updateWalletImage());
-        yield put(startupSync());
+        yield put( walletCheckIn() )
+        yield put( updateWalletImage() )
+        yield put( startupSync() )
       }
     } else {
       // DB would be absent during wallet setup
     }
-  } catch (err) {
-    console.log(err);
+  } catch ( err ) {
+    console.log( err )
   }
 }
 
-export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
+export const fetchDBWatcher = createWatcher( fetchDBWorker, FETCH_FROM_DB )
 
-export function* insertDBWorker({ payload }) {
+export function* insertDBWorker( { payload } ) {
   try {
-    const storage = yield select((state) => state.storage);
-    const { database, insertedIntoDB, key } = storage;
-    if (!key) {
+    const storage = yield select( ( state ) => state.storage )
+    const { database, insertedIntoDB, key } = storage
+    if ( !key ) {
       // dispatch failure
-      console.log('Key missing');
-      return;
+      console.log( 'Key missing' )
+      return
     }
 
     const updatedDB = {
       ...database,
       ...payload,
-    };
+    }
 
     const inserted = yield call(
       dataManager.insert,
       updatedDB,
       key,
       insertedIntoDB,
-    );
-    if (!inserted) {
+    )
+    if ( !inserted ) {
       // dispatch failure
-      console.log('Failed to insert into DB');
-      return;
+      console.log( 'Failed to insert into DB' )
+      return
     }
-    yield put(dbInserted(payload));
+    yield put( dbInserted( payload ) )
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
-    yield call(servicesEnricherWorker, { payload: { database: updatedDB } });
-  } catch (err) {
-    console.log(err);
+    yield call( servicesEnricherWorker, {
+      payload: {
+        database: updatedDB 
+      } 
+    } )
+  } catch ( err ) {
+    console.log( err )
   }
 }
-export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
+export const insertDBWatcher = createWatcher( insertDBWorker, INSERT_INTO_DB )
 
-function* servicesEnricherWorker({ payload }) {
+function* servicesEnricherWorker( { payload } ) {
   try {
     const database = payload.database
       ? payload.database
-      : yield select((state) => state.storage.database);
-    if (!database) {
-      throw new Error('Database missing; services encrichment failed');
+      : yield select( ( state ) => state.storage.database )
+    if ( !database ) {
+      throw new Error( 'Database missing; services encrichment failed' )
     }
 
-    let dbVersion = database.VERSION;
-    let appVersion = DeviceInfo.getVersion();
-    if (appVersion === '0.7') {
-      appVersion = '0.7.0';
+    let dbVersion = database.VERSION
+    let appVersion = DeviceInfo.getVersion()
+    if ( appVersion === '0.7' ) {
+      appVersion = '0.7.0'
     }
-    if (appVersion === '0.8') {
-      appVersion = '0.8.0';
+    if ( appVersion === '0.8' ) {
+      appVersion = '0.8.0'
     }
-    if (appVersion === '0.9') {
-      appVersion = '0.9.0';
+    if ( appVersion === '0.9' ) {
+      appVersion = '0.9.0'
     }
     let services;
     let migrated = false;
@@ -185,12 +193,12 @@ function* servicesEnricherWorker({ payload }) {
         }
       } else {
         services = {
-          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+          REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+          SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+          S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
-            ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+            ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
             : new TrustedContactsService(),
           KEEPERS_INFO: KEEPERS_INFO
             ? KeeperService.fromJSON(KEEPERS_INFO)
@@ -202,12 +210,12 @@ function* servicesEnricherWorker({ payload }) {
       database.VERSION = DeviceInfo.getVersion();
       yield call(insertDBWorker, { payload: database });
     }
-  } catch (err) {
-    console.log(err);
+  } catch ( err ) {
+    console.log( err )
   }
 }
 
 export const servicesEnricherWatcher = createWatcher(
   servicesEnricherWorker,
   ENRICH_SERVICES,
-);
+)
