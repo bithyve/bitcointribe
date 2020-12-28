@@ -216,9 +216,7 @@ const TrustedContactHistoryKeeper = (props) => {
 
   useEffect(() => {
     (async () => {
-      const shareHistory = JSON.parse(
-        await AsyncStorage.getItem('shareHistory'),
-      );
+      const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
       if (shareHistory) updateHistory(shareHistory);
       let shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[2].levelInfo[4].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '';
       setSelectedShareId(shareId);
@@ -229,9 +227,7 @@ const TrustedContactHistoryKeeper = (props) => {
   const setContactInfo = useCallback(async () => {
     let keeperInfoTemp: any[] = keeperInfo;
     if (keeperInfoTemp.length > 0) {
-      let keeperInfoIndex = keeperInfoTemp.findIndex(
-        (value) => value.shareId == selectedShareId,
-      );
+      let keeperInfoIndex = keeperInfoTemp.findIndex((value) => value.shareId == selectedShareId);
       if (keeperInfoIndex > -1) {
         setSelectedContacts(keeperInfoTemp[keeperInfoIndex].data);
         const selectedContacts = trustedContactsInfo.slice(1, 3);
@@ -731,16 +727,11 @@ const TrustedContactHistoryKeeper = (props) => {
             keeperInfoTemp[i].publicKey = '';
             keeperInfoTemp[i].ephemeralAddress = '';
             keeperInfoTemp[i].type = 'contact';
-            keeperInfoTemp[i].data = contact;
+            keeperInfoTemp[i].data = {...contact, index};
             break;
-          } else {
-            flag = true;
-            break;
-          }
+          } else { flag = true; break; }
         }
-      } else {
-        flag = true;
-      }
+      } else flag = true;
       if (flag) {
         let obj = {
           shareId: selectedShareId,
@@ -749,11 +740,10 @@ const TrustedContactHistoryKeeper = (props) => {
           publicKey: '',
           ephemeralAddress: '',
           type: 'contact',
-          data: contact,
+          data: {...contact, index},
         };
         keeperInfo.push(obj);
       }
-      console.log('AFTER RESHARE keeperInfo', keeperInfo);
       dispatch(updatedKeeperInfo(keeperInfo));
     },
     [index, trustedContactsInfo],
@@ -1150,7 +1140,7 @@ const TrustedContactHistoryKeeper = (props) => {
           onPressReshare={() => {
             (ReshareBottomSheet as any).current.snapTo(1);
           }}
-          reshareButtonText={'Restore Keeper'}
+          reshareButtonText={'Reshare Keeper'}
           changeButtonText={'Change Keeper'}
         />
       </View>
@@ -1285,7 +1275,10 @@ const TrustedContactHistoryKeeper = (props) => {
         renderContent={() => (
           <KeeperTypeModalContents
             onPressSetup={async (type, name) => {
-              if(type == 'contact') (ChangeBottomSheet as any).current.snapTo(1);
+              if(type == 'contact') {
+                (keeperTypeBottomSheet as any).current.snapTo(0);
+                (ChangeBottomSheet as any).current.snapTo(1);
+              }
               if(type == 'device') {
                 (QrBottomSheet as any).current.snapTo(1);
               }

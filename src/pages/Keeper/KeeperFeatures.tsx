@@ -266,7 +266,7 @@ class KeeperFeatures extends Component<
                 Store one of your wallet's Recovery Key
               </Text>
             </View>
-            <View
+            {this.props.navigation.getParam('isPrimaryKeeper') && <View
               style={{
                 justifyContent: 'center',
                 width: wp('80%'),
@@ -297,6 +297,7 @@ class KeeperFeatures extends Component<
                 Generate 2FA code to send from your savings account
               </Text>
             </View>
+            }
           </View>
           <View
             style={{

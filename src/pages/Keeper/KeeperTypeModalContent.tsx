@@ -1,60 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React, { useState, useEffect } from "react";
+import { View, Image, Text, StyleSheet } from "react-native";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
+import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import RadioButton from '../../components/RadioButton';
+} from "react-native-responsive-screen";
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import RadioButton from "../../components/RadioButton";
+import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
+import { useSelector } from "react-redux";
 
 export default function KeeperTypeModalContents(props) {
   const [keeperTypesData, setKeeperTypesData] = useState([
     {
-      type: 'contact',
-      name: 'Friends and Family',
-      info: 'Lorem ipsum dolor sit amet, consectetur',
-      image: require('../../assets/images/icons/icon_contact.png'),
+      type: "contact",
+      name: "Friends and Family",
+      info: "Lorem ipsum dolor sit amet, consectetur",
+      image: require("../../assets/images/icons/icon_contact.png"),
     },
     {
-      type: 'device',
-      name: 'Keeper Device',
-      info: 'Lorem ipsum dolor sit amet, consectetur',
-      image: require('../../assets/images/icons/icon_secondarydevice.png'),
+      type: "device",
+      name: "Keeper Device",
+      info: "Lorem ipsum dolor sit amet, consectetur",
+      image: require("../../assets/images/icons/icon_secondarydevice.png"),
     },
     {
-      type: 'pdf',
-      name: 'Pdf Keeper',
-      info: 'Lorem ipsum dolor sit amet, consectetur',
-      image: require('../../assets/images/icons/files-and-folders-2.png'),
+      type: "pdf",
+      name: "Pdf Keeper",
+      info: "Lorem ipsum dolor sit amet, consectetur",
+      image: require("../../assets/images/icons/files-and-folders-2.png"),
     },
   ]);
   const [SelectedKeeperType, setSelectedKeeperType] = useState({
-    type: '',
-    name: '',
+    type: "",
+    name: "",
   });
+  const levelHealth: LevelHealthInterface[] = useSelector(
+    (state) => state.health.levelHealth
+  );
+  const currentLevel = useSelector((state) => state.health.currentLevel);
+  const [completedKeeperType, setCompletedKeeperType] = useState([]);
 
-  const [selectedLevelId, setSelectedLevelId] = useState(props.selectedLevelId ? props.selectedLevelId : false)
+  const restrictChangeToContactType = () => {
+    let completedKeeperType = [];
+    let contactCount = 0;
+    let pdfCount = 0;
+    let deviceCount = 0;
+    let levelhealth: LevelHealthInterface[] = [];
+    if (
+      levelHealth[1] &&
+      levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
+    )
+      levelhealth = [levelHealth[1]];
+    if (
+      levelHealth[2] &&
+      levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
+    )
+      levelhealth = [levelHealth[1], levelHealth[2]];
+    if (levelHealth[2] && currentLevel == 3) levelhealth = [levelHealth[2]];
+    let isPKCounted = false;
+    for (let i = 0; i < levelhealth.length; i++) {
+      const element = levelhealth[i];
+      for (let j = 0; j < element.levelInfo.length; j++) {
+        const element2 = element.levelInfo[j];
+        if (
+          levelhealth[i] &&
+          element2.shareType == "contact" &&
+          props.keeper &&
+          props.keeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          element2.shareType == "contact" &&
+          props.keeper.shareType == "contact"
+        ) {
+          contactCount++;
+        } else if (
+          !props.keeper &&
+          levelhealth[i] &&
+          element2.shareType == "contact"
+        )
+          contactCount++;
+        if (
+          levelhealth[i] &&
+          element2.shareType == "pdf" &&
+          props.keeper &&
+          props.keeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          element2.shareType == "pdf" &&
+          props.keeper.shareType == "pdf"
+        ) {
+          pdfCount++;
+        } else if (
+          !props.keeper &&
+          levelhealth[i] &&
+          element2.shareType == "pdf"
+        )
+          pdfCount++;
+        if (
+          ((levelhealth[i] && element2.shareType == "device") ||
+            (levelhealth[i] && element2.shareType == "primaryKeeper")) &&
+          props.keeper &&
+          props.keeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          (element2.shareType == "device" ||
+            element2.shareType == "primaryKeeper") &&
+          props.keeper.shareType == "device" &&
+          !isPKCounted
+        ) {
+          if (levelhealth[i] && element2.shareType == "primaryKeeper")
+            isPKCounted = true;
+          deviceCount++;
+        } else if (
+          !props.keeper &&
+          levelhealth[i] &&
+          (element2.shareType == "device" ||
+            element2.shareType == "primaryKeeper") &&
+          !isPKCounted
+        ) {
+          if (levelhealth[i] && element2.shareType == "primaryKeeper")
+            isPKCounted = true;
+          deviceCount++;
+        }
+      }
+    }
+    console.log("contactCount", contactCount);
+    console.log("pdfCount", pdfCount);
+    console.log("deviceCount", deviceCount);
+    if (contactCount >= 2) completedKeeperType.push("contact");
+    if (pdfCount >= 1) completedKeeperType.push("pdf");
+    if (deviceCount >= 3) completedKeeperType.push("device");
+    setCompletedKeeperType(completedKeeperType);
+  };
+
+  useEffect(() => {
+    restrictChangeToContactType();
+  }, []);
+
+  const [selectedLevelId, setSelectedLevelId] = useState(
+    props.selectedLevelId ? props.selectedLevelId : false
+  );
   const onKeeperSelect = (value) => {
     if (value.type != SelectedKeeperType.type) {
       setSelectedKeeperType(value);
     }
   };
   useEffect(() => {
-      setSelectedLevelId(props.selectedLevelId)
+    setSelectedLevelId(props.selectedLevelId);
   }, [props.selectedLevelId]);
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View style={{ height: '100%' }}>
+    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+      <View style={{ height: "100%" }}>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.headerText}>Add Keeper</Text>
           <Text
             style={{
               ...styles.modalInfoText,
-              marginTop: wp('1.5%'),
+              marginTop: wp("1.5%"),
               color: Colors.lightTextColor,
             }}
           >
@@ -69,7 +172,25 @@ export default function KeeperTypeModalContents(props) {
           }}
         >
           {keeperTypesData.map((value) => {
-            if(selectedLevelId == 2 && value.type === 'pdf'){return;}
+            if (
+              value.type === "pdf" &&
+              (selectedLevelId == 2 ||
+                completedKeeperType.findIndex((value) => value == "pdf") > -1)
+            ) {
+              return;
+            }
+            if (
+              value.type === "contact" &&
+              completedKeeperType.findIndex((value) => value == "contact") > -1
+            ) {
+              return;
+            }
+            if (
+              value.type === "device" &&
+              completedKeeperType.findIndex((value) => value == "device") > -1
+            ) {
+              return;
+            }
             return (
               <AppBottomSheetTouchableWrapper
                 activeOpacity={10}
@@ -87,11 +208,11 @@ export default function KeeperTypeModalContents(props) {
                 </View>
                 <Image
                   style={{
-                    width: wp('9%'),
-                    height: wp('9%'),
-                    resizeMode: 'contain',
-                    alignSelf: 'center',
-                    marginRight: wp('5%'),
+                    width: wp("9%"),
+                    height: wp("9%"),
+                    resizeMode: "contain",
+                    alignSelf: "center",
+                    marginRight: wp("5%"),
                   }}
                   source={value.image}
                 />
@@ -103,15 +224,14 @@ export default function KeeperTypeModalContents(props) {
                 </View>
               </AppBottomSheetTouchableWrapper>
             );
-            
           })}
         </View>
         <View style={styles.successModalAmountView}>
           <Text
             style={{
               ...styles.modalInfoText,
-              marginBottom: wp('5%'),
-              marginTop: 'auto',
+              marginBottom: wp("5%"),
+              marginTop: "auto",
             }}
           >
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -120,12 +240,12 @@ export default function KeeperTypeModalContents(props) {
         </View>
         <View style={styles.bottomButtonView}>
           <AppBottomSheetTouchableWrapper
-            onPress={() =>
+            onPress={() => {
               props.onPressSetup(
                 SelectedKeeperType.type,
-                SelectedKeeperType.name,
-              )
-            }
+                SelectedKeeperType.name
+              );
+            }}
             style={{
               ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,
@@ -162,13 +282,13 @@ export default function KeeperTypeModalContents(props) {
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: '100%',
+    height: "100%",
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: wp('5%'),
+    marginRight: wp("8%"),
+    marginLeft: wp("8%"),
+    marginTop: wp("5%"),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
@@ -176,23 +296,23 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
   successModalAmountView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: hp('1%'),
+    marginRight: wp("8%"),
+    marginLeft: wp("8%"),
+    marginTop: hp("1%"),
   },
   successModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: wp("13%"),
+    width: wp("35%"),
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
-    alignSelf: 'center',
-    marginLeft: wp('8%'),
+    alignSelf: "center",
+    marginLeft: wp("8%"),
   },
   proceedButtonText: {
     color: Colors.white,
@@ -205,9 +325,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   typeRadioButtonView: {
-    justifyContent: 'center',
-    width: wp('10%'),
-    height: wp('10%'),
+    justifyContent: "center",
+    width: wp("10%"),
+    height: wp("10%"),
   },
   keeperTypeTitle: {
     color: Colors.blue,
@@ -219,23 +339,23 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
-    width: wp('70%'),
+    width: wp("70%"),
   },
   bottomButtonView: {
-    height: 'auto',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: wp('8%'),
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: wp("8%"),
   },
   backButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: wp("13%"),
+    width: wp("35%"),
+    justifyContent: "center",
+    alignItems: "center",
   },
   keeperTypeElementView: {
-    flexDirection: 'row',
-    marginTop: wp('5%'),
-    marginBottom: wp('5%'),
+    flexDirection: "row",
+    marginTop: wp("5%"),
+    marginBottom: wp("5%"),
   },
 });

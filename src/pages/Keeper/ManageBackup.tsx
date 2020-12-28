@@ -512,11 +512,6 @@ class ManageBackup extends Component<
       this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
     } else if (shareType == 'contact') {
       let index = 1;
-      let contactIndex = this.state.levelData.findIndex(
-        (value) =>
-          value.keeper1.shareType == 'contact' ||
-          value.keeper2.shareType == 'contact',
-      );
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
@@ -526,33 +521,9 @@ class ManageBackup extends Component<
       if (count == 1 && isSetup) index = 2;
       else if (count == 0 && isSetup) index = 1;
       else {
-        if (contactIndex == -1) index = 1;
-        else {
-          let idxTmp = 0;
-          for (let i = 0; i < this.state.levelData.length; i++) {
-            const element = this.state.levelData[i];
-            if (element.keeper1.shareType == 'contact') {
-              idxTmp++;
-            }
-            if (
-              element.keeper1.shareType == 'contact' &&
-              element.keeper1.shareId == selectedKeeper.shareId
-            ) {
-              break;
-            }
-            if (element.keeper2.shareType == 'contact') {
-              idxTmp++;
-            }
-            if (
-              element.keeper2.shareType == 'contact' &&
-              element.keeper2.shareId == selectedKeeper.shareId
-            ) {
-              break;
-            }
-          }
-          index = idxTmp;
-        }
+        index = selectedKeeper.data.index;
       }
+      console.log('navigation to contact index', index)
       this.props.navigation.navigate('TrustedContactHistoryKeeper', {
         ...navigationParams,
         index,

@@ -195,8 +195,8 @@ function* generateMetaSharesWorker({ payload }) {
         );
         if (!isLevel2Initialized) {
           yield put(initLevelTwo(level));
+          yield put(updateLevelTwoMetaShareStatus(true));
         }
-        yield put(updateLevelTwoMetaShareStatus(true));
       }
       if (level == 3) {
         let isLevel3Initialized = yield select(
@@ -204,8 +204,8 @@ function* generateMetaSharesWorker({ payload }) {
         );
         if (!isLevel3Initialized) {
           yield put(initLevelTwo(level));
+          yield put(updateLevelThreeMetaShareStatus(true));
         }
-        yield put(updateLevelThreeMetaShareStatus(true));
       }
       let s3Service: S3Service = yield select((state) => state.health.service);
       const { SERVICES } = yield select((state) => state.storage.database);
