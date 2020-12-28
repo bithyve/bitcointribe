@@ -719,6 +719,7 @@ const TrustedContactHistoryKeeper = (props) => {
           updatedAt: moment(new Date()).valueOf(),
           name: contact.name,
           shareType: 'contact',
+          status: 'notAccessible',
         },
       ];
       dispatch(updateMSharesHealth(shareArray));

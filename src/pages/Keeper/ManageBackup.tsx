@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   View,
   Text,
@@ -11,45 +11,43 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
-} from 'react-native';
+} from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { withNavigationFocus } from 'react-navigation';
-import { connect } from 'react-redux';
-import { fetchEphemeralChannel } from '../../store/actions/trustedContacts';
+} from "react-native-responsive-screen";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
+import { RFValue } from "react-native-responsive-fontsize";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import BottomSheet from "reanimated-bottom-sheet";
+import DeviceInfo from "react-native-device-info";
+import SmallHeaderModal from "../../components/SmallHeaderModal";
+import { withNavigationFocus } from "react-navigation";
+import { connect } from "react-redux";
+import { fetchEphemeralChannel } from "../../store/actions/trustedContacts";
 import {
   setCloudBackupStatus,
   setIsBackupProcessing,
-} from '../../store/actions/preferences';
-import idx from 'idx';
-import KeeperTypeModalContents from './KeeperTypeModalContent';
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
-import moment from 'moment';
-import SetupPrimaryKeeper from './SetupPrimaryKeeper';
+} from "../../store/actions/preferences";
+import idx from "idx";
+import KeeperTypeModalContents from "./KeeperTypeModalContent";
+import { timeFormatter } from "../../common/CommonFunctions/timeFormatter";
+import moment from "moment";
+import SetupPrimaryKeeper from "./SetupPrimaryKeeper";
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+} from "../../common/constants/serviceTypes";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import {
   CloudData,
   getKeeperInfoFromShareId,
   getLevelInfo,
-} from '../../common/CommonFunctions';
-import {
-  trustedChannelsSetupSync,
-} from '../../store/actions/trustedContacts';
-import CloudBackup from '../../common/CommonFunctions/CloudBackup';
+} from "../../common/CommonFunctions";
+import { trustedChannelsSetupSync } from "../../store/actions/trustedContacts";
+import CloudBackup from "../../common/CommonFunctions/CloudBackup";
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -58,14 +56,14 @@ import {
   sendApprovalRequest,
   onApprovalStatusChange,
   reShareWithSameKeeper,
-  autoShareContact
-} from '../../store/actions/health';
-import { modifyLevelStatus } from './ManageBackupFunction';
-import ApproveSetup from './ApproveSetup';
-import { MetaShare, notificationType } from '../../bitcoin/utilities/Interface';
-import firebase from 'react-native-firebase';
-import { fetchKeeperTrustedChannel } from '../../store/actions/keeper';
-import { nameToInitials } from '../../common/CommonFunctions';
+  autoShareContact,
+} from "../../store/actions/health";
+import { modifyLevelStatus } from "./ManageBackupFunction";
+import ApproveSetup from "./ApproveSetup";
+import { MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
+import firebase from "react-native-firebase";
+import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
+import { nameToInitials } from "../../common/CommonFunctions";
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -121,7 +119,6 @@ interface ManageBackupPropsTypes {
   autoShareContact: any;
   trustedChannelsSetupSync: any;
   trustedChannelsSetupSyncing: any;
-
 }
 
 class ManageBackup extends Component<
@@ -142,14 +139,14 @@ class ManageBackup extends Component<
     this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null;
     let obj = {
-      shareType: '',
+      shareType: "",
       updatedAt: 0,
-      status: 'notAccessible',
-      shareId: '',
+      status: "notAccessible",
+      shareId: "",
       reshareVersion: 0,
-      name: '',
+      name: "",
       data: {},
-      uuid: '',
+      uuid: "",
     };
     this.state = {
       selectedKeeper: obj,
@@ -157,28 +154,28 @@ class ManageBackup extends Component<
       isError: false,
       levelData: [
         {
-          status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          status: "notSetup",
+          infoGray: "Improve security by adding Keepers",
+          infoRed: "Keepers need your attention",
+          infoGreen: "All Keepers are accessible",
           keeper1: obj,
           keeper2: obj,
           id: 1,
         },
         {
-          status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          status: "notSetup",
+          infoGray: "Improve security by adding Keepers",
+          infoRed: "Keepers need your attention",
+          infoGreen: "All Keepers are accessible",
           keeper1: obj,
           keeper2: obj,
           id: 2,
         },
         {
-          status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          status: "notSetup",
+          infoGray: "Improve security by adding Keepers",
+          infoRed: "Keepers need your attention",
+          infoGreen: "All Keepers are accessible",
           keeper1: obj,
           keeper2: obj,
           id: 3,
@@ -187,8 +184,8 @@ class ManageBackup extends Component<
       isPrimaryKeeper: false,
       encryptedCloudDataJson: [],
       selectedLevelId: 0,
-      selectedKeeperType: '',
-      selectedKeeperName: '',
+      selectedKeeperType: "",
+      selectedKeeperName: "",
     };
   }
 
@@ -210,32 +207,32 @@ class ManageBackup extends Component<
     } = this.props;
     let data = JSON.parse(notification.data.content);
     if (
-      data.notificationType == 'secureXpub' &&
+      data.notificationType == "secureXpub" &&
       !secureAccount.secureHDWallet.xpubs.secondary
     ) {
       let share = getKeeperInfoFromShareId(
         levelHealth,
-        s3Service.levelhealth.metaShares[1].shareId,
+        s3Service.levelhealth.metaShares[1].shareId
       );
       fetchKeeperTrustedChannel(
         s3Service.levelhealth.metaShares[1].shareId,
         data.notificationType,
-        share.name,
+        share.name
       );
     }
-    if (data.notificationType == 'uploadPDFShare') {
+    if (data.notificationType == "uploadPDFShare") {
       if (data.shareID == keeperApproveStatus.shareId) {
         onApprovalStatusChange(
           true,
           moment(new Date()).valueOf(),
-          data.shareID,
+          data.shareID
         );
       }
     }
   };
 
   componentDidMount = async () => {
-    console.log('keeperInfo', this.props.keeperInfo);
+    console.log("keeperInfo", this.props.keeperInfo);
     await this.onRefresh();
     this.createNotificationListeners();
     this.modifyLevelData();
@@ -248,7 +245,7 @@ class ManageBackup extends Component<
       this.state.levelData,
       levelHealthObject,
       currentLevel,
-      keeperInfo,
+      keeperInfo
     );
     this.setState({
       levelData: levelData.levelData,
@@ -260,7 +257,7 @@ class ManageBackup extends Component<
   setSelectedCards = () => {
     const { levelData } = this.state;
     for (let a = 0; a < levelData.length; a++) {
-      if (levelData[a].status == 'notSetup') {
+      if (levelData[a].status == "notSetup") {
         this.setState({ selectedId: levelData[a].id });
         break;
       }
@@ -268,16 +265,16 @@ class ManageBackup extends Component<
     let level = 1;
     if (
       levelData.findIndex(
-        (value) => value.status == 'bad' || value.status == 'notSetup',
+        (value) => value.status == "bad" || value.status == "notSetup"
       )
     ) {
       let index = levelData.findIndex(
-        (value) => value.status == 'bad' || value.status == 'notSetup',
+        (value) => value.status == "bad" || value.status == "notSetup"
       );
       level = levelData[index > -1 ? index - 1 : 2].id;
     }
     let value = 1;
-    if (this.state.levelData[0].status == 'notSetup') value = 1;
+    if (this.state.levelData[0].status == "notSetup") value = 1;
     else if (level) value = level + 1;
     else if (level == 3) value = 3;
     this.setState({ selectedId: value });
@@ -289,9 +286,9 @@ class ManageBackup extends Component<
   };
 
   getTime = (item) => {
-    return (item.toString() && item.toString() == '0') ||
-      item.toString() == 'never'
-      ? 'never'
+    return (item.toString() && item.toString() == "0") ||
+      item.toString() == "never"
+      ? "never"
       : timeFormatter(moment(new Date()), item);
   };
 
@@ -302,14 +299,14 @@ class ManageBackup extends Component<
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
-        : '';
+        : "";
     encryptedCloudDataJson = await CloudData(this.props.database);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
-        shareId: '',
-        KeeperType: 'cloud',
-        updated: '',
+        shareId: "",
+        KeeperType: "cloud",
+        updated: "",
         reshareVersion: 0,
       },
     ];
@@ -334,59 +331,59 @@ class ManageBackup extends Component<
   };
 
   setCloudBackupStatus = (share) => {
-    try{
-    this.props.setCloudBackupStatus({ status: true });
-    if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
-      this.updateHealthForCloud();
-    } else if (
-      (this.props.cloudBackupStatus.status && this.props.currentLevel == 1) ||
-      this.props.currentLevel == 2
-    ) {
-      this.updateHealthForCloud(share);
+    try {
+      this.props.setCloudBackupStatus({ status: true });
+      if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
+        this.updateHealthForCloud();
+      } else if (
+        (this.props.cloudBackupStatus.status && this.props.currentLevel == 1) ||
+        this.props.currentLevel == 2
+      ) {
+        this.updateHealthForCloud(share);
+      }
+      this.props.setIsBackupProcessing({ status: false });
+    } catch (error) {
+      console.log("ERRORsf", error);
     }
-    this.props.setIsBackupProcessing({ status: false });
-  }catch(error){
-    console.log("ERRORsf", error);
-  }
   };
 
   updateHealthForCloud = (share?) => {
-    try{
-    let levelHealth = this.props.levelHealth;
-    let levelHealthVar = levelHealth[0].levelInfo[0];
-    if (
-      share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object) &&
-      levelHealth.length > 0
-    ) {
-      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
-    }
-    // health update for 1st upload to cloud
-    if (
-      this.props.cloudBackupStatus &&
-      levelHealth.length &&
-      levelHealthVar.status != 'accessible'
-    ) {
-      console.log("cloudBackupStatus inside if", levelHealthVar);
-      if (levelHealthVar.shareType == 'cloud') {
-        levelHealthVar.updatedAt = moment(new Date()).valueOf();
-        levelHealthVar.status == 'accessible';
-        levelHealthVar.reshareVersion = 0;
-        levelHealthVar.guardian = 'cloud';
+    try {
+      let levelHealth = this.props.levelHealth;
+      let levelHealthVar = levelHealth[0].levelInfo[0];
+      if (
+        share &&
+        !(Object.keys(share).length === 0 && share.constructor === Object) &&
+        levelHealth.length > 0
+      ) {
+        levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
       }
-      let shareArray = [
-        {
-          walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
-          updatedAt: moment(new Date()).valueOf(),
-          status: 'accessible',
-          shareType: 'cloud',
-        },
-      ];
-      this.props.updateMSharesHealth(shareArray);
-    }
-    } catch(error){
+      // health update for 1st upload to cloud
+      if (
+        this.props.cloudBackupStatus &&
+        levelHealth.length &&
+        levelHealthVar.status != "accessible"
+      ) {
+        console.log("cloudBackupStatus inside if", levelHealthVar);
+        if (levelHealthVar.shareType == "cloud") {
+          levelHealthVar.updatedAt = moment(new Date()).valueOf();
+          levelHealthVar.status == "accessible";
+          levelHealthVar.reshareVersion = 0;
+          levelHealthVar.guardian = "cloud";
+        }
+        let shareArray = [
+          {
+            walletId: this.props.s3Service.getWalletId().data.walletId,
+            shareId: levelHealthVar.shareId,
+            reshareVersion: levelHealthVar.reshareVersion,
+            updatedAt: moment(new Date()).valueOf(),
+            status: "accessible",
+            shareType: "cloud",
+          },
+        ];
+        this.props.updateMSharesHealth(shareArray);
+      }
+    } catch (error) {
       console.log("jasdjhERROR", error);
     }
   };
@@ -396,7 +393,10 @@ class ManageBackup extends Component<
       this.modifyLevelData();
     }
 
-    if (JSON.stringify(prevProps.levelHealth) !== JSON.stringify(this.props.levelHealth)) {
+    if (
+      JSON.stringify(prevProps.levelHealth) !==
+      JSON.stringify(this.props.levelHealth)
+    ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -415,7 +415,7 @@ class ManageBackup extends Component<
       prevProps.isLevelThreeMetaShareCreated !=
         this.props.isLevelThreeMetaShareCreated &&
       prevProps.isLevel3Initialized != this.props.isLevel3Initialized &&
-      this.state.selectedKeeper.shareId == '' &&
+      this.state.selectedKeeper.shareId == "" &&
       this.props.metaShares.length == 5 &&
       this.props.isLevel3Initialized &&
       this.props.isLevelThreeMetaShareCreated
@@ -424,7 +424,7 @@ class ManageBackup extends Component<
         shareType: this.state.selectedKeeperType,
         name: this.state.selectedKeeperName,
         reshareVersion: 0,
-        status: 'notAccessible',
+        status: "notAccessible",
         updatedAt: 0,
         shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
         data: {},
@@ -446,8 +446,8 @@ class ManageBackup extends Component<
         if (
           levelInfo[2] &&
           levelInfo[3] &&
-          levelInfo[2].status == 'accessible' &&
-          levelInfo[3].status == 'accessible'
+          levelInfo[2].status == "accessible" &&
+          levelInfo[3].status == "accessible"
         ) {
           for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
             const element = s3Service.levelhealth.metaShares[i];
@@ -462,30 +462,48 @@ class ManageBackup extends Component<
   };
 
   autoUploadShare = () => {
-    let { levelHealth, currentLevel, reShareWithSameKeeper, autoShareContact } = this.props;
-    if (levelHealth[2] &&
+    let {
+      levelHealth,
+      currentLevel,
+      reShareWithSameKeeper,
+      autoShareContact,
+    } = this.props;
+    if (
+      levelHealth[2] &&
       currentLevel == 2 &&
-      levelHealth[2].levelInfo[4].status == 'accessible' &&
-      levelHealth[2].levelInfo[5].status == 'accessible'
+      levelHealth[2].levelInfo[4].status == "accessible" &&
+      levelHealth[2].levelInfo[5].status == "accessible"
     ) {
       let deviceLevelInfo = [];
       let contactLevelInfo = [];
       for (let i = 2; i < levelHealth[2].levelInfo.length - 2; i++) {
-        if (levelHealth[2].levelInfo[i].status != 'accessible' && 
-          (levelHealth[1].levelInfo[i].shareType == 'primaryKeeper' ||
-          levelHealth[1].levelInfo[i].shareType == 'device')
+        if (
+          levelHealth[2].levelInfo[i].status != "accessible" &&
+          (levelHealth[1].levelInfo[i].shareType == "primaryKeeper" ||
+            levelHealth[1].levelInfo[i].shareType == "device")
         ) {
-          let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i };
+          let obj = {
+            ...levelHealth[1].levelInfo[i],
+            newShareId: levelHealth[2].levelInfo[i].shareId,
+            index: i,
+          };
           deviceLevelInfo.push(obj);
         }
-        if (levelHealth[2].levelInfo[i].status != 'accessible' && levelHealth[1].levelInfo[i].shareType == 'contact') {
-          let obj = { ...levelHealth[1].levelInfo[i], newShareId: levelHealth[2].levelInfo[i].shareId, index: i }
+        if (
+          levelHealth[2].levelInfo[i].status != "accessible" &&
+          levelHealth[1].levelInfo[i].shareType == "contact"
+        ) {
+          let obj = {
+            ...levelHealth[1].levelInfo[i],
+            newShareId: levelHealth[2].levelInfo[i].shareId,
+            index: i,
+          };
           contactLevelInfo.push(obj);
         }
       }
-      console.log('contactLevelInfo', contactLevelInfo);
-      if(deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
-      if(contactLevelInfo.length) autoShareContact(contactLevelInfo);
+      console.log("contactLevelInfo", contactLevelInfo);
+      if (deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
+      if (contactLevelInfo.length) autoShareContact(contactLevelInfo);
     }
   };
 
@@ -500,7 +518,7 @@ class ManageBackup extends Component<
       isSetup,
     } = value;
     let navigationParams = {
-      selectedTime: updatedAt ? this.getTime(updatedAt) : 'never',
+      selectedTime: updatedAt ? this.getTime(updatedAt) : "never",
       selectedStatus: keeperStatus,
       selectedTitle: name,
       isPrimaryKeeper: this.state.isPrimaryKeeper,
@@ -508,30 +526,30 @@ class ManageBackup extends Component<
       selectedContact: selectedKeeper.data,
       selectedKeeper,
     };
-    if (shareType == 'device' || shareType == 'primaryKeeper') {
-      this.props.navigation.navigate('KeeperDeviceHistory', navigationParams);
-    } else if (shareType == 'contact') {
+    if (shareType == "device" || shareType == "primaryKeeper") {
+      this.props.navigation.navigate("KeeperDeviceHistory", navigationParams);
+    } else if (shareType == "contact") {
       let index = 1;
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
-        if (element.keeper1.shareType == 'contact') count++;
-        if (element.keeper2.shareType == 'contact') count++;
+        if (element.keeper1.shareType == "contact") count++;
+        if (element.keeper2.shareType == "contact") count++;
       }
       if (count == 1 && isSetup) index = 2;
       else if (count == 0 && isSetup) index = 1;
       else {
         index = selectedKeeper.data.index;
       }
-      console.log('navigation to contact index', index)
-      this.props.navigation.navigate('TrustedContactHistoryKeeper', {
+      console.log("navigation to contact index", index);
+      this.props.navigation.navigate("TrustedContactHistoryKeeper", {
         ...navigationParams,
         index,
       });
-    } else if (shareType == 'pdf') {
+    } else if (shareType == "pdf") {
       this.props.navigation.navigate(
-        'PersonalCopyHistoryKeeper',
-        navigationParams,
+        "PersonalCopyHistoryKeeper",
+        navigationParams
       );
     }
   };
@@ -552,15 +570,15 @@ class ManageBackup extends Component<
     sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
-      type == 'pdf'
+      type == "pdf"
         ? notificationType.uploadPDFShare
-        : notificationType.approveKeeper,
+        : notificationType.approveKeeper
     );
-    if (this.state.selectedKeeperType == 'pdf') {
+    if (this.state.selectedKeeperType == "pdf") {
       onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),
-        this.state.selectedKeeper.shareId,
+        this.state.selectedKeeper.shareId
       );
     }
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
@@ -603,7 +621,10 @@ class ManageBackup extends Component<
       if (chosenContact.imageAvailable) {
         return (
           <View style={styles.imageBackground}>
-            <Image source={{uri: chosenContact.image.uri}} style={styles.contactImage} />
+            <Image
+              source={{ uri: chosenContact.image.uri }}
+              style={styles.contactImage}
+            />
           </View>
         );
       } else {
@@ -611,28 +632,28 @@ class ManageBackup extends Component<
           <View style={styles.imageBackground}>
             <Text
               style={{
-                textAlign: 'center',
+                textAlign: "center",
                 fontSize: RFValue(9),
               }}
             >
               {chosenContact &&
-              chosenContact.firstName === 'F&F request' &&
+              chosenContact.firstName === "F&F request" &&
               chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ''
+              chosenContact.contactsWalletName !== ""
                 ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
                 : chosenContact && chosenContact.name
                 ? nameToInitials(
                     chosenContact &&
                       chosenContact.firstName &&
                       chosenContact.lastName
-                      ? chosenContact.firstName + ' ' + chosenContact.lastName
+                      ? chosenContact.firstName + " " + chosenContact.lastName
                       : chosenContact.firstName && !chosenContact.lastName
                       ? chosenContact.firstName
                       : !chosenContact.firstName && chosenContact.lastName
                       ? chosenContact.lastName
-                      : '',
+                      : ""
                   )
-                : ''}
+                : ""}
             </Text>
           </View>
         );
@@ -641,7 +662,7 @@ class ManageBackup extends Component<
     return (
       <Image
         style={styles.contactImageAvatar}
-        source={require('../../assets/images/icons/icon_user.png')}
+        source={require("../../assets/images/icons/icon_user.png")}
       />
     );
   };
@@ -659,14 +680,14 @@ class ManageBackup extends Component<
       healthLoading,
       keeperApproveStatus,
       currentLevel,
-      trustedChannelsSetupSyncing
+      trustedChannelsSetupSyncing,
     } = this.props;
     return (
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ flex: 1, backgroundColor: "white" }}>
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.headerBackArrowView}
@@ -683,7 +704,7 @@ class ManageBackup extends Component<
             style={styles.headerSettingImageView}
           >
             <Image
-              source={require('../../assets/images/icons/setting.png')}
+              source={require("../../assets/images/icons/setting.png")}
               style={styles.headerSettingImage}
             />
           </TouchableOpacity>
@@ -699,19 +720,19 @@ class ManageBackup extends Component<
         >
           <View style={styles.topHealthView}>
             <ImageBackground
-              source={require('../../assets/images/icons/keeper_sheild.png')}
-              style={{ ...styles.healthShieldImage, position: 'relative' }}
-              resizeMode={'contain'}
+              source={require("../../assets/images/icons/keeper_sheild.png")}
+              style={{ ...styles.healthShieldImage, position: "relative" }}
+              resizeMode={"contain"}
             >
               {isError && (
                 <View
                   style={{
                     backgroundColor: Colors.red,
-                    height: wp('3%'),
-                    width: wp('3%'),
-                    borderRadius: wp('3%') / 2,
-                    position: 'absolute',
-                    top: wp('5%'),
+                    height: wp("3%"),
+                    width: wp("3%"),
+                    borderRadius: wp("3%") / 2,
+                    position: "absolute",
+                    top: wp("5%"),
                     right: 0,
                     borderWidth: 2,
                     borderColor: Colors.white,
@@ -726,16 +747,16 @@ class ManageBackup extends Component<
               <Text style={styles.backupInfoText}>at level {currentLevel}</Text>
             </View>
           </View>
-          <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
+          <View style={{ flex: 1, alignItems: "center", position: "relative" }}>
             {levelData.map((value) => {
               return (
                 <TouchableOpacity onPress={() => this.selectId(value.id)}>
                   <View
                     style={{
                       borderRadius: 10,
-                      marginTop: wp('7%'),
+                      marginTop: wp("7%"),
                       backgroundColor:
-                        value.status == 'good' || value.status == 'bad'
+                        value.status == "good" || value.status == "bad"
                           ? Colors.blue
                           : Colors.backgroundColor,
                       shadowRadius:
@@ -751,8 +772,8 @@ class ManageBackup extends Component<
                     }}
                   >
                     <View style={styles.cardView}>
-                      <View style={{ flexDirection: 'row' }}>
-                        {value.status == 'good' || value.status == 'bad' ? (
+                      <View style={{ flexDirection: "row" }}>
+                        {value.status == "good" || value.status == "bad" ? (
                           <View
                             style={{
                               ...styles.cardHealthImageView,
@@ -761,33 +782,33 @@ class ManageBackup extends Component<
                                   ? 10
                                   : 0,
                               backgroundColor:
-                                value.status == 'good'
+                                value.status == "good"
                                   ? Colors.green
                                   : Colors.red,
                             }}
                           >
-                            {value.status == 'good' ? (
+                            {value.status == "good" ? (
                               <Image
-                                source={require('../../assets/images/icons/check_white.png')}
+                                source={require("../../assets/images/icons/check_white.png")}
                                 style={{
                                   ...styles.cardHealthImage,
-                                  width: wp('4%'),
+                                  width: wp("4%"),
                                 }}
                               />
                             ) : (
                               <Image
-                                source={require('../../assets/images/icons/icon_error_white.png')}
+                                source={require("../../assets/images/icons/icon_error_white.png")}
                                 style={styles.cardHealthImage}
                               />
                             )}
                           </View>
                         ) : (
                           <Image
-                            source={require('../../assets/images/icons/icon_setup.png')}
+                            source={require("../../assets/images/icons/icon_setup.png")}
                             style={{
-                              borderRadius: wp('7%') / 2,
-                              width: wp('7%'),
-                              height: wp('7%'),
+                              borderRadius: wp("7%") / 2,
+                              width: wp("7%"),
+                              height: wp("7%"),
                             }}
                           />
                         )}
@@ -795,7 +816,7 @@ class ManageBackup extends Component<
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
-                              value.status == 'notSetup'
+                              value.status == "notSetup"
                                 ? Colors.white
                                 : Colors.deepBlue,
                           }}
@@ -804,7 +825,7 @@ class ManageBackup extends Component<
                             style={{
                               ...styles.cardButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == "notSetup"
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
@@ -814,13 +835,13 @@ class ManageBackup extends Component<
                         </TouchableOpacity>
                       </View>
 
-                      <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
-                        <View style={{ justifyContent: 'center' }}>
+                      <View style={{ flexDirection: "row", marginTop: "auto" }}>
+                        <View style={{ justifyContent: "center" }}>
                           <Text
                             style={{
                               ...styles.levelText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == "notSetup"
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
@@ -831,21 +852,21 @@ class ManageBackup extends Component<
                             style={{
                               ...styles.levelInfoText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == "notSetup"
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
                           >
-                            {value.keeper1.status == 'notAccessible' &&
-                            value.keeper2.status == 'notAccessible' &&
+                            {value.keeper1.status == "notAccessible" &&
+                            value.keeper2.status == "notAccessible" &&
                             value.keeper1.updatedAt == 0 &&
                             value.keeper2.updatedAt == 0
                               ? value.infoGray
-                              : value.keeper1.status == 'accessible' &&
-                                value.keeper2.status == 'accessible'
+                              : value.keeper1.status == "accessible" &&
+                                value.keeper2.status == "accessible"
                               ? value.infoGreen
-                              : value.keeper1.status == 'accessible' ||
-                                value.keeper2.status == 'accessible'
+                              : value.keeper1.status == "accessible" ||
+                                value.keeper2.status == "accessible"
                               ? value.infoRed
                               : value.infoRed}
                           </Text>
@@ -859,22 +880,22 @@ class ManageBackup extends Component<
                             style={{
                               ...styles.manageButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == "notSetup"
                                   ? Colors.black
                                   : Colors.white,
                             }}
                             onPress={() => this.selectId(value.id)}
                           >
-                            {value.status == 'notSetup' ? 'Setup' : 'Manage'}
+                            {value.status == "notSetup" ? "Setup" : "Manage"}
                           </Text>
                           <AntDesign
                             name={
                               selectedId && selectedId == value.id
-                                ? 'arrowup'
-                                : 'arrowright'
+                                ? "arrowup"
+                                : "arrowright"
                             }
                             color={
-                              value.status == 'notSetup'
+                              value.status == "notSetup"
                                 ? Colors.black
                                 : Colors.white
                             }
@@ -889,12 +910,12 @@ class ManageBackup extends Component<
                           style={{ backgroundColor: Colors.white, height: 0.5 }}
                         />
                         <View style={styles.cardView}>
-                          <View style={{ width: wp('40%') }}>
+                          <View style={{ width: wp("40%") }}>
                             <Text
                               numberOfLines={2}
                               style={{
                                 color:
-                                  value.status == 'notSetup'
+                                  value.status == "notSetup"
                                     ? Colors.textColorGrey
                                     : Colors.white,
                                 fontFamily: Fonts.FiraSansRegular,
@@ -907,19 +928,19 @@ class ManageBackup extends Component<
                           {value.id == 1 ? (
                             <View
                               style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
+                                flexDirection: "row",
+                                marginTop: "auto",
                               }}
                             >
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
                                   borderColor:
-                                    value.keeper1.status == 'accessible'
+                                    value.keeper1.status == "accessible"
                                       ? Colors.deepBlue
                                       : Colors.red,
                                   borderWidth:
-                                    value.keeper1.status == 'accessible'
+                                    value.keeper1.status == "accessible"
                                       ? 0
                                       : 1,
                                 }}
@@ -930,7 +951,7 @@ class ManageBackup extends Component<
                                 }}
                               >
                                 <Image
-                                  source={require('../../assets/images/icons/reset.png')}
+                                  source={require("../../assets/images/icons/reset.png")}
                                   style={styles.resetImage}
                                 />
                                 <Text
@@ -939,54 +960,54 @@ class ManageBackup extends Component<
                                     fontSize: RFValue(11),
                                   }}
                                 >
-                                  {value.keeper1.status == 'accessible'
-                                    ? 'Data Backed-Up'
-                                    : 'Add Backup'}
+                                  {value.keeper1.status == "accessible"
+                                    ? "Data Backed-Up"
+                                    : "Add Backup"}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
-                                  width: wp('41%'),
+                                  width: wp("41%"),
                                   borderColor:
-                                    value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                    value.keeper2.status == "accessible"
+                                      ? value.status == "notSetup"
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
                                   borderWidth:
-                                    value.keeper2.status == 'accessible'
+                                    value.keeper2.status == "accessible"
                                       ? 0
                                       : 0.5,
-                                  marginLeft: 'auto',
+                                  marginLeft: "auto",
                                 }}
                                 onPress={() =>
                                   navigation.navigate(
-                                    'SecurityQuestionHistoryKeeper',
+                                    "SecurityQuestionHistoryKeeper",
                                     {
                                       selectedTime: this.getTime(new Date()),
-                                      selectedStatus: 'Ugly',
-                                    },
+                                      selectedStatus: "Ugly",
+                                    }
                                   )
                                 }
                               >
                                 <ImageBackground
-                                  source={require('../../assets/images/icons/questionMark.png')}
+                                  source={require("../../assets/images/icons/questionMark.png")}
                                   style={{
                                     ...styles.resetImage,
-                                    position: 'relative',
+                                    position: "relative",
                                   }}
                                 >
-                                  {value.keeper2.status == 'notAccessible' ? (
+                                  {value.keeper2.status == "notAccessible" ? (
                                     <View
                                       style={{
                                         backgroundColor: Colors.red,
-                                        width: wp('1%'),
-                                        height: wp('1%'),
-                                        position: 'absolute',
+                                        width: wp("1%"),
+                                        height: wp("1%"),
+                                        position: "absolute",
                                         top: 0,
                                         right: 0,
-                                        borderRadius: wp('1%') / 2,
+                                        borderRadius: wp("1%") / 2,
                                       }}
                                     />
                                   ) : null}
@@ -1004,59 +1025,71 @@ class ManageBackup extends Component<
                           ) : (
                             <View
                               style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
+                                flexDirection: "row",
+                                marginTop: "auto",
                               }}
                             >
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == "notSetup"
                                       ? Colors.white
                                       : Colors.deepBlue,
-                                  width: 'auto',
-                                  paddingLeft: wp('3%'),
-                                  paddingRight: wp('3%'),
+                                  width: "auto",
+                                  paddingLeft: wp("3%"),
+                                  paddingRight: wp("3%"),
                                   borderColor:
-                                    value.keeper1.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                    value.keeper1.status == "accessible"
+                                      ? value.status == "notSetup"
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
                                   borderWidth:
-                                    value.keeper1.status == 'accessible'
+                                    value.keeper1.status == "accessible"
                                       ? 0
                                       : 1,
                                 }}
                                 onPress={() => this.onPressKeeper(value, 1)}
                               >
-                                {value.keeper1.status == 'accessible' &&
-                                (value.keeper1.shareType == 'device' ||
+                                {value.keeper1.status == "accessible" &&
+                                (value.keeper1.shareType == "device" ||
                                   value.keeper1.shareType ==
-                                    'primaryKeeper') ? (
+                                    "primaryKeeper") ? (
                                   <Image
                                     source={
-                                      value.keeper1.shareType == 'device' ||
-                                      value.keeper1.shareType == 'primaryKeeper'
-                                        ? require('../../assets/images/icons/icon_ipad_blue.png')
-                                        : require('../../assets/images/icons/pexels-photo.png')
+                                      value.keeper1.shareType == "device" ||
+                                      value.keeper1.shareType == "primaryKeeper"
+                                        ? require("../../assets/images/icons/icon_ipad_blue.png")
+                                        : require("../../assets/images/icons/pexels-photo.png")
                                     }
                                     style={{
-                                      width: wp('6%'),
-                                      height: wp('6%'),
-                                      resizeMode: 'contain',
-                                      borderRadius: wp('6%') / 2,
+                                      width: wp("6%"),
+                                      height: wp("6%"),
+                                      resizeMode: "contain",
+                                      borderRadius: wp("6%") / 2,
                                     }}
                                   />
-                                ) : value.keeper1.shareType == 'contact' &&
-                                  value.keeper1.updatedAt != 0 ? this.getImageIcon(value.keeper1.data) : (
+                                ) : value.keeper1.shareType == "contact" &&
+                                  value.keeper1.updatedAt != 0 ? (
+                                  this.getImageIcon(value.keeper1.data)
+                                ) : value.keeper1.shareType == "pdf" &&
+                                  value.keeper1.status == "accessible" ? (
+                                  <Image
+                                    source={require("../../assets/images/icons/doc.png")}
+                                    style={{
+                                      width: wp("5%"),
+                                      height: wp("6%"),
+                                      resizeMode: "contain",
+                                    }}
+                                  />
+                                ) : (
                                   <View
                                     style={{
                                       backgroundColor: Colors.red,
-                                      width: wp('2%'),
-                                      height: wp('2%'),
-                                      borderRadius: wp('2%') / 2,
+                                      width: wp("2%"),
+                                      height: wp("2%"),
+                                      borderRadius: wp("2%") / 2,
                                     }}
                                   />
                                 )}
@@ -1064,71 +1097,83 @@ class ManageBackup extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == "notSetup"
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                     fontSize: RFValue(11),
-                                    marginLeft: wp('3%'),
+                                    marginLeft: wp("3%"),
                                   }}
                                 >
-                                  {value.status == 'good' ||
-                                  (value.status == 'bad' && value.keeper1.name)
+                                  {value.status == "good" ||
+                                  (value.status == "bad" && value.keeper1.name)
                                     ? value.keeper1.name
                                     : value.id == 2
-                                    ? 'Add Primary Keeper'
-                                    : 'Add Keeper'}
+                                    ? "Add Primary Keeper"
+                                    : "Add Keeper"}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == "notSetup"
                                       ? Colors.white
                                       : Colors.deepBlue,
-                                  width: 'auto',
-                                  paddingLeft: wp('3%'),
-                                  paddingRight: wp('3%'),
+                                  width: "auto",
+                                  paddingLeft: wp("3%"),
+                                  paddingRight: wp("3%"),
                                   borderColor:
-                                    value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                    value.keeper2.status == "accessible"
+                                      ? value.status == "notSetup"
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
                                   borderWidth:
-                                    value.keeper2.status == 'accessible'
+                                    value.keeper2.status == "accessible"
                                       ? 0
                                       : 0.5,
-                                  marginLeft: wp('4%'),
+                                  marginLeft: wp("4%"),
                                 }}
                                 onPress={() => this.onPressKeeper(value, 2)}
                               >
-                                {value.keeper2.status == 'accessible' &&
-                                (value.keeper2.shareType == 'device' ||
+                                {value.keeper2.status == "accessible" &&
+                                (value.keeper2.shareType == "device" ||
                                   value.keeper2.shareType ==
-                                    'primaryKeeper') ? (
+                                    "primaryKeeper") ? (
                                   <Image
                                     source={
-                                      value.keeper2.shareType == 'device' ||
-                                      value.keeper2.shareType == 'primaryKeeper'
-                                        ? require('../../assets/images/icons/icon_ipad_blue.png')
-                                        : require('../../assets/images/icons/pexels-photo.png')
+                                      value.keeper2.shareType == "device" ||
+                                      value.keeper2.shareType == "primaryKeeper"
+                                        ? require("../../assets/images/icons/icon_ipad_blue.png")
+                                        : require("../../assets/images/icons/pexels-photo.png")
                                     }
                                     style={{
-                                      width: wp('6%'),
-                                      height: wp('6%'),
-                                      resizeMode: 'contain',
-                                      borderRadius: wp('6%') / 2,
+                                      width: wp("6%"),
+                                      height: wp("6%"),
+                                      resizeMode: "contain",
+                                      borderRadius: wp("6%") / 2,
                                     }}
                                   />
-                                ) : value.keeper2.shareType == 'contact' &&
-                                  value.keeper2.updatedAt != 0 ? this.getImageIcon(value.keeper2.data) : (
+                                ) : value.keeper2.shareType == "contact" &&
+                                  value.keeper2.updatedAt != 0 ? (
+                                  this.getImageIcon(value.keeper2.data)
+                                ) : value.keeper2.shareType == "pdf" &&
+                                  value.keeper2.status == "accessible" ? (
+                                  <Image
+                                    source={require("../../assets/images/icons/doc.png")}
+                                    style={{
+                                      width: wp("5%"),
+                                      height: wp("6%"),
+                                      resizeMode: "contain",
+                                    }}
+                                  />
+                                ) : (
                                   <View
                                     style={{
                                       backgroundColor: Colors.red,
-                                      width: wp('2%'),
-                                      height: wp('2%'),
-                                      borderRadius: wp('2%') / 2,
+                                      width: wp("2%"),
+                                      height: wp("2%"),
+                                      borderRadius: wp("2%") / 2,
                                     }}
                                   />
                                 )}
@@ -1137,17 +1182,17 @@ class ManageBackup extends Component<
                                     ...styles.cardButtonText,
                                     fontSize: RFValue(11),
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == "notSetup"
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    marginLeft: wp('3%'),
+                                    marginLeft: wp("3%"),
                                   }}
                                 >
-                                  {(value.status == 'bad' ||
-                                    value.status == 'good') &&
+                                  {(value.status == "bad" ||
+                                    value.status == "good") &&
                                   value.keeper2.name
                                     ? value.keeper2.name
-                                    : 'Add Keeper'}
+                                    : "Add Keeper"}
                                 </Text>
                               </TouchableOpacity>
                             </View>
@@ -1163,12 +1208,12 @@ class ManageBackup extends Component<
         </ScrollView>
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'keeperTypeBottomSheet'}
+          ref={"keeperTypeBottomSheet"}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('75%')
-              : hp('75%'),
+            Platform.OS == "ios" && DeviceInfo.hasNotch()
+              ? hp("75%")
+              : hp("75%"),
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
@@ -1188,7 +1233,7 @@ class ManageBackup extends Component<
                   this.props.currentLevel == 1 &&
                   selectedLevelId == 3
                 ) {
-                  alert('Please complete Level 2');
+                  alert("Please complete Level 2");
                 } else {
                   this.sendApprovalRequestToPK(type);
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
@@ -1210,25 +1255,25 @@ class ManageBackup extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'SetupPrimaryKeeperBottomSheet'}
+          ref={"SetupPrimaryKeeperBottomSheet"}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('70'),
+            Platform.OS == "ios" && DeviceInfo.hasNotch()
+              ? hp("60%")
+              : hp("70"),
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
-              title={'Setup Primary Keeper\non a Personal Device'}
+              title={"Setup Primary Keeper\non a Personal Device"}
               subText={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
               }
-              textToCopy={'http://hexawallet.io/keeperapp'}
+              textToCopy={"http://hexawallet.io/keeperapp"}
               info={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
               }
-              proceedButtonText={'Proceed'}
-              backButtonText={'Back'}
+              proceedButtonText={"Proceed"}
+              backButtonText={"Back"}
               onPressBack={() =>
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
@@ -1240,12 +1285,12 @@ class ManageBackup extends Component<
                   selectedKeeper,
                 } = this.state;
                 let PKStatus = levelData[1].keeper1.keeper1Done
-                  ? 'accessed'
-                  : 'notAccessible';
+                  ? "accessed"
+                  : "notAccessible";
                 let navigationParams = {
                   selectedTime: this.getTime(new Date()),
                   selectedStatus: PKStatus,
-                  selectedTitle: 'Primary Keeper',
+                  selectedTitle: "Primary Keeper",
                   isPrimaryKeeper: true,
                   isSetUp: true,
                   selectedLevelId,
@@ -1253,8 +1298,8 @@ class ManageBackup extends Component<
                   selectedKeeper: selectedKeeper,
                 };
                 this.props.navigation.navigate(
-                  'KeeperDeviceHistory',
-                  navigationParams,
+                  "KeeperDeviceHistory",
+                  navigationParams
                 );
               }}
             />
@@ -1269,17 +1314,17 @@ class ManageBackup extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'ApprovePrimaryKeeperBottomSheet'}
+          ref={"ApprovePrimaryKeeperBottomSheet"}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('70'),
+            Platform.OS == "ios" && DeviceInfo.hasNotch()
+              ? hp("60%")
+              : hp("70"),
           ]}
           renderContent={() => (
             <ApproveSetup
               isContinueDisabled={
-                selectedKeeperType == 'pdf'
+                selectedKeeperType == "pdf"
                   ? !keeperApproveStatus.status
                   : false
               }
@@ -1297,11 +1342,11 @@ class ManageBackup extends Component<
                     : selectedKeeperType,
                   keeperStatus: selectedKeeper.status
                     ? selectedKeeper.status
-                    : 'notAccessible',
+                    : "notAccessible",
                   name: selectedKeeper.name
                     ? selectedKeeper.name
                     : selectedKeeperName,
-                  shareId: selectedKeeper.shareId ? selectedKeeper.shareId : '',
+                  shareId: selectedKeeper.shareId ? selectedKeeper.shareId : "",
                   updatedAt: selectedKeeper.updatedAt
                     ? selectedKeeper.updatedAt
                     : 0,
@@ -1331,7 +1376,7 @@ const mapStateToProps = (state) => {
   return {
     accounts: state.accounts || [],
     walletName:
-      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || "",
     metaShares: idx(state, (_) => _.health.service.levelhealth.metaShares),
     s3Service: idx(state, (_) => _.health.service),
     overallHealth: idx(state, (_) => _.sss.overallHealth),
@@ -1346,13 +1391,13 @@ const mapStateToProps = (state) => {
     currentLevel: idx(state, (_) => _.health.currentLevel),
     isLevelTwoMetaShareCreated: idx(
       state,
-      (_) => _.health.isLevelTwoMetaShareCreated,
+      (_) => _.health.isLevelTwoMetaShareCreated
     ),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     isLevelThreeMetaShareCreated: idx(
       state,
-      (_) => _.health.isLevelThreeMetaShareCreated,
+      (_) => _.health.isLevelThreeMetaShareCreated
     ),
     healthLoading: idx(state, (_) => _.health.loading.checkMSharesHealth),
     keeperSetupStatus: idx(state, (_) => _.health.loading.keeperSetupStatus),
@@ -1362,7 +1407,7 @@ const mapStateToProps = (state) => {
     keeperApproveStatus: idx(state, (_) => _.health.keeperApproveStatus),
     trustedChannelsSetupSyncing: idx(
       state,
-      (_) => _.trustedContacts.loading.trustedChannelsSetupSync,
+      (_) => _.trustedContacts.loading.trustedChannelsSetupSync
     ),
   };
 };
@@ -1381,14 +1426,14 @@ export default withNavigationFocus(
     fetchKeeperTrustedChannel,
     reShareWithSameKeeper,
     autoShareContact,
-    trustedChannelsSetupSync
-  })(ManageBackup),
+    trustedChannelsSetupSync,
+  })(ManageBackup)
 );
 
 const styles = StyleSheet.create({
   modalHeaderTitleView: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    flexDirection: "row",
     paddingRight: 5,
     paddingBottom: 5,
     paddingTop: 10,
@@ -1398,36 +1443,36 @@ const styles = StyleSheet.create({
   headerBackArrowView: {
     height: 30,
     width: 30,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   headerSettingImageView: {
-    height: wp('10%'),
-    width: wp('10&'),
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: wp("10%"),
+    width: wp("10&"),
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerSettingImage: {
-    height: wp('6%'),
-    width: wp('6%'),
+    height: wp("6%"),
+    width: wp("6%"),
   },
   topHealthView: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   healthShieldImage: {
-    width: wp('17%'),
-    height: wp('25%'),
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: wp("17%"),
+    height: wp("25%"),
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerSeparator: {
     backgroundColor: Colors.seaBlue,
     width: 4,
     borderRadius: 5,
-    height: wp('17%'),
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
+    height: wp("17%"),
+    marginLeft: wp("5%"),
+    marginRight: wp("5%"),
   },
   backupText: {
     color: Colors.black,
@@ -1440,8 +1485,8 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
   },
   cardView: {
-    height: wp('35%'),
-    width: wp('85%'),
+    height: wp("35%"),
+    width: wp("85%"),
     padding: 20,
   },
   cardHealthImageView: {
@@ -1450,23 +1495,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 10,
-    borderRadius: wp('7%') / 2,
-    width: wp('7%'),
-    height: wp('7%'),
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: wp("7%") / 2,
+    width: wp("7%"),
+    height: wp("7%"),
+    justifyContent: "center",
+    alignItems: "center",
   },
   cardHealthImage: {
-    width: wp('2%'),
-    height: wp('4%'),
-    resizeMode: 'contain',
+    width: wp("2%"),
+    height: wp("4%"),
+    resizeMode: "contain",
   },
   cardButtonView: {
-    width: wp('21%'),
-    height: wp('8'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
+    width: wp("21%"),
+    height: wp("8"),
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: "auto",
     borderRadius: 8,
   },
   cardButtonText: {
@@ -1485,10 +1530,10 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   manageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginTop: 'auto',
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: "auto",
+    marginTop: "auto",
   },
   manageButtonText: {
     fontSize: RFValue(10),
@@ -1497,45 +1542,45 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   appBackupButton: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: Colors.deepBlue,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    justifyContent: "space-evenly",
+    alignItems: "center",
     borderRadius: 8,
-    width: wp('31%'),
-    height: wp('11%'),
+    width: wp("31%"),
+    height: wp("11%"),
   },
   resetImage: {
-    width: wp('4%'),
-    height: wp('4%'),
-    resizeMode: 'contain',
+    width: wp("4%"),
+    height: wp("4%"),
+    resizeMode: "contain",
   },
   contactImageAvatar: {
-    width: wp('6%'),
-    height: wp('6%'),
-    alignSelf: 'center',
+    width: wp("6%"),
+    height: wp("6%"),
+    alignSelf: "center",
     shadowColor: Colors.textColorGrey,
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
   },
   contactImage: {
-    height: wp('6%'),
-    width: wp('6%'),
-    borderRadius: wp('6%') / 2,
+    height: wp("6%"),
+    width: wp("6%"),
+    borderRadius: wp("6%") / 2,
   },
   imageBackground: {
     backgroundColor: Colors.shadowBlue,
-    height: wp('6%'),
-    width: wp('6%'),
-    borderRadius: wp('6%') / 2,
+    height: wp("6%"),
+    width: wp("6%"),
+    borderRadius: wp("6%") / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     shadowColor: Colors.textColorGrey,
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

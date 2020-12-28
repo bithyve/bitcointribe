@@ -238,10 +238,9 @@ const KeeperDeviceHistory = (props) => {
           if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          // {"uuid":"1916dc055fa3eec82d7afe2e","publicKey":"0fa36ed22727611c8b9f19ef65acdd003387cb8230263e4f28ff7dd51ba21623","privateKey":"024af71b291184df2cfe72636d3c8f908f0756d01d4036e7bfdbf2a1e2efa1dd","ephemeralAddress":"25c5739ac4c616be0e93d52d3e9c8ef210922bd5301f3bd14e03c733b2c7c8c1","isSignUp":true,"password":"1111","walletName":"qwe"}
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"8f47f38136f18e6d79fe07aa","publicKey": "49ae8cd5e9876eb1b91f1f020055d9fc77b0094b1e6ed0ee8ccd4a028b03b98f","ephemeralAddress": "e42fc3663f05e30c63ce80352387c75c9be326aa05b6ee56f01ac749c108e402","walletName":"WER"}'
-            : '{"uuid":"1916dc055fa3eec82d7afe2e","publicKey": "0fa36ed22727611c8b9f19ef65acdd003387cb8230263e4f28ff7dd51ba21623","ephemeralAddress": "25c5739ac4c616be0e93d52d3e9c8ef210922bd5301f3bd14e03c733b2c7c8c1","walletName":"qwe"}';
+            ? '{"uuid":"67bf864aadeaadaa186e3f14","publicKey":"477e4dff92af30f8fe7d75c6da555709a45d849a05bde28d8ced801a7e49fa75","ephemeralAddress":"de6d42bd3917909c1290c5f5594ab997999294eadabb3e6146684dfb8f98f807","walletName":"Mac"}'
+            : '{"uuid":"bf9ec30e3d7bd67d9c1268fe","publicKey":"42b7d841ce2e3c1415688352d27e233ab4b08e7ef005f654220dd66d15677860","ephemeralAddress":"41f630228637802b61fffa5eaedb21421ea530dea0ab12da7b703f3f351a0cc0","walletName":"Macdd"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
