@@ -466,7 +466,7 @@ export default function ContactList( props ) {
         />
       </View>
       <View style={{
-        flex: 1, flexDirection: 'row', position: 'relative'
+        position: 'relative', height: hp( '40%' )
       }}>
         {filterContactData ? (
           <FlatList
