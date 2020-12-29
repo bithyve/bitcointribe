@@ -28,6 +28,7 @@ import {
   initLevelTwo,
 } from '../../store/actions/health';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
+import Loader from '../../components/loader';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
@@ -125,7 +126,6 @@ class KeeperFeatures extends Component<
 
   setUpKeeper = async () => {
     let level = this.props.navigation.state.params.selectedLevelId;
-    this.setState({ setUpLoader: true });
     if (!this.props.isLevelTwoMetaShareCreated && !this.props.isLevel2Initialized  && level == 2)
       await this.props.generateMetaShare(level);
     if(!this.props.isLevelThreeMetaShareCreated && !this.props.isLevel3Initialized && level == 3)
@@ -233,6 +233,7 @@ class KeeperFeatures extends Component<
             </View>
           </View>
         </View>
+        {setUpLoader ? <Loader isLoading={true} /> : null}
         <ScrollView style={{ flex: 1 }}>
           <View style={{ ...styles.topHealthView }}>
             <View
@@ -362,7 +363,9 @@ class KeeperFeatures extends Component<
           <TouchableOpacity
             disabled={setUpLoader ? true : false}
             onPress={() => {
-              this.setUpKeeper();
+              this.setState({ setUpLoader: true }, () => {
+                this.setUpKeeper();
+            }); 
             }}
             style={{
               ...styles.successModalButtonView,
@@ -371,7 +374,7 @@ class KeeperFeatures extends Component<
             }}
           >
             {setUpLoader ? (
-              <ActivityIndicator size={'small'} />
+              <ActivityIndicator size="small" color={Colors.white} />
             ) : (
               <Text
                 style={{

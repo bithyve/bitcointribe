@@ -1276,6 +1276,7 @@ const TrustedContactHistoryKeeper = (props) => {
         ]}
         renderContent={() => (
           <ApproveSetup
+          currentTime ={moment(new Date()).valueOf()}
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
               (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);

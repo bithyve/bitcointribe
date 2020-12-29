@@ -1323,6 +1323,7 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <ApproveSetup
+              currentTime ={moment(new Date()).valueOf()}
               isContinueDisabled={
                 selectedKeeperType == "pdf"
                   ? !keeperApproveStatus.status

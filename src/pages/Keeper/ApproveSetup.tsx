@@ -14,7 +14,7 @@ import CountDown from 'react-native-countdown-component';
 import Config from '../../bitcoin/HexaConfig';
 
 export default function ApproveSetup(props) {
-  const KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY;
+  let KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY;
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
