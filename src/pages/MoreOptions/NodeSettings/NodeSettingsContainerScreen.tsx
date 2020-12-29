@@ -151,7 +151,7 @@ const styles = StyleSheet.create( {
   floatingNoteContainer: {
     position: 'absolute',
     bottom: 0,
-    marginBottom: 24,
+    marginBottom: 0,
   }
 } )
 
