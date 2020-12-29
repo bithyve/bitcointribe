@@ -99,8 +99,6 @@ const KeeperDeviceHistory = (props) => {
       ? false
       : true
   );
-  const [contactCount, setContactCount] = useState(0);
-
   const levelHealth: LevelHealthInterface[] = useSelector(
     (state) => state.health.levelHealth
   );
@@ -415,7 +413,7 @@ const KeeperDeviceHistory = (props) => {
     if (type == "pdf") {
       props.navigation.navigate(
         'PersonalCopyHistoryKeeper',
-        props.navigation.state.params,
+        {...props.navigation.state.params, selectedTitle: name},
       );
     }
   };

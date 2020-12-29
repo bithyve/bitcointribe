@@ -36,12 +36,19 @@ import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 import SmallHeaderModal from "../../components/SmallHeaderModal";
 import PersonalCopyHelpContents from "../../components/Helper/PersonalCopyHelpContents";
 import HistoryHeaderComponent from "./HistoryHeaderComponent";
-import { getPDFData, confirmPDFShared } from '../../store/actions/health';
+import { getPDFData, confirmPDFShared, sendApprovalRequest, onApprovalStatusChange } from '../../store/actions/health';
+import KeeperTypeModalContents from "./KeeperTypeModalContent";
+import { LevelHealthInterface, notificationType } from "../../bitcoin/utilities/Interface";
+import ApproveSetup from "./ApproveSetup";
 
 const PersonalCopyHistory = (props) => {
   const dispatch = useDispatch();
   const ErrorBottomSheet = React.createRef();
   const HelpBottomSheet = React.createRef();
+  const keeperTypeBottomSheet = React.createRef();
+  const ApprovePrimaryKeeperBottomSheet = React.createRef();
+  const [selectedKeeperType, setSelectedKeeperType] = useState('');
+  const [selectedKeeperName, setSelectedKeeperName] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
 
@@ -99,6 +106,7 @@ const PersonalCopyHistory = (props) => {
   );
   const levelHealth = useSelector((state) => state.health.levelHealth);
   const currentLevel = useSelector((state) => state.health.currentLevel);
+  const keeperInfo = useSelector((state) => state.health.keeperInfo);
   const pdfInfo = useSelector((state) => state.health.pdfInfo);
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
@@ -261,7 +269,103 @@ const PersonalCopyHistory = (props) => {
     );
   };
 
-  const confirmClick = () => {};
+  const sendApprovalRequestToPK = (type) => {
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : currentLevel == 3
+        ? levelHealth[2].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+        console.log('PKShareId', PKShareId);
+    dispatch(
+      sendApprovalRequest(
+        selectedKeeper.shareId,
+        PKShareId,
+        type == "pdf"
+          ? notificationType.uploadPDFShare
+          : notificationType.approveKeeper
+      )
+    );
+    if (type == "pdf") {
+      dispatch(onApprovalStatusChange(
+        false,
+        moment(new Date()).valueOf(),
+        selectedKeeper.shareId
+      ));
+    }
+    (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+    (keeperTypeBottomSheet as any).current.snapTo(0);
+  };
+
+  const onPressChangeKeeperType = (type, name) => {
+    if (type == "contact") {
+      let levelhealth: LevelHealthInterface[] = [];
+      if (
+        levelHealth[1] &&
+        levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
+      )
+        levelhealth = [levelHealth[1]];
+      if (
+        levelHealth[2] &&
+        levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
+      )
+        levelhealth = [levelHealth[1], levelHealth[2]];
+      let index = 1;
+      let contactCount = 0;
+      for (let i = 0; i < levelhealth.length; i++) {
+        const element = levelhealth[i];
+        for (let j = 0; j < element.levelInfo.length; j++) {
+          const element2 = element.levelInfo[j];
+          if (
+            levelhealth[i] &&
+            element2.shareType == "contact" &&
+            props.keeper &&
+            props.keeper.shareId != element2.shareId &&
+            levelhealth[i] &&
+            element2.shareType == "contact" &&
+            props.keeper.shareType == "contact"
+          ) {
+            contactCount++;
+          } else if (
+            !props.keeper &&
+            levelhealth[i] &&
+            element2.shareType == "contact"
+          )
+            contactCount++;
+          if (element2.shareType == "contact" && contactCount < 2) {
+            if (
+              keeperInfo.findIndex(
+                (value) =>
+                  value.shareId == element2.shareId && value.type == "contact"
+              ) > -1
+            ) {
+              if (
+                keeperInfo[
+                  keeperInfo.findIndex(
+                    (value) =>
+                      value.shareId == element2.shareId &&
+                      value.type == "contact"
+                  )
+                ].data.index == 1
+              )
+                index = 2;
+            }
+          }
+        }
+      }
+      props.navigation.navigate("TrustedContactHistoryKeeper", {
+        ...props.navigation.state.params,
+        selectedTitle: name,
+        index: index,
+      });
+    }
+    if (type == "device") {
+      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name});
+    }
+    if (type == "pdf") {
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -292,7 +396,7 @@ const PersonalCopyHistory = (props) => {
           }}
           changeButtonText={"Change Keeper"}
           onPressChange={() => {
-            (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+            (keeperTypeBottomSheet as any).current.snapTo(1);
           }}
         />
       </View>
@@ -324,6 +428,54 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={keeperTypeBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('75%') : hp('75%'),
+        ]}
+        renderContent={() => (
+          <KeeperTypeModalContents
+            onPressSetup={async (type, name) =>{
+              setSelectedKeeperType(type);
+              setSelectedKeeperName(name);
+              sendApprovalRequestToPK(type);
+            }}
+            onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+            selectedLevelId={selectedLevelId}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+          />
+        )}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ApprovePrimaryKeeperBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
+        ]}
+        renderContent={() => (
+          <ApproveSetup
+            onPressContinue={() => {
+              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => {
+              (keeperTypeBottomSheet as any).current.snapTo(1);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
       />
     </View>
   );

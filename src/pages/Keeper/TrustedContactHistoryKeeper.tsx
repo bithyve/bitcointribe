@@ -104,7 +104,6 @@ const TrustedContactHistoryKeeper = (props) => {
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
-  const QrBottomSheet = React.createRef();
   const keeperTypeBottomSheet = React.createRef();
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [qrScannedData, setQrScannedData] = useState('');
@@ -1044,76 +1043,6 @@ const TrustedContactHistoryKeeper = (props) => {
     }
   }, [chosenContact, trustedQR]);
 
-  const renderQrContent = useCallback(() => {
-    return (
-      <QRModal
-        isFromKeeperDeviceHistory={true}
-        QRModalHeader={'QR scanner'}
-        title={'Note'}
-        infoText={
-          'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
-        }
-        modalRef={QrBottomSheet}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => {
-          try {
-            setQrScannedData(qrData);
-            if (qrData) {
-              props.navigation.navigate('KeeperFeatures', {
-                isReshare: false,
-                qrScannedData: qrData,
-                isPrimaryKeeper: false,
-                selectedShareId: selectedShareId,
-                selectedLevelId,
-                isChange: true
-              });
-              (QrBottomSheet as any).current.snapTo(0);
-            }
-          } catch (err) {
-            console.log({ err });
-          }
-
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-            (QrBottomSheet.current as any).snapTo(0);
-          }, 2);
-        }}
-        onBackPress={() => {
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-          }, 2);
-          (QrBottomSheet as any).current.snapTo(0);
-        }}
-        onPressContinue={() => {
-          // {uuid: "77a5afe364edb1ff71d254e4", publicKey: "46e9c9490a34b76188839b7db8fc85fd6cccda59f33f54d8d2b7e20a5a2f6a1a", privateKey: "0ee8702c3a00c5fcb782feecac3542d6103a65629a83b8942507f20aa14b4875", ephemeralAddress: "621135470af4d9c55f641434230e2b5128315be2d1ae14e4dbc9d323a346fbf3", isSignUp: true, …}
-          let qrScannedData = 
-            '{"uuid":"77a5afe364edb1ff71d254e4","publicKey": "46e9c9490a34b76188839b7db8fc85fd6cccda59f33f54d8d2b7e20a5a2f6a1a","ephemeralAddress": "621135470af4d9c55f641434230e2b5128315be2d1ae14e4dbc9d323a346fbf3","walletName":"Change"}';
-          props.navigation.navigate('KeeperFeatures', {
-            isReshare: false,
-            qrScannedData,
-            isPrimaryKeeper: false,
-            selectedShareId: selectedShareId,
-            selectedLevelId: selectedLevelId,
-            isChange: true
-          });
-        }}
-      />
-    );
-  }, [QrBottomSheetsFlag]);
-
-  const renderQrHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-          }, 2);
-          (QrBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
   const sendApprovalRequestToPK = (type) => {
     let PKShareId =
       currentLevel == 2 || currentLevel == 1
@@ -1121,7 +1050,6 @@ const TrustedContactHistoryKeeper = (props) => {
         : currentLevel == 3
         ? levelHealth[2].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
-        console.log('PKShareId', PKShareId);
     dispatch(
       sendApprovalRequest(
         selectedKeeper.shareId,
@@ -1131,7 +1059,6 @@ const TrustedContactHistoryKeeper = (props) => {
           : notificationType.approveKeeper
       )
     );
-    console.log('type', type);
     if (type == "pdf") {
       dispatch(onApprovalStatusChange(
         false,
@@ -1145,73 +1072,15 @@ const TrustedContactHistoryKeeper = (props) => {
 
   const onPressChangeKeeperType = (type, name) => {
     if (type == "contact") {
-      let levelhealth: LevelHealthInterface[] = [];
-      if (
-        levelHealth[1] &&
-        levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
-      )
-        levelhealth = [levelHealth[1]];
-      if (
-        levelHealth[2] &&
-        levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
-      )
-        levelhealth = [levelHealth[1], levelHealth[2]];
-      let index = 1;
-      let contactCount = 0;
-      for (let i = 0; i < levelhealth.length; i++) {
-        const element = levelhealth[i];
-        for (let j = 0; j < element.levelInfo.length; j++) {
-          const element2 = element.levelInfo[j];
-          if (
-            levelhealth[i] &&
-            element2.shareType == "contact" &&
-            props.keeper &&
-            props.keeper.shareId != element2.shareId &&
-            levelhealth[i] &&
-            element2.shareType == "contact" &&
-            props.keeper.shareType == "contact"
-          ) {
-            contactCount++;
-          } else if (
-            !props.keeper &&
-            levelhealth[i] &&
-            element2.shareType == "contact"
-          )
-            contactCount++;
-          if (element2.shareType == "contact" && contactCount < 2) {
-            if (
-              keeperInfo.findIndex(
-                (value) =>
-                  value.shareId == element2.shareId && value.type == "contact"
-              ) > -1
-            ) {
-              if (
-                keeperInfo[
-                  keeperInfo.findIndex(
-                    (value) =>
-                      value.shareId == element2.shareId &&
-                      value.type == "contact"
-                  )
-                ].data.index == 1
-              )
-                index = 2;
-            }
-          }
-        }
-      }
-      props.navigation.navigate("TrustedContactHistoryKeeper", {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: index,
-      });
+      (ChangeBottomSheet as any).current.snapTo(1);
     }
     if (type == "device") {
-      (QrBottomSheet as any).current.snapTo(1);
+      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name});
     }
     if (type == "pdf") {
       props.navigation.navigate(
         'PersonalCopyHistoryKeeper',
-        props.navigation.state.params,
+        {...props.navigation.state.params, selectedTitle: name}
       );
     }
   };
@@ -1397,25 +1266,6 @@ const TrustedContactHistoryKeeper = (props) => {
             onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
           />
         )}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0);
-        }}
-        onCloseStart={() => {}}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={QrBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('89%'),
-        ]}
-        renderContent={renderQrContent}
-        renderHeader={renderQrHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}

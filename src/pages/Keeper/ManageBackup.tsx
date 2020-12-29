@@ -275,8 +275,8 @@ class ManageBackup extends Component<
     }
     let value = 1;
     if (this.state.levelData[0].status == "notSetup") value = 1;
+    else if (level === 3) value = 0;
     else if (level) value = level + 1;
-    else if (level == 3) value = 3;
     this.setState({ selectedId: value });
   };
 
@@ -747,7 +747,7 @@ class ManageBackup extends Component<
               <Text style={styles.backupInfoText}>at level {currentLevel}</Text>
             </View>
           </View>
-          <View style={{ flex: 1, alignItems: "center", position: "relative" }}>
+          <View style={{ flex: 1, alignItems: "center", position: "relative", paddingBottom: wp('7%') }}>
             {levelData.map((value) => {
               return (
                 <TouchableOpacity onPress={() => this.selectId(value.id)}>
