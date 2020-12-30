@@ -77,7 +77,6 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import Relay from '../../bitcoin/utilities/Relay'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 
@@ -291,6 +290,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
+  console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
   let { serviceType, accountNumber, accountType } = payload
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
 
@@ -1395,12 +1395,68 @@ export const addNewAccountShellWatcher = createWatcher(
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
-  try {
-    // TODO: Implement backend logic here for saving an account's properties
+  // TODO:: Replace below if statemeent to update default account settings
+
+  if( account && account.instanceNumber==0 )
+  {
     yield put( accountSettingsUpdated( {
       account 
     } ) )
-  } catch ( error ) {
+  }
+  // Below implementation is for non-default accounts
+
+  let accountType = ''
+  switch( account.kind )  {
+      case DONATION_ACCOUNT:
+        accountType = REGULAR_ACCOUNT
+        break
+      case REGULAR_ACCOUNT:
+        accountType = REGULAR_ACCOUNT
+        break
+      case SECURE_ACCOUNT:
+        accountType = SECURE_ACCOUNT
+        break
+      case TEST_ACCOUNT:
+        accountType = TEST_ACCOUNT
+        break
+  }
+  
+  try {
+    const service = yield select(
+      ( state ) => state.accounts[ accountType ].service
+    )
+
+    const result = yield call(
+      service.updateDerivativeAccount,
+      {
+        kind: account.kind,
+        instanceNumber: account.instanceNumber,
+        customDisplayName :account.customDisplayName,
+        customDescription: account.customDescription
+      }
+    )
+    if ( result.status === 200 ) {
+
+      const service = yield select(
+        ( state ) => state.accounts[ accountType ].service
+      )
+
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const updatedSERVICES = {
+        ...SERVICES,
+        [ account.kind ]: JSON.stringify( service ),
+      }
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES 
+        } 
+      } )
+
+      yield put( accountSettingsUpdated( {
+        account 
+      } ) )
+    } 
+  }catch ( error ) {
     yield put( accountSettingsUpdateFailed( {
       account, error 
     } ) )
