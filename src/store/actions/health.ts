@@ -187,13 +187,13 @@ export const isLevel3InitializedStatus = () => {
   return { type: IS_LEVEL3_INITIALIZED };
 };
 
-export const updatedKeeperInfo = (info) =>{
-  return { type: KEEPER_INFO, payload: { info } };
+export const updatedKeeperInfo = (keeperData) =>{
+  return { type: KEEPER_INFO, payload: { keeperData } };
 }
 
-// export const putKeeperInfo = (info) =>{
-//   return { type: PUT_KEEPER_INFO, payload: { info } };
-// }
+export const putKeeperInfo = (info) =>{
+  return { type: PUT_KEEPER_INFO, payload: { info } };
+}
 
 export const downloadMShare = (
   payload: {

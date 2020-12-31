@@ -735,36 +735,17 @@ const TrustedContactHistoryKeeper = (props) => {
           status: 'notAccessible',
         },
       ];
-      dispatch(updateMSharesHealth(shareArray));
-      let keeperInfoTemp = keeperInfo;
-      let flag = false;
-      if (keeperInfoTemp.length > 0) {
-        for (let i = 0; i < keeperInfoTemp.length; i++) {
-          const element = keeperInfoTemp[i];
-          if (element.shareId == selectedShareId) {
-            keeperInfoTemp[i].name = contact.name;
-            keeperInfoTemp[i].uuid = contact.id;
-            keeperInfoTemp[i].publicKey = '';
-            keeperInfoTemp[i].ephemeralAddress = '';
-            keeperInfoTemp[i].type = 'contact';
-            keeperInfoTemp[i].data = {...contact, index};
-            break;
-          } else { flag = true; break; }
-        }
-      } else flag = true;
-      if (flag) {
-        let obj = {
-          shareId: selectedShareId,
-          name: contact.name,
-          uuid: contact.id,
-          publicKey: '',
-          ephemeralAddress: '',
-          type: 'contact',
-          data: {...contact, index},
-        };
-        keeperInfo.push(obj);
-      }
-      dispatch(updatedKeeperInfo(keeperInfo));
+      dispatch(updateMSharesHealth(shareArray));      
+      let obj = {
+        shareId: selectedShareId,
+        name: contact.name,
+        uuid: contact.id,
+        publicKey: '',
+        ephemeralAddress: '',
+        type: 'contact',
+        data: {...contact, index}
+      };
+      dispatch(updatedKeeperInfo(obj));
     },
     [index, trustedContactsInfo],
   );
@@ -1073,7 +1054,7 @@ const TrustedContactHistoryKeeper = (props) => {
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf") {
+    if (type == "pdf" && !keeperApproveStatus.shareId) {
       dispatch(onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),

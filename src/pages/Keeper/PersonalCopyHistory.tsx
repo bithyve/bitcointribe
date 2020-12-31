@@ -289,7 +289,7 @@ const PersonalCopyHistory = (props) => {
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf") {
+    if (type == "pdf" && !keeperApproveStatus.shareId) {
       dispatch(onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),

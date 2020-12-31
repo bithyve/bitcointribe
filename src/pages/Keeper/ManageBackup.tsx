@@ -560,6 +560,7 @@ class ManageBackup extends Component<
       currentLevel,
       sendApprovalRequest,
       onApprovalStatusChange,
+      keeperApproveStatus
     } = this.props;
     let PKShareId =
       currentLevel == 2 || currentLevel == 1
@@ -574,7 +575,7 @@ class ManageBackup extends Component<
         ? notificationType.uploadSecondaryShare
         : notificationType.approveKeeper
     );
-    if (this.state.selectedKeeperType == "pdf") {
+    if (this.state.selectedKeeperType == "pdf" && !keeperApproveStatus.shareId) {
       onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),

@@ -1882,8 +1882,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     let tmpList = asyncNotificationList;
     if (notificationList) {
+      // console.log("notificationList['notifications']", notificationList['notifications'])
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
+        // console.log('element', element)
         let readStatus = false;
         if (element.notificationType == releaseNotificationTopic) {
           let releaseCases = this.props.releaseCasesValue;

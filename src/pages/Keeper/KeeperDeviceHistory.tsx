@@ -310,16 +310,14 @@ const KeeperDeviceHistory = (props) => {
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf") {
-      if(!keeperApproveStatus.shareId){
-        dispatch(
-          onApprovalStatusChange(
-            false,
-            moment(new Date()).valueOf(),
-            selectedKeeper.shareId
-          )
-        );
-      }
+    if (type == "pdf" && !keeperApproveStatus.shareId) {
+      dispatch(
+        onApprovalStatusChange(
+          false,
+          moment(new Date()).valueOf(),
+          selectedKeeper.shareId
+        )
+      );
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);

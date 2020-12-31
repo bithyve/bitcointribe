@@ -53,6 +53,8 @@ import {
   CONFIRM_PDF_SHARED,
   DOWNLOAD_PDFSHARE_HEALTH,
   downloadedPdfShare,
+  KEEPER_INFO,
+  putKeeperInfo,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -518,38 +520,16 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             },
           ];
           yield put(updateMSharesHealth(shareArray));
-          let keeperInfo = yield select((state) => state.health.keeperInfo);
-          let flag = false;
-          if (keeperInfo.length > 0) {
-            for (let i = 0; i < keeperInfo.length; i++) {
-              const element = keeperInfo[i];
-              if (element.shareId == share.shareId) {
-                flag = false;
-                keeperInfo[i].name = ScannedData.walletName;
-                keeperInfo[i].uuid = ScannedData.uuid;
-                keeperInfo[i].publicKey = ScannedData.publicKey;
-                keeperInfo[i].ephemeralAddress = ScannedData.ephemeralAddress;
-                keeperInfo[i].type = type;
-                break;
-              } else {
-                flag = true;
-              }
-            }
-          } else {
-            flag = true;
-          }
-          if (flag) {
-            let obj = {
-              shareId: share.shareId,
-              name: ScannedData.walletName,
-              uuid: ScannedData.uuid,
-              publicKey: ScannedData.publicKey,
-              ephemeralAddress: ScannedData.ephemeralAddress,
-              type,
-            };
-            keeperInfo.push(obj);
-          }
-          yield put(updatedKeeperInfo(keeperInfo));
+          let obj = {
+            shareId: share.shareId,
+            name: ScannedData.walletName,
+            uuid: ScannedData.uuid,
+            publicKey: ScannedData.publicKey,
+            ephemeralAddress: ScannedData.ephemeralAddress,
+            type: type,
+            data: {}
+          };
+          yield put(updatedKeeperInfo(obj));
           yield put(onApprovalStatusChange(false, 0, ""));
         }
       }
@@ -1110,7 +1090,8 @@ function* recoverWalletWorker({ payload }) {
         "securityQuestionHistory",
         JSON.stringify(securityQuestionHistory)
       );
-      yield put(updatedKeeperInfo(keeperData));
+      yield put(putKeeperInfo(keeperData));
+      // yield put(updatedKeeperInfo(keeperData));
       // personal copy health restoration
       // let updatedPDFHealth = {};
       // for (const share of restorationShares) {
@@ -1767,6 +1748,7 @@ function* uploadPdfShareWorker({ payload }) {
     //         for (let i = 0; i < keeperInfo.length; i++) {
     //           const element = keeperInfo[i];
     //           if (element.shareId == share.shareId) {
+                  //  flag = false;
     //             keeperInfo[i].name = ScannedData.walletName;
     //             keeperInfo[i].uuid = ScannedData.uuid;
     //             keeperInfo[i].publicKey = ScannedData.publicKey;
@@ -1775,7 +1757,6 @@ function* uploadPdfShareWorker({ payload }) {
     //             break;
     //           } else {
     //             flag = true;
-    //             break;
     //           }
     //         }
     //       } else {
@@ -1928,31 +1909,18 @@ function* reShareWithSameKeeperWorker({ payload }) {
                 object = { ...keeperInfo[index] };
                 object.shareId = selectedShareId;
               }
-              let flag = false;
               if (object) {
-                if (keeperInfo.length > 0) {
-                  for (let i = 0; i < keeperInfo.length; i++) {
-                    const element = keeperInfo[i];
-                    if (element.shareId == selectedShareId) {
-                      keeperInfo[i].name = object.name;
-                      keeperInfo[i].uuid = object.uuid;
-                      keeperInfo[i].publicKey = object.publicKey;
-                      keeperInfo[i].ephemeralAddress = object.ephemeralAddress;
-                      keeperInfo[i].type = object.type;
-                      break;
-                    } else {
-                      flag = true;
-                      break;
-                    }
-                  }
-                } else {
-                  flag = true;
-                }
-                if (flag) {
-                  keeperInfo.push(object);
-                }
+                let obj = {
+                  shareId: selectedShareId,
+                  name: object.name,
+                  uuid: object.uuid,
+                  publicKey: object.publicKey,
+                  ephemeralAddress: object.ephemeralAddress,
+                  type: object.type,
+                  data: {}
+                };
+                yield put(updatedKeeperInfo(obj));
               }
-              yield put(updatedKeeperInfo(keeperInfo));
             }
             const updatedSERVICES = {
               ...SERVICES,
@@ -2060,31 +2028,18 @@ function* autoShareContactWorker({ payload }) {
             object = { ...keeperInfo[index] };
             object.shareId = selectedShareId;
           }
-          let flag = false;
           if (object) {
-            if (keeperInfo.length > 0) {
-              for (let i = 0; i < keeperInfo.length; i++) {
-                const element = keeperInfo[i];
-                if (element.shareId == selectedShareId) {
-                  keeperInfo[i].name = object.name;
-                  keeperInfo[i].uuid = object.uuid;
-                  keeperInfo[i].publicKey = object.publicKey;
-                  keeperInfo[i].ephemeralAddress = object.ephemeralAddress;
-                  keeperInfo[i].type = object.type;
-                  break;
-                } else {
-                  flag = true;
-                  break;
-                }
-              }
-            } else {
-              flag = true;
-            }
-            if (flag) {
-              keeperInfo.push(object);
-            }
+            let obj = {
+              shareId: selectedShareId,
+              name: object.name,
+              uuid: object.uuid,
+              publicKey: object.publicKey,
+              ephemeralAddress: object.ephemeralAddress,
+              type: object.type,
+              data: {}
+            };
+            yield put(updatedKeeperInfo(obj));
           }
-          yield put(updatedKeeperInfo(keeperInfo));
         }
         const updatedSERVICES = {
           ...SERVICES,
@@ -2532,35 +2487,16 @@ function* confirmPDFSharedWorker({ payload }) {
       },
     ];
     yield put(updateMSharesHealth(shareArray));
-    let keeperInfo = yield select((state) => state.health.keeperInfo);
-    let flag = false;
-    if (keeperInfo.length > 0) {
-      for (let i = 0; i < keeperInfo.length; i++) {
-        const element = keeperInfo[i];
-        if (element.shareId == shareId) {
-          keeperInfo[i].name = "Keeper PDF";
-          keeperInfo[i].type = "pdf";
-          break;
-        } else {
-          flag = true;
-          break;
-        }
-      }
-    } else {
-      flag = true;
-    }
-    if (flag) {
-      let obj = {
-        shareId: shareId,
-        name: "Keeper PDF",
-        uuid: "",
-        publicKey: "",
-        ephemeralAddress: "",
-        type: "pdf",
-      };
-      keeperInfo.push(obj);
-    }
-    yield put(updatedKeeperInfo(keeperInfo));
+    let obj = {
+      shareId: shareId,
+      name: "Keeper PDF",
+      uuid: "",
+      publicKey: "",
+      ephemeralAddress: "",
+      type: "pdf",
+      data: {}
+    };
+    yield put(updatedKeeperInfo(obj));
     yield put(onApprovalStatusChange(false, 0, ""));
     yield put(switchS3LoaderKeeper("pdfDataProcess"));
   } catch (error) {
@@ -2572,4 +2508,38 @@ function* confirmPDFSharedWorker({ payload }) {
 export const confirmPDFSharedWatcher = createWatcher(
   confirmPDFSharedWorker,
   CONFIRM_PDF_SHARED
+);
+
+function* updatedKeeperInfoWorker({ payload }) {
+  try {
+    let { keeperData } = payload;
+    let keeperInfo = [...yield select((state) => state.health.keeperInfo)];
+    let flag = false;
+    if (keeperInfo.length > 0) {
+      for (let i = 0; i < keeperInfo.length; i++) {
+        const element = keeperInfo[i];
+        if (element.shareId == keeperData.shareId) {
+          flag = false;
+          keeperInfo[i].name = keeperData.name;
+          keeperInfo[i].uuid = keeperData.uuid;
+          keeperInfo[i].publicKey = keeperData.publicKey;
+          keeperInfo[i].ephemeralAddress = keeperData.ephemeralAddress;
+          keeperInfo[i].type = keeperData.type;
+          keeperInfo[i].data = keeperData.data;
+          break;
+        } else flag = true;
+      }
+    } else flag = true; 
+    if (flag) {
+      keeperInfo.push(keeperData);
+    }
+    yield put(putKeeperInfo(keeperInfo));
+  } catch (error) {
+    console.log("Error updatedKeeperInfoWorker", error);
+  }
+}
+
+export const updatedKeeperInfoWatcher = createWatcher(
+  updatedKeeperInfoWorker,
+  KEEPER_INFO
 );

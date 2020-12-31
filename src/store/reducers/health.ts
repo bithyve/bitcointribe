@@ -29,7 +29,8 @@ import {
   DOWNLOADED_SM_SHARES,
   REMOVE_SN,
   SET_PDF_INFO,
-  DOWNLOADED_PDFSHARE_HEALTH
+  DOWNLOADED_PDFSHARE_HEALTH,
+  PUT_KEEPER_INFO
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -91,7 +92,7 @@ const initialState: {
     status: Boolean;
     initiatedAt: number;
     shareId: string;
-    secondaryShare: MetaShare;
+    secondaryShare?: MetaShare;
   }
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -238,11 +239,11 @@ export default (state = initialState, action) => {
         isLevelThreeMetaShareCreated: action.payload.beingLoaded,
       };
 
-    case KEEPER_INFO:
+    case PUT_KEEPER_INFO:
       return {
-        ...state,
-        keeperInfo: action.payload.info,
-      };
+      ...state,
+      keeperInfo: action.payload.info,
+    };
 
     case IS_LEVEL2_INITIALIZED:
       return {
