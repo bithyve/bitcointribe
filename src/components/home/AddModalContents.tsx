@@ -24,6 +24,12 @@ export default function AddModalContents( props ) {
       info: 'Add contacts from your Address Book',
       type: 'addContact',
     },
+    {
+      title: 'Add a Swan Bitcoin Account',
+      subtitle: 'Buy Bitcoin into Hexa Wallet from SwanBitcoin',
+      imageSource: require( '../../assets/images/icons/swan_temp.png' ),
+      type: 'swan',
+    },
   ] )
 
   return (
