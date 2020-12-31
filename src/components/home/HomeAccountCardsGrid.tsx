@@ -8,6 +8,7 @@ export type Props = {
   onCardLongPressed: ( accountShell: AccountShell ) => void;
   onAccountSelected: ( accountShell: AccountShell ) => void;
   onAddNewSelected: () => void;
+  currentLevel: number;
   contentContainerStyle?: Record<string, unknown>;
 };
 
@@ -26,6 +27,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
   onCardLongPressed,
   onAccountSelected,
   onAddNewSelected,
+  currentLevel,
   contentContainerStyle = {
   },
 }: Props ) => {
@@ -75,6 +77,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       renderItem={( { item, index }: RenderItemProps ) => {
         return <AccountCardColumn
           cardData={item}
+          currentLevel={currentLevel}
           prependsAddButton={index == 0}
           onAccountCardSelected={onAccountSelected}
           onAddNewAccountPressed={onAddNewSelected}

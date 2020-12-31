@@ -2249,6 +2249,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             paddingTop: 36,
             paddingLeft: 14,
           }}
+          currentLevel={currentLevel}
           onAddNewSelected={this.navigateToAddNewAccountScreen}
           onCardSelected={this.handleAccountCardSelection}
         />

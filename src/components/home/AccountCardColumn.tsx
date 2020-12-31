@@ -8,12 +8,14 @@ import {
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
 import HomeAccountsListCard from './HomeAccountsListCard';
 import AccountShell from '../../common/data/models/AccountShell';
+import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export type Props = {
   cardData: AccountShell[];
   prependsAddButton: boolean;
   onAccountCardSelected: (accountShell: AccountShell) => void;
   onAddNewAccountPressed: () => void;
+  currentLevel: number;
   onCardLongPressed: (accountShell: AccountShell) => void;
 };
 
@@ -23,6 +25,7 @@ const AccountCardColumn: React.FC<Props> = ({
   onAccountCardSelected,
   onAddNewAccountPressed,
   onCardLongPressed,
+  currentLevel
 }: Props) => {
   return (
     <View style={styles.rootContainer}>
@@ -34,15 +37,19 @@ const AccountCardColumn: React.FC<Props> = ({
       )}
 
       {cardData.map((accountShell) => {
+        let disabled = false;
+        if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return (
           <TouchableOpacity
             key={accountShell.id}
+            disabled={disabled}
             style={styles.cardContainer}
             onPress={() => onAccountCardSelected(accountShell)}
             onLongPress={() => onCardLongPressed(accountShell)}
           >
             <HomeAccountsListCard
               accountShell={accountShell}
+              cardDisabled={disabled}
             />
           </TouchableOpacity>
         );

@@ -17,13 +17,14 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 
 export type Props = {
   accountShell: AccountShell;
+  cardDisabled: boolean;
 };
 
 type HeaderProps = Props;
 type BodyProps = Props;
 
 
-const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) => {
+const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled}: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
 
@@ -59,7 +60,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
   )
 }
 
-const BodySection: React.FC<BodyProps> = ( { accountShell, }: BodyProps ) => {
+const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled}: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
   const totalBalance = useTotalBalanceForAccountShell( accountShell )
@@ -96,11 +97,11 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, }: BodyProps ) => {
 }
 
 
-const HomeAccountsListCard: React.FC<Props> = ( { accountShell, }: Props ) => {
+const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled}: Props ) => {
   return (
-    <CardView cornerRadius={10} style={styles.rootContainer}>
-      <HeaderSection accountShell={accountShell} />
-      <BodySection accountShell={accountShell} />
+    <CardView cornerRadius={10} style={cardDisabled ? {...styles.rootContainer, opacity:0.3} : styles.rootContainer}>
+      <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
+      <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
     </CardView>
   )
 }
