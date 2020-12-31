@@ -2029,16 +2029,7 @@ function* autoShareContactWorker({ payload }) {
             object.shareId = selectedShareId;
           }
           if (object) {
-            let obj = {
-              shareId: selectedShareId,
-              name: object.name,
-              uuid: object.uuid,
-              publicKey: object.publicKey,
-              ephemeralAddress: object.ephemeralAddress,
-              type: object.type,
-              data: {}
-            };
-            yield put(updatedKeeperInfo(obj));
+            yield put(updatedKeeperInfo(object));
           }
         }
         const updatedSERVICES = {
