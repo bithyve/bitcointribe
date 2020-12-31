@@ -173,7 +173,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    SwanIntegration: {
+    SwanIntegrationScreen: {
       screen: SwanIntegrationScreen,
       navigationOptions: {
         title: 'Swan Home'

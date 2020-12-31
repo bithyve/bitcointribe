@@ -14,20 +14,20 @@ export default function AddModalContents( props ) {
   const [ addData, setAddData ] = useState( [
     {
       title: 'Buy bitcoin into Hexa wallet',
-      image: require( '../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+      image: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
       info: 'Redeem a FastBitcoins voucher',
       type: 'buyBitcoins',
     },
     {
       title: 'Add a Contact',
-      image: require( '../assets/images/icons/icon_addcontact.png' ),
+      image: require( '../../assets/images/icons/icon_addcontact.png' ),
       info: 'Add contacts from your Address Book',
       type: 'addContact',
     },
     {
       title: 'Add a Swan Bitcoin Account',
-      subtitle: 'Buy Bitcoin into Hexa Wallet from SwanBitcoin',
-      imageSource: require( '../../assets/images/icons/swan_temp.png' ),
+      info: 'Buy Bitcoin into Hexa Wallet from SwanBitcoin',
+      image: require( '../../assets/images/icons/swan_temp.png' ),
       type: 'swan',
     },
   ] )
