@@ -15,6 +15,7 @@ import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
+import swanIntegrationReducer from './reducers/SwanIntegration'
 
 const config = {
   key: 'root', // key is required
@@ -118,6 +119,11 @@ import {
 import nodeSettingsReducer from './reducers/nodeSettings'
 import { connectToBitHyveNodeWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 
+import {
+  fetchSwanTokenWatcher,
+  linkSwanWalletWatcher,
+} from './sagas/SwanIntegration'
+
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -209,6 +215,10 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+
+    // Swan Integration
+    fetchSwanTokenWatcher,
+    linkSwanWalletWatcher,
   ]
 
   yield all(
@@ -238,6 +248,7 @@ const rootReducer = combineReducers( {
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,
+  swanIntegration: swanIntegrationReducer,
 } )
 
 export default function makeStore() {
