@@ -42,7 +42,7 @@ const actionMenuItems: ActionMenuItem[] = [
 const actionItemKeyExtractor = ( item: ActionMenuItem ) => String( item.kind )
 
 
-const SwanIntegrationDemoScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const SwanIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
@@ -101,4 +101,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default SwanIntegrationDemoScreen
+export default SwanIntegrationScreen
