@@ -18,7 +18,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkMSharesHealth, initializeHealthSetup } from '../../store/actions/health';
+import { initializeHealthSetup } from '../../store/actions/health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 

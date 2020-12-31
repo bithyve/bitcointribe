@@ -40,6 +40,7 @@ import { getPDFData, confirmPDFShared, sendApprovalRequest, onApprovalStatusChan
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import { LevelHealthInterface, notificationType } from "../../bitcoin/utilities/Interface";
 import ApproveSetup from "./ApproveSetup";
+import { StackActions } from 'react-navigation';
 
 const PersonalCopyHistory = (props) => {
   const dispatch = useDispatch();
@@ -233,6 +234,9 @@ const PersonalCopyHistory = (props) => {
           // setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          const popAction = StackActions.pop({ n: 1 });
+          props.navigation.dispatch(popAction);
+          props.navigation.replace('ManageBackupKeeper');
         }}
       />
     );

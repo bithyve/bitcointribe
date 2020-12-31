@@ -33,7 +33,6 @@ import {
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
-  checkMSharesHealth,
   sendApprovalRequest,
   onApprovalStatusChange,
 } from '../../store/actions/health';
@@ -248,11 +247,11 @@ const TrustedContactHistoryKeeper = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let keeperInfoTemp: any[] = keeperInfo;
+    let keeperInfoTemp: any[] = [...keeperInfo];
     if (keeperInfoTemp.length > 0) {
       let keeperInfoIndex = keeperInfoTemp.findIndex((value) => value.shareId == selectedShareId);
-      if (keeperInfoIndex > -1) {
-        setSelectedContacts(keeperInfoTemp[keeperInfoIndex].data);
+      if (keeperInfoIndex > -1 && keeperInfoTemp[keeperInfoIndex].type == 'contact') {
+        setSelectedContacts([keeperInfoTemp[keeperInfoIndex].data]);
         const selectedContacts = trustedContactsInfo.slice(1, 3);
         let tempContact = selectedContacts[0];
         const tcInstance =
@@ -354,7 +353,6 @@ const TrustedContactHistoryKeeper = (props) => {
     async (index) => {
       saveInTransitHistory();
       setIsReshare(true);
-      dispatch(checkMSharesHealth());
     },
     [saveInTransitHistory, chosenContact],
   );
