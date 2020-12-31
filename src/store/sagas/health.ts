@@ -1444,9 +1444,16 @@ function* sendApprovalRequestWorker({ payload }) {
   let { shareID, PkShareId, notificationType } = payload;
   let keeper = yield select((state) => state.keeper.service);
   let keeperInfo: Keepers = keeper.keeper.keepers;
-  if (keeperInfo[PkShareId].keeperUUID) {
+  let keeperTCData;
+  if(!keeperInfo[PkShareId]){
+    let levelHealth: LevelHealthInterface[] = yield select((state) => state.health.levelHealth);
+    keeperTCData = keeperInfo[levelHealth[1].levelInfo[2].shareId];
+  }
+  else keeperTCData = keeperInfo[PkShareId]
+  console.log('keeperTCData', keeperTCData)
+  if (keeperTCData && keeperTCData.keeperUUID) {
     let title =
-      notificationType == "uploadPDFShare"
+      notificationType == "uploadSecondaryShare"
         ? "Approval Request for PDF Keeper"
         : "Approval Request for Keeper";
     const notification: INotification = {
@@ -1459,7 +1466,7 @@ function* sendApprovalRequestWorker({ payload }) {
     };
     let res = yield call(
       RelayServices.sendKeeperNotifications,
-      [keeperInfo[PkShareId].keeperUUID],
+      [keeperTCData.keeperUUID],
       notification
     );
   }

@@ -108,6 +108,9 @@ const PersonalCopyHistory = (props) => {
   const currentLevel = useSelector((state) => state.health.currentLevel);
   const keeperInfo = useSelector((state) => state.health.keeperInfo);
   const pdfInfo = useSelector((state) => state.health.pdfInfo);
+  const keeperApproveStatus = useSelector(
+    (state) => state.health.keeperApproveStatus
+  );
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
@@ -282,7 +285,7 @@ const PersonalCopyHistory = (props) => {
         selectedKeeper.shareId,
         PKShareId,
         type == "pdf"
-          ? notificationType.uploadPDFShare
+          ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
@@ -357,10 +360,11 @@ const PersonalCopyHistory = (props) => {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: index,
+        isChangeKeeperType: true
       });
     }
     if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name});
+      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true});
     }
     if (type == "pdf") {
       (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -445,6 +449,7 @@ const PersonalCopyHistory = (props) => {
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
+            keeper={selectedKeeper}
           />
         )}
         renderHeader={() => (
@@ -462,6 +467,11 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={() => (
           <ApproveSetup
+            isContinueDisabled={
+              selectedKeeperType == "pdf"
+                ? !keeperApproveStatus.status
+                : false
+            }
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
               (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);

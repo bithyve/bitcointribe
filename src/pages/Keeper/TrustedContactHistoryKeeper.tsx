@@ -198,6 +198,10 @@ const TrustedContactHistoryKeeper = (props) => {
   const currentLevel = useSelector((state) => state.health.currentLevel);
   const [selectedKeeperType, setSelectedKeeperType] = useState('');
   const [selectedKeeperName, setSelectedKeeperName] = useState('');
+  const keeperApproveStatus = useSelector(
+    (state) => state.health.keeperApproveStatus
+  );
+  const [isChange, setIsChange] = useState(false);
   useEffect(() => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
@@ -213,11 +217,25 @@ const TrustedContactHistoryKeeper = (props) => {
     setChosenContact(props.navigation.state.params.selectedContact);
     let shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[2].levelInfo[4].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '';
     setSelectedShareId(shareId);
+    setIsChange(
+      props.navigation.state.params.isChangeKeeperType
+        ? props.navigation.state.params.isChangeKeeperType
+        : false
+    );
   }, [
     props.navigation.state.params.selectedLevelId,
     props.navigation.state.params.selectedKeeper,
     props.navigation.state.params.selectedStatus,
   ]);
+
+  useEffect(() => {
+    if (isChange) {
+      setTimeout(() => {
+        setLoadContacts(true);
+      }, 2);
+      (trustedContactsBottomSheet as any).current.snapTo(1);
+    }
+  }, [isChange]);
 
   useEffect(() => {
     (async () => {
@@ -428,12 +446,8 @@ const TrustedContactHistoryKeeper = (props) => {
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
         title={'Reshare with the same contact?'}
-        info={
-          'Proceed if you want to reshare the link/ QR with the same contact'
-        }
-        note={
-          'For a different contact, please go back and choose ‘Change contact’'
-        }
+        info={'Proceed if you want to reshare the link/ QR with the same contact'}
+        note={'For a different contact, please go back and choose ‘Change contact’'}
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -1055,7 +1069,7 @@ const TrustedContactHistoryKeeper = (props) => {
         selectedKeeper.shareId,
         PKShareId,
         type == "pdf"
-          ? notificationType.uploadPDFShare
+          ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
@@ -1075,7 +1089,7 @@ const TrustedContactHistoryKeeper = (props) => {
       (ChangeBottomSheet as any).current.snapTo(1);
     }
     if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name});
+      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true});
     }
     if (type == "pdf") {
       props.navigation.navigate(
@@ -1259,6 +1273,7 @@ const TrustedContactHistoryKeeper = (props) => {
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
+            keeper={selectedKeeper}
           />
         )}
         renderHeader={() => (
@@ -1276,7 +1291,12 @@ const TrustedContactHistoryKeeper = (props) => {
         ]}
         renderContent={() => (
           <ApproveSetup
-          currentTime ={moment(new Date()).valueOf()}
+            currentTime ={moment(new Date()).valueOf()}
+            isContinueDisabled={
+              selectedKeeperType == "pdf"
+                ? !keeperApproveStatus.status
+                : false
+            }
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
               (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);

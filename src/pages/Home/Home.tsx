@@ -1904,7 +1904,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             readStatus = true
           }
         }
-        if (element.notificationType == 'uploadPDFShare') {
+        if (element.notificationType == 'uploadSecondaryShare') {
           let data = JSON.parse(element.data);
           if (data.shareID == keeperApproveStatus.shareId) {
             onApprovalStatusChange(
@@ -1920,7 +1920,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           fetchKeeperTrustedChannel(shareId, element.notificationType, share.name);
         }
         if (element.notificationType == 'reShare') {
-          this.props.autoDownloadShareContact(JSON.parse(element.data).selectedShareId, this.props.s3Service.getWalletId().data.walletId);
+          this.props.autoDownloadShareContact(JSON.parse(element.data).selectedShareId, JSON.parse(element.data).walletId);
         }
         if (
           asyncNotificationList.findIndex(

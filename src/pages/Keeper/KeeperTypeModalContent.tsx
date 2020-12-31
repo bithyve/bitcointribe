@@ -60,19 +60,15 @@ export default function KeeperTypeModalContents(props) {
     )
       levelhealth = [levelHealth[1], levelHealth[2]];
     if (levelHealth[2] && currentLevel == 3) levelhealth = [levelHealth[2]];
-    let isPKCounted = false;
     for (let i = 0; i < levelhealth.length; i++) {
       const element = levelhealth[i];
-      for (let j = 0; j < element.levelInfo.length; j++) {
+      for (let j = 2; j < element.levelInfo.length; j++) {
         const element2 = element.levelInfo[j];
         if (
-          levelhealth[i] &&
-          element2.shareType == "contact" &&
           props.keeper &&
-          props.keeper.shareId != element2.shareId &&
           levelhealth[i] &&
           element2.shareType == "contact" &&
-          props.keeper.shareType == "contact"
+          props.keeper.shareId != element2.shareId
         ) {
           contactCount++;
         } else if (
@@ -82,13 +78,10 @@ export default function KeeperTypeModalContents(props) {
         )
           contactCount++;
         if (
-          levelhealth[i] &&
-          element2.shareType == "pdf" &&
           props.keeper &&
-          props.keeper.shareId != element2.shareId &&
           levelhealth[i] &&
           element2.shareType == "pdf" &&
-          props.keeper.shareType == "pdf"
+          props.keeper.shareId != element2.shareId
         ) {
           pdfCount++;
         } else if (
@@ -98,28 +91,17 @@ export default function KeeperTypeModalContents(props) {
         )
           pdfCount++;
         if (
-          ((levelhealth[i] && element2.shareType == "device") ||
-            (levelhealth[i] && element2.shareType == "primaryKeeper")) &&
           props.keeper &&
-          props.keeper.shareId != element2.shareId &&
           levelhealth[i] &&
-          (element2.shareType == "device" ||
-            element2.shareType == "primaryKeeper") &&
-          props.keeper.shareType == "device" &&
-          !isPKCounted
+          element2.shareType == "device" &&
+          props.keeper.shareId != element2.shareId
         ) {
-          if (levelhealth[i] && element2.shareType == "primaryKeeper")
-            isPKCounted = true;
           deviceCount++;
         } else if (
           !props.keeper &&
           levelhealth[i] &&
-          (element2.shareType == "device" ||
-            element2.shareType == "primaryKeeper") &&
-          !isPKCounted
+          element2.shareType == "device"
         ) {
-          if (levelhealth[i] && element2.shareType == "primaryKeeper")
-            isPKCounted = true;
           deviceCount++;
         }
       }
@@ -129,7 +111,7 @@ export default function KeeperTypeModalContents(props) {
     console.log("deviceCount", deviceCount);
     if (contactCount >= 2) completedKeeperType.push("contact");
     if (pdfCount >= 1) completedKeeperType.push("pdf");
-    if (deviceCount >= 3) completedKeeperType.push("device");
+    if (deviceCount >= 2) completedKeeperType.push("device");
     setCompletedKeeperType(completedKeeperType);
   };
 

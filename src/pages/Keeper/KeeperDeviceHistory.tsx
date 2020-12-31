@@ -25,7 +25,10 @@ import ApproveSetup from "./ApproveSetup";
 import HistoryHeaderComponent from "./HistoryHeaderComponent";
 import _ from "underscore";
 import { useDispatch, useSelector } from "react-redux";
-import { sendApprovalRequest, onApprovalStatusChange } from "../../store/actions/health";
+import {
+  sendApprovalRequest,
+  onApprovalStatusChange,
+} from "../../store/actions/health";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import {
   LevelHealthInterface,
@@ -72,18 +75,6 @@ const KeeperDeviceHistory = (props) => {
       date: null,
       info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet",
     },
-    // {
-    //   id: 5,
-    //   title: 'Recovery Secret In-Transit',
-    //   date: '20 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
-    // {
-    //   id: 6,
-    //   title: 'Recovery Secret Not Accessible',
-    //   date: '19 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
   ]);
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
     props.navigation.state.params.isPrimaryKeeper
@@ -102,12 +93,15 @@ const KeeperDeviceHistory = (props) => {
   const levelHealth: LevelHealthInterface[] = useSelector(
     (state) => state.health.levelHealth
   );
-  const [selectedKeeperType, setSelectedKeeperType] = useState('');
-  const [selectedKeeperName, setSelectedKeeperName] = useState('');
+  const [selectedKeeperType, setSelectedKeeperType] = useState("");
+  const [selectedKeeperName, setSelectedKeeperName] = useState("");
   const keeperInfo: any[] = useSelector((state) => state.health.keeperInfo);
   const currentLevel = useSelector((state) => state.health.currentLevel);
+  const keeperApproveStatus = useSelector(
+    (state) => state.health.keeperApproveStatus
+  );
+  const [isChange, setIsChange] = useState(false);
   useEffect(() => {
-    console.log("props.navigation.state.params", props.navigation.state.params);
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
@@ -116,6 +110,11 @@ const KeeperDeviceHistory = (props) => {
         props.navigation.state.params.selectedTitle == "Keeper Device"
         ? false
         : true
+    );
+    setIsChange(
+      props.navigation.state.params.isChangeKeeperType
+        ? props.navigation.state.params.isChangeKeeperType
+        : false
     );
   }, [
     props.navigation.state.params.selectedLevelId,
@@ -154,6 +153,13 @@ const KeeperDeviceHistory = (props) => {
       updatedSecondaryHistory[3].date = shareHistory[0].notAccessible;
     setSecondaryDeviceHistory(updatedSecondaryHistory);
   };
+
+  useEffect(() => {
+    if (isChange) {
+      setQrBottomSheetsFlag(true);
+      (QrBottomSheet as any).current.snapTo(1);
+    }
+  }, [isChange]);
 
   useEffect(() => {
     (async () => {
@@ -237,14 +243,15 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"67bf864aadeaadaa186e3f14","publicKey":"477e4dff92af30f8fe7d75c6da555709a45d849a05bde28d8ced801a7e49fa75","ephemeralAddress":"de6d42bd3917909c1290c5f5594ab997999294eadabb3e6146684dfb8f98f807","walletName":"Mac"}'
-            : '{"uuid":"bf9ec30e3d7bd67d9c1268fe","publicKey":"42b7d841ce2e3c1415688352d27e233ab4b08e7ef005f654220dd66d15677860","ephemeralAddress":"41f630228637802b61fffa5eaedb21421ea530dea0ab12da7b703f3f351a0cc0","walletName":"Macdd"}';
+            ? '{"uuid":"c19ada7c7494ca74dcfec1b0","publicKey":"093587e3b490412872e67f05968c545e6d67162a1fe6a5c1819f29edba12ce43","ephemeralAddress":"893a13c5e97b4e99a1257f2cb22ca7c69e9a2912ae84bdba032f3e8881291332","walletName":"Keeper1"}'
+            : '{"uuid":"4052504ab0a7c6932c5d443c","publicKey":"36e2e21f44df18bd72840c1804e62ca8a128415cdac96aa2d3d4480efa8c7447","ephemeralAddress":"a94abb04e3362ffbc113ffc1bce5414ad0c1b0c2ef637b8dc9b9340c719474f3","walletName":"sdf"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
             isPrimaryKeeper: isPrimaryKeeper,
             selectedShareId: selectedKeeper.shareId,
             selectedLevelId: selectedLevelId,
+            isChange,
           });
         }}
       />
@@ -299,16 +306,20 @@ const KeeperDeviceHistory = (props) => {
         selectedKeeper.shareId,
         PKShareId,
         type == "pdf"
-          ? notificationType.uploadPDFShare
+          ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
     if (type == "pdf") {
-      dispatch(onApprovalStatusChange(
-        false,
-        moment(new Date()).valueOf(),
-        selectedKeeper.shareId
-      ));
+      if(!keeperApproveStatus.shareId){
+        dispatch(
+          onApprovalStatusChange(
+            false,
+            moment(new Date()).valueOf(),
+            selectedKeeper.shareId
+          )
+        );
+      }
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);
@@ -405,16 +416,17 @@ const KeeperDeviceHistory = (props) => {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: index,
+        isChangeKeeperType: true
       });
     }
     if (type == "device") {
       (QrBottomSheet as any).current.snapTo(1);
     }
     if (type == "pdf") {
-      props.navigation.navigate(
-        'PersonalCopyHistoryKeeper',
-        {...props.navigation.state.params, selectedTitle: name},
-      );
+      props.navigation.navigate("PersonalCopyHistoryKeeper", {
+        ...props.navigation.state.params,
+        selectedTitle: name,
+      });
     }
   };
 
@@ -498,38 +510,6 @@ const KeeperDeviceHistory = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ApproveSetupBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70%"),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            onPressContinue={() => {
-              if (ApproveSetupBottomSheet as any)
-                (ApproveSetupBottomSheet as any).current.snapTo(0);
-
-              props.navigation.navigate("KeeperFeatures", {
-                isReshare,
-                qrScannedData,
-                isPrimaryKeeper: isPrimaryKeeper,
-                selectedShareId: selectedKeeper.shareId,
-              });
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            backgroundColor={Colors.backgroundColor1}
-            onPressHeader={() => {
-              if (ApproveSetupBottomSheet as any)
-                (ApproveSetupBottomSheet as any).current.snapTo(0);
-            }}
-          />
-        )}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
         ref={ApprovePrimaryKeeperBottomSheet}
         snapPoints={[
           -50,
@@ -537,6 +517,11 @@ const KeeperDeviceHistory = (props) => {
         ]}
         renderContent={() => (
           <ApproveSetup
+            isContinueDisabled={
+              selectedKeeperType == "pdf"
+                ? !keeperApproveStatus.status
+                : false
+            }
             onPressContinue={() => {
               if (isPrimaryKeeper) {
                 (QrBottomSheet.current as any).snapTo(1);
@@ -576,10 +561,10 @@ const KeeperDeviceHistory = (props) => {
         ]}
         renderContent={() => (
           <KeeperTypeModalContents
-            onPressSetup={async (type, name) =>{
+            onPressSetup={async (type, name) => {
               setSelectedKeeperType(type);
               setSelectedKeeperName(name);
-              sendApprovalRequestToPK(type)
+              sendApprovalRequestToPK(type);
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}

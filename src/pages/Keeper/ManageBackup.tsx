@@ -220,7 +220,7 @@ class ManageBackup extends Component<
         share.name
       );
     }
-    if (data.notificationType == "uploadPDFShare") {
+    if (data.notificationType == "uploadSecondaryShare") {
       if (data.shareID == keeperApproveStatus.shareId) {
         onApprovalStatusChange(
           true,
@@ -571,7 +571,7 @@ class ManageBackup extends Component<
       this.state.selectedKeeper.shareId,
       PKShareId,
       type == "pdf"
-        ? notificationType.uploadPDFShare
+        ? notificationType.uploadSecondaryShare
         : notificationType.approveKeeper
     );
     if (this.state.selectedKeeperType == "pdf") {
