@@ -36,20 +36,33 @@ import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 import SmallHeaderModal from "../../components/SmallHeaderModal";
 import PersonalCopyHelpContents from "../../components/Helper/PersonalCopyHelpContents";
 import HistoryHeaderComponent from "./HistoryHeaderComponent";
-import { getPDFData, confirmPDFShared, sendApprovalRequest, onApprovalStatusChange } from '../../store/actions/health';
+import {
+  getPDFData,
+  confirmPDFShared,
+  sendApprovalRequest,
+  onApprovalStatusChange,
+} from "../../store/actions/health";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
-import { LevelHealthInterface, notificationType } from "../../bitcoin/utilities/Interface";
+import {
+  LevelHealthInterface,
+  notificationType,
+} from "../../bitcoin/utilities/Interface";
 import ApproveSetup from "./ApproveSetup";
-import { StackActions } from 'react-navigation';
+import { StackActions } from "react-navigation";
 
 const PersonalCopyHistory = (props) => {
-  const dispatch = useDispatch();
-  const ErrorBottomSheet = React.createRef();
-  const HelpBottomSheet = React.createRef();
-  const keeperTypeBottomSheet = React.createRef();
-  const ApprovePrimaryKeeperBottomSheet = React.createRef();
-  const [selectedKeeperType, setSelectedKeeperType] = useState('');
-  const [selectedKeeperName, setSelectedKeeperName] = useState('');
+  const dispatches = useDispatch();
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
+  const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(
+    React.createRef()
+  );
+  const [
+    ApprovePrimaryKeeperBottomSheet,
+    setApprovePrimaryKeeperBottomSheet,
+  ] = useState(React.createRef());
+  const [selectedKeeperType, setSelectedKeeperType] = useState("");
+  const [selectedKeeperName, setSelectedKeeperName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
 
@@ -82,11 +95,10 @@ const PersonalCopyHistory = (props) => {
       info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet",
     },
   ]);
-  const PersonalCopyShareBottomSheet = React.createRef();
-
-  const secureAccount: SecureAccount = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].service
-  );
+  const [
+    PersonalCopyShareBottomSheet,
+    setPersonalCopyShareBottomSheet,
+  ] = useState(React.createRef());
 
   const selectedPersonalCopy = props.navigation.getParam(
     "selectedPersonalCopy"
@@ -126,21 +138,25 @@ const PersonalCopyHistory = (props) => {
     props.navigation.state.params.selectedStatus,
   ]);
 
-  const saveInTransitHistory = async () => {
-    const shareHistory = JSON.parse(await AsyncStorage.getItem("shareHistory"));
-    if (shareHistory) {
-      let updatedShareHistory = [...shareHistory];
-      updatedShareHistory = {
-        ...updatedShareHistory,
-        inTransit: Date.now(),
-      };
-      updateHistory(updatedShareHistory);
-      await AsyncStorage.setItem(
-        "shareHistory",
-        JSON.stringify(updatedShareHistory)
-      );
-    }
-  };
+  // const saveInTransitHistory = async () => {
+  //   try{
+  //       const shareHistory = JSON.parse(await AsyncStorage.getItem("shareHistory"));
+  //     if (shareHistory) {
+  //       let updatedShareHistory = [...shareHistory];
+  //       // updatedShareHistory = {
+  //       //   ...updatedShareHistory,
+  //       //   inTransit: Date.now(),
+  //       // };
+  //       updateHistory(updatedShareHistory);
+  //       await AsyncStorage.setItem(
+  //         "shareHistory",
+  //         JSON.stringify(updatedShareHistory)
+  //       );
+  //     }
+  //   }catch(e){
+  //     console.log('e', e)
+  //   }
+  // };
 
   const sortedHistory = (history) => {
     const currentHistory = history.filter((element) => {
@@ -176,8 +192,8 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     (async () => {
-      console.log('useEffect pdfInfo', pdfInfo);
-      if(!pdfInfo.filePath) dispatch(getPDFData(selectedKeeper.shareId))
+      console.log("useEffect pdfInfo", pdfInfo);
+      if (!pdfInfo.filePath) dispatches(getPDFData(selectedKeeper.shareId));
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem("shareHistory")
       );
@@ -221,22 +237,17 @@ const PersonalCopyHistory = (props) => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
         onPressShare={() => {}}
-        onPressConfirm={async () => {
-          dispatch(confirmPDFShared(selectedKeeper.shareId))
-          // let personalCopyDetails = JSON.parse(
-          //   await AsyncStorage.getItem("personalCopyDetails")
-          // );
-          // personalCopyDetails[selectedPersonalCopy.type].shared = true;
-          // AsyncStorage.setItem(
-          //   "personalCopyDetails",
-          //   JSON.stringify(personalCopyDetails)
-          // );
-          // setPersonalCopyDetails(personalCopyDetails);
-          saveInTransitHistory();
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-          const popAction = StackActions.pop({ n: 1 });
-          props.navigation.dispatch(popAction);
-          props.navigation.replace('ManageBackupKeeper');
+        onPressConfirm={() => {
+          try {
+            dispatches(confirmPDFShared(selectedKeeper.shareId))(
+              PersonalCopyShareBottomSheet as any
+            ).current.snapTo(0);
+            const popAction = StackActions.pop({ n: 1 });
+            props.navigation.dispatch(popAction);
+            props.navigation.replace("ManageBackupKeeper");
+          } catch (err) {
+            console.log("confirm error", err);
+          }
         }}
       />
     );
@@ -283,8 +294,8 @@ const PersonalCopyHistory = (props) => {
         : currentLevel == 3
         ? levelHealth[2].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
-        console.log('PKShareId', PKShareId);
-    dispatch(
+    console.log("PKShareId", PKShareId);
+    dispatches(
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
@@ -294,11 +305,13 @@ const PersonalCopyHistory = (props) => {
       )
     );
     if (type == "pdf" && !keeperApproveStatus.shareId) {
-      dispatch(onApprovalStatusChange(
-        false,
-        moment(new Date()).valueOf(),
-        selectedKeeper.shareId
-      ));
+      dispatches(
+        onApprovalStatusChange(
+          false,
+          moment(new Date()).valueOf(),
+          selectedKeeper.shareId
+        )
+      );
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);
@@ -364,11 +377,15 @@ const PersonalCopyHistory = (props) => {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: index,
-        isChangeKeeperType: true
+        isChangeKeeperType: true,
       });
     }
     if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true});
+      props.navigation.navigate("KeeperDeviceHistory", {
+        ...props.navigation.state.params,
+        selectedTitle: name,
+        isChangeKeeperType: true,
+      });
     }
     if (type == "pdf") {
       (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -400,6 +417,10 @@ const PersonalCopyHistory = (props) => {
           }}
           reshareButtonText={"Restore Keeper"}
           onPressReshare={async () => {
+            console.log(
+              "onPressReshare PersonalCopyShareBottomSheet",
+              PersonalCopyShareBottomSheet
+            );
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
           changeButtonText={"Change Keeper"}
@@ -442,11 +463,11 @@ const PersonalCopyHistory = (props) => {
         ref={keeperTypeBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('75%') : hp('75%'),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("75%") : hp("75%"),
         ]}
         renderContent={() => (
           <KeeperTypeModalContents
-            onPressSetup={async (type, name) =>{
+            onPressSetup={async (type, name) => {
               setSelectedKeeperType(type);
               setSelectedKeeperName(name);
               sendApprovalRequestToPK(type);
@@ -458,7 +479,9 @@ const PersonalCopyHistory = (props) => {
         )}
         renderHeader={() => (
           <SmallHeaderModal
-            onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+            onPressHeader={() =>
+              (keeperTypeBottomSheet as any).current.snapTo(0)
+            }
           />
         )}
       />
@@ -472,9 +495,7 @@ const PersonalCopyHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf"
-                ? !keeperApproveStatus.status
-                : false
+              selectedKeeperType == "pdf" ? !keeperApproveStatus.status : false
             }
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
