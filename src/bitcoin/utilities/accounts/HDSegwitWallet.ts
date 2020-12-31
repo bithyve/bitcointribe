@@ -22,9 +22,13 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 
 const { HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
@@ -1029,6 +1033,28 @@ export default class HDSegwitWallet extends Bitcoin {
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
       accountId, accountNumber 
+    }
+  };
+
+  public updateDerivativeAccount = async (
+    account: {
+      kind: string,
+      instanceNumber: number,
+      customDescription: string,
+      customDisplayName: string
+    }
+  ): Promise<{
+    updateSuccessful: boolean;
+  }>  => {
+    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
+
+    this
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
+    this
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
+
+    return { 
+      updateSuccessful: true 
     }
   };
 
