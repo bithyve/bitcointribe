@@ -3,14 +3,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 export const materialIconCurrencyCodes = [
   'BRL',
+  'BDT',
   'CNY',
   'JPY',
   'GBP',
   'KRW',
+  'KZT',
   'RUB',
   'TRY',
   'INR',
+  'ILS',
+  'NGN',
+  'PHP',
   'EUR',
+  'TRY',
+  'TWD',
   'USD',
 ]
 
@@ -19,9 +26,12 @@ function getCurrencyCodeIconName( currencyCode: string ): string {
   switch ( currencyCode ) {
       case 'BRL':
         return 'currency-brl'
+      case 'BDT':
+        return 'currency-bdt'
       case 'CNY':
-      case 'JPY':
         return 'currency-cny'
+      case 'JPY':
+        return 'currency-jpy'
       case 'GBP':
         return 'currency-gbp'
       case 'KRW':
@@ -30,8 +40,18 @@ function getCurrencyCodeIconName( currencyCode: string ): string {
         return 'currency-rub'
       case 'TRY':
         return 'currency-try'
+      case 'TWD':
+        return 'currency-twd'
       case 'INR':
         return 'currency-inr'
+      case 'ILS':
+        return 'currency-ils'
+      case 'KZT':
+        return 'currency-kzt'
+      case 'NGN':
+        return 'currency-ngn'
+      case 'PHP':
+        return 'currency-php'
       case 'EUR':
         return 'currency-eur'
       case 'USD':

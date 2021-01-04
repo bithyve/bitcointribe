@@ -4,7 +4,6 @@ import { encrypt, decrypt } from '../common/encryption'
 const initialize = () => db.init()
 
 const fetch = async ( key ) => {
-  console.log( '**DB** Fetch' )
   try {
     const data = await db.fetch()
     if ( data.rows._array.length === 0 ) {
@@ -20,7 +19,6 @@ const fetch = async ( key ) => {
 }
 
 const insert = async ( database, key, inserted = true ) => {
-  console.log( '**DB** Insert' )
   const encryptedDatabase = encrypt( database, key )
 
   try {

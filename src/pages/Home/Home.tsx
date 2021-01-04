@@ -995,15 +995,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
-    const currencyCodeTmp = currencyCode
-    if ( !currencyCodeTmp ) {
+    if ( !currencyCode ) {
       this.props.setCurrencyCode( RNLocalize.getCurrencies()[ 0 ] )
       this.setState( {
         currencyCode: RNLocalize.getCurrencies()[ 0 ],
       } )
     } else {
       this.setState( {
-        currencyCode: currencyCodeTmp,
+        currencyCode: currencyCode,
       } )
     }
   };

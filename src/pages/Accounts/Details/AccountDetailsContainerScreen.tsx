@@ -253,7 +253,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       dispatch( refreshAccountShell( accountShell, {
         autoSync: true
       } ) )
-    }, 10 )
+    }, 100 )
   }, [] )
 
   useEffect( () => {
