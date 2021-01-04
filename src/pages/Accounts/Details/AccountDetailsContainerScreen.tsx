@@ -244,10 +244,16 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
+
   useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: true
-    } ) )
+    // 📝 A slight timeout is needed here in order for the refresh control to
+    // properly lay itself out above the rest of the content and become visible
+    // when the loading starts
+    setTimeout( () => {
+      dispatch( refreshAccountShell( accountShell, {
+        autoSync: true
+      } ) )
+    }, 10 )
   }, [] )
 
   useEffect( () => {
@@ -260,6 +266,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     )
       dispatch( fetchFeeAndExchangeRates() )
   }, [] )
+
 
   const sections = useMemo( () => {
     return [
@@ -371,10 +378,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    paddingTop: 20,
   },
 
   scrollViewContainer: {
+    paddingTop: 20,
+    height: '100%',
     paddingHorizontal: 24,
   },
 
@@ -384,7 +392,6 @@ const styles = StyleSheet.create( {
 
   footerSection: {
     paddingVertical: 38,
-    marginBottom: 25
   },
 } )
 
