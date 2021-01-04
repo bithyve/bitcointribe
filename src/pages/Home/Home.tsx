@@ -994,16 +994,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setCurrencyCodeFromAsync = async () => {
+    console.log( 'RNLocalize.getCurrencies()[ 0 ], RNLocalize.getCurrencies() ', RNLocalize.getCurrencies()[ 0 ], RNLocalize.getCurrencies() )
     const { currencyCode } = this.props
-    const currencyCodeTmp = currencyCode
-    if ( !currencyCodeTmp ) {
+    console.log( { 
+      currencyCode 
+    } )
+    if ( !currencyCode ) {
       this.props.setCurrencyCode( RNLocalize.getCurrencies()[ 0 ] )
       this.setState( {
         currencyCode: RNLocalize.getCurrencies()[ 0 ],
       } )
     } else {
       this.setState( {
-        currencyCode: currencyCodeTmp,
+        currencyCode: currencyCode,
       } )
     }
   };
