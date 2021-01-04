@@ -687,8 +687,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if ( prevProps.accountsState !== this.props.accountsState ) {
-      this.getBalances()
-      this.getNewTransactionNotifications()
+      // this.getBalances()
+      // this.getNewTransactionNotifications()
     }
 
     if ( prevProps.fcmTokenValue !== this.props.fcmTokenValue ) {

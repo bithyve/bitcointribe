@@ -4,12 +4,11 @@ import {
   StyleSheet,
   Alert,
   RefreshControl,
-  ScrollView,
+  SectionList,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
-import TransactionsList from '../../../components/account-details/AccountDetailsTransactionsList'
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import KnowMoreBottomSheet, {
@@ -35,15 +34,25 @@ import config from '../../../bitcoin/HexaConfig'
 import { DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import TransactionPreviewHeader from './TransactionPreviewHeader'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
 import { DONATION_ACCOUNT } from '../../../common/constants/serviceTypes'
+import TransactionsPreviewSection from './TransactionsPreviewSection'
 
 export type Props = {
   navigation: any;
 };
+
+
+enum SectionKind {
+  ACCOUNT_CARD,
+  TRANSACTIONS_LIST_PREVIEW,
+  SEND_AND_RECEIVE_FOOTER,
+}
+
+const sectionListItemKeyExtractor = ( index ) => String( index )
+
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -235,10 +244,16 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
+
   useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: true
-    } ) )
+    // 📝 A slight timeout is needed here in order for the refresh control to
+    // properly lay itself out above the rest of the content and become visible
+    // when the loading starts
+    setTimeout( () => {
+      dispatch( refreshAccountShell( accountShell, {
+        autoSync: true
+      } ) )
+    }, 10 )
   }, [] )
 
   useEffect( () => {
@@ -252,117 +267,132 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       dispatch( fetchFeeAndExchangeRates() )
   }, [] )
 
-  return (
 
+  const sections = useMemo( () => {
+    return [
+      {
+        kind: SectionKind.ACCOUNT_CARD,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View style={styles.viewSectionContainer}>
+              <AccountDetailsCard
+                accountShell={accountShell}
+                onKnowMorePressed={showKnowMoreSheet}
+                onSettingsPressed={navigateToAccountSettings}
+              />
+            </View>
+          )
+        },
+      },
+      {
+        kind: SectionKind.TRANSACTIONS_LIST_PREVIEW,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View style={styles.viewSectionContainer}>
+              <TransactionsPreviewSection
+                transactions={accountTransactions.slice( 0, 3 )}
+                availableBalance={spendableBalance}
+                bitcoinUnit={accountShell.unit}
+                isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
+                onViewMorePressed={navigateToTransactionsList}
+                onTransactionItemSelected={handleTransactionSelection}
+              />
+            </View>
+          )
+        },
+      },
+      {
+        kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View style={styles.viewSectionContainer}>
+              <View style={styles.footerSection}>
+                <SendAndReceiveButtonsFooter
+                  onSendPressed={() => {
+                    navigation.navigate( 'Send', {
+                      serviceType: primarySubAccount.sourceKind,
+                      averageTxFees,
+                      spendableBalance: AccountShell.getSpendableBalance( accountShell ),
+                      derivativeAccountDetails,
+                      accountShellID,
+                    } )
+                  }}
+                  onReceivePressed={() => {
+                    navigation.navigate( 'Receive', {
+                      serviceType: primarySubAccount.sourceKind,
+                      derivativeAccountDetails,
+                    } )
+                  }}
+                  averageTxFees={averageTxFees}
+                  network={
+                    config.APP_STAGE === 'dev' ||
+                      primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+                      ? NetworkKind.TESTNET
+                      : NetworkKind.MAINNET
+                  }
+                />
+
+                {isShowingDonationButton && (
+                  <View style={{
+                    alignItems: 'center',
+                    marginTop: 36,
+                  }}>
+                    <Button
+                      raised
+                      buttonStyle={ButtonStyles.floatingActionButton}
+                      title="Donation Webpage"
+                      titleStyle={ButtonStyles.actionButtonText}
+                      onPress={showDonationWebViewSheet}
+                    />
+                  </View>
+                )}
+              </View>
+            </View>
+          )
+        },
+      },
+    ]
+  }, [] )
+
+  return (
     <View style={styles.rootContainer}>
-      <ScrollView
-        style={styles.scrollViewContainer}
+      <SectionList
+        contentContainerStyle={styles.scrollViewContainer}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             onRefresh={performRefreshOnPullDown}
             refreshing={isRefreshing}
           />
         }
-      >
-        <AccountDetailsCard
-          accountShell={accountShell}
-          onKnowMorePressed={showKnowMoreSheet}
-          onSettingsPressed={navigateToAccountSettings}
-        />
-
-        <View
-          style={{
-            paddingVertical: 20,
-          }}
-        >
-          <TransactionPreviewHeader
-            availableBalance={spendableBalance}
-            bitcoinUnit={accountShell.unit}
-            isTestAccount={
-              primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT
-            }
-            onViewMorePressed={navigateToTransactionsList}
-          />
-
-        </View>
-
-        {/* <TransactionPreviewTabs  */}
-
-        {/* /> */}
-
-
-        <View
-          style={{
-            marginBottom: 20,
-          }}
-        >
-          <TransactionsList
-            transactions={accountTransactions.slice( 0, 3 )}
-            onTransactionSelected={handleTransactionSelection}
-          />
-        </View>
-
-        <View style={styles.footerSection}>
-
-          <SendAndReceiveButtonsFooter
-            onSendPressed={() => {
-              navigation.navigate( 'Send', {
-                serviceType: primarySubAccount.sourceKind,
-                averageTxFees,
-                spendableBalance: AccountShell.getSpendableBalance( accountShell ),
-                derivativeAccountDetails,
-                accountShellID,
-              } )
-            }}
-            onReceivePressed={() => {
-              navigation.navigate( 'Receive', {
-                serviceType: primarySubAccount.sourceKind,
-                derivativeAccountDetails,
-              } )
-            }}
-            averageTxFees={averageTxFees}
-            network={
-              config.APP_STAGE === 'dev' ||
-                primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
-                ? NetworkKind.TESTNET
-                : NetworkKind.MAINNET
-            }
-          />
-
-          {isShowingDonationButton && (
-            <View style={{
-              alignItems: 'center',
-              marginTop: 36,
-            }}>
-              <Button
-                raised
-                buttonStyle={ButtonStyles.floatingActionButton}
-                title="Donation Webpage"
-                titleStyle={ButtonStyles.actionButtonText}
-                onPress={showDonationWebViewSheet}
-              />
-            </View>
-          )}
-        </View>
-      </ScrollView>
+        sections={sections}
+        stickySectionHeadersEnabled={false}
+        keyExtractor={sectionListItemKeyExtractor}
+      />
     </View>
   )
 }
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    paddingTop: 20,
   },
 
   scrollViewContainer: {
+    paddingTop: 20,
+    height: '100%',
     paddingHorizontal: 24,
+  },
+
+  viewSectionContainer: {
+    marginBottom: 16,
   },
 
   footerSection: {
     paddingVertical: 38,
-    marginBottom: 25
   },
-
 } )
 
 AccountDetailsContainerScreen.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
