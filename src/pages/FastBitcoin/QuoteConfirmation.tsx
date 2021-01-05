@@ -9,9 +9,10 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import currencyIconSource from '../../utils/currency/currencyIconSource'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
 
 export default function QuoteConfirmation( props ) {
-  const currencySymbol = currencyIconSource( props.currencyCode, false )
+  const currencySymbol = getCurrencyImageByRegion( props.currencyCode, 'gray' )
   return (
     <View style={styles.modalContentContainer}>
       <View>
