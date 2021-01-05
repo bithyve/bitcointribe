@@ -253,7 +253,7 @@ const TrustedContactHistoryKeeper = (props) => {
       if (keeperInfoIndex > -1 && keeperInfoTemp[keeperInfoIndex].type == 'contact') {
         setSelectedContacts([keeperInfoTemp[keeperInfoIndex].data]);
         const selectedContacts = trustedContactsInfo.slice(1, 3);
-        let tempContact = selectedContacts[0];
+        let tempContact = keeperInfoTemp[keeperInfoIndex].data;
         const tcInstance =
           trustedContacts.tc.trustedContacts[
             tempContact.name.toLowerCase().trim()
@@ -744,6 +744,7 @@ const TrustedContactHistoryKeeper = (props) => {
         data: {...contact, index}
       };
       dispatch(updatedKeeperInfo(obj));
+      dispatch(onApprovalStatusChange(false, 0, ""));
     },
     [index, trustedContactsInfo],
   );

@@ -409,31 +409,23 @@ class ManageBackup extends Component<
       }
     }
 
-    if (
-      prevProps.levelHealth != this.props.levelHealth &&
-      this.state.selectedLevelId == 3 &&
-      prevProps.isLevelThreeMetaShareCreated !=
-        this.props.isLevelThreeMetaShareCreated &&
-      prevProps.isLevel3Initialized != this.props.isLevel3Initialized &&
-      this.state.selectedKeeper.shareId == "" &&
-      this.props.metaShares.length == 5 &&
-      this.props.isLevel3Initialized &&
-      this.props.isLevelThreeMetaShareCreated
-    ) {
-      let obj = {
-        shareType: this.state.selectedKeeperType,
-        name: this.state.selectedKeeperName,
-        reshareVersion: 0,
-        status: "notAccessible",
-        updatedAt: 0,
-        shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
-        data: {},
-      };
-      this.setState({
-        selectedKeeper: obj,
-      });
-      this.sendApprovalRequestToPK(this.state.selectedKeeperType);
-      (this.refs.keeperTypeBottomSheet as any).snapTo(0);
+    if(JSON.stringify(prevProps.metaShares) != JSON.stringify(this.props.metaShares)){
+      if(this.props.metaShares.length == 5){
+        let obj = {
+          shareType: this.state.selectedKeeperType,
+          name: this.state.selectedKeeperName,
+          reshareVersion: 0,
+          status: "notAccessible",
+          updatedAt: 0,
+          shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
+          data: {},
+        };
+        this.setState({
+          selectedKeeper: obj,
+        });
+        this.sendApprovalRequestToPK(this.state.selectedKeeperType, this.props.s3Service.levelhealth.metaShares[3].shareId);
+        (this.refs.keeperTypeBottomSheet as any).snapTo(0);
+      }
     }
   };
 
@@ -554,7 +546,7 @@ class ManageBackup extends Component<
     }
   };
 
-  sendApprovalRequestToPK = (type) => {
+  sendApprovalRequestToPK = (type, shareId?) => {
     let {
       levelHealth,
       currentLevel,
@@ -571,15 +563,16 @@ class ManageBackup extends Component<
     sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
-      type == "pdf"
+      type == "pdf" || type == "contact"
         ? notificationType.uploadSecondaryShare
         : notificationType.approveKeeper
     );
-    if (this.state.selectedKeeperType == "pdf" && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
+      console.log('sendApprovalRequestToPK type', type, shareId)
       onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),
-        this.state.selectedKeeper.shareId
+        this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId : shareId
       );
     }
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
@@ -1223,19 +1216,22 @@ class ManageBackup extends Component<
                   selectedKeeperType: type,
                   selectedKeeperName: name,
                 });
+                let getApproval = true;
                 if (
                   selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2
-                ) {
+                ) { 
+                  getApproval = false;
                   await this.props.generateMetaShare(selectedLevelId);
                 } else if (
                   this.props.currentLevel == 1 &&
                   selectedLevelId == 3
                 ) {
                   alert("Please complete Level 2");
-                } else {
+                }
+                if (getApproval) {
                   this.sendApprovalRequestToPK(type);
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
                 }
@@ -1326,7 +1322,7 @@ class ManageBackup extends Component<
             <ApproveSetup
               currentTime ={moment(new Date()).valueOf()}
               isContinueDisabled={
-                selectedKeeperType == "pdf"
+                selectedKeeperType == "pdf" || selectedKeeperType == "contact"
                   ? !keeperApproveStatus.status
                   : false
               }

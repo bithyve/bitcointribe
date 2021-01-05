@@ -144,7 +144,8 @@ import {
   sharePDFWatcher,
   confirmPDFSharedWatcher,
   downloadPdfShareHealthWatcher,
-  updatedKeeperInfoWatcher
+  updatedKeeperInfoWatcher,
+  uploadSMShareWatcher
 } from './sagas/health';
 
 import {
@@ -271,6 +272,7 @@ const rootSaga = function* () {
     confirmPDFSharedWatcher,
     downloadPdfShareHealthWatcher,
     updatedKeeperInfoWatcher,
+    uploadSMShareWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher
   ];

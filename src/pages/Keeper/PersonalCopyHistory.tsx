@@ -51,7 +51,7 @@ import ApproveSetup from "./ApproveSetup";
 import { StackActions } from "react-navigation";
 
 const PersonalCopyHistory = (props) => {
-  const dispatches = useDispatch();
+  const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(
@@ -193,7 +193,7 @@ const PersonalCopyHistory = (props) => {
   useEffect(() => {
     (async () => {
       console.log("useEffect pdfInfo", pdfInfo);
-      if (!pdfInfo.filePath) dispatches(getPDFData(selectedKeeper.shareId));
+      dispatch(getPDFData(selectedKeeper.shareId));
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem("shareHistory")
       );
@@ -239,14 +239,12 @@ const PersonalCopyHistory = (props) => {
         onPressShare={() => {}}
         onPressConfirm={() => {
           try {
-            dispatches(confirmPDFShared(selectedKeeper.shareId))(
-              PersonalCopyShareBottomSheet as any
-            ).current.snapTo(0);
+            dispatch(confirmPDFShared(selectedKeeper.shareId));
+            (PersonalCopyShareBottomSheet as any).current.snapTo(0);
             const popAction = StackActions.pop({ n: 1 });
-            props.navigation.dispatch(popAction);
-            props.navigation.replace("ManageBackupKeeper");
+            props.navigation.dispatch(popAction);            
           } catch (err) {
-            console.log("confirm error", err);
+            console.log("error", err);
           }
         }}
       />
@@ -295,7 +293,7 @@ const PersonalCopyHistory = (props) => {
         ? levelHealth[2].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
     console.log("PKShareId", PKShareId);
-    dispatches(
+    dispatch(
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
@@ -305,7 +303,7 @@ const PersonalCopyHistory = (props) => {
       )
     );
     if (type == "pdf" && !keeperApproveStatus.shareId) {
-      dispatches(
+      dispatch(
         onApprovalStatusChange(
           false,
           moment(new Date()).valueOf(),

@@ -110,6 +110,7 @@ import Mailer from "react-native-mail";
 import Share from "react-native-share";
 import RNPrint from "react-native-print";
 import idx from "idx";
+import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -719,7 +720,14 @@ export function* downloadMetaShareWorker({ payload }) {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
   }
 
-  console.log({ res });
+  let pkShare = {}
+  let result;
+  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE) {
+    result = yield call(S3Service.downloadSMShare, encryptedKey, otp);
+  }
+  if (result) {
+    pkShare = result.data.metaShare;
+  }
   if (res.status === 200) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
@@ -741,6 +749,7 @@ export function* downloadMetaShareWorker({ payload }) {
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
         },
+        PK_SHARE: pkShare
         // DYNAMIC_NONPMDD: dynamicNonPMDD,
       };
 
@@ -1366,6 +1375,8 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     const contact =
       trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
     if (contact && contact.symmetricKey) {
+      // Upload secondary share
+      let response = yield call(uploadSMShareWorker, {payload: { otp, encryptedKey}});
       // has trusted channel
       const data: TrustedDataElements = {
         // won't include elements from payload.data
@@ -1384,8 +1395,9 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
         )
       );
     } else {
+      // Upload secondary share
+      let response = yield call(uploadSMShareWorker, {payload: { otp, encryptedKey}});
       // adding transfer details to he ephemeral data
-
       const data: EphemeralDataElements = {
         ...payload.data,
         shareTransferDetails: {
@@ -2452,7 +2464,7 @@ export const sharePDFWatcher = createWatcher(sharePDFWorker, SHARE_PDF);
 
 function* confirmPDFSharedWorker({ payload }) {
   try {
-    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    yield put(switchS3LoaderKeeper("pdfDataConfirm"));
     let { shareId } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
     let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
@@ -2489,9 +2501,9 @@ function* confirmPDFSharedWorker({ payload }) {
     };
     yield put(updatedKeeperInfo(obj));
     yield put(onApprovalStatusChange(false, 0, ""));
-    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    yield put(switchS3LoaderKeeper("pdfDataConfirm"));
   } catch (error) {
-    yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    yield put(switchS3LoaderKeeper("pdfDataConfirm"));
     console.log("Error EF channel", error);
   }
 }
@@ -2534,3 +2546,41 @@ export const updatedKeeperInfoWatcher = createWatcher(
   updatedKeeperInfoWorker,
   KEEPER_INFO
 );
+
+function* uploadSMShareWorker({ payload }) {
+  try {
+    // yield put(switchS3LoaderKeeper("pdfDataProcess"));
+    let { encryptedKey, otp } = payload;
+    let { WALLET_SETUP } = yield select((state) => state.storage.database);
+    let levelHealth: LevelHealthInterface[] = yield select(
+      (state) => state.health.levelHealth
+    );
+    let currentLevel: number = yield select(
+      (state) => state.health.currentLevel
+    );
+    const keeper: KeeperService = yield select((state) => state.keeper.service);
+    // TODO get primaryKeeper shareID
+
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+    const res = yield call(
+      keeper.fetchTrustedChannel,
+      PKShareId,
+      WALLET_SETUP.walletName
+    );
+    if (res.status == 200) {
+      let data: TrustedDataElements = res.data.data;
+      let secondaryShare = data.pdfShare;
+      yield call(uploadSecondaryShareWorker, {payload: { encryptedKey, metaShare: secondaryShare, otp }});
+    }
+    } catch (error) {
+      console.log("Error updatedKeeperInfoWorker", error);
+    }
+  }
+  
+  export const uploadSMShareWatcher = createWatcher(
+    uploadSMShareWorker,
+    KEEPER_INFO
+  );

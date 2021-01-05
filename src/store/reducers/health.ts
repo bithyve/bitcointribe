@@ -50,6 +50,7 @@ const initialState: {
     autoShareContact: Boolean;
     pdfDataProcess: Boolean;
     pdfShare: Boolean;
+    pdfDataConfirm: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -116,6 +117,7 @@ const initialState: {
     autoShareContact: false,
     pdfDataProcess: false,
     pdfShare: false,
+    pdfDataConfirm: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
