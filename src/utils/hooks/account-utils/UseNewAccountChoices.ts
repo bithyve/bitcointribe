@@ -108,7 +108,7 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Collaborative Custody',
-          defaultDescription: 'Key management services',
+          defaultDescription: 'Multi-sig vault with a co-signer',
           serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
         } ),
       ],
