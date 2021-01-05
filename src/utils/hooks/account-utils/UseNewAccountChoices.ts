@@ -107,9 +107,9 @@ export default function useNewAccountChoices() {
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
-          defaultTitle: 'Whirlpool Account',
-          defaultDescription: 'Powered by Samurai',
-          serviceAccountKind: ServiceAccountKind.WHIRLPOOL,
+          defaultTitle: 'Collaborative Custody',
+          defaultDescription: 'Key management services',
+          serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
         } ),
       ],
 
