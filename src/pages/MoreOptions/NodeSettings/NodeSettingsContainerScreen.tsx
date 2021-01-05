@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { View, Text, StyleSheet, AsyncStorage, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
@@ -12,7 +12,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import {  personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import {  connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 
 export type Props = {
   navigation: any;
@@ -109,6 +109,17 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
               isConnectionEnabled={isPersonalNodeConnectionEnabled}
               onToggle={() => {
                 dispatch( personalNodePreferenceToggled( !isPersonalNodeConnectionEnabled ) )
+                if( nodeSettingsState.activePersonalNode ){
+                  if( isPersonalNodeConnectionEnabled ) {
+                    // switching back to BH(default)-node
+                    dispatch( connectToBitHyveNode() )
+                  } else {
+                    // reconnecting to personal node
+                    const reactivatePersonalNode: PersonalNode = nodeSettingsState.activePersonalNode
+                    reactivatePersonalNode.isConnectionActive = true
+                    dispatch( savePersonalNodeConfiguration( reactivatePersonalNode ) )
+                  }
+                }
               }}
             />
 
