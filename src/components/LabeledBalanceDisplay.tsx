@@ -1,26 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   Image,
-} from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import CurrencyKind from '../common/data/enums/CurrencyKind';
-import useCurrencyCode from '../utils/hooks/state-selectors/UseCurrencyCode';
-import useCurrencyKind from '../utils/hooks/state-selectors/UseCurrencyKind';
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import CurrencyKind from '../common/data/enums/CurrencyKind'
+import useCurrencyCode from '../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../utils/hooks/state-selectors/UseCurrencyKind'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
-} from './MaterialCurrencyCodeIcon';
-import { getCurrencyImageByRegion } from '../common/CommonFunctions';
-import useFormattedAmountText from '../utils/hooks/formatting/UseFormattedAmountText';
-import useFormattedUnitText from '../utils/hooks/formatting/UseFormattedUnitText';
-import { Satoshis } from '../common/data/enums/UnitAliases';
-import BitcoinUnit, { displayNameForBitcoinUnit } from '../common/data/enums/BitcoinUnit';
-import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin';
-import { UsNumberFormat } from '../common/utilities';
+} from './MaterialCurrencyCodeIcon'
+import { getCurrencyImageByRegion } from '../common/CommonFunctions'
+import useFormattedAmountText from '../utils/hooks/formatting/UseFormattedAmountText'
+import useFormattedUnitText from '../utils/hooks/formatting/UseFormattedUnitText'
+import { Satoshis } from '../common/data/enums/UnitAliases'
+import BitcoinUnit, { displayNameForBitcoinUnit } from '../common/data/enums/BitcoinUnit'
+import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin'
+import { UsNumberFormat } from '../common/utilities'
 
 export type Props = {
   balance: Satoshis;
@@ -41,55 +41,61 @@ export type Props = {
  * and a unit label that dynamically changes with the user's
  * currency preferences.
  */
-const LabeledBalanceDisplay: React.FC<Props> = ({
+const LabeledBalanceDisplay: React.FC<Props> = ( {
   balance,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
   iconSpacing = 4,
   textColor = Colors.currencyGray,
   bitcoinIconColor = 'gray',
-  containerStyle = {},
-  currencyImageStyle = {},
-  amountTextStyle = {},
-  unitTextStyle = {},
+  containerStyle = {
+  },
+  currencyImageStyle = {
+  },
+  amountTextStyle = {
+  },
+  unitTextStyle = {
+  },
   isTestAccount = false,
-}: Props) => {
-  const fiatCurrencyCode = useCurrencyCode();
+}: Props ) => {
+  const fiatCurrencyCode = useCurrencyCode()
 
-  const prefersBitcoin = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
-  const amountToDisplay = useMemo(() => {
-    const divisor = [BitcoinUnit.SATS, BitcoinUnit.TSATS].includes(bitcoinUnit) ? 1 : SATOSHIS_IN_BTC;
+  const amountToDisplay = useMemo( () => {
+    const divisor = [ BitcoinUnit.SATS, BitcoinUnit.TSATS ].includes( bitcoinUnit ) ? 1 : SATOSHIS_IN_BTC
 
-    return balance / divisor;
-  }, [balance, bitcoinUnit]);
+    return balance / divisor
+  }, [ balance, bitcoinUnit ] )
 
   const formattedBalanceText = isTestAccount ?
-    UsNumberFormat(amountToDisplay)
-    : useFormattedAmountText(amountToDisplay);
+    UsNumberFormat( amountToDisplay )
+    : useFormattedAmountText( amountToDisplay )
 
   const formattedUnitText = isTestAccount ?
-    displayNameForBitcoinUnit(bitcoinUnit)
-    : useFormattedUnitText({ bitcoinUnit, currencyKind });
+    displayNameForBitcoinUnit( bitcoinUnit )
+    : useFormattedUnitText( {
+      bitcoinUnit, currencyKind 
+    } )
 
-  const bitcoinIconSource = useMemo(() => {
-    switch (bitcoinIconColor) {
-      case 'dark':
-        return require('../assets/images/currencySymbols/icon_bitcoin_dark.png');
-      case 'light':
-        return require('../assets/images/currencySymbols/icon_bitcoin_light.png');
-      case 'gray':
-        return require('../assets/images/currencySymbols/icon_bitcoin_gray.png');
-      default:
-        return require('../assets/images/currencySymbols/icon_bitcoin_gray.png');
+  const bitcoinIconSource = useMemo( () => {
+    switch ( bitcoinIconColor ) {
+        case 'dark':
+          return require( '../assets/images/currencySymbols/icon_bitcoin_dark.png' )
+        case 'light':
+          return require( '../assets/images/currencySymbols/icon_bitcoin_light.png' )
+        case 'gray':
+          return require( '../assets/images/currencySymbols/icon_bitcoin_gray.png' )
+        default:
+          return require( '../assets/images/currencySymbols/icon_bitcoin_gray.png' )
     }
-  }, [bitcoinIconColor]);
+  }, [ bitcoinIconColor ] )
 
-  const unitTextStyles = useMemo(() => {
-    const fontSize = Number(unitTextStyle.fontSize) || RFValue(11);
-    const paddingTop = fontSize * 0.5;
+  const unitTextStyles = useMemo( () => {
+    const fontSize = Number( unitTextStyle.fontSize ) || RFValue( 11 )
+    const paddingTop = fontSize * 0.5
 
     return {
       ...defaultStyles.unitText,
@@ -97,21 +103,21 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
       ...unitTextStyle,
       fontSize,
       paddingTop,
-    };
-  }, [unitTextStyle]);
+    }
+  }, [ unitTextStyle ] )
 
   const BalanceCurrencyIcon = () => {
     const style = {
       ...defaultStyles.currencyImage,
       marginRight: iconSpacing,
       ...currencyImageStyle,
-    };
-
-    if (prefersBitcoin || isTestAccount) {
-      return <Image style={style} source={bitcoinIconSource} />;
     }
 
-    if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
+    if ( prefersBitcoin || isTestAccount ) {
+      return <Image style={style} source={bitcoinIconSource} />
+    }
+
+    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
       return (
         <MaterialCurrencyCodeIcon
           currencyCode={fiatCurrencyCode}
@@ -119,20 +125,24 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
           size={style.width}
           style={style}
         />
-      );
+      )
     } else {
       return (
         <Image
           style={style}
-          source={getCurrencyImageByRegion(fiatCurrencyCode, bitcoinIconColor)}
+          source={getCurrencyImageByRegion( fiatCurrencyCode, bitcoinIconColor )}
         />
-      );
+      )
     }
-  };
+  }
 
   return (
-    <View style={{ ...defaultStyles.rootContainer, ...containerStyle }}>
-      <View style={{ marginRight: iconSpacing }}>
+    <View style={{
+      ...defaultStyles.rootContainer, ...containerStyle 
+    }}>
+      <View style={{
+        marginRight: iconSpacing 
+      }}>
         <BalanceCurrencyIcon />
       </View>
 
@@ -148,10 +158,10 @@ const LabeledBalanceDisplay: React.FC<Props> = ({
 
       <Text style={unitTextStyles}>{formattedUnitText}</Text>
     </View>
-  );
-};
+  )
+}
 
-const defaultStyles = StyleSheet.create({
+const defaultStyles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -165,13 +175,14 @@ const defaultStyles = StyleSheet.create({
 
   amountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
+    fontSize: RFValue( 17 ),
     marginRight: 3,
   },
 
   unitText: {
     fontFamily: Fonts.FiraSansRegular,
   },
-});
+} )
 
-export default LabeledBalanceDisplay;
+export default LabeledBalanceDisplay
+                                                                                 

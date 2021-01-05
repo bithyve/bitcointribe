@@ -13,10 +13,10 @@ export const materialIconCurrencyCodes = [
   'TRY',
   'INR',
   'ILS',
+  'MNT',
   'NGN',
   'PHP',
   'EUR',
-  'TRY',
   'TWD',
   'USD',
 ]
@@ -48,10 +48,12 @@ function getCurrencyCodeIconName( currencyCode: string ): string {
         return 'currency-ils'
       case 'KZT':
         return 'currency-kzt'
+      case 'MNT':
+        return 'currency-mnt'
       case 'NGN':
         return 'currency-ngn'
       case 'PHP':
-        return 'currency-php'
+        return 'currency-php' 
       case 'EUR':
         return 'currency-eur'
       case 'USD':
