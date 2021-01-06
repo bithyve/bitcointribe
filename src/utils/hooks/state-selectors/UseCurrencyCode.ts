@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
 
-export default function useCurrencyCode(defaultCode: string = 'USD'): string {
-  return useSelector((state) => {
-    return state.preferences.currencyCode || defaultCode;
-  });
-};
+export default function useCurrencyCode( defaultCode = 'USD' ): string {
+  return useSelector( ( state ) => {
+    return state.preferences.currencyCode || defaultCode
+  } )
+}

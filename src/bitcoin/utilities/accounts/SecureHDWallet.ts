@@ -1,6 +1,3 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse } from 'axios'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
@@ -59,6 +56,8 @@ export default class SecureHDWallet extends Bitcoin {
   public derivativeAccounts: DerivativeAccounts | DonationDerivativeAccount =
     config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
+  public accountName: String;
+  public accountDescription: String;
 
   private lastBalTxSync = 0;
   private confirmedUTXOs: Array<{
@@ -1150,6 +1149,35 @@ export default class SecureHDWallet extends Bitcoin {
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
       accountId, accountNumber 
+    }
+  };
+
+  public updateDerivativeAccount = async (
+    account: {
+      kind: string,
+      instanceNumber: number,
+      customDescription: string,
+      customDisplayName: string
+    }
+  ): Promise<{
+    updateSuccessful: boolean;
+  }>  => {
+    if ( account && account.instanceNumber==0 ) {
+      this.accountName = account.customDisplayName
+      this.accountDescription = account.customDescription
+      return { 
+        updateSuccessful: true 
+      }
+    }
+    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
+
+    this
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
+    this
+      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
+
+    return { 
+      updateSuccessful: true 
     }
   };
 

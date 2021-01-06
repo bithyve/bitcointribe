@@ -1,4 +1,4 @@
-import { call, put, select, delay } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import {
   createWatcher,
   serviceGenerator,
@@ -58,8 +58,6 @@ import {
   EncDynamicNonPMDD,
   MetaShare,
   EphemeralDataElements,
-  DerivativeAccounts,
-  DerivativeAccount,
   TrustedDataElements,
   WalletImage,
   ShareUploadables,
@@ -69,10 +67,9 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
-import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native'
+import { AsyncStorage, Platform, NativeModules } from 'react-native'
 import {
   updateEphemeralChannel,
-  trustedContactApproved,
   updateTrustedChannel,
   updateTrustedContactInfoLocally,
 } from '../actions/trustedContacts'
@@ -88,13 +85,14 @@ import Mailer from 'react-native-mail'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
 import {
-  failedST3,
   remapAccountShells,
   restoredAccountShells,
 } from '../actions/accounts'
 import RelayServices from '../../bitcoin/services/RelayService'
 import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import PersonalNode from '../../common/data/models/PersonalNode'
+import { personalNodeConfigurationSet } from '../actions/nodeSettings'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -600,7 +598,7 @@ export function* downloadMetaShareWorker( { payload } ) {
     } else {
       let updatedRecoveryShares = {
       }
-      let updated = false
+      // let updated = false
 
       if ( payload.replaceIndex === 0 || payload.replaceIndex ) {
         // replacing stored key w/ scanned from Guardian's help-restore
@@ -628,7 +626,7 @@ export function* downloadMetaShareWorker( { payload } ) {
                 META_SHARE: metaShare,
                 ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
               }
-              updated = true
+              // updated = true
             } else {
               updatedRecoveryShares[ objectKey ] = recoveryShare
             }
@@ -1596,7 +1594,7 @@ export const restoreShareFromQRWatcher = createWatcher(
   RESTORE_SHARE_FROM_QR,
 )
 
-function* recoverWalletWorker( { payload } ) {
+function* recoverWalletWorker() {
   yield put( switchS3Loader( 'restoreWallet' ) )
 
   try {
@@ -1607,11 +1605,10 @@ function* recoverWalletWorker( { payload } ) {
     const { security } = WALLET_SETUP
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
-    let encDynamicNonPMDD
     const mappedMetaShares: { [walletId: string]: MetaShare[] } = {
     }
     Object.keys( RECOVERY_SHARES ).forEach( ( key ) => {
-      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[ key ]
+      const { META_SHARE } = RECOVERY_SHARES[ key ]
       if ( META_SHARE ) {
         // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
         const shares = mappedMetaShares[ META_SHARE.meta.walletId ]
@@ -1661,37 +1658,31 @@ function* recoverWalletWorker( { payload } ) {
 
     if ( res.status === 200 ) {
       const { mnemonic } = res.data
-      const {
-        regularAcc,
-        testAcc,
-        secureAcc,
-        s3Service,
-        trustedContacts,
-      } = yield call(
+      const { s3Service, } = yield call(
         serviceGenerator,
         security.answer,
         mnemonic,
         restorationShares,
       )
 
-      const UNDER_CUSTODY = {
-      }
-      let DYNAMIC_NONPMDD = {
-      }
-      if ( encDynamicNonPMDD ) {
-        // decentralized restoration of Wards
-        const res = s3Service.decryptDynamicNonPMDD( encDynamicNonPMDD )
+      // const UNDER_CUSTODY = {
+      // }
+      // let DYNAMIC_NONPMDD = {
+      // }
+      // if ( encDynamicNonPMDD ) {
+      //   // decentralized restoration of Wards
+      //   const res = s3Service.decryptDynamicNonPMDD( encDynamicNonPMDD )
 
-        if ( res.status !== 200 )
-          console.log( 'Failed to decrypt dynamic nonPMDD' )
-        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD
-        dynamicNonPMDD.META_SHARES.forEach( ( metaShare ) => {
-          UNDER_CUSTODY[ metaShare.meta.tag ] = {
-            META_SHARE: metaShare,
-          }
-        } )
-        DYNAMIC_NONPMDD = dynamicNonPMDD
-      }
+      //   if ( res.status !== 200 )
+      //     console.log( 'Failed to decrypt dynamic nonPMDD' )
+      //   const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD
+      //   dynamicNonPMDD.META_SHARES.forEach( ( metaShare ) => {
+      //     UNDER_CUSTODY[ metaShare.meta.tag ] = {
+      //       META_SHARE: metaShare,
+      //     }
+      //   } )
+      //   DYNAMIC_NONPMDD = dynamicNonPMDD
+      // }
 
       // const DECENTRALIZED_BACKUP = {
       //   RECOVERY_SHARES: {},
@@ -1812,15 +1803,20 @@ const asyncDataToBackup = async () => {
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
+  if( activePersonalNode )
+    STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
   return STATE_DATA
 }
 
-function* updateWalletImageWorker( { payload } ) {
+function* updateWalletImageWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.sss.service )
 
   let walletImage: WalletImage = {
@@ -1872,11 +1868,6 @@ function* updateWalletImageWorker( { payload } ) {
     const STATE_DATA = yield call( stateDataToBackup )
     if ( Object.keys( STATE_DATA ).length ) {
       const currentStateHash = hash( STATE_DATA )
-      console.log( {
-        STATE_DATA,
-        previousStateHash: hashesWI.STATE_DATA,
-        currentStateHash,
-      } )
       if ( !hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA ) {
         walletImage[ 'STATE_DATA' ] = STATE_DATA
         hashesWI.STATE_DATA = currentStateHash
@@ -1967,11 +1958,22 @@ function* fetchWalletImageWorker( { payload } ) {
 
     if ( STATE_DATA ) {
       for ( const key of Object.keys( STATE_DATA ) ) {
-        if ( key === 'accountShells' && STATE_DATA[ key ] ) {
-          const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
-          yield put( restoredAccountShells( {
-            accountShells
-          } ) )
+        if( !STATE_DATA[ key ] ) continue
+
+        switch( key ){
+            case 'accountShells': 
+              const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoredAccountShells( {
+                accountShells
+              } ) )
+              break
+
+            case 'activePersonalNode':
+              const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
+              yield put( personalNodeConfigurationSet( 
+                activePersonalNode
+              ) )
+              break
         }
       }
     }

@@ -1,16 +1,16 @@
 
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
-import { useDispatch } from "react-redux";
-import ButtonStyles from '../../../common/Styles/ButtonStyles';
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions';
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import AccountShellMergeDestinationsList from '../../../components/account-settings/merge-account-shells/AccountShellMergeDestinationsList';
-import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells';
-import AccountShell from '../../../common/data/models/AccountShell';
-import { mergeAccountShells } from '../../../store/actions/accounts';
-import AccountShellMergeSelectionListHeader from '../../../components/account-settings/merge-account-shells/AccountShellMergeSelectionListHeader';
+import React, { useMemo, useState } from 'react'
+import { View, StyleSheet } from 'react-native'
+import { Button } from 'react-native-elements'
+import { useDispatch } from 'react-redux'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import AccountShellMergeDestinationsList from '../../../components/account-settings/merge-account-shells/AccountShellMergeDestinationsList'
+import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells'
+import AccountShell from '../../../common/data/models/AccountShell'
+import { mergeAccountShells } from '../../../store/actions/accounts'
+import AccountShellMergeSelectionListHeader from '../../../components/account-settings/merge-account-shells/AccountShellMergeSelectionListHeader'
 
 
 export type Props = {
@@ -18,38 +18,36 @@ export type Props = {
 };
 
 
-const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const dispatch = useDispatch();
+const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dispatch = useDispatch()
 
-  const accountShell = useAccountShellFromNavigation(navigation);
-  const compatibleDestinations = useCompatibleAccountShells(accountShell);
+  const accountShell = useAccountShellFromNavigation( navigation )
+  const compatibleDestinations = useCompatibleAccountShells( accountShell )
 
-  const [selectedDestinationID, setSelectedDestinationID] = useState<string>(null);
+  const [ selectedDestinationID, setSelectedDestinationID ] = useState<string>( null )
 
-  const canProceed = useMemo(() => {
-    return selectedDestinationID != null;
-  }, [selectedDestinationID]);
+  const canProceed = useMemo( () => {
+    return selectedDestinationID != null
+  }, [ selectedDestinationID ] )
 
-  const selectedDestination = useMemo(() => {
-    return compatibleDestinations.find(shell => shell.id === selectedDestinationID);
-  }, [selectedDestinationID]);
+  const selectedDestination = useMemo( () => {
+    return compatibleDestinations.find( shell => shell.id === selectedDestinationID )
+  }, [ selectedDestinationID ] )
 
 
-  function handleDestinationSelection(accountShell: AccountShell) {
-    setSelectedDestinationID(accountShell.id);
+  function handleDestinationSelection( accountShell: AccountShell ) {
+    setSelectedDestinationID( accountShell.id )
   }
 
   function handleProceedButtonPress() {
-    dispatch(mergeAccountShells({
+    dispatch( mergeAccountShells( {
       source: accountShell,
       destination: selectedDestination,
-    }));
+    } ) )
 
-    navigation.dispatch(resetStackToAccountDetails({
+    navigation.dispatch( resetStackToAccountDetails( {
       accountShellID: accountShell.id,
-    }));
+    } ) )
   }
 
   return (
@@ -75,11 +73,11 @@ const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ({
         />
       </View>
     </View>
-  );
-};
+  )
+}
 
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -91,6 +89,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: 'center',
   },
-});
+} )
 
-export default AccountSettingsMergeAccountShellsScreen;
+export default AccountSettingsMergeAccountShellsScreen

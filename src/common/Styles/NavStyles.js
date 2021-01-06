@@ -36,7 +36,7 @@ const NavStyles = StyleSheet.create( {
   modalHeaderSubtitleText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 11 ),
   },
 
   modalNavHeaderContainer: {
