@@ -13,6 +13,7 @@ import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
 import {  connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import { Keyboard } from 'react-native'
 
 export type Props = {
   navigation: any;
@@ -33,6 +34,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   }, [ nodeSettingsState.prefersPersonalNodeConnection ] )
 
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )
+  const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
   const showConnectionSucceededBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -91,6 +93,27 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     }
   }, [ nodeSettingsState.hasConnectionSucceeded, nodeSettingsState.hasConnectionFailed ] )
 
+
+  useEffect( () => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible( true )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible( false )
+      }
+    )
+
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
+
   return (
     <View style={styles.rootContainer}>
       <KeyboardAvoidingView
@@ -138,14 +161,16 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <View style={styles.floatingNoteContainer}>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Test account will always use the default BitHyve test node, irrelevant of personal node'
-          }
-        />
-      </View>
+      {isKeyboardVisible == false && (
+        <View style={styles.floatingNoteContainer}>
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Test account will always use the default BitHyve test node, irrelevant of personal node'
+            }
+          />
+        </View>
+      )}
     </View>
   )
 }
