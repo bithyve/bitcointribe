@@ -1350,16 +1350,6 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
-  // TODO:: Replace below if statemeent to update default account settings
-
-  if( account && account.instanceNumber==0 )
-  {
-    yield put( accountSettingsUpdated( {
-      account 
-    } ) )
-  }
-  // Below implementation is for non-default accounts
-
   let accountType = ''
   switch( account.kind )  {
       case DONATION_ACCOUNT:
