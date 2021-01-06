@@ -516,7 +516,7 @@ class SendConfirmation extends Component<
       this.props.currencyKind === CurrencyKind.BITCOIN
     ) {
       return UsNumberFormat( value )
-    } else if ( exchangeRates !== undefined ) {
+    } else if ( exchangeRates !== undefined && exchangeRates[ CurrencyCode ] ) {
       return (
         ( value / SATOSHIS_IN_BTC ) *
         exchangeRates[ CurrencyCode ].last
@@ -643,7 +643,7 @@ class SendConfirmation extends Component<
                   ? UsNumberFormat( this.spendableBalance )
                   : prefersBitcoin
                     ? UsNumberFormat( this.spendableBalance )
-                    : exchangeRates
+                    : exchangeRates && exchangeRates[ CurrencyCode ]
                       ? (
                         ( this.spendableBalance / SATOSHIS_IN_BTC ) *
                       exchangeRates[ CurrencyCode ].last
@@ -783,7 +783,7 @@ class SendConfirmation extends Component<
                     ? UsNumberFormat( totalAmount )
                     : prefersBitcoin
                       ? UsNumberFormat( totalAmount )
-                      : exchangeRates
+                      : exchangeRates && exchangeRates[ CurrencyCode ]
                         ? (
                           ( totalAmount / SATOSHIS_IN_BTC ) *
                         exchangeRates[ CurrencyCode ].last
