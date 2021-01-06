@@ -1,31 +1,31 @@
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { transactionReassignmentCompleted } from "../../../store/actions/accounts";
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { transactionReassignmentCompleted } from '../../../store/actions/accounts'
 
 type Props = {
-  onSuccess: (transactionReassignmentDestinationID: string) => void;
+  onSuccess: ( transactionReassignmentDestinationID: string ) => void;
   onError: () => void;
 };
 
-export default function useTransactionReassignmentCompletedEffect({
+export default function useTransactionReassignmentCompletedEffect( {
   onSuccess,
   onError,
-}: Props) {
-  const dispatch = useDispatch();
+}: Props ) {
+  const dispatch = useDispatch()
 
   const {
     hasTransactionReassignmentSucceeded,
     hasTransactionReassignmentFailed,
     transactionReassignmentDestinationID,
-  } = useSelector(state => state.accounts);
+  } = useSelector( state => state.accounts )
 
-  useEffect(() => {
-    if (hasTransactionReassignmentSucceeded) {
-      onSuccess(transactionReassignmentDestinationID);
-    } else if (hasTransactionReassignmentFailed) {
-      onError();
+  useEffect( () => {
+    if ( hasTransactionReassignmentSucceeded ) {
+      onSuccess( transactionReassignmentDestinationID )
+    } else if ( hasTransactionReassignmentFailed ) {
+      onError()
     }
 
-    dispatch(transactionReassignmentCompleted());
-  }, [hasTransactionReassignmentSucceeded, hasTransactionReassignmentFailed]);
+    dispatch( transactionReassignmentCompleted() )
+  }, [ hasTransactionReassignmentSucceeded, hasTransactionReassignmentFailed ] )
 }
