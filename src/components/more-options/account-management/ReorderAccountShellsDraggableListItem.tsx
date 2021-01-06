@@ -30,7 +30,11 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
       onLongPress={onLongPress}
       containerStyle={{
         opacity: isActive ? 0.6 : 1,
-        backgroundColor: isActive ? 'rgba(175,175,175,0.7)' : Colors.white,
+        backgroundColor: isActive ? Colors.white : Colors.white,
+        borderBottomWidth: isActive ? 10 : 0,
+        borderTopWidth: isActive ? 10 : 0,
+        borderRightWidth: isActive ? 10 : 0,
+        borderColor: '#f8f8ff'
       }}
     >
       <Image
