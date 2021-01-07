@@ -24,6 +24,7 @@ import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import TwoFAToken from '../pages/Accounts/TwoFAToken'
+import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import QRScannerScreen from '../pages/QRScannerScreen'
 import HealthCheck from '../pages/HealthCheck'
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck'
@@ -160,6 +161,7 @@ const HomeNavigator = createStackNavigator(
     Receive,
     PairNewWallet,
     NewOwnQuestions,
+    TwoFAValidation,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {

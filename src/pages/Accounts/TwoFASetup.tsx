@@ -76,7 +76,7 @@ const TwoFASetup = props => {
           <TouchableOpacity
             onPress={
               () => {
-                props.navigation.navigate( 'Home' )
+                props.navigation.navigate( 'TwoFAValidation' )
               }
             }
             style={{

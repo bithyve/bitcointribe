@@ -1,16 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useState, } from 'react'
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   TextInput,
   StyleSheet,
-  ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  Alert,
-  AsyncStorage,
   Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
@@ -21,42 +17,25 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  transferST3,
-  clearTransfer,
-  fetchTransactions,
-  fetchBalanceTx,
-} from '../../store/actions/accounts'
+import { useDispatch } from 'react-redux'
 import SendStatusModalContents from '../../components/SendStatusModalContents'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import SendConfirmationContent from './SendConfirmationContent'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
-import {
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes'
 import DeviceInfo from 'react-native-device-info'
 
-export default function TwoFAToken( props ) {
+export default function TwoFAValidation( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
-  const serviceType = props.navigation.getParam( 'serviceType' )
-  const recipientAddress = props.navigation.getParam( 'recipientAddress' )
   const [ SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
-  )
-  const { transfer, loading } = useSelector(
-    ( state ) => state.accounts[ serviceType ],
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   function onPressNumber( text ) {
-    const tmpToken = tokenArray
+    const tmpToken = [ ...tokenArray ]
     if ( text ) {
       tmpToken.push( text )
     } else {
@@ -66,104 +45,36 @@ export default function TwoFAToken( props ) {
     if ( tmpToken.length > 0 ) {
       setToken( tmpToken.join( '' ) )
     }
+
+    if( tmpToken.length > 6 ) setIsConfirmDisabled( false )
+    else if( !isConfirmDisabled ) setIsConfirmDisabled( true )
   }
 
-  const dispatch = useDispatch()
-  const renderSuccessStatusContents = () => (
-    <SendStatusModalContents
-      title1stLine={'Sent Successfully'}
-      title2ndLine={''}
-      info1stLine={'bitcoin successfully sent to'}
-      info2ndLine={''}
-      userName={recipientAddress}
-      // modalRef={SendSuccessBottomSheet}
-      isSuccess={true}
-      onPressViewAccount={() => {
-        dispatch( clearTransfer( serviceType ) )
-        // dispatch(fetchTransactions(serviceType));
-        dispatch(
-          fetchBalanceTx( serviceType, {
-            loader: true,
-            syncTrustedDerivative:
-              serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
-                ? true
-                : false,
-          } ),
-        )
-        props.navigation.navigate( 'AccountDetails' )
-      }}
-      transactionId={transfer.txid}
-      transactionDateTime={Date()}
-    />
-  )
-
-  const storeTrustedContactsHistory = async ( details ) => {
-    if ( details && details.length > 0 ) {
-      let IMKeeperOfHistory = JSON.parse(
-        await AsyncStorage.getItem( 'IMKeeperOfHistory' ),
-      )
-      let OtherTrustedContactsHistory = JSON.parse(
-        await AsyncStorage.getItem( 'OtherTrustedContactsHistory' ),
-      )
-      for ( let i = 0; i < details.length; i++ ) {
-        const element = details[ i ]
-        if ( element.selectedContact.contactName ) {
-          const obj = {
-            id: createRandomString( 36 ),
-            title: 'Sent Amount',
-            date: moment( Date.now() ).valueOf(),
-            info: '',
-            // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-            selectedContactInfo: element,
-          }
-          if ( element.selectedContact.isWard ) {
-            if ( !IMKeeperOfHistory ) IMKeeperOfHistory = []
-            IMKeeperOfHistory.push( obj )
-            await AsyncStorage.setItem(
-              'IMKeeperOfHistory',
-              JSON.stringify( IMKeeperOfHistory ),
-            )
-          }
-          if (
-            !element.selectedContact.isWard &&
-            !element.selectedContact.isGuardian
-          ) {
-            if ( !OtherTrustedContactsHistory ) OtherTrustedContactsHistory = []
-            OtherTrustedContactsHistory.push( obj )
-            await AsyncStorage.setItem(
-              'OtherTrustedContactsHistory',
-              JSON.stringify( OtherTrustedContactsHistory ),
-            )
-          }
-        }
-      }
-    }
-  }
-
-  useEffect( () => {
-    if ( !transfer.txid && transfer.stage3.failed ) {
-      setTimeout( () => {
-        setElevation( 0 )
-      }, 4 )
-      setTimeout( () => {
-        SendUnSuccessBottomSheet.current.snapTo( 1 )
-      }, 2 )
-    }
-    if ( transfer.txid ) {
-      storeTrustedContactsHistory( transfer.details )
-    }
-  }, [ transfer ] )
+  // const dispatch = useDispatch()
+  // const renderSuccessStatusContents = () => (
+  //   <SendStatusModalContents
+  //     title1stLine={'Sent Successfully'}
+  //     title2ndLine={''}
+  //     info1stLine={'bitcoin successfully sent to'}
+  //     info2ndLine={''}
+  //     userName={''}
+  //     // modalRef={SendSuccessBottomSheet}
+  //     isSuccess={true}
+  //     onPressViewAccount={() => {
+  //       props.navigation.goBack()
+  //     }}
+  //     transactionDateTime={Date()}
+  //   />
+  // )
 
   const renderSendUnSuccessContents = () => {
     return (
       <SendConfirmationContent
-        title={'Send Unsuccessful'}
-        info={
-          transfer && transfer.stage3
-            ? 'There seems to be a problem' + '\n' + transfer.stage3.err
-            : 'Something went wrong, please try again.'
+        title={'2FA Validation Unsuccessful'}
+        info={      
+          'Invalid 2FA token, please retry.'
         }
-        userInfo={transfer.details}
+        userInfo={[]}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
@@ -173,13 +84,12 @@ export default function TwoFAToken( props ) {
             SendUnSuccessBottomSheet.current.snapTo( 0 )
         }}
         onPressCancel={() => {
-          dispatch( clearTransfer( serviceType ) )
           if ( SendUnSuccessBottomSheet.current )
             SendUnSuccessBottomSheet.current.snapTo( 0 )
-          props.navigation.navigate( 'AccountDetails' )
+          props.navigation.goBack()
         }}
         isUnSuccess={true}
-        accountKind={serviceType}
+        accountKind={''}
       />
     )
   }
@@ -195,18 +105,6 @@ export default function TwoFAToken( props ) {
       />
     )
   }
-
-  if ( transfer.txid ) {
-    if ( props.navigation.state.params.onTransactionSuccess )
-      props.navigation.state.params.onTransactionSuccess()
-    props.navigation.goBack()
-  }
-
-  useEffect( () => {
-    if ( !loading.transfer ) {
-      setIsConfirmDisabled( false )
-    }
-  }, [ loading.transfer ] )
 
   return (
     <SafeAreaView style={{
@@ -434,7 +332,6 @@ export default function TwoFAToken( props ) {
                 setTimeout( () => {
                   setIsConfirmDisabled( true )
                 }, 1 )
-                dispatch( transferST3( serviceType, token ) )
               }}
               style={{
                 ...styles.confirmModalButtonView,
@@ -444,36 +341,7 @@ export default function TwoFAToken( props ) {
                   : Colors.blue,
               }}
             >
-              {( !isConfirmDisabled && loading.transfer ) ||
-              ( isConfirmDisabled && loading.transfer ) ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Text style={styles.confirmButtonText}>Confirm</Text>
-                )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate( 'ResetTwoFAHelp' )
-              }}
-              style={{
-                width: wp( '30%' ),
-                height: wp( '13%' ),
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 10,
-                marginLeft: 5,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Need Help?
-              </Text>
+              <Text style={styles.confirmButtonText}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>
