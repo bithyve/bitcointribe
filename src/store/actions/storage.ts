@@ -1,4 +1,3 @@
-import { database } from 'react-native-firebase';
 import dataManager from '../../storage/database-manager';
 
 // types and action creators: dispatched by components and sagas

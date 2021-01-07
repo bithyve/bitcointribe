@@ -7,7 +7,9 @@ import { useDispatch } from 'react-redux';
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info';
 import { setApiHeaders } from './src/services/api';
-import firebase from 'react-native-firebase';
+import firebase from '@react-native-firebase/app';
+import analytics from '@react-native-firebase/analytics';
+import crashlytics from '@react-native-firebase/crashlytics';
 import { updatePreference } from './src/store/actions/preferences';
 import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState';
 import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet';
@@ -34,8 +36,11 @@ export default function AppWrapper() {
   const store = makeStore();
 
   useEffect(() => {
-    configureAPIHeaders();
-    firebase.analytics().setAnalyticsCollectionEnabled(true);
+    ( async () => {
+      configureAPIHeaders();
+      await firebase.analytics().setAnalyticsCollectionEnabled(true);
+      await crashlytics().setCrashlyticsCollectionEnabled(true);
+    });
   }, []);
 
   return (
@@ -118,7 +123,6 @@ function AppContent() {
     };
   }, []);
 
-
   return (
     <Navigator
       onNavigationStateChange={async (prevState, currentState) => {
@@ -126,7 +130,7 @@ function AppContent() {
         setCurrentScreenName(getActiveRouteName(currentState));
 
         if (previousScreenName !== currentScreenName) {
-          firebase.analytics().setCurrentScreen(currentScreenName);
+          analytics().logEvent(currentScreenName);
         }
       }}
     />

@@ -2,14 +2,14 @@
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.VIBRATE" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
   <!-- OPTIONAL PERMISSIONS, REMOVE WHATEVER YOU DO NOT NEED -->
   <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
   <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
   <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-  <uses-permission android:name="android.permission.VIBRATE" />
 
   <!-- These require runtime permissions on M -->
   <uses-permission android:name="android.permission.CAMERA" />
@@ -18,7 +18,11 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <!-- END OPTIONAL PERMISSIONS -->
-
+<permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <!-- < Only if you're using GCM or localNotificationSchedule() > -->
   <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:theme="@style/AppTheme" android:networkSecurityConfig="@xml/network_security_config" android:requestLegacyExternalStorage="true">
     <activity android:name=".MainActivity" android:launchMode="singleTask" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize">
       <intent-filter>
@@ -44,31 +48,36 @@
     <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:grantUriPermissions="true" android:exported="false">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
     </provider>  
-     <meta-data android:name="io.fabric.ApiKey" android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6" />
-     <service android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">
-      <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-      </intent-filter>
-    </service>
-    <service android:name="io.invertase.firebase.messaging.RNFirebaseInstanceIdService">
+     <meta-data
+      android:name="com.google.firebase.messaging.default_notification_channel_id"
+      android:value="@string/default_notification_channel_id" />
+      <meta-data
+      android:name="com.dieam.reactnativepushnotification.default_notification_channel_id"
+      android:value="@string/default_notification_channel_id" />
+    <!-- Change the value to true to enable pop-up for in foreground on receiving remote notifications (for prevent duplicating while showing local notifications set this to false) -->
+        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
+                    android:value="false"/>
+        <!-- Change the resource name to your App's accent color - or any other color you want -->
+        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
+                    android:resource="@color/white"/> <!-- or @android:color/{name} to use a standard color -->
+
+        <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
+        <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />
+        <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-      <!-- For background messaging -->
-    <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
-    <!-- <meta-data
-    android:name="com.google.firebase.messaging.default_notification_channel_id"
-    android:value="@string/default_notification_channel_id" /> -->
-    <receiver android:name="io.invertase.firebase.notifications.RNFirebaseNotificationReceiver"/>
-    <receiver android:enabled="true" android:exported="true" android:name="io.invertase.firebase.notifications.RNFirebaseNotificationsRebootReceiver">
-      <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED"/>
-        <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-        <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
-        <category android:name="android.intent.category.DEFAULT" />
-      </intent-filter>
-    </receiver>
   </application>
 
 </manifest>
