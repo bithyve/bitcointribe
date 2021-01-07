@@ -24,6 +24,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import SendConfirmationContent from './SendConfirmationContent'
 import DeviceInfo from 'react-native-device-info'
+import { validateTwoFA } from '../../store/actions/accounts'
 
 export default function TwoFAValidation( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
@@ -50,7 +51,7 @@ export default function TwoFAValidation( props ) {
     else if( !isConfirmDisabled ) setIsConfirmDisabled( true )
   }
 
-  // const dispatch = useDispatch()
+  const dispatch = useDispatch()
   // const renderSuccessStatusContents = () => (
   //   <SendStatusModalContents
   //     title1stLine={'Sent Successfully'}
@@ -332,6 +333,7 @@ export default function TwoFAValidation( props ) {
                 setTimeout( () => {
                   setIsConfirmDisabled( true )
                 }, 1 )
+                dispatch( validateTwoFA( parseInt( token ) ) )
               }}
               style={{
                 ...styles.confirmModalButtonView,

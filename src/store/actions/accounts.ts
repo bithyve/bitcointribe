@@ -26,6 +26,7 @@ export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS'
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX'
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA'
+export const VALIDATE_TWO_FA = 'VALIDATE_TWO_FA'
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
@@ -205,6 +206,15 @@ export const syncViaXpubAgent = (
     payload: {
       serviceType, derivativeAccountType, accountNumber 
     },
+  }
+}
+
+export const validateTwoFA = ( token: number ) => {
+  return {
+    type: VALIDATE_TWO_FA,
+    payload: { 
+      token 
+    }
   }
 }
 
@@ -510,6 +520,7 @@ export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
 export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
+export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
 export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
@@ -629,7 +640,14 @@ export const secondaryXprivGenerated = ( generated ) => {
     } 
   }
 }
-
+export const twoFAValid = ( isValid: boolean ) => {
+  return {
+    type: TWO_FA_VALID,
+    payload: {
+      isValid
+    }
+  }
+}
 export const twoFAResetted = ( resetted ) => {
   return {
     type: TWO_FA_RESETTED, payload: {
