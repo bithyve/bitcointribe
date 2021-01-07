@@ -61,6 +61,7 @@ export const SHARE_PDF = 'SHARE_PDF';
 export const CONFIRM_PDF_SHARED = 'CONFIRM_PDF_SHARED';
 export const DOWNLOAD_PDFSHARE_HEALTH = 'DOWNLOAD_PDFSHARE_HEALTH';
 export const DOWNLOADED_PDFSHARE_HEALTH = 'DOWNLOADED_PDFSHARE_HEALTH';
+export const UPLOAD_SM_SHARE = 'UPLOAD_SM_SHARE';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -399,5 +400,14 @@ export const confirmPDFShared = (
   return {
     type: CONFIRM_PDF_SHARED,
     payload: { shareId },
+  };
+};
+
+export const uploadSMShare = (
+  encryptedKey, otp
+) => {
+  return {
+    type: UPLOAD_SM_SHARE,
+    payload: { encryptedKey, otp },
   };
 };

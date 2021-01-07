@@ -118,7 +118,7 @@ function* initHealthWorker() {
 
   if (initialized) return;
   yield put(initLoader(true));
-  const res = yield call(s3Service.initializeHealth);
+  const res = yield call(s3Service.initializeHealthKeeper);
 
   if (res.status === 200) {
     // Update Initial Health to reducer
@@ -235,7 +235,7 @@ function* checkSharesHealthWorker() {
   try {
     yield put(switchS3LoadingStatus(true));
     const s3Service: S3Service = yield select((state) => state.health.service);
-    const res = yield call(s3Service.checkHealth);
+    const res = yield call(s3Service.checkHealthKeeper);
     if (res.status === 200) {
       yield put(updateHealth(res.data.levels, res.data.currentLevel));
     } else {
@@ -270,7 +270,7 @@ function* updateSharesHealthWorker({ payload }) {
 
     const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
-    const res = yield call(S3Service.updateHealth, payload.shares);
+    const res = yield call(S3Service.updateHealthKeeper, payload.shares);
     if (res.status === 200) {
       if (res.data.updationResult) {
         let s3Service: S3Service = yield select(
@@ -377,7 +377,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       }
     }
     if (isReshare || isChange) {
-      yield call(s3Service.reshareMetaShare, shareIndex);
+      yield call(s3Service.reshareMetaShareKeeper, shareIndex);
     }
     let share = metaShare[shareIndex];
     const fcmTokenValue = yield select(
@@ -1022,7 +1022,7 @@ function* recoverWalletWorker({ payload }) {
     );
 
     const res = yield call(
-      S3Service.recoverFromSecrets,
+      S3Service.recoverFromSecretsKeeper,
       encryptedSecrets,
       security.answer,
       payload.level
@@ -1287,7 +1287,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   }
 
   if (payload.changingGuardian) {
-    yield call(s3Service.reshareMetaShare, shareIndex);
+    yield call(s3Service.reshareMetaShareKeeper, shareIndex);
     if (payload.previousGuardianName) {
       trustedContacts.tc.trustedContacts[
         payload.previousGuardianName
@@ -1634,7 +1634,7 @@ function* uploadPdfShareWorker({ payload }) {
           );
         }
       }
-      yield call(s3Service.reshareMetaShare, shareIndex);
+      yield call(s3Service.reshareMetaShareKeeper, shareIndex);
     }
 
     let s3ServiceTest: S3Service = yield select(
@@ -1810,7 +1810,7 @@ function* recoverMnemonicHealthWorker({ payload }) {
   );
 
   const res = yield call(
-    S3Service.recoverFromSecrets,
+    S3Service.recoverFromSecretsKeeper,
     encryptedSecrets,
     securityAns,
     2
@@ -2241,7 +2241,7 @@ function* getPDFDataWorker({ payload }) {
         shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
       }
       if (isReShare) {
-        yield call(s3Service.reshareMetaShare, shareIndex);
+        yield call(s3Service.reshareMetaShareKeeper, shareIndex);
       }
       let publicKey = pdfInfo.publicKey;
       let privateKey = pdfInfo.privateKey;
@@ -2582,5 +2582,5 @@ function* uploadSMShareWorker({ payload }) {
   
   export const uploadSMShareWatcher = createWatcher(
     uploadSMShareWorker,
-    KEEPER_INFO
+    UPLOAD_PDF_SHARE
   );

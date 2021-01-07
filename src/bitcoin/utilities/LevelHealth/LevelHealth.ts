@@ -24,7 +24,7 @@ export default class LevelHealth {
     keyLength: number;
   } = config.CIPHER_SPEC;
 
-  public static recoverFromSecrets = (
+  public static recoverFromSecretsKeeper = (
     decryptedSecrets: string[],
     level?: number
   ): {
@@ -475,7 +475,7 @@ export default class LevelHealth {
     return { metaShare };
   };
 
-  public static updateHealth = async (
+  public static updateHealthKeeper = async (
     shares: [
       {
         walletId: string;
@@ -680,24 +680,6 @@ export default class LevelHealth {
   public generateMessageID = (): string =>
     LevelHealth.generateRandomString(config.MSG_ID_LENGTH);
 
-  public generateShares = (): {
-    shares: string[];
-  } => {
-    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
-    const shares = secrets.share(
-      this.stringToHex(this.mnemonic),
-      config.SSS_TOTAL,
-      config.SSS_THRESHOLD,
-    );
-
-    for (let itr = 0; itr < shares.length; itr++) {
-      const checksum = LevelHealth.calculateChecksum(shares[itr]);
-      shares[itr] = shares[itr] + checksum;
-    }
-
-    return { shares };
-  };
-
   public generateLevel1Shares = (): {
     shares: string[];
   } => {
@@ -777,7 +759,7 @@ export default class LevelHealth {
     };
   };
 
-  public initializeHealth = async (): Promise<{
+  public initializeHealthKeeper = async (): Promise<{
     success: boolean;
     levelInfo: any[];
   }> => {
@@ -866,7 +848,7 @@ export default class LevelHealth {
     };
   };
 
-  public checkHealth2 = async (): Promise<{
+  public checkHealthKeeper = async (): Promise<{
     data: {};
   }> => {
     let response = {};
@@ -1302,17 +1284,17 @@ export default class LevelHealth {
     return { metaShares: this.metaShares };
   };
 
-  public reshareMetaShare = (index: number) => {
+  public reshareMetaShareKeeper = (index: number) => {
     this.metaShares[index].meta.reshareVersion =
     this.metaShares[index].meta.reshareVersion + 1;
     console.log({ resharing: this.metaShares[index] });
     return this.metaShares[index];
   };
 
-  public restoreMetaShares = (
+  public restoreMetaSharesKeeper = (
     metaShares: MetaShare[],
   ): {
-    restored: Boolean;
+    restored: boolean;
   } => {
     if (Object.keys(metaShares).length !== 3) {
       throw new Error('Restoration requires a minimum of 3 metaShares');
@@ -1464,7 +1446,7 @@ export default class LevelHealth {
   public updateWalletImage = async (
     walletImage: WalletImage,
   ): Promise<{
-    updated: Boolean;
+    updated: boolean;
   }> => {
     try {
       let res: AxiosResponse;

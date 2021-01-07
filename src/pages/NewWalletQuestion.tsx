@@ -194,6 +194,9 @@ export default function NewWalletQuestion( props ) {
             setIsDisabled(true);
           }, 2);
         }}
+        style={{
+          ...styles.buttonView, elevation: Elevation
+        }}
       >
         {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>Confirm</Text>

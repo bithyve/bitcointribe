@@ -16,6 +16,7 @@ import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
 export default class S3Service {
   public static fromJSON = (json: string) => {
     const { levelhealth } = JSON.parse(json);
+    const { sss } = JSON.parse(json)
     const {
       mnemonic,
       encryptedSecrets,
@@ -34,7 +35,7 @@ export default class S3Service {
       walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
-    } = levelhealth;
+    } = levelhealth ? levelhealth : sss;
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
@@ -46,6 +47,28 @@ export default class S3Service {
       pdfHealth,
     })
   };
+
+  public sss: SSS;
+  public levelhealth: LevelHealth;
+  public hdWallet: HDSegwitWallet;
+  public secureWallet: SecureHDWallet;
+  constructor(
+    mnemonic: string,
+    stateVars?: {
+      encryptedSecrets: string[];
+      shareIDs: string[];
+      metaShares: MetaShare[];
+      healthCheckInitialized: boolean;
+      walletId: string;
+      healthCheckStatus: {};
+      pdfHealth: {};
+    },
+  ) {
+    this.levelhealth = new LevelHealth(mnemonic, stateVars);
+    this.sss = new SSS(mnemonic, stateVars);
+    this.hdWallet = new HDSegwitWallet();
+    this.secureWallet = new SecureHDWallet(mnemonic);
+  }
 
   public static recoverFromSecrets = (
     encryptedSecrets: string[],
@@ -67,8 +90,38 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
+      const { decryptedSecrets } = SSS.decryptSecrets(encryptedSecrets, answer);
+      const { mnemonic } = SSS.recoverFromSecrets(decryptedSecrets);
+      return { status: config.STATUS.SUCCESS, data: { mnemonic } };
+    } catch (err) {
+      return {
+        status: 501, err: err.message, message: ErrMap[ 501 ] 
+      }
+    }
+  };
+
+  public static recoverFromSecretsKeeper = (
+    encryptedSecrets: string[],
+    answer: string,
+    level?: number
+  ):
+    | {
+        status: number;
+        data: {
+          mnemonic: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
       const { decryptedSecrets } = LevelHealth.decryptSecrets(encryptedSecrets, answer);
-      const { mnemonic } = LevelHealth.recoverFromSecrets(decryptedSecrets, level);
+      const { mnemonic } = LevelHealth.recoverFromSecretsKeeper(decryptedSecrets, level);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
     } catch (err) {
       return {
@@ -354,6 +407,43 @@ export default class S3Service {
   };
 
   public static updateHealth = async (
+    metaShares: MetaShare[],
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updationInfo: Array<{
+            walletId: string;
+            shareId: string;
+            updated: boolean;
+            updatedAt?: number;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+            err?: string;
+          }>;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await SSS.updateHealth(metaShares),
+      }
+    } catch (err) {
+      return {
+        status: 506, err: err.message, message: ErrMap[ 506 ] 
+      }
+    }
+  };
+
+  public static updateHealthKeeper = async (
     shares: [{
       walletId: string;
       shareId: string;
@@ -405,7 +495,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await LevelHealth.updateHealth(shares),
+        data: await LevelHealth.updateHealthKeeper(shares),
       };
     } catch (err) {
       return {
@@ -500,26 +590,6 @@ export default class S3Service {
     }
   };
 
-  public levelhealth: LevelHealth;
-  public hdWallet: HDSegwitWallet;
-  public secureWallet: SecureHDWallet;
-  constructor(
-    mnemonic: string,
-    stateVars?: {
-      encryptedSecrets: string[];
-      shareIDs: string[];
-      metaShares: MetaShare[];
-      healthCheckInitialized: boolean;
-      walletId: string;
-      healthCheckStatus: {};
-      pdfHealth: {};
-    },
-  ) {
-    this.levelhealth = new LevelHealth(mnemonic, stateVars);
-    this.hdWallet = new HDSegwitWallet();
-    this.secureWallet = new SecureHDWallet(mnemonic);
-  }
-
   public generateShares = (
     answer: string,
   ):
@@ -538,8 +608,8 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { shares } = this.levelhealth.generateShares();
-      const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
+      const { shares } = this.sss.generateShares();
+      const { encryptedSecrets } = this.sss.encryptSecrets(shares, answer);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
       return {
@@ -578,7 +648,7 @@ export default class S3Service {
       
       const { shares } = this.levelhealth.generateLevel1Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets,tag, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag, version, level);
       console.log("metaShares",metaShares);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
@@ -703,7 +773,35 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.levelhealth.initializeHealth(),
+        data: await this.sss.initializeHealthcheck(),
+      }
+    } catch (err) {
+      return {
+        status: 513, err: err.message, message: ErrMap[ 513 ] 
+      }
+    }
+  };
+
+  public initializeHealthKeeper = async (): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.levelhealth.initializeHealthKeeper(),
       };
     } catch (err) {
       return {
@@ -741,6 +839,40 @@ export default class S3Service {
   public checkHealth = async (): Promise<
     | {
         status: number;
+        data: {
+          shareGuardianMapping: {
+            [index: number]: {
+              shareId: string;
+              updatedAt: number;
+              guardian: string;
+            };
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.checkHealth(),
+      }
+    } catch (err) {
+      return {
+        status: 514, err: err.message, message: ErrMap[ 514 ] 
+      }
+    }
+  };
+
+  public checkHealthKeeper = async (): Promise<
+    | {
+        status: number;
         data?: {};
         err?: undefined;
         message?: undefined;
@@ -755,7 +887,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: (await this.levelhealth.checkHealth2()).data,
+        data: (await this.levelhealth.checkHealthKeeper()).data,
       };
     } catch (err) {
       return {
@@ -943,7 +1075,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.levelhealth.createMetaShares(secureAssets, tag, version),
+        data: this.sss.createMetaShares(secureAssets, tag, version),
       };
     } catch (err) {
       return {
@@ -970,7 +1102,34 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const metaShare = this.levelhealth.reshareMetaShare(index);
+      const metaShare = this.sss.reshareMetaShare(index);
+      return { status: config.STATUS.SUCCESS, data: { metaShare } };
+    } catch (err) {
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
+    }
+  };
+
+  public reshareMetaShareKeeper = (
+    index: number,
+  ):
+    | {
+        status: number;
+        data: {
+          metaShare: MetaShare;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const metaShare = this.levelhealth.reshareMetaShareKeeper(index);
       return { status: config.STATUS.SUCCESS, data: { metaShare } };
     } catch (err) {
       return {
@@ -997,7 +1156,34 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { restored } = this.levelhealth.restoreMetaShares(metaShares);
+      const { restored } = this.sss.restoreMetaShares(metaShares);
+      return { status: config.STATUS.SUCCESS, data: { restored } };
+    } catch (err) {
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
+    }
+  };
+
+  public restoreMetaSharesKeeper = (
+    metaShares: MetaShare[],
+  ):
+    | {
+        status: number;
+        data: {
+          restored: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { restored } = this.levelhealth.restoreMetaSharesKeeper(metaShares);
       return { status: config.STATUS.SUCCESS, data: { restored } };
     } catch (err) {
       return {
