@@ -1306,6 +1306,33 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public validate2FASetup = async ( token: number ): Promise<{
+    valid: Boolean
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+        HEXA_ID,
+        walletID: this.walletID,
+        token,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    console.log( {
+      res 
+    } )
+    const { valid } = res.data
+    if ( !valid ) {
+      throw new Error( '2FA validation failed' )
+    } else {
+      return { 
+        valid 
+      }
+    }
+  };
+
   public updateDonationPreferences = async (
     accountNumber: number,
     preferences: {

@@ -159,6 +159,33 @@ export default class SecureAccount {
     }
   };
 
+
+  public validate2FASetup = async ( token: number ): Promise<{
+      status: number;
+      data: {
+          valid: Boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+  } | {
+      status: number;
+      err: any;
+      message: string;  
+      data?: undefined;
+  }> => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.validate2FASetup( token ),
+      }
+    } catch ( err ) {
+      return {
+        status: 301, err: err.message, message: ErrMap[ 301 ] 
+      }
+    }
+  };
+
+
   public importSecureAccount = async (
     secondaryXpub: string,
     bhXpub?: string,
