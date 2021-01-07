@@ -41,6 +41,7 @@ const ReorderAccountShellsDraggableList: React.FC<Props> = ( {
 }: Props ) => {
   return (
     <DraggableFlatList
+      activationDistance={5}
       data={accountShells}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
