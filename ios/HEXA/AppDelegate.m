@@ -1,8 +1,5 @@
 // firebase
 #import <Firebase.h>
-//#import "RNFirebaseNotifications.h"
-//#import "RNFirebaseMessaging.h"
-
 
 #import "AppDelegate.h"
 #import <React/RCTBridge.h>
@@ -20,28 +17,6 @@
 
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
-
-//#ifdef FB_SONARKIT_ENABLED
-//#import <FlipperKit/FlipperClient.h>
-//#import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
-//#import <FlipperKitUserDefaultsPlugin/FKUserDefaultsPlugin.h>
-//#import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
-//#import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
-//#import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-
-
-
-//static void InitializeFlipper(UIApplication *application) {
-//  FlipperClient *client = [FlipperClient sharedClient];
-//  SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
-//  [client addPlugin:[[FlipperKitLayoutPlugin alloc] initWithRootNode:application withDescriptorMapper:layoutDescriptorMapper]];
-//  [client addPlugin:[[FKUserDefaultsPlugin alloc] initWithSuiteName:nil]];
-//  [client addPlugin:[FlipperKitReactPlugin new]];
-//  [client addPlugin:[[FlipperKitNetworkPlugin alloc] initWithNetworkAdapter:[SKIOSNetworkAdapter new]]];
-//  [client start];
-//}
-//#endif
-
 
 
 @interface AppDelegate () <RCTBridgeDelegate>
@@ -148,28 +123,5 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 {
   [RNCPushNotificationIOS didReceiveNotificationResponse:response];
 }
-
-
-
-
-
-//- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-//  [[RNFirebaseNotifications instance] didReceiveLocalNotification:notification];
-//}
-
-//- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
-//fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
-//  [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-//}
-//
-//- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
-//  [[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
-//}
-//
-//-(void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-//
-//  [[RNFirebaseMessaging instance] didReceiveRemoteNotification:response.notification.request.content.userInfo];
-//  completionHandler();
-//}
 
 @end
