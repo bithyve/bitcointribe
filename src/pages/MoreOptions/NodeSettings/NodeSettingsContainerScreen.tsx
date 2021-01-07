@@ -85,6 +85,26 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     dispatch( savePersonalNodeConfiguration( newPersonalNodeConfig ) )
   }
 
+  function handleConnectionToggle() {
+    const prefersPersonalNodeConnection = !isPersonalNodeConnectionEnabled
+
+    dispatch( personalNodePreferenceToggled( prefersPersonalNodeConnection ) )
+  }
+
+  useEffect( () => {
+    if ( nodeSettingsState.activePersonalNode ) {
+      if ( isPersonalNodeConnectionEnabled == false ) {
+        // switching back to BH(default)-node
+        dispatch( connectToBitHyveNode() )
+      } else {
+        // reconnecting to personal node
+        activePersonalNode.isConnectionActive = true
+        dispatch( savePersonalNodeConfiguration( activePersonalNode ) )
+      }
+    }
+  }, [ activePersonalNode, isPersonalNodeConnectionEnabled ] )
+
+
   useEffect( () => {
     if ( nodeSettingsState.hasConnectionSucceeded ) {
       showConnectionSucceededBottomSheet()
@@ -130,20 +150,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
                 paddingHorizontal: 14
               }}
               isConnectionEnabled={isPersonalNodeConnectionEnabled}
-              onToggle={() => {
-                dispatch( personalNodePreferenceToggled( !isPersonalNodeConnectionEnabled ) )
-                if( nodeSettingsState.activePersonalNode ){
-                  if( isPersonalNodeConnectionEnabled ) {
-                    // switching back to BH(default)-node
-                    dispatch( connectToBitHyveNode() )
-                  } else {
-                    // reconnecting to personal node
-                    const reactivatePersonalNode: PersonalNode = nodeSettingsState.activePersonalNode
-                    reactivatePersonalNode.isConnectionActive = true
-                    dispatch( savePersonalNodeConfiguration( reactivatePersonalNode ) )
-                  }
-                }
-              }}
+              onToggle={handleConnectionToggle}
             />
 
             {( isPersonalNodeConnectionEnabled && isEditingPersonalNodeConnection ) && (
