@@ -18,7 +18,6 @@ import TrustedContactsService from '../../../bitcoin/services/TrustedContactsSer
 import {
   addTransferDetails,
   clearTransfer,
-  removeTwoFA,
 } from '../../../store/actions/accounts'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
@@ -74,7 +73,6 @@ function renderSectionHeader(
 interface SendPropsTypes {
   navigation: any;
   addTransferDetails: any;
-  removeTwoFA: any;
   clearTransfer: any;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
@@ -153,10 +151,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     } )
     this.updateAccountData()
     this.getAccountBalances()
-    if ( this.state.serviceType === SECURE_ACCOUNT ) {
-      this.twoFASetupMethod()
-    }
-
     if (
       this.state.serviceType === TEST_ACCOUNT &&
       !this.props.hasShownInitialKnowMoreSendSheet
@@ -597,21 +591,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   };
 
-  twoFASetupMethod = async () => {
-    const { accountsState } = this.props
-
-    if (
-      accountsState[ this.state.serviceType ].service.secureHDWallet.twoFASetup
-    ) {
-      this.props.navigation.navigate( 'TwoFASetup', {
-        twoFASetup:
-          accountsState[ this.state.serviceType ].service.secureHDWallet
-            .twoFASetup,
-      } )
-      this.props.removeTwoFA()
-    }
-  };
-
   updateAddressBook = async () => {
     const {
       regularAccount,
@@ -962,7 +941,6 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    removeTwoFA,
     addTransferDetails,
     clearTransfer,
     initialKnowMoreSendSheetShown,
