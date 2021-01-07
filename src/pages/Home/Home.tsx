@@ -505,6 +505,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
    //let date =  new Date(Date.now() + (3 * 60 * 1000));
    PushNotification.localNotificationSchedule({
       channelId: `${channelIdRandom}`,
+      vibrate: true, 
+      vibration: 300,
       priority: "high",
       showWhen: true, 
       autoCancel: true,
@@ -517,6 +519,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   localNotification = async (notificationDetails) => {
+    console.log(":notificationDetails",notificationDetails);
+
     let channelIdRandom = moment().valueOf();
    PushNotification.createChannel(
     {
@@ -528,7 +532,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       importance: 4, // (optional) default: 4. Int value of the Android notification importance
       vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
     },
-    (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+    (created) => console.log(`createChannel localNotification returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
   );
 
     PushNotification.localNotification({
@@ -754,6 +758,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[REGULAR_ACCOUNT].service.hdWallet
     const secureAccount = accountsState[SECURE_ACCOUNT].service.secureHDWallet
+    console.log(":regularAccount",regularAccount);
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
@@ -761,7 +766,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[FAST_BITCOINS][1] &&
       secureAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions
-
+    console.log(":newTransactionsRegular",newTransactionsRegular);
     if (newTransactionsRegular && newTransactionsRegular.length)
       newTransactions.push(...newTransactionsRegular)
     if (newTransactionsSecure && newTransactionsSecure.length)
@@ -808,6 +813,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           title: obj.title,
           body: obj.info,
         }
+        console.log(":asyncNotificationList",asyncNotificationList);
+
         this.localNotification(notificationDetails)
       }
       //this.props.notificationsUpdated(asyncNotificationList);
