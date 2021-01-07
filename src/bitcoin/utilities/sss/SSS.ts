@@ -1048,7 +1048,7 @@ export default class SSS {
       this.metaShares = []
       throw new Error('Something went wrong while generating metaShares')
     }
-
+console.log('SSS this.metaShares',this.metaShares)
     return {
       metaShares: this.metaShares 
     }

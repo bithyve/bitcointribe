@@ -70,7 +70,7 @@ import RelayServices from "../../bitcoin/services/RelayService";
 import AddContactAddressBook from "../Contacts/AddContactAddressBook";
 import config from "../../bitcoin/HexaConfig";
 import TrustedContactsService from "../../bitcoin/services/TrustedContactsService";
-import HomeHeader from "../../components/home/home-header_update";
+import HomeHeader from "../../components/home/home-header";
 import idx from "idx";
 import CustomBottomTabs, {
   BottomTab,
@@ -1897,13 +1897,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     let tmpList = asyncNotificationList;
     if (notificationList) {
-      console.log(
-        "notificationList['notifications']",
-        notificationList["notifications"]
-      );
+      // console.log(
+      //   "notificationList['notifications']",
+      //   notificationList["notifications"]
+      // );
       for (let i = 0; i < notificationList["notifications"].length; i++) {
         const element = notificationList["notifications"][i];
-        console.log("element", element);
+        // console.log("element", element);
         let readStatus = false;
         if (element.notificationType == releaseNotificationTopic) {
           let releaseCases = this.props.releaseCasesValue;

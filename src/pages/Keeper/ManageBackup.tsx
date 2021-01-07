@@ -318,7 +318,7 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-
+    // this.props.setCloudBackupStatus({ status: false });
     if (!this.props.isBackupProcessing.status) {
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
@@ -393,10 +393,14 @@ class ManageBackup extends Component<
       this.modifyLevelData();
     }
 
-    if (
-      JSON.stringify(prevProps.levelHealth) !==
-      JSON.stringify(this.props.levelHealth)
-    ) {
+    // if (
+    //   JSON.stringify(prevProps.levelHealth) !==
+    //   JSON.stringify(this.props.levelHealth)
+    // ) {
+      if (
+        prevProps.levelHealth !==
+        this.props.levelHealth
+      ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&

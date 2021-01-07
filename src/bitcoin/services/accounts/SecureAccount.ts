@@ -15,7 +15,7 @@ export default class SecureAccount {
     const { secureHDWallet } = JSON.parse( json )
     const {
       primaryMnemonic,
-      // secondaryMnemonic,
+      secondaryMnemonic,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -27,14 +27,14 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       confirmedUTXOs,
-      // twoFASetup,
+      twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       feeRates,
     }: {
       primaryMnemonic: string;
-      // secondaryMnemonic: string;
+      secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -56,10 +56,10 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      // twoFASetup: {
-      //   qrData: string;
-      //   secret: string;
-      // };
+      twoFASetup: {
+        qrData: string;
+        secret: string;
+      };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -67,7 +67,7 @@ export default class SecureAccount {
     } = secureHDWallet
 
     return new SecureAccount(primaryMnemonic, {
-      // secondaryMnemonic,
+      secondaryMnemonic,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -79,7 +79,7 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       confirmedUTXOs,
-      // twoFASetup,
+      twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -92,7 +92,7 @@ export default class SecureAccount {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
-      // secondaryMnemonic: string;
+      secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -114,10 +114,10 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      // twoFASetup: {
-      //   qrData: string;
-      //   secret: string;
-      // };
+      twoFASetup: {
+        qrData: string;
+        secret: string;
+      };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];

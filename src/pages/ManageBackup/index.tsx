@@ -25,7 +25,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeHealthSetup, checkMSharesHealth } from '../../store/actions/health';
-//import { initHealthCheck } from '../../store/actions/sss';
+import { initHealthCheck } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import Icons from '../../common/Icons';
@@ -1290,12 +1290,12 @@ export default function ManageBackup(props) {
   useEffect( () => {
     // HC init and down-streaming
     if (s3Service) {
-      const { healthCheckInitialized } = s3Service.levelhealth;
+      const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
         // dispatch(checkMSharesHealth());
       } else {
         // console.log({ healthCheckInitialized });
-        dispatch(initializeHealthSetup());
+        dispatch(initHealthCheck());
       }
     }
   }, [ s3Service ] )

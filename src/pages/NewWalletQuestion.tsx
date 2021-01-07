@@ -31,7 +31,6 @@ import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
-import { initializeHealthSetup } from '../store/actions/health';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import { getTestcoins } from '../store/actions/accounts';
@@ -106,7 +105,6 @@ export default function NewWalletQuestion( props ) {
           answer,
         };
         dispatch(initializeSetup(walletName, security));
-        // if (security.answer) dispatch(initializeHealthSetup());
         const current = Date.now();
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
