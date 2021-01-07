@@ -836,9 +836,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList()
     }
 
-    if (prevProps.accountsState !== this.props.accountsState) {
-      this.getBalances()
-      this.getNewTransactionNotifications()
+    if ( prevProps.accountsState !== this.props.accountsState ) {
+      // this.getBalances()
+      // this.getNewTransactionNotifications()
     }
 
     if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
@@ -1144,21 +1144,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
-    const currencyCodeTmp = currencyCode
-    if (!currencyCodeTmp) {
-      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0])
-      this.setState({
-        currencyCode: RNLocalize.getCurrencies()[0],
-      })
+    if ( !currencyCode ) {
+      this.props.setCurrencyCode( RNLocalize.getCurrencies()[ 0 ] )
+      this.setState( {
+        currencyCode: RNLocalize.getCurrencies()[ 0 ],
+      } )
     } else {
-      this.setState({
-        currencyCode: currencyCodeTmp,
-      })
+      this.setState( {
+        currencyCode: currencyCode,
+      } )
     }
   };
-
-  
-
 
   getBalances = () => {
     const { accountsState } = this.props

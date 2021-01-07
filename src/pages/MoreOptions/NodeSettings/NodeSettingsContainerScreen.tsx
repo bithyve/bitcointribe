@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { View, Text, StyleSheet, AsyncStorage, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
@@ -12,7 +12,8 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import {  personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import {  connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import { Keyboard } from 'react-native'
 
 export type Props = {
   navigation: any;
@@ -33,6 +34,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   }, [ nodeSettingsState.prefersPersonalNodeConnection ] )
 
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )
+  const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
   const showConnectionSucceededBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -91,6 +93,27 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     }
   }, [ nodeSettingsState.hasConnectionSucceeded, nodeSettingsState.hasConnectionFailed ] )
 
+
+  useEffect( () => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible( true )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible( false )
+      }
+    )
+
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
+
   return (
     <View style={styles.rootContainer}>
       <KeyboardAvoidingView
@@ -109,6 +132,17 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
               isConnectionEnabled={isPersonalNodeConnectionEnabled}
               onToggle={() => {
                 dispatch( personalNodePreferenceToggled( !isPersonalNodeConnectionEnabled ) )
+                if( nodeSettingsState.activePersonalNode ){
+                  if( isPersonalNodeConnectionEnabled ) {
+                    // switching back to BH(default)-node
+                    dispatch( connectToBitHyveNode() )
+                  } else {
+                    // reconnecting to personal node
+                    const reactivatePersonalNode: PersonalNode = nodeSettingsState.activePersonalNode
+                    reactivatePersonalNode.isConnectionActive = true
+                    dispatch( savePersonalNodeConfiguration( reactivatePersonalNode ) )
+                  }
+                }
               }}
             />
 
@@ -127,14 +161,16 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <View style={styles.floatingNoteContainer}>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Test account will always use the default BitHyve test node, irrelevant of personal node'
-          }
-        />
-      </View>
+      {isKeyboardVisible == false && (
+        <View style={styles.floatingNoteContainer}>
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Test account will always use the default BitHyve test node, irrelevant of personal node'
+            }
+          />
+        </View>
+      )}
     </View>
   )
 }

@@ -138,8 +138,8 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: 26,
-    height: 26,
+    width: 22,
+    height: 22,
     marginBottom: 8,
   },
 
@@ -174,8 +174,8 @@ const styles = StyleSheet.create( {
   },
 
   selectionIndicatorContainer: {
-    width: 24,
-    height: 24,
+    width: 18,
+    height: 18,
     borderRadius: 999,
     borderWidth: 1,
     justifyContent: 'center',

@@ -39,11 +39,52 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       return [ accountShells ]
     }
 
-    const shellCount = accountShells.length
+    ///////////////////
+    // Even though we're rendering the list as horizontally scrolling set of
+    // 2-row columns, we want the appearance to be such that every group of four
+    // is ordered row-wise. The logic below is for formatting the data in such
+    // away that this will happen. (See: https://github.com/bithyve/hexa/issues/2250)
+    ///////////////////
+
+    const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+      if ( index % 2 == 0 ) {
+        accumulated.push( current )
+      }
+
+      return accumulated
+    }, [] )
+
+    const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+      if ( index % 2 == 1 ) {
+        accumulated.push( current )
+      }
+
+      return accumulated
+    }, [] )
+
+    const sortedShells: AccountShell[] = []
+    let isChoosingEvenIndexedShells = true
+    let isFirstShell = true
+
+    while ( evenIndexedShells.length > 0 || oddIndexedShells.length > 0 ) {
+      if ( isFirstShell ) {
+        sortedShells.push( ...oddIndexedShells.splice( 0, 1 ) )
+        isFirstShell = false
+      } else {
+        if ( isChoosingEvenIndexedShells ) {
+          sortedShells.push( ...evenIndexedShells.splice( 0, 2 ) )
+        } else {
+          sortedShells.push( ...oddIndexedShells.splice( 0, 2 ) )
+        }
+        isChoosingEvenIndexedShells = !isChoosingEvenIndexedShells
+      }
+    }
+
+    const shellCount = sortedShells.length
     const columns = []
     let currentColumn = []
 
-    accountShells.forEach( ( accountShell, index ) => {
+    sortedShells.forEach( ( accountShell, index ) => {
       currentColumn.push( accountShell )
 
       // Make a new column after adding two items -- or after adding the
