@@ -51,7 +51,8 @@ export const getCurrencyImageByRegion = (
   currencyCode: string,
   type: 'light' | 'dark' | 'gray' | 'light_blue',
 ) => {
-  const dollarCurrency = [ 'USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'TTD', 'TVD', 'ZWD' ]
+  const dollarCurrency = [ 'USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'USH', 'TTD', 'TVD', 'ZWD', 'MXN', 'COP', 'CLP', 'UYU', 'DOP', 'ARS' ]
+  // These currencies also use the $ symbol although the currency is Peso 'MXN', 'COP', 'CLP', 'UYU', 'DOP', 'ARS'
 
   const poundCurrency = [ 'EGP', 'FKP', 'GIP', 'GGP', 'IMP', 'JEP', 'SHP', 'SYP', 'GBP' ]
 
@@ -132,4 +133,16 @@ export const getCurrencyImageByRegion = (
     }
     return require( '../../assets/images/currencySymbols/icon_chf_gray.png' )
   }
+
+  // Using the below as the default fall back in case some corrency is missed in the list
+  if ( type == 'light' ) {
+    return require( '../../assets/images/currencySymbols/icon_dollar_white.png' )
+  } else if ( type == 'dark' ) {
+    return require( '../../assets/images/currencySymbols/icon_dollar_dark.png' )
+  } else if ( type == 'gray' ) {
+    return require( '../../assets/images/currencySymbols/dollar_grey.png' )
+  } else if ( type == 'light_blue' ) {
+    return require( '../../assets/images/currencySymbols/icon_dollar_lightblue.png' )
+  }
+  return require( '../../assets/images/currencySymbols/icon_dollar_light.png' )
 }

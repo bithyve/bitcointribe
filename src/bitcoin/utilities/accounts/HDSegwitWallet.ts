@@ -29,6 +29,7 @@ import {
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import { acc } from 'react-native-reanimated'
 
 const { HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
@@ -55,6 +56,8 @@ export default class HDSegwitWallet extends Bitcoin {
   public trustedContactToDA: { [contactName: string]: number } = {
   };
   public feeRates: any;
+  public accountName: String;
+  public accountDescription: String;
 
   private mnemonic: string;
   private passphrase: string;
@@ -1046,6 +1049,13 @@ export default class HDSegwitWallet extends Bitcoin {
   ): Promise<{
     updateSuccessful: boolean;
   }>  => {
+    if ( account && account.instanceNumber==0 ) {
+      this.accountName = account.customDisplayName
+      this.accountDescription = account.customDescription
+      return { 
+        updateSuccessful: true 
+      }
+    }
     const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
 
     this

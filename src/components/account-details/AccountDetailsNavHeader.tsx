@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useDispatch } from 'react-redux'
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native'
+import { Image, View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native'
 import Colors from '../../common/Colors'
 import ScreenHeaderStyles from '../../common/Styles/ScreenHeaders'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -100,6 +100,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
 
           <View style={styles.currencyKindToggleContainer}>
             <CurrencyKindToggleSwitch
+              fiatCurrencyCode={currencyCode}
               activeOnImage={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
               inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_dark.png' )}
               activeOffImage={
@@ -109,7 +110,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                     color={Colors.white}
                     size={14}
                   />
-                  : getCurrencyImageByRegion( currencyCode, 'light' )
+                  : null
               }
               inactiveOffImage={
                 materialIconCurrencyCodes.includes( currencyCode ) ?
@@ -118,7 +119,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                     color={Colors.blue}
                     size={14}
                   />
-                  : getCurrencyImageByRegion( currencyCode, 'dark' )
+                  : null
               }
               trackColor={Colors.lightBlue}
               thumbColor={Colors.blue}

@@ -208,7 +208,7 @@ class SendToContact extends Component<
       },
       () => {
         if ( bitcoinAmount ) {
-          const currency = this.state.exchangeRates
+          const currency = this.state.exchangeRates && this.state.exchangeRates[ this.state.CurrencyCode ]
             ? (
               ( parseInt( bitcoinAmount ) / SATOSHIS_IN_BTC ) *
                 this.state.exchangeRates[ this.state.CurrencyCode ].last
@@ -490,7 +490,7 @@ class SendToContact extends Component<
 
     const temp = value
     if ( prefersBitcoin ) {
-      const result = exchangeRates
+      const result = exchangeRates && exchangeRates[ CurrencyCode ]
         ? (
           ( value / SATOSHIS_IN_BTC ) *
             exchangeRates[ CurrencyCode ].last
@@ -500,7 +500,7 @@ class SendToContact extends Component<
         bitcoinAmount: temp, currencyAmount: result.toString()
       } )
     } else {
-      let currency = exchangeRates
+      let currency = exchangeRates && exchangeRates[ CurrencyCode ]
         ? value / exchangeRates[ CurrencyCode ].last
         : 0
       currency = currency < 1 ? currency * SATOSHIS_IN_BTC : currency
@@ -861,7 +861,7 @@ class SendToContact extends Component<
       ? UsNumberFormat( spendableBalance )
       : prefersBitcoin
         ? UsNumberFormat( spendableBalance )
-        : exchangeRates
+        : exchangeRates && exchangeRates[ CurrencyCode ]
           ? (
             ( spendableBalance / SATOSHIS_IN_BTC ) *
           exchangeRates[ CurrencyCode ].last

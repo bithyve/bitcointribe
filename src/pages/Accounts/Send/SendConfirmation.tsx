@@ -69,6 +69,7 @@ import { resetStackToAccountDetails } from '../../../navigation/actions/Navigati
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { processRecipients } from '../../../store/sagas/accounts'
 import { AccountsState } from '../../../store/reducers/accounts'
+import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -91,6 +92,7 @@ interface SendConfirmationStateTypes {
 interface SendConfirmationPropsTypes {
   navigation: any;
   accounts: AccountsState;
+  nodeSettings: NodeSettingsState;
   WALLET_SETUP: any;
   trustedContactsService: any;
   exchangeRates: any;
@@ -514,7 +516,7 @@ class SendConfirmation extends Component<
       this.props.currencyKind === CurrencyKind.BITCOIN
     ) {
       return UsNumberFormat( value )
-    } else if ( exchangeRates !== undefined ) {
+    } else if ( exchangeRates !== undefined && exchangeRates[ CurrencyCode ] ) {
       return (
         ( value / SATOSHIS_IN_BTC ) *
         exchangeRates[ CurrencyCode ].last
@@ -641,7 +643,7 @@ class SendConfirmation extends Component<
                   ? UsNumberFormat( this.spendableBalance )
                   : prefersBitcoin
                     ? UsNumberFormat( this.spendableBalance )
-                    : exchangeRates
+                    : exchangeRates && exchangeRates[ CurrencyCode ]
                       ? (
                         ( this.spendableBalance / SATOSHIS_IN_BTC ) *
                       exchangeRates[ CurrencyCode ].last
@@ -781,7 +783,7 @@ class SendConfirmation extends Component<
                     ? UsNumberFormat( totalAmount )
                     : prefersBitcoin
                       ? UsNumberFormat( totalAmount )
-                      : exchangeRates
+                      : exchangeRates && exchangeRates[ CurrencyCode ]
                         ? (
                           ( totalAmount / SATOSHIS_IN_BTC ) *
                         exchangeRates[ CurrencyCode ].last
@@ -1186,33 +1188,42 @@ class SendConfirmation extends Component<
           enabledGestureInteraction={false}
           ref={'SendUnSuccessBottomSheet'}
           snapPoints={[ -50, hp( '65%' ) ]}
-          renderContent={() => (
-            <SendConfirmationContent
-              title={'Send Unsuccessful'}
-              info={
-                transfer && transfer.stage2
-                  ? 'Something went wrong; ' + transfer.stage2.err
-                  : 'Something went wrong, please try again'
+          renderContent={() => {
+            let errorMessage = 'Something went wrong, please try again'
+            if( transfer && transfer.stage2 ){
+              errorMessage = 'Something went wrong; ' + transfer.stage2.err
+
+              // modifying the error message if user is connected to own/personal node
+              const { nodeSettings } = this.props
+              if( nodeSettings.activePersonalNode && nodeSettings.activePersonalNode.isConnectionActive ){
+                errorMessage = `${errorMessage}\n\nPlease check the connection to the node you are connected to and try again`
               }
-              userInfo={transfer.details ? transfer.details : []}
-              isFromContact={false}
-              okButtonText={'Try Again'}
-              cancelButtonText={'Back'}
-              isCancel={true}
-              onPressOk={() => {
-                if ( this.refs.SendUnSuccessBottomSheet as any )
-                  ( this.refs.SendUnSuccessBottomSheet as any ).snapTo( 0 )
-              }}
-              onPressCancel={() => {
-                this.props.clearTransfer( this.serviceType )
-                if ( this.refs.SendUnSuccessBottomSheet as any )
-                  ( this.refs.SendUnSuccessBottomSheet as any ).snapTo( 0 )
-                navigation.navigate( 'AccountDetails' )
-              }}
-              isUnSuccess={true}
-              accountKind={this.serviceType}
-            />
-          )}
+            }
+            return (
+              <SendConfirmationContent
+                title={'Send Unsuccessful'}
+                info={
+                  errorMessage
+                }
+                userInfo={transfer.details ? transfer.details : []}
+                isFromContact={false}
+                okButtonText={'Try Again'}
+                cancelButtonText={'Back'}
+                isCancel={true}
+                onPressOk={() => {
+                  if ( this.refs.SendUnSuccessBottomSheet as any )
+                    ( this.refs.SendUnSuccessBottomSheet as any ).snapTo( 0 )
+                }}
+                onPressCancel={() => {
+                  this.props.clearTransfer( this.serviceType )
+                  if ( this.refs.SendUnSuccessBottomSheet as any )
+                    ( this.refs.SendUnSuccessBottomSheet as any ).snapTo( 0 )
+                  navigation.navigate( 'AccountDetails' )
+                }}
+                isUnSuccess={true}
+                accountKind={this.serviceType}
+              /> )
+          }}
           renderHeader={() => <ModalHeader />}
         />
 
@@ -1296,6 +1307,7 @@ const mapStateToProps = ( state ) => {
     trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     accounts: idx( state, ( _ ) => _.accounts ) || [],
+    nodeSettings: idx( state, ( _ ) => _.nodeSettings ) || [],
     WALLET_SETUP: idx( state, ( _ ) => _.storage.database.WALLET_SETUP ) || '',
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currencyKind: idx( state, ( _ ) => _.preferences.currencyKind ),

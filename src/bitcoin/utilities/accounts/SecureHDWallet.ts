@@ -56,6 +56,8 @@ export default class SecureHDWallet extends Bitcoin {
   public derivativeAccounts: DerivativeAccounts | DonationDerivativeAccount =
     config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
+  public accountName: String;
+  public accountDescription: String;
 
   private lastBalTxSync = 0;
   private confirmedUTXOs: Array<{
@@ -1160,6 +1162,13 @@ export default class SecureHDWallet extends Bitcoin {
   ): Promise<{
     updateSuccessful: boolean;
   }>  => {
+    if ( account && account.instanceNumber==0 ) {
+      this.accountName = account.customDisplayName
+      this.accountDescription = account.customDescription
+      return { 
+        updateSuccessful: true 
+      }
+    }
     const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
 
     this

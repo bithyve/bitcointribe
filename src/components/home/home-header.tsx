@@ -164,7 +164,7 @@ const HomeHeader = ( {
               >
                 {prefersBitcoin
                   ? UsNumberFormat( balances.accumulativeBalance )
-                  : exchangeRates
+                  : exchangeRates && exchangeRates[ CurrencyCode ]
                     ? (
                       ( balances.accumulativeBalance / SATOSHIS_IN_BTC ) *
                       exchangeRates[ CurrencyCode ].last
