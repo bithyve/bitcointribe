@@ -514,6 +514,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       title: "We have not seen you in a while!", 
       message: "Opening your app regularly ensures you get all the notifications and security updates", // (required)
       date: date,
+      repeatType: 'day',
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     });
   };
