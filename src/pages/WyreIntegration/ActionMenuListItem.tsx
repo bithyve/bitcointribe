@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { ActionMenuItem } from './SwanIntegrationScreen'
+import { ActionMenuItem } from './WyreIntegrationScreen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import useSwanIntegrationState from '../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
-import { SwanActionKind } from '../../store/actions/SwanIntegration'
-import useSwanIntegrationResultFromAction from '../../utils/hooks/swan-integration/UseSwanIntegrationResultFromAction'
+import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
+import { WyreActionKind } from '../../store/actions/WyreIntegration'
+import useWyreIntegrationResultFromAction from '../../utils/hooks/wyre-integration/UseWyreIntegrationResultFromAction'
+
 
 export type Props = {
   actionItem: ActionMenuItem;
@@ -18,7 +19,7 @@ const ActionMenuListItem: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
-  const actionResultText = useSwanIntegrationResultFromAction( actionItem.kind )
+  const actionResultText = useWyreIntegrationResultFromAction( actionItem.kind )
 
   return (
     <View style={{
