@@ -1779,6 +1779,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   else if( type =='swan' ) {
                     navigation.navigate( 'SwanIntegrationScreen' )
                   }
+                  else if( type =='wyre' ) {
+                    navigation.navigate( 'WyreIntegrationScreen' )
+                  }
                 }}
               />
             </>

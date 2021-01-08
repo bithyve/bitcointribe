@@ -25,10 +25,16 @@ export default function AddModalContents( props ) {
       type: 'addContact',
     },
     {
-      title: 'Add a Swan Bitcoin Account',
+      title: 'Add a SwanBitcoin Account',
       info: 'Buy Bitcoin into Hexa Wallet from SwanBitcoin',
       image: require( '../../assets/images/icons/swan_temp.png' ),
       type: 'swan',
+    },
+    {
+      title: 'Add a Wyre Account',
+      info: 'Buy Bitcoin into Hexa Wallet from Wyre',
+      image: require( '../../assets/images/icons/wyre_notext_small.png' ),
+      type: 'wyre',
     },
   ] )
 
