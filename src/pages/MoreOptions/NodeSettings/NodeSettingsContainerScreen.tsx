@@ -12,8 +12,9 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import {  connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import {  bitHyveNodeConnectionCompleted, connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 import { Keyboard } from 'react-native'
+import BitHyveNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/BitHyveNodeConnectionSuccessBottomSheet'
 
 export type Props = {
   navigation: any;
@@ -41,7 +42,27 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
 
     presentBottomSheet(
       <PersonalNodeConnectionSuccessBottomSheet
-        onViewNodeDetailsPressed={() => {
+        onConfirmPressed={() => {
+          dismissBottomSheet()
+        }}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        dismissOnOverlayPress: false,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ],
+  )
+
+
+  const showBitHyveConnectionSuccessBottomSheet = useCallback( () => {
+    dispatch( bitHyveNodeConnectionCompleted() )
+
+    presentBottomSheet(
+      <BitHyveNodeConnectionSuccessBottomSheet
+        onConfirmPressed={() => {
           dismissBottomSheet()
         }}
       />,
@@ -108,12 +129,18 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
 
 
   useEffect( () => {
-    if ( nodeSettingsState.hasConnectionSucceeded ) {
+    if ( nodeSettingsState.hasPersonalNodeConnectionSucceeded ) {
       showConnectionSucceededBottomSheet()
-    } else if ( nodeSettingsState.hasConnectionFailed ) {
+    } else if ( nodeSettingsState.hasBitHyveNodeConnectionSucceeded ) {
+      showBitHyveConnectionSuccessBottomSheet()
+    } else if ( nodeSettingsState.hasPersonalNodeConnectionFailed ) {
       showConnectionFailedBottomSheet()
     }
-  }, [ nodeSettingsState.hasConnectionSucceeded, nodeSettingsState.hasConnectionFailed ] )
+  }, [
+    nodeSettingsState.hasPersonalNodeConnectionSucceeded,
+    nodeSettingsState.hasBitHyveNodeConnectionSucceeded,
+    nodeSettingsState.hasPersonalNodeConnectionFailed,
+  ] )
 
 
   useEffect( () => {
