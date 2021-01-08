@@ -23,6 +23,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import Loader from '../../components/loader';
 
 const ContactsListForAssociateContact = (props) => {
   const [contacts, setContacts] = useState([]);
@@ -33,7 +34,7 @@ const ContactsListForAssociateContact = (props) => {
   const { approvingTrustedContact } = useSelector(
     (state) => state.trustedContacts.loading,
   );
-
+  const [showLoader, setShowLoader] = useState(false);
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
   }
@@ -47,7 +48,7 @@ const ContactsListForAssociateContact = (props) => {
 
   const updateTrustedContactsInfo = async (contact?) => {
     const associatedContact = contact ? contact : contacts[0];
-
+    setShowLoader(true);
     const selectedContactName = `${associatedContact.firstName} ${
       associatedContact.lastName ? associatedContact.lastName : ''
     }`
@@ -74,6 +75,7 @@ const ContactsListForAssociateContact = (props) => {
         console.log({ con: associatedContact });
         postAssociation(associatedContact);
       } else {
+        setShowLoader(false);
         Toast('Contact already exists');
         return;
       }
@@ -97,6 +99,7 @@ const ContactsListForAssociateContact = (props) => {
       approvedTrustedContacts &&
       approvedTrustedContacts[approvingContact]
     )
+ //     setShowLoader(false);
       props.navigation.navigate('Home');
   }, [approvedTrustedContacts, approvingContact]);
 
@@ -145,6 +148,7 @@ const ContactsListForAssociateContact = (props) => {
           <AppBottomSheetTouchableWrapper
             disabled={approvingTrustedContact}
             onPress={() => {
+              setShowLoader(true);
               let { skippedContactsCount } = trustedContacts.tc;
               let data;
               if (!skippedContactsCount) {
@@ -197,6 +201,7 @@ const ContactsListForAssociateContact = (props) => {
         Associate a contact from your address book. This will help you remember
         who the request was from
       </Text>
+      
       <ContactList
         isTrustedContact={true}
         isShowSkipContact={true}
@@ -208,6 +213,8 @@ const ContactsListForAssociateContact = (props) => {
           // updateTrustedContactsInfo();
         }}
       />
+      {showLoader ? <Loader isLoading={true} /> : null}
+
     </View>
   );
 };
