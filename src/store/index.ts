@@ -16,6 +16,8 @@ import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
+import wyreIntegrationReducer from './reducers/WyreIntegration'
+
 
 const config = {
   key: 'root', // key is required
@@ -124,6 +126,11 @@ import {
   linkSwanWalletWatcher,
 } from './sagas/SwanIntegration'
 
+import {
+  fetchWyreTokenWatcher,
+  linkWyreWalletWatcher,
+} from './sagas/WyreIntegration'
+
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -219,6 +226,10 @@ const rootSaga = function* () {
     // Swan Integration
     fetchSwanTokenWatcher,
     linkSwanWalletWatcher,
+
+    // Swan Integration
+    fetchWyreTokenWatcher,
+    linkWyreWalletWatcher,
   ]
 
   yield all(
@@ -249,6 +260,7 @@ const rootReducer = combineReducers( {
   preferences: preferencesReducer,
   loaders,
   swanIntegration: swanIntegrationReducer,
+  wyreIntegration: wyreIntegrationReducer,
 } )
 
 export default function makeStore() {
