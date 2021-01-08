@@ -37,10 +37,11 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
   const showConnectionSucceededBottomSheet = useCallback( () => {
+    dispatch( personalNodeConnectionCompleted() )
+
     presentBottomSheet(
       <PersonalNodeConnectionSuccessBottomSheet
         onViewNodeDetailsPressed={() => {
-          dispatch( personalNodeConnectionCompleted() )
           dismissBottomSheet()
         }}
       />,
@@ -55,10 +56,11 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   )
 
   const showConnectionFailedBottomSheet = useCallback( () => {
+    dispatch( personalNodeConnectionCompleted() )
+
     presentBottomSheet(
       <PersonalNodeConnectionFailureBottomSheet
         onTryAgainPressed={() => {
-          dispatch( personalNodeConnectionCompleted() )
           dismissBottomSheet()
         }}
       />,
@@ -90,21 +92,19 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   function handleConnectionToggle() {
     const prefersPersonalNodeConnection = !isPersonalNodeConnectionEnabled
 
-    dispatch( personalNodePreferenceToggled( prefersPersonalNodeConnection ) )
-  }
-
-  useEffect( () => {
-    if ( nodeSettingsState.activePersonalNode ) {
-      if ( isPersonalNodeConnectionEnabled == false ) {
-        // switching back to BH(default)-node
-        dispatch( connectToBitHyveNode() )
-      } else {
+    if ( prefersPersonalNodeConnection == false ) {
+      // switching back to BH(default)-node
+      dispatch( connectToBitHyveNode() )
+    } else {
+      if ( activePersonalNode ) {
         // reconnecting to personal node
         activePersonalNode.isConnectionActive = true
         dispatch( savePersonalNodeConfiguration( activePersonalNode ) )
       }
     }
-  }, [ activePersonalNode, isPersonalNodeConnectionEnabled ] )
+
+    dispatch( personalNodePreferenceToggled( prefersPersonalNodeConnection ) )
+  }
 
 
   useEffect( () => {
@@ -175,7 +175,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'Test account will always use the default BitHyve test node, irrelevant of personal node'
+              'Make sure that your node is accessible at all times for the app to be able to connect to it'
             }
           />
         </View>

@@ -51,7 +51,7 @@ const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onViewNode
           <Button
             raised
             buttonStyle={ButtonStyles.primaryActionButton}
-            title="View Node Details"
+            title="OK"
             titleStyle={ButtonStyles.actionButtonText}
             onPress={onViewNodeDetailsPressed}
           />
