@@ -17,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import SendStatusModalContents from '../../components/SendStatusModalContents'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -34,6 +34,20 @@ export default function TwoFAValidation( props ) {
     React.createRef<BottomSheet>(),
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
+
+  const additional = useSelector( ( state ) => state.accounts.additional )
+
+  useEffect( ()=>{
+    if ( token && additional && additional.secure ) {
+      const validationSucccessful = additional.secure.twoFAValid
+      if( validationSucccessful ){
+        props.navigation.navigate( 'AccountDetails' )
+      } else {
+        SendUnSuccessBottomSheet.current.snapTo( 1 )
+      }
+    }
+  }, [ additional ] )
+ 
 
   function onPressNumber( text ) {
     const tmpToken = [ ...tokenArray ]
@@ -83,11 +97,13 @@ export default function TwoFAValidation( props ) {
         onPressOk={() => {
           if ( SendUnSuccessBottomSheet.current )
             SendUnSuccessBottomSheet.current.snapTo( 0 )
+
+          setIsConfirmDisabled( false )
         }}
         onPressCancel={() => {
           if ( SendUnSuccessBottomSheet.current )
             SendUnSuccessBottomSheet.current.snapTo( 0 )
-          props.navigation.goBack()
+          props.navigation.navigate( 'Home' )
         }}
         isUnSuccess={true}
         accountKind={''}
