@@ -27,9 +27,11 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
   const accountsState = useAccountsState();
 
   const walletInstance = useMemo(() => {
+    if(accountKind){
     const walletService = accountsState[accountKind].service;
 
     return walletService.hdWallet || walletService.secureHDWallet;
+    }
   }, [accountKind, accountsState]);
 
 
