@@ -62,7 +62,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
 const BodySection: React.FC<BodyProps> = ( { accountShell, }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
-  const totalBalance = useTotalBalanceForAccountShell( accountShell )
+  const totalBalance = AccountShell.getTotalBalance( accountShell )
 
   const balanceTextStyle = useMemo( () => {
     return {
