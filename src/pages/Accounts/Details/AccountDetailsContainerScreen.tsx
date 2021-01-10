@@ -65,7 +65,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
-  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
