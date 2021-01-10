@@ -1,45 +1,44 @@
 import axios from 'axios'
 import Config from 'react-native-config'
+import CryptoJS from 'crypto-js'
 
-const swanOAuthURL = Config.SWAN_URL || 'https://dev-api.swanbitcoin.com/'
+const wyreBaseURL = Config.WYRE_BASE_URL || 'https://api.testwyre.com/v3'
+const WYRE_API_KEY = Config.WYRE_API_KEY || ''
 
-export const redeemAuthCode = ( data ) =>
-  axios( {
-    method: 'post',
-    url: 'https://login-demo.curity.io/oauth/v2/oauth-token',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    data: new URLSearchParams( {
-      grant_type: 'authorization_code',
-      code:'ESJaHCabOUKwf46LEqdSerokFDNb5DLa',
-      client_id:'demo-web-client',
-      client_secret:'6koyn9KpRuofYt2U',
-      redirect_uri: 'https://oauth.tools/callback/code'
+export const fetchWyreReservation = ( { amount, currencyCode } ) => {
+  try {
+    const url = `${wyreBaseURL}/orders/reserve`
+
+    const headers= { 
+      'Authorization': `Bearer ${WYRE_API_KEY}`, 
+      'Content-Type': 'application/json'
+    }
+
+    const body = {
+      amount,
+      'sourceCurrency': currencyCode,
+      'destCurrency': 'BTC',
+      'referrerAccountId': 'AC_A462Y892EX9',
+      'dest': '2NFg9snC3mhc6KsVn3StAstaGGkSNQJFzET',
+      'country': 'GB',
+      'redirectUrl': 'https://hexawallet.io/dev/tcg/AndroSwat/2d26253bf3e96d1891b0794d7ebc3954aa4f29e414949634e9f9cff907215827a40e417d675dbffd8998418a6922ae4186ec5c27b5be5e5cd1d6e917fff0387e70ef816216069e2d1eca5db818e0705a/otp/xxx/1610104041398/v1.4.1',
+      'failureRedirectUrl': 'https://google.com',
+      'lockfields': [ 'destCurrency' ]
+    }
+
+    return axios( {
+      method: 'post',
+      url: url,
+      headers: headers,
+      data: body
     } )
-  } )
 
-export const getSwanAuthToken = ( data ) =>
-  axios( {
-    method: 'get',
-    url: swanOAuthURL,
-  } )
-
-export const linkSwanWallet = ( data ) =>
-  axios( {
-    method: 'post',
-    url: swanOAuthURL.concat( 'wallets?mode=swan' ),
-    data,
-    headers: {
-      Authorization: `Bearer ${data.swanAuthToken}` 
+  } catch ( error ) {
+    console.log( 'error calling wyre ', error )
+    return {
+      error 
     }
-  } )
+  }
+}
 
-export const syncSwanWallet = ( data ) =>
-  axios( {
-    method: 'get',
-    url: `${swanOAuthURL}wallets/${data.swanWalletId}?mode=swan`,
-    headers: {
-      Authorization: `Bearer ${data.swanAuthToken}` 
-    }
-  } )
+
