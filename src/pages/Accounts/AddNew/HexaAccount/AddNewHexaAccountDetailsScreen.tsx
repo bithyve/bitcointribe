@@ -9,6 +9,7 @@ import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import Loader from '../../../../components/loader'
 
 export type Props = {
   navigation: any;
@@ -38,6 +39,7 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
   const currentSubAccountInfo: HexaSubAccountDescribing = useMemo( () => {
     return navigation.getParam( 'currentSubAccountInfo' )
   }, [ navigation.state.params ] )
+  const [showLoader, setShowLoader] = useState(false);
 
   const [ accountName, setAccountName ] = useState( currentSubAccountInfo.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( '' )
@@ -61,6 +63,7 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
   } )
 
   function handleProceedButtonPress() {
+    setShowLoader(true);
     currentSubAccountInfo.customDisplayName = accountName
     currentSubAccountInfo.customDescription = accountDescription
     console.log( 'dispatching addNewAccountShell' )
@@ -120,6 +123,7 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
         </View>
 
       </ScrollView>
+      {showLoader ? <Loader isLoading={true} /> : null}
     </KeyboardAvoidingView>
   )
 }

@@ -12,8 +12,9 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
 import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import {  connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
+import {  bitHyveNodeConnectionCompleted, connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 import { Keyboard } from 'react-native'
+import BitHyveNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/BitHyveNodeConnectionSuccessBottomSheet'
 
 export type Props = {
   navigation: any;
@@ -37,10 +38,31 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
   const showConnectionSucceededBottomSheet = useCallback( () => {
+    dispatch( personalNodeConnectionCompleted() )
+
     presentBottomSheet(
       <PersonalNodeConnectionSuccessBottomSheet
-        onViewNodeDetailsPressed={() => {
-          dispatch( personalNodeConnectionCompleted() )
+        onConfirmPressed={() => {
+          dismissBottomSheet()
+        }}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        dismissOnOverlayPress: false,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ],
+  )
+
+
+  const showBitHyveConnectionSuccessBottomSheet = useCallback( () => {
+    dispatch( bitHyveNodeConnectionCompleted() )
+
+    presentBottomSheet(
+      <BitHyveNodeConnectionSuccessBottomSheet
+        onConfirmPressed={() => {
           dismissBottomSheet()
         }}
       />,
@@ -55,10 +77,11 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   )
 
   const showConnectionFailedBottomSheet = useCallback( () => {
+    dispatch( personalNodeConnectionCompleted() )
+
     presentBottomSheet(
       <PersonalNodeConnectionFailureBottomSheet
         onTryAgainPressed={() => {
-          dispatch( personalNodeConnectionCompleted() )
           dismissBottomSheet()
         }}
       />,
@@ -90,30 +113,34 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   function handleConnectionToggle() {
     const prefersPersonalNodeConnection = !isPersonalNodeConnectionEnabled
 
-    dispatch( personalNodePreferenceToggled( prefersPersonalNodeConnection ) )
-  }
-
-  useEffect( () => {
-    if ( nodeSettingsState.activePersonalNode ) {
-      if ( isPersonalNodeConnectionEnabled == false ) {
-        // switching back to BH(default)-node
-        dispatch( connectToBitHyveNode() )
-      } else {
+    if ( prefersPersonalNodeConnection == false ) {
+      // switching back to BH(default)-node
+      dispatch( connectToBitHyveNode() )
+    } else {
+      if ( activePersonalNode ) {
         // reconnecting to personal node
         activePersonalNode.isConnectionActive = true
         dispatch( savePersonalNodeConfiguration( activePersonalNode ) )
       }
     }
-  }, [ activePersonalNode, isPersonalNodeConnectionEnabled ] )
+
+    dispatch( personalNodePreferenceToggled( prefersPersonalNodeConnection ) )
+  }
 
 
   useEffect( () => {
-    if ( nodeSettingsState.hasConnectionSucceeded ) {
+    if ( nodeSettingsState.hasPersonalNodeConnectionSucceeded ) {
       showConnectionSucceededBottomSheet()
-    } else if ( nodeSettingsState.hasConnectionFailed ) {
+    } else if ( nodeSettingsState.hasBitHyveNodeConnectionSucceeded ) {
+      showBitHyveConnectionSuccessBottomSheet()
+    } else if ( nodeSettingsState.hasPersonalNodeConnectionFailed ) {
       showConnectionFailedBottomSheet()
     }
-  }, [ nodeSettingsState.hasConnectionSucceeded, nodeSettingsState.hasConnectionFailed ] )
+  }, [
+    nodeSettingsState.hasPersonalNodeConnectionSucceeded,
+    nodeSettingsState.hasBitHyveNodeConnectionSucceeded,
+    nodeSettingsState.hasPersonalNodeConnectionFailed,
+  ] )
 
 
   useEffect( () => {
@@ -175,7 +202,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'Test account will always use the default BitHyve test node, irrelevant of personal node'
+              'Make sure that your node is accessible at all times for the app to be able to connect to it'
             }
           />
         </View>

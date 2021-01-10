@@ -17,6 +17,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import openLink from '../../../../utils/OpenLink'
 import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
+import Loader from '../../../../components/loader'
 
 export type Props = {
   navigation: any;
@@ -36,6 +37,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   const [ isTFAEnabled, setIsTFAEnabled ] = useState(
     currentSubAccountInfo.isTFAEnabled,
   )
+  const [showLoader, setShowLoader] = useState(false);
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -46,10 +48,12 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   }, [] )
 
   useAccountShellCreationCompletionEffect( () => {
+    console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 
   function handleProceedButtonPress() {
+    setShowLoader(true);
     currentSubAccountInfo.customDisplayName = accountName
     currentSubAccountInfo.doneeName = doneeName
     currentSubAccountInfo.customDescription = accountDescription
@@ -176,8 +180,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
             />
           </View>
         </View>
-
       </ScrollView>
+      {showLoader ? <Loader isLoading={true} /> : null}
     </KeyboardAvoidingView>
   )
 }

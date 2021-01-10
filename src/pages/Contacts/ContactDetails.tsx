@@ -336,13 +336,14 @@ class ContactDetails extends PureComponent<
         defaultAccountShell = shell;
     });
 
-    this.props.navigation.navigate("SendToContact", {
-      accountShellID: defaultAccountShell.id,
-      spendableBalance: AccountShell.getSpendableBalance(defaultAccountShell),
-      selectedContact: this.Contact,
-      serviceType: REGULAR_ACCOUNT,
-      isFromAddressBook: true,
-    });
+    this.props.navigation.dispatch(
+      resetStackToSend({
+        accountShellID: defaultAccountShell.id,
+        selectedContact: this.Contact,
+        serviceType: REGULAR_ACCOUNT,
+        isFromAddressBook: true,
+      })
+    );
 
   };
 
