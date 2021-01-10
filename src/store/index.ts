@@ -127,8 +127,7 @@ import {
 } from './sagas/SwanIntegration'
 
 import {
-  fetchWyreTokenWatcher,
-  linkWyreWalletWatcher,
+  fetchWyreReservationWatcher
 } from './sagas/WyreIntegration'
 
 const rootSaga = function* () {
@@ -227,9 +226,8 @@ const rootSaga = function* () {
     fetchSwanTokenWatcher,
     linkSwanWalletWatcher,
 
-    // Swan Integration
-    fetchWyreTokenWatcher,
-    linkWyreWalletWatcher,
+    // Wyre Integration
+    fetchWyreReservationWatcher
   ]
 
   yield all(

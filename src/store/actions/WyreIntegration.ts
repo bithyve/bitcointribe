@@ -1,3 +1,11 @@
+
+export const FETCH_WYRE_RESERVATION = 'FETCH_WYRE_RESERVATION_WALLET'
+export const WYRE_RESERVATION_SUCCEEDED = 'WYRE_RESERVATION_SUCCEEDED'
+
+export const FETCH_WYRE_RESERVATION_FAILED = 'FETCH_WYRE_RESERVATION_FAILED'
+export const FETCH_WYRE_RESERVATION_SUCCEEDED = 'FETCH_WYRE_RESERVATION_SUCCEEDED'
+export const FETCH_WYRE_RESERVATION_COMPLETED = 'FETCH_WYRE_RESERVATION_COMPLETED'
+
 export const FETCH_WYRE_TOKEN = 'FETCH_WYRE_TOKEN'
 export const FETCH_WYRE_TOKEN_FAILED = 'FETCH_WYRE_TOKEN_FAILED'
 export const FETCH_WYRE_TOKEN_SUCCEEDED = 'FETCH_WYRE_TOKEN_SUCCEEDED'
@@ -7,11 +15,6 @@ export const LINK_WYRE_WALLET = 'LINK_WYRE_WALLET'
 export const LINK_WYRE_WALLET_FAILED = 'LINK_WYRE_WALLET_FAILED'
 export const LINK_WYRE_WALLET_SUCCEEDED = 'LINK_WYRE_WALLET_SUCCEEDED'
 export const LINK_WYRE_WALLET_COMPLETED = 'LINK_WYRE_WALLET_COMPLETED'
-
-export const SYNC_WYRE_WALLET = 'SYNC_WYRE_WALLET_WALLET'
-export const SYNC_WYRE_WALLET_FAILED = 'SYNC_WYRE_WALLET_FAILED'
-export const SYNC_WYRE_WALLET_SUCCEEDED = 'SYNC_WYRE_WALLET_SUCCEEDED'
-export const SYNC_WYRE_WALLET_COMPLETED = 'SYNC_WYRE_WALLET_COMPLETED'
 
 export const ADD_WYRE_METADATA = 'ADD_WYRE_METADATA'
 export const ADD_WYRE_METADATA_FAILED = 'ADD_WYRE_METADATA_FAILED'
@@ -23,7 +26,26 @@ export enum WyreActionKind {
   AUTHENTICATE,
   CREATE_WYRE_ACCOUNT_SHELL,
   LINK_HEXA_AND_WYRE_SUB_ACCOUNTS,
-  SYNC_WYRE_ACCOUNT_DATA,
+  FETCH_WYRE_RESERVATION,
+}
+
+
+export const fetchWyreReservation = ( data ) => {
+  console.log( 'fetchWyreReservation called ', { 
+    data 
+  } )
+  return {
+    type: FETCH_WYRE_RESERVATION,
+    payload: {
+      data 
+    },
+  }
+}
+
+export const wyreReservationSucceeded = ( data ) => {
+  return {
+    type: WYRE_RESERVATION_SUCCEEDED, payload: data
+  }
 }
 
 export const fetchWyreToken = ( data ) => {
@@ -54,7 +76,7 @@ export const fetchWyreTokenSucceeded = ( data ) => {
   return {
     type: FETCH_WYRE_TOKEN_SUCCEEDED,
     payload: {
-      wyreTokenDetails: data 
+      wyreReservationCode: data 
     }
   }
 }
@@ -90,43 +112,34 @@ export const linkWyreWalletSucceeded = ( data ) => {
   return {
     type: LINK_WYRE_WALLET_SUCCEEDED,
     payload: {
-      wyreWalletDetails: data 
+      wyreHostedUrl: data 
     },
   }
 }
 
-export const syncWyreWallet = ( data ) => {
+export const fetchWyreReservationCompleted = ( data ) => {
   return {
-    type: SYNC_WYRE_WALLET,
+    type: FETCH_WYRE_RESERVATION_COMPLETED,
     payload: {
       data 
     },
   }
 }
 
-export const syncWyreWalletCompleted = ( data ) => {
+export const fetchWyreReservationFailed = ( data ) => {
   return {
-    type: SYNC_WYRE_WALLET_COMPLETED,
+    type: FETCH_WYRE_RESERVATION_FAILED,
     payload: {
       data 
     },
   }
 }
 
-export const syncWyreWalletFailed = ( data ) => {
+export const fetchWyreReservationSucceeded = ( data ) => {
   return {
-    type: SYNC_WYRE_WALLET_FAILED,
+    type: FETCH_WYRE_RESERVATION_SUCCEEDED,
     payload: {
-      data 
-    },
-  }
-}
-
-export const syncWyreWalletSucceeded = ( data ) => {
-  return {
-    type: SYNC_WYRE_WALLET_SUCCEEDED,
-    payload: {
-      syncWyreWalletDetails: data 
+      fetchWyreReservationDetails: data 
     },
   }
 }

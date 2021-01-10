@@ -4,9 +4,6 @@ import { useMemo } from 'react'
 
 export default function useWyreIntegrationResultFromAction( actionKind: WyreActionKind ): string {
   const wyreIntegrationState = useWyreIntegrationState()
-  console.log( { 
-    wyreIntegrationState 
-  } )
   return useMemo( () => {
     switch ( actionKind ) {
         case WyreActionKind.AUTHENTICATE:
@@ -15,7 +12,7 @@ export default function useWyreIntegrationResultFromAction( actionKind: WyreActi
           } else if ( wyreIntegrationState.fetchWyreTokenFailed ) {
             return `Failed. Message: ${wyreIntegrationState.fetchWyreTokenFailedMessage}`
           } else {
-            return `Succeed. Token Details: ${wyreIntegrationState.wyreTokenDetails}`
+            return `Succeed. Token Details: ${wyreIntegrationState.wyreReservationCode}`
           }
 
         case WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL:
@@ -24,7 +21,7 @@ export default function useWyreIntegrationResultFromAction( actionKind: WyreActi
           } else if ( wyreIntegrationState.addWyreMetadataFailed ) {
             return `Failed. Message: ${wyreIntegrationState.addWyreMetadataFailedMessage}`
           } else {
-            return `Succeed. Metadata Details: ${wyreIntegrationState.wyreMetadataDetails}`
+            return `Succeed. Metadata Details: ${wyreIntegrationState.wyreReservationSucceeded}`
           }
 
         case WyreActionKind.LINK_HEXA_AND_WYRE_SUB_ACCOUNTS:
@@ -33,16 +30,16 @@ export default function useWyreIntegrationResultFromAction( actionKind: WyreActi
           } else if ( wyreIntegrationState.linkWyreWalletFailed ) {
             return `Failed. Message: ${wyreIntegrationState.linkWyreWalletFailedMessage}`
           } else {
-            return `Succeed. Wallet Details: ${wyreIntegrationState.wyreWalletDetails}`
+            return `Succeed. Wallet Details: ${wyreIntegrationState.wyreHostedUrl}`
           }
 
-        case WyreActionKind.SYNC_WYRE_ACCOUNT_DATA:
-          if ( wyreIntegrationState.isSyncingWyreWallet ) {
+        case WyreActionKind.FETCH_WYRE_RESERVATION:
+          if ( wyreIntegrationState.isProcessingWyreOrder ) {
             return 'In Progress'
-          } else if ( wyreIntegrationState.syncWyreWalletFailed ) {
-            return `Failed. Message: ${wyreIntegrationState.syncWyreWalletFailedMessage}`
+          } else if ( wyreIntegrationState.fetchWyreReservationFailed ) {
+            return `Failed. Message: ${wyreIntegrationState.fetchWyreReservationFailedMessage}`
           } else {
-            return `Succeed. Wallet Details: ${wyreIntegrationState.wyreWalletDetails}`
+            return `Succeed. Wallet Details: ${wyreIntegrationState.wyreHostedUrl}`
           }
     }
   }, [ actionKind, wyreIntegrationState ] )

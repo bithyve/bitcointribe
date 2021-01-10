@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Linking, View, Text, StyleSheet } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ActionMenuListItem from './ActionMenuListItem'
 import { FlatList } from 'react-native-gesture-handler'
-import useSwanIntegrationState from '../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
-import { fetchSwanToken, linkSwanWallet, syncSwanWallet, SwanActionKind, addSwanMetadata } from '../../store/actions/SwanIntegration'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
+// import wyreReservationSucceeded from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
+
+import { fetchWyreReservation, fetchWyreToken, linkWyreWallet,  WyreActionKind, addWyreMetadata } from '../../store/actions/WyreIntegration'
 
 export type Props = {
   navigation: any;
@@ -13,58 +16,74 @@ export type Props = {
 export type ActionMenuItem = {
   title: string;
   subtitle: string;
-  kind: SwanActionKind;
+  kind: WyreActionKind;
 }
 
 const actionMenuItems: ActionMenuItem[] = [
   {
     title: 'Authenticate',
-    subtitle: 'Login and Authenticate with Swan',
-    kind: SwanActionKind.AUTHENTICATE,
+    subtitle: 'Login and Authenticate with Wyre',
+    kind: WyreActionKind.AUTHENTICATE,
   },
+  // {
+  //   title: 'Create Wyre Account Shell in Hexa',
+  //   subtitle: 'Create Wyre Account Shell in Hexa Wallet',
+  //   kind: WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL,
+  // },
+  // {
+  //   title: 'Link Hexa and Wyre SubAccounts',
+  //   subtitle: 'Send xPub to Wyre',
+  //   kind: WyreActionKind.LINK_HEXA_AND_WYRE_SUB_ACCOUNTS,
+  // },
   {
-    title: 'Create Swan Account Shell in Hexa',
-    subtitle: 'Create Swan Account Shell in Hexa Wallet',
-    kind: SwanActionKind.CREATE_SWAN_ACCOUNT_SHELL,
-  },
-  {
-    title: 'Link Hexa and Swan SubAccounts',
-    subtitle: 'Send xPub to Swan',
-    kind: SwanActionKind.LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
-  },
-  {
-    title: 'Query Swan Account Data',
-    subtitle: 'Get latest Swan Account Info',
-    kind: SwanActionKind.SYNC_SWAN_ACCOUNT_DATA,
+    title: 'Buy with Wyre',
+    subtitle: 'Buy Bitcoin from Wyre',
+    kind: WyreActionKind.FETCH_WYRE_RESERVATION,
   },
 ]
 
 const actionItemKeyExtractor = ( item: ActionMenuItem ) => String( item.kind )
 
 
-const SwanIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
+
+  const { wyreHostedUrl, wyreReservationSucceeded } = useWyreIntegrationState()
+  const currencyCode = useCurrencyCode()
+
+  useEffect( ()=> {
+    console.log( ' inside useEffect ', { 
+      wyreReservationSucceeded, wyreHostedUrl 
+    } )
+    if( wyreReservationSucceeded && wyreHostedUrl )
+      Linking.openURL( wyreHostedUrl )
+  }, [ wyreReservationSucceeded, wyreHostedUrl ] )
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
     switch ( itemKind ) {
-        case SwanActionKind.AUTHENTICATE:
-          dispatch( fetchSwanToken( {
+        case WyreActionKind.AUTHENTICATE:
+          dispatch( fetchWyreToken( {
           } ) )
           break
-        case SwanActionKind.CREATE_SWAN_ACCOUNT_SHELL:
+        case WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL:
         // TODO: This would be a call to the "add new AccountShell" action
         // being built here: https://github.com/bithyve/hexa/blob/f247ab7ae05e52e23ec4fc773360ef84a063248f/src/store/actions/accounts.ts#L296
-          dispatch( addSwanMetadata( {
+          dispatch( addWyreMetadata( {
           } ) )
           break
-        case SwanActionKind.LINK_HEXA_AND_SWAN_SUB_ACCOUNTS:
-          dispatch( linkSwanWallet( {
+        case WyreActionKind.LINK_HEXA_AND_WYRE_SUB_ACCOUNTS:
+          dispatch( linkWyreWallet( {
           } ) )
           break
-        case SwanActionKind.SYNC_SWAN_ACCOUNT_DATA:
-          //Linking.openURL( 'https://dev-api.swanbitcoin.com?client_id=demo-web-client&state=1599045135410-jFe&scope=openid%20profile%20read&response_type=code&code_challenge=SfO9AIeVOoLBdi8xF5VF5ByzExMx4bxGDRsXUYMVRWc&code_challenge_method=S256&prompt=login&ui_locales=en&nonce=1599046102647-dv4&redirect_uri=https://oauth.tools/callback/code' )
-          Linking.openURL( 'https://pay.testwyre.com/purchase?country=IN&lastName&failureRedirectUrl=https%3A%2F%2Fgoogle.com&amount=10&redirectUrl=https%3A%2F%2Fgoogle.com&utm_campaign=AC_A462Y892EX9&city&utm_medium=widget&postalCode&dest=ethereum%3A0x9E01E0E60dF079136a7a1d4ed97d709D5Fe3e341&accountId=AC_A462Y892EX9&firstName&phone=%2B1111111111&destCurrency=BTC&reservation=24369R29YXBJ9HQMY62A&street1&state&email=user%40sendwyre.com&utm_source=checkout' )
-          // dispatch(syncSwanWallet({}));
+        case WyreActionKind.FETCH_WYRE_RESERVATION:
+          console.log( { 
+            itemKind 
+          } )
+          //Linking.openURL( 'https://dev-api.wyrebitcoin.com?client_id=demo-web-client&state=1599045135410-jFe&scope=openid%20profile%20read&response_type=code&code_challenge=SfO9AIeVOoLBdi8xF5VF5ByzExMx4bxGDRsXUYMVRWc&code_challenge_method=S256&prompt=login&ui_locales=en&nonce=1599046102647-dv4&redirect_uri=https://oauth.tools/callback/code' )
+          dispatch( fetchWyreReservation( {
+            amount: 100,
+            currencyCode: currencyCode
+          } ) )
           break
     }
   }
@@ -102,4 +121,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default SwanIntegrationScreen
+export default WyreIntegrationScreen

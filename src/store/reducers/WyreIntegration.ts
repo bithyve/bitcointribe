@@ -1,4 +1,9 @@
 import {
+  FETCH_WYRE_RESERVATION,
+  FETCH_WYRE_RESERVATION_FAILED,
+  FETCH_WYRE_RESERVATION_SUCCEEDED,
+  WYRE_RESERVATION_SUCCEEDED,
+
   FETCH_WYRE_TOKEN_FAILED,
   FETCH_WYRE_TOKEN_SUCCEEDED,
   FETCH_WYRE_TOKEN_COMPLETED,
@@ -12,9 +17,10 @@ import {
 
 
 export type WyreIntegrationState = {
-  wyreTokenDetails: unknown | null;
-  wyreWalletDetails: unknown | null;
-  wyreMetadataDetails: unknown | null;
+  wyreReservationCode: string | null;
+  wyreHostedUrl: string | null;
+  wyreReservationSucceeded: boolean;
+  isProcessingWyreOrder: boolean;
 
   isFetchingWyreToken: boolean;
   fetchWyreTokenFailed: boolean;
@@ -25,8 +31,8 @@ export type WyreIntegrationState = {
   linkWyreWalletFailedMessage: null;
 
   isSyncingWyreWallet: boolean;
-  syncWyreWalletFailed: boolean;
-  syncWyreWalletFailedMessage: null;
+  fetchWyreReservationFailed: boolean;
+  fetchWyreReservationFailedMessage: null;
 
   isAddingWyreMetadata: boolean;
   addWyreMetadataFailed: boolean;
@@ -34,9 +40,10 @@ export type WyreIntegrationState = {
 }
 
 const INITIAL_STATE: WyreIntegrationState = {
-  wyreTokenDetails: null,
-  wyreWalletDetails: null,
-  wyreMetadataDetails: null,
+  wyreReservationCode: null,
+  wyreHostedUrl: null,
+  wyreReservationSucceeded: false,
+  isProcessingWyreOrder: false,
 
   isFetchingWyreToken: false,
   fetchWyreTokenFailed: false,
@@ -47,8 +54,8 @@ const INITIAL_STATE: WyreIntegrationState = {
   linkWyreWalletFailedMessage: null,
 
   isSyncingWyreWallet: false,
-  syncWyreWalletFailed: false,
-  syncWyreWalletFailedMessage: null,
+  fetchWyreReservationFailed: false,
+  fetchWyreReservationFailedMessage: null,
 
   isAddingWyreMetadata: false,
   addWyreMetadataFailed: false,
@@ -57,6 +64,14 @@ const INITIAL_STATE: WyreIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
+      case WYRE_RESERVATION_SUCCEEDED:
+        return {
+          ...state,
+          wyreReservationCode: action.payload.wyreReservationCode,
+          wyreHostedUrl: action.payload.wyreHostedUrl,
+          wyreReservationSucceeded: true,
+          isProcessingWyreOrder: false,
+        }
       case FETCH_WYRE_TOKEN:
         return {
           ...state,
@@ -78,14 +93,14 @@ const reducer = ( state = INITIAL_STATE, action ) => {
 
       case FETCH_WYRE_TOKEN_SUCCEEDED:
         console.log(
-          'payload.wyreTokenDetails',
-          action.payload.wyreTokenDetails,
+          'payload.wyreReservationCode',
+          action.payload.wyreReservationCode,
         )
         return {
           ...state,
           isFetchingWyreToken: false,
           fetchWyreTokenFailed: false,
-          wyreTokenDetails: action.payload.wyreTokenDetails,
+          wyreReservationCode: action.payload.wyreReservationCode,
         }
 
       case FETCH_WYRE_TOKEN_COMPLETED:
@@ -116,14 +131,14 @@ const reducer = ( state = INITIAL_STATE, action ) => {
 
       case LINK_WYRE_WALLET_SUCCEEDED:
         console.log(
-          'payload.wyreWalletDetails',
-          action.payload.wyreWalletDetails,
+          'payload.wyreHostedUrl',
+          action.payload.wyreHostedUrl,
         )
         return {
           ...state,
           isLinkingWyreWallet: false,
           linkWyreWalletFailed: false,
-          wyreWalletDetails: action.payload.wyreWalletDetails,
+          wyreHostedUrl: action.payload.wyreHostedUrl,
         }
 
       case LINK_WYRE_WALLET_COMPLETED:
