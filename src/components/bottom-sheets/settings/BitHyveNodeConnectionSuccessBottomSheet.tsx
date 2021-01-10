@@ -2,18 +2,16 @@ import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { Button } from 'react-native-elements'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 
 export type Props = {
   onConfirmPressed: () => void;
 };
 
-const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }: Props ) => {
+const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }: Props ) => {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
@@ -30,7 +28,7 @@ const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmP
 
         <View style={styles.headerSection}>
           <Text style={BottomSheetStyles.confirmationMessageHeading}>
-            Successfully connected to your node
+            Successfully connected to BitHyve's node
           </Text>
         </View>
 
@@ -42,7 +40,7 @@ const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmP
           </Text>
 
           <Text style={ListStyles.infoHeaderSubtitleText}>
-            You may also switch to use the BitHyve default node
+            You may also switch to using your own node
           </Text>
         </View>
 
@@ -97,4 +95,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default PersonalNodeConnectionSuccessBottomSheet
+export default BitHyveNodeConnectionSuccessBottomSheet

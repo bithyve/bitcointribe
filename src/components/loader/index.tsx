@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Modal } from 'react-native';
 import PropTypes from 'prop-types';
 
 const Loader = ({ backgroundColor, indicatorColor, isLoading }) => (
-  <View style={[styles.container, { backgroundColor }]}>
-    {isLoading ? <ActivityIndicator size="large" animating color={indicatorColor} /> : null}
-  </View>
+  <Modal
+    animationType='fade'
+    transparent={true}
+    visible={true}>
+    <View style={[styles.container, { backgroundColor }]}>
+      {isLoading ? <ActivityIndicator size="large" animating color={indicatorColor} /> : null}
+    </View>
+  </Modal>
 );
 
 export default Loader;
