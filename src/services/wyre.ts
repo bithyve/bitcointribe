@@ -8,7 +8,9 @@ export const fetchWyreReservation = ( { amount, currencyCode, country } ) => {
       amount,
       currencyCode,
       country,
-      'receiveAddress': '2NFg9snC3mhc6KsVn3StAstaGGkSNQJFzET'
+      // this address needs to be retrieved from the wyre account
+      'receiveAddress': '2NFg9snC3mhc6KsVn3StAstaGGkSNQJFzET',
+      referenceId: Date.now()
     }
     console.log( 'calling relay with', { 
       body 
