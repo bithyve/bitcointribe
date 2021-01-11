@@ -84,6 +84,8 @@ export default class HDSegwitWallet extends Bitcoin {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -123,6 +125,8 @@ export default class HDSegwitWallet extends Bitcoin {
   }
 
   public initializeStateVars = ( stateVars ) => {
+    this.accountName = stateVars && stateVars.accountName ? stateVars.accountName: ''
+    this.accountDescription = stateVars && stateVars.accountDescription ? stateVars.accountDescription: ''
     this.usedAddresses =
       stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : []
     this.nextFreeAddressIndex =
@@ -1039,29 +1043,43 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public updateDerivativeAccount = async (
+  public updateAccountDetails = (
     account: {
       kind: string,
       instanceNumber: number,
       customDescription: string,
       customDisplayName: string
     }
-  ): Promise<{
+  ): {
     updateSuccessful: boolean;
-  }>  => {
-    if ( account && account.instanceNumber==0 ) {
-      this.accountName = account.customDisplayName
-      this.accountDescription = account.customDescription
-      return { 
-        updateSuccessful: true 
-      }
-    }
-    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
+  } => {
+    switch( account.kind ){
 
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
+        case TEST_ACCOUNT:
+          this.accountName = account.customDisplayName
+          this.accountDescription = account.customDescription
+          break
+
+        case REGULAR_ACCOUNT:
+          if( !account.instanceNumber ){
+          // instance num zero represents the parent acc
+            this.accountName = account.customDisplayName
+            this.accountDescription = account.customDescription
+          } else {
+            const subPrimInstance: SubPrimaryDerivativeAccountElements =  
+            this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ]
+            subPrimInstance.accountName = account.customDisplayName
+            subPrimInstance.accountDescription = account.customDescription
+          }
+          break
+        
+        case DONATION_ACCOUNT:
+          const donationInstance: DonationDerivativeAccountElements =  
+              this.derivativeAccounts[ DONATION_ACCOUNT ][ account.instanceNumber ]
+          donationInstance.subject = account.customDisplayName
+          donationInstance.description = account.customDescription
+          break
+    }
 
     return { 
       updateSuccessful: true 

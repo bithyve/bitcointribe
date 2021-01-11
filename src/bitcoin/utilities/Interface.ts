@@ -139,7 +139,6 @@ export interface DerivativeAccountElements {
   xpub: string;
   xpubId: string;
   xpriv: string;
-  accountName?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   nextFreeChangeAddressIndex?: number;
