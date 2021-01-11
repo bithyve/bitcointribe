@@ -893,7 +893,8 @@ function* feeAndExchangeRatesWorker() {
     if ( res.status === 200 ) {
       const { exchangeRates, averageTxFees } = res.data
 
-      if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
+      if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
+      } ) )
       else {
         if (
           JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
