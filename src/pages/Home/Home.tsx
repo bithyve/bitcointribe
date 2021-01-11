@@ -70,7 +70,7 @@ import RelayServices from "../../bitcoin/services/RelayService";
 import AddContactAddressBook from "../Contacts/AddContactAddressBook";
 import config from "../../bitcoin/HexaConfig";
 import TrustedContactsService from "../../bitcoin/services/TrustedContactsService";
-import HomeHeader from "../../components/home/home-header";
+import HomeHeader from "../../components/home/home-header_update";
 import idx from "idx";
 import CustomBottomTabs, {
   BottomTab,
@@ -604,7 +604,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-    const { healthCheckInitialized } = s3Service.sss;
+    const { healthCheckInitialized } = s3Service.levelhealth;
     console.log("healthCheckInitialized", healthCheckInitialized);
     if (!healthCheckInitialized) {
       initializeHealthSetup();
@@ -2282,11 +2282,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
             navigation={navigation}
-            // currentLevel={currentLevel}
+            currentLevel={currentLevel}
             //  onSwitchToggle={this.onSwitchToggle}
             // setCurrencyToggleValue={this.setCurrencyToggleValue}
             // navigation={this.props.navigation}
-            overallHealth={overallHealth}
+            // overallHealth={overallHealth}
           />
         </View>
 

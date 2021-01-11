@@ -35,7 +35,7 @@ function* initSetupWorker( { payload } ) {
     s3Service,
     trustedContacts,
     keepersInfo
-  } = yield call(serviceGenerator, security.answer);
+  } = yield call(serviceGenerator2, security.answer);
 
   const initialDatabase: Database = {
     WALLET_SETUP: {

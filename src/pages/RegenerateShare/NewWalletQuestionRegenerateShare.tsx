@@ -52,7 +52,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
   const [ansError, setAnsError] = useState('');
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
-  // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
+  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   // if (isInitialized) {
   //     props.navigation.navigate('HomeNav');
   // }

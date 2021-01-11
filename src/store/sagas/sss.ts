@@ -116,11 +116,11 @@ function* generateMetaSharesWorker() {
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
-  if (!secondaryMnemonic || !twoFASecret) {
-    throw new Error('secure assets missing; staticNonPMDD');
-  }
+  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '';
+  const twoFASecret = secureAccount.secureHDWallet.twoFASetup ? secureAccount.secureHDWallet.twoFASetup.secret : '';
+  // if (!secondaryMnemonic || !twoFASecret) {
+  //   throw new Error('secure assets missing; staticNonPMDD');
+  // }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
@@ -135,23 +135,25 @@ function* generateMetaSharesWorker() {
   const appVersion = DeviceInfo.getVersion()
 
   if (s3Service.sss.metaShares.length) return;
-  const res = yield call(
-    s3Service.createMetaShares,
-    secureAssets,
-    walletName,
-    appVersion,
-  )
-  if ( res.status === 200 ) {
-    return s3Service
-    // const { SERVICES } = yield select(state => state.storage.database);
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   S3_SERVICE: JSON.stringify(s3Service)
-    // };
-    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
+  if(secondaryMnemonic) {
+    const res = yield call(
+      s3Service.createMetaShares,
+      secureAssets,
+      walletName,
+      appVersion,
+    )
+    if ( res.status === 200 ) {
+      return s3Service
+      // const { SERVICES } = yield select(state => state.storage.database);
+      // const updatedSERVICES = {
+      //   ...SERVICES,
+      //   S3_SERVICE: JSON.stringify(s3Service)
+      // };
+      // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      throw new Error( res.err )
+    }
   }
 }
 
@@ -164,34 +166,36 @@ function* initHCWorker() {
   let s3Service: S3Service = yield select((state) => state.sss.service);
   const initialized = s3Service.sss.healthCheckInitialized;
   console.log('initHCWorker initialized', initialized)
-  // if (initialized) return;
+  if (initialized) return;
 
   yield put(switchS3Loader('initHC'));
   if (!s3Service.sss.metaShares.length) {
     console.log('initHCWorker s3Service.sss.metaShares.length', s3Service.sss.metaShares)
     s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
-  const res = yield call(s3Service.initializeHealth);
-  if (res.status === 200) {
-    yield put(healthCheckInitialized());
+  if(s3Service) {
+    const res = yield call(s3Service.initializeHealth);
+    if (res.status === 200) {
+      yield put(healthCheckInitialized());
 
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify( s3Service ),
-    }
-    console.log( 'Health Check Initialized' )
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify( s3Service ),
       }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    console.log( {
-      err: res.err
-    } )
-    yield put( switchS3Loader( 'initHC' ) )
+      console.log( 'Health Check Initialized' )
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES
+        }
+      } )
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      console.log( {
+        err: res.err
+      } )
+      yield put( switchS3Loader( 'initHC' ) )
+    }
   }
 }
 

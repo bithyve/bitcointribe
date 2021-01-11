@@ -2,7 +2,6 @@ import { call, delay, put, select } from "redux-saga/effects";
 import {
   createWatcher,
   requestTimedout,
-  serviceGenerator,
   serviceGenerator2,
 } from "../utils/utilities";
 import {
@@ -366,6 +365,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
     let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    console.log('metaShare createAndUploadOnEFChannelWorker', metaShare);
     let shareIndex = level == 2 ? 1 : 3;
     if (selectedShareId && s3Service.levelhealth.metaShares.length) {
       if (
