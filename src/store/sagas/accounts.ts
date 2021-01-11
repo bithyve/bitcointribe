@@ -24,7 +24,7 @@ import {
   GENERATE_SECONDARY_XPRIV,
   alternateTransferST2Executed,
   RESET_TWO_FA,
-  // twoFAResetted,
+  twoFAResetted,
   RUN_TEST,
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
@@ -923,48 +923,48 @@ export const feeAndExchangeRatesWatcher = createWatcher(
   FETCH_FEE_AND_EXCHANGE_RATES
 )
 
-// function* resetTwoFAWorker({ payload }) {
-//   const service = yield select(
-//     (state) => state.accounts[SECURE_ACCOUNT].service,
-//   );
+function* resetTwoFAWorker({ payload }) {
+  const service = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
 
-//   const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
+  const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
 
-//   if (res.status == 200) {
-//     yield put(twoFAResetted(true));
-//   } else {
-//     if (res.err === 'ECONNABORTED') requestTimedout();
-//     console.log('Failed to reset twoFA', res.err);
-//     yield put(twoFAResetted(false));
-//   }
-// }
+  if (res.status == 200) {
+    yield put(twoFAResetted(true));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log('Failed to reset twoFA', res.err);
+    yield put(twoFAResetted(false));
+  }
+}
 
-// export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
+export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
 
-// function* removeTwoFAWorker() {
-//   const service: SecureAccount = yield select(
-//     (state) => state.accounts[SECURE_ACCOUNT].service,
-//   );
+function* removeTwoFAWorker() {
+  const service: SecureAccount = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
 
-//   const { removed } = yield call(service.removeTwoFADetails);
+  const { removed } = yield call(service.removeTwoFADetails);
 
-//   if (removed) {
-//     const { SERVICES } = yield select((state) => state.storage.database);
-//     const updatedSERVICES = {
-//       ...SERVICES,
-//       [SECURE_ACCOUNT]: JSON.stringify(service),
-//     };
+  if (removed) {
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [SECURE_ACCOUNT]: JSON.stringify(service),
+    };
 
-//     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-//   } else {
-//     console.log('Failed to remove 2FA details');
-//   }
-// }
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+  } else {
+    console.log('Failed to remove 2FA details');
+  }
+}
 
-// export const removeTwoFAWatcher = createWatcher(
-//   removeTwoFAWorker,
-//   REMOVE_TWO_FA,
-// );
+export const removeTwoFAWatcher = createWatcher(
+  removeTwoFAWorker,
+  REMOVE_TWO_FA,
+);
 
 function* accountsSyncWorker( {} ) {
   try {

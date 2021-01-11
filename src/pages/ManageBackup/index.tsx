@@ -1294,7 +1294,7 @@ export default function ManageBackup(props) {
       if (healthCheckInitialized) {
         // dispatch(checkMSharesHealth());
       } else {
-        // console.log({ healthCheckInitialized });
+        console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());
       }
     }

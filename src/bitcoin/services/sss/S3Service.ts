@@ -35,7 +35,7 @@ export default class S3Service {
       walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
-    } = levelhealth ? levelhealth : sss;
+    } = sss ? sss : levelhealth;
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
@@ -66,7 +66,6 @@ export default class S3Service {
   ) {
     this.levelhealth = new LevelHealth(mnemonic, stateVars);
     this.sss = new SSS(mnemonic, stateVars);
-    console.log('this.sss', this.sss)
     this.hdWallet = new HDSegwitWallet();
     this.secureWallet = new SecureHDWallet(mnemonic);
   }

@@ -30,12 +30,12 @@ const bitcoinAxios = axios.create( {
 } )
 
 export default class SecureHDWallet extends Bitcoin {
-  public twoFASetup: {
+  public twoFASetup?: {
     qrData: string;
     secret: string;
   };
-  public secondaryMnemonic: string;
-  public secondaryXpriv: string;
+  public secondaryMnemonic?: string;
+  public secondaryXpriv?: string;
   public xpubs: {
     primary?: string;
     secondary?: string;
@@ -91,12 +91,12 @@ export default class SecureHDWallet extends Bitcoin {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
-      // secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       primaryXpriv: string;
-     secondaryXpriv?: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -113,7 +113,7 @@ export default class SecureHDWallet extends Bitcoin {
         address: string;
         status?: any;
       }>;
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -1286,6 +1286,7 @@ export default class SecureHDWallet extends Bitcoin {
     // invoked once per wallet (during initial setup)
     let res: AxiosResponse;
     this.secondaryMnemonic = bip39.generateMnemonic(256);
+    console.log('initSetupWorker setupSecureAccount secondaryMnemonic', this.secondaryMnemonic);
     const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
     try {
       res = await SIGNING_AXIOS.post('setupSecureAccount', {
@@ -1304,7 +1305,7 @@ export default class SecureHDWallet extends Bitcoin {
     } else {
       const { prepared } = this.prepareSecureAccount(setupData.bhXpub);
       if (prepared) {
-        // this.twoFASetup = setupData;
+        this.twoFASetup = setupData;
         return { setupData };
       } else {
         throw new Error(

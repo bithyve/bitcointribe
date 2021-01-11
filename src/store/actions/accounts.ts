@@ -208,11 +208,11 @@ export const syncViaXpubAgent = (
   }
 }
 
-// export const removeTwoFA = () => {
-//   return {
-//     type: REMOVE_TWO_FA,
-//   };
-// };
+export const removeTwoFA = () => {
+  return {
+    type: REMOVE_TWO_FA,
+  };
+};
 
 // export const calculateExchangeRate = () => {
 //   return { type: EXCHANGE_RATE };
@@ -232,12 +232,12 @@ export const generateSecondaryXpriv = ( serviceType, secondaryMnemonic ) => {
   }
 }
 
-// export const resetTwoFA = (secondaryMnemonic) => {
-//   return {
-//     type: RESET_TWO_FA,
-//     payload: { secondaryMnemonic },
-//   };
-// };
+export const resetTwoFA = (secondaryMnemonic) => {
+  return {
+    type: RESET_TWO_FA,
+    payload: { secondaryMnemonic },
+  };
+};
 
 export const runTest = () => {
   return {
@@ -632,9 +632,9 @@ export const secondaryXprivGenerated = ( generated ) => {
   }
 }
 
-// export const twoFAResetted = (resetted) => {
-//   return { type: TWO_FA_RESETTED, payload: { resetted } };
-// };
+export const twoFAResetted = (resetted) => {
+  return { type: TWO_FA_RESETTED, payload: { resetted } };
+};
 
 export const settedDonationAccount = ( serviceType, successful ) => {
   return {

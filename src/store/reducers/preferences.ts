@@ -33,7 +33,7 @@ const initialState = ip.freeze( {
   isReceiveHelperDoneValue: false,
   savingWarning: false,
   isSendHelperDoneValue: false,
-  // isTwoFASetupDone: false,
+  isTwoFASetupDone: false,
   hasShownInitialKnowMoreSendSheet: false,
   isContactOpen: false,
   isMigrated: false,

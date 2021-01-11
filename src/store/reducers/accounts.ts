@@ -526,15 +526,15 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
         }
 
-      // case TWO_FA_RESETTED:
-      //   return {
-      //     ...state,
-      //     additional: {
-      //       secure: {
-      //         twoFAResetted: action.payload.resetted,
-      //       },
-      //     },
-      //   }
+      case TWO_FA_RESETTED:
+        return {
+          ...state,
+          additional: {
+            secure: {
+              twoFAResetted: action.payload.resetted,
+            },
+          },
+        }
 
         // TODO: I don't think averageTxFees should be a wallet-wide concern.
       case AVERAGE_TX_FEE:

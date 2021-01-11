@@ -30,7 +30,7 @@ import {
   FAST_BITCOINS,
 } from "../../common/constants/serviceTypes";
 import { connect } from "react-redux";
-import { downloadMShare, uploadRequestedShare } from "../../store/actions/sss";
+import { downloadMShare, uploadRequestedShare, initHealthCheck } from "../../store/actions/sss";
 import {
   initializeHealthSetup,
   updateMSharesHealth,
@@ -175,6 +175,7 @@ interface HomePropsTypes {
   uploadRequestedShare: any;
   s3Service: any;
   initializeHealthSetup: any;
+  initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -589,7 +590,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { navigation, s3Service, initializeHealthSetup } = this.props;
+    const { navigation, s3Service, initializeHealthSetup, initHealthCheck } = this.props;
     this.closeBottomSheet();
     this.getBalances();
 
@@ -603,10 +604,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-    const { healthCheckInitialized } = s3Service.levelhealth;
+    const { healthCheckInitialized } = s3Service.sss;
     console.log("healthCheckInitialized", healthCheckInitialized);
     if (!healthCheckInitialized) {
       initializeHealthSetup();
+      initHealthCheck();
     }
 
     Linking.addEventListener("url", this.handleDeepLinkEvent);
@@ -2280,11 +2282,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
             navigation={navigation}
-            currentLevel={currentLevel}
+            // currentLevel={currentLevel}
             //  onSwitchToggle={this.onSwitchToggle}
             // setCurrencyToggleValue={this.setCurrencyToggleValue}
             // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
+            overallHealth={overallHealth}
           />
         </View>
 
@@ -2410,6 +2412,7 @@ export default withNavigationFocus(
     fetchTrustedChannel,
     uploadRequestedShare,
     initializeHealthSetup,
+    initHealthCheck,
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,

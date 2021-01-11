@@ -156,9 +156,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     } )
     this.updateAccountData()
     this.getAccountBalances()
-    if ( this.state.serviceType === SECURE_ACCOUNT ) {
-      this.twoFASetupMethod()
-    }
+    // if ( this.state.serviceType === SECURE_ACCOUNT ) {
+    //   this.twoFASetupMethod()
+    // }
 
     if (
       this.state.serviceType === TEST_ACCOUNT &&

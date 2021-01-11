@@ -157,18 +157,12 @@ export const serviceGenerator2 = async (
   let secondaryXpub = '';
   let bhXpub = '';
   if (metaShares) {
-    // res = s3Service.decryptStaticNonPMDD(
-    //   metaShares[Object.keys(metaShares)[0]].encryptedStaticNonPMDD,
-    // );
-    // if (res.status !== 200) throw new Error('Failed to decrypt StaticNPMDD');
     if(decryptedCloudDataJson && decryptedCloudDataJson.walletImage.SERVICES.SECURE_ACCOUNT)
     {
       let secureAccountData = JSON.parse(decryptedCloudDataJson.walletImage.SERVICES.SECURE_ACCOUNT);
-      console.log("secureAccountData",secureAccountData);
       secondaryXpub = secureAccountData.secureHDWallet.xpubs.secondary;
       bhXpub = secureAccountData.secureHDWallet.xpubs.bh;
     }
-    
   }
 
   // Secure account setup
@@ -218,8 +212,4 @@ export const requestTimedout = () => {
     'Request Timeout!',
     'Unable to get a response from server. Please, try again shortly',
   );
-  // Alert.alert( // retired timeout alert
-  //   'Request Timeout!',
-  //   'Unable to get a response from server. Please, try again shortly.',
-  // );
 };

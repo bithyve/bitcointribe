@@ -34,7 +34,7 @@ export default class SecureAccount {
       feeRates,
     }: {
       primaryMnemonic: string;
-      secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -56,7 +56,7 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -92,7 +92,7 @@ export default class SecureAccount {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
-      secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -114,7 +114,7 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -306,49 +306,49 @@ export default class SecureAccount {
     }
   };
 
-  // public resetTwoFA = async (
-  //   secondaryMnemonic: string,
-  // ): Promise<
-  //   | {
-  //       status: number;
-  //       data: {
-  //         qrData: any;
-  //         secret: any;
-  //       };
-  //       err?: undefined;
-  //       message?: undefined;
-  //     }
-  //   | {
-  //       status: number;
-  //       err: string;
-  //       message: string;
-  //       data?: undefined;
-  //     }
-  // > => {
-  //   try {
-  //     return {
-  //       status: config.STATUS.SUCCESS,
-  //       data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
-  //     };
-  //   } catch (err) {
-  //     return { status: 306, err: err.message, message: ErrMap[306] };
-  //   }
-  // };
+  public resetTwoFA = async (
+    secondaryMnemonic: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          qrData: any;
+          secret: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
+      };
+    } catch (err) {
+      return { status: 306, err: err.message, message: ErrMap[306] };
+    }
+  };
 
-  // public removeSecondaryMnemonic = (): { removed: Boolean } =>
-  //   this.secureHDWallet.removeSecondaryMnemonic();
+  public removeSecondaryMnemonic = (): { removed: Boolean } =>
+    this.secureHDWallet.removeSecondaryMnemonic();
 
-  // public removeTwoFADetails = (): { removed: Boolean } =>
-  //   this.secureHDWallet.removeTwoFADetails();
+  public removeTwoFADetails = (): { removed: Boolean } =>
+    this.secureHDWallet.removeTwoFADetails();
 
-  // public isSecondaryMnemonic = (secondaryMnemonic: string) =>
-  //   this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
+  public isSecondaryMnemonic = (secondaryMnemonic: string) =>
+    this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
 
-  // public restoreSecondaryMnemonic = (
-  //   secondaryMnemonic: string,
-  // ): {
-  //   restored: boolean;
-  // } => this.secureHDWallet.restoreSecondaryMnemonic(secondaryMnemonic);
+  public restoreSecondaryMnemonic = (
+    secondaryMnemonic: string,
+  ): {
+    restored: boolean;
+  } => this.secureHDWallet.restoreSecondaryMnemonic(secondaryMnemonic);
 
   public getSecondaryXpub = ():
     | {
