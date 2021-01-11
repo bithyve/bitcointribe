@@ -1866,6 +1866,7 @@ function* updateWalletImageWorker() {
     }
 
     const STATE_DATA = yield call( stateDataToBackup )
+
     if ( Object.keys( STATE_DATA ).length ) {
       const currentStateHash = hash( STATE_DATA )
       if ( !hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA ) {
@@ -1946,6 +1947,32 @@ function* fetchWalletImageWorker( { payload } ) {
       STATE_DATA,
     } = walletImage
 
+    const payload = {
+      SERVICES, DECENTRALIZED_BACKUP
+    }
+    yield call( insertDBWorker, {
+      payload
+    } ) // synchronously update db
+
+    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
+    const {
+      REGULAR_ACCOUNT,
+      TEST_ACCOUNT,
+      SECURE_ACCOUNT,
+      S3_SERVICE,
+      TRUSTED_CONTACTS,
+    } = SERVICES
+    const services = {
+      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
+      TRUSTED_CONTACTS: TRUSTED_CONTACTS
+        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
+        : new TrustedContactsService(),
+    }
+    yield put( remapAccountShells( services ) )
+
     if ( ASYNC_DATA ) {
       for ( const key of Object.keys( ASYNC_DATA ) ) {
         console.log( 'restoring to async: ', key )
@@ -1979,32 +2006,6 @@ function* fetchWalletImageWorker( { payload } ) {
         }
       }
     }
-
-    const payload = {
-      SERVICES, DECENTRALIZED_BACKUP
-    }
-    yield call( insertDBWorker, {
-      payload
-    } ) // synchronously update db
-
-    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
-    const {
-      REGULAR_ACCOUNT,
-      TEST_ACCOUNT,
-      SECURE_ACCOUNT,
-      S3_SERVICE,
-      TRUSTED_CONTACTS,
-    } = SERVICES
-    const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
-      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
-      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
-      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
-      TRUSTED_CONTACTS: TRUSTED_CONTACTS
-        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
-        : new TrustedContactsService(),
-    }
-    yield put( remapAccountShells( services ) )
 
     // update hashes
     const hashesWI = {
