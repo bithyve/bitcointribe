@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
-import { Linking, View, Text, StyleSheet } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { View, StyleSheet, Button } from 'react-native'
+import { useDispatch } from 'react-redux'
 import ActionMenuListItem from './ActionMenuListItem'
 import { FlatList } from 'react-native-gesture-handler'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
-// import wyreReservationSucceeded from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 
-import { fetchWyreReservation,  WyreActionKind } from '../../store/actions/WyreIntegration'
+import { clearWyreCache, fetchWyreReservation,  WyreActionKind } from '../../store/actions/WyreIntegration'
+import openLink from '../../utils/OpenLink'
 
 export type Props = {
   navigation: any;
@@ -36,7 +36,7 @@ const actionMenuItems: ActionMenuItem[] = [
   //   kind: WyreActionKind.LINK_HEXA_AND_WYRE_SUB_ACCOUNTS,
   // },
   {
-    title: 'Buy with Wyre',
+    title: 'Fetch Reservation Code from Wyre',
     subtitle: 'Buy Bitcoin from Wyre',
     kind: WyreActionKind.FETCH_WYRE_RESERVATION,
   },
@@ -51,12 +51,15 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const { wyreHostedUrl, wyreReservationSucceeded } = useWyreIntegrationState()
   const currencyCode = useCurrencyCode()
 
+  useEffect ( ()=>{
+    console.log( ' *** Running Once' )
+    dispatch( clearWyreCache( {
+    } ) )
+  }, [] )
   useEffect( ()=> {
     console.log( ' inside useEffect ', { 
       wyreReservationSucceeded, wyreHostedUrl 
     } )
-    if( wyreReservationSucceeded && wyreHostedUrl )
-      Linking.openURL( wyreHostedUrl )
   }, [ wyreReservationSucceeded, wyreHostedUrl ] )
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
@@ -71,7 +74,6 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           console.log( { 
             itemKind 
           } )
-          //Linking.openURL( 'https://dev-api.wyrebitcoin.com?client_id=demo-web-client&state=1599045135410-jFe&scope=openid%20profile%20read&response_type=code&code_challenge=SfO9AIeVOoLBdi8xF5VF5ByzExMx4bxGDRsXUYMVRWc&code_challenge_method=S256&prompt=login&ui_locales=en&nonce=1599046102647-dv4&redirect_uri=https://oauth.tools/callback/code' )
           dispatch( fetchWyreReservation( {
             amount: 100,
             currencyCode: currencyCode
@@ -93,12 +95,19 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }
 
   return (
-    <FlatList
-      style={styles.rootContainer}
-      keyExtractor={actionItemKeyExtractor}
-      renderItem={renderItem}
-      data={actionMenuItems}
-    />
+    <View>
+      <FlatList
+        style={styles.rootContainer}
+        keyExtractor={actionItemKeyExtractor}
+        renderItem={renderItem}
+        data={actionMenuItems}
+      />
+      <Button
+        onPress = {()=>{( wyreReservationSucceeded &&  wyreHostedUrl )? openLink( wyreHostedUrl ): null}}
+        title = "Buy Now!"
+        color = "blue"
+      />
+    </View>
   )
 }
 

@@ -1,5 +1,6 @@
 import {
   WYRE_RESERVATION_SUCCEEDED,
+  CLEAR_WYRE_CACHE
 
 } from '../actions/WyreIntegration'
 
@@ -36,8 +37,15 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           wyreReservationSucceeded: true,
           isProcessingWyreOrder: false,
         }
+      case CLEAR_WYRE_CACHE:
+        return {
+          ...state,
+          wyreReservationCode: '',
+          wyreHostedUrl: '',
+          wyreReservationSucceeded: false,
+          isProcessingWyreOrder: false,
+        }
   }
-
   return state
 }
 
