@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   StyleSheet,
   View,
@@ -6,134 +6,130 @@ import {
   TouchableOpacity,
   StatusBar,
   Text,
-  Image,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
   ActivityIndicator,
-  Button,
   Alert,
-} from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Fonts from '../../common/Fonts';
-import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles/Styles';
+} from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Fonts from '../../common/Fonts'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { RFValue } from 'react-native-responsive-fontsize';
-import HeaderTitle from '../../components/HeaderTitle';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import CopyThisText from '../../components/CopyThisText';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import { useDispatch, useSelector } from 'react-redux';
+} from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import HeaderTitle from '../../components/HeaderTitle'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   requestShare,
   downloadMShare,
   ErrorReceiving,
-} from '../../store/actions/sss';
-import Toast from '../../components/Toast';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import ModalHeader from '../../components/ModalHeader';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import QRCode from 'react-native-qrcode-svg';
-import config from '../../bitcoin/HexaConfig';
+} from '../../store/actions/sss'
+import Toast from '../../components/Toast'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalHeader from '../../components/ModalHeader'
+import BottomSheet from 'reanimated-bottom-sheet'
+import DeviceInfo from 'react-native-device-info'
+import QRCode from 'react-native-qrcode-svg'
+import config from '../../bitcoin/HexaConfig'
 
-export default function RestoreWalletBySecondaryDevice(props) {
-  const [secondaryQR, setSecondaryQR] = useState('');
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+export default function RestoreWalletBySecondaryDevice( props ) {
+  const [ secondaryQR, setSecondaryQR ] = useState( '' )
+  const [ ErrorBottomSheet ] = useState( React.createRef() )
+  const [ errorMessage, setErrorMessage ] = useState( '' )
+  const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    (state) => state.sss.errorReceiving,
-  );
+    ( state ) => state.sss.errorReceiving,
+  )
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
-    (state) => state.storage.database,
-  );
-  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+    ( state ) => state.storage.database,
+  )
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
-  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
-    ? RECOVERY_SHARES[0]
-    : { REQUEST_DETAILS: null, META_SHARE: null };
+  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[ 0 ]
+    ? RECOVERY_SHARES[ 0 ]
+    : {
+      REQUEST_DETAILS: null, META_SHARE: null
+    }
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...REQUEST_DETAILS,
-          requester: WALLET_SETUP.walletName,
-          type: 'recoveryQR',
-          ver: DeviceInfo.getVersion(),
-        }),
-      )
-    : null;
-  secondaryQR ? console.log(secondaryQR) : null;
+      JSON.stringify( {
+        ...REQUEST_DETAILS,
+        requester: WALLET_SETUP.walletName,
+        type: 'recoveryQR',
+        ver: DeviceInfo.getVersion(),
+      } ),
+    )
+    : null
+  secondaryQR ? console.log( secondaryQR ) : null
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!REQUEST_DETAILS) dispatch(requestShare(0));
-  }, []);
+  const dispatch = useDispatch()
+  useEffect( () => {
+    if ( !REQUEST_DETAILS ) dispatch( requestShare( 0 ) )
+  }, [] )
 
-  if (META_SHARE) {
-    Toast('Received');
+  if ( META_SHARE ) {
+    Toast( 'Received' )
   }
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery key');
+  if ( isErrorReceivingFailed ) {
+    setTimeout( () => {
+      setErrorMessageHeader( 'Error receiving Recovery key' )
       setErrorMessage(
         'There was an error while receiving your Recovery Key, please try again',
-      );
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
+      )
+    }, 2 );
+    ( ErrorBottomSheet as any ).current.snapTo( 1 )
+    dispatch( ErrorReceiving( null ) )
   }
 
-  const getQrCodeData = useCallback((qrData) => {
+  const getQrCodeData = useCallback( ( qrData ) => {
     try {
-      const scannedData = JSON.parse(qrData);
-      switch (scannedData.type) {
-        case 'ReverseRecoveryQR':
-          const recoveryRequest = {
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            uploadedAt: scannedData.UPLOADED_AT,
-            isQR: true,
-          };
+      const scannedData = JSON.parse( qrData )
+      switch ( scannedData.type ) {
+          case 'ReverseRecoveryQR':
+            const recoveryRequest = {
+              requester: scannedData.requester,
+              publicKey: scannedData.publicKey,
+              uploadedAt: scannedData.UPLOADED_AT,
+              isQR: true,
+            }
 
-          if (
-            Date.now() - recoveryRequest.uploadedAt >
+            if (
+              Date.now() - recoveryRequest.uploadedAt >
             config.TC_REQUEST_EXPIRY
-          ) {
-            Alert.alert(
-              `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
-              `Please ask your Guardian to initiate a new ${
-                recoveryRequest.isQR ? 'QR' : 'Link'
-              }`,
-            );
-          }
+            ) {
+              Alert.alert(
+                `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
+                `Please ask your Guardian to initiate a new ${
+                  recoveryRequest.isQR ? 'QR' : 'Link'
+                }`,
+              )
+            }
 
-          // downloadSecret(index, recoveryRequest.publicKey);
+            // downloadSecret(index, recoveryRequest.publicKey);
 
-          dispatch(
-            downloadMShare(recoveryRequest.publicKey, null, 'recovery', 0),
-          );
+            dispatch(
+              downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
+            )
 
-          setTimeout(() => {
-            props.navigation.navigate('RestoreSelectedContactsList');
-          }, 1000);
-          break;
+            setTimeout( () => {
+              props.navigation.navigate( 'RestoreSelectedContactsList' )
+            }, 1000 )
+            break
 
-        default:
-          break;
+          default:
+            break
       }
-    } catch (err) {
-      Toast('Invalid QR');
+    } catch ( err ) {
+      Toast( 'Invalid QR' )
     }
-  }, []);
+  }, [] )
 
-  const renderErrorModalContent = useCallback(() => {
+  const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
@@ -141,36 +137,42 @@ export default function RestoreWalletBySecondaryDevice(props) {
         info={errorMessage}
         proceedButtonText={'Try again'}
         onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ( ErrorBottomSheet as any ).current.snapTo( 0 )
         }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/errorImage.png')}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
       />
-    );
-  }, [errorMessage, errorMessageHeader]);
+    )
+  }, [ errorMessage, errorMessageHeader ] )
 
-  const renderErrorModalHeader = useCallback(() => {
+  const renderErrorModalHeader = useCallback( () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ( ErrorBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1
+      }}>
 
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.goBack();
+              props.navigation.goBack()
             }}
-            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
@@ -183,11 +185,15 @@ export default function RestoreWalletBySecondaryDevice(props) {
         </View>
 
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
+          style={{
+            flex: 1
+          }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View style={{ marginBottom: 22 }}>
+          <View style={{
+            marginBottom: 22
+          }}>
             <HeaderTitle
               isKnowMoreButton={true}
               onPressKnowMore={() => {}}
@@ -201,12 +207,14 @@ export default function RestoreWalletBySecondaryDevice(props) {
           </View>
 
           <View
-            style={{ alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              alignItems: 'center', justifyContent: 'center'
+            }}
           >
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={secondaryQR} size={hp('27%')} />
+              <QRCode value={secondaryQR} size={hp( '27%' )} />
             )}
           </View>
 
@@ -215,25 +223,25 @@ export default function RestoreWalletBySecondaryDevice(props) {
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: hp('3%'),
-                marginBottom: hp('3%'),
+                marginTop: hp( '3%' ),
+                marginBottom: hp( '3%' ),
               }}
             >
               <TouchableOpacity
                 onPress={() => {
                   dispatch(
-                    downloadMShare(REQUEST_DETAILS.KEY, null, 'recovery'),
-                  );
-                  props.navigation.goBack();
+                    downloadMShare( REQUEST_DETAILS.KEY, null, 'recovery' ),
+                  )
+                  props.navigation.goBack()
                 }}
                 disabled={!!META_SHARE}
                 style={{
-                  backgroundColor: !!META_SHARE
+                  backgroundColor: META_SHARE
                     ? Colors.lightBlue
                     : Colors.blue,
                   borderRadius: 10,
-                  width: wp('50%'),
-                  height: wp('13%'),
+                  width: wp( '50%' ),
+                  height: wp( '13%' ),
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
@@ -241,7 +249,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                 <Text
                   style={{
                     color: Colors.white,
-                    fontSize: RFValue(13),
+                    fontSize: RFValue( 13 ),
                     fontFamily: Fonts.FiraSansMedium,
                   }}
                 >
@@ -251,19 +259,19 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
               <TouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('QRScanner', {
+                  props.navigation.navigate( 'QRScanner', {
                     onCodeScanned: getQrCodeData,
-                  });
+                  } )
                 }}
                 disabled={!!META_SHARE}
                 style={{
-                  backgroundColor: !!META_SHARE
+                  backgroundColor: META_SHARE
                     ? Colors.lightBlue
                     : Colors.blue,
                   borderRadius: 10,
                   marginTop: 10,
-                  width: wp('50%'),
-                  height: wp('13%'),
+                  width: wp( '50%' ),
+                  height: wp( '13%' ),
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
@@ -271,7 +279,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                 <Text
                   style={{
                     color: Colors.white,
-                    fontSize: RFValue(13),
+                    fontSize: RFValue( 13 ),
                     fontFamily: Fonts.FiraSansMedium,
                   }}
                 >
@@ -295,104 +303,15 @@ export default function RestoreWalletBySecondaryDevice(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('35%')
-              : hp('40%'),
+              ? hp( '35%' )
+              : hp( '40%' ),
           ]}
           renderContent={renderErrorModalContent}
           renderHeader={renderErrorModalHeader}
         />
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
-  pageTitle: {
-    color: Colors.blue,
-    fontSize: RFValue(25),
-    marginLeft: 15,
-    marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  labelStyle: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12),
-    marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  bottomNoteText: {
-    color: Colors.blue,
-    fontSize: RFValue(13),
-    marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  bottomNoteInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  buttonView: {
-    height: wp('13%'),
-    width: wp('30%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  bottomButtonView: {
-    flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: 40,
-    paddingTop: 30,
-    alignItems: 'center',
-  },
-  statusIndicatorView: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-  },
-  statusIndicatorActiveView: {
-    height: 5,
-    width: 25,
-    backgroundColor: Colors.blue,
-    borderRadius: 10,
-  },
-  statusIndicatorInactiveView: {
-    width: 5,
-    backgroundColor: Colors.lightBlue,
-    borderRadius: 10,
-    marginLeft: 5,
-  },
-  addressView: {
-    flex: 1,
-    backgroundColor: Colors.backgroundColor,
-    borderBottomLeftRadius: 8,
-    borderTopLeftRadius: 8,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: 'center',
-  },
-  addressText: {
-    fontSize: RFValue(13),
-    color: Colors.lightBlue,
-  },
-  copyIconView: {
-    width: 48,
-    height: 50,
-    backgroundColor: Colors.borderColor,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+

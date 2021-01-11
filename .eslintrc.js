@@ -19,6 +19,14 @@ module.exports = {
   },
   'plugins': [ 'react', '@typescript-eslint' ],
   'rules': {
+    'no-case-declarations': 'off',
+    'no-fallthrough': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    'no-empty-pattern': 'off',
+    'eslint-disable no-case-declarations': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     'computed-property-spacing': [ 'error', 'always' ],
     'array-bracket-spacing': [ 'error', 'always' ],
     'object-curly-spacing': [ 'error', 'always' ],
@@ -42,6 +50,10 @@ module.exports = {
     } ],
     'eol-last': [ 'error', 'always' ],
     'react/display-name': 'off',
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    'prefer-const': [ 'warn', {
+      'destructuring': 'all',
+      'ignoreReadBeforeAssign': true
+    } ],
   }
 }

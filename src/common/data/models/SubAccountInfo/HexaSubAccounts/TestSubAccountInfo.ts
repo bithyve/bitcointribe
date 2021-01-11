@@ -1,16 +1,16 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../../bitcoin/utilities/Interface';
-import AccountVisibility from '../../../enums/AccountVisibility';
-import SourceAccountKind from '../../../enums/SourceAccountKind';
-import SubAccountKind from '../../../enums/SubAccountKind';
-import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup';
+} from '../../../../../bitcoin/utilities/Interface'
+import AccountVisibility from '../../../enums/AccountVisibility'
+import SourceAccountKind from '../../../enums/SourceAccountKind'
+import SubAccountKind from '../../../enums/SubAccountKind'
+import UTXOCompatibilityGroup from '../../../enums/UTXOCompatibilityGroup'
 import {
   HexaSubAccountDescribing,
   SubAccountDescribingConstructorProps,
-} from '../Interfaces';
+} from '../Interfaces'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
@@ -27,7 +27,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription: string = 'Learn Bitcoin';
+  defaultDescription = 'Learn Bitcoin';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -40,22 +40,24 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Test Account',
-    balances = { confirmed: 0, unconfirmed: 0 },
+    balances = {
+      confirmed: 0, unconfirmed: 0 
+    },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactions = [],
   }: ConstructorProps) {
-    this.id = id;
-    this.accountShellID = accountShellID;
-    this.instanceNumber = instanceNumber;
-    this.defaultTitle = defaultTitle;
-    this.balances = balances;
-    this.customDisplayName = customDisplayName;
-    this.customDescription = customDescription;
-    this.visibility = visibility;
-    this.isTFAEnabled = isTFAEnabled;
-    this.transactions = transactions;
+    this.id = id
+    this.accountShellID = accountShellID
+    this.instanceNumber = instanceNumber
+    this.defaultTitle = defaultTitle
+    this.balances = balances
+    this.customDisplayName = customDisplayName
+    this.customDescription = customDescription
+    this.visibility = visibility
+    this.isTFAEnabled = isTFAEnabled
+    this.transactions = transactions
   }
 }

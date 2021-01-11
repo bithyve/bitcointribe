@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import ListStyles from '../../../common/Styles/ListStyles';
+import React, { useMemo } from 'react'
+import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import ListStyles from '../../../common/Styles/ListStyles'
 
 export type Props = {
   navigation: any;
@@ -17,9 +17,9 @@ export type SettingsListItem = {
 const listItems: SettingsListItem[] = [
   {
     title: 'Name & Description',
-    subtitle: `Customize display properties`,
+    subtitle: 'Customize display properties',
     screenName: 'EditDisplayProperties',
-    imageSource: require('../../../assets/images/icons/icon_checking_blue.png'),
+    imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
   },
 
   // 📝 These items are being commented out until their functionality is fully implemented.
@@ -49,28 +49,26 @@ const listItems: SettingsListItem[] = [
   //   screenName: '',
   //   imageSource: require('../../../assets/images/icons/icon_archive.png'),
   // },
-];
+]
 
-const listItemKeyExtractor = (item: SettingsListItem) => item.title;
+const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
 
-const AccountSettingsMainScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const accountShellID = useMemo(() => {
-    return navigation.getParam('accountShellID');
-  }, [navigation]);
+const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const accountShellID = useMemo( () => {
+    return navigation.getParam( 'accountShellID' )
+  }, [ navigation ] )
 
-  function handleListItemPressed(listItem: SettingsListItem) {
-    navigation.navigate(listItem.screenName, {
+  function handleListItemPressed( listItem: SettingsListItem ) {
+    navigation.navigate( listItem.screenName, {
       accountShellID,
-    });
+    } )
   }
 
-  const renderItem = ({ item: listItem }: { item: SettingsListItem }) => {
+  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
     return (
       <ListItem
         bottomDivider
-        onPress={() => { handleListItemPressed(listItem) }}
+        onPress={() => { handleListItemPressed( listItem ) }}
       >
         <Image
           source={listItem.imageSource}
@@ -85,24 +83,26 @@ const AccountSettingsMainScreen: React.FC<Props> = ({
 
         <ListItem.Chevron />
       </ListItem>
-    );
-  };
+    )
+  }
 
   return (
     <FlatList
       style={styles.rootContainer}
-      contentContainerStyle={{ paddingHorizontal: 14 }}
+      contentContainerStyle={{
+        paddingHorizontal: 14 
+      }}
       data={listItems}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 10,
   },
-});
+} )
 
-export default AccountSettingsMainScreen;
+export default AccountSettingsMainScreen

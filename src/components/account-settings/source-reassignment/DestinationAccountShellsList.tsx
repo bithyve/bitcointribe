@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import { FlatList } from 'react-native-gesture-handler';
-import AccountShell from '../../../common/data/models/AccountShell';
-import RadioButton from '../../RadioButton';
-import DestinationAccountShellListItemContent from '../DestinationAccountShellListItemContent';
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { FlatList } from 'react-native-gesture-handler'
+import AccountShell from '../../../common/data/models/AccountShell'
+import RadioButton from '../../RadioButton'
+import DestinationAccountShellListItemContent from '../DestinationAccountShellListItemContent'
 
 export type Props = {
   selectableDestinations: AccountShell[];
@@ -12,7 +12,7 @@ export type Props = {
   onDestinationSelected: (accountShell: AccountShell) => void;
 };
 
-const listItemKeyExtractor = (item: AccountShell) => item.id;
+const listItemKeyExtractor = (item: AccountShell) => item.id
 
 const DestinationAccountShellsList: React.FC<Props> = ({
   selectableDestinations,
@@ -21,8 +21,8 @@ const DestinationAccountShellsList: React.FC<Props> = ({
 }: Props) => {
 
   const isChecked = useCallback((accountShell: AccountShell) => {
-    return accountShell.id === selectedDestinationID;
-  }, [selectedDestinationID]);
+    return accountShell.id === selectedDestinationID
+  }, [ selectedDestinationID ])
 
   const renderItem = ({ item: accountShell }: { item: AccountShell }) => {
     return (
@@ -36,24 +36,26 @@ const DestinationAccountShellsList: React.FC<Props> = ({
 
         <DestinationAccountShellListItemContent subAccountInfo={accountShell.primarySubAccount} />
       </ListItem>
-    );
-  };
+    )
+  }
 
   return (
     <FlatList
       style={styles.rootContainer}
-      contentContainerStyle={{ paddingHorizontal: 14 }}
+      contentContainerStyle={{
+        paddingHorizontal: 14 
+      }}
       extraData={selectedDestinationID}
       data={selectableDestinations}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   rootContainer: {
   }
-});
+})
 
-export default DestinationAccountShellsList;
+export default DestinationAccountShellsList

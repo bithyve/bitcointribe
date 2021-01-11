@@ -86,6 +86,7 @@ export default function useNewAccountChoices() {
               ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
               : ''
           }`,
+          defaultDescription: 'Directly Accept Donations',
           doneeName: '',
           causeName: '',
         } ),
@@ -106,9 +107,9 @@ export default function useNewAccountChoices() {
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
-          defaultTitle: 'Whirlpool Account',
-          defaultDescription: 'Powered by Samurai',
-          serviceAccountKind: ServiceAccountKind.WHIRLPOOL,
+          defaultTitle: 'Collaborative Custody',
+          defaultDescription: 'Multi-sig vault with a co-signer',
+          serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
         } ),
       ],
 

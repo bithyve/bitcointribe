@@ -28,4 +28,4 @@ enum SubAccountKind {
   FULLY_IMPORTED_WALLET = 'FULLY_IMPORTED_WALLET',
 }
 
-export default SubAccountKind;
+export default SubAccountKind

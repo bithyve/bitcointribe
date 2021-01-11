@@ -1,16 +1,16 @@
-import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
-import TransactionKind from '../../common/data/enums/TransactionKind';
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces';
-import moment from 'moment';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import LabeledBalanceDisplay from '../LabeledBalanceDisplay';
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
+import React, { useMemo } from 'react'
+import { StyleSheet } from 'react-native'
+import { ListItem, Icon } from 'react-native-elements'
+import TransactionKind from '../../common/data/enums/TransactionKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import moment from 'moment'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -18,45 +18,45 @@ export type Props = {
   currencyKind?: CurrencyKind | null;
 };
 
-const TransactionListItemContent: React.FC<Props> = ({
+const TransactionListItemContent: React.FC<Props> = ( {
   transaction,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
-}: Props) => {
-  const transactionKindIconName = useMemo(() => {
-    switch (transaction.transactionType) {
-      case TransactionKind.RECEIVE:
-        return 'long-arrow-down';
-      case TransactionKind.SEND:
-        return 'long-arrow-up';
+}: Props ) => {
+  const transactionKindIconName = useMemo( () => {
+    switch ( transaction.transactionType ) {
+        case TransactionKind.RECEIVE:
+          return 'long-arrow-down'
+        case TransactionKind.SEND:
+          return 'long-arrow-up'
     }
-  }, [transaction.transactionType]);
+  }, [ transaction.transactionType ] )
 
-  const transactionKindIconColor = useMemo(() => {
-    switch (transaction.transactionType) {
-      case TransactionKind.RECEIVE:
-        return Colors.green;
-      case TransactionKind.SEND:
-        return Colors.red;
+  const transactionKindIconColor = useMemo( () => {
+    switch ( transaction.transactionType ) {
+        case TransactionKind.RECEIVE:
+          return Colors.green
+        case TransactionKind.SEND:
+          return Colors.red
     }
-  }, [transaction.transactionType]);
+  }, [ transaction.transactionType ] )
 
-  const amountTextStyle = useMemo(() => {
+  const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
-    };
-  }, [transaction.transactionType]);
+    }
+  }, [ transaction.transactionType ] )
 
-  const formattedDateText = useMemo(() => {
-    return moment(transaction.date).format('DD MMMM YYYY');
-  }, [transaction.transactionType]);
+  const formattedDateText = useMemo( () => {
+    return moment( transaction.date ).format( 'DD MMMM YYYY' )
+  }, [ transaction.transactionType ] )
 
-  const confirmationsText = useMemo(() => {
+  const confirmationsText = useMemo( () => {
     return transaction.confirmations > 6 ?
-      `6+`
+      '6+'
       : `${transaction.confirmations}`
-  }, [transaction.confirmations]);
+  }, [ transaction.confirmations ] )
 
   return (
     <>
@@ -96,10 +96,10 @@ const TransactionListItemContent: React.FC<Props> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
     </>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   transactionKindIcon: {
     marginRight: 14,
   },
@@ -110,12 +110,12 @@ const styles = StyleSheet.create({
 
   titleText: {
     color: Colors.blue,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginBottom: 2,
   },
 
   subtitleText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
   },
 
   bitcoinImage: {
@@ -141,14 +141,14 @@ const styles = StyleSheet.create({
   confirmationsText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
-    marginTop: RFValue(4),
+    fontSize: RFValue( 12 ),
+    marginTop: RFValue( 4 ),
   },
 
   amountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
+    fontSize: RFValue( 17 ),
   },
-});
+} )
 
-export default TransactionListItemContent;
+export default TransactionListItemContent

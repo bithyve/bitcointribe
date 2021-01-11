@@ -1,13 +1,13 @@
-import SubAccountKind from '../../enums/SubAccountKind';
-import ServiceAccountKind from '../../enums/ServiceAccountKind';
-import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup';
-import AccountVisibility from '../../enums/AccountVisibility';
-import { ImageSourcePropType } from 'react-native';
+import SubAccountKind from '../../enums/SubAccountKind'
+import ServiceAccountKind from '../../enums/ServiceAccountKind'
+import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
+import AccountVisibility from '../../enums/AccountVisibility'
+import { ImageSourcePropType } from 'react-native'
 import {
   Balances,
   TransactionDetails,
-} from '../../../../bitcoin/utilities/Interface';
-import SourceAccountKind from '../../enums/SourceAccountKind';
+} from '../../../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../enums/SourceAccountKind'
 
 interface SubAccountDescribing {
   id: string;
@@ -62,7 +62,7 @@ interface SubAccountDescribing {
   transactions: TransactionDetails[];
 }
 
-export interface HexaSubAccountDescribing extends SubAccountDescribing {}
+export type HexaSubAccountDescribing = SubAccountDescribing
 
 export interface DonationSubAccountDescribing extends HexaSubAccountDescribing {
   doneeName: string;
@@ -74,14 +74,14 @@ export interface ExternalServiceSubAccountDescribing
   readonly serviceAccountKind: ServiceAccountKind;
 }
 
-export interface ImportedWalletSubAccountDescribing
-  extends SubAccountDescribing {}
+export type ImportedWalletSubAccountDescribing = SubAccountDescribing
 
 export type SubAccountDescribingConstructorProps = {
   id?: string;
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
+  defaultDescription?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;
   balances?: Balances;
@@ -92,4 +92,4 @@ export type SubAccountDescribingConstructorProps = {
   transactions?: TransactionDetails[];
 };
 
-export default SubAccountDescribing;
+export default SubAccountDescribing

@@ -62,13 +62,13 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
 const BodySection: React.FC<BodyProps> = ( { accountShell, }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
-  const totalBalance = useTotalBalanceForAccountShell( accountShell )
+  const totalBalance = AccountShell.getTotalBalance( accountShell )
 
   const balanceTextStyle = useMemo( () => {
     return {
       color: accountsState.accountsSynched ? Colors.black : Colors.textColorGrey,
     }
-  }, [ accountsState.accountsSynced ] )
+  }, [ accountsState.accountsSynched ] )
 
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
@@ -107,8 +107,8 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, }: Props ) => {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    width: widthPercentageToDP( '42.6%' ),
-    height: heightPercentageToDP( '20.1%' ),
+    width: widthPercentageToDP( 42.6 ),
+    height: heightPercentageToDP( 20.1 ),
     borderColor: Colors.borderColor,
     borderWidth: 1,
     paddingHorizontal: 12,
@@ -122,8 +122,8 @@ const styles = StyleSheet.create( {
   },
 
   headerAccountImage: {
-    width: 44,
-    height: 44,
+    width: widthPercentageToDP( 10 ),
+    height: widthPercentageToDP( 10 ),
   },
 
   headerBadgeContainer: {

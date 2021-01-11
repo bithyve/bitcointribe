@@ -1,27 +1,31 @@
-import { BottomSheetHandleProps } from '@gorhom/bottom-sheet';
-import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import Colors from '../../common/Colors';
+import { BottomSheetHandleProps } from '@gorhom/bottom-sheet'
+import React from 'react'
+import { View, Text, StyleSheet, Platform } from 'react-native'
+import Colors from '../../common/Colors'
 
-export const HANDLE_CONTAINER_HEIGHT = 12;
+export const HANDLE_CONTAINER_HEIGHT = 12
 
 export type Props = BottomSheetHandleProps & {
   containerStyle?: Record<string, unknown>;
   handleIndicatorStyle?: Record<string, unknown>;
 };
 
-const BottomSheetHandle: React.FC<Props> = ({
+const BottomSheetHandle: React.FC<Props> = ( {
   containerStyle,
   handleIndicatorStyle,
-}: Props) => {
+}: Props ) => {
   return (
-    <View style={{ ...styles.rootContainer, ...containerStyle }}>
-      <View style={{ ...styles.handleIndicator, ...handleIndicatorStyle }}></View>
+    <View style={{
+      ...styles.rootContainer, ...containerStyle 
+    }}>
+      <View style={{
+        ...styles.handleIndicator, ...handleIndicatorStyle 
+      }}></View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
@@ -43,6 +47,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 7,
   },
-});
+} )
 
-export default BottomSheetHandle;
+export default BottomSheetHandle
