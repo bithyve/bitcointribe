@@ -116,7 +116,7 @@ import {
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
-import { connectToBitHyveNodeWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 
 const rootSaga = function* () {
   const sagas = [
@@ -192,6 +192,7 @@ const rootSaga = function* () {
     // Node Settings
     savePersonalNodeConfigurationWatcher,
     connectToBitHyveNodeWatcher,
+    restorePersonalNodeConfigurationWatcher,
 
     // Notifications
     updateFCMTokensWatcher,
