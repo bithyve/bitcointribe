@@ -3,12 +3,6 @@ import { call, put } from 'redux-saga/effects'
 import {
   FETCH_WYRE_RESERVATION,
   wyreReservationSucceeded,
-  FETCH_WYRE_TOKEN,
-  fetchWyreTokenSucceeded,
-  fetchWyreTokenFailed,
-  LINK_WYRE_WALLET,
-  linkWyreWalletSucceeded,
-  linkWyreWalletFailed,
 } from '../actions/WyreIntegration'
 
 import {

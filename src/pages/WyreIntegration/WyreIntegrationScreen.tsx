@@ -7,7 +7,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 // import wyreReservationSucceeded from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 
-import { fetchWyreReservation, fetchWyreToken, linkWyreWallet,  WyreActionKind, addWyreMetadata } from '../../store/actions/WyreIntegration'
+import { fetchWyreReservation,  WyreActionKind } from '../../store/actions/WyreIntegration'
 
 export type Props = {
   navigation: any;
@@ -61,19 +61,11 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
     switch ( itemKind ) {
-        case WyreActionKind.AUTHENTICATE:
-          dispatch( fetchWyreToken( {
-          } ) )
-          break
         case WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL:
         // TODO: This would be a call to the "add new AccountShell" action
-        // being built here: https://github.com/bithyve/hexa/blob/f247ab7ae05e52e23ec4fc773360ef84a063248f/src/store/actions/accounts.ts#L296
-          dispatch( addWyreMetadata( {
-          } ) )
-          break
-        case WyreActionKind.LINK_HEXA_AND_WYRE_SUB_ACCOUNTS:
-          dispatch( linkWyreWallet( {
-          } ) )
+        // need to add redux components for   
+          // dispatch( createWyreAccountShell( {
+          // } ) )
           break
         case WyreActionKind.FETCH_WYRE_RESERVATION:
           console.log( { 
