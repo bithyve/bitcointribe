@@ -57,8 +57,8 @@ export default class SecureHDWallet extends Bitcoin {
   public derivativeAccounts: DerivativeAccounts | DonationDerivativeAccount =
     config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
-  public accountName: String;
-  public accountDescription: String;
+  public accountName: string;
+  public accountDescription: string;
 
   private lastBalTxSync = 0;
   private confirmedUTXOs: Array<{

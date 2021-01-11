@@ -24,12 +24,9 @@ import {
   SUB_PRIMARY_ACCOUNT,
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
-  SECURE_ACCOUNT,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import { acc } from 'react-native-reanimated'
 
 const { HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
@@ -56,8 +53,8 @@ export default class HDSegwitWallet extends Bitcoin {
   public trustedContactToDA: { [contactName: string]: number } = {
   };
   public feeRates: any;
-  public accountName: String;
-  public accountDescription: String;
+  public accountName: string;
+  public accountDescription: string;
 
   private mnemonic: string;
   private passphrase: string;

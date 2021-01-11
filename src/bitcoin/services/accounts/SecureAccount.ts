@@ -1,4 +1,3 @@
-import { TransactionBuilder } from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
 import { ErrMap } from '../../utilities/ErrMap'
@@ -7,7 +6,6 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  DerivativeAccountTypes,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {

@@ -1,15 +1,13 @@
 import * as bip39 from 'bip39'
-import { Network, TransactionBuilder } from 'bitcoinjs-lib'
+import { Network } from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import { ErrMap } from '../ErrMap'
 import HDSegwitWallet from './HDSegwitWallet'
 import {
   Transactions,
-  INotification,
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  DerivativeAccountTypes,
 } from '../Interface'
 
 export default class BaseAccount {
