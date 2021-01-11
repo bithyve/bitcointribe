@@ -65,7 +65,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
-  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
@@ -293,7 +292,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
             <View style={styles.viewSectionContainer}>
               <TransactionsPreviewSection
                 transactions={accountTransactions.slice( 0, 3 )}
-                availableBalance={spendableBalance}
+                availableBalance={AccountShell.getSpendableBalance( accountShell )}
                 bitcoinUnit={accountShell.unit}
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
                 onViewMorePressed={navigateToTransactionsList}
@@ -355,7 +354,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         },
       },
     ]
-  }, [] )
+  }, [ accountTransactions, accountShell ] )
 
   return (
     <View style={styles.rootContainer}>

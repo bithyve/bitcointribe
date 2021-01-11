@@ -686,8 +686,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList()
     }
 
-    if ( prevProps.accountsState !== this.props.accountsState ) {
-      // this.getBalances()
+    if ( prevProps.accountsState.accountShells !== this.props.accountsState.accountShells ) {
+      this.getBalances()
       // this.getNewTransactionNotifications()
     }
 
