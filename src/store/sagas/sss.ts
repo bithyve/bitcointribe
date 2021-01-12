@@ -92,7 +92,7 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { personalNodeConfigurationSet } from '../actions/nodeSettings'
+import {  restorePersonalNodeConfiguration } from '../actions/nodeSettings'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -1898,7 +1898,9 @@ function* updateWalletImageWorker() {
     }
   }
 
-  // console.log({ walletImage });
+  console.log( {
+    walletImage 
+  } )
 
   if ( Object.keys( walletImage ).length === 0 ) {
     console.log( 'WI: nothing to update' )
@@ -1970,7 +1972,7 @@ function* fetchWalletImageWorker( { payload } ) {
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
-              yield put( personalNodeConfigurationSet( 
+              yield put( restorePersonalNodeConfiguration( 
                 activePersonalNode
               ) )
               break
