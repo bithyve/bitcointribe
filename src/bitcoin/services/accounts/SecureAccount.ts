@@ -1,4 +1,3 @@
-import { TransactionBuilder } from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
 import { ErrMap } from '../../utilities/ErrMap'
@@ -7,7 +6,6 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  DerivativeAccountTypes,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -16,6 +14,8 @@ export default class SecureAccount {
     const {
       primaryMnemonic,
       secondaryMnemonic,
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -35,6 +35,8 @@ export default class SecureAccount {
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -68,6 +70,8 @@ export default class SecureAccount {
 
     return new SecureAccount( primaryMnemonic, {
       secondaryMnemonic,
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -92,6 +96,8 @@ export default class SecureAccount {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
@@ -593,33 +599,30 @@ export default class SecureAccount {
     }
   };
 
-  public updateDerivativeAccount = async (
+  public updateAccountDetails =  (
     account: {
       kind: string,
       instanceNumber: number,
       customDescription: string,
       customDisplayName: string
     }
-  ): Promise<
-  | {
-      status: number;
-      data: {
+  ): {
+    status: number;
+    data: {
         updateSuccessful: boolean;
-      };
-      err?: undefined;
-      message?: undefined;
-    }
-  | {
-      status: number;
-      err: any;
-      message: string;
-      data?: undefined;
-    }
-> => {
+    };
+    err?: undefined;
+    message?: undefined;
+  } | {
+    status: number;
+    err: any;
+    message: string;
+    data?: undefined;
+  }  => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.updateDerivativeAccount(
+        data: this.secureHDWallet.updateAccountDetails(
           account
         ),
       }
