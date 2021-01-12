@@ -514,6 +514,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       title: "We have not seen you in a while!", 
       message: "Opening your app regularly ensures you get all the notifications and security updates", // (required)
       date: date,
+      // repeatType: 'time',
+      // repeatTime: 3000, // 3 seconds
+      // fireDate: Date.now(),
       repeatType: 'day',
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     });
@@ -555,10 +558,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   bootStrapNotifications = async () => {
     //return new Promise<void>(resolve => {
+      PushNotificationIOS.addEventListener('registrationError', console.log)
       if (Platform.OS === 'ios') {
-        PushNotification.checkPermissions(({ alert, badge, sound }) => {
+        await PushNotification.checkPermissions(async({ alert, badge, sound }) => {
           if (!alert || !badge || !sound) {
-            PushNotification.requestPermissions();
+            await PushNotification.requestPermissions();
           }
           this.storeFCMToken();
           this.scheduleNotification();
@@ -580,14 +584,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         if (token) {
           console.log("TOKEN", token);
           const fcmArray = [token.token]
-          const fcmTokenFromAsync = this.props.fcmTokenValue
+          const fcmTokenFromAsync = this.props.fcmTokenValue;
           if (!fcmTokenFromAsync || fcmTokenFromAsync != token.token) {
+            await AsyncStorage.setItem('fcmToken', token.token)
             this.props.setFCMToken(token.token)
 
-            await AsyncStorage.setItem('fcmToken', token.token)
             this.props.updateFCMTokens(fcmArray)
-            this.scheduleNotification();
-            this.createNotificationListeners();
             AsyncStorage.getItem('walletRecovered').then((recovered) => {
               // updates the new FCM token to channels post recovery
               if (recovered) {
@@ -651,7 +653,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async (item) => {
     console.log("item", item);
-    const content = item.data;
+    const content = JSON.parse( item.data.content )
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
