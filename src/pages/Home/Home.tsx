@@ -514,18 +514,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       title: "We have not seen you in a while!", 
       message: "Opening your app regularly ensures you get all the notifications and security updates", // (required)
       date: date,
-      // repeatType: 'time',
-      // repeatTime: 3000, // 3 seconds
-      // fireDate: Date.now(),
       repeatType: 'day',
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     });
   };
 
   localNotification = async (notificationDetails) => {
-    console.log(":notificationDetails",notificationDetails);
-
-    let channelIdRandom = moment().valueOf();
+  let channelIdRandom = moment().valueOf();
    PushNotification.createChannel(
     {
       channelId: `${channelIdRandom}`,
@@ -557,8 +552,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   bootStrapNotifications = async () => {
-    //return new Promise<void>(resolve => {
-      PushNotificationIOS.addEventListener('registrationError', console.log)
+    PushNotificationIOS.addEventListener('registrationError', console.log)
       if (Platform.OS === 'ios') {
         await PushNotification.checkPermissions(async({ alert, badge, sound }) => {
           if (!alert || !badge || !sound) {
@@ -567,13 +561,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.storeFCMToken();
           this.scheduleNotification();
           this.createNotificationListeners();
-         // return resolve();
         });
       } else {
         this.storeFCMToken();
         this.scheduleNotification();
         this.createNotificationListeners();
-       // return resolve();
       }
     };
     
