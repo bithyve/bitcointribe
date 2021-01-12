@@ -54,6 +54,8 @@ import {
   FETCH_FEE_AND_EXCHANGE_RATES,
   exchangeRatesCalculated,
   setAverageTxFee,
+  VALIDATE_TWO_FA,
+  twoFAValid,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -939,6 +941,46 @@ function* resetTwoFAWorker( { payload } ) {
 }
 
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
+
+
+function* validateTwoFAWorker( { payload } ) {
+  const service: SecureAccount = yield select(
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
+  )
+
+  const res = yield call( service.validate2FASetup, payload.token )
+
+  if ( res.status == 200 && res.data.valid ) {
+    yield put( twoFAValid( true ) )
+    const { removed } = yield call( service.removeTwoFADetails )
+
+    if( removed ){
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const updatedSERVICES = {
+        ...SERVICES,
+        [ SECURE_ACCOUNT ]: JSON.stringify( service ),
+      }
+  
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES 
+        } 
+      } )
+    } else {
+      console.log( 'Failed to remove 2FA details from the device' )
+    }
+   
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    console.log( 'Failed to validate twoFA', res.err )
+    yield put( twoFAValid( false ) )
+  }
+}
+
+export const validateTwoFAWatcher = createWatcher(
+  validateTwoFAWorker,
+  VALIDATE_TWO_FA
+)
 
 function* removeTwoFAWorker() {
   const service: SecureAccount = yield select(

@@ -29,9 +29,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.checkCompatibility(method, version),
+        data: await Relay.checkCompatibility( method, version ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -61,9 +61,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.fetchReleases(build),
+        data: await Relay.fetchReleases( build ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -94,9 +94,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.updateFCMTokens(walletID, FCMs),
+        data: await Relay.updateFCMTokens( walletID, FCMs ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -127,9 +127,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.fetchNotifications(walletID),
+        data: await Relay.fetchNotifications( walletID ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -160,9 +160,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendNotifications(receivers, notification),
+        data: await Relay.sendNotifications( receivers, notification ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -193,9 +193,9 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendDonationNote(donationId, txNote),
+        data: await Relay.sendDonationNote( donationId, txNote ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -210,7 +210,7 @@ export default class RelayServices {
         status: config.STATUS.SUCCESS,
         data: await Relay.fetchFeeAndExchangeRates(),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,

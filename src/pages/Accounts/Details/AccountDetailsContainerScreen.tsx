@@ -27,7 +27,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell, removeTwoFA } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -37,7 +37,7 @@ import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseA
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 
 export type Props = {
@@ -243,6 +243,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
+  useEffect( ()=>{
+    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
+    const serviceType = primarySubAccount.sourceKind
+    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
+      navigation.navigate( 'TwoFASetup', {
+        twoFASetup:
+          accountsState[ serviceType ].service.secureHDWallet
+            .twoFASetup, 
+      } )
+      // dispatch( removeTwoFA() )    
+    }
+  }, [ primarySubAccount.sourceKind ] )
 
   useEffect( () => {
     // 📝 A slight timeout is needed here in order for the refresh control to
