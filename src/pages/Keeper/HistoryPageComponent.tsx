@@ -132,6 +132,7 @@ const HistoryPageComponent = (props) => {
         </TouchableOpacity>
         {props.IsReshare && (
           <TouchableOpacity
+            disabled={props.disableChange ? props.disableChange : false}
             onPress={() => props.onPressChange()}
             style={{
               marginLeft: 10,
@@ -144,7 +145,7 @@ const HistoryPageComponent = (props) => {
             <Text
               style={{
                 ...styles.proceedButtonText,
-                color: Colors.blue,
+                color: props.disableChange ? Colors.lightBlue : Colors.blue,
               }}
             >
               {props.changeButtonText}

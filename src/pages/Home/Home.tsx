@@ -605,7 +605,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-    console.log('s3Service', s3Service)
     const { healthCheckInitializedKeeper } = s3Service.levelhealth;
     console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
     if (!healthCheckInitializedKeeper) {

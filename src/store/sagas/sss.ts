@@ -130,8 +130,6 @@ function* generateMetaSharesWorker() {
     bhXpub: bh,
   };
 
-  console.log('s3Service.createMetaShares secureAssets', secureAssets );
-
   const appVersion = DeviceInfo.getVersion()
 
   if (s3Service.sss.metaShares.length) return;

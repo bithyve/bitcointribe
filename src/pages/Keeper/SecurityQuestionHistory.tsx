@@ -258,6 +258,7 @@ const SecurityQuestionHistory = (props) => {
           confirmButtonText={'Confirm Question'}
           reshareButtonText={'Confirm Question'}
           changeButtonText={'Change Question'}
+          disableChange={true}
           onPressReshare={() => {
             (SecurityQuestionBottomSheet as any).current.snapTo(1);
           }}

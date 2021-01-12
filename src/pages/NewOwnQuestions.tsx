@@ -196,7 +196,7 @@ export default function NewOwnQuestions( props ) {
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={()=> walletName ? onPressConfirm() : alert('sdf')}
+        onPress={()=> walletName ? onPressConfirm() : null}
         style={{ ...styles.buttonView, elevation: Elevation }}
       >
         {/* {!loading.initializing ? ( */}
