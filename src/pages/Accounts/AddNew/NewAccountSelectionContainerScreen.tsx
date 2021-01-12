@@ -14,6 +14,7 @@ import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccoun
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { fetchWyreReservation } from '../../../store/actions/WyreIntegration'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -76,6 +77,10 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           case ServiceAccountKind.FAST_BITCOINS:
             dispatch( addNewAccountShell( selectedChoice ) )
             break
+          case ServiceAccountKind.WYRE:
+            navigation.navigate( 'NewWyreAccountDetails', {
+              currentSubAccount: selectedChoice,
+            } )
           default:
             break
       }
@@ -85,13 +90,13 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
-          navigation.navigate( 'AddNewHexaAccountDetails', {
-            currentSubAccountInfo: selectedChoice,
+          navigation.navigate( 'NewHexaAccountDetails', {
+            currentSubAccount: selectedChoice,
           } )
           break
         case SubAccountKind.DONATION_ACCOUNT:
           navigation.navigate( 'AddNewDonationAccountDetails', {
-            currentSubAccountInfo: selectedChoice,
+            currentSubAccount: selectedChoice,
           } )
           break
         case SubAccountKind.TRUSTED_CONTACTS:

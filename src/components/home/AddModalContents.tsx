@@ -41,13 +41,13 @@ export default function AddModalContents( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={{
-        marginBottom: hp( '13%' ) 
+        marginBottom: hp( '13%' )
       }}>
         <FlatList
           data={addData}
           ItemSeparatorComponent={() => (
             <View style={{
-              backgroundColor: Colors.white 
+              backgroundColor: Colors.white
             }}>
               <View style={styles.separatorView} />
             </View>
@@ -56,17 +56,17 @@ export default function AddModalContents( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressElements( item.type )}
               style={{
-                ...styles.addModalView, backgroundColor: Colors.white 
+                ...styles.addModalView, backgroundColor: Colors.white
               }}
             >
               <View style={styles.modalElementInfoView}>
                 <View style={{
-                  justifyContent: 'center' 
+                  justifyContent: 'center'
                 }}>
                   <Image
                     source={item.image}
                     style={{
-                      width: 25, height: 25 
+                      width: 25, height: 25
                     }}
                   />
                 </View>

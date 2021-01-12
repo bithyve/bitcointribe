@@ -1,26 +1,40 @@
+import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import {
-  WYRE_RESERVATION_SUCCEEDED,
+  FETCH_WYRE_RESERVATION_SUCCEEDED,
   CLEAR_WYRE_CACHE
 
 } from '../actions/WyreIntegration'
 
 
+export type WyreOrder = {
+  amount: number;
+  currencyCode: string;
+}
+
 export type WyreIntegrationState = {
   wyreReservationCode: string | null;
   wyreHostedUrl: string | null;
   wyreReservationSucceeded: boolean;
+
+  pendingWyreOrder: WyreOrder | null;
   isProcessingWyreOrder: boolean;
+  hasWyreOrderSucceeded: boolean;
 
   isSyncingWyreWallet: boolean;
   fetchWyreReservationFailed: boolean;
   fetchWyreReservationFailedMessage: null;
 }
 
+
 const INITIAL_STATE: WyreIntegrationState = {
   wyreReservationCode: null,
   wyreHostedUrl: null,
   wyreReservationSucceeded: false,
+
+  pendingWyreOrder: null,
   isProcessingWyreOrder: false,
+  hasWyreOrderSucceeded: false,
+
 
   isSyncingWyreWallet: false,
   fetchWyreReservationFailed: false,
@@ -29,7 +43,7 @@ const INITIAL_STATE: WyreIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
-      case WYRE_RESERVATION_SUCCEEDED:
+      case FETCH_WYRE_RESERVATION_SUCCEEDED:
         return {
           ...state,
           wyreReservationCode: action.payload.wyreReservationCode,
@@ -39,11 +53,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
       case CLEAR_WYRE_CACHE:
         return {
-          ...state,
-          wyreReservationCode: '',
-          wyreHostedUrl: '',
-          wyreReservationSucceeded: false,
-          isProcessingWyreOrder: false,
+          ...INITIAL_STATE,
         }
   }
   return state

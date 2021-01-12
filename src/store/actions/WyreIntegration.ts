@@ -1,12 +1,18 @@
+import { Action } from 'redux'
+import { WyreOrder } from '../reducers/WyreIntegration'
 
 export const FETCH_WYRE_RESERVATION = 'FETCH_WYRE_RESERVATION'
-export const WYRE_RESERVATION_SUCCEEDED = 'WYRE_RESERVATION_SUCCEEDED'
 
 export const FETCH_WYRE_RESERVATION_FAILED = 'FETCH_WYRE_RESERVATION_FAILED'
 export const FETCH_WYRE_RESERVATION_SUCCEEDED = 'FETCH_WYRE_RESERVATION_SUCCEEDED'
 export const FETCH_WYRE_RESERVATION_COMPLETED = 'FETCH_WYRE_RESERVATION_COMPLETED'
 
+export const WYRE_ORDER_FAILED = 'WYRE_ORDER_FAILED'
+export const WYRE_ORDER_SUCCEEDED = 'WYRE_ORDER_SUCCEEDED'
+export const WYRE_ORDER_COMPLETED = 'WYRE_ORDER_COMPLETED'
+
 export const CLEAR_WYRE_CACHE = 'CLEAR_WYRE_CACHE'
+
 
 export enum WyreActionKind {
   AUTHENTICATE,
@@ -17,41 +23,31 @@ export enum WyreActionKind {
   CLEAR_WYRE_CACHE
 }
 
-export const clearWyreCache = ( data ) => {
-  console.log( 'clearWyreCache called ', { 
-    data 
-  } )
+
+export const clearWyreCache = ( ) => {
   return {
     type: CLEAR_WYRE_CACHE,
-    payload: {
-      data
-    }
   }
 }
 
 export const fetchWyreReservation = ( data ) => {
-  console.log( 'fetchWyreReservation called ', { 
-    data 
+  console.log( 'fetchWyreReservation called ', {
+    data
   } )
   return {
     type: FETCH_WYRE_RESERVATION,
     payload: {
-      data 
+      data
     },
   }
 }
 
-export const wyreReservationSucceeded = ( data ) => {
-  return {
-    type: WYRE_RESERVATION_SUCCEEDED, payload: data
-  }
-}
 
 export const fetchWyreReservationCompleted = ( data ) => {
   return {
     type: FETCH_WYRE_RESERVATION_COMPLETED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -60,7 +56,7 @@ export const fetchWyreReservationFailed = ( data ) => {
   return {
     type: FETCH_WYRE_RESERVATION_FAILED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -69,7 +65,49 @@ export const fetchWyreReservationSucceeded = ( data ) => {
   return {
     type: FETCH_WYRE_RESERVATION_SUCCEEDED,
     payload: {
-      fetchWyreReservationDetails: data 
+      fetchWyreReservationDetails: data
     },
+  }
+}
+
+
+export interface WyreOrderSuccessAction extends Action {
+  type: typeof WYRE_ORDER_SUCCEEDED;
+  payload: WyreOrder;
+}
+
+
+export const wyreOrderSucceeded = ( payload: WyreOrder ): WyreOrderSuccessAction => {
+  return {
+    type: WYRE_ORDER_SUCCEEDED,
+    payload,
+  }
+}
+
+
+
+export interface WyreOrderFailureAction extends Action {
+  type: typeof WYRE_ORDER_FAILED;
+  payload: string;
+}
+
+export const wyreOrderFailed = (
+  errorMessage: string
+): WyreOrderFailureAction => {
+  return {
+    type: WYRE_ORDER_FAILED,
+    payload: errorMessage,
+  }
+}
+
+
+
+export interface WyreOrderCompletionAction extends Action {
+  type: typeof WYRE_ORDER_COMPLETED;
+}
+
+export const wyreOrderCompleted = ( ): WyreOrderCompletionAction => {
+  return {
+    type: WYRE_ORDER_COMPLETED,
   }
 }

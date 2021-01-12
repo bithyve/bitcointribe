@@ -16,13 +16,13 @@ export const fetchWyreReservationWatcher = createWatcher(
   FETCH_WYRE_RESERVATION
 )
 
-export function* fetchWyreReservationWorker( { payload } ) {
-  console.log( { 
-    payload 
+function* fetchWyreReservationWorker( { payload } ) {
+  console.log( {
+    payload
   } )
   const wyreResponse = yield call( fetchWyreReservation, payload.data )
-  console.log( { 
-    wyreResponse 
+  console.log( {
+    wyreResponse
   } )
   const { reservation, url, error } = wyreResponse.data
   if( error ) {
