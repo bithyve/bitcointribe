@@ -40,7 +40,7 @@ export default function AppWrapper() {
       configureAPIHeaders();
       await firebase.analytics().setAnalyticsCollectionEnabled(true);
       await crashlytics().setCrashlyticsCollectionEnabled(true);
-    });
+    })();
   }, []);
 
   return (
