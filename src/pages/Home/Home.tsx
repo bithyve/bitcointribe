@@ -113,6 +113,7 @@ const releaseNotificationTopic = getReleaseTopic();
 import { AccountsState } from "../../store/reducers/accounts";
 import HomeAccountCardsList from "./HomeAccountCardsList";
 import AccountShell from "../../common/data/models/AccountShell";
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -173,7 +174,7 @@ interface HomePropsTypes {
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
-  s3Service: any;
+  s3Service: S3Service;
   initializeHealthSetup: any;
   initHealthCheck: any;
   overallHealth: any;
@@ -604,9 +605,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
-    const { healthCheckInitialized } = s3Service.levelhealth;
-    console.log("healthCheckInitialized", healthCheckInitialized);
-    if (!healthCheckInitialized) {
+    console.log('s3Service', s3Service)
+    const { healthCheckInitializedKeeper } = s3Service.levelhealth;
+    console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
+    if (!healthCheckInitializedKeeper) {
       initializeHealthSetup();
       initHealthCheck();
     }
@@ -717,8 +719,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           levelHealthVar.levelInfo[2].status == "accessible" &&
           levelHealthVar.levelInfo[3].status == "accessible"
         ) {
-          for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
-            const element = s3Service.levelhealth.metaShares[i];
+          for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
+            const element = s3Service.levelhealth.metaSharesKeeper[i];
             if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
               secretShare = element;
             }
@@ -1801,7 +1803,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       !this.props.secureAccount.secureHDWallet.xpubs.secondary
     ) {
       this.bottomSheetRef.current?.close();
-      let shareId = s3Service.levelhealth.metaShares[1].shareId;
+      let shareId = s3Service.levelhealth.metaSharesKeeper[1].shareId;
       let share = getKeeperInfoFromShareId(levelHealth, shareId);
       fetchKeeperTrustedChannel(shareId, value.type, share.name);
     }
@@ -1940,7 +1942,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           element.notificationType == "secureXpub" &&
           !secureAccount.secureHDWallet.xpubs.secondary
         ) {
-          let shareId = s3Service.levelhealth.metaShares[1].shareId;
+          let shareId = s3Service.levelhealth.metaSharesKeeper[1].shareId;
           let share = getKeeperInfoFromShareId(levelHealth, shareId);
           fetchKeeperTrustedChannel(
             shareId,

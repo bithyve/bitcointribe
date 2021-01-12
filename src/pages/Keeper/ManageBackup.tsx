@@ -64,6 +64,7 @@ import { MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
 import firebase from "react-native-firebase";
 import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -104,7 +105,7 @@ interface ManageBackupPropsTypes {
   isLevel2Initialized: Boolean;
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
-  s3Service: any;
+  s3Service: S3Service;
   updateMSharesHealth: any;
   keeperInfo: any[];
   sendApprovalRequest: any;
@@ -212,10 +213,10 @@ class ManageBackup extends Component<
     ) {
       let share = getKeeperInfoFromShareId(
         levelHealth,
-        s3Service.levelhealth.metaShares[1].shareId
+        s3Service.levelhealth.metaSharesKeeper[1].shareId
       );
       fetchKeeperTrustedChannel(
-        s3Service.levelhealth.metaShares[1].shareId,
+        s3Service.levelhealth.metaSharesKeeper[1].shareId,
         data.notificationType,
         share.name
       );
@@ -421,13 +422,13 @@ class ManageBackup extends Component<
           reshareVersion: 0,
           status: "notAccessible",
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaShares[3].shareId,
+          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[3].shareId,
           data: {},
         };
         this.setState({
           selectedKeeper: obj,
         });
-        this.sendApprovalRequestToPK(this.state.selectedKeeperType, this.props.s3Service.levelhealth.metaShares[3].shareId);
+        this.sendApprovalRequestToPK(this.state.selectedKeeperType, this.props.s3Service.levelhealth.metaSharesKeeper[3].shareId);
         (this.refs.keeperTypeBottomSheet as any).snapTo(0);
       }
     }
@@ -445,8 +446,8 @@ class ManageBackup extends Component<
           levelInfo[2].status == "accessible" &&
           levelInfo[3].status == "accessible"
         ) {
-          for (let i = 0; i < s3Service.levelhealth.metaShares.length; i++) {
-            const element = s3Service.levelhealth.metaShares[i];
+          for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
+            const element = s3Service.levelhealth.metaSharesKeeper[i];
             if (levelInfo[0].shareId == element.shareId) {
               secretShare = element;
             }

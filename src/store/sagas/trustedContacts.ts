@@ -905,7 +905,7 @@ function* walletCheckInWorker({ payload }) {
     return; // aborting checkIn if walletSync is specifically done in context of trusted-contacts
   }
 
-    const { metaShares, healthCheckStatus } = s3Service.levelhealth; // Fixing error old code is => s3Service.sss
+    const { metaShares, healthCheckStatus } = s3Service.sss; // Fixing error old code is => s3Service.sss
     console.log("metaShares, healthCheckStatus",metaShares, healthCheckStatus);
     const preSyncHCStatus = JSON.stringify({ healthCheckStatus });
   yield put(switchTCLoading('walletCheckIn'));
@@ -987,7 +987,7 @@ function* walletCheckInWorker({ payload }) {
       };
 
       if (preSyncHCStatus !== postSyncHCStatus) {
-        s3Service.levelhealth.healthCheckStatus = healthCheckStatus;
+        s3Service.sss.healthCheckStatus = healthCheckStatus;
         updatedSERVICES = {
           ...updatedSERVICES,
           S3_SERVICE: JSON.stringify(s3Service),

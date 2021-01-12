@@ -17,25 +17,39 @@ export default class S3Service {
   public static fromJSON = (json: string) => {
     const { levelhealth } = JSON.parse(json);
     const { sss } = JSON.parse(json)
+    const mnemonic = sss.mnemonic ? sss.mnemonic : levelhealth.mnemonic;
+    const walletId = sss.walletId ? sss.walletId : levelhealth.walletId;
     const {
-      mnemonic,
       encryptedSecrets,
       shareIDs,
       metaShares,
       healthCheckInitialized,
-      walletId,
       healthCheckStatus,
       pdfHealth,
     }: {
-      mnemonic: string;
       encryptedSecrets: string[];
       shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
-      walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
-    } = sss ? sss : levelhealth;
+    } = sss;
+
+    const {
+      encryptedSecretsKeeper,
+      shareIDsKeeper,
+      metaSharesKeeper,
+      healthCheckInitializedKeeper,
+      healthCheckStatusKeeper,
+      pdfHealthKeeper,
+    }: {
+      encryptedSecretsKeeper: string[];
+      shareIDsKeeper: string[];
+      metaSharesKeeper: MetaShare[];
+      healthCheckInitializedKeeper: boolean;
+      healthCheckStatusKeeper: {};
+      pdfHealthKeeper: {};
+    } = levelhealth;
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
@@ -45,6 +59,12 @@ export default class S3Service {
       walletId,
       healthCheckStatus,
       pdfHealth,
+      encryptedSecretsKeeper,
+      shareIDsKeeper,
+      metaSharesKeeper,
+      healthCheckInitializedKeeper,
+      healthCheckStatusKeeper,
+      pdfHealthKeeper,
     })
   };
 
@@ -62,6 +82,12 @@ export default class S3Service {
       walletId: string;
       healthCheckStatus: {};
       pdfHealth: {};
+      encryptedSecretsKeeper: string[];
+      shareIDsKeeper: string[];
+      metaSharesKeeper: MetaShare[];
+      healthCheckInitializedKeeper: boolean;
+      healthCheckStatusKeeper: {};
+      pdfHealthKeeper: {};
     },
   ) {
     this.levelhealth = new LevelHealth(mnemonic, stateVars);

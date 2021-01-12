@@ -113,7 +113,7 @@ import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
-  const initialized = s3Service.levelhealth.healthCheckInitialized;
+  const initialized = s3Service.levelhealth.healthCheckInitializedKeeper;
 
   if (initialized) return;
   yield put(initLoader(true));
@@ -364,10 +364,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       isChange,
     } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
-    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
     console.log('metaShare createAndUploadOnEFChannelWorker', metaShare);
     let shareIndex = level == 2 ? 1 : 3;
-    if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+    if (selectedShareId && s3Service.levelhealth.metaSharesKeeper.length) {
       if (
         metaShare.findIndex((value) => value.shareId == selectedShareId) > -1
       ) {
@@ -394,7 +394,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       (state) => state.storage.database
     );
 
-    console.log("s3Service", s3Service.levelhealth.metaShares);
+    console.log("s3Service", s3Service.levelhealth.metaSharesKeeper);
 
     let s3ServiceTest: S3Service = yield select(
       (state) => state.accounts[TEST_ACCOUNT].service
@@ -1263,7 +1263,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   let { index } = payload;
 
   const s3Service: S3Service = yield select((state) => state.health.service);
-  if (!s3Service.levelhealth.metaShares.length) return;
+  if (!s3Service.levelhealth.metaSharesKeeper.length) return;
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service
   );
@@ -1277,8 +1277,8 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     (state) => state.storage.database
   );
   let shareIndex = 2;
-  if (payload.shareId && s3Service.levelhealth.metaShares.length) {
-    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+  if (payload.shareId && s3Service.levelhealth.metaSharesKeeper.length) {
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
     if (metaShare.findIndex((value) => value.shareId == payload.shareId) > -1) {
       shareIndex = metaShare.findIndex(
         (value) => value.shareId == payload.shareId
@@ -1551,7 +1551,7 @@ function* generatePDFWorker({ payload }) {
     let storedPDFHealth = yield call(AsyncStorage.getItem, "PDF Health");
     // console.log('/sagas/sss ', {storedPDFHealth})
     if (storedPDFHealth) {
-      const { pdfHealth } = s3Service.levelhealth;
+      const { pdfHealthKeeper } = s3Service.levelhealth;
       storedPDFHealth = JSON.parse(storedPDFHealth);
       storedPDFHealth = {
         ...storedPDFHealth,
@@ -1624,8 +1624,8 @@ function* uploadPdfShareWorker({ payload }) {
 
     if (isReshare) {
       let shareIndex = 1;
-      if (share.shareId && s3Service.levelhealth.metaShares.length) {
-        let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+      if (share.shareId && s3Service.levelhealth.metaSharesKeeper.length) {
+        let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
         if (
           metaShare.findIndex((value) => value.shareId == share.shareId) > -1
         ) {
@@ -1874,9 +1874,9 @@ function* reShareWithSameKeeperWorker({ payload }) {
         let s3Service: S3Service = yield select(
           (state) => state.health.service
         );
-        let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+        let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
         let shareIndex = 3;
-        if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+        if (selectedShareId && s3Service.levelhealth.metaSharesKeeper.length) {
           if (
             metaShare.findIndex((value) => value.shareId == selectedShareId) >
             -1
@@ -2006,10 +2006,10 @@ function* autoShareContactWorker({ payload }) {
       );
       let trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts;
       let s3Service: S3Service = yield select((state) => state.health.service);
-      let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+      let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
       let walletId = s3Service.getWalletId().data.walletId;
       let shareIndex = 3;
-      if (selectedShareId && s3Service.levelhealth.metaShares.length) {
+      if (selectedShareId && s3Service.levelhealth.metaSharesKeeper.length) {
         if (
           metaShare.findIndex((value) => value.shareId == selectedShareId) > -1
         ) {
@@ -2209,7 +2209,7 @@ function* getPDFDataWorker({ payload }) {
     let currentLevel: number = yield select(
       (state) => state.health.currentLevel
     );
-    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
     const keeper: KeeperService = yield select((state) => state.keeper.service);
     // TODO get primaryKeeper shareID
 
@@ -2235,7 +2235,7 @@ function* getPDFDataWorker({ payload }) {
       let shareIndex = 3;
       if (
         shareId &&
-        s3Service.levelhealth.metaShares.length &&
+        s3Service.levelhealth.metaSharesKeeper.length &&
         metaShare.findIndex((value) => value.shareId == shareId) > -1
       ) {
         shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
@@ -2467,12 +2467,12 @@ function* confirmPDFSharedWorker({ payload }) {
     yield put(switchS3LoaderKeeper("pdfDataConfirm"));
     let { shareId } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
-    let metaShare: MetaShare[] = s3Service.levelhealth.metaShares;
+    let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
     let walletId = s3Service.levelhealth.walletId;
     let shareIndex = 3;
     if (
       shareId &&
-      s3Service.levelhealth.metaShares.length &&
+      s3Service.levelhealth.metaSharesKeeper.length &&
       metaShare.findIndex((value) => value.shareId == shareId) > -1
     ) {
       shareIndex = metaShare.findIndex((value) => value.shareId == shareId);

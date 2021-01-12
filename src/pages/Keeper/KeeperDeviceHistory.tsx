@@ -243,7 +243,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"7f2eac0b3f10d4f2182e971b","publicKey":"097487701a8f52ff7176573df0c05f968f06eb75735c2f612433738cd2ab20bf","ephemeralAddress":"ab3d5e3260beca01a9a298a127aacabc1e1372735c4a5b60e9c9976c602e6991","walletName":"dfwsdf"}'
+            ? '{"uuid":"33eb523f03a1554957f2bf4a","publicKey":"77ef9acd05417e312bbdc3f5e18fa31e52e6c9623e34137f7a649808d5c519ec","ephemeralAddress":"c42db49ac16cb311dba3f1364150a4fae0640d4f0a908fa14c10c3b2501ed9c2","walletName":"Sdf"}'
             : '{"uuid":"227450241a48c9a6fdbd8f75","publicKey":"701f1b5db5b7e3d21453f539072e5e23bd736b0175317ad3f56f5b8da6c78fbc","ephemeralAddress":"1d9bbdff8d726dc0bceb616ab5da611be00b917f08ad32fe822c4ef77fa45d64","walletName":"SK"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,

@@ -634,24 +634,24 @@ export default class LevelHealth {
   };
 
   public walletId: string;
-  public shareIDs: string[];
-  public encryptedSecrets: string[];
-  public metaShares: MetaShare[];
-  public healthCheckInitialized: boolean;
-  public pdfHealth: {};
-  public healthCheckStatus: {};
+  public shareIDsKeeper: string[];
+  public encryptedSecretsKeeper: string[];
+  public metaSharesKeeper: MetaShare[];
+  public healthCheckInitializedKeeper: boolean;
+  public pdfHealthKeeper: {};
+  public healthCheckStatusKeeper: {};
   private mnemonic: string;
 
   constructor(
     mnemonic: string,
     stateVars?: {
-      encryptedSecrets: string[];
-      shareIDs: string[];
-      metaShares: MetaShare[];
-      healthCheckInitialized: boolean;
+      encryptedSecretsKeeper: string[];
+      shareIDsKeeper: string[];
+      metaSharesKeeper: MetaShare[];
+      healthCheckInitializedKeeper: boolean;
       walletId: string;
-      healthCheckStatus: {};
-      pdfHealth: {};
+      healthCheckStatusKeeper: {};
+      pdfHealthKeeper: {};
     },
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -665,14 +665,14 @@ export default class LevelHealth {
           .createHash('sha256')
           .update(bip39.mnemonicToSeedSync(this.mnemonic))
           .digest('hex');
-    this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
-    this.shareIDs = stateVars ? stateVars.shareIDs : [];
-    this.metaShares = stateVars ? stateVars.metaShares : [];
-    this.healthCheckInitialized = stateVars
-      ? stateVars.healthCheckInitialized
+    this.encryptedSecretsKeeper = stateVars ? stateVars.encryptedSecretsKeeper : [];
+    this.shareIDsKeeper = stateVars ? stateVars.shareIDsKeeper : [];
+    this.metaSharesKeeper = stateVars ? stateVars.metaSharesKeeper : [];
+    this.healthCheckInitializedKeeper = stateVars
+      ? stateVars.healthCheckInitializedKeeper
       : false;
-    this.healthCheckStatus = stateVars ? stateVars.healthCheckStatus : {};
-    this.pdfHealth = stateVars ? stateVars.pdfHealth : {};
+    this.healthCheckStatusKeeper = stateVars ? stateVars.healthCheckStatusKeeper : {};
+    this.pdfHealthKeeper = stateVars ? stateVars.pdfHealthKeeper : {};
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -727,15 +727,15 @@ export default class LevelHealth {
     messageId: string;
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   } => {
-    if (!this.metaShares.length) {
+    if (!this.metaSharesKeeper.length) {
       throw new Error('Generate MetaShares prior uploading');
     }
 
     // let res: AxiosResponse;
-    this.metaShares[
+    this.metaSharesKeeper[
       shareIndex
     ].meta.guardian = contactName.toLowerCase().trim();
-    const metaShare: MetaShare = this.metaShares[shareIndex];
+    const metaShare: MetaShare = this.metaSharesKeeper[shareIndex];
     const { encryptedMetaShare, key, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
     );
@@ -812,10 +812,10 @@ export default class LevelHealth {
   }> => {
     let res: AxiosResponse;
 
-    if (!this.metaShares.length)
+    if (!this.metaSharesKeeper.length)
       throw new Error('Can not initialize health check; missing MetaShares');
 
-    const metaShares = this.metaShares.slice(0, 3);
+    const metaShares = this.metaSharesKeeper.slice(0, 3);
     try {
       res = await BH_AXIOS.post('checkSharesHealth2', {
         HEXA_ID,
@@ -833,7 +833,7 @@ export default class LevelHealth {
     for (const { shareId, updatedAt } of updates) {
       for (let index = 0; index < metaShares.length; index++) {
         if (metaShares[index] && metaShares[index].shareId === shareId) {
-          this.healthCheckStatus[index] = { shareId, updatedAt };
+          this.healthCheckStatusKeeper[index] = { shareId, updatedAt };
           shareGuardianMapping[index] = {
             shareId,
             updatedAt,
@@ -880,17 +880,17 @@ export default class LevelHealth {
     message: string;
   }> => {
     let levelInfo = [];
-    if (this.metaShares.length) {
+    if (this.metaSharesKeeper.length) {
       levelInfo[0] = {
         shareType: 'cloud',
         updatedAt: 0,
         status: 'notAccessible',
-        shareId: this.metaShares[0].shareId,
+        shareId: this.metaSharesKeeper[0].shareId,
         reshareVersion: 0,
       };
       levelInfo[1] = SecurityQuestionHealth;
-      for (let i = 1; i < this.metaShares.length; i++) {
-        const element = this.metaShares[i];
+      for (let i = 1; i < this.metaSharesKeeper.length; i++) {
+        const element = this.metaSharesKeeper[i];
         let shareType = '';
         if (i == 0) shareType = 'cloud';
         if (i == 1) shareType = 'primaryKeeper';
@@ -939,7 +939,7 @@ export default class LevelHealth {
       bhXpub,
     } = secureAccAssets;
 
-    const shareIDs = this.shareIDs;
+    const shareIDs = this.shareIDsKeeper;
 
     const socialStaticNonPMDD: SocialStaticNonPMDD = {
       secondaryXpub,
@@ -1138,7 +1138,7 @@ export default class LevelHealth {
   ): {
     metaShares: MetaShare[];
   } => {
-    if (!this.encryptedSecrets.length) {
+    if (!this.encryptedSecretsKeeper.length) {
       throw new Error('Can not create MetaShares; missing encryptedSecrets');
     }
 
@@ -1157,7 +1157,7 @@ export default class LevelHealth {
 
     let index = 0;
     let metaShare: MetaShare;
-    for (const encryptedSecret of this.encryptedSecrets) {
+    for (const encryptedSecret of this.encryptedSecretsKeeper) {
       if (index === 0) {
         metaShare = {
           encryptedSecret,
@@ -1190,15 +1190,15 @@ export default class LevelHealth {
         };
       }
 
-      this.metaShares.push(metaShare);
+      this.metaSharesKeeper.push(metaShare);
       index++;
     }
-    if (this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
-      this.metaShares = [];
+    if (this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL) {
+      this.metaSharesKeeper = [];
       throw new Error('Something went wrong while generating metaShares');
     }
 
-    return { metaShares: this.metaShares };
+    return { metaShares: this.metaSharesKeeper };
   };
 
   public createMetaSharesKeeper = (
@@ -1214,7 +1214,7 @@ export default class LevelHealth {
   ): {
     metaShares: MetaShare[];
   } => {
-    if (!this.encryptedSecrets.length) {
+    if (!this.encryptedSecretsKeeper.length) {
       throw new Error('Can not create MetaShares; missing encryptedSecrets');
     }
 
@@ -1234,7 +1234,7 @@ export default class LevelHealth {
     let index = 0;
     let metaShareArray = [];
     let metaShare: MetaShare;
-    for (const encryptedSecret of this.encryptedSecrets) {
+    for (const encryptedSecret of this.encryptedSecretsKeeper) {
       if (index === 1) {
         metaShare = {
           encryptedSecret,
@@ -1269,26 +1269,26 @@ export default class LevelHealth {
       metaShareArray.push(metaShare);
       index++;
     }
-    this.metaShares = metaShareArray;
+    this.metaSharesKeeper = metaShareArray;
     
-     if (level == 2 && this.metaShares.length !== config.SSS_LEVEL1_TOTAL) {
-      this.metaShares = [];
+     if (level == 2 && this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL) {
+      this.metaSharesKeeper = [];
       throw new Error('Something went wrong while generating metaShares');
     }
 
-    if (level == 3 && this.metaShares.length !== config.SSS_LEVEL2_TOTAL) {
-      this.metaShares = [];
+    if (level == 3 && this.metaSharesKeeper.length !== config.SSS_LEVEL2_TOTAL) {
+      this.metaSharesKeeper = [];
       throw new Error('Something went wrong while generating metaShares');
     }
 
-    return { metaShares: this.metaShares };
+    return { metaShares: this.metaSharesKeeper };
   };
 
   public reshareMetaShareKeeper = (index: number) => {
-    this.metaShares[index].meta.reshareVersion =
-    this.metaShares[index].meta.reshareVersion + 1;
-    console.log({ resharing: this.metaShares[index] });
-    return this.metaShares[index];
+    this.metaSharesKeeper[index].meta.reshareVersion =
+    this.metaSharesKeeper[index].meta.reshareVersion + 1;
+    console.log({ resharing: this.metaSharesKeeper[index] });
+    return this.metaSharesKeeper[index];
   };
 
   public restoreMetaSharesKeeper = (
@@ -1300,7 +1300,7 @@ export default class LevelHealth {
       throw new Error('Restoration requires a minimum of 3 metaShares');
     }
 
-    this.metaShares = metaShares;
+    this.metaSharesKeeper = metaShares;
 
     // restoring other assets
 
@@ -1308,10 +1308,10 @@ export default class LevelHealth {
     this.healthCheckInitialized = true;
 
     // enriching pdf health variable if restoration is done via Personal Copy
-    if (this.metaShares[3]) {
+    if (this.metaSharesKeeper[3]) {
       this.createQR(3);
     }
-    if (this.metaShares[4]) {
+    if (this.metaSharesKeeper[4]) {
       this.createQR(4);
     }
 
@@ -1322,7 +1322,7 @@ export default class LevelHealth {
           share.encryptedStaticNonPMDD,
         );
         const { shareIDs } = decryptedStaticNonPMDD;
-        this.shareIDs = shareIDs;
+        this.shareIDsKeeper = shareIDs;
         break;
       }
     }
@@ -1332,7 +1332,7 @@ export default class LevelHealth {
 
   public createQR = (index: number): { qrData: string[] } => {
     const splits: number = config.SSS_METASHARE_SPLITS;
-    const metaString = JSON.stringify(this.metaShares[index]);
+    const metaString = JSON.stringify(this.metaSharesKeeper[index]);
     const slice = Math.trunc(metaString.length / splits);
     const qrData: string[] = [];
 
@@ -1352,10 +1352,10 @@ export default class LevelHealth {
         qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
       }
       if (itr === 0) {
-        this.pdfHealth = {
-          ...this.pdfHealth,
+        this.pdfHealthKeeper = {
+          ...this.pdfHealthKeeper,
           [index]: {
-            shareId: this.metaShares[index].shareId,
+            shareId: this.metaSharesKeeper[index].shareId,
             qrData: qrData[itr],
           },
         };
@@ -1384,9 +1384,9 @@ export default class LevelHealth {
       encryptedSecretsTmp.push(encrypted);
       shareIDs.push(LevelHealth.getShareId(encrypted));
     }
-    this.encryptedSecrets = encryptedSecretsTmp;
-    this.shareIDs = shareIDs; // preserving just the online(relay-transmitted) shareIDs
-    return { encryptedSecrets: this.encryptedSecrets };
+    this.encryptedSecretsKeeper = encryptedSecretsTmp;
+    this.shareIDsKeeper = shareIDs; // preserving just the online(relay-transmitted) shareIDs
+    return { encryptedSecrets: this.encryptedSecretsKeeper };
   };
 
   public encryptWI = (
@@ -1502,16 +1502,16 @@ export default class LevelHealth {
   ) : Promise<{
    data: MetaShare[];
   }> => {
-    for (let i = 0; i < this.metaShares.length; i++) {
-      const element = this.metaShares[i];
+    for (let i = 0; i < this.metaSharesKeeper.length; i++) {
+      const element = this.metaSharesKeeper[i];
       console.log('updateGuardianInMetaShare Guardian name', name)
       if(element.shareId == shareId){
         console.log('updateGuardianInMetaShare element.shareId inside if', shareId);
-        this.metaShares[i].meta.guardian = name.toLowerCase().trim();
+        this.metaSharesKeeper[i].meta.guardian = name.toLowerCase().trim();
       }
     }
-    console.log('updateGuardianInMetaShare outside for', this.metaShares);
-    return {data: this.metaShares};
+    console.log('updateGuardianInMetaShare outside for', this.metaSharesKeeper);
+    return {data: this.metaSharesKeeper};
   }
 
   public static encryptWithAnswer = (
