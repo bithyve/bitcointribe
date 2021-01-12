@@ -8,7 +8,7 @@ import MoreOptionsStack from '../more-options/MoreOptionsStack'
 import AllTransactionsStack from '../transactions/AllTransactionsStack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
-import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/NewWyreAccountDetailsScreen'
+import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 
 
 const MODAL_ROUTES = [
@@ -33,9 +33,9 @@ const HomeStack = createStackNavigator(
       },
     },
     NewWyreAccountDetails: {
-      screen: NewWyreAccountDetailsScreen,
+      screen: WyreOrderFormScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Buy with Wyre'
       }
     },
     AllTransactions: {
