@@ -40,6 +40,7 @@ import {
   REFRESH_ACCOUNT_SHELL,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
+  TWO_FA_VALID,
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -53,8 +54,7 @@ import {
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
 
-// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
-const ACCOUNT_VARS: {
+export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: string;
   balances: {
@@ -83,7 +83,10 @@ const ACCOUNT_VARS: {
     settedup: boolean;
     loading: boolean;
   };
-} = {
+}
+
+// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
+const ACCOUNT_VARS: AccountVars  = {
   service: null,
   receivingAddress: '',
   balances: {
@@ -141,7 +144,11 @@ export type AccountsState = {
   additional?: {
     regular?: any;
     test?: any;
-    secure?: any;
+    secure?: {
+      xprivGenerated?: boolean;
+      twoFAValid?: boolean;
+      twoFAResetted?: boolean;
+    };
   };
 
   isGeneratingNewAccountShell: boolean;
@@ -522,6 +529,16 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           additional: {
             secure: {
               xprivGenerated: action.payload.generated,
+            },
+          },
+        }
+
+      case TWO_FA_VALID:
+        return {
+          ...state,
+          additional: {
+            secure: {
+              twoFAValid: action.payload.isValid,
             },
           },
         }

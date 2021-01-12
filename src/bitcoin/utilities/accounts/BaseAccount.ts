@@ -1,15 +1,13 @@
 import * as bip39 from 'bip39'
-import { Network, TransactionBuilder } from 'bitcoinjs-lib'
+import { Network } from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import { ErrMap } from '../ErrMap'
 import HDSegwitWallet from './HDSegwitWallet'
 import {
   Transactions,
-  INotification,
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  DerivativeAccountTypes,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -20,6 +18,8 @@ export default class BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -378,33 +378,30 @@ export default class BaseAccount {
   };
 
 
-  public updateDerivativeAccount = async (
+  public updateAccountDetails = (
     account: {
       kind: string,
       instanceNumber: number,
       customDescription: string,
       customDisplayName: string
     }
-  ): Promise<
-  | {
-      status: number;
-      data: {
+  ): {
+    status: number;
+    data: {
         updateSuccessful: boolean;
-      };
-      err?: undefined;
-      message?: undefined;
-    }
-  | {
-      status: number;
-      err: any;
-      message: string;
-      data?: undefined;
-    }
-> => {
+    };
+    err?: undefined;
+    message?: undefined;
+  } | {
+    status: number;
+    err: any;
+    message: string;
+    data?: undefined;
+  }  => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.updateDerivativeAccount(
+        data: this.hdWallet.updateAccountDetails(
           account
         ),
       }
