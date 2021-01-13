@@ -1414,7 +1414,8 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
           null,
           null,
           shareUploadables,
-          updatedDB
+          updatedDB,
+          true
         )
       );
     }

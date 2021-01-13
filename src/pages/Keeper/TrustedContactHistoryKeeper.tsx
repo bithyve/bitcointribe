@@ -616,7 +616,7 @@ const TrustedContactHistoryKeeper = (props) => {
           `/${requester}` +
           `/${numberEncPubKey}` +
           `/${numHintType}` +
-          `/${numHint}` +
+          `/${numHint}_keeper` +
           `/${uploadedAt}` +
           `/v${appVersion}`;
         console.log({ numberDL });
@@ -645,7 +645,7 @@ const TrustedContactHistoryKeeper = (props) => {
           `/${requester}` +
           `/${emailEncPubKey}` +
           `/${emailHintType}` +
-          `/${emailHint}` +
+          `/${emailHint}_keeper` +
           `/${uploadedAt}` +
           `/v${appVersion}`;
         console.log({ emailDL });
@@ -669,7 +669,7 @@ const TrustedContactHistoryKeeper = (props) => {
           `/${requester}` +
           `/${otpEncPubKey}` +
           `/${otpHintType}` +
-          `/${otpHint}` +
+          `/${otpHint}_keeper` +
           `/${uploadedAt}` +
           `/v${appVersion}`;
         setIsOTPType(true);
@@ -931,6 +931,7 @@ const TrustedContactHistoryKeeper = (props) => {
                 .initiatedAt,
             type: 'trustedGuardian',
             ver: DeviceInfo.getVersion(),
+            isFromKeeper: true,
           }),
         );
     }

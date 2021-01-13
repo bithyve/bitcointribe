@@ -24,7 +24,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import {
-  approveTrustedContact,
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';

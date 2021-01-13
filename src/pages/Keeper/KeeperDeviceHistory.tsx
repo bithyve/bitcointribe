@@ -243,8 +243,8 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"33eb523f03a1554957f2bf4a","publicKey":"77ef9acd05417e312bbdc3f5e18fa31e52e6c9623e34137f7a649808d5c519ec","ephemeralAddress":"c42db49ac16cb311dba3f1364150a4fae0640d4f0a908fa14c10c3b2501ed9c2","walletName":"Sdf"}'
-            : '{"uuid":"227450241a48c9a6fdbd8f75","publicKey":"701f1b5db5b7e3d21453f539072e5e23bd736b0175317ad3f56f5b8da6c78fbc","ephemeralAddress":"1d9bbdff8d726dc0bceb616ab5da611be00b917f08ad32fe822c4ef77fa45d64","walletName":"SK"}';
+            ? '{"uuid":"3c96b489e61bd74d1f82a236","publicKey":"6e2d9c020e5dcbf5b09b0be7df102436b1fae3db5e547f3a2460aaa61df6d69c","ephemeralAddress":"602ae7c502aaf0a349150cc42434896f26539eaceafb98519210f4ba1a493267","walletName":"MacPro"}'
+            : '{"uuid":"2f760eb3e5ff4b696c2e6cd5","publicKey":"297465943d38886e2854f110821d2edb7b0ab6aa1556934858b7a902bb4c4941","ephemeralAddress":"c34b7e8513bce3a4e43a42870d46ced80ff19a47208a657128f5cae4b22dee5d","walletName":"Mac"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

@@ -53,8 +53,8 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import Toast from '../../components/Toast';
-import { downloadMetaShareWorker } from './sss';
-// import { downloadMetaShareWorker } from './health';
+import { downloadMetaShareWorker as downloadMetaShareWorker } from './sss';
+import { downloadMetaShareWorker as downloadMetaShareWorkerKeeper } from './health';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import DeviceInfo from 'react-native-device-info';
 import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts';
@@ -108,6 +108,7 @@ function* approveTrustedContactWorker({ payload }) {
     contactsPublicKey,
     contactsWalletName,
     isGuardian,
+    isFromKeeper
   } = payload;
 
   let encKey;
@@ -135,6 +136,9 @@ function* approveTrustedContactWorker({ payload }) {
           true,
           trustedContacts,
           uploadXpub,
+          null,
+          null,
+          isFromKeeper,
         ),
       );
     } else {
@@ -332,7 +336,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  const { contactInfo, data, fetch } = payload;
+  const { contactInfo, data, fetch, isFromKeeper } = payload;
 
   let generatedKey = false;
   if (
@@ -470,7 +474,12 @@ function* updateEphemeralChannelWorker({ payload }) {
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       // yield delay(1000); // introducing delay in order to evade database insertion collision
-      yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      if(isFromKeeper){
+        yield call(downloadMetaShareWorkerKeeper, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      } else {
+        yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      }
+      
       Toast('You have been successfully added as a Keeper');
       yield put(trustedContactApproved(contactInfo.contactName, true));
     } else if (payload.uploadXpub) {

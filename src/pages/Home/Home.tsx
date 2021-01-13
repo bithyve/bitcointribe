@@ -392,6 +392,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             type: scannedData.type,
             isQR: true,
             version: scannedData.ver,
+            isFromKeeper: scannedData.isFromKeeper ? scannedData.isFromKeeper : false,
           };
           this.setState(
             {
@@ -1069,6 +1070,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             return;
           }
         }
+        let hint = splits[8];
+        let isFromKeeper = false;
+        if(splits[8].includes('_')){
+          let hintStr = splits[8].split("_");
+          hint = hintStr[0];
+          isFromKeeper = hintStr[1] == 'keeper' ? true : false;
+        }
 
         const trustedContactRequest = {
           isGuardian: ["tcg", "atcg"].includes(splits[4]),
@@ -1077,9 +1085,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           requester: splits[5],
           encryptedKey: splits[6],
           hintType: splits[7],
-          hint: splits[8],
+          hint,
           uploadedAt: splits[9],
           version,
+          isFromKeeper
         };
 
         this.setState(
@@ -1519,6 +1528,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       uploadedAt,
       isRecovery,
       version,
+      isFromKeeper
     } = trustedContactRequest || recoveryRequest;
     const {
       UNDER_CUSTODY,
@@ -1614,7 +1624,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     publicKey,
                     true,
                     requester,
-                    isGuardian
+                    isGuardian,
+                    isFromKeeper
                   );
                 },
                 isGuardian,

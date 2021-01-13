@@ -72,6 +72,7 @@ export default class CloudBackup {
             share: this.share,
           });
         } else {
+          // console.log('createFile');
           this.createFile({});
         }
       });
@@ -269,6 +270,7 @@ export default class CloudBackup {
     share?: any;
   }) => {
     let { result1, googleData, share } = params;
+    // console.log('updateData share', share);
     const { data } = this.dataObject.regularAccount.getWalletId();
     var arr = [];
     var newArray = [];
@@ -308,6 +310,7 @@ export default class CloudBackup {
     if (Platform.OS == 'ios') {
       iCloud.startBackup(JSON.stringify(newArray));
       this.callBack(share);
+      // console.log('Platform.OS share', share)
     } else {
       console.log("GOOGLEDATA", googleData);
       const metaData = {
