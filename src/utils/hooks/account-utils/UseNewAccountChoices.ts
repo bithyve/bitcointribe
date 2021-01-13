@@ -101,6 +101,12 @@ export default function useNewAccountChoices() {
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
+          defaultTitle: 'Wyre Account',
+          defaultDescription: 'Bought using Apple Pay / Credit Card',
+          serviceAccountKind: ServiceAccountKind.WYRE,
+        } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
           defaultTitle: 'FastBitcoins.com',
           defaultDescription: 'Use FastBitcoin Vouchers',
           serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,

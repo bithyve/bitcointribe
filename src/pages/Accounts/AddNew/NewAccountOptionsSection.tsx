@@ -6,6 +6,8 @@ import SubAccountOptionCard from '../../../components/accounts/SubAccountOptionC
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import CardStyles from '../../../common/Styles/Cards.js'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
+import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 
 export interface Props {
   choices: SubAccountDescribing[];
@@ -32,11 +34,24 @@ function isSubAccountCreationSupported( subAccount: SubAccountDescribing ): bool
       case SubAccountKind.DONATION_ACCOUNT:
         return true
       case SubAccountKind.SERVICE:
-        return false
+        return isServiceSubAccountCreationSupported( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
       case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         return false
       case SubAccountKind.FULLY_IMPORTED_WALLET:
         return false
+      default:
+        return false
+  }
+}
+
+function isServiceSubAccountCreationSupported( serviceAccountKind: ServiceAccountKind ): boolean {
+  switch ( serviceAccountKind ) {
+      case ServiceAccountKind.FAST_BITCOINS:
+        return false
+      case ServiceAccountKind.SWAN:
+        return false
+      case ServiceAccountKind.WYRE:
+        return true
       default:
         return false
   }
@@ -61,13 +76,26 @@ function specialTagForChoice( subAccount: SubAccountDescribing ): string | null 
       case SubAccountKind.DONATION_ACCOUNT:
         return 'NEW'
       case SubAccountKind.SERVICE:
-        return 'COMING SOON'
+        return specialTagForServiceChoice( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
       case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         return 'COMING SOON'
       case SubAccountKind.FULLY_IMPORTED_WALLET:
         return 'COMING SOON'
       default:
         return null
+  }
+}
+
+function specialTagForServiceChoice( serviceAccountKind: ServiceAccountKind ): string {
+  switch ( serviceAccountKind ) {
+      case ServiceAccountKind.FAST_BITCOINS:
+        return 'COMING SOON'
+      case ServiceAccountKind.SWAN:
+        return 'COMING SOON'
+      case ServiceAccountKind.WYRE:
+        return 'NEW'
+      default:
+        return 'COMING SOON'
   }
 }
 
