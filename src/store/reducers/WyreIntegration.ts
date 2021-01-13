@@ -14,22 +14,23 @@ export type WyreOrder = {
 export type WyreIntegrationState = {
   wyreReservationCode: string | null;
   wyreHostedUrl: string | null;
-  wyreReservationSucceeded: boolean;
+  hasWyreReservationFetchSucceeded: boolean;
+  hasWyreReservationFetchFailed: boolean;
+  fetchWyreReservationFailedMessage: null;
 
   pendingWyreOrder: WyreOrder | null;
   isProcessingWyreOrder: boolean;
   hasWyreOrderSucceeded: boolean;
 
   isSyncingWyreWallet: boolean;
-  fetchWyreReservationFailed: boolean;
-  fetchWyreReservationFailedMessage: null;
 }
 
 
 const INITIAL_STATE: WyreIntegrationState = {
   wyreReservationCode: null,
   wyreHostedUrl: null,
-  wyreReservationSucceeded: false,
+  hasWyreReservationFetchSucceeded: false,
+  hasWyreReservationFetchFailed: false,
 
   pendingWyreOrder: null,
   isProcessingWyreOrder: false,
@@ -48,7 +49,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           ...state,
           wyreReservationCode: action.payload.wyreReservationCode,
           wyreHostedUrl: action.payload.wyreHostedUrl,
-          wyreReservationSucceeded: true,
+          hasWyreReservationFetchSucceeded: true,
           isProcessingWyreOrder: false,
         }
       case CLEAR_WYRE_CACHE:

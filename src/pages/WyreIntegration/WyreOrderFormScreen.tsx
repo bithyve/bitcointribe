@@ -1,65 +1,61 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native'
 import Colors from '../../common/Colors'
-import FiatCurrencies from '../../common/FiatCurrencies'
 import FormStyles from '../../common/Styles/FormStyles'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import ListStyles from '../../common/Styles/ListStyles'
 import { Input, Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import { addNewAccountShell } from '../../store/actions/accounts'
-import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 import openLink from '../../utils/OpenLink'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { clearWyreCache, fetchWyreReservation } from '../../store/actions/WyreIntegration'
 import { RFValue } from 'react-native-responsive-fontsize'
+import useWyreCurrencyCodeChoices, { WyreCurrencyCodePickerItem } from '../../utils/hooks/wyre-integration/UseWyreCurrencyCodeChoices'
+import useWyreReservationFetchEffect from '../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
 
 export type Props = {
   navigation: any;
 };
 
-
 const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const amountInputRef = useRef<Input>( null )
 
-  const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
-    return navigation.getParam( 'currentSubAccount' )
-  }, [ navigation.state.params ] )
 
-  const { wyreHostedUrl, wyreReservationSucceeded } = useWyreIntegrationState()
+  const { wyreHostedUrl, hasWyreReservationFetchSucceeded } = useWyreIntegrationState()
   const [ amountToBuyValue, setAmountToBuyValue ] = useState( '' )
   const preferredCurrencyCode = useCurrencyCode()
+  const currencyCodeChoices = useWyreCurrencyCodeChoices()
 
-  const [ selectedCurrencyCodeChoice, setSelectedCurrencyCodeChoice ] = useState( {
-    value: preferredCurrencyCode, label: preferredCurrencyCode,
+  const [ selectedCurrencyCodeChoice, setSelectedCurrencyCodeChoice ] = useState<WyreCurrencyCodePickerItem>( {
+    value: preferredCurrencyCode,
+    label: preferredCurrencyCode,
   } )
-
-  const currencyCodeChoices = useMemo( () => {
-    return FiatCurrencies.map( item => {
-      return {
-        value: item.code,
-        label: `${item.symbol} ${item.code}`,
-      }
-    } )
-  }, [ FiatCurrencies ] )
 
   const canProceed = useMemo( () => {
     return (
-      wyreReservationSucceeded &&
+      hasWyreReservationFetchSucceeded &&
       wyreHostedUrl &&
       Boolean( Number( amountToBuyValue ) ) &&
       Number( amountToBuyValue ) > 0
     )
-  }, [ amountToBuyValue, wyreReservationSucceeded, wyreHostedUrl ] )
+  }, [ amountToBuyValue, hasWyreReservationFetchSucceeded, wyreHostedUrl ] )
 
+
+  useWyreReservationFetchEffect( {
+    onSuccess: () => {
+      openLink( wyreHostedUrl )
+    }
+  } )
 
   function handleProceedButtonPress() {
-    openLink( wyreHostedUrl )
+    dispatch( fetchWyreReservation( {
+      amount: amountToBuyValue,
+      currencyCode: selectedCurrencyCodeChoice.value,
+    } ) )
   }
 
   useEffect( () => {
@@ -209,10 +205,6 @@ const styles = StyleSheet.create( {
 
   textInputContainer: {
     marginBottom: 12,
-  },
-
-  footerSection: {
-    paddingHorizontal: 16,
   },
 } )
 

@@ -7,7 +7,8 @@ import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/D
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import { View, Text } from 'react-native'
 import NavStyles from '../../../common/Styles/NavStyles'
-import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/NewWyreAccountDetailsScreen'
+import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 
 
 const AddNewAccountStack = createStackNavigator(
@@ -44,6 +45,12 @@ const AddNewAccountStack = createStackNavigator(
       screen: NewWyreAccountDetailsScreen,
       navigationOptions: {
         title: 'Account Details'
+      }
+    },
+    PlaceWyreOrder: {
+      screen: WyreOrderFormScreen,
+      navigationOptions: {
+        title: 'Buy with Wyre'
       }
     },
     AddNewDonationAccountDetails: {

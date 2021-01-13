@@ -48,7 +48,7 @@ const actionItemKeyExtractor = ( item: ActionMenuItem ) => String( item.kind )
 const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
 
-  const { wyreHostedUrl, wyreReservationSucceeded } = useWyreIntegrationState()
+  const { wyreHostedUrl, hasWyreReservationFetchSucceeded } = useWyreIntegrationState()
   const currencyCode = useCurrencyCode()
 
   useEffect ( ()=>{
@@ -96,7 +96,7 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         data={actionMenuItems}
       />
       <Button
-        onPress = {()=>{( wyreReservationSucceeded &&  wyreHostedUrl )? openLink( wyreHostedUrl ): null}}
+        onPress = {()=>{( hasWyreReservationFetchSucceeded &&  wyreHostedUrl )? openLink( wyreHostedUrl ): null}}
         title = "Buy Now!"
         color = "blue"
       />

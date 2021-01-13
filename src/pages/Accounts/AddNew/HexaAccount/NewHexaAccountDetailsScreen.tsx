@@ -71,7 +71,6 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   }
 
   return (
-    // <View style={styles.rootContainer}>
     <KeyboardAvoidingView
       style={styles.rootContainer}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
