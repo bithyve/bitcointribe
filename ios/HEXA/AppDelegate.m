@@ -49,9 +49,14 @@
 //  [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
 //  [RNFirebaseNotifications configure];
   
-  // Define UNUserNotificationCenter
+   // Define UNUserNotificationCenter
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-  center.delegate = self;
+  
+  [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge)completionHandler:^(BOOL granted, NSError * _Nullable error) {
+    if (granted) {
+      center.delegate = self; 
+    }
+  }];
   
 //  #ifdef FB_SONARKIT_ENABLED
 //    InitializeFlipper(application);
@@ -86,18 +91,10 @@
     // If you'd like to export some custom RCTBridgeModules that are not Expo modules, add them here!
     return extraModules;
 }
-
-
-
-
-
-- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+// Required to register for notifications
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
 {
-#if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-#else
-  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-#endif
+ [RNCPushNotificationIOS didRegisterUserNotificationSettings:notificationSettings];
 }
 
 // Required for the register event.
@@ -116,12 +113,28 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
  [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
 }
-// Required for localNotification event
+// IOS 10+ Required for localNotification event
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
 didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)(void))completionHandler
 {
   [RNCPushNotificationIOS didReceiveNotificationResponse:response];
+  completionHandler();
+}
+
+// IOS 4-10 Required for the localNotification event.
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+ [RNCPushNotificationIOS didReceiveLocalNotification:notification];
+}
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
+  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
 }
 
 @end
