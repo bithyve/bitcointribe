@@ -90,6 +90,9 @@ const releaseNotificationTopic = getReleaseTopic()
 import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -1780,7 +1783,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     navigation.navigate( 'SwanIntegrationScreen' )
                   }
                   else if( type =='wyre' ) {
-                    navigation.navigate( 'WyreIntegrationScreen' )
+                    // const newSubAccount = new ExternalServiceSubAccountInfo( {
+                    //   instanceNumber: 1,
+                    //   defaultTitle: 'Wyre Account',
+                    //   defaultDescription: 'Bought using Apple Pay / Credit Card',
+                    //   serviceAccountKind: ServiceAccountKind.WYRE,
+                    // } )
+                    const newSubAccount = new CheckingSubAccountInfo( {
+                      instanceNumber: 1,
+                      defaultTitle: 'Wyre Account',
+                      defaultDescription: 'Bought using Apple Pay / Credit Card',
+                    } )
+                    // navigation.navigate( 'WyreIntegrationScreen' )
+
+                    navigation.navigate( 'NewWyreAccountDetails', {
+                      currentSubAccount: newSubAccount,
+                    } )
                   }
                 }}
               />

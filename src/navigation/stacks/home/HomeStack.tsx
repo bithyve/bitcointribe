@@ -8,6 +8,7 @@ import MoreOptionsStack from '../more-options/MoreOptionsStack'
 import AllTransactionsStack from '../transactions/AllTransactionsStack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
+import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/NewWyreAccountDetailsScreen'
 
 
 const MODAL_ROUTES = [
@@ -30,6 +31,12 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    NewWyreAccountDetails: {
+      screen: NewWyreAccountDetailsScreen,
+      navigationOptions: {
+        title: 'Account Details'
+      }
     },
     AllTransactions: {
       screen: AllTransactionsStack,

@@ -52,27 +52,20 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const currencyCode = useCurrencyCode()
 
   useEffect ( ()=>{
-    console.log( ' *** Running Once' )
-    dispatch( clearWyreCache( {
-    } ) )
+    dispatch( clearWyreCache() )
   }, [] )
-  useEffect( ()=> {
-    console.log( ' inside useEffect ', { 
-      wyreReservationSucceeded, wyreHostedUrl 
-    } )
-  }, [ wyreReservationSucceeded, wyreHostedUrl ] )
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
     switch ( itemKind ) {
         case WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL:
         // TODO: This would be a call to the "add new AccountShell" action
-        // need to add redux components for   
+        // need to add redux components for
           // dispatch( createWyreAccountShell( {
           // } ) )
           break
         case WyreActionKind.FETCH_WYRE_RESERVATION:
-          console.log( { 
-            itemKind 
+          console.log( {
+            itemKind
           } )
           dispatch( fetchWyreReservation( {
             amount: 100,
@@ -81,12 +74,12 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           break
     }
   }
-  
+
   const renderItem = ( { item: actionMenuItem }: { item: ActionMenuItem } ) => {
     return (
       <ActionMenuListItem
         containerStyle={{
-          marginBottom: 20 
+          marginBottom: 20
         }}
         actionItem={actionMenuItem}
         onItemSelected={() => handleItemSelection( actionMenuItem ) }
