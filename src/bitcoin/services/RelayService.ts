@@ -139,7 +139,7 @@ export default class RelayServices {
   };
 
   public static sendNotifications = async (
-    receivers: { walletId: string; FCMs: string[] }[],
+    receivers: { walletId: string; FCMs?: string[] }[],
     notification: INotification
   ): Promise<
     | {
