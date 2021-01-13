@@ -24,7 +24,6 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TRUSTED_CONTACTS,
   FAST_BITCOINS,
 } from '../../common/constants/serviceTypes'
 import { connect } from 'react-redux'
@@ -46,7 +45,6 @@ import { setCurrencyCode } from '../../store/actions/preferences'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
-//import firebase from 'react-native-firebase'
 import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -92,6 +90,8 @@ import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -115,7 +115,7 @@ interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
   CurrencyCode: string;
-  balances: any;
+  netBalance: number;
   selectedBottomTab: BottomTab | null;
 
   bottomSheetState: BottomSheetState;
@@ -191,8 +191,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
-      balances: {
-      },
+      netBalance: 0,
       selectedBottomTab: null,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
@@ -714,14 +713,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       )
-    } catch (error) { }
+    } catch ( error ) { 
+      // do nothing
+    }
   };
 
   componentDidMount = () => {
     const { navigation } = this.props
 
     this.closeBottomSheet()
-    this.getBalances()
+    this.calculateNetBalance()
 
     this.appStateListener = AppState.addEventListener(
       'change',
@@ -839,7 +840,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if ( prevProps.accountsState.accountShells !== this.props.accountsState.accountShells ) {
-      this.getBalances()
+      this.calculateNetBalance()
       // this.getNewTransactionNotifications()
     }
 
@@ -1158,116 +1159,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  getBalances = () => {
-    const { accountsState } = this.props
+  calculateNetBalance = () => {
+    const { accountShells } = this.props.accountsState
 
-    let testBalance = accountsState[TEST_ACCOUNT].service
-      ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0
+    let totalBalance = 0
+    accountShells.forEach( ( accountShell: AccountShell ) => {
+      if( accountShell.primarySubAccount.sourceKind !== SourceAccountKind.TEST_ACCOUNT )
+        totalBalance += AccountShell.getTotalBalance( accountShell )
+    } )
 
-    const testTransactions = accountsState[TEST_ACCOUNT].service
-      ? accountsState[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : []
-
-    if (!testTransactions.length) testBalance = 10000 // hardcoding t-balance (till t-faucet saga syncs)
-
-    let regularBalance = accountsState[REGULAR_ACCOUNT].service
-      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0
-
-
-    // regular derivative accounts
-    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-      const derivativeAccount =
-        accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
-        ]
-      if (derivativeAccount && derivativeAccount.instance.using) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          if (derivativeAccount[accountNumber].balances) {
-            regularBalance +=
-              derivativeAccount[accountNumber].balances.balance +
-              derivativeAccount[accountNumber].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    let secureBalance = accountsState[SECURE_ACCOUNT].service
-      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
-      : 0
-
-
-    // secure derivative accounts
-    for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-      if (dAccountType === TRUSTED_CONTACTS) continue
-
-      const derivativeAccount =
-        accountsState[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
-        ]
-
-      if (derivativeAccount && derivativeAccount.instance.using) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          if (derivativeAccount[accountNumber].balances) {
-            secureBalance +=
-              derivativeAccount[accountNumber].balances.balance +
-              derivativeAccount[accountNumber].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    // donation transactions
-    let additionalBalances = 0
-
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts =
-        accountsState[serviceType].service[
-          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts
-
-      for (const additionAcc of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[additionAcc]) continue
-
-        for (
-          let index = 1;
-          index <= derivativeAccounts[additionAcc].instance.using;
-          index++
-        ) {
-          const account = derivativeAccounts[additionAcc][index]
-
-          if (account.balances) {
-            additionalBalances +=
-              account.balances.balance + account.balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    const accumulativeBalance =
-      regularBalance + secureBalance + additionalBalances
-
-    this.setState({
-      balances: {
-        testBalance,
-        regularBalance,
-        secureBalance,
-        accumulativeBalance,
-      },
-    })
+    this.setState( {
+      netBalance: totalBalance,
+    } )
   };
 
   onNotificationListOpen = async () => {
@@ -1916,7 +1819,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      balances,
+      netBalance,
       selectedBottomTab,
       notificationData,
       currencyCode,
@@ -1954,7 +1857,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationData={notificationData}
             walletName={walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
-            balances={balances}
+            netBalance={netBalance}
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
             navigation={this.props.navigation}
