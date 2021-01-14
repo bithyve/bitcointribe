@@ -61,7 +61,7 @@ export const fetchWyreReservationFailed = ( data ) => {
   }
 }
 
-export const fetchWyreReservationSucceeded = ( data ) => {
+export const hasWyreReservationFetchSucceeded = ( data ) => {
   return {
     type: FETCH_WYRE_RESERVATION_SUCCEEDED,
     payload: {

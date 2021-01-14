@@ -16,6 +16,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import useWyreCurrencyCodeChoices, { WyreCurrencyCodePickerItem } from '../../utils/hooks/wyre-integration/UseWyreCurrencyCodeChoices'
 import useWyreReservationFetchEffect from '../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
 
+
 export type Props = {
   navigation: any;
 };
@@ -37,19 +38,18 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   const canProceed = useMemo( () => {
     return (
-      hasWyreReservationFetchSucceeded &&
-      wyreHostedUrl &&
       Boolean( Number( amountToBuyValue ) ) &&
       Number( amountToBuyValue ) > 0
     )
-  }, [ amountToBuyValue, hasWyreReservationFetchSucceeded, wyreHostedUrl ] )
+  }, [ amountToBuyValue ] )
 
 
-  useWyreReservationFetchEffect( {
-    onSuccess: () => {
+  useEffect( ()=>{
+    if ( wyreHostedUrl && hasWyreReservationFetchSucceeded && Boolean( Number( amountToBuyValue ) ) &&
+    Number( amountToBuyValue ) > 0 ) {
       openLink( wyreHostedUrl )
     }
-  } )
+  }, [ wyreHostedUrl, hasWyreReservationFetchSucceeded ] )
 
   function handleProceedButtonPress() {
     dispatch( fetchWyreReservation( {

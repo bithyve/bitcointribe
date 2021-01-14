@@ -38,7 +38,6 @@ const INITIAL_STATE: WyreIntegrationState = {
 
 
   isSyncingWyreWallet: false,
-  fetchWyreReservationFailed: false,
   fetchWyreReservationFailedMessage: null,
 }
 
@@ -47,8 +46,8 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case FETCH_WYRE_RESERVATION_SUCCEEDED:
         return {
           ...state,
-          wyreReservationCode: action.payload.wyreReservationCode,
-          wyreHostedUrl: action.payload.wyreHostedUrl,
+          wyreReservationCode: action.payload.fetchWyreReservationDetails.wyreReservationCode,
+          wyreHostedUrl: action.payload.fetchWyreReservationDetails.wyreHostedUrl,
           hasWyreReservationFetchSucceeded: true,
           isProcessingWyreOrder: false,
         }
