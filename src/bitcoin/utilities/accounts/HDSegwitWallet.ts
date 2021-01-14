@@ -219,21 +219,19 @@ export default class HDSegwitWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
-          const donationAcc: DonationDerivativeAccountElements = this
-            .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-          receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
-          break
-
         case SUB_PRIMARY_ACCOUNT:
-          const account = this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][
-            accountNumber
-          ]
+        case WYRE:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const account = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
 
         default:
           receivingAddress = this.receivingAddress
     }
+
+    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
