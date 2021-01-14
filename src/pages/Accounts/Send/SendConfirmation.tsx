@@ -227,7 +227,7 @@ class SendConfirmation extends Component<
 
         const recipient =
           trustedContactsService.tc.trustedContacts[ contactName ]
-        if ( recipient.walletID && recipient.FCMs.length )
+        if ( recipient.walletID )
           receivers.push( {
             walletId: recipient.walletID,
             FCMs: recipient.FCMs,
