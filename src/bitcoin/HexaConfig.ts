@@ -13,7 +13,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
 } from '../common/constants/serviceTypes'
 import PersonalNode from '../common/data/models/PersonalNode'
-
+import _ from 'lodash'
 class HexaConfig {
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://testapi.bithyve.com'
   public MAINNET_BASE_URL: string = Config.BIT_MAINNET_BASE_URL ? Config.BIT_MAINNET_BASE_URL.trim() : 'https://api.bithyve.com'
@@ -102,7 +102,7 @@ class HexaConfig {
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
 
-  public ESPLORA_API_ENDPOINTS = {
+  public BITHYVE_ESPLORA_API_ENDPOINT = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
       MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
@@ -123,7 +123,9 @@ class HexaConfig {
       TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
       BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
     },
-  };
+  }
+  public ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINT ) // current API-endpoints being used
+  public USE_ESPLORA_FALLBACK = false; // BITHYVE_ESPLORA_API_ENDPOINT acts as the fallback(when true)
 
   public RELAY: string;
   public SIGNING_SERVER: string;
@@ -235,7 +237,7 @@ class HexaConfig {
     }
   };
 
-  public connectToPersonalNode =  async ( personalNode: PersonalNode ) => {
+  public connectToPersonalNode =  async ( personalNode: PersonalNode, useFallBack?: boolean ) => {
     const personalNodeURL = personalNode.urlPath
     if( personalNodeURL && personalNode.isConnectionActive ){
       const personalNodeEPs = {
@@ -260,32 +262,14 @@ class HexaConfig {
           ...this.ESPLORA_API_ENDPOINTS,
           TESTNET: personalNodeEPs,
         }
+
+      this.USE_ESPLORA_FALLBACK = useFallBack
     }
   }
 
   public connectToBitHyveNode =  async () => {
-    this.ESPLORA_API_ENDPOINTS = {
-      TESTNET: {
-        MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
-        MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
-        MULTITXN: this.TESTNET_BASE_URL + '/data',
-        MULTIBALANCETXN: this.TESTNET_BASE_URL + '/baltxs',
-        NEWMULTIUTXOTXN: this.TESTNET_BASE_URL + '/nutxotxs',
-        TXN_FEE: this.TESTNET_BASE_URL + '/fee-estimates',
-        TXNDETAILS: this.TESTNET_BASE_URL + '/tx',
-        BROADCAST_TX: this.TESTNET_BASE_URL + '/tx',
-      },
-      MAINNET: {
-        MULTIBALANCE: this.MAINNET_BASE_URL + '/balances',
-        MULTIUTXO: this.MAINNET_BASE_URL + '/utxos',
-        MULTITXN: this.MAINNET_BASE_URL + '/data',
-        MULTIBALANCETXN: this.MAINNET_BASE_URL + '/baltxs',
-        NEWMULTIUTXOTXN: this.MAINNET_BASE_URL + '/nutxotxs',
-        TXN_FEE: this.MAINNET_BASE_URL + '/fee-estimates',
-        TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
-        BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
-      },
-    }
+    this.ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINT )
+    this.USE_ESPLORA_FALLBACK = false
   }
 }
 
