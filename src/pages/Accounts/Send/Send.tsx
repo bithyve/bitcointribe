@@ -46,6 +46,7 @@ import {
   makeContactRecipientDescription,
 } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
 
 export enum SectionKind {
   SCAN_QR,
@@ -217,6 +218,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   updateAccountData = () => {
+    // includes 2FA based accounts post setup validation
+    const is2FAActive = !( this.props.accountsState[ SECURE_ACCOUNT ].service as SecureAccount ).secureHDWallet.twoFASetup
+
     const defaultAccountData = [
       {
         id: REGULAR_ACCOUNT,
@@ -225,17 +229,21 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         checked: false,
         image: require( '../../../assets/images/icons/icon_regular_account.png' ),
       },
-      {
-        id: SECURE_ACCOUNT,
-        account_name: 'Savings Account',
-        type: SECURE_ACCOUNT,
-        checked: false,
-        image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
-      },
     ]
 
+    if( is2FAActive ) defaultAccountData.push( {
+      id: SECURE_ACCOUNT,
+      account_name: 'Savings Account',
+      type: SECURE_ACCOUNT,
+      checked: false,
+      image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
+    } )
+
+    const parentAccounts = [ REGULAR_ACCOUNT ]
+    if( is2FAActive ) parentAccounts.push( SECURE_ACCOUNT )
+
     const additionalAccountData = []
-    for ( const serviceType of [ REGULAR_ACCOUNT, SECURE_ACCOUNT ] ) {
+    for ( const serviceType of parentAccounts ) {
       const derivativeAccounts = this.props.accountsState[ serviceType ].service[
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
       ].derivativeAccounts
