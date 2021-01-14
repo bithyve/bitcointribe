@@ -11,6 +11,7 @@ import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/acc
 import AccountShell from '../../../common/data/models/AccountShell'
 import { mergeAccountShells } from '../../../store/actions/accounts'
 import AccountShellMergeSelectionListHeader from '../../../components/account-settings/merge-account-shells/AccountShellMergeSelectionListHeader'
+import Colors from '../../../common/Colors';
 
 
 export type Props = {
@@ -66,6 +67,8 @@ const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ( { navigation,
         <Button
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
+          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
           title="Confirm & Proceed"
           titleStyle={ButtonStyles.actionButtonText}
           onPress={handleProceedButtonPress}
@@ -88,6 +91,9 @@ const styles = StyleSheet.create( {
     position: 'absolute',
     bottom: 30,
     alignSelf: 'center',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
 } )
 

@@ -174,6 +174,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
               raised
               buttonStyle={ButtonStyles.primaryActionButton}
               title="Proceed"
+              disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
               titleStyle={ButtonStyles.actionButtonText}
               onPress={handleProceedButtonPress}
               disabled={canProceed === false}
@@ -237,6 +239,10 @@ const styles = StyleSheet.create( {
   footerSection: {
     paddingHorizontal: 26,
     alignItems: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 } )
 

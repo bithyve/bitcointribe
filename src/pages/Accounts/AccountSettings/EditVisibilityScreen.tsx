@@ -7,6 +7,8 @@ import { Button } from 'react-native-elements'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
+import Colors from '../../../common/Colors'
+
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { updateSubAccountSettings } from '../../../store/actions/accounts'
@@ -85,6 +87,9 @@ const styles = StyleSheet.create( {
     position: 'absolute',
     bottom: 30,
     alignSelf: 'center',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
 } )
 

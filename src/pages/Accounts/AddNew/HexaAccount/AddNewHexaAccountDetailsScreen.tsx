@@ -10,6 +10,7 @@ import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/acc
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
 import Loader from '../../../../components/loader'
+import Colors from '../../../../common/Colors';
 
 export type Props = {
   navigation: any;
@@ -115,6 +116,8 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
               raised
               buttonStyle={ButtonStyles.primaryActionButton}
               title="Proceed"
+              disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+              disabledTitleStyle={ButtonStyles.actionButtonText}
               titleStyle={ButtonStyles.actionButtonText}
               onPress={handleProceedButtonPress}
               disabled={canProceed === false}
@@ -150,6 +153,10 @@ const styles = StyleSheet.create( {
   footerSection: {
     paddingHorizontal: 16,
     alignItems: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 } )
 

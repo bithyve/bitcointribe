@@ -7,6 +7,7 @@ import useActiveAccountShells from '../../../utils/hooks/state-selectors/account
 import AccountShell from '../../../common/data/models/AccountShell';
 import { accountShellsOrderUpdated } from '../../../store/actions/accounts';
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList';
+import Colors from '../../../common/Colors';
 
 export type Props = {
   navigation: any;
@@ -57,6 +58,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ({
             raised
             buttonStyle={ButtonStyles.primaryActionButton}
             title="Save New Ordering"
+            disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
             titleStyle={ButtonStyles.actionButtonText}
             onPress={handleProceedButtonPress}
           />
@@ -77,6 +80,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     alignSelf: 'center',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
 });
 

@@ -14,6 +14,7 @@ import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccoun
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors';
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -116,6 +117,8 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         <Button
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
+          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
           title="Proceed"
           titleStyle={ButtonStyles.actionButtonText}
           onPress={handleProceedButtonPress}
@@ -208,6 +211,10 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 30,
     paddingBottom: 40,
     alignItems: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 } )
 

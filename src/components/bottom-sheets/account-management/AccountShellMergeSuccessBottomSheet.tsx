@@ -151,6 +151,10 @@ const styles = StyleSheet.create( {
     marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 
   avatarImage: {

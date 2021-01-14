@@ -9,6 +9,7 @@ import CurrentTotalHeader from '../../../../components/account-settings/transact
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList'
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
 import CurrencyKind from '../../../../common/data/enums/CurrencyKind'
+import Colors from '../../../../common/Colors';
 
 export type Props = {
   navigation: any;
@@ -71,6 +72,8 @@ const SelectReassignableTransactionsScreen: React.FC<Props> = ( { navigation, }:
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
           title="Confirm & Proceed"
+          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
           titleStyle={ButtonStyles.actionButtonText}
           onPress={handleProceedButtonPress}
           disabled={canProceed === false}
@@ -91,6 +94,9 @@ const styles = StyleSheet.create( {
     position: 'absolute',
     bottom: 30,
     alignSelf: 'center',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
 } )
 

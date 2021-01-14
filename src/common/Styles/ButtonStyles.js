@@ -32,12 +32,13 @@ const actionButton = {
 const primaryActionButton = {
   ...actionButton,
   backgroundColor: Colors.blue,
-  shadowColor: Colors.blue,
-  shadowOpacity: 0.16,
-  shadowOffset: {
-    width: 10, height: 10
-  },
-  elevation: 5,
+  
+}
+
+const disabledPrimaryActionButton = {
+  ...actionButton,
+  backgroundColor: Colors.lightBlue,
+  
 }
 
 const actionButtonText = {
@@ -51,7 +52,7 @@ const ButtonStyles = StyleSheet.create( {
   actionButton,
   miniNavButton,
   primaryActionButton,
-
+  disabledPrimaryActionButton,
   floatingActionButton: {
     ...primaryActionButton,
     minHeight: 48,

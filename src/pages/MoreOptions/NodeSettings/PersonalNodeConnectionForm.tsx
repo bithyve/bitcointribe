@@ -5,6 +5,7 @@ import FormStyles from '../../../common/Styles/FormStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { Button, Input } from 'react-native-elements'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
+import Colors from '../../../common/Colors';
 
 export type PersonalNodeFormData = {
   ipAddress: string;
@@ -92,6 +93,8 @@ const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
           title="Proceed"
+          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
           titleStyle={ButtonStyles.actionButtonText}
           onPress={handleProceedButtonPress}
           disabled={canProceed === false}
@@ -119,6 +122,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingHorizontal: 26,
     alignItems: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 
 })

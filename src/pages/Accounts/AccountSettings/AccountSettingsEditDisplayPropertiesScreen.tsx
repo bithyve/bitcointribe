@@ -102,6 +102,8 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Button
           raised
           buttonStyle={ButtonStyles.primaryActionButton}
+          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
+          disabledTitleStyle={ButtonStyles.actionButtonText}
           title="Confirm & Proceed"
           titleStyle={ButtonStyles.actionButtonText}
           onPress={handleSaveButtonPress}
@@ -139,6 +141,10 @@ const styles = StyleSheet.create( {
   listFooterSection: {
     // paddingHorizontal: 16,
     alignItems: 'flex-start',
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    elevation: 5
   },
 } )
 
