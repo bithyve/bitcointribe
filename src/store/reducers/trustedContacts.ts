@@ -1,6 +1,6 @@
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { SERVICES_ENRICHED } from '../actions/storage';
-import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { SERVICES_ENRICHED } from '../actions/storage'
+import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes'
 import {
   TRUSTED_CONTACT_INITIALIZED,
   TRUSTED_CONTACT_APPROVED,
@@ -12,16 +12,16 @@ import {
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
   APPROVE_TRUSTED_CONTACT,
-} from '../actions/trustedContacts';
+} from '../actions/trustedContacts'
 import {
   EphemeralData,
   EphemeralDataElements,
-} from '../../bitcoin/utilities/Interface';
+} from '../../bitcoin/utilities/Interface'
 import {
   UPDATE_ADDRESS_BOOK_LOCALLY,
   UPDATE_TRUSTED_CONTACT_INFO,
-} from '../constants';
-import { chain } from 'icepick';
+} from '../constants'
+import { chain } from 'icepick'
 
 const initialState: {
   service: TrustedContactsService;
@@ -66,127 +66,129 @@ const initialState: {
   },
   addressBook: null,
   trustedContactsInfo: null,
-};
+}
 
-export default (state = initialState, action) => {
-  switch (action.type) {
-    case SERVICES_ENRICHED:
-      return {
-        ...state,
-        service: action.payload.services[TRUSTED_CONTACTS],
-        serviceEnriched: true,
-      };
+export default ( state = initialState, action ) => {
+  switch ( action.type ) {
+      case SERVICES_ENRICHED:
+        return {
+          ...state,
+          service: action.payload.services[ TRUSTED_CONTACTS ],
+          serviceEnriched: true,
+        }
 
-    case TRUSTED_CONTACT_INITIALIZED:
-      return {
-        ...state,
-        initializedTrustedContacts: {
-          ...state.initializedTrustedContacts,
-          [action.payload.contactName]: { publicKey: action.payload.publicKey },
-        },
-      };
-
-    case APPROVE_TRUSTED_CONTACT:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          approvingTrustedContact: true,
-        },
-      };
-
-    case TRUSTED_CONTACT_APPROVED:
-      return {
-        ...state,
-        approvedTrustedContacts: {
-          ...state.approvedTrustedContacts,
-          [action.payload.contactName]: {
-            approved: action.payload.approved,
+      case TRUSTED_CONTACT_INITIALIZED:
+        return {
+          ...state,
+          initializedTrustedContacts: {
+            ...state.initializedTrustedContacts,
+            [ action.payload.contactName ]: {
+              publicKey: action.payload.publicKey 
+            },
           },
-        },
-        loading: {
-          ...state.loading,
-          approvingTrustedContact: false,
-        },
-      };
+        }
 
-    case EPHEMERAL_CHANNEL_UPDATED:
-      return {
-        ...state,
-        ephemeralChannel: {
-          ...state.ephemeralChannel,
-          [action.payload.contactName]: {
-            updated: action.payload.updated,
-            data: action.payload.data,
+      case APPROVE_TRUSTED_CONTACT:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: true,
           },
-        },
-      };
+        }
 
-    case EPHEMERAL_CHANNEL_FETCHED:
-      return {
-        ...state,
-        ephemeralChannel: {
-          ...state.ephemeralChannel,
-          [action.payload.contactName]: {
-            data: action.payload.data,
+      case TRUSTED_CONTACT_APPROVED:
+        return {
+          ...state,
+          approvedTrustedContacts: {
+            ...state.approvedTrustedContacts,
+            [ action.payload.contactName ]: {
+              approved: action.payload.approved,
+            },
           },
-        },
-      };
-
-    case TRUSTED_CHANNEL_UPDATED:
-      return {
-        ...state,
-        trustedChannel: {
-          ...state.trustedChannel,
-          [action.payload.contactName]: {
-            updated: action.payload.updated,
-            data: action.payload.data,
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: false,
           },
-        },
-      };
+        }
 
-    case TRUSTED_CHANNEL_FETCHED:
-      return {
-        ...state,
-        trustedChannel: {
-          ...state.trustedChannel,
-          [action.payload.contactName]: {
-            data: action.payload.data,
+      case EPHEMERAL_CHANNEL_UPDATED:
+        return {
+          ...state,
+          ephemeralChannel: {
+            ...state.ephemeralChannel,
+            [ action.payload.contactName ]: {
+              updated: action.payload.updated,
+              data: action.payload.data,
+            },
           },
-        },
-      };
+        }
 
-    case PAYMENT_DETAILS_FETCHED:
-      return {
-        ...state,
-        paymentDetails: action.payload.paymentDetails,
-      };
+      case EPHEMERAL_CHANNEL_FETCHED:
+        return {
+          ...state,
+          ephemeralChannel: {
+            ...state.ephemeralChannel,
+            [ action.payload.contactName ]: {
+              data: action.payload.data,
+            },
+          },
+        }
 
-    case CLEAR_PAYMENT_DETAILS:
-      return {
-        ...state,
-        paymentDetails: null,
-      };
+      case TRUSTED_CHANNEL_UPDATED:
+        return {
+          ...state,
+          trustedChannel: {
+            ...state.trustedChannel,
+            [ action.payload.contactName ]: {
+              updated: action.payload.updated,
+              data: action.payload.data,
+            },
+          },
+        }
 
-    case SWITCH_TC_LOADING:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          [action.payload.beingLoaded]: !state.loading[
-            action.payload.beingLoaded
-          ],
-        },
-      };
+      case TRUSTED_CHANNEL_FETCHED:
+        return {
+          ...state,
+          trustedChannel: {
+            ...state.trustedChannel,
+            [ action.payload.contactName ]: {
+              data: action.payload.data,
+            },
+          },
+        }
 
-    case UPDATE_ADDRESS_BOOK_LOCALLY:
-      return chain(state).setIn(['addressBook'], action.payload).value();
+      case PAYMENT_DETAILS_FETCHED:
+        return {
+          ...state,
+          paymentDetails: action.payload.paymentDetails,
+        }
 
-    case UPDATE_TRUSTED_CONTACT_INFO:
-      return chain(state)
-        .setIn(['trustedContactsInfo'], action.payload.trustedContactInfo)
-        .value();
+      case CLEAR_PAYMENT_DETAILS:
+        return {
+          ...state,
+          paymentDetails: null,
+        }
+
+      case SWITCH_TC_LOADING:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            [ action.payload.beingLoaded ]: !state.loading[
+              action.payload.beingLoaded
+            ],
+          },
+        }
+
+      case UPDATE_ADDRESS_BOOK_LOCALLY:
+        return chain( state ).setIn( [ 'addressBook' ], action.payload ).value()
+
+      case UPDATE_TRUSTED_CONTACT_INFO:
+        return chain( state )
+          .setIn( [ 'trustedContactsInfo' ], action.payload.trustedContactInfo )
+          .value()
   }
 
-  return state;
-};
+  return state
+}
