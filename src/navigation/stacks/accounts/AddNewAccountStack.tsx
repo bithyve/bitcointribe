@@ -47,12 +47,6 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Account Details'
       }
     },
-    PlaceWyreOrder: {
-      screen: WyreOrderFormScreen,
-      navigationOptions: {
-        title: 'Buy with Wyre'
-      }
-    },
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {

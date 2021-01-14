@@ -55,8 +55,8 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     nameInputRef.current?.focus()
   }, [] )
 
-  // TODO: We need a bit more design clarity about what to do after new
-  // account creation succeeds or fails.
+  // TODO: We need a bit more design clarity about what to do if
+  // account creation fails here.
   useAccountShellCreationCompletionEffect( () => {
     console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )

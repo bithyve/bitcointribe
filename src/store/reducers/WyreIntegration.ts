@@ -1,7 +1,8 @@
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import {
   FETCH_WYRE_RESERVATION_SUCCEEDED,
-  CLEAR_WYRE_CACHE
+  CLEAR_WYRE_CACHE,
+  FETCH_WYRE_RESERVATION_COMPLETED
 
 } from '../actions/WyreIntegration'
 
@@ -50,6 +51,12 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           wyreHostedUrl: action.payload.fetchWyreReservationDetails.wyreHostedUrl,
           hasWyreReservationFetchSucceeded: true,
           isProcessingWyreOrder: false,
+        }
+      case FETCH_WYRE_RESERVATION_COMPLETED:
+        return {
+          ...state,
+          hasWyreReservationFetchSucceeded: false,
+          hasWyreReservationFetchFailed: false,
         }
       case CLEAR_WYRE_CACHE:
         return {

@@ -2,7 +2,7 @@ import { call, put, select } from 'redux-saga/effects'
 
 import {
   FETCH_WYRE_RESERVATION,
-  hasWyreReservationFetchSucceeded,
+  fetchWyreReservationSucceeded,
 } from '../actions/WyreIntegration'
 
 import {
@@ -24,7 +24,7 @@ export const fetchWyreReservationWatcher = createWatcher(
 
 function* fetchWyreReservationWorker( { payload } ) {
   const { amount, currencyCode, country, instance, sourceKind } = payload
-  
+
   let service: RegularAccount| SecureAccount
   switch ( sourceKind ) {
       case SourceAccountKind.SECURE_ACCOUNT:
@@ -45,12 +45,12 @@ function* fetchWyreReservationWorker( { payload } ) {
   } )
   const { reservation, url, error } = wyreResponse.data
   if( error ) {
-    yield put( hasWyreReservationFetchSucceeded( {
+    yield put( fetchWyreReservationSucceeded( {
       wyreReservationCode: null,
       wyreHostedUrl: null,
     } ) )
   }
-  yield put( hasWyreReservationFetchSucceeded( {
+  yield put( fetchWyreReservationSucceeded( {
     wyreReservationCode: reservation,
     wyreHostedUrl: url
   } ) )

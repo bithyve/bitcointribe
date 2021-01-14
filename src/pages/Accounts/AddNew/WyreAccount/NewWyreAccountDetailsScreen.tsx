@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-import FiatCurrencies from '../../../../common/FiatCurrencies'
 import FormStyles from '../../../../common/Styles/FormStyles'
 import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
@@ -11,6 +10,9 @@ import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/acc
 import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useWyreIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
+import { fetchWyreReservation } from '../../../../store/actions/WyreIntegration'
+import useWyreReservationFetchEffect from '../../../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
+import openLink from '../../../../utils/OpenLink'
 
 export type Props = {
   navigation: any;
@@ -23,18 +25,17 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
-  const { wyreHostedUrl, hasWyreReservationFetchSucceeded } = useWyreIntegrationState()
+  const { wyreHostedUrl } = useWyreIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
-  const [ amountToBuyValue ] = useState( '' )
 
   const canProceed = useMemo( () => {
     return (
       accountName.length > 0 &&
       accountDescription.length > 0
     )
-  }, [ accountName, accountDescription, amountToBuyValue ] )
+  }, [ accountName, accountDescription, ] )
 
 
   function handleProceedButtonPress() {
@@ -45,10 +46,12 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   }
 
   useAccountShellCreationCompletionEffect( () => {
-    if ( hasWyreReservationFetchSucceeded && wyreHostedUrl ) {
-      navigation.navigate( 'PlaceWyreOrder', {
-        currentSubAccount,
-      } )
+    dispatch( fetchWyreReservation() )
+  } )
+
+  useWyreReservationFetchEffect( {
+    onSuccess: () => {
+      openLink( wyreHostedUrl )
     }
   } )
 
@@ -101,7 +104,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               <Button
                 raised
                 buttonStyle={ButtonStyles.primaryActionButton}
-                title="Proceed"
+                title="Proceed to Wyre"
                 titleStyle={ButtonStyles.actionButtonText}
                 onPress={handleProceedButtonPress}
                 disabled={canProceed === false}
@@ -151,7 +154,7 @@ const styles = StyleSheet.create( {
 
   footerSection: {
     paddingHorizontal: 16,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
 } )
 

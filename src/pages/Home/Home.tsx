@@ -92,7 +92,6 @@ import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -140,7 +139,10 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
   exchangeRates?: any[];
+
   accountsState: AccountsState;
+  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -1782,18 +1784,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   else if( type =='swan' ) {
                     navigation.navigate( 'SwanIntegrationScreen' )
                   }
-                  else if( type =='wyre' ) {
-                    const newSubAccount = new ExternalServiceSubAccountInfo( {
-                      instanceNumber: 1,
-                      defaultTitle: 'Wyre Account',
-                      defaultDescription: 'Bought using Apple Pay / Credit Card',
-                      serviceAccountKind: ServiceAccountKind.WYRE,
-                    } )
-                    // navigation.navigate( 'WyreIntegrationScreen' )
+                  else if ( type =='wyre' ) {
+                    if ( this.props.currentWyreSubAccount ) {
+                      navigation.navigate( 'PlaceWyreOrder', {
+                        currentSubAccount: this.props.currentWyreSubAccount
+                      } )
+                    } else {
+                      const newSubAccount = new ExternalServiceSubAccountInfo( {
+                        instanceNumber: 1,
+                        defaultTitle: 'Wyre Account',
+                        defaultDescription: 'Bought using Apple Pay / Credit Card',
+                        serviceAccountKind: ServiceAccountKind.WYRE,
+                      } )
 
-                    navigation.navigate( 'PlaceWyreOrder', {
-                      currentSubAccount: newSubAccount,
-                    } )
+                      navigation.navigate( 'NewWyreAccountDetails', {
+                        currentSubAccount: newSubAccount,
+                      } )
+                    }
                   }
                 }}
               />
@@ -2058,6 +2065,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
+    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
