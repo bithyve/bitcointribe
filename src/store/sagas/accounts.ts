@@ -1247,13 +1247,22 @@ function* refreshAccountShellWorker( { payload } ) {
   const { primarySubAccount } = shell
   const options: { autoSync?: boolean } = payload.options
 
-  let accountKind: any = primarySubAccount.kind
-  if (
-    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
-    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
-  )
-    if ( primarySubAccount.instanceNumber )
-      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+  let accountKind
+  switch( primarySubAccount.kind ){
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        if ( primarySubAccount.instanceNumber )
+          accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        else accountKind = primarySubAccount.kind
+        break
+
+      case SubAccountKind.SERVICE:
+        accountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+        break
+
+      default:
+        accountKind = primarySubAccount.kind
+  }
 
   if ( options && options.autoSync ) {
     // auto-refresh the account-shell once per-session
@@ -1288,16 +1297,11 @@ function* refreshAccountShellWorker( { payload } ) {
         payload 
       } )
     } else {
-      console.log( '***-> refreshAccountShellWorker in else ', primarySubAccount )
-      const payload = ( primarySubAccount.kind===SubAccountKind.SERVICE )
-        ?
-        {
-          serviceType: SubAccountKind.REGULAR_ACCOUNT,
-          accountType: accountKind,
-          accountNumber: primarySubAccount.instanceNumber,
-        }
-        :
-        ''
+      const payload = {
+        serviceType: primarySubAccount.sourceKind,
+        accountType: accountKind,
+        accountNumber: primarySubAccount.instanceNumber,
+      }
       yield call( fetchDerivativeAccBalanceTxWorker, {
         payload 
       } )
