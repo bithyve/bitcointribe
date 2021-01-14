@@ -16,6 +16,8 @@ import {
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccount,
   SubPrimaryDerivativeAccountElements,
+  WyreDerivativeAccount,
+  WyreDerivativeAccountElements,
 } from '../Interface'
 import axios, { AxiosResponse } from 'axios'
 import {
@@ -1012,12 +1014,10 @@ export default class HDSegwitWallet extends Bitcoin {
     accountId: string;
     accountNumber: number;
   } => {
-    console.log( '***-> Made it to setupDerivativeAccount ', accountType, accountDetails )
     let accountId: string
     let accountNumber: number
     switch ( accountType ) {
         case SUB_PRIMARY_ACCOUNT:
-        case WYRE:
           const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
             .derivativeAccounts[ accountType ]
           const inUse = subPrimaryAccounts.instance.using
@@ -1034,6 +1034,24 @@ export default class HDSegwitWallet extends Bitcoin {
             accountNumber
           ] = updatedSubPrimInstance
           accountId = updatedSubPrimInstance.xpubId
+          break
+
+        case WYRE:
+          const wyreAccounts: WyreDerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          accountNumber = wyreAccounts.instance.using + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const wyreInstance: WyreDerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const updatedWyreInstance = {
+            ...wyreInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = updatedWyreInstance
+          accountId = updatedWyreInstance.xpubId
           break
     }
 

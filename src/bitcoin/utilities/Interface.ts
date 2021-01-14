@@ -238,6 +238,22 @@ export interface SubPrimaryDerivativeAccount {
   };
   [accounts: number]: SubPrimaryDerivativeAccountElements;
 }
+
+export interface WyreDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface WyreDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: WyreDerivativeAccountElements;
+}
+
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount
