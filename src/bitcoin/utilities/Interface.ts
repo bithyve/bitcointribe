@@ -164,6 +164,7 @@ export enum DerivativeAccountTypes {
   FAST_BITCOINS = 'FAST_BITCOINS',
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  WYRE = 'WYRE'
 }
 
 // Base Dervative Account

@@ -24,6 +24,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -1011,10 +1012,12 @@ export default class HDSegwitWallet extends Bitcoin {
     accountId: string;
     accountNumber: number;
   } => {
+    console.log( '***-> Made it to setupDerivativeAccount ', accountType, accountDetails )
     let accountId: string
     let accountNumber: number
     switch ( accountType ) {
         case SUB_PRIMARY_ACCOUNT:
+        case WYRE:
           const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
             .derivativeAccounts[ accountType ]
           const inUse = subPrimaryAccounts.instance.using
