@@ -2,7 +2,7 @@ import { call, put } from 'redux-saga/effects'
 
 import {
   FETCH_WYRE_RESERVATION,
-  wyreReservationSucceeded,
+  hasWyreReservationFetchSucceeded,
 } from '../actions/WyreIntegration'
 
 import {
@@ -26,12 +26,12 @@ function* fetchWyreReservationWorker( { payload } ) {
   } )
   const { reservation, url, error } = wyreResponse.data
   if( error ) {
-    yield put( wyreReservationSucceeded( {
+    yield put( hasWyreReservationFetchSucceeded( {
       wyreReservationCode: null,
       wyreHostedUrl: null,
     } ) )
   }
-  yield put( wyreReservationSucceeded( {
+  yield put( hasWyreReservationFetchSucceeded( {
     wyreReservationCode: reservation,
     wyreHostedUrl: url
   } ) )

@@ -1796,7 +1796,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     } )
                     // navigation.navigate( 'WyreIntegrationScreen' )
 
-                    navigation.navigate( 'NewWyreAccountDetails', {
+                    navigation.navigate( 'PlaceWyreOrder', {
                       currentSubAccount: newSubAccount,
                     } )
                   }

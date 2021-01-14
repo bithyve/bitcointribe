@@ -6,7 +6,7 @@ export default function useWyreIntegrationResultFromAction( actionKind: WyreActi
   const wyreIntegrationState = useWyreIntegrationState()
   return useMemo( () => {
     switch ( actionKind ) {
-      
+
         /*
         // commenting this while create wyre shell redux code is ready
         case WyreActionKind.CREATE_WYRE_ACCOUNT_SHELL:
@@ -21,10 +21,10 @@ export default function useWyreIntegrationResultFromAction( actionKind: WyreActi
         case WyreActionKind.FETCH_WYRE_RESERVATION:
           if ( wyreIntegrationState.isProcessingWyreOrder ) {
             return 'In Progress'
-          } else if ( wyreIntegrationState.fetchWyreReservationFailed ) {
+          } else if ( wyreIntegrationState.hasWyreReservationFetchFailed ) {
             return `Failed. Message: ${wyreIntegrationState.fetchWyreReservationFailedMessage}`
           } else {
-            return `Succeed. Result: ${wyreIntegrationState.wyreReservationSucceeded}`
+            return `Succeed. Result: ${wyreIntegrationState.hasWyreReservationFetchSucceeded}`
           }
     }
   }, [ actionKind, wyreIntegrationState ] )

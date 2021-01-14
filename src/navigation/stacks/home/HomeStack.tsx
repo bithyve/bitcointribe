@@ -32,7 +32,7 @@ const HomeStack = createStackNavigator(
         header: null,
       },
     },
-    NewWyreAccountDetails: {
+    PlaceWyreOrder: {
       screen: WyreOrderFormScreen,
       navigationOptions: {
         title: 'Buy with Wyre'
