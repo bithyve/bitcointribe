@@ -18,7 +18,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
 import { useDispatch, useSelector } from 'react-redux';
-
 import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
 const currencyCode = [
   'BRL',
@@ -37,6 +36,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
@@ -68,6 +68,7 @@ const HomeHeader = ({
 }) => {
 
   const dispatch = useDispatch();
+  const s3Service: S3Service = useSelector((state) => state.health.service);
   const currencyKind: CurrencyKind = useCurrencyKind();
 
   const prefersBitcoin = useMemo(() => {
@@ -75,27 +76,15 @@ const HomeHeader = ({
   }, [currencyKind]);
 
   const getMessage = (health, keeper) => {
-    if(!health){
-      return (
-        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
-          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
-            Add Keeper
-          </Text>
-          <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}> to improve health</Text>
-        </View>
-      );
+    let boldMessage = '';
+    let normalMessage = ' to improve health'
+    if(!s3Service.levelhealth.healthCheckInitializedKeeper) boldMessage = 'Upgrade Backup'
+    else if(!health) boldMessage = 'Add Keeper';
+    else if(health=='ugly') {
+      boldMessage = keeper;
+      normalMessage = ' needs your attention';
     }
-    else if(health=='ugly'){
-      return (
-        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
-          <Text style={styles.manageBackupMessageTextHighlight}>
-            {keeper}
-          </Text>
-          <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}> needs your attention</Text>
-        </View>
-      );
-    }
-    else if(health=='good'){
+    if(health=='good'){
       return (
         <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
           <Text style={styles.manageBackupMessageText}>Your wallet is now </Text>
@@ -103,6 +92,14 @@ const HomeHeader = ({
         </View>
       );
     }
+    return (
+      <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
+        <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
+          {boldMessage}
+        </Text>
+        <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}>{normalMessage}</Text>
+      </View>
+    );
   };
   
   return (
@@ -197,9 +194,6 @@ const HomeHeader = ({
               {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
-          {/* <MessageAsPerHealth
-            health={overallHealth ? (overallHealth as any).overallStatus : 0}
-          /> */}
         </View>
       </View>
       <View
@@ -230,8 +224,8 @@ const HomeHeader = ({
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            // navigation.navigate('ManageBackupUpgradeSecurity');
-            navigation.navigate('ManageBackupKeeper');
+            navigation.navigate('ManageBackupUpgradeSecurity');
+            // navigation.navigate('ManageBackupKeeper');
             // navigation.navigate('ManageBackup');
           }}
           style={styles.manageBackupMessageView}
