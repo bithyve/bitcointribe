@@ -67,10 +67,10 @@ const WyreIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           console.log( {
             itemKind
           } )
-          dispatch( fetchWyreReservation( {
-            amount: 100,
-            currencyCode: currencyCode
-          } ) )
+          dispatch( fetchWyreReservation( 
+            100,
+            currencyCode
+          ) )
           break
     }
   }

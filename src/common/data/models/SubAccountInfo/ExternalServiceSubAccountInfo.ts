@@ -67,6 +67,9 @@ implements ExternalServiceSubAccountDescribing {
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription
     this.isTFAEnabled = isTFAEnabled
+    this.sourceKind = isTFAEnabled
+      ? SourceAccountKind.SECURE_ACCOUNT
+      : SourceAccountKind.REGULAR_ACCOUNT
     this.visibility = visibility
     this.transactions = transactions
     this.utxoCompatibilityGroup = utxoCompatibilityGroup

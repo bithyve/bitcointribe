@@ -2,7 +2,6 @@ import SubAccountKind from '../../enums/SubAccountKind'
 import ServiceAccountKind from '../../enums/ServiceAccountKind'
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
 import AccountVisibility from '../../enums/AccountVisibility'
-import { ImageSourcePropType } from 'react-native'
 import {
   Balances,
   TransactionDetails,
@@ -13,7 +12,7 @@ interface SubAccountDescribing {
   id: string;
   accountShellID: string | null;
 
-  readonly kind: SubAccountKind;
+  readonly kind: SubAccountKind; 
 
   /**
    * Instance number(backend) for a particular SubAccountKind

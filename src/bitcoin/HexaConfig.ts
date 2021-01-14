@@ -157,6 +157,14 @@ class HexaConfig {
     },
   };
 
+  public WYRE: DerivativeAccount = {
+    series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
+    instance: {
+      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
+      using: 0,
+    },
+  };
+
   public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
@@ -174,20 +182,13 @@ class HexaConfig {
     },
   };
 
-  public WYRE: DonationDerivativeAccount = {
-    series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
-    instance: {
-      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
-      using: 0,
-    },
-  };
 
   public DERIVATIVE_ACC: DerivativeAccounts = {
     SUB_PRIMARY_ACCOUNT: this.SUB_PRIMARY_ACCOUNT,
     FAST_BITCOINS: this.FAST_BITCOINS,
+    WYRE: this.WYRE,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
-    WYRE: this.WYRE,
   };
 
   public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE ];

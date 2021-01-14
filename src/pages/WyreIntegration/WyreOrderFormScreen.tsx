@@ -52,10 +52,10 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }, [ wyreHostedUrl, hasWyreReservationFetchSucceeded ] )
 
   function handleProceedButtonPress() {
-    dispatch( fetchWyreReservation( {
-      amount: amountToBuyValue,
-      currencyCode: selectedCurrencyCodeChoice.value,
-    } ) )
+    dispatch( fetchWyreReservation(
+      amountToBuyValue,
+      selectedCurrencyCodeChoice.value,
+    ) )
   }
 
   useEffect( () => {

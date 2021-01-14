@@ -1,4 +1,5 @@
 import { Action } from 'redux'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { WyreOrder } from '../reducers/WyreIntegration'
 
 export const FETCH_WYRE_RESERVATION = 'FETCH_WYRE_RESERVATION'
@@ -30,14 +31,11 @@ export const clearWyreCache = ( ) => {
   }
 }
 
-export const fetchWyreReservation = ( data ) => {
-  console.log( 'fetchWyreReservation called ', {
-    data
-  } )
+export const fetchWyreReservation = ( amount, currencyCode, country?, instance?: number, sourceKind?: SourceAccountKind ) => {
   return {
     type: FETCH_WYRE_RESERVATION,
     payload: {
-      data
+      amount, currencyCode, country, instance, sourceKind
     },
   }
 }

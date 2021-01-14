@@ -1783,16 +1783,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     navigation.navigate( 'SwanIntegrationScreen' )
                   }
                   else if( type =='wyre' ) {
-                    // const newSubAccount = new ExternalServiceSubAccountInfo( {
-                    //   instanceNumber: 1,
-                    //   defaultTitle: 'Wyre Account',
-                    //   defaultDescription: 'Bought using Apple Pay / Credit Card',
-                    //   serviceAccountKind: ServiceAccountKind.WYRE,
-                    // } )
-                    const newSubAccount = new CheckingSubAccountInfo( {
+                    const newSubAccount = new ExternalServiceSubAccountInfo( {
                       instanceNumber: 1,
                       defaultTitle: 'Wyre Account',
                       defaultDescription: 'Bought using Apple Pay / Credit Card',
+                      serviceAccountKind: ServiceAccountKind.WYRE,
                     } )
                     // navigation.navigate( 'WyreIntegrationScreen' )
 

@@ -8,6 +8,8 @@ import {
   DonationDerivativeAccount,
   SubPrimaryDerivativeAccount,
   SubPrimaryDerivativeAccountElements,
+  WyreDerivativeAccount,
+  WyreDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -26,7 +28,7 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import config from '../../bitcoin/HexaConfig'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 
@@ -256,7 +258,37 @@ const updatePrimarySubAccounts = (
             }
             transactions = donationInstance.transactions.transactionDetails
           }
+          break
 
+        case SubAccountKind.SERVICE:
+          switch( ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+              case ServiceAccountKind.WYRE:
+                const { sourceKind, instanceNumber } = shell.primarySubAccount
+                let derivativeAccounts
+                switch ( sourceKind ) {
+                    case SourceAccountKind.REGULAR_ACCOUNT:
+                      derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                      break
+      
+                    case SourceAccountKind.SECURE_ACCOUNT:
+                      derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                      break
+                }
+                const wyreAccounts: WyreDerivativeAccount =
+                derivativeAccounts[ DerivativeAccountTypes.WYRE ]
+                const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
+      
+                if ( wyreInstance && wyreInstance.balances ) {
+                  accountName = wyreInstance.accountName
+                  accountDescription = wyreInstance.accountDescription
+                  balances = {
+                    confirmed: wyreInstance.balances.balance,
+                    unconfirmed: wyreInstance.balances.unconfirmedBalance,
+                  }
+                  transactions = wyreInstance.transactions.transactionDetails
+                }
+                break
+          }
           break
     }
 
@@ -336,7 +368,6 @@ const updateSecondarySubAccounts = (
               dervTransactions,
             )
           } else {
-            // backward compatibiliy for versions < 1.4.0 (adding the sub-account)
             let secondarySubAccount: SubAccountDescribing
             switch ( dAccountType ) {
                 case DerivativeAccountTypes.TRUSTED_CONTACTS:
