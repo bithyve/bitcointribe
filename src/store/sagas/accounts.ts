@@ -75,12 +75,13 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -1336,6 +1337,10 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountId: string
   let subAccountInstanceNum: number
   
+  const service = yield select(
+    ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
+  )
+
   switch ( subAccountInfo.kind ) {
       case SubAccountKind.DONATION_ACCOUNT:
         const donationInstance = yield call( setupDonationAccountWorker, {
@@ -1358,10 +1363,6 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
-        const service = yield select(
-          ( state ) => state.accounts[ subAccountInfo.kind ].service
-        )
-
         const accountDetails = {
           accountName: subAccountInfo.customDisplayName,
           accountDescription: subAccountInfo.customDescription,
@@ -1390,47 +1391,43 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
           err: derivativeSetupRes.err 
         } )
         break
+
       case SubAccountKind.SERVICE:
-        console.log( '***-> addNewSubAccount case selected ', subAccountInfo, subAccountInfo.kind, 'subAccountInfo.serviceAccountKind ', subAccountInfo.serviceAccountKind )
-        /*
-        Check that the service is WYRE
-        */
-        const hdWalletService = yield select(
-          ( state ) => state.accounts[ SubAccountKind.REGULAR_ACCOUNT ].service
-        )
-
-        const wyreAccountDetails = {
-          accountName: subAccountInfo.customDisplayName,
-          accountDescription: subAccountInfo.customDescription,
+        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.WYRE:
+              const wyreAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const wyreSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.WYRE,
+                wyreAccountDetails
+              )
+      
+              if ( wyreSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES 
+                  } 
+                } )
+      
+                subAccountId = wyreSetupRes.data.accountId
+                subAccountInstanceNum = wyreSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: wyreSetupRes.err 
+                } )
+              }
+              break
         }
-        const wyreSetupRes = yield call(
-          hdWalletService.setupDerivativeAccount,
-          DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
-          wyreAccountDetails
-        )
-
-        if ( wyreSetupRes.status === 200 ) {
-          const { SERVICES } = yield select( ( state ) => state.storage.database )
-          const updatedSERVICES = {
-            ...SERVICES,
-            [ subAccountInfo.kind ]: JSON.stringify( hdWalletService ),
-          }
-          yield call( insertDBWorker, {
-            payload: {
-              SERVICES: updatedSERVICES 
-            } 
-          } )
-
-          subAccountId = wyreSetupRes.data.accountId
-          subAccountInstanceNum = wyreSetupRes.data.accountNumber
-        } else console.log( {
-          err: wyreSetupRes.err 
-        } )
         break
   }
-  console.log( { 
-    subAccountInfo, subAccountId, subAccountInstanceNum 
-  } )
 
   if ( subAccountId ) return {
     subAccountId, subAccountInstanceNum 
@@ -1441,13 +1438,12 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 function* addNewAccountShell( { payload: subAccountInfo, }: {
   payload: SubAccountDescribing;
 } ) {
-  console.log( '***-> addNewAccountShell ', subAccountInfo )
+
   const bitcoinUnit =
     subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
       ? BitcoinUnit.TSATS
       : BitcoinUnit.SATS
 
-  
   try {
     const { subAccountId, subAccountInstanceNum } = yield call(
       addNewSubAccount,
@@ -1465,7 +1461,7 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
     } ) )
     yield put( accountShellOrderedToFront( newAccountShell ) )
   } catch ( error ) {
-    console.log( 'addNewAccountShell saga::error: ' + error )
+
     const newAccountShell = new AccountShell( {
       unit: bitcoinUnit,
       primarySubAccount: subAccountInfo,
