@@ -9,15 +9,15 @@ import {
 
 export enum BottomTab {
   Transactions,
-  Add,
+  FriendsAndFamily,
   QR,
   More,
 }
 
 export interface Props {
   tabBarZIndex?: number;
+  selectedTab?: BottomTab | null;
   onSelect: ( tab: BottomTab ) => void;
-  selectedTab: BottomTab | null;
 }
 
 type TabItem = {
@@ -33,9 +33,9 @@ const tabItems: TabItem[] = [
     inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_transactions.png' ),
   },
   {
-    tab: BottomTab.Add,
-    activeImageSource: require( '../../assets/images/HomePageIcons/icon_add_active.png' ),
-    inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_add.png' ),
+    tab: BottomTab.FriendsAndFamily,
+    activeImageSource: require( '../../assets/images/icons/icon_contact.png' ),
+    inactiveImageSource: require( '../../assets/images/icons/icon_contact.png' ),
   },
   {
     tab: BottomTab.QR,
