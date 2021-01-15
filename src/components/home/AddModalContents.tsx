@@ -13,9 +13,9 @@ import { FlatList } from 'react-native-gesture-handler'
 export default function AddModalContents( props ) {
   const [ addData, setAddData ] = useState( [
     {
-      title: 'Buy bitcoin into Hexa wallet',
+      title: 'Scan a Voucher',
       image: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-      info: 'Redeem a FastBitcoins voucher',
+      info: 'From select retail stores with FastBitcoins',
       type: 'buyBitcoins',
     },
     {
@@ -25,14 +25,14 @@ export default function AddModalContents( props ) {
       type: 'addContact',
     },
     {
-      title: 'Add a SwanBitcoin Account',
-      info: 'Buy Bitcoin into Hexa Wallet from SwanBitcoin',
+      title: 'Set up automatic buys',
+      info: ' Stack sats with SwanBitcoin',
       image: require( '../../assets/images/icons/swan_temp.png' ),
       type: 'swan',
     },
     {
-      title: 'Add a Wyre Account',
-      info: 'Buy Bitcoin into Hexa Wallet from Wyre',
+      title: 'Buy using ApplePay or Debit Card',
+      info: 'Powered by Wyre',
       image: require( '../../assets/images/icons/wyre_notext_small.png' ),
       type: 'wyre',
     },

@@ -73,7 +73,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           marginBottom: ListStyles.infoHeaderSection.paddingVertical,
         }}>
           <Text style={ListStyles.infoHeaderSubtitleText}>
-            {'Hexa Wyre Accounts enables purchases of BTC using debit cards and Apple Pay.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
+            {'Hexa Wyre Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
           </Text>
         </View>
 
