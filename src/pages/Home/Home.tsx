@@ -92,6 +92,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import messaging from '@react-native-firebase/messaging';
+import firebase from '@react-native-firebase/app';
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -551,16 +553,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   bootStrapNotifications = async () => {
-    PushNotificationIOS.addEventListener('registrationError', console.log)
-      if (Platform.OS === 'ios') {
-        await PushNotification.checkPermissions(async({ alert, badge, sound }) => {
-          if (!alert || !badge || !sound) {
-            await PushNotification.requestPermissions();
-          }
+    if (Platform.OS === 'ios') {
+        firebase
+      .messaging()
+      .hasPermission()
+      .then(enabled => {       
+        if (enabled) {
           this.storeFCMToken();
-          this.scheduleNotification();
-          this.createNotificationListeners();
-        });
+              this.scheduleNotification();
+              this.createNotificationListeners();
+        } else {
+          firebase
+          .messaging()
+          .requestPermission({provisional: true})
+          .then(() => {
+            this.storeFCMToken();
+            this.scheduleNotification();
+            this.createNotificationListeners();
+          })
+          .catch(() => {
+            console.log('Permission rejected.');
+          });
+       }
+     })
+.catch();
       } else {
         this.storeFCMToken();
         this.scheduleNotification();
@@ -569,29 +585,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     };
     
   storeFCMToken = async () => {
-    PushNotification.configure({
-      // (optional) Called when Token is generated (iOS and Android)
-      onRegister: async(token) => {
-        if (token) {
-          console.log("TOKEN", token);
-          const fcmArray = [token.token]
-          const fcmTokenFromAsync = this.props.fcmTokenValue;
-          if (!fcmTokenFromAsync || fcmTokenFromAsync != token.token) {
-            await AsyncStorage.setItem('fcmToken', token.token)
-            this.props.setFCMToken(token.token)
+    const fcmToken = await messaging().getToken();
+    console.log("TOKEN", fcmToken);
+    const fcmArray = [ fcmToken ]
+    const fcmTokenFromAsync = this.props.fcmTokenValue
+    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+      this.props.setFCMToken( fcmToken )
 
-            this.props.updateFCMTokens(fcmArray)
-            AsyncStorage.getItem('walletRecovered').then((recovered) => {
-              // updates the new FCM token to channels post recovery
-              if (recovered) {
-                this.props.postRecoveryChannelSync()
-              }
-            })
-          }
+      await AsyncStorage.setItem( 'fcmToken', fcmToken )
+      this.props.updateFCMTokens( fcmArray )
+
+      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+        // updates the new FCM token to channels post recovery
+        if ( recovered ) {
+          this.props.postRecoveryChannelSync()
         }
-      },
-    });
-    
+      } )
+    }
   };
 
   createNotificationListeners = async () => {
@@ -729,9 +739,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.onAppStateChange,
     )
 
-    this.bootStrapNotifications()
-    this.setUpFocusListener()
-    this.getNewTransactionNotifications()
+    this.bootStrapNotifications();
+    this.setUpFocusListener();
+    this.getNewTransactionNotifications();
 
     Linking.addEventListener('url', this.handleDeepLinkEvent)
     Linking.getInitialURL().then(this.handleDeepLinking)
