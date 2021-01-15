@@ -64,6 +64,7 @@ import {
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { getAccountIcon, getAccountTitle } from './Send/utils'
 
 export default function Receive( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -635,14 +636,7 @@ export default function Receive( props ) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    derivativeAccountDetails &&
-                    derivativeAccountDetails.type === DONATION_ACCOUNT
-                      ? require( '../../assets/images/icons/icon_donation_hexa.png' )
-                      : serviceType == TEST_ACCOUNT
-                        ? require( '../../assets/images/icons/icon_test.png' )
-                        : serviceType == REGULAR_ACCOUNT
-                          ? require( '../../assets/images/icons/icon_regular.png' )
-                          : require( '../../assets/images/icons/icon_secureaccount.png' )
+                    getAccountIcon( serviceType, derivativeAccountDetails )
                   }
                   style={{
                     width: wp( '10%' ), height: wp( '10%' )
@@ -659,14 +653,9 @@ export default function Receive( props ) {
                       fontSize: RFValue( 12 ),
                     }}
                   >
-                    {derivativeAccountDetails &&
-                    derivativeAccountDetails.type === DONATION_ACCOUNT
-                      ? 'Donation Account'
-                      : serviceType == TEST_ACCOUNT
-                        ? 'Test Account'
-                        : serviceType == REGULAR_ACCOUNT
-                          ? 'Checking Account'
-                          : 'Savings Account'}
+                    {
+                      getAccountTitle( derivativeAccountDetails.type, derivativeAccountDetails )
+                    }
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (

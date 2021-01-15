@@ -15,7 +15,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
     trustKind: ContactTrustKind.KEEPER_OF_USER,
     hasXPub: true,
     hasTrustedAddress: false,
-    hasTrustedChannelWithUser: false,
+    isPendingRequestAcceptance: false,
   },
   {
     id: '2',
@@ -29,7 +29,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
     trustKind: ContactTrustKind.USER_IS_KEEPING,
     hasXPub: true,
     hasTrustedAddress: false,
-    hasTrustedChannelWithUser: false,
+    isPendingRequestAcceptance: false,
   },
   {
     id: '3',
@@ -43,7 +43,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
     trustKind: ContactTrustKind.OTHER,
     hasXPub: true,
     hasTrustedAddress: false,
-    hasTrustedChannelWithUser: false,
+    isPendingRequestAcceptance: false,
   },
   {
     id: '4',
@@ -57,7 +57,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
     trustKind: ContactTrustKind.KEEPER_OF_USER,
     hasXPub: true,
     hasTrustedAddress: false,
-    hasTrustedChannelWithUser: false,
+    isPendingRequestAcceptance: false,
   },
 ]
 

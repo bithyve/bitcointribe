@@ -109,7 +109,7 @@ export default class Relay {
   };
 
   public static sendNotifications = async (
-    receivers: { walletId: string; FCMs: string[] }[],
+    receivers: { walletId: string; FCMs?: string[] }[],
     notification: INotification
   ): Promise<{
     sent: boolean;
