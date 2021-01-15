@@ -682,7 +682,8 @@ export const newAccountShellAdded = ( { accountShell, }: {
   accountShell: AccountShell;
 } ) => {
   return {
-    type: NEW_ACCOUNT_SHELL_ADDED, payload: accountShell
+    type: NEW_ACCOUNT_SHELL_ADDED,
+    payload: accountShell
   }
 }
 

@@ -54,6 +54,7 @@ import {
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
@@ -210,6 +211,7 @@ const initialState: AccountsState = {
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
+  let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
   const accountType = action.payload ? action.payload.serviceType : null
 
   switch ( action.type ) {
@@ -599,11 +601,21 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELL_ADDED:
+        if (
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
+        ) {
+          currentWyreSubAccount = action.payload.primarySubAccount
+        } else {
+          currentWyreSubAccount = null
+        }
+
         return {
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
           accountShells: state.accountShells.concat( action.payload ),
+          currentWyreSubAccount
         }
 
       case NEW_ACCOUNT_ADD_FAILED:
