@@ -12,13 +12,13 @@ export const ENRICH_SERVICES = 'ENRICH_SERVICES'
 
 export const initializeDB = () => {
   return {
-    type: INIT_DB 
+    type: INIT_DB
   }
 }
 
 export const fetchFromDB = () => {
   return {
-    type: FETCH_FROM_DB 
+    type: FETCH_FROM_DB
   }
 }
 
@@ -29,15 +29,15 @@ export const fetchFromDB = () => {
 export const keyFetched = ( key ) => {
   return {
     type: KEY_FETCHED, payload: {
-      key 
-    } 
+      key
+    }
   }
 }
 
 export const enrichServices = ( database ) => {
   return {
     type: ENRICH_SERVICES, payload: {
-      database 
+      database
     }
   }
 }
@@ -51,32 +51,32 @@ export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
 export const dbInitialized = ( initialized ) => {
   return {
     type: DB_INITIALIZED, payload: {
-      initialized 
-    } 
+      initialized
+    }
   }
 }
 
 export const dbFetched = ( database ) => {
   return {
     type: DB_FETCHED, payload: {
-      database 
-    } 
+      database
+    }
   }
 }
 
 export const dbInserted = ( updatedEntity ) => {
   return {
     type: DB_INSERTED, payload: {
-      updatedEntity 
-    } 
+      updatedEntity
+    }
   }
 }
 
 export const servicesEnriched = ( services ) => {
   return {
     type: SERVICES_ENRICHED, payload: {
-      services 
-    } 
+      services
+    }
   }
 }
 
@@ -99,7 +99,7 @@ export const fetchDatabase = ( key ) => {
       error = ex
     }
     return {
-      database, error 
+      database, error
     }
   }
 }

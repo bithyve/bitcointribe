@@ -61,6 +61,8 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
 import SendStack from './stacks/send/SendStack'
 import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
+import SwanIntegrationScreen from '../pages/SwanIntegration/SwanIntegrationScreen'
+import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
 
 
 const SetupNavigator = createStackNavigator(
@@ -178,6 +180,18 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    SwanIntegrationScreen: {
+      screen: SwanIntegrationScreen,
+      navigationOptions: {
+        title: 'Swan Home'
+      }
+    },
+    WyreIntegrationScreen: {
+      screen: WyreIntegrationScreen,
+      navigationOptions: {
+        title: 'Wyre Home'
+      }
+    }
   },
   {
     headerLayoutPreset: 'center',

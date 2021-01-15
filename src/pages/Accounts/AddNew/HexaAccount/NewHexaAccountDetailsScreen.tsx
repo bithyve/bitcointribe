@@ -32,16 +32,16 @@ const HeaderSection: React.FC<HeaderSectionProps> = ( { subAccountInfo, } ) => {
   )
 }
 
-const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
 
-  const currentSubAccountInfo: HexaSubAccountDescribing = useMemo( () => {
-    return navigation.getParam( 'currentSubAccountInfo' )
+  const currentSubAccount: HexaSubAccountDescribing = useMemo( () => {
+    return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
-  const [showLoader, setShowLoader] = useState(false);
+  const [ showLoader, setShowLoader ] = useState( false )
 
-  const [ accountName, setAccountName ] = useState( currentSubAccountInfo.defaultTitle )
+  const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( '' )
 
   const canProceed = useMemo( () => {
@@ -55,23 +55,22 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
     nameInputRef.current?.focus()
   }, [] )
 
-  // TODO: We need a bit more design clarity about what to do after new
-  // account creation succeeds or fails.
+  // TODO: We need a bit more design clarity about what to do if
+  // account creation fails here.
   useAccountShellCreationCompletionEffect( () => {
     console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 
   function handleProceedButtonPress() {
-    setShowLoader(true);
-    currentSubAccountInfo.customDisplayName = accountName
-    currentSubAccountInfo.customDescription = accountDescription
+    setShowLoader( true )
+    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.customDescription = accountDescription
     console.log( 'dispatching addNewAccountShell' )
-    dispatch( addNewAccountShell( currentSubAccountInfo ) )
+    dispatch( addNewAccountShell( currentSubAccount ) )
   }
 
   return (
-    // <View style={styles.rootContainer}>
     <KeyboardAvoidingView
       style={styles.rootContainer}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -81,7 +80,7 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
       }}>
         <View style={styles.rootContentContainer}>
 
-          <HeaderSection subAccountInfo={currentSubAccountInfo} />
+          <HeaderSection subAccountInfo={currentSubAccount} />
 
           <View style={styles.formContainer}>
             <Input
@@ -154,4 +153,4 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default AddNewHexaAccountDetailsScreen
+export default NewHexaAccountDetailsScreen

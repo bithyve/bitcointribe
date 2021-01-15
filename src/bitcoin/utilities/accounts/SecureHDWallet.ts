@@ -22,6 +22,7 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
   SECURE_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 
@@ -230,7 +231,7 @@ export default class SecureHDWallet extends Bitcoin {
   public getInitialReceivingAddress = (): string => {
     if ( this.xpubs ) return this.createSecureMultiSig( 0 ).address
   };
-
+ 
   public getReceivingAddress = (
     derivativeAccountType?: string,
     accountNumber?: number,
@@ -238,21 +239,19 @@ export default class SecureHDWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
-          const donationAcc: DonationDerivativeAccountElements = this
-            .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-          receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
-          break
-
         case SUB_PRIMARY_ACCOUNT:
-          const account = this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][
-            accountNumber
-          ]
+        case WYRE:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const account = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
 
         default:
           receivingAddress = this.receivingAddress
     }
+
+    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
