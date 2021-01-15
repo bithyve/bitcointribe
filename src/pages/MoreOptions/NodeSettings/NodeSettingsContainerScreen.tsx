@@ -98,12 +98,14 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   async function handleSettingsSubmission( {
     ipAddress,
     portNumber,
+    useFallback
   }: PersonalNodeFormData ) {
     const newPersonalNodeConfig: PersonalNode = {
       isConnectionActive: true,
       ipAddress: ipAddress,
       portNumber: portNumber,
       urlPath: `${ipAddress}:${portNumber}`,
+      useFallback
     }
 
     setIsEditingPersonalNodeConnection( false )
