@@ -130,16 +130,33 @@ export default class Bitcoin {
         },
       }
 
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-          accountToAddressMapping,
-        )
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-          accountToAddressMapping,
-        )
+      try{
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        }
+      } catch( err ){
+        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
+        console.log( 'using BitHyve Node as fallback(fetch-balTx)' )
+
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        }
       }
 
       const accountToResponseMapping = res.data
