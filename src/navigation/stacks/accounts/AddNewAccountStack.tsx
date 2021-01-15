@@ -47,6 +47,7 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Account Details'
       }
     },
+
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {

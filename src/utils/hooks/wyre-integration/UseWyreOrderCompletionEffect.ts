@@ -4,14 +4,25 @@ import { wyreOrderCompleted } from '../../../store/actions/WyreIntegration'
 import useWyreIntegrationState from '../state-selectors/accounts/UseWyreIntegrationState'
 
 
-export default function useWyreOrderCompletionEffect( onComplete: () => void ) {
+export default function useWyreOrderCompletionEffect( callbacks: {
+  onSuccess?: () => void;
+  onFailure?: () => void;
+} ) {
   const dispatch = useDispatch()
-  const { hasWyreOrderSucceeded } = useWyreIntegrationState()
+
+  const {
+    hasWyreOrderSucceeded,
+    hasWyreOrderFailed,
+  } = useWyreIntegrationState()
 
   useEffect( () => {
-    if ( hasWyreOrderSucceeded ) {
-      dispatch( wyreOrderCompleted() )
-      onComplete()
+    if ( hasWyreOrderSucceeded && callbacks.onSuccess ) {
+      callbacks.onSuccess()
+    } else if ( hasWyreOrderFailed && callbacks.onFailure ) {
+      callbacks.onFailure()
     }
-  }, [ hasWyreOrderSucceeded ] )
+
+    dispatch( wyreOrderCompleted() )
+
+  }, [ hasWyreOrderSucceeded, hasWyreOrderFailed ] )
 }

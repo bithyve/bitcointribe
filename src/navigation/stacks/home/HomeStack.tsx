@@ -17,6 +17,7 @@ const MODAL_ROUTES = [
   'QRScanner',
   'FriendsAndFamily',
   'MoreOptions',
+  'PlaceWyreOrder',
 ]
 
 const HomeStack = createStackNavigator(
