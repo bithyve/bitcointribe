@@ -70,6 +70,7 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { processRecipients } from '../../../store/sagas/accounts'
 import { AccountsState } from '../../../store/reducers/accounts'
 import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
+import { getAccountIcon, getAccountTitle } from './utils'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -477,24 +478,6 @@ class SendConfirmation extends Component<
     }
   };
 
-  getServiceTypeAccount = () => {
-    const { derivativeAccountDetails } = this.state
-    if ( derivativeAccountDetails ) {
-      if ( derivativeAccountDetails.type === 'DONATION_ACCOUNT' )
-        return 'Donation Account'
-    }
-
-    if ( this.serviceType == 'TEST_ACCOUNT' ) {
-      return 'Test Account'
-    } else if ( this.serviceType == 'SECURE_ACCOUNT' ) {
-      return 'Savings Account'
-    } else if ( this.serviceType == 'REGULAR_ACCOUNT' ) {
-      return 'Checking Account'
-    } else if ( this.serviceType == 'S3_SERVICE' ) {
-      return 'S3 Service'
-    }
-  };
-
   onTransactionSuccess = () => {
     if ( this.refs.SendSuccessBottomSheet as any )
       ( this.refs.SendSuccessBottomSheet as any ).snapTo( 1 )
@@ -589,14 +572,7 @@ class SendConfirmation extends Component<
             </TouchableOpacity>
             <Image
               source={
-                this.state.derivativeAccountDetails &&
-                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                  ? require( '../../../assets/images/icons/icon_donation_account.png' )
-                  : this.serviceType == TEST_ACCOUNT
-                    ? require( '../../../assets/images/icons/icon_test.png' )
-                    : this.serviceType == REGULAR_ACCOUNT
-                      ? require( '../../../assets/images/icons/icon_regular.png' )
-                      : require( '../../../assets/images/icons/icon_secureaccount.png' )
+                getAccountIcon( this.serviceType,   this.state.derivativeAccountDetails )
               }
               style={{
                 width: wp( '10%' ), height: wp( '10%' ) 
@@ -634,7 +610,7 @@ class SendConfirmation extends Component<
         <ScrollView>
           <View style={styles.availableBalanceView}>
             <Text style={styles.accountTypeTextBalanceView}>
-              {this.getServiceTypeAccount()}
+              {getAccountTitle( this.serviceType,   this.state.derivativeAccountDetails )}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}

@@ -10,6 +10,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import SmallHeaderModal from '../../../components/SmallHeaderModal'
 import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface'
@@ -47,6 +48,7 @@ import {
 } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
+import { getAccountIcon } from './utils'
 
 export enum SectionKind {
   SCAN_QR,
@@ -1034,14 +1036,7 @@ function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<Naviga
         <View style={styles.navHeaderTitleContainer}>
           <Image
             source={
-              derivativeAccountDetails &&
-              derivativeAccountDetails.type === DONATION_ACCOUNT
-                ? require( '../../../assets/images/icons/icon_donation_hexa.png' )
-                : accountKind == TEST_ACCOUNT
-                  ? require( '../../../assets/images/icons/icon_test.png' )
-                  : accountKind == REGULAR_ACCOUNT
-                    ? require( '../../../assets/images/icons/icon_regular.png' )
-                    : require( '../../../assets/images/icons/icon_secureaccount.png' )
+              getAccountIcon( accountKind, derivativeAccountDetails ) 
             }
             style={{
               width: 40, height: 40 
