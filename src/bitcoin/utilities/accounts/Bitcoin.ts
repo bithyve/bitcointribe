@@ -690,6 +690,39 @@ export default class Bitcoin {
     }
   };
 
+
+  public broadcastTransaction = async (
+    txHex: string,
+  ): Promise<{
+    txid: string;
+  }> => {
+    let res: AxiosResponse
+    if ( this.network === bitcoinJS.networks.testnet ) {
+      res = await bitcoinAxios.post(
+        config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+        txHex,
+        {
+          headers: {
+            'Content-Type': 'text/plain' 
+          },
+        },
+      )
+    } else {
+      res = await bitcoinAxios.post(
+        config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
+        txHex,
+        {
+          headers: {
+            'Content-Type': 'text/plain' 
+          },
+        },
+      )
+    }
+    return {
+      txid: res.data 
+    }
+  };
+
   public fromOutputScript = ( output: Buffer ): string => {
     return bitcoinJS.address.fromOutputScript( output, this.network )
   };
