@@ -22,7 +22,6 @@ import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import TwoFAToken from '../pages/Accounts/TwoFAToken'
 import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import QRScannerScreen from '../pages/QRScannerScreen'
@@ -130,7 +129,6 @@ const HomeNavigator = createStackNavigator(
     TrustedContacts,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    ReceivingAddress,
     Send: {
       screen: SendStack,
     },
