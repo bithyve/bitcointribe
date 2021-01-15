@@ -606,11 +606,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.getNewTransactionNotifications();
 
     // health check
+    // const { healthCheckInitialized } = s3Service.sss;
+    // console.log("healthCheckInitialized", healthCheckInitialized);
+    // if (!healthCheckInitialized) {
+    //   initHealthCheck();
+    // }
+
     const { healthCheckInitializedKeeper } = s3Service.levelhealth;
     console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
     if (!healthCheckInitializedKeeper) {
       initializeHealthSetup();
-      initHealthCheck();
     }
 
     Linking.addEventListener("url", this.handleDeepLinkEvent);
@@ -846,8 +851,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         prevProps.levelHealth.length == 0
       ) {
         this.cloudData();
-      } else {
-        // this.updateCloudData();
       }
     }
 

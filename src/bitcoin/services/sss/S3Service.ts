@@ -1271,7 +1271,46 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.levelhealth.prepareShareUploadables(
+        data: this.sss.prepareShareUploadables(
+          shareIndex,
+          contactName,
+          dynamicNonPMDD,
+        ),
+      }
+    } catch (err) {
+      return {
+        status: 523, err: err.message, message: ErrMap[ 523 ] 
+      }
+    }
+  };
+
+  public prepareShareUploadablesKeeper = (
+    shareIndex: number,
+    contactName: string,
+    dynamicNonPMDD?: MetaShare[],
+  ):
+    | {
+        status: number;
+        data: {
+          otp: string;
+          encryptedKey: string;
+          encryptedMetaShare: string;
+          messageId: string;
+          encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.levelhealth.prepareShareUploadablesKeeper(
           shareIndex,
           contactName,
           dynamicNonPMDD,

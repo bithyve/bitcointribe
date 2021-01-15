@@ -1321,7 +1321,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   // );
 
   const res = yield call(
-    s3Service.prepareShareUploadables,
+    s3Service.prepareShareUploadablesKeeper,
     shareIndex,
     payload.contactInfo.contactName
   ); // contact injection (requires database insertion)

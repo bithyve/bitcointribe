@@ -716,7 +716,7 @@ export default class LevelHealth {
     return { shares };
   };
 
-  public prepareShareUploadables = (
+  public prepareShareUploadablesKeeper = (
     shareIndex: number,
     contactName: string,
     dynamicNonPMDD?: MetaShare[],
@@ -763,7 +763,7 @@ export default class LevelHealth {
     success: boolean;
     levelInfo: any[];
   }> => {
-    if (this.healthCheckInitialized)
+    if (this.healthCheckInitializedKeeper)
       throw new Error('Health Check is already initialized.');
 
     let randomIdForSecurityQ = generateRandomString(8);
@@ -797,7 +797,7 @@ export default class LevelHealth {
       if (err.code) throw new Error(err.code);
     }
     if (res.data.initSuccessful) {
-      this.healthCheckInitialized = true;
+      this.healthCheckInitializedKeeper = true;
     }
     return {
       success: res.data.initSuccessful,
@@ -1305,7 +1305,7 @@ export default class LevelHealth {
     // restoring other assets
 
     // restoring healthCheckInit variable
-    this.healthCheckInitialized = true;
+    this.healthCheckInitializedKeeper = true;
 
     // enriching pdf health variable if restoration is done via Personal Copy
     if (this.metaSharesKeeper[3]) {
