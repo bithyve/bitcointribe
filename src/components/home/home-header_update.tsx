@@ -225,8 +225,8 @@ const HomeHeader = ({
         <TouchableOpacity
           onPress={() => {
             // navigation.navigate('ManageBackupUpgradeSecurity');
-            navigation.navigate('ManageBackupKeeper');
-            // navigation.navigate('ManageBackup');
+            // navigation.navigate('ManageBackupKeeper');
+            navigation.navigate('ManageBackup');
           }}
           style={styles.manageBackupMessageView}
         >
