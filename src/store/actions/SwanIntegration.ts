@@ -30,14 +30,14 @@ export const fetchSwanToken = ( data ) => {
   return {
     type: FETCH_SWAN_TOKEN,
     payload: {
-      data 
+      data
     },
   }
 }
 
 export const fetchSwanTokenCompleted = () => {
   return {
-    type: FETCH_SWAN_TOKEN_COMPLETED 
+    type: FETCH_SWAN_TOKEN_COMPLETED
   }
 }
 
@@ -45,7 +45,7 @@ export const fetchSwanTokenFailed = data => {
   return {
     type: FETCH_SWAN_TOKEN_FAILED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -54,7 +54,7 @@ export const fetchSwanTokenSucceeded = ( data ) => {
   return {
     type: FETCH_SWAN_TOKEN_SUCCEEDED,
     payload: {
-      swanTokenDetails: data 
+      swanTokenDetails: data
     }
   }
 }
@@ -63,7 +63,7 @@ export const linkSwanWallet = ( data ) => {
   return {
     type: LINK_SWAN_WALLET,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -72,7 +72,7 @@ export const linkSwanWalletCompleted = ( data ) => {
   return {
     type: LINK_SWAN_WALLET_COMPLETED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -81,7 +81,7 @@ export const linkSwanWalletFailed = ( data ) => {
   return {
     type: LINK_SWAN_WALLET_FAILED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -90,7 +90,7 @@ export const linkSwanWalletSucceeded = ( data ) => {
   return {
     type: LINK_SWAN_WALLET_SUCCEEDED,
     payload: {
-      swanWalletDetails: data 
+      swanWalletDetails: data
     },
   }
 }
@@ -99,7 +99,7 @@ export const syncSwanWallet = ( data ) => {
   return {
     type: SYNC_SWAN_WALLET,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -108,7 +108,7 @@ export const syncSwanWalletCompleted = ( data ) => {
   return {
     type: SYNC_SWAN_WALLET_COMPLETED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -117,7 +117,7 @@ export const syncSwanWalletFailed = ( data ) => {
   return {
     type: SYNC_SWAN_WALLET_FAILED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -126,7 +126,7 @@ export const syncSwanWalletSucceeded = ( data ) => {
   return {
     type: SYNC_SWAN_WALLET_SUCCEEDED,
     payload: {
-      syncSwanWalletDetails: data 
+      syncSwanWalletDetails: data
     },
   }
 }
@@ -135,7 +135,7 @@ export const addSwanMetadata = ( data ) => {
   return {
     type: ADD_SWAN_METADATA,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -144,7 +144,7 @@ export const addSwanMetadataCompleted = ( data ) => {
   return {
     type: ADD_SWAN_METADATA_COMPLETED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -153,7 +153,7 @@ export const addSwanMetadataFailed = ( data ) => {
   return {
     type: ADD_SWAN_METADATA_FAILED,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -162,7 +162,7 @@ export const addSwanMetadataSucceeded = ( data ) => {
   return {
     type: ADD_SWAN_METADATA_SUCCEEDED,
     payload: {
-      addSwanMetadaDetails: data 
+      addSwanMetadaDetails: data
     },
   }
 }
