@@ -34,6 +34,13 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     return nodeSettingsState.prefersPersonalNodeConnection
   }, [ nodeSettingsState.prefersPersonalNodeConnection ] )
 
+  useEffect( ()=>{
+    // resets personal node preference if there's no active personal node
+    if( nodeSettingsState.prefersPersonalNodeConnection && !activePersonalNode )
+      dispatch( personalNodePreferenceToggled( false ) )
+    
+  }, [] )
+
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )
   const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
@@ -98,12 +105,14 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   async function handleSettingsSubmission( {
     ipAddress,
     portNumber,
+    useFallback
   }: PersonalNodeFormData ) {
     const newPersonalNodeConfig: PersonalNode = {
       isConnectionActive: true,
       ipAddress: ipAddress,
       portNumber: portNumber,
       urlPath: `${ipAddress}:${portNumber}`,
+      useFallback
     }
 
     setIsEditingPersonalNodeConnection( false )
@@ -113,7 +122,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
   function handleConnectionToggle() {
     const prefersPersonalNodeConnection = !isPersonalNodeConnectionEnabled
 
-    if ( prefersPersonalNodeConnection == false ) {
+    if ( prefersPersonalNodeConnection == false && activePersonalNode ) {
       // switching back to BH(default)-node
       dispatch( connectToBitHyveNode() )
     } else {

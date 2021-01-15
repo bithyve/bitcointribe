@@ -750,17 +750,36 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
+
+      try{
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
+      }catch( err ){
+        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
+        console.log( 'using BitHyve Node as fallback(sync derivative-accounts)' )
+
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
       }
+    
 
       const accountsToResponseMapping = res.data
       if ( !Object.keys( accountsToResponseMapping ).length ) return
