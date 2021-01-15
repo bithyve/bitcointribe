@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
-import { Button } from 'react-native-elements';
 import Colors from '../../../common/Colors';
-import ButtonStyles from '../../../common/Styles/ButtonStyles';
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles';
+import ButtonBlue from '../../ButtonBlue';
 
 
 export type Props = {
@@ -31,13 +30,10 @@ const TransactionReassignmentSuccessBottomSheet: React.FC<Props> = ({
         </Text>
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="View Account"
-            titleStyle={ButtonStyles.actionButtonText}
-            onPress={onViewAccountDetailsPressed}
-          />
+        <ButtonBlue
+          buttonText="View Account"
+          handleButtonPress={onViewAccountDetailsPressed}
+        />
         </View>
       </View>
     </View>
@@ -67,10 +63,6 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    elevation: 5
   },
 });
 

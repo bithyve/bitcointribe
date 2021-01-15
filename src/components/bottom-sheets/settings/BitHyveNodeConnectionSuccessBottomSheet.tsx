@@ -1,10 +1,9 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { Button } from 'react-native-elements'
 import Colors from '../../../common/Colors'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
+import ButtonBlue from '../../ButtonBlue'
 
 
 export type Props = {
@@ -46,13 +45,10 @@ const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPr
 
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="OK"
-            titleStyle={ButtonStyles.actionButtonText}
-            onPress={onConfirmPressed}
-          />
+        <ButtonBlue
+          buttonText="OK"
+          handleButtonPress={onConfirmPressed}
+        />
         </View>
       </View>
     </View>
@@ -92,10 +88,6 @@ const styles = StyleSheet.create( {
     marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    elevation: 5
   },
 } )
 

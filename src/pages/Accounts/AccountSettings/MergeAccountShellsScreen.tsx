@@ -1,9 +1,7 @@
 
 import React, { useMemo, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import AccountShellMergeDestinationsList from '../../../components/account-settings/merge-account-shells/AccountShellMergeDestinationsList'
@@ -11,7 +9,7 @@ import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/acc
 import AccountShell from '../../../common/data/models/AccountShell'
 import { mergeAccountShells } from '../../../store/actions/accounts'
 import AccountShellMergeSelectionListHeader from '../../../components/account-settings/merge-account-shells/AccountShellMergeSelectionListHeader'
-import Colors from '../../../common/Colors';
+import ButtonBlue from '../../../components/ButtonBlue'
 
 
 export type Props = {
@@ -64,15 +62,10 @@ const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ( { navigation,
       </View>
 
       <View style={styles.proceedButtonContainer}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
-          disabledTitleStyle={ButtonStyles.actionButtonText}
-          title="Confirm & Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Confirm & Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
     </View>
@@ -90,10 +83,6 @@ const styles = StyleSheet.create( {
     elevation: 2,
     position: 'absolute',
     bottom: 30,
-    alignSelf: 'center',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
   },
 } )
 

@@ -2,10 +2,10 @@ import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { Button, Input } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
 import Colors from '../../../common/Colors';
+import ButtonBlue from '../../../components/ButtonBlue'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
@@ -89,15 +89,10 @@ const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
       </View>
 
       <View style={styles.footerSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Proceed"
-          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
-          disabledTitleStyle={ButtonStyles.actionButtonText}
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
 
@@ -122,10 +117,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingHorizontal: 26,
     alignItems: 'flex-start',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    elevation: 5
   },
 
 })

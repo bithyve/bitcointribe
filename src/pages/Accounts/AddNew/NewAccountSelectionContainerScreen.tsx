@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, SectionList, SafeAreaView } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import { Button } from 'react-native-elements'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { addNewAccountShell } from '../../../store/actions/accounts'
@@ -15,6 +13,7 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors';
+import ButtonBlue from '../../../components/ButtonBlue'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -114,15 +113,10 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const ListFooter: React.FC = () => {
     return (
       <View style={styles.listFooterSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
-          disabledTitleStyle={ButtonStyles.actionButtonText}
-          title="Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
     )
@@ -211,10 +205,6 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 30,
     paddingBottom: 40,
     alignItems: 'flex-start',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    elevation: 5
   },
 } )
 

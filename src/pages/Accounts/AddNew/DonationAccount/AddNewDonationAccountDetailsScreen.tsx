@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import FormStyles from '../../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import { Input, Button, CheckBox } from 'react-native-elements'
+import { Input, CheckBox } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
@@ -18,6 +17,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import openLink from '../../../../utils/OpenLink'
 import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
 import Loader from '../../../../components/loader'
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -170,16 +170,11 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
           </View>
 
           <View style={styles.footerSection}>
-            <Button
-              raised
-              buttonStyle={ButtonStyles.primaryActionButton}
-              title="Proceed"
-              disabledStyle={ButtonStyles.disabledPrimaryActionButton}
-          disabledTitleStyle={ButtonStyles.actionButtonText}
-              titleStyle={ButtonStyles.actionButtonText}
-              onPress={handleProceedButtonPress}
-              disabled={canProceed === false}
-            />
+          <ButtonBlue
+            buttonText="Proceed"
+            handleButtonPress={handleProceedButtonPress}
+            buttonDisable={canProceed === false}
+          />
           </View>
         </View>
       </ScrollView>
@@ -239,10 +234,6 @@ const styles = StyleSheet.create( {
   footerSection: {
     paddingHorizontal: 26,
     alignItems: 'flex-start',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    elevation: 5
   },
 } )
 
