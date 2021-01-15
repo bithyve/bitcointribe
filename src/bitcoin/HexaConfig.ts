@@ -102,7 +102,7 @@ class HexaConfig {
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
 
-  public BITHYVE_ESPLORA_API_ENDPOINT = {
+  public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
       MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
@@ -124,7 +124,7 @@ class HexaConfig {
       BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
     },
   }
-  public ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINT ) // current API-endpoints being used
+  public ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINTS ) // current API-endpoints being used
   public USE_ESPLORA_FALLBACK = false; // BITHYVE_ESPLORA_API_ENDPOINT acts as the fallback(when true)
 
   public RELAY: string;
@@ -237,7 +237,7 @@ class HexaConfig {
     }
   };
 
-  public connectToPersonalNode =  async ( personalNode: PersonalNode, useFallBack?: boolean ) => {
+  public connectToPersonalNode =  async ( personalNode: PersonalNode ) => {
     const personalNodeURL = personalNode.urlPath
     if( personalNodeURL && personalNode.isConnectionActive ){
       const personalNodeEPs = {
@@ -263,12 +263,12 @@ class HexaConfig {
           TESTNET: personalNodeEPs,
         }
 
-      this.USE_ESPLORA_FALLBACK = useFallBack
+      this.USE_ESPLORA_FALLBACK = personalNode.useFallback
     }
   }
 
   public connectToBitHyveNode =  async () => {
-    this.ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINT )
+    this.ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINTS )
     this.USE_ESPLORA_FALLBACK = false
   }
 }

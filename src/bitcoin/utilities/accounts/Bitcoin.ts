@@ -697,30 +697,69 @@ export default class Bitcoin {
     txid: string;
   }> => {
     let res: AxiosResponse
-    if ( this.network === bitcoinJS.networks.testnet ) {
-      res = await bitcoinAxios.post(
-        config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
-        txHex,
-        {
-          headers: {
-            'Content-Type': 'text/plain' 
+    try{
+      if ( this.network === bitcoinJS.networks.testnet ) {
+        res = await bitcoinAxios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+          txHex,
+          {
+            headers: {
+              'Content-Type': 'text/plain' 
+            },
           },
-        },
-      )
-    } else {
-      res = await bitcoinAxios.post(
-        config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
-        txHex,
-        {
-          headers: {
-            'Content-Type': 'text/plain' 
+        )
+      } else {
+        res = await bitcoinAxios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
+          txHex,
+          {
+            headers: {
+              'Content-Type': 'text/plain' 
+            },
           },
-        },
+        )
+      }
+      return {
+        txid: res.data 
+      }
+    } catch( err ){
+      console.log(
+        `An error occurred while broadcasting via current node. ${err}`,
       )
-    }
-    return {
-      txid: res.data 
-    }
+
+      if( config.USE_ESPLORA_FALLBACK ){
+        console.log( 'using BitHyve Node as fallback(tx-broadcast)' )
+        try {
+          if ( this.network === bitcoinJS.networks.testnet ) {
+            res = await bitcoinAxios.post(
+              config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+              txHex,
+              {
+                headers: {
+                  'Content-Type': 'text/plain' 
+                },
+              },
+            )
+          } else {
+            res = await bitcoinAxios.post(
+              config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
+              txHex,
+              {
+                headers: {
+                  'Content-Type': 'text/plain' 
+                },
+              },
+            )
+          }
+          return {
+            txid: res.data 
+          }
+        } catch ( err ) {
+        // console.log(err.message);
+          throw new Error( 'Transaction broadcasting failed' )
+        }
+      } 
+    } 
   };
 
   public fromOutputScript = ( output: Buffer ): string => {
