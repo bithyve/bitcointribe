@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   StyleSheet,
   Text,
@@ -6,74 +6,81 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
+} from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
-import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth';
+} from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
-export default function Login(props) {
-  const [passcode, setPasscode] = useState('');
-  const [passcodeFlag, setPasscodeFlag] = useState(true);
-  const [checkAuth, setCheckAuth] = useState(false);
+export default function Login( props ) {
+  const [ passcode, setPasscode ] = useState( '' )
+  const [ passcodeFlag, setPasscodeFlag ] = useState( true )
+  const [ checkAuth, setCheckAuth ] = useState( false )
 
-  function onPressNumber(text) {
-    let tmpPasscode = passcode;
-    if (passcode.length < 4) {
-      if (text != 'x') {
-        tmpPasscode += text;
-        setPasscode(tmpPasscode);
+  function onPressNumber( text ) {
+    let tmpPasscode = passcode
+    if ( passcode.length < 4 ) {
+      if ( text != 'x' ) {
+        tmpPasscode += text
+        setPasscode( tmpPasscode )
       }
     }
-    if (passcode && text == 'x') {
-      setPasscode(passcode.slice(0, -1));
-      setCheckAuth(false);
+    if ( passcode && text == 'x' ) {
+      setPasscode( passcode.slice( 0, -1 ) )
+      setCheckAuth( false )
     }
   }
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const { reLogin, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
-  );
+  )
 
-  if (reLogin) {
-    if (props.navigation.state.params.isPasscodeCheck) props.navigation.goBack();
-    else props.navigation.pop(2);
-    dispatch(switchReLogin(false, true));
+  if ( reLogin ) {
+    if ( props.navigation.state.params.isPasscodeCheck ) props.navigation.goBack()
+    else props.navigation.pop( 2 )
+    dispatch( switchReLogin( false, true ) )
   }
 
-  useEffect(() => {
-    if (authenticationFailed) {
-      setCheckAuth(true);
-      setPasscode('');
+  useEffect( () => {
+    if ( authenticationFailed ) {
+      setCheckAuth( true )
+      setPasscode( '' )
     } else {
-      setCheckAuth(false);
+      setCheckAuth( false )
     }
-  }, [authenticationFailed]);
+  }, [ authenticationFailed ] )
 
   const hardwareBackHandler = () => {
-    return true;
-  }; // returning true disables the hardware back button
+    return true
+  } // returning true disables the hardware back button
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar />
-      <View style={{ flex: 1 }}>
-        <View style={{}}>
+      <View style={{
+        flex: 1 
+      }}>
+        <View style={{
+        }}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View style={{ alignSelf: 'baseline' }}>
+            <View style={{
+              alignSelf: 'baseline' 
+            }}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -92,7 +99,7 @@ export default function Login(props) {
                     {passcode.length >= 1 ? (
                       <Text
                         style={{
-                          fontSize: RFValue(10),
+                          fontSize: RFValue( 10 ),
                           textAlignVertical: 'center',
                           justifyContent: 'center',
                           alignItems: 'center',
@@ -107,8 +114,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -126,7 +133,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 2 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{
+                        fontSize: RFValue( 10 ) 
+                      }}>
                         <FontAwesome
                           size={10}
                           name={'circle'}
@@ -136,8 +145,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -155,7 +164,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 3 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{
+                        fontSize: RFValue( 10 ) 
+                      }}>
                         <FontAwesome
                           size={10}
                           name={'circle'}
@@ -165,8 +176,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -184,7 +195,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 4 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{
+                        fontSize: RFValue( 10 ) 
+                      }}>
                         <FontAwesome
                           size={10}
                           name={'circle'}
@@ -194,16 +207,18 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
               {checkAuth ? (
-                <View style={{ marginLeft: 'auto' }}>
+                <View style={{
+                  marginLeft: 'auto' 
+                }}>
                   <Text style={styles.errorText}>
                     Incorrect passcode, try again!
-              </Text>
+                  </Text>
                 </View>
               ) : null}
             </View>
@@ -213,8 +228,8 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
-                  setCheckAuth(false);
-                  dispatch(credsAuth(passcode, true));
+                  setCheckAuth( false )
+                  dispatch( credsAuth( passcode, true ) )
                 }}
                 style={{
                   ...styles.proceedButtonView,
@@ -228,37 +243,39 @@ export default function Login(props) {
           ) : null}
         </View>
 
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          marginTop: 'auto' 
+        }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
-              onPress={() => onPressNumber('1')}
+              onPress={() => onPressNumber( '1' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('1')}
+                onPress={() => onPressNumber( '1' )}
               >
                 1
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('2')}
+              onPress={() => onPressNumber( '2' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('2')}
+                onPress={() => onPressNumber( '2' )}
               >
                 2
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('3')}
+              onPress={() => onPressNumber( '3' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('3')}
+                onPress={() => onPressNumber( '3' )}
               >
                 3
               </Text>
@@ -266,34 +283,34 @@ export default function Login(props) {
           </View>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
-              onPress={() => onPressNumber('4')}
+              onPress={() => onPressNumber( '4' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('4')}
+                onPress={() => onPressNumber( '4' )}
               >
                 4
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('5')}
+              onPress={() => onPressNumber( '5' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('5')}
+                onPress={() => onPressNumber( '5' )}
               >
                 5
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('6')}
+              onPress={() => onPressNumber( '6' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('6')}
+                onPress={() => onPressNumber( '6' )}
               >
                 6
               </Text>
@@ -301,34 +318,34 @@ export default function Login(props) {
           </View>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
-              onPress={() => onPressNumber('7')}
+              onPress={() => onPressNumber( '7' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('7')}
+                onPress={() => onPressNumber( '7' )}
               >
                 7
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('8')}
+              onPress={() => onPressNumber( '8' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('8')}
+                onPress={() => onPressNumber( '8' )}
               >
                 8
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('9')}
+              onPress={() => onPressNumber( '9' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('9')}
+                onPress={() => onPressNumber( '9' )}
               >
                 9
               </Text>
@@ -336,26 +353,28 @@ export default function Login(props) {
           </View>
           <View style={styles.keyPadRow}>
             <View style={styles.keyPadElementTouchable}>
-              <Text style={{ flex: 1, padding: 15 }}></Text>
+              <Text style={{
+                flex: 1, padding: 15 
+              }}></Text>
             </View>
             <TouchableOpacity
-              onPress={() => onPressNumber('0')}
+              onPress={() => onPressNumber( '0' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('0')}
+                onPress={() => onPressNumber( '0' )}
               >
                 0
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => onPressNumber('x')}
+              onPress={() => onPressNumber( 'x' )}
               style={styles.keyPadElementTouchable}
             >
               <Text
                 style={styles.keyPadElementText}
-                onPress={() => onPressNumber('x')}
+                onPress={() => onPressNumber( 'x' )}
               >
                 <Ionicons name="ios-backspace" size={30} color={Colors.blue} />
               </Text>
@@ -364,14 +383,14 @@ export default function Login(props) {
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   textBoxStyles: {
     borderWidth: 0.5,
-    height: wp('13%'),
-    width: wp('13%'),
+    height: wp( '13%' ),
+    width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
     borderColor: Colors.borderColor,
@@ -380,69 +399,73 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   textBoxActive: {
-    height: wp('13%'),
-    width: wp('13%'),
+    height: wp( '13%' ),
+    width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {
+      width: 0, height: 3 
+    },
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   keyPadRow: {
     flexDirection: 'row',
-    height: hp('8%'),
+    height: hp( '8%' ),
   },
   keyPadElementTouchable: {
     flex: 1,
-    height: hp('8%'),
-    fontSize: RFValue(18),
+    height: hp( '8%' ),
+    fontSize: RFValue( 18 ),
     justifyContent: 'center',
     alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp('6%'),
-    height: wp('13%'),
-    width: wp('30%'),
+    marginTop: hp( '6%' ),
+    height: wp( '13%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15 
+    },
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontStyle: 'italic',
   },
   boldItalicText: {
@@ -452,26 +475,26 @@ const styles = StyleSheet.create({
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     marginLeft: 20,
-    marginTop: hp('10%'),
+    marginTop: hp( '10%' ),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
   passcodeTextInputView: {
     flexDirection: 'row',
-    marginTop: hp('4.5%'),
-    marginBottom: hp('1.5%'),
+    marginTop: hp( '4.5%' ),
+    marginBottom: hp( '1.5%' ),
     width: 'auto'
   },
-});
+} )
