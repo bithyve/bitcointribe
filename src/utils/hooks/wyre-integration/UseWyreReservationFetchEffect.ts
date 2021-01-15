@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { wyreOrderCompleted } from '../../../store/actions/WyreIntegration'
+import { fetchWyreReservationCompleted } from '../../../store/actions/WyreIntegration'
 import useWyreIntegrationState from '../state-selectors/accounts/UseWyreIntegrationState'
 
 
@@ -22,7 +22,7 @@ export default function useWyreReservationFetchEffect( callbacks: {
       callbacks.onFailure()
     }
 
-    dispatch( wyreOrderCompleted() )
+    dispatch( fetchWyreReservationCompleted() )
 
   }, [ hasWyreReservationFetchSucceeded, hasWyreReservationFetchFailed ] )
 }

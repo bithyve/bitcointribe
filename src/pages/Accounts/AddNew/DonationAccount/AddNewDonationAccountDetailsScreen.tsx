@@ -37,7 +37,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   const [ isTFAEnabled, setIsTFAEnabled ] = useState(
     currentSubAccount.isTFAEnabled,
   )
-  const [showLoader, setShowLoader] = useState(false);
+  const [ showLoader, setShowLoader ] = useState( false )
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -53,7 +53,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   } )
 
   function handleProceedButtonPress() {
-    setShowLoader(true);
+    setShowLoader( true )
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.doneeName = doneeName
     currentSubAccount.customDescription = accountDescription

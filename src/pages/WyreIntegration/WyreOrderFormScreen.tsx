@@ -1,20 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native'
+import React, { useEffect, useMemo } from 'react'
+import { View, StyleSheet, Text, ScrollView, Image } from 'react-native'
 import Colors from '../../common/Colors'
-import FormStyles from '../../common/Styles/FormStyles'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import ListStyles from '../../common/Styles/ListStyles'
-import { Input, Button } from 'react-native-elements'
+import { Button, ListItem } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 import openLink from '../../utils/OpenLink'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import DropDownPicker from 'react-native-dropdown-picker'
 import { clearWyreCache, fetchWyreReservation } from '../../store/actions/WyreIntegration'
-import { RFValue } from 'react-native-responsive-fontsize'
-import useWyreCurrencyCodeChoices, { WyreCurrencyCodePickerItem } from '../../utils/hooks/wyre-integration/UseWyreCurrencyCodeChoices'
 import useWyreReservationFetchEffect from '../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
+import DepositSubAccountShellListItem from '../Accounts/AddNew/WyreAccount/DepositAccountShellListItem'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 
 export type Props = {
@@ -23,163 +20,93 @@ export type Props = {
 
 const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
-  const amountInputRef = useRef<Input>( null )
+  const { wyreHostedUrl } = useWyreIntegrationState()
 
+  const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
+    return navigation.getParam( 'currentSubAccount' )
+  }, [ navigation.state.params ] )
 
-  const { wyreHostedUrl, hasWyreReservationFetchSucceeded } = useWyreIntegrationState()
-  const [ amountToBuyValue, setAmountToBuyValue ] = useState( '' )
-  const preferredCurrencyCode = useCurrencyCode()
-  const currencyCodeChoices = useWyreCurrencyCodeChoices()
-
-  const [ selectedCurrencyCodeChoice, setSelectedCurrencyCodeChoice ] = useState<WyreCurrencyCodePickerItem>( {
-    value: preferredCurrencyCode,
-    label: preferredCurrencyCode,
-  } )
-
-  const canProceed = useMemo( () => {
-    return (
-      Boolean( Number( amountToBuyValue ) ) &&
-      Number( amountToBuyValue ) > 0
-    )
-  }, [ amountToBuyValue ] )
-
-
-  useEffect( ()=>{
-    if ( wyreHostedUrl && hasWyreReservationFetchSucceeded && Boolean( Number( amountToBuyValue ) ) &&
-    Number( amountToBuyValue ) > 0 ) {
-      openLink( wyreHostedUrl )
-    }
-  }, [ wyreHostedUrl, hasWyreReservationFetchSucceeded ] )
+  const wyreAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 
   function handleProceedButtonPress() {
-    dispatch( fetchWyreReservation(
-      amountToBuyValue,
-      selectedCurrencyCodeChoice.value,
-    ) )
+    dispatch( fetchWyreReservation() )
   }
 
   useEffect( () => {
     dispatch( clearWyreCache() )
   }, [] )
 
-  useEffect( () => {
-    amountInputRef.current?.focus()
-  }, [] )
+
+  useWyreReservationFetchEffect( {
+    onSuccess: () => {
+      openLink( wyreHostedUrl )
+    }
+  } )
 
   return (
-    <KeyboardAvoidingView
-      style={styles.rootContainer}
-      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView style={{
-        flex: 1
-      }}>
-        <View style={styles.rootContentContainer}>
+    <ScrollView style={{
+      flex: 1
+    }}>
+      <View style={styles.rootContentContainer}>
 
-          <View style={ListStyles.infoHeaderSection}>
-            <Text style={ListStyles.infoHeaderSubtitleText}>
-              Enter details for your order
-            </Text>
-          </View>
+        <View style={ListStyles.infoHeaderSection}>
 
-          <View style={styles.formContainer}>
-            <View style={{
-              zIndex: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              paddingHorizontal: 30,
-              marginBottom: 24,
+          <Text style={{
+            ...ListStyles.infoHeaderTitleText, marginBottom: 10
+          }}>
+            Wyre Destination Account:
+          </Text>
+
+          <ListItem
+            containerStyle={{
+              backgroundColor: Colors.secondaryBackgroundColor,
+              borderRadius: 12,
+            }}
+            disabled
+          >
+            <DepositSubAccountShellListItem accountShell={wyreAccountShell} />
+          </ListItem>
+        </View>
+
+        <View style={{
+          paddingHorizontal: ListStyles.infoHeaderSection.paddingHorizontal,
+          marginBottom: ListStyles.infoHeaderSection.paddingVertical,
+        }}>
+          <Text style={ListStyles.infoHeaderSubtitleText}>
+            {'Hexa Wyre Accounts enables purchases of BTC using debit cards and Apple Pay.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
+          </Text>
+        </View>
+
+        <View style={styles.proceedButtonContainer}>
+          <Button
+            raised
+            buttonStyle={ButtonStyles.primaryActionButton}
+            title="Proceed to Wyre"
+            titleStyle={ButtonStyles.actionButtonText}
+            onPress={handleProceedButtonPress}
+          />
+
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <Text style={{
             }}>
-              <Text style={{
-                flex: 0,
-                marginBottom: 12,
-                fontSize: RFValue( 14 ),
-                fontWeight: '600',
-                color: Colors.blue,
-              }}>
-                Enter the amount you'd like to order in:
-              </Text>
-
-              <DropDownPicker
-                items={currencyCodeChoices}
-                defaultValue={selectedCurrencyCodeChoice.value}
-                containerStyle={{
-                  minWidth: 130,
-                  flex: 0,
-                  height: 40,
-                  marginBottom: 12,
-                }}
-                style={{
-                  backgroundColor: Colors.secondaryBackgroundColor,
-                }}
-                itemStyle={{
-                  justifyContent: 'flex-start',
-                }}
-                selectedLabelStyle={{
-                  color: 'black'
-                }}
-                dropDownStyle={{
-                  backgroundColor: Colors.backgroundColor,
-                  paddingHorizontal: 12,
-                  paddingVertical: 14,
-                }}
-                scrollViewProps={{
-                  indicatorStyle: 'black',
-                }}
-                onChangeItem={item => setSelectedCurrencyCodeChoice( item )}
-              />
-            </View>
-
-            <Input
-              inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
-              inputStyle={FormStyles.inputText}
-              placeholder={'Enter An Amount'}
-              placeholderTextColor={FormStyles.placeholderText.color}
-              underlineColorAndroid={FormStyles.placeholderText.color}
-              value={amountToBuyValue}
-              maxLength={24}
-              numberOfLines={1}
-              keyboardType="number-pad"
-              onChangeText={setAmountToBuyValue}
-              ref={amountInputRef}
-            />
-
-            <View style={styles.proceedButtonContainer}>
-              <Button
-                raised
-                buttonStyle={ButtonStyles.primaryActionButton}
-                title="Proceed to Wyre"
-                titleStyle={ButtonStyles.actionButtonText}
-                onPress={handleProceedButtonPress}
-                disabled={canProceed === false}
-              />
-
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-                <Text style={{
-                }}>
                   Powered by
-                </Text>
-                <Image
-                  source={require( '../../assets/images/icons/wyre_large.png' )}
-                  style={{
-                    marginLeft: 2,
-                    width: 50,
-                    height: 30,
-                  }}
-                />
-              </View>
-            </View>
-
+            </Text>
+            <Image
+              source={require( '../../assets/images/icons/wyre_large.png' )}
+              style={{
+                marginLeft: 2,
+                width: 50,
+                height: 30,
+              }}
+            />
           </View>
         </View>
 
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </ScrollView>
   )
 }
 

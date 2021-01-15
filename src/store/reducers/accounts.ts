@@ -53,6 +53,7 @@ import {
 } from '../../common/constants/serviceTypes'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 
 export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
@@ -169,6 +170,8 @@ export type AccountsState = {
   hasAccountShellMergeFailed: boolean;
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
+
+  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
 };
 
 const initialState: AccountsState = {
@@ -202,6 +205,8 @@ const initialState: AccountsState = {
   hasAccountShellMergeFailed: false,
   accountShellMergeSource: null,
   accountShellMergeDestination: null,
+
+  currentWyreSubAccount: null,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -238,7 +243,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             transfer: {
               ...state[ accountType ].transfer,
               stage1: {
-                ...action.payload.result 
+                ...action.payload.result
               },
               executed: 'ST1',
             },
@@ -286,7 +291,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
 
-      
+
       case REMOVE_TRANSFER_DETAILS:
         return {
           ...state,
@@ -385,7 +390,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
                   transfer: {
                     ...state[ accountType ].transfer,
                     stage2: {
-                      ...action.payload.result 
+                      ...action.payload.result
                     },
                     executed: 'ST2',
                   },

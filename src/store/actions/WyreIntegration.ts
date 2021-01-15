@@ -31,7 +31,25 @@ export const clearWyreCache = ( ) => {
   }
 }
 
-export const fetchWyreReservation = ( amount, currencyCode, country?, instance?: number, sourceKind?: SourceAccountKind ) => {
+export interface WyreReservationFetchAction extends Action {
+  type: typeof FETCH_WYRE_RESERVATION;
+  payload: {
+    amount?: number;
+    currencyCode?: string;
+    country?: string;
+    instance?: number;
+    sourceKind?: SourceAccountKind;
+  };
+}
+
+
+export const fetchWyreReservation = (
+  amount?: number,
+  currencyCode?: string,
+  country?: string,
+  instance?: number,
+  sourceKind?: SourceAccountKind,
+): WyreReservationFetchAction => {
   return {
     type: FETCH_WYRE_RESERVATION,
     payload: {
@@ -41,12 +59,9 @@ export const fetchWyreReservation = ( amount, currencyCode, country?, instance?:
 }
 
 
-export const fetchWyreReservationCompleted = ( data ) => {
+export const fetchWyreReservationCompleted = ( ) => {
   return {
     type: FETCH_WYRE_RESERVATION_COMPLETED,
-    payload: {
-      data
-    },
   }
 }
 
@@ -59,7 +74,7 @@ export const fetchWyreReservationFailed = ( data ) => {
   }
 }
 
-export const hasWyreReservationFetchSucceeded = ( data ) => {
+export const fetchWyreReservationSucceeded = ( data ) => {
   return {
     type: FETCH_WYRE_RESERVATION_SUCCEEDED,
     payload: {
@@ -83,7 +98,6 @@ export const wyreOrderSucceeded = ( payload: WyreOrder ): WyreOrderSuccessAction
 }
 
 
-
 export interface WyreOrderFailureAction extends Action {
   type: typeof WYRE_ORDER_FAILED;
   payload: string;
@@ -97,7 +111,6 @@ export const wyreOrderFailed = (
     payload: errorMessage,
   }
 }
-
 
 
 export interface WyreOrderCompletionAction extends Action {

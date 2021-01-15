@@ -5,10 +5,7 @@ import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import { Button } from 'react-native-elements'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { addNewAccountShell } from '../../../store/actions/accounts'
 import { useDispatch } from 'react-redux'
-import { resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
@@ -49,12 +46,6 @@ export interface Props {
 }
 
 const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  useAccountShellCreationCompletionEffect( () => {
-    console.log( 'dispatching resetToHomeAction' )
-    navigation.dispatch( resetToHomeAction() )
-  } )
-
-  const dispatch = useDispatch()
   const newAccountChoices = useNewAccountChoices()
   const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
@@ -73,9 +64,6 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
       switch (
         ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind
       ) {
-          case ServiceAccountKind.FAST_BITCOINS:
-            dispatch( addNewAccountShell( selectedChoice ) )
-            break
           case ServiceAccountKind.WYRE:
             navigation.navigate( 'NewWyreAccountDetails', {
               currentSubAccount: selectedChoice,
@@ -97,9 +85,6 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           navigation.navigate( 'AddNewDonationAccountDetails', {
             currentSubAccount: selectedChoice,
           } )
-          break
-        case SubAccountKind.TRUSTED_CONTACTS:
-          dispatch( addNewAccountShell( selectedChoice ) )
           break
         case SubAccountKind.FULLY_IMPORTED_WALLET:
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
