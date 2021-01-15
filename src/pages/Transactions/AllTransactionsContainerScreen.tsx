@@ -1,33 +1,31 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import useAllAccountTransactions from '../../utils/hooks/transactions/UseAllAccountTransactions';
-import EmptyListInfoBox from '../../components/empty-states/EmptyListInfoBox';
-import TransactionsFlatList from '../../components/transactions/TransactionsFlatList';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import useAllAccountTransactions from '../../utils/hooks/transactions/UseAllAccountTransactions'
+import EmptyListInfoBox from '../../components/empty-states/EmptyListInfoBox'
+import TransactionsFlatList from '../../components/transactions/TransactionsFlatList'
 
 export type Props = {
   navigation: any;
 };
 
-const AllTransactionsContainerScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const { transactions, isLoadingTransactions } = useAllAccountTransactions();
+const AllTransactionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const { transactions, isLoadingTransactions } = useAllAccountTransactions()
 
-  const isShowingInfoBox = useMemo(() => {
-    return transactions.length < 2;
-  }, [transactions]);
+  const isShowingInfoBox = useMemo( () => {
+    return transactions.length < 2
+  }, [ transactions ] )
 
-  if (isLoadingTransactions) {
-    return <ActivityIndicator size="large" />;
+  if ( isLoadingTransactions ) {
+    return <ActivityIndicator size="large" />
   } else {
     return (
       <View style={styles.rootContainer}>
         <TransactionsFlatList
           transactions={transactions}
-          onTransactionSelected={(transaction) => {
-            navigation.navigate('TransactionDetails', {
+          onTransactionSelected={( transaction ) => {
+            navigation.navigate( 'TransactionDetails', {
               transaction,
-            });
+            } )
           }}
         />
 
@@ -39,11 +37,11 @@ const AllTransactionsContainerScreen: React.FC<Props> = ({
           />
         )}
       </View>
-    );
+    )
   }
-};
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -54,6 +52,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: '5%',
   },
-});
+} )
 
-export default AllTransactionsContainerScreen;
+export default AllTransactionsContainerScreen
