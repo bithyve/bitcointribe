@@ -48,7 +48,7 @@ import {
 } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
-import { getAccountIcon } from './utils'
+import { getAccountIcon, getAccountTitle } from './utils'
 
 export enum SectionKind {
   SCAN_QR,
@@ -258,23 +258,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           index <= derivativeAccounts[ accType ].instance.using;
           index++
         ) {
+          const derivativeAccountDetails = {
+            type: accType, number: index
+          }
           const accInstance = {
             id: accType,
             account_number: index,
-            account_name:
-              accType === DONATION_ACCOUNT
-                ? 'Donation Account'
-                : serviceType === REGULAR_ACCOUNT
-                  ? 'Checking Account'
-                  : 'Savings Account',
+            account_name: getAccountTitle( serviceType, derivativeAccountDetails ),
             type: serviceType,
             checked: false,
-            image:
-              accType === DONATION_ACCOUNT
-                ? require( '../../../assets/images/icons/icon_donation_account.png' )
-                : serviceType === REGULAR_ACCOUNT
-                  ? require( '../../../assets/images/icons/icon_regular_account.png' )
-                  : require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
+            image: getAccountIcon( serviceType, derivativeAccountDetails ) 
           }
           additionalAccountData.push( accInstance )
         }

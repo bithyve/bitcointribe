@@ -42,6 +42,7 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   DONATION_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import RelayServices from '../../../bitcoin/services/RelayService'
 import {
@@ -716,6 +717,7 @@ class SendConfirmation extends Component<
                 'Savings Account': SECURE_ACCOUNT,
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
+                'Wyre': WYRE,
               }[ selectedContactData.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
