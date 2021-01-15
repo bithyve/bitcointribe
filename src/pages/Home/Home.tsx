@@ -12,10 +12,9 @@ import {
   AppState
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
-import AddModalContents from '../../components/home/AddModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
@@ -90,8 +89,9 @@ import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -101,7 +101,7 @@ export enum BottomSheetState {
 }
 
 export enum BottomSheetKind {
-  TAB_BAR_ADD_MENU,
+  TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
   CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
@@ -544,7 +544,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       )
-    } catch ( error ) { 
+    } catch ( error ) {
       // do nothing
     }
   };
@@ -1112,7 +1112,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage( async remoteMessage => {
+    firebase.messaging().onMessage( async () => {
       // console.log('A new FCM message arrived!',remoteMessage);
     } )
   };
@@ -1234,10 +1234,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.navigation.navigate( 'QRScanner', {
         onCodeScanned: this.processQRData,
       } )
-    } else if ( tab === BottomTab.Add ) {
-      this.openBottomSheet( BottomSheetKind.TAB_BAR_ADD_MENU )
+    } else if ( tab === BottomTab.FriendsAndFamily ) {
+      this.props.navigation.navigate( 'FriendsAndFamily' )
     }
   };
+
+  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+    switch ( menuItem.kind ) {
+        case BuyMenuItemKind.FAST_BITCOINS:
+          this.props.navigation.navigate( 'VoucherScanner' )
+          break
+        case BuyMenuItemKind.SWAN:
+          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          break
+        case BuyMenuItemKind.WYRE:
+          if ( this.props.currentWyreSubAccount ) {
+            this.props.navigation.navigate( 'PlaceWyreOrder', {
+              currentSubAccount: this.props.currentWyreSubAccount
+            } )
+          } else {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Wyre Account',
+              defaultDescription: 'Bought using Apple Pay / Credit Card',
+              serviceAccountKind: ServiceAccountKind.WYRE,
+            } )
+
+            this.props.navigation.navigate( 'NewWyreAccountDetails', {
+              currentSubAccount: newSubAccount,
+            } )
+          }
+          break
+    }
+  }
 
   processDLRequest = ( key, rejected ) => {
     const { trustedContactRequest, recoveryRequest } = this.state
@@ -1626,7 +1655,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_ADD_MENU:
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints
@@ -1662,49 +1691,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { custodyRequest } = this.state
 
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_ADD_MENU:
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
-              <AddModalContents
-                onPressElements={( type ) => {
-                  if ( type == 'buyBitcoins' ) {
-                    navigation.navigate( 'VoucherScanner' )
-                  } else if ( type == 'addContact' ) {
-                    this.setState(
-                      {
-                        isLoadContacts: true,
-                      },
-                      () => {
-                        this.openBottomSheet(
-                          BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK,
-                        )
-                      },
-                    )
-                  }
-                  else if( type =='swan' ) {
-                    navigation.navigate( 'SwanIntegrationScreen' )
-                  }
-                  else if ( type =='wyre' ) {
-                    if ( this.props.currentWyreSubAccount ) {
-                      navigation.navigate( 'PlaceWyreOrder', {
-                        currentSubAccount: this.props.currentWyreSubAccount
-                      } )
-                    } else {
-                      const newSubAccount = new ExternalServiceSubAccountInfo( {
-                        instanceNumber: 1,
-                        defaultTitle: 'Wyre Account',
-                        defaultDescription: 'Bought using Apple Pay / Credit Card',
-                        serviceAccountKind: ServiceAccountKind.WYRE,
-                      } )
-
-                      navigation.navigate( 'NewWyreAccountDetails', {
-                        currentSubAccount: newSubAccount,
-                      } )
-                    }
-                  }
-                }}
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
               />
             </>
           )
@@ -1848,13 +1841,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     const {
       netBalance,
-      selectedBottomTab,
       notificationData,
       currencyCode,
     } = this.state
 
     const {
-      navigation,
       exchangeRates,
       walletName,
       overallHealth,
@@ -1904,28 +1895,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <View
-          style={styles.floatingFriendsAndFamilyButtonContainer}
+          style={styles.floatingActionButtonContainer}
           pointerEvents="box-none"
         >
           <Button
             raised
-            title="Friends & Family"
+            title="Buy"
             icon={
               <Image
-                source={require( '../../assets/images/icons/icon_contact.png' )}
+                source={require( '../../assets/images/icons/icon_buy.png' )}
                 style={{
                   width: 18, height: 18
                 }}
               />
             }
             buttonStyle={{
-              ...ButtonStyles.floatingActionButton, borderRadius: 9999
+              ...ButtonStyles.floatingActionButton,
+              borderRadius: 9999,
+              paddingHorizontal: widthPercentageToDP( 10 )
             }}
             titleStyle={{
               ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 4,
+              marginLeft: 8,
             }}
-            onPress={() => navigation.navigate( 'FriendsAndFamily' )}
+            onPress={() => this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )}
           />
         </View>
 
@@ -1936,10 +1929,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         <CustomBottomTabs
           onSelect={this.handleBottomTabSelection}
-          selectedTab={selectedBottomTab}
           tabBarZIndex={
             this.state.currentBottomSheetKind ==
-              BottomSheetKind.TAB_BAR_ADD_MENU || null
+              BottomSheetKind.TAB_BAR_BUY_MENU || null
               ? 1
               : 0
           }
@@ -2024,7 +2016,7 @@ const styles = StyleSheet.create( {
     },
   },
 
-  floatingFriendsAndFamilyButtonContainer: {
+  floatingActionButtonContainer: {
     position: 'absolute',
     zIndex: 0,
     bottom: TAB_BAR_HEIGHT,
@@ -2032,6 +2024,6 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
-    padding: heightPercentageToDP( 1 ),
+    padding: heightPercentageToDP( 1.5 ),
   },
 } )
