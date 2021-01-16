@@ -1495,7 +1495,9 @@ function* updateAccountSettings( { payload: account, }: {
     const result = yield call(
       service.updateAccountDetails,
       {
-        kind: account.kind===SubAccountKind.SERVICE? ( account.serviceAccountKind ) : account.kind,
+        // for accounts of subAccountKind as SERVICE we need to know which specific
+        // service the account belongs to, this is serviceAccountKind of ExternalServiceSubAccountDescribing
+        kind: account.kind===SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
         instanceNumber: account.instanceNumber,
         customDisplayName :account.customDisplayName,
         customDescription: account.customDescription
