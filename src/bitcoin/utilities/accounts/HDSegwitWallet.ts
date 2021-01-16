@@ -33,7 +33,7 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 
 const { HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT 
+  timeout: REQUEST_TIMEOUT
 } )
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -157,7 +157,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
         ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts 
+          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
         }
         : config.DERIVATIVE_ACC
     this.lastBalTxSync =
@@ -178,7 +178,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getMnemonic = (): { mnemonic: string } => {
     return {
-      mnemonic: this.mnemonic 
+      mnemonic: this.mnemonic
     }
   };
 
@@ -387,7 +387,7 @@ export default class HDSegwitWallet extends Bitcoin {
         )
 
       return {
-        address: account.contactDetails.receivingAddress 
+        address: account.contactDetails.receivingAddress
       }
     } catch ( err ) {
       throw new Error( `Unable to generate receiving address: ${err.message}` )
@@ -539,7 +539,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -650,7 +650,7 @@ export default class HDSegwitWallet extends Bitcoin {
           )
         }
       }
- 
+
       const accountsToResponseMapping = res.data
       if ( !Object.keys( accountsToResponseMapping ).length ) return
 
@@ -843,11 +843,11 @@ export default class HDSegwitWallet extends Bitcoin {
               }
             }
 
-          // sort transactions(lastest first) 
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => { 
+          // sort transactions(lastest first)
+          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
             return tx2.blockTime - tx1.blockTime
           } )
-       
+
           const lastSyncTime =
             this.derivativeAccounts[ dAccountType ][ accountNumber ]
               .lastBalTxSync || 0
@@ -888,7 +888,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
 
       return {
-        synched: true 
+        synched: true
       }
     } catch ( err ) {
       // console.log(
@@ -915,7 +915,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if ( accountType === DONATION_ACCOUNT ) {
       const { id } = this.derivativeAccounts[ accountType ][ accountNumber ]
       if ( id ) accountDetails = {
-        donationId: id 
+        donationId: id
       }
     }
 
@@ -1019,7 +1019,7 @@ export default class HDSegwitWallet extends Bitcoin {
     )
 
     return {
-      synched: true 
+      synched: true
     }
   };
 
@@ -1073,7 +1073,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
-      accountId, accountNumber 
+      accountId, accountNumber
     }
   };
 
@@ -1100,23 +1100,30 @@ export default class HDSegwitWallet extends Bitcoin {
             this.accountName = account.customDisplayName
             this.accountDescription = account.customDescription
           } else {
-            const subPrimInstance: SubPrimaryDerivativeAccountElements =  
+            const subPrimInstance: SubPrimaryDerivativeAccountElements =
             this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ]
             subPrimInstance.accountName = account.customDisplayName
             subPrimInstance.accountDescription = account.customDescription
           }
           break
-        
+
         case DONATION_ACCOUNT:
-          const donationInstance: DonationDerivativeAccountElements =  
+          const donationInstance: DonationDerivativeAccountElements =
               this.derivativeAccounts[ DONATION_ACCOUNT ][ account.instanceNumber ]
           donationInstance.subject = account.customDisplayName
           donationInstance.description = account.customDescription
           break
+        case WYRE:
+          const wyreInstance: WyreDerivativeAccountElements =
+              this.derivativeAccounts[ WYRE ][ account.instanceNumber ]
+
+          wyreInstance.accountName = account.customDisplayName
+          wyreInstance.accountDescription = account.customDescription
+          break
     }
 
-    return { 
-      updateSuccessful: true 
+    return {
+      updateSuccessful: true
     }
   };
 
@@ -1196,7 +1203,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      setupSuccessful, accountId: xpubId, accountNumber 
+      setupSuccessful, accountId: xpubId, accountNumber
     }
   };
 
@@ -1263,7 +1270,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      updated 
+      updated
     }
   };
 
@@ -1488,7 +1495,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.transactions = transactions
     // console.log({ balances, transactions });
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -1553,7 +1560,7 @@ export default class HDSegwitWallet extends Bitcoin {
     // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return {
-      fee 
+      fee
     }
   };
 
@@ -1606,11 +1613,11 @@ export default class HDSegwitWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance 
+      fee, balance: confirmedBalance
     }
 
     return {
-      inputs, outputs, fee, balance: confirmedBalance 
+      inputs, outputs, fee, balance: confirmedBalance
     }
   };
 
@@ -1702,7 +1709,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if ( !defaultPriorityInputs || defaultDebitedAmount > confirmedBalance ) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return {
-        fee: defaultPriorityFee, balance: confirmedBalance 
+        fee: defaultPriorityFee, balance: confirmedBalance
       }
     }
 
@@ -1746,7 +1753,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     // console.log({ txPrerequisites });
     return {
-      txPrerequisites 
+      txPrerequisites
     }
   };
 
