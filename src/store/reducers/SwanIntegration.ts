@@ -1,12 +1,8 @@
 import {
-  FETCH_SWAN_TOKEN_FAILED,
-  FETCH_SWAN_TOKEN_SUCCEEDED,
-  FETCH_SWAN_TOKEN_COMPLETED,
-
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
-  FETCH_SWAN_TOKEN,
+
   LINK_SWAN_WALLET,
 } from '../actions/SwanIntegration'
 
@@ -57,44 +53,6 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
-      case FETCH_SWAN_TOKEN:
-        return {
-          ...state,
-          isFetchingSwanToken: true,
-        }
-
-      case FETCH_SWAN_TOKEN_FAILED:
-        console.log(
-          'action.payload.fetchSwanTokenFailedMessage',
-          action.payload.fetchSwanTokenFailed,
-          action.payload.fetchSwanTokenFailedMessage,
-        )
-        return {
-          ...state,
-          isFetchingSwanToken: false,
-          fetchSwanTokenFailed: action.payload.data.fetchSwanTokenFailed,
-          fetchSwanTokenFailedMessage: action.payload.data.fetchSwanTokenFailedMessage,
-        }
-
-      case FETCH_SWAN_TOKEN_SUCCEEDED:
-        console.log(
-          'payload.swanTokenDetails',
-          action.payload.swanTokenDetails,
-        )
-        return {
-          ...state,
-          isFetchingSwanToken: false,
-          fetchSwanTokenFailed: false,
-          swanTokenDetails: action.payload.swanTokenDetails,
-        }
-
-      case FETCH_SWAN_TOKEN_COMPLETED:
-        return {
-          ...state,
-          isFetchingSwanToken: false,
-          fetchSwanTokenFailedMessage: null,
-        }
-
       case LINK_SWAN_WALLET:
         return {
           ...state,

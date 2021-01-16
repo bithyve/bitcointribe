@@ -1,9 +1,7 @@
 import { call, put } from 'redux-saga/effects'
 
 import {
-  FETCH_SWAN_TOKEN,
-  fetchSwanTokenSucceeded,
-  fetchSwanTokenFailed,
+  FETCH_SWAN_AUTHENTICATION_URL,
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
@@ -18,6 +16,15 @@ import {
 
 import { createWatcher } from '../utils/utilities'
 
+export const fetchSwanAuthenticationUrlWatcher = createWatcher(
+  fetchSwanAuthenticationUrlWorker,
+  FETCH_SWAN_AUTHENTICATION_URL
+)
+
+export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
+
+}
+
 export function* fetchSwanTokenWorker( { payload } ) {
   // Authentication code is available which needs to be redeemed
   console.log( 'About to Redeem Authorization Code ', payload.data )
@@ -30,7 +37,7 @@ export function* fetchSwanTokenWorker( { payload } ) {
         fetchSwanTokenFail: true,
         fetchSwanTokenFailMessage: 'Swan authentication failed',
       }
-      yield put( fetchSwanTokenFailed( data ) )
+      //yield put( fetchSwanTokenFailed( data ) )
     } else {
       /*
       If we are here that means authentication was succesful with Swan
@@ -49,13 +56,13 @@ export function* fetchSwanTokenWorker( { payload } ) {
       and update it when we get the auth token.
       */
 
-      yield put( fetchSwanTokenSucceeded( result.data ) )
+      //yield put( fetchSwanTokenSucceeded( result.data ) )
       if ( result.error ) {
         const data = {
           fetchSwanTokenFail: true,
           fetchSwanTokenFailMessage: result.message || 'Swan authentication failed',
         }
-        yield put( fetchSwanTokenFailed( data ) )
+        //yield put( fetchSwanTokenFailed( data ) )
       }
     }
   } catch ( err ) {
@@ -64,14 +71,9 @@ export function* fetchSwanTokenWorker( { payload } ) {
       fetchSwanTokenFail: true,
       fetchSwanTokenFailMessage: 'Swan authentication failed',
     }
-    yield put( fetchSwanTokenFailed( data ) )
+    //yield put( fetchSwanTokenFailed( data ) )
   }
 }
-
-export const fetchSwanTokenWatcher = createWatcher(
-  fetchSwanTokenWorker,
-  FETCH_SWAN_TOKEN,
-)
 
 function* linkSwanWalletWorker( { payload } ) {
   console.log( 'linkSwanWallet payload.data', payload.data )

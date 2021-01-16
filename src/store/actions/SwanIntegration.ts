@@ -1,7 +1,4 @@
-export const FETCH_SWAN_TOKEN = 'FETCH_SWAN_TOKEN'
-export const FETCH_SWAN_TOKEN_FAILED = 'FETCH_SWAN_TOKEN_FAILED'
-export const FETCH_SWAN_TOKEN_SUCCEEDED = 'FETCH_SWAN_TOKEN_SUCCEEDED'
-export const FETCH_SWAN_TOKEN_COMPLETED = 'FETCH_SWAN_TOKEN_COMPLETED'
+export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
 
 export const LINK_SWAN_WALLET = 'LINK_SWAN_WALLET'
 export const LINK_SWAN_WALLET_FAILED = 'LINK_SWAN_WALLET_FAILED'
@@ -20,41 +17,18 @@ export const ADD_SWAN_METADATA_COMPLETED = 'ADD_SWAN_METADATA_COMPLETED'
 
 
 export enum SwanActionKind {
+  FETCH_SWAN_AUTHENTICATION_URL,
   AUTHENTICATE,
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
   SYNC_SWAN_ACCOUNT_DATA,
 }
 
-export const fetchSwanToken = ( data ) => {
+export const fetchSwanAuthenticationUrl = ( data ) =>  {
   return {
-    type: FETCH_SWAN_TOKEN,
+    type: FETCH_SWAN_AUTHENTICATION_URL,
     payload: {
       data
-    },
-  }
-}
-
-export const fetchSwanTokenCompleted = () => {
-  return {
-    type: FETCH_SWAN_TOKEN_COMPLETED
-  }
-}
-
-export const fetchSwanTokenFailed = data => {
-  return {
-    type: FETCH_SWAN_TOKEN_FAILED,
-    payload: {
-      data
-    },
-  }
-}
-
-export const fetchSwanTokenSucceeded = ( data ) => {
-  return {
-    type: FETCH_SWAN_TOKEN_SUCCEEDED,
-    payload: {
-      swanTokenDetails: data
     }
   }
 }
