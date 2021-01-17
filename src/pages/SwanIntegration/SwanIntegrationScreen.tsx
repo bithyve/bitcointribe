@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Linking, View, Text, StyleSheet } from 'react-native'
 import { useDispatch } from 'react-redux'
 import ActionMenuListItem from './ActionMenuListItem'
@@ -8,6 +8,8 @@ import { fetchSwanAuthenticationUrl, linkSwanWallet, syncSwanWallet, SwanActionK
 import { addNewAccountShell } from '../../store/actions/accounts'
 import  ExternalServiceSubAccountInfo  from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import openLink from '../../utils/OpenLink'
+
 export type Props = {
   navigation: any;
 };
@@ -45,7 +47,19 @@ const actionItemKeyExtractor = ( item: ActionMenuItem ) => String( item.kind )
 
 
 const SwanIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const { hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl } = useSwanIntegrationState()
   const dispatch = useDispatch()
+  useEffect( ()=>{
+    dispatch( fetchSwanAuthenticationUrl( {
+    } ) )
+  }, [] )
+
+  useEffect( ()=>{
+    console.log( 'inside use effect', {
+      hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl
+    } )
+    if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
+  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
 
   function handleItemSelection( { kind: itemKind }: ActionMenuItem ) {
     switch ( itemKind ) {
@@ -71,8 +85,8 @@ const SwanIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           // ) )
           break
         case SwanActionKind.SYNC_SWAN_ACCOUNT_DATA:
-          Linking.openURL( 'https://dev-api.swanbitcoin.com?client_id=demo-web-client&state=1599045135410-jFe&scope=openid%20profile%20read&response_type=code&code_challenge=SfO9AIeVOoLBdi8xF5VF5ByzExMx4bxGDRsXUYMVRWc&code_challenge_method=S256&prompt=login&ui_locales=en&nonce=1599046102647-dv4&redirect_uri=https://oauth.tools/callback/code' )
-          // dispatch(syncSwanWallet({}));
+          dispatch( fetchSwanAuthenticationUrl( {
+          } ) )
           break
     }
   }
