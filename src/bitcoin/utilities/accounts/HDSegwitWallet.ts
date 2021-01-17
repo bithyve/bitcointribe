@@ -1088,7 +1088,6 @@ export default class HDSegwitWallet extends Bitcoin {
     updateSuccessful: boolean;
   } => {
     switch( account.kind ){
-
         case TEST_ACCOUNT:
           this.accountName = account.customDisplayName
           this.accountDescription = account.customDescription
