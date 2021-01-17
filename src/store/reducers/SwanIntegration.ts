@@ -1,4 +1,6 @@
+import { $CombinedState } from 'redux'
 import {
+  FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
@@ -8,6 +10,19 @@ import {
 
 
 export type SwanIntegrationState = {
+  isSwanAuthenticationInProgress: boolean | null,
+  swanAuthenticationUrl: string | null,
+  code_verifier: string | null,
+  code_challenge: string | null,
+  state: string | null,
+  nonce: number | null,
+  hasFetchSwanAuthenticationUrlSucceeded: boolean | null,
+  hasFetchSwanAuthenticationCodeSucceeded: boolean | null,
+  swanAuthenticatedCode: string | null,
+  isSwanRedeemCodeInProgress: boolean | null,
+  swanToken: string | null
+
+
   swanTokenDetails: unknown | null;
   swanWalletDetails: unknown | null;
   swanMetadataDetails: unknown | null;
@@ -30,6 +45,19 @@ export type SwanIntegrationState = {
 }
 
 const INITIAL_STATE: SwanIntegrationState = {
+  isSwanAuthenticationInProgress: false,
+  swanAuthenticationUrl: null,
+  code_challenge: null,
+  code_verifier: null,
+  state: null,
+  nonce: null,
+  hasFetchSwanAuthenticationUrlSucceeded: false,
+  hasFetchSwanAuthenticationCodeSucceeded: false,
+  swanAuthenticatedCode: null,
+  isSwanRedeemCodeInProgress: false,
+  swanToken: null,
+
+
   swanTokenDetails: null,
   swanWalletDetails: null,
   swanMetadataDetails: null,
@@ -53,6 +81,17 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
+      case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
+        return {
+          ...state,
+          isSwanAuthenticationInProgress: true,
+          hasFetchSwanAuthenticationUrlSucceeded: true,
+          swanAuthenticationUrl: action.payload.data.swanAuthenticationUrl,
+          code_challenge: action.payload.data.code_challenge,
+          code_verifier: action.payload.data.code_verifier,
+          nonce: action.payload.data.nonce,
+          state: action.payload.data.state
+        }
       case LINK_SWAN_WALLET:
         return {
           ...state,
