@@ -28,7 +28,7 @@ import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 
 const {  HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT 
+  timeout: REQUEST_TIMEOUT
 } )
 
 export default class SecureHDWallet extends Bitcoin {
@@ -180,7 +180,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
         ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts 
+          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
         }
         : config.DERIVATIVE_ACC
     this.lastBalTxSync =
@@ -224,14 +224,14 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync( this.primaryMnemonic )
     hash.update( seed )
     return {
-      walletId: hash.digest( 'hex' ) 
+      walletId: hash.digest( 'hex' )
     }
   };
 
   public getInitialReceivingAddress = (): string => {
     if ( this.xpubs ) return this.createSecureMultiSig( 0 ).address
   };
- 
+
   public getReceivingAddress = (
     derivativeAccountType?: string,
     accountNumber?: number,
@@ -267,21 +267,21 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync( secondaryMnemonic )
     hash.update( seed )
     return {
-      secondaryID: hash.digest( 'hex' ) 
+      secondaryID: hash.digest( 'hex' )
     }
   };
 
   public removeSecondaryMnemonic = () => {
     this.secondaryMnemonic = null
     return {
-      removed: !this.secondaryMnemonic 
+      removed: !this.secondaryMnemonic
     }
   };
 
   public removeTwoFADetails = () => {
     this.twoFASetup = null
     return {
-      removed: !this.twoFASetup 
+      removed: !this.twoFASetup
     }
   };
 
@@ -303,18 +303,18 @@ export default class SecureHDWallet extends Bitcoin {
     const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
     if ( currentXpub !== this.xpubs.secondary ) {
       return {
-        restored: false 
+        restored: false
       }
     }
     this.secondaryMnemonic = secondaryMnemonic
     return {
-      restored: true 
+      restored: true
     }
   };
 
   public getSecondaryXpub = (): { secondaryXpub: string } => {
     return {
-      secondaryXpub: this.xpubs.secondary 
+      secondaryXpub: this.xpubs.secondary
     }
   };
 
@@ -338,7 +338,7 @@ export default class SecureHDWallet extends Bitcoin {
     const secondaryXpub = decrypted
     if ( this.validateXpub( secondaryXpub ) ) {
       return {
-        secondaryXpub 
+        secondaryXpub
       }
     } else {
       throw new Error( 'Secondary Xpub is either tampered or is invalid' )
@@ -368,7 +368,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      isValid: res.data.isValid 
+      isValid: res.data.isValid
     }
   };
 
@@ -495,7 +495,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.balances = balances
     this.transactions = transactions
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -664,7 +664,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -778,7 +778,7 @@ export default class SecureHDWallet extends Bitcoin {
           )
         }
       }
-    
+
 
       const accountsToResponseMapping = res.data
       if ( !Object.keys( accountsToResponseMapping ).length ) return
@@ -963,11 +963,11 @@ export default class SecureHDWallet extends Bitcoin {
               }
             }
 
-          // sort transactions(lastest first) 
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => { 
+          // sort transactions(lastest first)
+          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
             return tx2.blockTime - tx1.blockTime
           } )
-      
+
           const lastSyncTime =
             this.derivativeAccounts[ dAccountType ][ accountNumber ]
               .lastBalTxSync || 0
@@ -1008,7 +1008,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       return {
-        synched: true 
+        synched: true
       }
     } catch ( err ) {
       // console.log(
@@ -1035,7 +1035,7 @@ export default class SecureHDWallet extends Bitcoin {
     if ( accountType === DONATION_ACCOUNT ) {
       const { id } = this.derivativeAccounts[ accountType ][ accountNumber ]
       if ( id ) accountDetails = {
-        donationId: id 
+        donationId: id
       }
     }
 
@@ -1135,7 +1135,7 @@ export default class SecureHDWallet extends Bitcoin {
     ).address
 
     return {
-      synched: true 
+      synched: true
     }
   };
 
@@ -1171,7 +1171,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
-      accountId, accountNumber 
+      accountId, accountNumber
     }
   };
 
@@ -1185,15 +1185,15 @@ export default class SecureHDWallet extends Bitcoin {
   ): {
     updateSuccessful: boolean;
   } => {
-    switch( account.kind ){ 
+    switch( account.kind ){
         case SECURE_ACCOUNT:
           if ( !account.instanceNumber ) {
             // instance num zero represents the parent acc
             this.accountName = account.customDisplayName
             this.accountDescription = account.customDescription
-          } 
+          }
           else {
-            const subPrimInstance: SubPrimaryDerivativeAccountElements =  
+            const subPrimInstance: SubPrimaryDerivativeAccountElements =
             this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ]
             subPrimInstance.accountName = account.customDisplayName
             subPrimInstance.accountDescription = account.customDescription
@@ -1201,16 +1201,16 @@ export default class SecureHDWallet extends Bitcoin {
           break
 
         case DONATION_ACCOUNT:
-          const donationInstance: DonationDerivativeAccountElements =  
+          const donationInstance: DonationDerivativeAccountElements =
               this.derivativeAccounts[ DONATION_ACCOUNT ][ account.instanceNumber ]
           donationInstance.subject = account.customDisplayName
           donationInstance.description = account.customDescription
-          break    
+          break
     }
-  
 
-    return { 
-      updateSuccessful: true 
+
+    return {
+      updateSuccessful: true
     }
   };
 
@@ -1295,7 +1295,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      setupSuccessful, accountId: xpubId, accountNumber 
+      setupSuccessful, accountId: xpubId, accountNumber
     }
   };
 
@@ -1329,7 +1329,7 @@ export default class SecureHDWallet extends Bitcoin {
       if ( prepared ) {
         this.twoFASetup = setupData
         return {
-          setupData 
+          setupData
         }
       } else {
         throw new Error(
@@ -1354,14 +1354,14 @@ export default class SecureHDWallet extends Bitcoin {
       if ( err.code ) throw new Error( err.code )
     }
     console.log( {
-      res 
+      res
     } )
     const { valid } = res.data
     if ( !valid ) {
       throw new Error( '2FA validation failed' )
     } else {
-      return { 
-        valid 
+      return {
+        valid
       }
     }
   };
@@ -1429,7 +1429,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      updated 
+      updated
     }
   };
 
@@ -1459,7 +1459,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
     const { qrData, secret } = res.data
     this.twoFASetup = {
-      qrData, secret 
+      qrData, secret
     }
     return this.twoFASetup
   };
@@ -1590,7 +1590,7 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return {
-      fee 
+      fee
     }
   };
 
@@ -1643,10 +1643,10 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance 
+      fee, balance: confirmedBalance
     }
     return {
-      inputs, outputs, fee, balance: confirmedBalance 
+      inputs, outputs, fee, balance: confirmedBalance
     }
   };
 
@@ -1740,7 +1740,7 @@ export default class SecureHDWallet extends Bitcoin {
     if ( !defaultPriorityInputs || defaultDebitedAmount > confirmedBalance ) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return {
-        fee: defaultPriorityFee, balance: confirmedBalance 
+        fee: defaultPriorityFee, balance: confirmedBalance
       }
     }
 
@@ -1769,11 +1769,11 @@ export default class SecureHDWallet extends Bitcoin {
           // to previous priority assets
           if ( priority === 'medium' )
             txPrerequisites[ priority ] = {
-              ...txPrerequisites[ 'low' ] 
+              ...txPrerequisites[ 'low' ]
             }
           if ( priority === 'high' )
             txPrerequisites[ priority ] = {
-              ...txPrerequisites[ 'medium' ] 
+              ...txPrerequisites[ 'medium' ]
             }
         } else {
           txPrerequisites[ priority ] = {
@@ -1788,7 +1788,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     // console.log({ txPrerequisites });
     return {
-      txPrerequisites 
+      txPrerequisites
     }
   };
 
@@ -1880,7 +1880,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       return {
-        signedTxb: txb, childIndexArray 
+        signedTxb: txb, childIndexArray
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
@@ -1926,7 +1926,7 @@ export default class SecureHDWallet extends Bitcoin {
       // console.log({ txid });
 
       return {
-        txid 
+        txid
       }
     } catch ( err ) {
       throw new Error( `Unable to transfer: ${err.message}` )
@@ -1975,7 +1975,7 @@ export default class SecureHDWallet extends Bitcoin {
       } )
 
       return {
-        signedTxb: txb 
+        signedTxb: txb
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )

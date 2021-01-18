@@ -20,6 +20,7 @@ export type BuyBitcoinBottomSheetMenuItem = {
   subtitle: string;
   kind: BuyMenuItemKind;
   imageSource: ImageSourcePropType;
+  disabled: boolean;
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
@@ -28,18 +29,21 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     subtitle: 'From select retail stores with FastBitcoins',
     kind: BuyMenuItemKind.FAST_BITCOINS,
     imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+    disabled: false
   },
   {
     title: 'Set up automatic buys',
     subtitle: 'Stack sats with SwanBitcoin',
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan_temp.png' ),
+    disabled: true
   },
   {
     title: 'Buy using ApplePay or Debit Card',
     subtitle: 'Powered by Wyre',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    disabled: false
   },
 ]
 
@@ -56,6 +60,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         }}
         bottomDivider
         onPress={() => { onMenuItemSelected( menuItem ) }}
+        disabled={menuItem.disabled}
       >
         <Image
           source={menuItem.imageSource}

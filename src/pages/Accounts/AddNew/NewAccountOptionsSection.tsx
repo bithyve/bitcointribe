@@ -25,7 +25,6 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 }: Props ) => {
 
   const { currentWyreSubAccount } = useAccountsState()
-
   /**
    * Helper to determine whether or not adding a new sub-account kind
    * from the "Add New" screen is currently supported.

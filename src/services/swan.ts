@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Config from 'react-native-config'
 
-const swanOAuthURL = Config.SWAN_URL || 'https://dev-api.swanbitcoin.com/'
+const swanOAuthURL = Config.SWAN_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'//'https://dev-api.swanbitcoin.com/'
 
 export const redeemAuthCode = ( data ) =>
   axios( {
@@ -31,7 +31,7 @@ export const linkSwanWallet = ( data ) =>
     url: swanOAuthURL.concat( 'wallets?mode=swan' ),
     data,
     headers: {
-      Authorization: `Bearer ${data.swanAuthToken}` 
+      Authorization: `Bearer ${data.swanAuthToken}`
     }
   } )
 
@@ -40,6 +40,6 @@ export const syncSwanWallet = ( data ) =>
     method: 'get',
     url: `${swanOAuthURL}wallets/${data.swanWalletId}?mode=swan`,
     headers: {
-      Authorization: `Bearer ${data.swanAuthToken}` 
+      Authorization: `Bearer ${data.swanAuthToken}`
     }
   } )
