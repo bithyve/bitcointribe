@@ -175,7 +175,7 @@ const styles = StyleSheet.create( {
   cardTouchableContainer: {
     flex: 1,
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
     overflow: 'hidden',
   },
 } )
