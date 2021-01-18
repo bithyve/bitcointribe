@@ -485,6 +485,10 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           featuresList,
           securityQuestion,
         };
+        if(isPrimaryKeeper && s3ServiceSecure.secureHDWallet.secondaryMnemonic && s3ServiceSecure.secureHDWallet.twoFASetup.secret) {
+          data.secondaryMnemonics = s3ServiceSecure.secureHDWallet.secondaryMnemonic;
+          data.twoFASetup = s3ServiceSecure.secureHDWallet.twoFASetup;
+        }
         const updateRes = yield call(
           keeper.updateTrustedChannel,
           share.shareId,

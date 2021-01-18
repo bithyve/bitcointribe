@@ -29,6 +29,7 @@ import {
 } from '../../store/actions/health';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
 import Loader from '../../components/loader';
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 interface KeeperFeaturesStateTypes {
   levelData: any;
@@ -41,7 +42,7 @@ interface KeeperFeaturesPropsTypes {
   navigation: any;
   createAndUploadOnEFChannel: any;
   levelHealth: any[];
-  s3Service: any;
+  s3Service: S3Service;
   updateMSharesHealth: any;
   isLevelTwoMetaShareCreated: Boolean;
   isLevelThreeMetaShareCreated: Boolean;
@@ -407,12 +408,6 @@ class KeeperFeatures extends Component<
 
 const mapStateToProps = (state) => {
   return {
-    accounts: state.accounts || [],
-    walletName:
-      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
-    s3Service: idx(state, (_) => _.sss.service),
-    overallHealth: idx(state, (_) => _.sss.overallHealth),
-    trustedContacts: idx(state, (_) => _.trustedContacts.service),
     levelHealth: idx(state, (_) => _.health.levelHealth),
     isLevelTwoMetaShareCreated: idx(
       state,
@@ -425,7 +420,7 @@ const mapStateToProps = (state) => {
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     updateMSharesHealthStatus: idx(state, (_) => _.health.updateMSharesHealth),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
-    metaShare: idx(state, (_) => _.sss.service.levelhealth.metaShares),
+    metaShare: idx(state, (_) => _.health.service.levelhealth.metaSharesKeeper),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
     keeperSetupStatus: idx(state, (_) => _.health.loading.keeperSetupStatus),
   };

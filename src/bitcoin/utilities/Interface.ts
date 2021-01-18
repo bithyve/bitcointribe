@@ -335,6 +335,11 @@ export interface TrustedDataElements {
   securityQuestion?: any;
   metaShare? : MetaShare;
   pdfShare? : MetaShare;
+  secondaryMnemonics?: string;
+  twoFASetup?: {
+      qrData: string;
+      secret: string;
+  };
 }
 export interface TrustedData {
   publicKey: string;
