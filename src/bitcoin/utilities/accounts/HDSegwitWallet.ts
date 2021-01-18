@@ -19,6 +19,7 @@ import {
   WyreDerivativeAccount,
   WyreDerivativeAccountElements,
   DerivativeAccountElements,
+  InputUTXOs,
 } from '../Interface'
 import axios, { AxiosResponse } from 'axios'
 import {
@@ -79,6 +80,13 @@ export default class HDSegwitWallet extends Bitcoin {
     address: string;
     status?: any;
   }> = [];
+  private unconfirmedUTXOs: Array<{
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }> = [];
   private txIdMap: {[txid: string]: boolean} = {
   };
 
@@ -98,6 +106,13 @@ export default class HDSegwitWallet extends Bitcoin {
       transactions: Transactions;
       txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      unconfirmedUTXOs: Array<{
         txId: string;
         vout: number;
         value: number;
@@ -156,6 +171,10 @@ export default class HDSegwitWallet extends Bitcoin {
     this.txIdMap = stateVars && stateVars.txIdMap
       ? stateVars.txIdMap
       : this.txIdMap
+    this.unconfirmedUTXOs =
+      stateVars && stateVars.unconfirmedUTXOs
+        ? stateVars.unconfirmedUTXOs
+        : this.unconfirmedUTXOs
     this.confirmedUTXOs =
       stateVars && stateVars.confirmedUTXOs
         ? stateVars.confirmedUTXOs
@@ -1383,8 +1402,8 @@ export default class HDSegwitWallet extends Bitcoin {
           confirmedUTXOs.push( utxo )
         }
       }
-      this.confirmedUTXOs = confirmedUTXOs
 
+      this.confirmedUTXOs = confirmedUTXOs
       this.nextFreeAddressIndex = nextFreeAddressIndex
       this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
       this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
@@ -1506,7 +1525,7 @@ export default class HDSegwitWallet extends Bitcoin {
       externalAddresses,
       internalAddresses,
       ownedAddresses,
-      this.confirmedUTXOs,
+      [ ...this.confirmedUTXOs, ...this.unconfirmedUTXOs ],
       this.balances,
       this.transactions,
       this.txIdMap,
@@ -1519,6 +1538,7 @@ export default class HDSegwitWallet extends Bitcoin {
     } )
 
     const confirmedUTXOs = []
+    const unconfirmedUTXOs = []
     for ( const utxo of UTXOs ) {
       if ( utxo.status ) {
         if ( this.isTest && utxo.address === this.getAddress( false, 0 ) ) {
@@ -1532,12 +1552,15 @@ export default class HDSegwitWallet extends Bitcoin {
             // defaulting utxo's on the change branch to confirmed
             confirmedUTXOs.push( utxo )
           }
+          else unconfirmedUTXOs.push( utxo )
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
         confirmedUTXOs.push( utxo )
       }
     }
+
+    this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
@@ -1888,6 +1911,25 @@ export default class HDSegwitWallet extends Bitcoin {
       throw new Error( `Transaction signing failed: ${err.message}` )
     }
   };
+
+  public removeConsumedUTXOs= ( consumedUTXOs: InputUTXOs[] ) => {
+    const latestUTXOSet = []
+    let consumedBalance = 0
+
+    this.confirmedUTXOs.forEach( confirmedUTXO => {
+      let include = true
+      consumedUTXOs.forEach( consumedUTXO => {
+        if( confirmedUTXO.txId === consumedUTXO.txId ) {
+          include = false
+          consumedBalance += consumedUTXO.value
+        }
+      } )
+
+      if( include ) latestUTXOSet.push( confirmedUTXO )
+    } )
+    this.balances.balance -= consumedBalance
+    this.confirmedUTXOs = latestUTXOSet
+  }
 
   private sortOutputs = async (
     outputs: Array<{
