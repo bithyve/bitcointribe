@@ -155,6 +155,7 @@ export interface DerivativeAccountElements {
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
+  txIdMap?: {[txid: string]: boolean};
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
 }

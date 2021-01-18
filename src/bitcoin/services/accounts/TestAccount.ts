@@ -25,6 +25,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
@@ -47,6 +48,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -74,6 +76,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
@@ -100,6 +103,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;

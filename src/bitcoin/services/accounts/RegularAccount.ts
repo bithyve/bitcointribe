@@ -21,6 +21,7 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
@@ -43,6 +44,7 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress;
       transactions: Transactions;
+      txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -67,6 +69,7 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
       derivativeAccounts,
       lastBalTxSync,
@@ -90,6 +93,7 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
