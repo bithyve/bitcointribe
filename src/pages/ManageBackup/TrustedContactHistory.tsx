@@ -1095,7 +1095,7 @@ const TrustedContactHistory = (props) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+    <View style={{ height: '100%', backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />

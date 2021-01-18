@@ -10,10 +10,8 @@ import {
 } from '../../services/wyre'
 
 import { createWatcher } from '../utils/utilities'
-import { DerivativeAccounts } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { WYRE } from '../../common/constants/serviceTypes'
-import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 

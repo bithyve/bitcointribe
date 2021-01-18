@@ -2,9 +2,9 @@ import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { Button, Input } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
+import ButtonBlue from '../../../components/ButtonBlue'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -119,13 +119,10 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
       </TouchableOpacity>
 
       <View style={styles.footerSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
 

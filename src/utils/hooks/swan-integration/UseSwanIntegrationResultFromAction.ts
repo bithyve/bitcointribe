@@ -4,9 +4,7 @@ import { useMemo } from 'react'
 
 export default function useSwanIntegrationResultFromAction( actionKind: SwanActionKind ): string {
   const swanIntegrationState = useSwanIntegrationState()
-  console.log( { 
-    swanIntegrationState 
-  } )
+
   return useMemo( () => {
     switch ( actionKind ) {
         case SwanActionKind.AUTHENTICATE:
@@ -36,13 +34,13 @@ export default function useSwanIntegrationResultFromAction( actionKind: SwanActi
             return `Succeed. Wallet Details: ${swanIntegrationState.swanWalletDetails}`
           }
 
-        case SwanActionKind.SYNC_SWAN_ACCOUNT_DATA:
-          if ( swanIntegrationState.isSyncingSwanWallet ) {
+        case SwanActionKind.FETCH_SWAN_AUTHENTICATION_URL:
+          if ( swanIntegrationState.isSwanAuthenticationInProgress ) {
             return 'In Progress'
-          } else if ( swanIntegrationState.syncSwanWalletFailed ) {
-            return `Failed. Message: ${swanIntegrationState.syncSwanWalletFailedMessage}`
+          } else if ( !swanIntegrationState.hasFetchSwanAuthenticationUrlSucceeded ) {
+            return `Failed. Message: ${swanIntegrationState.swanAuthenticationUrl}`
           } else {
-            return `Succeed. Wallet Details: ${swanIntegrationState.swanWalletDetails}`
+            return `Succeed. Wallet Details: ${swanIntegrationState.swanAuthenticationUrl}`
           }
     }
   }, [ actionKind, swanIntegrationState ] )

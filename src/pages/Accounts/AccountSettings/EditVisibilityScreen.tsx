@@ -2,14 +2,13 @@ import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
-import { Button } from 'react-native-elements'
-
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
+
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import ButtonBlue from '../../../components/ButtonBlue'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -62,12 +61,9 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
       </View>
 
       <View style={styles.proceedButtonContainer}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Confirm"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleSaveButtonPress}
+        <ButtonBlue
+          buttonText="Confirm"
+          handleButtonPress={handleSaveButtonPress}
         />
       </View>
     </View>

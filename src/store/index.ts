@@ -123,8 +123,7 @@ import nodeSettingsReducer from './reducers/nodeSettings'
 import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 
 import {
-  fetchSwanTokenWatcher,
-  linkSwanWalletWatcher,
+  fetchSwanAuthenticationUrlWatcher,
 } from './sagas/SwanIntegration'
 
 import {
@@ -226,8 +225,7 @@ const rootSaga = function* () {
     postRecoveryChannelSyncWatcher,
 
     // Swan Integration
-    fetchSwanTokenWatcher,
-    linkSwanWalletWatcher,
+    fetchSwanAuthenticationUrlWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher

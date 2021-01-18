@@ -1,9 +1,8 @@
 import { call, put } from 'redux-saga/effects'
 
 import {
-  FETCH_SWAN_TOKEN,
-  fetchSwanTokenSucceeded,
-  fetchSwanTokenFailed,
+  FETCH_SWAN_AUTHENTICATION_URL,
+  fetchSwanAuthenticationUrlSucceeded,
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
@@ -18,6 +17,41 @@ import {
 
 import { createWatcher } from '../utils/utilities'
 
+import { generatePKCEParameters } from '../lib/swan'
+import Config from '../../bitcoin/HexaConfig'
+
+const client_id = Config.SWAN_CLIENT_ID || 'demo-web-client'
+const swan_auth_url = 'https://login-demo.curity.io/oauth/v2/oauth-authorize'// Config.SWAN_BASE_URL
+const redirect_uri = 'hexa://dev/swan/success/code/'//'https://oauth.tools/callback/code' //
+
+export const fetchSwanAuthenticationUrlWatcher = createWatcher(
+  fetchSwanAuthenticationUrlWorker,
+  FETCH_SWAN_AUTHENTICATION_URL
+)
+
+export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
+  const { code_challenge, code_verifier, nonce, state } = generatePKCEParameters()
+  const swanAuthenticationUrl = `\
+${swan_auth_url}?\
+&client_id=${client_id}\
+&state=${state}\
+&scope=openid%20profile%20read\
+&response_type=code\
+&code_challenge=${code_challenge}\
+&code_challenge_method=S256\
+&prompt=login\
+&ui_locales=en\
+&nonce=${nonce}\
+&redirect_uri=${redirect_uri}\
+`
+  console.log( {
+    code_challenge, code_verifier, nonce, state, swanAuthenticationUrl
+  } )
+  yield put( fetchSwanAuthenticationUrlSucceeded( {
+    swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
+  } ) )
+}
+
 export function* fetchSwanTokenWorker( { payload } ) {
   // Authentication code is available which needs to be redeemed
   console.log( 'About to Redeem Authorization Code ', payload.data )
@@ -30,7 +64,7 @@ export function* fetchSwanTokenWorker( { payload } ) {
         fetchSwanTokenFail: true,
         fetchSwanTokenFailMessage: 'Swan authentication failed',
       }
-      yield put( fetchSwanTokenFailed( data ) )
+      //yield put( fetchSwanTokenFailed( data ) )
     } else {
       /*
       If we are here that means authentication was succesful with Swan
@@ -49,13 +83,13 @@ export function* fetchSwanTokenWorker( { payload } ) {
       and update it when we get the auth token.
       */
 
-      yield put( fetchSwanTokenSucceeded( result.data ) )
+      //yield put( fetchSwanTokenSucceeded( result.data ) )
       if ( result.error ) {
         const data = {
           fetchSwanTokenFail: true,
           fetchSwanTokenFailMessage: result.message || 'Swan authentication failed',
         }
-        yield put( fetchSwanTokenFailed( data ) )
+        //yield put( fetchSwanTokenFailed( data ) )
       }
     }
   } catch ( err ) {
@@ -64,14 +98,9 @@ export function* fetchSwanTokenWorker( { payload } ) {
       fetchSwanTokenFail: true,
       fetchSwanTokenFailMessage: 'Swan authentication failed',
     }
-    yield put( fetchSwanTokenFailed( data ) )
+    //yield put( fetchSwanTokenFailed( data ) )
   }
 }
-
-export const fetchSwanTokenWatcher = createWatcher(
-  fetchSwanTokenWorker,
-  FETCH_SWAN_TOKEN,
-)
 
 function* linkSwanWalletWorker( { payload } ) {
   console.log( 'linkSwanWallet payload.data', payload.data )

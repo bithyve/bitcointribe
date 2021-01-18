@@ -1,16 +1,16 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { Input, Button } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { updateSubAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import ButtonBlue from '../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -99,13 +99,10 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
       </View>
 
       <View style={styles.listFooterSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Confirm & Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleSaveButtonPress}
-          disabled={canSaveChanges === false}
+      <ButtonBlue
+          buttonText="Confirm & Proceed"
+          handleButtonPress={handleSaveButtonPress}
+          buttonDisable={canSaveChanges === false}
         />
       </View>
     </View>

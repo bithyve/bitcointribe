@@ -59,6 +59,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
   const descriptionTextContainerStyle = useMemo( () => {
     return {
       ...styles.descriptionTextContainer,
+      flex: isDisabled ? 0 : 1,
       marginBottom: isDisabled ? -8 : 8,
     }
   }, [ isSelected ] )
@@ -141,6 +142,7 @@ const styles = StyleSheet.create( {
     width: 22,
     height: 22,
     marginBottom: 8,
+    marginTop: 8
   },
 
   cardContainer: {
@@ -177,7 +179,7 @@ const styles = StyleSheet.create( {
     width: 18,
     height: 18,
     borderRadius: 999,
-    borderWidth: 1,
+    borderWidth: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },

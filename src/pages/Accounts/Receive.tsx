@@ -654,7 +654,7 @@ export default function Receive( props ) {
                     }}
                   >
                     {
-                      getAccountTitle( derivativeAccountDetails.type, derivativeAccountDetails )
+                      getAccountTitle( serviceType, derivativeAccountDetails )
                     }
                   </Text>
                 </View>

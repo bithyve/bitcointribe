@@ -1,10 +1,10 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import Colors from '../../../common/Colors'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
+
 
 
 export type Props = {
