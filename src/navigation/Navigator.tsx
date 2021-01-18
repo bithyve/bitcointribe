@@ -22,7 +22,6 @@ import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import TwoFAToken from '../pages/Accounts/TwoFAToken'
 import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import QRScannerScreen from '../pages/QRScannerScreen'
@@ -62,6 +61,8 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
 import SendStack from './stacks/send/SendStack'
 import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
+import SwanIntegrationScreen from '../pages/SwanIntegration/SwanIntegrationScreen'
+import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
 
 
 const SetupNavigator = createStackNavigator(
@@ -128,7 +129,6 @@ const HomeNavigator = createStackNavigator(
     TrustedContacts,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    ReceivingAddress,
     Send: {
       screen: SendStack,
     },
@@ -180,6 +180,18 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    SwanIntegrationScreen: {
+      screen: SwanIntegrationScreen,
+      navigationOptions: {
+        title: 'Swan Home'
+      }
+    },
+    WyreIntegrationScreen: {
+      screen: WyreIntegrationScreen,
+      navigationOptions: {
+        title: 'Wyre Home'
+      }
+    }
   },
   {
     headerLayoutPreset: 'center',

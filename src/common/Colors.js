@@ -20,6 +20,7 @@ const Colors = {
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
+  coral: '#D35400',
 
   // Grayscale
   gray1: '#d0d0d0',

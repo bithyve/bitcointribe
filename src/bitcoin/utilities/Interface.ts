@@ -164,6 +164,7 @@ export enum DerivativeAccountTypes {
   FAST_BITCOINS = 'FAST_BITCOINS',
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  WYRE = 'WYRE'
 }
 
 // Base Dervative Account
@@ -237,6 +238,22 @@ export interface SubPrimaryDerivativeAccount {
   };
   [accounts: number]: SubPrimaryDerivativeAccountElements;
 }
+
+export interface WyreDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface WyreDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: WyreDerivativeAccountElements;
+}
+
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount

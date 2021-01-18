@@ -27,17 +27,17 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
 
-  const currentSubAccountInfo: DonationSubAccountDescribing = useMemo( () => {
-    return navigation.getParam( 'currentSubAccountInfo' )
+  const currentSubAccount: DonationSubAccountDescribing = useMemo( () => {
+    return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
   const [ accountName, setAccountName ] = useState( '' )
-  const [ doneeName, setDoneeName ] = useState( currentSubAccountInfo.doneeName )
+  const [ doneeName, setDoneeName ] = useState( currentSubAccount.doneeName )
   const [ accountDescription, setAccountDescription ] = useState( '' )
   const [ isTFAEnabled, setIsTFAEnabled ] = useState(
-    currentSubAccountInfo.isTFAEnabled,
+    currentSubAccount.isTFAEnabled,
   )
-  const [showLoader, setShowLoader] = useState(false);
+  const [ showLoader, setShowLoader ] = useState( false )
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -53,16 +53,16 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   } )
 
   function handleProceedButtonPress() {
-    setShowLoader(true);
-    currentSubAccountInfo.customDisplayName = accountName
-    currentSubAccountInfo.doneeName = doneeName
-    currentSubAccountInfo.customDescription = accountDescription
-    currentSubAccountInfo.isTFAEnabled = isTFAEnabled
-    currentSubAccountInfo.sourceKind = currentSubAccountInfo.isTFAEnabled
+    setShowLoader( true )
+    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.doneeName = doneeName
+    currentSubAccount.customDescription = accountDescription
+    currentSubAccount.isTFAEnabled = isTFAEnabled
+    currentSubAccount.sourceKind = currentSubAccount.isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
       : SourceAccountKind.REGULAR_ACCOUNT
 
-    dispatch( addNewAccountShell( currentSubAccountInfo ) )
+    dispatch( addNewAccountShell( currentSubAccount ) )
   }
 
   async function openTermsAndConditions() {

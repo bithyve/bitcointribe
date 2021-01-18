@@ -55,5 +55,6 @@ module.exports = {
       'destructuring': 'all',
       'ignoreReadBeforeAssign': true
     } ],
+    'no-trailing-spaces': 'error'
   }
 }

@@ -37,6 +37,8 @@ function backgroundImageForAccountKind(
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
       case SubAccountKind.DONATION_ACCOUNT:
         return require( '../../assets/images/carouselImages/donation_account_background.png' )
+      case SubAccountKind.SERVICE:
+        return require( '../../assets/images/carouselImages/wyre_account_background.png' )
       default:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
   }
@@ -52,6 +54,8 @@ function shadowColorForAccountKind( accountKind: SubAccountKind ): string {
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
         return Colors.borderColor
+      case SubAccountKind.SERVICE:
+        return Colors.coral
       default:
         return Colors.borderColor
   }
