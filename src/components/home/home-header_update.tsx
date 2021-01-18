@@ -37,6 +37,7 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface';
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
@@ -66,7 +67,9 @@ const HomeHeader = ({
   navigation,
   currentLevel,
 }) => {
-
+  const levelHealth: LevelHealthInterface[] = useSelector(
+    ( state ) => state.health.levelHealth,
+  );
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.health.service);
   const currencyKind: CurrencyKind = useCurrencyKind();
@@ -224,9 +227,11 @@ const HomeHeader = ({
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            // navigation.navigate('ManageBackupUpgradeSecurity');
-            // navigation.navigate('ManageBackupKeeper');
-            navigation.navigate('ManageBackup');
+            if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible'){
+              navigation.navigate('ManageBackupKeeper');
+            } else {
+              navigation.navigate('ManageBackup');
+            }
           }}
           style={styles.manageBackupMessageView}
         >

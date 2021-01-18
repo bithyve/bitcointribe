@@ -56,7 +56,14 @@ import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
-  listData: any[];
+  listData: {
+    title: String;
+    info: String;
+    subTitle: String;
+    type: String;
+    image: any;
+    status: String;
+  }[];
   selectedContact: any[];
   encryptedCloudDataJson: any;
 }
@@ -94,6 +101,7 @@ class UpgradeBackup extends Component<
           subTitle: "Lorem ipsum dolor sit amet",
           type: "backup",
           image: require("../../assets/images/icons/icon_backup.png"),
+          status: 'setup'
         },
         {
           title: "Primary Keeper",
@@ -101,6 +109,7 @@ class UpgradeBackup extends Component<
           subTitle: "Lorem ipsum dolor sit amet",
           type: "primary",
           image: require("../../assets/images/icons/icon_secondarydevice.png"),
+          status: 'setup'
         },
         {
           title: "Keeper Contacts",
@@ -108,6 +117,7 @@ class UpgradeBackup extends Component<
           subTitle: "Lorem ipsum dolor sit amet",
           type: "contact",
           image: require("../../assets/images/icons/icon_contact.png"),
+          status: 'setup'
         },
         {
           title: "Keeper Device & PDF Keepers",
@@ -115,6 +125,7 @@ class UpgradeBackup extends Component<
           subTitle: "Lorem ipsum dolor sit amet",
           type: "devicePDF",
           image: require("../../assets/images/icons/files-and-folders-2.png"),
+          status: 'setup'
         },
         {
           title: "Security Question",
@@ -122,6 +133,7 @@ class UpgradeBackup extends Component<
           subTitle: "Lorem ipsum dolor sit amet",
           type: "securityQuestion",
           image: require("../../assets/images/icons/icon_question.png"),
+          status: 'setup'
         },
       ],
       selectedContact: [
@@ -200,8 +212,25 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    (this.refs.RestoreFromICloud as any).snapTo(1);
+    this.upgradeProcess();
   };
+
+  upgradeProcess = () => {
+    let { levelHealth } = this.props;
+    let { listData } = this.state;
+    if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible') {
+      listData[0].status = 'accessible';
+      this.props.navigation.navigate('ManageBackupKeeper');
+    }
+    else{
+      (this.refs.RestoreFromICloud as any).snapTo(1);
+    }
+    if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[1].status == 'accessible'){
+      listData[4].status = 'accessible';
+      (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+    }
+    this.setState({listData});
+  }
 
   componentDidUpdate = (prevProps, prevState) => {
     if (
@@ -210,6 +239,11 @@ class UpgradeBackup extends Component<
       this.props.s3Service.levelhealth.healthCheckInitializedKeeper
     ) {
       this.cloudData();
+    }
+    if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
+      if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
+        this.props.navigation.navigate('ManageBackupKeeper');
+      }
     }
   };
 
@@ -416,9 +450,9 @@ class UpgradeBackup extends Component<
                       style={{
                         height: wp("6%"),
                         width: "auto",
-                        paddingLeft: 15,
-                        paddingRight: 15,
-                        backgroundColor: Colors.borderColor,
+                        paddingLeft: wp("5%"),
+                        paddingRight: wp("5%"),
+                        backgroundColor: item.status == 'accessible' ? Colors.lightGreen : Colors.borderColor,
                         justifyContent: "center",
                         alignItems: "center",
                         borderRadius: 5,
@@ -426,32 +460,34 @@ class UpgradeBackup extends Component<
                     >
                       <Text
                         style={{
-                          color: Colors.textColorGrey,
+                          color: item.status == 'accessible' ? Colors.darkGreen : Colors.textColorGrey,
                           fontFamily: Fonts.FiraSansRegular,
                           fontSize: RFValue(9),
                         }}
                       >
-                        Not Setup
+                        {item.status == 'accessible' ? 'Complete' : 'Not Setup' }
                       </Text>
                     </View>
-                    <View
-                      style={{
-                        height: wp("6%"),
-                        width: wp("6%"),
-                        borderRadius: wp("6%") / 2,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: Colors.lightGreen,
-                        marginLeft: 5,
-                      }}
-                    >
-                      <AntDesign
-                        style={{ marginTop: 1 }}
-                        size={RFValue(11)}
-                        color={Colors.darkGreen}
-                        name={"check"}
-                      />
-                    </View>
+                    {item.status != 'setup' && 
+                      <View
+                        style={{
+                          height: wp("6%"),
+                          width: wp("6%"),
+                          borderRadius: wp("6%") / 2,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          backgroundColor: Colors.lightGreen,
+                          marginLeft: wp("2.5%"),
+                        }}
+                      >
+                        <AntDesign
+                          style={{ marginTop: 1 }}
+                          size={RFValue(15)}
+                          color={Colors.darkGreen}
+                          name={"check"}
+                        />
+                      </View>
+                    }
                   </View>
                 </View>
               </View>
