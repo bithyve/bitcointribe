@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import FormStyles from '../../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import { Input, Button } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
 import Loader from '../../../../components/loader'
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -110,14 +110,11 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
           </View>
 
           <View style={styles.footerSection}>
-            <Button
-              raised
-              buttonStyle={ButtonStyles.primaryActionButton}
-              title="Proceed"
-              titleStyle={ButtonStyles.actionButtonText}
-              onPress={handleProceedButtonPress}
-              disabled={canProceed === false}
-            />
+          <ButtonBlue
+            buttonText="Proceed"
+            handleButtonPress={handleProceedButtonPress}
+            buttonDisable={canProceed === false}
+          />
           </View>
         </View>
 
