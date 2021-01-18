@@ -1,19 +1,16 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { Button } from 'react-native-elements'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 export type Props = {
   onTryAgainPressed: () => void;
 };
 
-const PersonalNodeConnectionFailureBottomSheet: React.FC<Props> = ( { onTryAgainPressed, }: Props ) => {
+const PersonalNodeConnectionFailureBottomSheet: React.FC<Props> = ({ onTryAgainPressed, }: Props) => {
   return (
     <View style={styles.rootContainer}>
 
@@ -39,20 +36,19 @@ const PersonalNodeConnectionFailureBottomSheet: React.FC<Props> = ( { onTryAgain
 
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="Try Again"
-            titleStyle={ButtonStyles.actionButtonText}
+          <TouchableOpacity
             onPress={onTryAgainPressed}
-          />
+            style={ButtonStyles.primaryActionButton}
+          >
+            <Text style={ButtonStyles.actionButtonText}>Try Again</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     backgroundColor: Colors.white,
@@ -76,10 +72,9 @@ const styles = StyleSheet.create( {
   },
 
   actionButtonContainer: {
-    marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
-} )
+})
 
 export default PersonalNodeConnectionFailureBottomSheet
