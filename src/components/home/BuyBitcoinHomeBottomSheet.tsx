@@ -32,10 +32,10 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   {
-    title: 'Set up automatic buys',
+    title: 'Set up automatic buys   (COMING SOON)',
     subtitle: 'Stack sats with SwanBitcoin',
     kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/swan_temp.png' ),
+    imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true
   },
   {
@@ -55,9 +55,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
       <ListItem
-        containerStyle={{
-          paddingHorizontal: 16,
-        }}
+        containerStyle={ menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container }
         bottomDivider
         onPress={() => { onMenuItemSelected( menuItem ) }}
         disabled={menuItem.disabled}
@@ -69,7 +67,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         />
 
         <ListItem.Content style={ListStyles.listItemContentContainer}>
-          <ListItem.Title style={ListStyles.listItemTitle}>{menuItem.title}</ListItem.Title>
+          <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : ListStyles.listItemTitle }>{menuItem.title}</ListItem.Title>
           <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>

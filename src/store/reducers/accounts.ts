@@ -211,7 +211,6 @@ const initialState: AccountsState = {
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
-  let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
   const accountType = action.payload ? action.payload.serviceType : null
 
   switch ( action.type ) {
@@ -601,13 +600,16 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELL_ADDED:
+        // using temperory variable to assign wyre account
+        // need to add the default wyre account to account state
+        // for now there is only one wyre account created so the first one is added as default
+        // this will need to be modified later elsewhere to add default wyre account to state
+        let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
         if (
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
         ) {
           currentWyreSubAccount = action.payload.primarySubAccount
-        } else {
-          currentWyreSubAccount = null
         }
 
         return {
@@ -615,7 +617,9 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
           accountShells: state.accountShells.concat( action.payload ),
-          currentWyreSubAccount
+          ...currentWyreSubAccount && {
+            currentWyreSubAccount
+          }
         }
 
       case NEW_ACCOUNT_ADD_FAILED:
