@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Image } from 'react-native'
 import Colors from '../../../common/Colors'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-import ButtonBlue from '../../ButtonBlue'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
+
 
 
 export type Props = {
@@ -45,10 +46,12 @@ const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPr
 
 
         <View style={styles.actionButtonContainer}>
-        <ButtonBlue
-          buttonText="OK"
-          handleButtonPress={onConfirmPressed}
-        />
+          <TouchableOpacity
+            onPress={onConfirmPressed}
+            style={ButtonStyles.primaryActionButton}
+          >
+            <Text style={ButtonStyles.actionButtonText}>OK</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -85,7 +88,6 @@ const styles = StyleSheet.create( {
   },
 
   actionButtonContainer: {
-    marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
