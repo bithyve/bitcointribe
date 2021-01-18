@@ -11,9 +11,6 @@ export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, coun
       receiveAddress,
       referenceId: Date.now()
     }
-    console.log( 'calling relay with', { 
-      body 
-    } )
     return BH_AXIOS.post( 'fetchWyreReservation', {
       HEXA_ID,
       ...body
@@ -22,7 +19,7 @@ export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, coun
   } catch ( error ) {
     console.log( 'error calling wyre ', error )
     return {
-      error 
+      error
     }
   }
 }

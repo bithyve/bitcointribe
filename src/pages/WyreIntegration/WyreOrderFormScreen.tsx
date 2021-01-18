@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, StyleSheet, Text, ScrollView, Image } from 'react-native'
 import Colors from '../../common/Colors'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
@@ -21,7 +21,7 @@ export type Props = {
 const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const { wyreHostedUrl } = useWyreIntegrationState()
-
+  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | null>()
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
@@ -29,6 +29,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const wyreAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 
   function handleProceedButtonPress() {
+    setHasButtonBeenPressed( true )
     dispatch( fetchWyreReservation() )
   }
 
@@ -79,6 +80,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
         <View style={styles.proceedButtonContainer}>
           <Button
+            disabled={hasButtonBeenPressed}
             raised
             buttonStyle={ButtonStyles.primaryActionButton}
             title="Proceed to Wyre"
