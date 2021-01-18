@@ -223,9 +223,7 @@ function* fetchBalanceTxWorker( { payload } ) {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( service.getBalanceTransactions, {
-    restore: payload.options.restore,
-  } )
+  const res = yield call( service.getBalanceTransactions, payload.options.hardRefresh )
   console.log( {
     res
   } )
@@ -1013,7 +1011,7 @@ export const removeTwoFAWatcher = createWatcher(
   REMOVE_TWO_FA
 )
 
-function* accountsSyncWorker( {} ) {
+function* accountsSyncWorker( { payload } ) {
   try {
     const accounts = yield select( ( state ) => state.accounts )
 
@@ -1027,7 +1025,7 @@ function* accountsSyncWorker( {} ) {
     //     serviceType: REGULAR_ACCOUNT,
     //     options: {
     //       service: regularService,
-    //       restore: payload.restore,
+    //       hardRefresh: payload.hardRefresh,
     //       shouldNotInsert: true,
     //     },
     //   },
@@ -1038,7 +1036,7 @@ function* accountsSyncWorker( {} ) {
     //     serviceType: SECURE_ACCOUNT,
     //     options: {
     //       service: secureService,
-    //       restore: payload.restore,
+    //       hardRefresh: payload.hardRefresh,
     //       shouldNotInsert: true,
     //     },
     //   },
@@ -1049,7 +1047,7 @@ function* accountsSyncWorker( {} ) {
     //     serviceType: TEST_ACCOUNT,
     //     options: {
     //       service: testService,
-    //       restore: payload.restore,
+    //       hardRefresh: payload.hardRefresh,
     //       shouldNotInsert: true,
     //     },
     //   },
@@ -1062,7 +1060,7 @@ function* accountsSyncWorker( {} ) {
     //       serviceType: TEST_ACCOUNT,
     //       options: {
     //         service: testService,
-    //         restore: payload.restore,
+    //         hardRefresh: payload.hardRefresh,
     //         shouldNotInsert: true,
     //       },
     //     },
@@ -1072,7 +1070,7 @@ function* accountsSyncWorker( {} ) {
     //       serviceType: REGULAR_ACCOUNT,
     //       options: {
     //         service: regularService,
-    //         restore: payload.restore,
+    //         hardRefresh: payload.hardRefresh,
     //         shouldNotInsert: true,
     //       },
     //     },
@@ -1082,7 +1080,7 @@ function* accountsSyncWorker( {} ) {
     //       serviceType: SECURE_ACCOUNT,
     //       options: {
     //         service: secureService,
-    //         restore: payload.restore,
+    //         hardRefresh: payload.hardRefresh,
     //         shouldNotInsert: true,
     //       },
     //     },

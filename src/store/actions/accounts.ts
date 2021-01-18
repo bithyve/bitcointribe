@@ -63,7 +63,7 @@ export const fetchBalanceTx = (
   options: {
     service?;
     loader?;
-    restore?;
+    hardRefresh?;
     shouldNotInsert?;
     syncTrustedDerivative?;
   } = {
@@ -197,10 +197,10 @@ export const clearAccountSyncCache = () => {
   }
 }
 
-export const syncAccounts = ( restore? ) => {
+export const syncAccounts = ( hardRefresh? ) => {
   return {
     type: SYNC_ACCOUNTS, payload: {
-      restore
+      hardRefresh
     }
   }
 }

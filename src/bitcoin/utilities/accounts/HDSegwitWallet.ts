@@ -18,6 +18,7 @@ import {
   SubPrimaryDerivativeAccountElements,
   WyreDerivativeAccount,
   WyreDerivativeAccountElements,
+  DerivativeAccountElements,
 } from '../Interface'
 import axios, { AxiosResponse } from 'axios'
 import {
@@ -78,6 +79,8 @@ export default class HDSegwitWallet extends Bitcoin {
     address: string;
     status?: any;
   }> = [];
+  private txIdMap: {[txid: string]: boolean} = {
+  };
 
   constructor(
     mnemonic?: string,
@@ -93,6 +96,7 @@ export default class HDSegwitWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: boolean};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -149,7 +153,9 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.transactions
         ? stateVars.transactions
         : this.transactions
-
+    this.txIdMap = stateVars && stateVars.txIdMap
+      ? stateVars.txIdMap
+      : this.txIdMap
     this.confirmedUTXOs =
       stateVars && stateVars.confirmedUTXOs
         ? stateVars.confirmedUTXOs
@@ -429,7 +435,8 @@ export default class HDSegwitWallet extends Bitcoin {
     let {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-    } = this.derivativeAccounts[ accountType ][ accountNumber ]
+    } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+
 
     // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
     if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
@@ -474,11 +481,21 @@ export default class HDSegwitWallet extends Bitcoin {
     ] = usedAddresses
 
     // console.log({ derivativeAccUsedAddresses: usedAddresses });
+    const externalAddressSet = externalAddresses
+    const internalAddressSet = internalAddresses
+
+    const  { confirmedUTXOs, balances, transactions, txIdMap } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
 
     const res = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
+      confirmedUTXOs,
+      balances,
+      transactions,
+      txIdMap,
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[ accountType ][ accountNumber ]
@@ -488,21 +505,19 @@ export default class HDSegwitWallet extends Bitcoin {
       accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
     )
 
-    const { balances, transactions, UTXOs } = res
-
-    const confirmedUTXOs = []
-    for ( const utxo of UTXOs ) {
+    const confUTXOs = []
+    for ( const utxo of res.UTXOs ) {
       if ( utxo.status ) {
-        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
+        if ( utxo.status.confirmed ) confUTXOs.push( utxo )
         else {
           if ( internalAddresses.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
-            confirmedUTXOs.push( utxo )
+            confUTXOs.push( utxo )
           }
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push( utxo )
+        confUTXOs.push( utxo )
       }
     }
 
@@ -526,9 +541,10 @@ export default class HDSegwitWallet extends Bitcoin {
       ...this.derivativeAccounts[ accountType ][ accountNumber ],
       lastBalTxSync: latestSyncTime,
       newTransactions,
-      confirmedUTXOs,
-      balances,
-      transactions,
+      confirmedUTXOs: confUTXOs,
+      balances: res.balances,
+      transactions: res.transactions,
+      txIdMap: res.txIdMap,
       nextFreeAddressIndex: res.nextFreeAddressIndex,
       nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
       receivingAddress: this.getAddress(
@@ -1325,8 +1341,13 @@ export default class HDSegwitWallet extends Bitcoin {
     const { txid, funded } = res.data
 
     if ( txid ) {
-      this.usedAddresses = [ recipientAddress ]
+      const externalAddresses = [ recipientAddress ]
+      const internalAddresses = []
       const ownedAddresses = [ recipientAddress ]
+
+      const externalAddressSet = externalAddresses
+      const internalAddressSet = internalAddresses
+
       const {
         UTXOs,
         balances,
@@ -1334,9 +1355,15 @@ export default class HDSegwitWallet extends Bitcoin {
         nextFreeAddressIndex,
         nextFreeChangeAddressIndex,
       } = await this.fetchBalanceTransactionsByAddresses(
-        this.usedAddresses,
-        [],
+        externalAddressSet,
+        internalAddressSet,
+        externalAddresses,
+        internalAddresses,
         ownedAddresses,
+        this.confirmedUTXOs,
+        this.balances,
+        this.transactions,
+        this.txIdMap,
         this.nextFreeAddressIndex - 1,
         this.nextFreeChangeAddressIndex - 1,
         'Test Account',
@@ -1391,37 +1418,55 @@ export default class HDSegwitWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( options?: {
-    restore?;
-  } ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean  ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
     };
     transactions: Transactions;
   }> => {
-    if ( options && options.restore ) {
-      // WI helps with restoration
-    }
-
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
-    const externalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++ ) {
+    let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+    if( hardRefresh ){
+      const hardGapLimit  = 10
+      startingExtIndex = 0
+      closingExtIndex = this.nextFreeAddressIndex + hardGapLimit
+      startingIntIndex = 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + hardGapLimit
+    }
+    else {
+      const softGapLimit = 5
+      startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+      closingExtIndex = this.nextFreeAddressIndex + softGapLimit
+      startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
+    }
+
+    const externalAddresses = [] // all external addresses(till closingExtIndex)
+    const externalAddressSet = [] // external address range set
+    for ( let itr = 0; itr < closingExtIndex; itr++ ) {
       const address = this.getAddress( false, itr )
       externalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingExtIndex ) externalAddressSet.push( address )
     }
+    console.log( {
+      startingExtIndex, closingExtIndex, nextFreeAddressIndex: this.nextFreeAddressIndex
+    } )
 
-    const internalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++ ) {
+    const internalAddresses = [] // all internal addresses(till closingIntIndex)
+    const internalAddressSet = [] // internal address range set
+    for ( let itr = 0; itr < closingIntIndex; itr++ ) {
       const address = this.getAddress( true, itr )
       internalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingIntIndex ) internalAddressSet.push( address )
     }
-
-    this.usedAddresses = [ ...externalAddresses, ...internalAddresses ]
+    console.log( {
+      startingIntIndex, closingIntIndex, nextFreeChangeAddressIndex: this.nextFreeChangeAddressIndex
+    } )
 
     const batchedDerivativeAddresses = []
     if ( !this.isTest ) {
@@ -1452,16 +1497,26 @@ export default class HDSegwitWallet extends Bitcoin {
       UTXOs,
       balances,
       transactions,
+      txIdMap,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
+      this.confirmedUTXOs,
+      this.balances,
+      this.transactions,
+      this.txIdMap,
       this.nextFreeAddressIndex - 1,
       this.nextFreeChangeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
     )
+    console.log( {
+      nextFreeAddressIndex
+    } )
 
     const confirmedUTXOs = []
     for ( const utxo of UTXOs ) {
@@ -1473,7 +1528,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
         if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
         else {
-          if ( internalAddresses.includes( utxo.address ) ) {
+          if ( internalAddressSet.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
             confirmedUTXOs.push( utxo )
           }
@@ -1490,8 +1545,12 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.setNewTransactions( transactions )
 
+    console.log( {
+      balances, transactions
+    } )
     this.balances = balances
     this.transactions = transactions
+    this.txIdMap = txIdMap
     // console.log({ balances, transactions });
     return {
       balances, transactions

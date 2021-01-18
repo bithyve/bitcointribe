@@ -15,7 +15,7 @@ const { API_URLS, REQUEST_TIMEOUT } = config
 const { TESTNET, MAINNET } = API_URLS
 
 const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT 
+  timeout: REQUEST_TIMEOUT
 } )
 export default class Bitcoin {
   public static networkType = ( scannedStr: string ) => {
@@ -98,9 +98,24 @@ export default class Bitcoin {
   };
 
   public fetchBalanceTransactionsByAddresses = async (
-    externalAddresses: string[],
-    internalAddresses: string[],
+    externalAddressSet: string[], // external range set (soft/hard)
+    internalAddressSet: string[], // internal range set (soft/hard)
+    externalAddresses: string[],  // all external addresses(till nextFreeAddressIndex)
+    internalAddresses: string[],  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
+    cachedUTXOs:  Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+      status?: any;
+    }>,
+    cachedBalances: {
+      balance: number;
+      unconfirmedBalance: number;
+    },
+    cachedTxs: Transactions,
+    cachedTxIdMap: {[txid: string]: boolean},
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -115,6 +130,7 @@ export default class Bitcoin {
       status?: any;
     }>;
     balances: { balance: number; unconfirmedBalance: number };
+    txIdMap:  {[txid: string]: boolean},
     transactions: Transactions;
     nextFreeAddressIndex: number;
     nextFreeChangeAddressIndex: number;
@@ -124,8 +140,8 @@ export default class Bitcoin {
       const requestId = uuidv4()
       const accountToAddressMapping = {
         [ requestId ]: {
-          External: externalAddresses,
-          Internal: internalAddresses,
+          External: externalAddressSet,
+          Internal: internalAddressSet,
           Owned: ownedAddresses,
         },
       }
@@ -162,67 +178,77 @@ export default class Bitcoin {
       const accountToResponseMapping = res.data
 
       const { Utxos, Txs } = accountToResponseMapping[ requestId ]
-      const balances = {
-        balance: 0,
-        unconfirmedBalance: 0,
-      }
-      const UTXOs = []
+
+      const UTXOs = cachedUTXOs
+      const balances =  cachedBalances
+
       if ( Utxos )
         for ( const addressSpecificUTXOs of Utxos ) {
           for ( const utxo of addressSpecificUTXOs ) {
             const { value, Address, status, vout, txid } = utxo
 
-            UTXOs.push( {
-              txId: txid,
-              vout,
-              value,
-              address: Address,
-              status,
+            let include = true
+            cachedUTXOs.forEach( ( utxo ) => {
+              if( utxo.txId === txid ) include = false
             } )
 
-            if (
-              accountType === 'Test Account' &&
+            if( include )
+            {
+              UTXOs.push( {
+                txId: txid,
+                vout,
+                value,
+                address: Address,
+                status,
+              } )
+
+              if (
+                accountType === 'Test Account' &&
               Address === externalAddresses[ 0 ]
-            ) {
-              balances.balance += value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-              continue
+              ) {
+                balances.balance += value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+                continue
+              }
+
+              if ( status.confirmed ) balances.balance += value
+              else if (
+                internalAddressSet.length &&
+              internalAddressSet.includes( Address )
+              )
+                balances.balance += value
+              else balances.unconfirmedBalance += value
             }
 
-            if ( status.confirmed ) balances.balance += value
-            else if (
-              internalAddresses.length &&
-              internalAddresses.includes( Address )
-            )
-              balances.balance += value
-            else balances.unconfirmedBalance += value
           }
         }
 
       const transactions: Transactions = {
-        totalTransactions: 0,
-        confirmedTransactions: 0,
-        unconfirmedTransactions: 0,
-        transactionDetails: [],
+        totalTransactions: cachedTxs.totalTransactions,
+        confirmedTransactions: cachedTxs.confirmedTransactions,
+        unconfirmedTransactions: cachedTxs.unconfirmedTransactions,
+        transactionDetails: cachedTxs.transactionDetails,
       }
 
       const addressesInfo = Txs
       // console.log({ addressesInfo });
-      const txMap = new Map()
+      const txIdMap = cachedTxIdMap? cachedTxIdMap: {
+      }
       if ( addressesInfo )
         for ( const addressInfo of addressesInfo ) {
           if ( addressInfo.TotalTransactions === 0 ) {
             continue
           }
-          transactions.totalTransactions += addressInfo.TotalTransactions
-          transactions.confirmedTransactions +=
-            addressInfo.ConfirmedTransactions
-          transactions.unconfirmedTransactions +=
-            addressInfo.UnconfirmedTransactions
+          // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
+          // transactions.totalTransactions += addressInfo.TotalTransactions
+          // transactions.confirmedTransactions +=
+          //   addressInfo.ConfirmedTransactions
+          // transactions.unconfirmedTransactions +=
+          //   addressInfo.UnconfirmedTransactions
 
           addressInfo.Transactions.forEach( ( tx ) => {
-            if ( !txMap.has( tx.txid ) ) {
+            if ( !txIdMap[ tx.txid ] ) {
               // check for duplicate tx (fetched against sending and  then again for change address)
-              txMap.set( tx.txid, true )
+              txIdMap[ tx.txid ] = true
 
               if ( tx.transactionType === 'Self' ) {
                 const outgoingTx = {
@@ -242,6 +268,7 @@ export default class Bitcoin {
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
+                  address: addressInfo.Address
                 }
 
                 const incomingTx = {
@@ -261,6 +288,7 @@ export default class Bitcoin {
                   primaryAccType,
                   senderAddresses: tx.SenderAddresses,
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
+                  address: addressInfo.Address
                 }
                 // console.log({ outgoingTx, incomingTx });
                 transactions.transactionDetails.push(
@@ -275,6 +303,7 @@ export default class Bitcoin {
                         .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
                         .join( ' ' )
                       break
+
                     case SUB_PRIMARY_ACCOUNT:
                       accType = primaryAccType
                       break
@@ -300,7 +329,8 @@ export default class Bitcoin {
                   primaryAccType,
                   recipientAddresses: tx.RecipientAddresses,
                   senderAddresses: tx.SenderAddresses,
-                  blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
+                  blockTime: tx.Status.block_time, // only available when tx is confirmed
+                  address: addressInfo.Address
                 }
 
                 transactions.transactionDetails.push( transaction )
@@ -327,14 +357,10 @@ export default class Bitcoin {
           }
         }
 
-      // sort transactions(lastest first) 
-      transactions.transactionDetails.sort( ( tx1, tx2 ) => { 
-        return tx2.blockTime - tx1.blockTime
-      } )
-
       return {
         UTXOs,
         balances,
+        txIdMap,
         transactions,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
         nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
@@ -344,7 +370,7 @@ export default class Bitcoin {
       //  `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
       //);
       console.log( {
-        err 
+        err
       } )
       throw new Error( 'Fetching balance-txn by addresses failed' )
     }
@@ -584,7 +610,7 @@ export default class Bitcoin {
         const res: AxiosResponse = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXO,
           {
-            addresses 
+            addresses
           },
         )
         data = res.data
@@ -592,7 +618,7 @@ export default class Bitcoin {
         const res: AxiosResponse = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXO,
           {
-            addresses 
+            addresses
           },
         )
         data = res.data
@@ -611,7 +637,7 @@ export default class Bitcoin {
         }
       }
       return {
-        UTXOs 
+        UTXOs
       }
     } catch ( err ) {
       // console.log(`An error occurred while connecting to Esplora: ${err}`);
@@ -620,7 +646,7 @@ export default class Bitcoin {
       try {
         const UTXOs = await this.blockcypherUTXOFallback( addresses )
         return {
-          UTXOs 
+          UTXOs
         }
       } catch ( err ) {
         // console.log(
@@ -695,15 +721,15 @@ export default class Bitcoin {
     if ( this.isPaymentURI( scannedStr ) ) {
       const { address } = this.decodePaymentURI( scannedStr )
       if ( this.isValidAddress( address ) ) return {
-        type: 'paymentURI' 
+        type: 'paymentURI'
       }
     } else if ( this.isValidAddress( scannedStr ) ) {
       return {
-        type: 'address' 
+        type: 'address'
       }
     }
     return {
-      type: null 
+      type: null
     }
   };
 
@@ -721,7 +747,7 @@ export default class Bitcoin {
           txHex,
           {
             headers: {
-              'Content-Type': 'text/plain' 
+              'Content-Type': 'text/plain'
             },
           },
         )
@@ -731,13 +757,13 @@ export default class Bitcoin {
           txHex,
           {
             headers: {
-              'Content-Type': 'text/plain' 
+              'Content-Type': 'text/plain'
             },
           },
         )
       }
       return {
-        txid: res.data 
+        txid: res.data
       }
     } catch( err ){
       console.log(
@@ -753,7 +779,7 @@ export default class Bitcoin {
               txHex,
               {
                 headers: {
-                  'Content-Type': 'text/plain' 
+                  'Content-Type': 'text/plain'
                 },
               },
             )
@@ -763,20 +789,20 @@ export default class Bitcoin {
               txHex,
               {
                 headers: {
-                  'Content-Type': 'text/plain' 
+                  'Content-Type': 'text/plain'
                 },
               },
             )
           }
           return {
-            txid: res.data 
+            txid: res.data
           }
         } catch ( err ) {
         // console.log(err.message);
           throw new Error( 'Transaction broadcasting failed' )
         }
-      } 
-    } 
+      }
+    }
   };
 
   public fromOutputScript = ( output: Buffer ): string => {
@@ -789,11 +815,11 @@ export default class Bitcoin {
   ): { paymentURI: string } => {
     if ( options ) {
       return {
-        paymentURI: bip21.encode( address, options ) 
+        paymentURI: bip21.encode( address, options )
       }
     } else {
       return {
-        paymentURI: bip21.encode( address ) 
+        paymentURI: bip21.encode( address )
       }
     }
   };
