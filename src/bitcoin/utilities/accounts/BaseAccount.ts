@@ -35,6 +35,13 @@ export default class BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -802,6 +809,10 @@ export default class BaseAccount {
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction( txHex )
+      if( txid ){
+        // chip consumed utxos
+        this.hdWallet.removeConsumedUTXOs( inputs )
+      }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
