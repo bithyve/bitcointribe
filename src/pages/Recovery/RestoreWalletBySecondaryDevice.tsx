@@ -195,8 +195,6 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             marginBottom: 22
           }}>
             <HeaderTitle
-              isKnowMoreButton={true}
-              onPressKnowMore={() => {}}
               firstLineTitle={'Restore wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
