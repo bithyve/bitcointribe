@@ -49,7 +49,7 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
 
       <View style={styles.buttonTextContainer}>
         <Text style={styles.buttonTitleText}>{title}</Text>
-        <Text style={styles.buttonSubtitleText}>{subtitle}</Text>
+       {subtitle ? <Text style={styles.buttonSubtitleText}>{subtitle}</Text> : null}
       </View>
     </TouchableOpacity>
   )
@@ -91,12 +91,12 @@ const styles = StyleSheet.create( {
   },
 
   buttonContainer: {
-    width: 165,
+    width: 150,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 15,
     borderColor: '#E3E3E3',
     borderWidth: 1,
