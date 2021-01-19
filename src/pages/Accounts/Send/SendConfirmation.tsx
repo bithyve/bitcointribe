@@ -1100,26 +1100,6 @@ class SendConfirmation extends Component<
         {showLoader ? <Loader isLoading={true} /> : null}
 
         <BottomSheet
-          onCloseStart={() => {
-            if ( this.refs.SendSuccessBottomSheet as any )
-              ( this.refs.SendSuccessBottomSheet as any ).snapTo( 0 )
-
-            this.props.clearTransfer( this.serviceType )
-
-            navigation.dispatch(
-              resetStackToAccountDetails( {
-                serviceType: this.serviceType,
-                index: this.state.derivativeAccountDetails
-                  ? 3
-                  : this.serviceType === TEST_ACCOUNT
-                    ? 0
-                    : this.serviceType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
-                spendableBalance: this.spendableBalance - totalAmount,
-              } ),
-            )
-          }}
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
           ref={'SendSuccessBottomSheet'}
