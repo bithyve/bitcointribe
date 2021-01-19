@@ -810,8 +810,27 @@ export default function ManageBackup( props ) {
   }
 
   useEffect( () => {
-    setAutoHighlightFlagsFromAsync()
-  }, [] )
+    setAutoHighlightFlagsFromAsync();
+    setSecurityQuestionCreatedData();
+  }, [] );
+
+  const setSecurityQuestionCreatedData = async() =>{
+    const updatedPageData = [ ...pageData ];
+    const securityQuestionHistory = JSON.parse(
+      await AsyncStorage.getItem('securityQuestionHistory'),
+    );
+      updatedPageData.forEach( ( data ) => {
+        switch ( data.title ) {
+            case 'Security Questions':
+              data.time = securityQuestionHistory ? securityQuestionHistory.created : 'never';
+              break
+
+            default:
+              break
+        }
+      } )
+      setPageData( updatedPageData )
+  }
 
   useEffect( () => {
     if ( autoHighlightFlags ) {
@@ -907,7 +926,7 @@ export default function ManageBackup( props ) {
     if ( overallHealth ) {
       setIsNextStepDisable( false )
       const updatedPageData = [ ...pageData ]
-      updatedPageData.forEach( ( data ) => {
+      updatedPageData.forEach( async( data ) => {
         switch ( data.title ) {
             case 'Secondary Device':
               if ( overallHealth.sharesInfo[ 0 ] ) {
@@ -947,6 +966,19 @@ export default function ManageBackup( props ) {
             case 'Security Questions':
               data.status = overallHealth.qaStatus.stage
               data.time = overallHealth.qaStatus.updatedAt
+              const securityQuestionHistory = JSON.parse(
+                await AsyncStorage.getItem('securityQuestionHistory'),
+              );
+              if(overallHealth.qaStatus.updatedAt){
+                const securityQuestionHistoryUpdated = {
+                  ...securityQuestionHistory,
+                  confirmed: overallHealth.qaStatus.updatedAt,
+                }
+                await AsyncStorage.setItem(
+                  'securityQuestionHistory',
+                  JSON.stringify( securityQuestionHistoryUpdated ),
+                )
+              }
               break
 
             default:
@@ -1606,7 +1638,7 @@ export default function ManageBackup( props ) {
     if ( item.type == 'security' ) {
       if ( autoHighlightFlags.securityAns ) {
         return item.status == 'Ugly'
-          ? 'Confirm the Security Question and Answer'
+          ? 'Confirm the Security Question and Answer created'
           : item.status == 'Bad'
             ? 'Confirm the Security Question and Answer'
             : item.status == 'Good'
