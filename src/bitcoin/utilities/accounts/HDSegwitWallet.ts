@@ -69,7 +69,6 @@ export default class HDSegwitWallet extends Bitcoin {
   private derivationPath: string;
   private xpub: string;
   private xpriv: string;
-  private usedAddresses: string[];
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private gapLimit: number;
@@ -93,6 +92,9 @@ export default class HDSegwitWallet extends Bitcoin {
   }> = [];
   private txIdMap: {[txid: string]: boolean} = {
   };
+  private addressQueryList: {external: string[], internal: string[] } = {
+    external: [], internal:[]
+  }
 
   constructor(
     mnemonic?: string,
@@ -101,7 +103,6 @@ export default class HDSegwitWallet extends Bitcoin {
     stateVars?: {
       accountName: string;
       accountDescription: string;
-      usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       gapLimit: number;
@@ -123,6 +124,7 @@ export default class HDSegwitWallet extends Bitcoin {
         address: string;
         status?: any;
       }>;
+      addressQueryList: {external: string[], internal: string[] };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -148,61 +150,63 @@ export default class HDSegwitWallet extends Bitcoin {
   }
 
   public initializeStateVars = ( stateVars ) => {
-    this.accountName = stateVars && stateVars.accountName ? stateVars.accountName: ''
-    this.accountDescription = stateVars && stateVars.accountDescription ? stateVars.accountDescription: ''
-    this.usedAddresses =
-      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : []
-    this.nextFreeAddressIndex =
-      stateVars && stateVars.nextFreeAddressIndex
-        ? stateVars.nextFreeAddressIndex
-        : 0
-    this.nextFreeChangeAddressIndex =
-      stateVars && stateVars.nextFreeChangeAddressIndex
-        ? stateVars.nextFreeChangeAddressIndex
-        : 0
-    this.gapLimit = config.GAP_LIMIT
-    this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT
-    this.balances =
-      stateVars && stateVars.balances ? stateVars.balances : this.balances
-    this.receivingAddress =
-      stateVars && stateVars.receivingAddress
-        ? stateVars.receivingAddress
-        : this.getInitialReceivingAddress()
-    this.transactions =
-      stateVars && stateVars.transactions
-        ? stateVars.transactions
-        : this.transactions
-    this.txIdMap = stateVars && stateVars.txIdMap
-      ? stateVars.txIdMap
-      : this.txIdMap
-    this.unconfirmedUTXOs =
-      stateVars && stateVars.unconfirmedUTXOs
-        ? stateVars.unconfirmedUTXOs
-        : this.unconfirmedUTXOs
-    this.confirmedUTXOs =
-      stateVars && stateVars.confirmedUTXOs
-        ? stateVars.confirmedUTXOs
-        : this.confirmedUTXOs
-    this.derivativeAccounts =
-      stateVars && stateVars.derivativeAccounts
-        ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
-        }
-        : config.DERIVATIVE_ACC
-    this.lastBalTxSync =
-      stateVars && stateVars.lastBalTxSync
-        ? stateVars.lastBalTxSync
-        : this.lastBalTxSync
-    this.newTransactions =
-      stateVars && stateVars.newTransactions
-        ? stateVars.newTransactions
-        : this.newTransactions
-    this.trustedContactToDA =
-      stateVars && stateVars.trustedContactToDA
-        ? stateVars.trustedContactToDA
-        : this.trustedContactToDA
-    this.feeRates =
-      stateVars && stateVars.feeRates ? stateVars.feeRates : this.feeRates
+    if( stateVars ){
+      this.accountName = stateVars.accountName ? stateVars.accountName: ''
+      this.accountDescription = stateVars.accountDescription ? stateVars.accountDescription: ''
+      this.nextFreeAddressIndex =
+        stateVars.nextFreeAddressIndex
+          ? stateVars.nextFreeAddressIndex
+          : 0
+      this.nextFreeChangeAddressIndex =
+        stateVars.nextFreeChangeAddressIndex
+          ? stateVars.nextFreeChangeAddressIndex
+          : 0
+      this.gapLimit = config.GAP_LIMIT
+      this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT
+      this.balances =
+        stateVars.balances ? stateVars.balances : this.balances
+      this.receivingAddress =
+        stateVars.receivingAddress
+          ? stateVars.receivingAddress
+          : this.getInitialReceivingAddress()
+      this.transactions =
+        stateVars.transactions
+          ? stateVars.transactions
+          : this.transactions
+      this.txIdMap = stateVars.txIdMap
+        ? stateVars.txIdMap
+        : this.txIdMap
+      this.unconfirmedUTXOs =
+        stateVars.unconfirmedUTXOs
+          ? stateVars.unconfirmedUTXOs
+          : this.unconfirmedUTXOs
+      this.confirmedUTXOs =
+        stateVars.confirmedUTXOs
+          ? stateVars.confirmedUTXOs
+          : this.confirmedUTXOs
+      this.addressQueryList = stateVars.addressQueryList ? stateVars.addressQueryList: this.addressQueryList
+      this.derivativeAccounts =
+        stateVars.derivativeAccounts
+          ? {
+            ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
+          }
+          : config.DERIVATIVE_ACC
+      this.lastBalTxSync =
+        stateVars.lastBalTxSync
+          ? stateVars.lastBalTxSync
+          : this.lastBalTxSync
+      this.newTransactions =
+        stateVars.newTransactions
+          ? stateVars.newTransactions
+          : this.newTransactions
+      this.trustedContactToDA =
+        stateVars.trustedContactToDA
+          ? stateVars.trustedContactToDA
+          : this.trustedContactToDA
+      this.feeRates =
+        stateVars.feeRates ? stateVars.feeRates : this.feeRates
+    }
+
   };
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -1466,15 +1470,18 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     const externalAddresses = [] // all external addresses(till closingExtIndex)
-    const externalAddressSet = [] // external address range set
+    const externalAddressSet = [] // external address range set w/ query list
     for ( let itr = 0; itr < closingExtIndex; itr++ ) {
       const address = this.getAddress( false, itr )
       externalAddresses.push( address )
       ownedAddresses.push( address )
       if( itr >= startingExtIndex ) externalAddressSet.push( address )
     }
+    externalAddressSet.push( ...this.addressQueryList.external )
+    ownedAddresses.push( ...this.addressQueryList.external )
+
     console.log( {
-      startingExtIndex, closingExtIndex, nextFreeAddressIndex: this.nextFreeAddressIndex
+      startingExtIndex, closingExtIndex, nextFreeAddressIndex: this.nextFreeAddressIndex, externalAddressSet
     } )
 
     const internalAddresses = [] // all internal addresses(till closingIntIndex)
@@ -1485,8 +1492,11 @@ export default class HDSegwitWallet extends Bitcoin {
       ownedAddresses.push( address )
       if( itr >= startingIntIndex ) internalAddressSet.push( address )
     }
+    internalAddressSet.push( ...this.addressQueryList.internal )
+    ownedAddresses.push( ...this.addressQueryList.internal )
+
     console.log( {
-      startingIntIndex, closingIntIndex, nextFreeChangeAddressIndex: this.nextFreeChangeAddressIndex
+      startingIntIndex, closingIntIndex, nextFreeChangeAddressIndex: this.nextFreeChangeAddressIndex, internalAddressSet
     } )
 
     const batchedDerivativeAddresses = []
@@ -1946,6 +1956,38 @@ export default class HDSegwitWallet extends Bitcoin {
     } )
     this.balances.balance -= consumedBalance
     this.confirmedUTXOs = latestUTXOSet
+    this.updateQueryList( consumedUTXOs )
+  }
+
+  private updateQueryList = ( consumedUTXOs: InputUTXOs[] ) => {
+    // updates query list with out of bound(lower bound) external/internal addresses
+    const softGapLimit = 5
+    const startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+    const startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+
+    for( const consumedUTXO of consumedUTXOs ){
+      let found = false
+      // is out of bound external address?
+      if( startingExtIndex )
+        for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+          const address = this.getAddress( false, itr )
+          if( consumedUTXO.address === address ){
+            this.addressQueryList.external.push( consumedUTXO.address ) // include out of bound(soft-refresh range) ext address
+            found = true
+            break
+          }
+        }
+
+      // is out of bound internal address?
+      if( startingIntIndex && !found )
+        for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+          const address = this.getAddress( true, itr )
+          if( consumedUTXO.address === address ){
+            this.addressQueryList.internal.push( consumedUTXO.address ) // include out of bound(soft-refresh range) int address
+            break
+          }
+        }
+    }
   }
 
   private sortOutputs = async (
