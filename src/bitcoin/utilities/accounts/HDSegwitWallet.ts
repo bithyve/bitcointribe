@@ -522,6 +522,9 @@ export default class HDSegwitWallet extends Bitcoin {
       confirmedUTXOs,
       transactions,
       txIdMap,
+      {
+        external: [], internal:[]
+      },
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[ accountType ][ accountNumber ]
@@ -1389,6 +1392,9 @@ export default class HDSegwitWallet extends Bitcoin {
         this.confirmedUTXOs,
         this.transactions,
         this.txIdMap,
+        {
+          external: [], internal:[]
+        },
         this.nextFreeAddressIndex - 1,
         this.nextFreeChangeAddressIndex - 1,
         'Test Account',
@@ -1545,6 +1551,7 @@ export default class HDSegwitWallet extends Bitcoin {
       balances,
       transactions,
       txIdMap,
+      addressQueryList,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
@@ -1556,13 +1563,11 @@ export default class HDSegwitWallet extends Bitcoin {
       cachedUTXOs,
       cachedTxs,
       cachedTxIdMap,
+      this.addressQueryList,
       this.nextFreeAddressIndex - 1,
       this.nextFreeChangeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
     )
-    console.log( {
-      nextFreeAddressIndex
-    } )
 
     const confirmedUTXOs = []
     const unconfirmedUTXOs = []
@@ -1589,19 +1594,17 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
     this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
 
     this.setNewTransactions( transactions )
 
-    console.log( {
-      balances, transactions
-    } )
     this.balances = balances
     this.transactions = transactions
     this.txIdMap = txIdMap
-    // console.log({ balances, transactions });
+
     return {
       balances, transactions
     }
