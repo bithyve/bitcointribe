@@ -110,10 +110,6 @@ export default class Bitcoin {
       address: string;
       status?: any;
     }>,
-    cachedBalances: {
-      balance: number;
-      unconfirmedBalance: number;
-    },
     cachedTxs: Transactions,
     cachedTxIdMap: {[txid: string]: boolean},
     lastUsedAddressIndex: number,
@@ -180,7 +176,10 @@ export default class Bitcoin {
       const { Utxos, Txs } = accountToResponseMapping[ requestId ]
 
       const UTXOs = cachedUTXOs
-      const balances =  cachedBalances
+      const balances = {
+        balance: 0,
+        unconfirmedBalance: 0,
+      }
 
       if ( Utxos )
         for ( const addressSpecificUTXOs of Utxos ) {
@@ -188,8 +187,14 @@ export default class Bitcoin {
             const { value, Address, status, vout, txid } = utxo
 
             let include = true
-            cachedUTXOs.forEach( ( utxo ) => {
-              if( utxo.txId === txid ) include = false
+            UTXOs.forEach( ( utxo ) => {
+              if( utxo.txId === txid ) {
+                if( status.confirmed && !utxo.status.confirmed ){
+                  // cached utxo status change(unconf to conf)
+                  utxo.status = status
+                }
+                include = false
+              }
             } )
 
             if( include )
@@ -201,26 +206,29 @@ export default class Bitcoin {
                 address: Address,
                 status,
               } )
-
-              if (
-                accountType === 'Test Account' &&
-              Address === externalAddresses[ 0 ]
-              ) {
-                balances.balance += value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-                continue
-              }
-
-              if ( status.confirmed ) balances.balance += value
-              else if (
-                internalAddressSet.length &&
-              internalAddressSet.includes( Address )
-              )
-                balances.balance += value
-              else balances.unconfirmedBalance += value
             }
 
           }
         }
+
+      // calculate balance
+      for( const utxo of UTXOs ){
+        if (
+          accountType === 'Test Account' &&
+          utxo.address === externalAddresses[ 0 ]
+        ) {
+          balances.balance += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+          continue
+        }
+
+        if ( utxo.status.confirmed ) balances.balance += utxo.value
+        else if (
+          internalAddressSet.length &&
+        internalAddressSet.includes( utxo.address )
+        )
+          balances.balance += utxo.value
+        else balances.unconfirmedBalance += utxo.value
+      }
 
       const transactions: Transactions = {
         totalTransactions: cachedTxs.totalTransactions,

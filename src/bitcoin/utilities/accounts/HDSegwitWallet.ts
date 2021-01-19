@@ -512,7 +512,6 @@ export default class HDSegwitWallet extends Bitcoin {
       internalAddresses,
       ownedAddresses,
       confirmedUTXOs,
-      balances,
       transactions,
       txIdMap,
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
@@ -1380,7 +1379,6 @@ export default class HDSegwitWallet extends Bitcoin {
         internalAddresses,
         ownedAddresses,
         this.confirmedUTXOs,
-        this.balances,
         this.transactions,
         this.txIdMap,
         this.nextFreeAddressIndex - 1,
@@ -1512,6 +1510,22 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
+
+    let cachedUTXOs =  [ ...this.confirmedUTXOs, ...this.unconfirmedUTXOs ]
+    let cachedTxIdMap = this.txIdMap
+    let cachedTxs = this.transactions
+    if( hardRefresh ){
+      cachedUTXOs = []
+      cachedTxIdMap = {
+      }
+      cachedTxs  = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      }
+    }
+
     const {
       UTXOs,
       balances,
@@ -1525,10 +1539,9 @@ export default class HDSegwitWallet extends Bitcoin {
       externalAddresses,
       internalAddresses,
       ownedAddresses,
-      [ ...this.confirmedUTXOs, ...this.unconfirmedUTXOs ],
-      this.balances,
-      this.transactions,
-      this.txIdMap,
+      cachedUTXOs,
+      cachedTxs,
+      cachedTxIdMap,
       this.nextFreeAddressIndex - 1,
       this.nextFreeChangeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
