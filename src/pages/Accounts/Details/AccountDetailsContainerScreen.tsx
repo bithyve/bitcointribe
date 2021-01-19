@@ -396,6 +396,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
 const styles = StyleSheet.create( {
   rootContainer: {
+    height: '100%',
   },
 
   scrollViewContainer: {
@@ -405,11 +406,11 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContainer: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
 
   footerSection: {
-    paddingVertical: 38,
+    paddingVertical: 15,
   },
 } )
 
