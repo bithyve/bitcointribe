@@ -130,8 +130,6 @@ export default function RestoreWalletByContacts( props ) {
           enabled
         >
           <HeaderTitle
-            isKnowMoreButton={true}
-            onPressKnowMore={() => {}}
             firstLineTitle={'Restore wallet using'}
             secondLineTitle={'Contacts'}
             infoTextNormal={'Select contacts to '}
