@@ -80,6 +80,11 @@ export interface TransactionDetails {
    * Note/message attached w/ the transaction(Donation acc specific)
    */
   message?: string;
+
+   /**
+   * Address corresponding to which this tx has been fetched
+   */
+  address?: string
 }
 
 export interface Balances {
