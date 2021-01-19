@@ -259,6 +259,7 @@ const TrustedContactHistory = (props) => {
   const renderTrustedContactsContent = useCallback(() => {
     return (
       <TrustedContacts
+        bottomsheetRef={trustedContactsBottomSheet as any}
         LoadContacts={LoadContacts}
         onPressBack={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
@@ -1224,7 +1225,7 @@ const TrustedContactHistory = (props) => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={trustedContactsBottomSheet as any}
-        snapPoints={[-30, hp('85%')]}
+        snapPoints={[-30, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%')]}
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />
