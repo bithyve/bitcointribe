@@ -28,6 +28,7 @@ export default class TestAccount extends BaseAccount {
       txIdMap,
       confirmedUTXOs,
       unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -64,6 +65,7 @@ export default class TestAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      addressQueryList: {external: string[], internal: string[] };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -87,6 +89,7 @@ export default class TestAccount extends BaseAccount {
       txIdMap,
       confirmedUTXOs,
       unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -127,6 +130,7 @@ export default class TestAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      addressQueryList: {external: string[], internal: string[] };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];

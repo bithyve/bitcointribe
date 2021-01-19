@@ -42,6 +42,7 @@ export default class BaseAccount {
         address: string;
         status?: any;
       }>;
+      addressQueryList: {external: string[], internal: string[] };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
