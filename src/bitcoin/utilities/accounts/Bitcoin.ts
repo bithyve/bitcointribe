@@ -230,12 +230,16 @@ export default class Bitcoin {
         else balances.unconfirmedBalance += utxo.value
       }
 
-      const transactions: Transactions = {
-        totalTransactions: cachedTxs.totalTransactions,
-        confirmedTransactions: cachedTxs.confirmedTransactions,
-        unconfirmedTransactions: cachedTxs.unconfirmedTransactions,
-        transactionDetails: cachedTxs.transactionDetails,
-      }
+      const upToDateTxs = []
+      const txsToUpdate = []
+      const newTxs = []
+      cachedTxs.transactionDetails.forEach( ( tx ) => {
+        if( tx.confirmations <= 6 ){
+          txsToUpdate.push( tx )
+        } else {
+          upToDateTxs.push( tx )
+        }
+      } )
 
       const addressesInfo = Txs
       // console.log({ addressesInfo });
@@ -299,7 +303,7 @@ export default class Bitcoin {
                   address: addressInfo.Address
                 }
                 // console.log({ outgoingTx, incomingTx });
-                transactions.transactionDetails.push(
+                newTxs.push(
                   ...[ outgoingTx, incomingTx ],
                 )
               } else {
@@ -341,8 +345,12 @@ export default class Bitcoin {
                   address: addressInfo.Address
                 }
 
-                transactions.transactionDetails.push( transaction )
+                newTxs.push( transaction )
               }
+            } else {
+              txsToUpdate.forEach( txToUpdate => {
+                if( txToUpdate.txid === tx.txid ) txToUpdate.confirmations = tx.NumberofConfirmations
+              } )
             }
           } )
 
@@ -364,6 +372,13 @@ export default class Bitcoin {
             }
           }
         }
+
+      const transactions: Transactions = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
+      }
 
       return {
         UTXOs,

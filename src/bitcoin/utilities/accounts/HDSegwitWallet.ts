@@ -44,10 +44,12 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedBalance: 0,
   };
   public receivingAddress: string;
+
+  // TODO: convert transactionDetails into a map(txid >> txObj); would require migration script
   public transactions: Transactions = {
-    totalTransactions: 0,
-    confirmedTransactions: 0,
-    unconfirmedTransactions: 0,
+    totalTransactions: 0, // remove
+    confirmedTransactions: 0, // remove
+    unconfirmedTransactions: 0, // remove
     transactionDetails: [],
   };
   public derivativeAccounts:
@@ -73,6 +75,8 @@ export default class HDSegwitWallet extends Bitcoin {
   private gapLimit: number;
   private lastBalTxSync = 0;
   private derivativeGapLimit: number;
+
+  // TODO: convert confirmedUTXOs into a map(utxo:txid >> utxo:obj)
   private confirmedUTXOs: Array<{
     txId: string;
     vout: number;
