@@ -111,7 +111,6 @@ export default function NewWalletQuestion( props ) {
         )
         const securityQuestionHistory = {
           created: current,
-          confirmed: current,
         }
         await AsyncStorage.setItem(
           'securityQuestionHistory',

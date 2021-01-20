@@ -109,7 +109,6 @@ export default function NewOwnQuestions( props ) {
         )
         const securityQuestionHistory = {
           created: current,
-          confirmed: current,
         }
         await AsyncStorage.setItem(
           'securityQuestionHistory',
