@@ -200,7 +200,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   };
 
   render() {
-    // console.log('lastSeen', this.props.lastSeen);
     return (
       <View style={styles.container}>
         <Video
