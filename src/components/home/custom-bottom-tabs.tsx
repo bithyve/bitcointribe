@@ -15,6 +15,7 @@ export enum BottomTab {
 }
 
 export interface Props {
+  isEnabled: boolean;
   tabBarZIndex?: number;
   selectedTab?: BottomTab | null;
   onSelect: ( tab: BottomTab ) => void;
@@ -82,6 +83,7 @@ const Tab: React.FC<TabViewProps> = ( {
 }
 
 const CustomBottomTabs: React.FC<Props> = ( {
+  isEnabled,
   tabBarZIndex = 1,
   onSelect,
   selectedTab,
@@ -96,7 +98,11 @@ const CustomBottomTabs: React.FC<Props> = ( {
             key={index}
             tabItem={tabItem}
             isActive={selectedTab == tabItem.tab}
-            onPress={() => onSelect( tabItem.tab )}
+            onPress={() => {
+              if ( isEnabled ) {
+                onSelect( tabItem.tab )
+              }
+            }}
           />
         )
       } )}

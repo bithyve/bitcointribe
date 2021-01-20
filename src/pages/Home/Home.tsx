@@ -1928,6 +1928,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <CustomBottomTabs
+          isEnabled={this.props.navigation.isFocused()}
           onSelect={this.handleBottomTabSelection}
           tabBarZIndex={
             this.state.currentBottomSheetKind ==
