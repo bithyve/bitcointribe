@@ -27,7 +27,7 @@
     "androidStagingRelease": "ENVFILE=.env.staging react-native run-android --variant=stagingRelease --appIdSuffix=staging",
     "androidProductionDebug": "ENVFILE=.env.production react-native run-android --variant=productionDebug",
     "androidProductionRelease": "ENVFILE=.env.production react-native run-android --variant=productionRelease",
-    "deep-clean": "yarn clear && yarn clean:node && yarn clean:ios && yarn clean:android && yarn install"
+    "deep-clean": "yarn clear && yarn clean:watchman && yarn clean:node && yarn clean:ios && yarn clean:android && yarn install"
   },
   "xcodeSchemes": {
     "Debug": [
@@ -55,6 +55,7 @@
     "assert": "^1.5.0",
     "asyncstorage-down": "^4.2.0",
     "axios": "^0.21.1",
+    "base64url": "^3.0.1",
     "bip21": "^2.0.2",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
@@ -97,6 +98,7 @@
     "react-native-crypto": "^2.2.0",
     "react-native-device-info": "^5.6.3",
     "react-native-draggable-flatlist": "^2.4.0",
+    "react-native-dropdown-picker": "^3.7.8",
     "react-native-elements": "^3.1.0",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "1.7.0",

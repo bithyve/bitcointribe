@@ -1899,9 +1899,9 @@ function* updateWalletImageWorker() {
     }
   }
 
-  console.log( {
-    walletImage 
-  } )
+  // console.log( {
+  //   walletImage 
+  // } )
 
   if ( Object.keys( walletImage ).length === 0 ) {
     console.log( 'WI: nothing to update' )

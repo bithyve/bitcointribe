@@ -75,12 +75,13 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -106,8 +107,8 @@ function* fetchDerivativeAccXpubWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -128,7 +129,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet
 
   console.log( {
-    derivativeAccounts 
+    derivativeAccounts
   } )
   const res = yield call(
     service.getDerivativeAccAddress,
@@ -138,7 +139,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
     accountName
   )
   console.log( {
-    res 
+    res
   } )
 
   if ( res.status === 200 ) {
@@ -149,8 +150,8 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -190,8 +191,8 @@ function* fetchTransactionsWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     yield put( switchLoader( payload.serviceType, 'transactions' ) )
@@ -226,7 +227,7 @@ function* fetchBalanceTxWorker( { payload } ) {
     restore: payload.options.restore,
   } )
   console.log( {
-    res 
+    res
   } )
   const postFetchBalances =
     res.status === 200 ? JSON.stringify( res.data.balances ) : preFetchBalances
@@ -253,8 +254,8 @@ function* fetchBalanceTxWorker( { payload } ) {
       }
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     }
   } else if ( res.status !== 200 ) {
@@ -270,12 +271,12 @@ function* fetchBalanceTxWorker( { payload } ) {
     try {
       yield call( syncDerivativeAccountsWorker, {
         payload: {
-          serviceTypes: [ payload.serviceType ], parentSynched 
+          serviceTypes: [ payload.serviceType ], parentSynched
         },
       } )
     } catch ( err ) {
       console.log( {
-        err 
+        err
       } )
     }
   }
@@ -295,13 +296,14 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
   let { serviceType, accountNumber, accountType } = payload
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
-
+  if( accountType=='SERVICE' ) accountType='WYRE'
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
 
   if ( !accountNumber ) accountNumber = 1
 
   const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet
+
   if (
     !derivativeAccounts[ accountType ] ||
     !derivativeAccounts[ accountType ][ accountNumber ].xpub
@@ -328,14 +330,14 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   if (
     res.status === 200 &&
     JSON.stringify( {
-      preFetchBalances, preFetchTransactions 
+      preFetchBalances, preFetchTransactions
     } ) !==
       JSON.stringify( {
-        postFetchBalances, postFetchTransactions 
+        postFetchBalances, postFetchTransactions
       } )
   ) {
     console.log( {
-      balanceTx: res.data 
+      balanceTx: res.data
     } )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
@@ -344,8 +346,8 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
     yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   } else if ( res.status !== 200 ) {
@@ -399,8 +401,8 @@ function* syncDerivativeAccountsWorker( { payload } ) {
         }
         yield call( insertDBWorker, {
           payload: {
-            SERVICES: updatedSERVICES 
-          } 
+            SERVICES: updatedSERVICES
+          }
         } )
       }
     } else {
@@ -453,8 +455,8 @@ function* syncViaXpubAgentWorker( { payload } ) {
       }
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     }
   } else {
@@ -488,7 +490,7 @@ export const processRecipients = async(
   const testAccount: TestAccount = accounts[ TEST_ACCOUNT ].service
   const regularAccount: RegularAccount = accounts[ REGULAR_ACCOUNT ].service
   const secureAccount: SecureAccount = accounts[ SECURE_ACCOUNT ].service
-  
+
   for ( const recipient of recipients ) {
     if ( recipient.address ) addressedRecipients.push( recipient )
     // recipient: explicit address
@@ -546,8 +548,8 @@ export const processRecipients = async(
               if ( trustedAddress )
                 res = {
                   status: 200, data: {
-                    address: trustedAddress 
-                  } 
+                    address: trustedAddress
+                  }
                 }
               else
                 throw new Error( 'Failed fetch contact address, xpub missing' )
@@ -562,8 +564,8 @@ export const processRecipients = async(
               if ( trustedTestAddress )
                 res = {
                   status: 200, data: {
-                    address: trustedTestAddress 
-                  } 
+                    address: trustedTestAddress
+                  }
                 }
               else
                 throw new Error(
@@ -578,7 +580,7 @@ export const processRecipients = async(
         }
 
         console.log( {
-          res 
+          res
         } )
         if ( res.status === 200 ) {
           const receivingAddress = res.data.address
@@ -600,14 +602,14 @@ function* transferST1Worker( { payload } ) {
   yield put( switchLoader( payload.serviceType, 'transfer' ) )
   let { recipients, averageTxFees, derivativeAccountDetails } = payload
   console.log( {
-    recipients 
+    recipients
   } )
 
   const accounts: AccountsState = yield select(
     ( state ) => state.accounts
   )
 
-  const trustedContactsServices: TrustedContactsService = 
+  const trustedContactsServices: TrustedContactsService =
   yield select(
     ( state ) => state.trustedContacts.service
   )
@@ -616,12 +618,12 @@ function* transferST1Worker( { payload } ) {
     recipients = yield call( processRecipients, recipients, payload.serviceType, accounts, trustedContactsServices )
   } catch ( err ) {
     yield put( failedST1( payload.serviceType, {
-      err 
+      err
     } ) )
     return
   }
   console.log( {
-    recipients 
+    recipients
   } )
   const service = accounts[ payload.serviceType ].service
 
@@ -635,7 +637,7 @@ function* transferST1Worker( { payload } ) {
   else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     yield put( failedST1( payload.serviceType, {
-      ...res 
+      ...res
     } ) )
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -660,8 +662,8 @@ function* transferST2Worker( { payload } ) {
     ( state ) => state.accounts[ serviceType ]
   )
 
-  const { txPrerequisites } = transfer.stage1? transfer.stage1: { 
-    txPrerequisites: null 
+  const { txPrerequisites } = transfer.stage1? transfer.stage1: {
+    txPrerequisites: null
   }
   if ( !txPrerequisites && !customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
@@ -678,14 +680,14 @@ function* transferST2Worker( { payload } ) {
   if ( res.status === 200 ) {
     if ( serviceType === SECURE_ACCOUNT ) {
       console.log( {
-        res 
+        res
       } )
       yield put( executedST2( serviceType, res.data ) )
     } else yield put( executedST2( serviceType, res.data.txid ) )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     yield put( failedST2( serviceType, {
-      ...res 
+      ...res
     } ) )
     // yield put(switchLoader(serviceType, 'transfer'));
   }
@@ -713,8 +715,8 @@ function* generateSecondaryXprivWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
     yield put( secondaryXprivGenerated( true ) )
   } else {
@@ -761,7 +763,7 @@ function* alternateTransferST2Worker( { payload } ) {
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     yield put( failedST2( serviceType, {
-      ...res 
+      ...res
     } ) )
     // yield put(switchLoader(serviceType, 'transfer'));
   }
@@ -792,7 +794,7 @@ function* transferST3Worker( { payload } ) {
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     yield put( failedST3( payload.serviceType, {
-      ...res 
+      ...res
     } ) )
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -811,7 +813,7 @@ function* testcoinsWorker( { payload } ) {
   )
   const res = yield call( service.getTestcoins )
   console.log( {
-    res 
+    res
   } )
   if ( res.status === 200 ) {
     yield put( testcoinsReceived( payload.serviceType, service ) )
@@ -823,8 +825,8 @@ function* testcoinsWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
 
     yield put( accountsSynched( true ) ) // initial sync: test-acc only (turns the amount text to black)
@@ -840,7 +842,7 @@ export const testcoinsWatcher = createWatcher( testcoinsWorker, GET_TESTCOINS )
 function* accumulativeTxAndBalWorker() {
   const accounts = yield select( ( state ) => state.accounts )
   console.log( {
-    accounts 
+    accounts
   } )
 
   const regularBalance = accounts[ REGULAR_ACCOUNT ].service
@@ -870,7 +872,7 @@ function* accumulativeTxAndBalWorker() {
     ...secureTransactions,
   ]
   console.log( {
-    accumulativeBalance, accumulativeTransactions 
+    accumulativeBalance, accumulativeTransactions
   } )
 }
 
@@ -890,7 +892,7 @@ function* feeAndExchangeRatesWorker() {
   try {
     const res = yield call( RelayServices.fetchFeeAndExchangeRates )
     console.log( {
-      res 
+      res
     } )
     if ( res.status === 200 ) {
       const { exchangeRates, averageTxFees } = res.data
@@ -914,7 +916,7 @@ function* feeAndExchangeRatesWorker() {
     }
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
   }
 }
@@ -960,16 +962,16 @@ function* validateTwoFAWorker( { payload } ) {
         ...SERVICES,
         [ SECURE_ACCOUNT ]: JSON.stringify( service ),
       }
-  
+
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
     } else {
       console.log( 'Failed to remove 2FA details from the device' )
     }
-   
+
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     console.log( 'Failed to validate twoFA', res.err )
@@ -998,8 +1000,8 @@ function* removeTwoFAWorker() {
 
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     console.log( 'Failed to remove 2FA details' )
@@ -1097,13 +1099,13 @@ function* accountsSyncWorker( {} ) {
 
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
     yield put( accountsSynched( true ) )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     yield put( accountsSynched( false ) )
   }
@@ -1171,7 +1173,7 @@ function* setupDonationAccountWorker( { payload } ) {
 
   if ( res.status === 200 ) {
     console.log( {
-      res 
+      res
     } )
     const { setupSuccessful, accountId, accountNumber } = res.data
     if ( !setupSuccessful ) {
@@ -1186,12 +1188,12 @@ function* setupDonationAccountWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
     yield put( settedDonationAccount( serviceType, true ) )
     return {
-      accountId, accountNumber 
+      accountId, accountNumber
     }
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -1216,7 +1218,7 @@ function* updateDonationPreferencesWorker( { payload } ) {
 
   if ( res.status === 200 ) {
     console.log( {
-      res 
+      res
     } )
 
     const { SERVICES } = yield select( ( state ) => state.storage.database )
@@ -1226,8 +1228,8 @@ function* updateDonationPreferencesWorker( { payload } ) {
     }
     yield call( insertDBWorker, {
       payload: {
-        SERVICES: updatedSERVICES 
-      } 
+        SERVICES: updatedSERVICES
+      }
     } )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -1245,13 +1247,22 @@ function* refreshAccountShellWorker( { payload } ) {
   const { primarySubAccount } = shell
   const options: { autoSync?: boolean } = payload.options
 
-  let accountKind: any = primarySubAccount.kind
-  if (
-    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
-    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
-  )
-    if ( primarySubAccount.instanceNumber )
-      accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+  let accountKind
+  switch( primarySubAccount.kind ){
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        if ( primarySubAccount.instanceNumber )
+          accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        else accountKind = primarySubAccount.kind
+        break
+
+      case SubAccountKind.SERVICE:
+        accountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+        break
+
+      default:
+        accountKind = primarySubAccount.kind
+  }
 
   if ( options && options.autoSync ) {
     // auto-refresh the account-shell once per-session
@@ -1283,7 +1294,7 @@ function* refreshAccountShellWorker( { payload } ) {
         accountNumber: primarySubAccount.instanceNumber,
       }
       yield call( syncViaXpubAgentWorker, {
-        payload 
+        payload
       } )
     } else {
       const payload = {
@@ -1292,7 +1303,7 @@ function* refreshAccountShellWorker( { payload } ) {
         accountNumber: primarySubAccount.instanceNumber,
       }
       yield call( fetchDerivativeAccBalanceTxWorker, {
-        payload 
+        payload
       } )
     }
 
@@ -1310,7 +1321,7 @@ function* refreshAccountShellWorker( { payload } ) {
     }
 
     yield call( fetchBalanceTxWorker, {
-      payload 
+      payload
     } )
 
     yield put(
@@ -1329,6 +1340,11 @@ export const refreshAccountShellWatcher = createWatcher(
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountId: string
   let subAccountInstanceNum: number
+
+  const service = yield select(
+    ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
+  )
+
   switch ( subAccountInfo.kind ) {
       case SubAccountKind.DONATION_ACCOUNT:
         const donationInstance = yield call( setupDonationAccountWorker, {
@@ -1351,10 +1367,6 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
-        const service = yield select(
-          ( state ) => state.accounts[ subAccountInfo.kind ].service
-        )
-
         const accountDetails = {
           accountName: subAccountInfo.customDisplayName,
           accountDescription: subAccountInfo.customDescription,
@@ -1373,20 +1385,56 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
           }
           yield call( insertDBWorker, {
             payload: {
-              SERVICES: updatedSERVICES 
-            } 
+              SERVICES: updatedSERVICES
+            }
           } )
 
           subAccountId = derivativeSetupRes.data.accountId
           subAccountInstanceNum = derivativeSetupRes.data.accountNumber
         } else console.log( {
-          err: derivativeSetupRes.err 
+          err: derivativeSetupRes.err
         } )
+        break
+
+      case SubAccountKind.SERVICE:
+        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.WYRE:
+              const wyreAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const wyreSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.WYRE,
+                wyreAccountDetails
+              )
+
+              if ( wyreSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = wyreSetupRes.data.accountId
+                subAccountInstanceNum = wyreSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: wyreSetupRes.err
+                } )
+              }
+              break
+        }
         break
   }
 
   if ( subAccountId ) return {
-    subAccountId, subAccountInstanceNum 
+    subAccountId, subAccountInstanceNum
   }
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
@@ -1394,6 +1442,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 function* addNewAccountShell( { payload: subAccountInfo, }: {
   payload: SubAccountDescribing;
 } ) {
+
   const bitcoinUnit =
     subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
       ? BitcoinUnit.TSATS
@@ -1412,11 +1461,11 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
       displayOrder: 1,
     } )
     yield put( newAccountShellAdded( {
-      accountShell: newAccountShell 
+      accountShell: newAccountShell
     } ) )
     yield put( accountShellOrderedToFront( newAccountShell ) )
   } catch ( error ) {
-    console.log( 'addNewAccountShell saga::error: ' + error )
+
     const newAccountShell = new AccountShell( {
       unit: bitcoinUnit,
       primarySubAccount: subAccountInfo,
@@ -1424,7 +1473,7 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
     } )
     yield put(
       newAccountShellAddFailed( {
-        accountShell: newAccountShell, error 
+        accountShell: newAccountShell, error
       } )
     )
   }
@@ -1438,7 +1487,6 @@ export const addNewAccountShellWatcher = createWatcher(
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
-  
   try {
     const service = yield select(
       ( state ) => state.accounts[ account.sourceKind ].service
@@ -1447,7 +1495,9 @@ function* updateAccountSettings( { payload: account, }: {
     const result = yield call(
       service.updateAccountDetails,
       {
-        kind: account.kind,
+        // for accounts of subAccountKind as SERVICE we need to know which specific
+        // service the account belongs to, this is serviceAccountKind of ExternalServiceSubAccountDescribing
+        kind: account.kind===SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
         instanceNumber: account.instanceNumber,
         customDisplayName :account.customDisplayName,
         customDescription: account.customDescription
@@ -1462,17 +1512,17 @@ function* updateAccountSettings( { payload: account, }: {
       }
       yield call( insertDBWorker, {
         payload: {
-          SERVICES: updatedSERVICES 
-        } 
+          SERVICES: updatedSERVICES
+        }
       } )
 
       yield put( accountSettingsUpdated( {
-        account 
+        account
       } ) )
-    } 
+    }
   }catch ( error ) {
     yield put( accountSettingsUpdateFailed( {
-      account, error 
+      account, error
     } ) )
   }
 }

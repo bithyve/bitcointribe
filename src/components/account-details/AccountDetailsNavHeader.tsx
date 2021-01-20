@@ -67,7 +67,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
   return (
     <View>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
 
       <StatusBar
@@ -80,10 +80,10 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
         <View style={styles.mainContentContainer}>
           <TouchableOpacity
             style={{
-              height: '100%', justifyContent: 'center', alignItems: 'center', flex: 0 
+              height: '100%', justifyContent: 'center', alignItems: 'center', flex: 0
             }}
             hitSlop={{
-              top: 20, left: 20, bottom: 20, right: 20 
+              top: 20, left: 20, bottom: 20, right: 20
             }}
             onPress={onBackPressed}
           >

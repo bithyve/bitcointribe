@@ -112,8 +112,9 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingVertical: widthPercentageToDP( 2.5 ),
     backgroundColor: Colors.white,
+    justifyContent: 'space-between',
   },
 
   headerSectionContainer: {
@@ -156,14 +157,14 @@ const styles = StyleSheet.create( {
   },
 
   subtitleText: {
-    marginTop: 5,
+    marginTop: widthPercentageToDP( 0.5 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
   },
 
   balanceRow: {
-    marginTop: 10,
+    marginTop: widthPercentageToDP( 1 ),
   },
 } )
 

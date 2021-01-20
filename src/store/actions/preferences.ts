@@ -27,7 +27,7 @@ export const setCurrencyCode = ( data ) => {
   return {
     type: CURRENCY_CODE,
     payload: {
-      currencyCode: data 
+      currencyCode: data
     },
   }
 }
@@ -48,7 +48,7 @@ export const setFCMToken = ( data ) => {
   return {
     type: FCM_TOKEN_VALUE,
     payload: {
-      fcmTokenValue: data 
+      fcmTokenValue: data
     },
   }
 }
@@ -57,7 +57,7 @@ export const setSecondaryDeviceAddress = ( data ) => {
   return {
     type: SECONDARY_DEVICE_ADDRESS_VALUE,
     payload: {
-      secondaryDeviceAddressValue: data 
+      secondaryDeviceAddressValue: data
     },
   }
 }
@@ -66,7 +66,7 @@ export const setReleaseCases = ( data ) => {
   return {
     type: RELEASE_CASES_VALUE,
     payload: {
-      releaseCasesValue: data 
+      releaseCasesValue: data
     },
   }
 }
@@ -75,7 +75,7 @@ export const setTestAccountHelperDone = ( data ) => {
   return {
     type: TEST_ACCOUNT_HELPER_DONE,
     payload: {
-      isTestHelperDoneValue: data 
+      isTestHelperDoneValue: data
     },
   }
 }
@@ -84,7 +84,7 @@ export const setTransactionHelper = ( data ) => {
   return {
     type: TRANSACTION_HELPER_DONE,
     payload: {
-      isTransactionHelperDoneValue: data 
+      isTransactionHelperDoneValue: data
     },
   }
 }
@@ -93,7 +93,7 @@ export const setReceiveHelper = ( data ) => {
   return {
     type: RECEIVE_HELPER_DONE,
     payload: {
-      isReceiveHelperDoneValue: data 
+      isReceiveHelperDoneValue: data
     },
   }
 }
@@ -110,7 +110,7 @@ export const setSavingWarning = ( data ) => {
   return {
     type: SAVING_WARNING,
     payload: {
-      savingWarning: data 
+      savingWarning: data
     },
   }
 }
@@ -161,7 +161,7 @@ export const updateApplicationStatus = ( data ) => {
   return {
     type: UPDATE_APPLICATION_STATUS,
     payload: {
-      status: data 
+      status: data
     },
   }
 }

@@ -22,18 +22,20 @@ LogBox.ignoreAllLogs(true);
 export const URI_PREFIX = 'hexa://';
 
 async function configureAPIHeaders() {
-  const version = await getVersion();
-  const buildNumber = await getBuildId();
+  const version = await getVersion()
+  const buildNumber = await getBuildId()
 
-  setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
-};
+  setApiHeaders( {
+    appVersion: version, appBuildNumber: buildNumber 
+  } )
+}
 
 
 export default function AppWrapper() {
 
   // Creates and holds an instance of the store so only children in the `Provider`'s
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
-  const store = makeStore();
+  const store = makeStore()
 
   useEffect(() => {
     ( async () => {
@@ -49,90 +51,90 @@ export default function AppWrapper() {
         <AppContent />
       </BottomSheetModalProvider>
     </Provider>
-  );
+  )
 }
 
 function AppContent() {
-  const dispatch = useDispatch();
-  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal();
+  const dispatch = useDispatch()
+  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
 
-  const preferencesState = usePreferencesState();
-  const [previousScreenName, setPreviousScreenName] = useState<string | null>();
-  const [currentScreenName, setCurrentScreenName] = useState<string | null>();
+  const preferencesState = usePreferencesState()
+  const [ previousScreenName, setPreviousScreenName ] = useState<string | null>()
+  const [ currentScreenName, setCurrentScreenName ] = useState<string | null>()
 
-  const canShowNoInternetWarning = useMemo(() => {
+  const canShowNoInternetWarning = useMemo( () => {
     return (
       currentScreenName != 'Login' &&
       currentScreenName != 'Launch' &&
       currentScreenName != 'ReLogin' &&
       preferencesState.hasShownNoInternetWarning === false
-    );
-  }, [previousScreenName, currentScreenName, preferencesState.hasShownNoInternetWarning]);
+    )
+  }, [ previousScreenName, currentScreenName, preferencesState.hasShownNoInternetWarning ] )
 
   async function resetInternetWarningFlag() {
-    await dispatch(updatePreference({
+    await dispatch( updatePreference( {
       key: 'hasShownNoInternetWarning',
       value: false,
-    }));
+    } ) )
   }
 
-  const showNoInternetWarning = useCallback(() => {
+  const showNoInternetWarning = useCallback( () => {
     presentBottomSheet(
       <NoInternetModalContents
         onPressTryAgain={() => {
-          dismissBottomSheet();
+          dismissBottomSheet()
         }}
         onPressIgnore={() => {
-          resetInternetWarningFlag();
-          dismissBottomSheet();
+          resetInternetWarningFlag()
+          dismissBottomSheet()
         }}
       />,
       defaultBottomSheetConfigs,
-    );
-  }, [presentBottomSheet, dismissBottomSheet]);
+    )
+  }, [ presentBottomSheet, dismissBottomSheet ] )
 
   function setupInternetWarningListener() {
-    return NetInfo.addEventListener((state) => {
+    return NetInfo.addEventListener( ( state ) => {
       if (
         state.isInternetReachable == null ||
         canShowNoInternetWarning == false
       ) {
-        return;
+        return
       }
 
-      if (state.isInternetReachable) {
-        dismissBottomSheet();
+      if ( state.isInternetReachable ) {
+        dismissBottomSheet()
       } else {
-        showNoInternetWarning();
+        showNoInternetWarning()
       }
-    });
+    } )
   }
 
-  useEffect(() => {
+  useEffect( () => {
     return () => {
       // reset when the app component unmounts
-      resetInternetWarningFlag();
-    };
-  }, []);
+      resetInternetWarningFlag()
+    }
+  }, [] )
 
-  useEffect(() => {
-    const unsubscribe = setupInternetWarningListener();
+  useEffect( () => {
+    const unsubscribe = setupInternetWarningListener()
 
     return () => {
-      unsubscribe();
-    };
-  }, []);
+      unsubscribe()
+    }
+  }, [] )
 
   return (
     <Navigator
-      onNavigationStateChange={async (prevState, currentState) => {
-        setPreviousScreenName(getActiveRouteName(prevState));
-        setCurrentScreenName(getActiveRouteName(currentState));
+      onNavigationStateChange={async ( prevState, currentState ) => {
+        setPreviousScreenName( getActiveRouteName( prevState ) )
+        setCurrentScreenName( getActiveRouteName( currentState ) )
 
         if (previousScreenName !== currentScreenName) {
           analytics().logEvent(currentScreenName);
         }
       }}
     />
-  );
+  )
 }

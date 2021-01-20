@@ -12,10 +12,9 @@ import {
   AppState
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
-import AddModalContents from '../../components/AddModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
@@ -94,9 +93,11 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging';
 import firebase from '@react-native-firebase/app';
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
-
 
 export enum BottomSheetState {
   Closed,
@@ -104,7 +105,7 @@ export enum BottomSheetState {
 }
 
 export enum BottomSheetKind {
-  TAB_BAR_ADD_MENU,
+  TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
   CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
@@ -141,7 +142,10 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
   exchangeRates?: any[];
+
   accountsState: AccountsState;
+  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -723,7 +727,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       )
-    } catch ( error ) { 
+    } catch ( error ) {
       // do nothing
     }
   };
@@ -1237,13 +1241,42 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else if (tab === BottomTab.QR) {
       this.props.navigation.navigate('QRScanner', {
         onCodeScanned: this.processQRData,
-      })
-    } else if (tab === BottomTab.Add) {
-      this.openBottomSheet(BottomSheetKind.TAB_BAR_ADD_MENU)
+      } )
+    } else if ( tab === BottomTab.FriendsAndFamily ) {
+      this.props.navigation.navigate( 'FriendsAndFamily' )
     }
   };
 
-  processDLRequest = (key, rejected) => {
+  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+    switch ( menuItem.kind ) {
+        case BuyMenuItemKind.FAST_BITCOINS:
+          this.props.navigation.navigate( 'VoucherScanner' )
+          break
+        case BuyMenuItemKind.SWAN:
+          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          break
+        case BuyMenuItemKind.WYRE:
+          if ( this.props.currentWyreSubAccount ) {
+            this.props.navigation.navigate( 'PlaceWyreOrder', {
+              currentSubAccount: this.props.currentWyreSubAccount
+            } )
+          } else {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Wyre Account',
+              defaultDescription: 'Bought using Apple Pay / Credit Card',
+              serviceAccountKind: ServiceAccountKind.WYRE,
+            } )
+
+            this.props.navigation.navigate( 'NewWyreAccountDetails', {
+              currentSubAccount: newSubAccount,
+            } )
+          }
+          break
+    }
+  }
+
+  processDLRequest = ( key, rejected ) => {
     const { trustedContactRequest, recoveryRequest } = this.state
     let {
       requester,
@@ -1628,35 +1661,35 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getBottomSheetSnapPoints(): any[] {
-    switch (this.state.currentBottomSheetKind) {
-      case BottomSheetKind.TAB_BAR_ADD_MENU:
-      case BottomSheetKind.CUSTODIAN_REQUEST:
-      case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
-        return defaultBottomSheetConfigs.snapPoints
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
+          return defaultBottomSheetConfigs.snapPoints
 
-      case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-        return [
-          -50,
-          heightPercentageToDP(
-            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
-          ),
-          heightPercentageToDP(95),
-        ]
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 95 ),
+          ]
 
-      case BottomSheetKind.ERROR:
-        return [
-          -50,
-          heightPercentageToDP(
-            Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
-          ),
-        ]
+        case BottomSheetKind.ERROR:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+            ),
+          ]
 
-      case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
-      case BottomSheetKind.NOTIFICATIONS_LIST:
-        return [-50, heightPercentageToDP(82)]
+        case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
+        case BottomSheetKind.NOTIFICATIONS_LIST:
+          return [ -50, heightPercentageToDP( 82 ) ]
 
-      default:
-        return defaultBottomSheetConfigs.snapPoints
+        default:
+          return defaultBottomSheetConfigs.snapPoints
     }
   }
 
@@ -1664,32 +1697,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { UNDER_CUSTODY, navigation } = this.props
     const { custodyRequest } = this.state
 
-    switch (this.state.currentBottomSheetKind) {
-      case BottomSheetKind.TAB_BAR_ADD_MENU:
-        return (
-          <>
-            <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return (
+            <>
+              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
-            <AddModalContents
-              onPressElements={(type) => {
-                if (type == 'buyBitcoins') {
-                  navigation.navigate('VoucherScanner')
-                } else if (type == 'addContact') {
-                  this.setState(
-                    {
-                      isLoadContacts: true,
-                    },
-                    () => {
-                      this.openBottomSheet(
-                        BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK,
-                      )
-                    },
-                  )
-                }
-              }}
-            />
-          </>
-        )
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
 
       case BottomSheetKind.CUSTODIAN_REQUEST:
         return (
@@ -1830,13 +1848,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     const {
       netBalance,
-      selectedBottomTab,
       notificationData,
       currencyCode,
     } = this.state
 
     const {
-      navigation,
       exchangeRates,
       walletName,
       overallHealth,
@@ -1886,28 +1902,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <View
-          style={styles.floatingFriendsAndFamilyButtonContainer}
+          style={styles.floatingActionButtonContainer}
           pointerEvents="box-none"
         >
           <Button
             raised
-            title="Friends & Family"
+            title="Buy"
             icon={
               <Image
-                source={require('../../assets/images/icons/icon_contact.png')}
+                source={require( '../../assets/images/icons/icon_buy.png' )}
                 style={{
                   width: 18, height: 18
                 }}
               />
             }
             buttonStyle={{
-              ...ButtonStyles.floatingActionButton, borderRadius: 9999
+              ...ButtonStyles.floatingActionButton,
+              borderRadius: 9999,
+              paddingHorizontal: widthPercentageToDP( 10 )
             }}
             titleStyle={{
               ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 4,
+              marginLeft: 8,
             }}
-            onPress={() => navigation.navigate('FriendsAndFamily')}
+            onPress={() => this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )}
           />
         </View>
 
@@ -1917,11 +1935,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <CustomBottomTabs
+          isEnabled={this.props.navigation.isFocused()}
           onSelect={this.handleBottomTabSelection}
-          selectedTab={selectedBottomTab}
           tabBarZIndex={
             this.state.currentBottomSheetKind ==
-              BottomSheetKind.TAB_BAR_ADD_MENU || null
+              BottomSheetKind.TAB_BAR_BUY_MENU || null
               ? 1
               : 0
           }
@@ -1949,7 +1967,8 @@ const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
-    exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
+    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
+    exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
     UNDER_CUSTODY: idx(
@@ -2005,7 +2024,7 @@ const styles = StyleSheet.create({
     },
   },
 
-  floatingFriendsAndFamilyButtonContainer: {
+  floatingActionButtonContainer: {
     position: 'absolute',
     zIndex: 0,
     bottom: TAB_BAR_HEIGHT,
@@ -2013,6 +2032,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
-    padding: heightPercentageToDP(1),
+    padding: heightPercentageToDP( 1.5 ),
   },
 })

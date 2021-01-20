@@ -63,7 +63,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    marginBottom: 42,
+    marginBottom: 5,
   },
 
   viewMoreLinkRow: {
