@@ -311,6 +311,9 @@ class SendConfirmation extends Component<
         ( this.refs.SendSuccessBottomSheet as any ).snapTo( 1 )
       }, 10 )
     } else if ( !transfer.txid && transfer.executed === 'ST2' ) {
+      this.setState( {
+        showLoader: false 
+      } )
       this.props.navigation.navigate( 'TwoFAToken', {
         serviceType: this.serviceType,
         recipientAddress: '',
