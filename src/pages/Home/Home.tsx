@@ -491,7 +491,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   scheduleNotification = async () => {
-   let channelIdRandom = moment().valueOf();
+  PushNotification.cancelAllLocalNotifications();
+  let channelIdRandom = moment().valueOf();
+
    PushNotification.createChannel(
     {
       channelId: `${channelIdRandom}`,
@@ -509,7 +511,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     
    //let date =  new Date(Date.now() + (3 * 60 * 1000));
    PushNotification.localNotificationSchedule({
-      channelId: `${channelIdRandom}`,
+      channelId: channelIdRandom,
       vibrate: true, 
       vibration: 300,
       priority: "high",
@@ -522,6 +524,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       repeatType: 'day',
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     });
+
+    PushNotification.getScheduledLocalNotifications((notiifcations)=>{
+      console.log("SCHEDULE notiifcations", notiifcations)
+    });
+
   };
 
   localNotification = async (notificationDetails) => {
