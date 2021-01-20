@@ -41,7 +41,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            Store some sats here not all. Use these stored sats to transact or send to your friends and family.
+            Store some sats here not all. Use these stored sats to transact or send to your friends and family
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -55,7 +55,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Use the Savings Account to store bigger quantities of sats.
+            Use the Savings Account to store bigger quantities of sats
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -75,15 +75,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
-                ...styles.separatorView,
-              }}
-            />
+          <View style={styles.separatorView}/>
           </View>
         </View>
 
@@ -94,7 +86,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            The Checking Account is a single signature account and the Savings Account is a 2 of 3 multi-signature account.
+            The Checking Account is a single signature account and the Savings Account is a 2 of 3 multi-signature account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -108,17 +100,17 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Correspondingly, transactions are cheaper from the Checking Account compared the the Savings Account.
+            Correspondingly, transactions are cheaper from the Checking Account compared the the Savings Account
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
             onPress={() => {
               scrollViewRef.current &&
-              scrollViewRef.current.scrollTo({
-                x: 0,
-                y: hp('170%'),
-                animated: true,
-              });
+                scrollViewRef.current.scrollTo({
+                  x: 0,
+                  y: hp('170%'),
+                  animated: true,
+                });
             }}
           >
             <FontAwesome
@@ -128,15 +120,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
-                ...styles.separatorView,
-              }}
-            />
+            <View style={styles.separatorView}/>
           </View>
         </View>
 
@@ -147,7 +131,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            Caution! The Checking Account does not require 2 Factor Authentication for spending sats. Someone having your phone’s, and your Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account.
+            Caution! The Checking Account does not require 2 Factor Authentication for spending sats. Someone having your phone’s, and your Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -162,7 +146,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               paddingBottom: hp('6%'),
             }}
           >
-            Note that due to the security built into the accounts, it is cheaper transacting from the Checking Account compared to the Savings account.
+            Note that due to the security built into the accounts, it is cheaper transacting from the Checking Account compared to the Savings account
           </Text>
         </View>
       </ScrollView>
@@ -230,6 +214,10 @@ const styles = StyleSheet.create({
     height: 0,
     alignSelf: 'center',
     marginBottom: wp('1%'),
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
   },
   helperImage: {
     width: wp('80%'),
