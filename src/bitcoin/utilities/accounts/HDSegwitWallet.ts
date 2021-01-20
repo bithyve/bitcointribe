@@ -511,7 +511,10 @@ export default class HDSegwitWallet extends Bitcoin {
     const externalAddressSet = externalAddresses
     const internalAddressSet = internalAddresses
 
-    const  { confirmedUTXOs, balances, transactions, txIdMap } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+    const  { confirmedUTXOs, transactions, txIdMap } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+    const addressQL =  {
+      external: [], internal:[]
+    }
 
     const res = await this.fetchBalanceTransactionsByAddresses(
       externalAddressSet,
@@ -522,9 +525,7 @@ export default class HDSegwitWallet extends Bitcoin {
       confirmedUTXOs,
       transactions,
       txIdMap,
-      {
-        external: [], internal:[]
-      },
+      addressQL,
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[ accountType ][ accountNumber ]
@@ -584,7 +585,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions
+      balances: res.balances, transactions: res.transactions
     }
   };
 

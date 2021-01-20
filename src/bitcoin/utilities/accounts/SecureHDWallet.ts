@@ -14,6 +14,7 @@ import {
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccountElements,
   SubPrimaryDerivativeAccount,
+  DerivativeAccountElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -69,9 +70,21 @@ export default class SecureHDWallet extends Bitcoin {
     address: string;
     status?: any;
   }> = [];
+  private unconfirmedUTXOs: Array<{
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }> = [];
+  private txIdMap: {[txid: string]: boolean} = {
+  };
+  private addressQueryList: {external: string[], internal: string[] } = {
+    external: [], internal:[]
+  }
+
   private primaryMnemonic: string;
   private walletID: string;
-  private usedAddresses: string[];
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
@@ -117,6 +130,15 @@ export default class SecureHDWallet extends Bitcoin {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: string[], internal: string[] };
+      txIdMap: {[txid: string]: boolean};
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -136,63 +158,71 @@ export default class SecureHDWallet extends Bitcoin {
   }
 
   public initializeStateVars = ( stateVars ) => {
-    this.accountName = stateVars && stateVars.accountName ? stateVars.accountName: ''
-    this.accountDescription = stateVars && stateVars.accountDescription ? stateVars.accountDescription: ''
-    this.secondaryMnemonic =
-      stateVars && stateVars.secondaryMnemonic
-        ? stateVars.secondaryMnemonic
-        : null
-    this.usedAddresses =
-      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : []
-    this.nextFreeAddressIndex =
-      stateVars && stateVars.nextFreeAddressIndex
-        ? stateVars.nextFreeAddressIndex
-        : 0
-    this.nextFreeChangeAddressIndex =
-      stateVars && stateVars.nextFreeChangeAddressIndex
-        ? stateVars.nextFreeChangeAddressIndex
-        : 0
-    this.gapLimit = config.GAP_LIMIT
-    this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT
-    this.primaryXpriv =
-      stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined
-    this.secondaryXpriv =
-      stateVars && stateVars.secondaryXpriv
-        ? stateVars.secondaryXpriv
-        : undefined
-    this.xpubs = stateVars && stateVars.xpubs ? stateVars.xpubs : undefined
-    this.balances =
-      stateVars && stateVars.balances ? stateVars.balances : this.balances
-    this.receivingAddress =
-      stateVars && stateVars.receivingAddress
-        ? stateVars.receivingAddress
-        : this.getInitialReceivingAddress()
-    this.transactions =
-      stateVars && stateVars.transactions
-        ? stateVars.transactions
-        : this.transactions
-    this.confirmedUTXOs =
-      stateVars && stateVars.confirmedUTXOs
-        ? stateVars.confirmedUTXOs
-        : this.confirmedUTXOs
-    this.twoFASetup =
-      stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined
-    this.derivativeAccounts =
-      stateVars && stateVars.derivativeAccounts
-        ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
-        }
-        : config.DERIVATIVE_ACC
-    this.lastBalTxSync =
-      stateVars && stateVars.lastBalTxSync
-        ? stateVars.lastBalTxSync
-        : this.lastBalTxSync
-    this.newTransactions =
-      stateVars && stateVars.newTransactions
-        ? stateVars.newTransactions
-        : this.newTransactions
-    this.feeRates =
-      stateVars && stateVars.feeRates ? stateVars.feeRates : this.feeRates
+    if( stateVars ){
+      this.accountName =  stateVars.accountName ? stateVars.accountName: ''
+      this.accountDescription =  stateVars.accountDescription ? stateVars.accountDescription: ''
+      this.secondaryMnemonic =
+         stateVars.secondaryMnemonic
+           ? stateVars.secondaryMnemonic
+           : null
+      this.nextFreeAddressIndex =
+         stateVars.nextFreeAddressIndex
+           ? stateVars.nextFreeAddressIndex
+           : 0
+      this.nextFreeChangeAddressIndex =
+         stateVars.nextFreeChangeAddressIndex
+           ? stateVars.nextFreeChangeAddressIndex
+           : 0
+      this.gapLimit = config.GAP_LIMIT
+      this.derivativeGapLimit = config.DERIVATIVE_GAP_LIMIT
+      this.primaryXpriv =
+         stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined
+      this.secondaryXpriv =
+         stateVars.secondaryXpriv
+           ? stateVars.secondaryXpriv
+           : undefined
+      this.xpubs =  stateVars.xpubs ? stateVars.xpubs : undefined
+      this.balances =
+         stateVars.balances ? stateVars.balances : this.balances
+      this.receivingAddress =
+         stateVars.receivingAddress
+           ? stateVars.receivingAddress
+           : this.getInitialReceivingAddress()
+      this.transactions =
+         stateVars.transactions
+           ? stateVars.transactions
+           : this.transactions
+      this.txIdMap = stateVars.txIdMap
+        ? stateVars.txIdMap
+        : this.txIdMap
+      this.confirmedUTXOs =
+         stateVars.confirmedUTXOs
+           ? stateVars.confirmedUTXOs
+           : this.confirmedUTXOs
+      this.unconfirmedUTXOs =
+           stateVars.unconfirmedUTXOs
+             ? stateVars.unconfirmedUTXOs
+             : this.unconfirmedUTXOs
+      this.addressQueryList = stateVars.addressQueryList ? stateVars.addressQueryList: this.addressQueryList
+      this.twoFASetup =
+         stateVars.twoFASetup ? stateVars.twoFASetup : undefined
+      this.derivativeAccounts =
+         stateVars.derivativeAccounts
+           ? {
+             ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
+           }
+           : config.DERIVATIVE_ACC
+      this.lastBalTxSync =
+         stateVars.lastBalTxSync
+           ? stateVars.lastBalTxSync
+           : this.lastBalTxSync
+      this.newTransactions =
+         stateVars.newTransactions
+           ? stateVars.newTransactions
+           : this.newTransactions
+      this.feeRates =
+         stateVars.feeRates ? stateVars.feeRates : this.feeRates
+    }
   };
 
   public importBHXpub = async (
@@ -390,43 +420,53 @@ export default class SecureHDWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( options?: {
-    restore?;
-  } ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
     };
     transactions: Transactions;
   }> => {
-    if ( options && options.restore ) {
-      // WI helps with restoration
-    }
-
-    // this.consumedAddresses = [];
-    // generating all consumed addresses:
-    // for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
-    //   const multiSig = this.createSecureMultiSig(itr);
-    //   this.consumedAddresses.push(multiSig.address);
-    // }
-
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
-    const externalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++ ) {
+    let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+    if( hardRefresh ){
+      const hardGapLimit  = 10
+      startingExtIndex = 0
+      closingExtIndex = this.nextFreeAddressIndex + hardGapLimit
+      startingIntIndex = 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + hardGapLimit
+    }
+    else {
+      const softGapLimit = 5
+      startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+      closingExtIndex = this.nextFreeAddressIndex + softGapLimit
+      startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
+    }
+
+    const externalAddresses = [] // all external addresses(till closingExtIndex)
+    const externalAddressSet = [] // external address range set w/ query list
+    for ( let itr = 0; itr < closingExtIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr )
       externalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingExtIndex ) externalAddressSet.push( address )
     }
+    externalAddressSet.push( ...this.addressQueryList.external )
+    ownedAddresses.push( ...this.addressQueryList.external )
 
-    const internalAddresses = []
-    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + this.gapLimit; itr++ ) {
+    const internalAddresses = [] // all internal addresses(till closingIntIndex)
+    const internalAddressSet = [] // internal address range set
+    for ( let itr = 0; itr < closingIntIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr, true )
       internalAddresses.push( address )
       ownedAddresses.push( address )
+      if( itr >= startingIntIndex ) internalAddressSet.push( address )
     }
-    this.usedAddresses = [ ...externalAddresses, ...internalAddresses ]
+    internalAddressSet.push( ...this.addressQueryList.internal )
+    ownedAddresses.push( ...this.addressQueryList.internal )
 
     const batchedDerivativeAddresses = []
 
@@ -453,22 +493,46 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
+    let cachedUTXOs =  [ ...this.confirmedUTXOs, ...this.unconfirmedUTXOs ]
+    let cachedTxIdMap = this.txIdMap
+    let cachedTxs = this.transactions
+    if( hardRefresh ){
+      cachedUTXOs = []
+      cachedTxIdMap = {
+      }
+      cachedTxs  = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      }
+    }
+
     const {
       UTXOs,
       balances,
       transactions,
+      txIdMap,
+      addressQueryList,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
+      cachedUTXOs,
+      cachedTxs,
+      cachedTxIdMap,
+      this.addressQueryList,
       this.nextFreeAddressIndex - 1,
       this.nextFreeChangeAddressIndex - 1,
       'Savings Account',
     )
 
     const confirmedUTXOs = []
+    const unconfirmedUTXOs = []
     for ( const utxo of UTXOs ) {
       if ( utxo.status ) {
         if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
@@ -477,13 +541,17 @@ export default class SecureHDWallet extends Bitcoin {
             // defaulting utxo's on the change branch to confirmed
             confirmedUTXOs.push( utxo )
           }
+          else unconfirmedUTXOs.push( utxo )
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
         confirmedUTXOs.push( utxo )
       }
     }
+
+    this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
     this.receivingAddress = this.createSecureMultiSig(
@@ -494,6 +562,8 @@ export default class SecureHDWallet extends Bitcoin {
 
     this.balances = balances
     this.transactions = transactions
+    this.txIdMap = txIdMap
+
     return {
       balances, transactions
     }
@@ -600,10 +670,24 @@ export default class SecureHDWallet extends Bitcoin {
       accountNumber
     ].usedAddresses = usedAddresses
 
+    const externalAddressSet = externalAddresses
+    const internalAddressSet = internalAddresses
+
+    const  { confirmedUTXOs, transactions, txIdMap } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+    const addressQL =  {
+      external: [], internal:[]
+    }
+
     const res = await this.fetchBalanceTransactionsByAddresses(
+      externalAddressSet,
+      internalAddressSet,
       externalAddresses,
       internalAddresses,
       ownedAddresses,
+      confirmedUTXOs,
+      transactions,
+      txIdMap,
+      addressQL,
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[ accountType ][ accountNumber ]
@@ -613,21 +697,19 @@ export default class SecureHDWallet extends Bitcoin {
       accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
     )
 
-    const { balances, transactions, UTXOs } = res
-
-    const confirmedUTXOs = []
-    for ( const utxo of UTXOs ) {
+    const confUTXOs = []
+    for ( const utxo of res.UTXOs ) {
       if ( utxo.status ) {
-        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
+        if ( utxo.status.confirmed ) confUTXOs.push( utxo )
         else {
           if ( internalAddresses.includes( utxo.address ) ) {
             // defaulting utxo's on the change branch to confirmed
-            confirmedUTXOs.push( utxo )
+            confUTXOs.push( utxo )
           }
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push( utxo )
+        confUTXOs.push( utxo )
       }
     }
 
@@ -652,8 +734,9 @@ export default class SecureHDWallet extends Bitcoin {
       lastBalTxSync: latestSyncTime,
       newTransactions,
       confirmedUTXOs,
-      balances,
-      transactions,
+      balances: res.balances,
+      transactions: res.transactions,
+      txIdMap: res.txIdMap,
       nextFreeAddressIndex: res.nextFreeAddressIndex,
       nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
       receivingAddress: this.createSecureMultiSig(
@@ -664,7 +747,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions
+      balances: res.balances, transactions: res.transactions
     }
   };
 
