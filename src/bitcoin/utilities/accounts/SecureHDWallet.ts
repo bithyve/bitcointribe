@@ -15,6 +15,7 @@ import {
   SubPrimaryDerivativeAccountElements,
   SubPrimaryDerivativeAccount,
   DerivativeAccountElements,
+  InputUTXOs,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -1560,6 +1561,58 @@ export default class SecureHDWallet extends Bitcoin {
     }
     return res.data
   };
+
+
+  public removeConsumedUTXOs= ( consumedUTXOs: InputUTXOs[] ) => {
+    const latestUTXOSet = []
+    let consumedBalance = 0
+
+    this.confirmedUTXOs.forEach( confirmedUTXO => {
+      let include = true
+      consumedUTXOs.forEach( consumedUTXO => {
+        if( confirmedUTXO.txId === consumedUTXO.txId ) {
+          include = false
+          consumedBalance += consumedUTXO.value
+        }
+      } )
+
+      if( include ) latestUTXOSet.push( confirmedUTXO )
+    } )
+    this.balances.balance -= consumedBalance
+    this.confirmedUTXOs = latestUTXOSet
+    this.updateQueryList( consumedUTXOs )
+  }
+
+  private updateQueryList = ( consumedUTXOs: InputUTXOs[] ) => {
+    // updates query list with out of bound(lower bound) external/internal addresses
+    const softGapLimit = 5
+    const startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+    const startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+
+    for( const consumedUTXO of consumedUTXOs ){
+      let found = false
+      // is out of bound external address?
+      if( startingExtIndex )
+        for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+          const { address } = this.createSecureMultiSig( itr )
+          if( consumedUTXO.address === address ){
+            this.addressQueryList.external.push( consumedUTXO.address ) // include out of bound(soft-refresh range) ext address
+            found = true
+            break
+          }
+        }
+
+      // is out of bound internal address?
+      if( startingIntIndex && !found )
+        for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+          const { address } = this.createSecureMultiSig( itr, true )
+          if( consumedUTXO.address === address ){
+            this.addressQueryList.internal.push( consumedUTXO.address ) // include out of bound(soft-refresh range) int address
+            break
+          }
+        }
+    }
+  }
 
   public sortOutputs = async (
     outputs: Array<{

@@ -6,6 +6,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  InputUTXOs,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -922,6 +923,7 @@ export default class SecureAccount {
               vout: number;
             };
           }>;
+          inputs: InputUTXOs[]
         };
         err?: undefined;
         message?: undefined;
@@ -942,7 +944,7 @@ export default class SecureAccount {
         nSequence,
       )
 
-      let inputs
+      let inputs: InputUTXOs[]
       if ( txnPriority === 'custom' && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
       } else {
@@ -963,7 +965,7 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          txHex, childIndexArray
+          txHex, childIndexArray, inputs
         },
       }
     } catch ( err ) {
@@ -983,6 +985,7 @@ export default class SecureAccount {
         vout: number;
       };
     }>,
+    inputs: InputUTXOs[]
   ): Promise<
     | {
         status: number;
@@ -1000,13 +1003,21 @@ export default class SecureAccount {
       }
   > => {
     try {
+      const { txid } =  await this.secureHDWallet.serverSigningAndBroadcast(
+        token,
+        txHex,
+        childIndexArray,
+      )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs )
+      }
+
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.serverSigningAndBroadcast(
-          token,
-          txHex,
-          childIndexArray,
-        ),
+        data: {
+          txid
+        }
       }
     } catch ( err ) {
       return {
@@ -1060,6 +1071,10 @@ export default class SecureAccount {
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
       const { txid } = await this.secureHDWallet.broadcastTransaction( txHex )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs )
+      }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });

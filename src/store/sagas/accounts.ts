@@ -781,12 +781,12 @@ function* transferST3Worker( { payload } ) {
     ( state ) => state.accounts[ payload.serviceType ]
   )
 
-  const { txHex, childIndexArray } = transfer.stage2
+  const { txHex, childIndexArray, inputs } = transfer.stage2
   if ( !txHex && !childIndexArray ) {
     console.log( 'TxHex and childindex array missing' )
   }
 
-  const res = yield call( service.transferST3, token, txHex, childIndexArray )
+  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs )
   if ( res.status === 200 ) {
     yield put( executedST3( payload.serviceType, res.data.txid ) )
   } else {
