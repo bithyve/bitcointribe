@@ -129,10 +129,10 @@ const styles = StyleSheet.create( {
   headerAccountSync: {
     width: widthPercentageToDP( 4 ),
     height: widthPercentageToDP( 4 ),
-    marginRight: -8,
-    marginBottom: -5,
-    marginLeft: -8,
-    marginTop: -7
+    marginRight: widthPercentageToDP( -2 ),
+    marginBottom: widthPercentageToDP( -2 ),
+    marginLeft: widthPercentageToDP( -2 ),
+    marginTop: widthPercentageToDP( -1.7 )
   },
 
   headerAccountImage: {
