@@ -12,9 +12,16 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler';
 import CountDown from 'react-native-countdown-component';
 import Config from '../../bitcoin/HexaConfig';
+import { useSelector } from 'react-redux';
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface';
 
 export default function ApproveSetup(props) {
   let KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY;
+  const levelHealth: LevelHealthInterface[] = useSelector(
+    (state) => state.health.levelHealth
+  );
+  const currentLevel = useSelector((state) => state.health.currentLevel);
+  let Pk_name = currentLevel == 2 ? levelHealth[1].levelInfo[2].name : levelHealth[2].levelInfo[2].name
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -48,7 +55,7 @@ export default function ApproveSetup(props) {
                 Waiting for approval from
               </Text>
               <Text style={{ ...styles.modalInfoText, fontSize: RFValue(20) }}>
-                Keeper on iPad Pro
+                Keeper on {Pk_name}
               </Text>
             </View>
           </View>

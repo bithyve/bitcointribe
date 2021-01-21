@@ -37,16 +37,16 @@ import {
 
 const KeeperDeviceHistory = (props) => {
   const dispatch = useDispatch();
-  const ErrorBottomSheet = React.createRef();
-  const HelpBottomSheet = React.createRef();
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const ApproveSetupBottomSheet = React.createRef();
-  const ApprovePrimaryKeeperBottomSheet = React.createRef();
-  const keeperTypeBottomSheet = React.createRef();
-  const ReshareBottomSheet = React.createRef();
+  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
+  const [ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet] = useState(React.createRef());
+  const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(React.createRef());
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
 
   const [qrScannedData, setQrScannedData] = useState("");
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
@@ -77,7 +77,7 @@ const KeeperDeviceHistory = (props) => {
     },
   ]);
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
-    props.navigation.state.params.isPrimaryKeeper
+    props.navigation.state.params.selectedKeeper && props.navigation.state.params.selectedKeeper.shareType && props.navigation.state.params.selectedKeeper.shareType == 'primaryKeeper' ? true : false
   );
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.navigation.state.params.selectedLevelId
@@ -243,8 +243,8 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"3c96b489e61bd74d1f82a236","publicKey":"6e2d9c020e5dcbf5b09b0be7df102436b1fae3db5e547f3a2460aaa61df6d69c","ephemeralAddress":"602ae7c502aaf0a349150cc42434896f26539eaceafb98519210f4ba1a493267","walletName":"MacPro"}'
-            : '{"uuid":"2f760eb3e5ff4b696c2e6cd5","publicKey":"297465943d38886e2854f110821d2edb7b0ab6aa1556934858b7a902bb4c4941","ephemeralAddress":"c34b7e8513bce3a4e43a42870d46ced80ff19a47208a657128f5cae4b22dee5d","walletName":"Mac"}';
+            ? '{"uuid":"e6abe8e76c37b186838db2e7","publicKey":"561e88094b6772911f1de843a6712802c80ca76712cbfe91231a09f283b46401","ephemeralAddress":"86c571cd2dce081cbf306d9122bfe5b5cdd1f61f81fde317b2e44d656792dacc","walletName":"Mac"}'
+            : '{"uuid":"a922f84c73d3b2c60bb91eb2","publicKey":"3b2dbd9735c1d6903797cbf6c2ecc4e6316d0369546a72cd8105762f4ac4962b","ephemeralAddress":"fb64a9f693b08501e9dbac4f9f158b7cbc8f1572e2b2108abca8b4b4c0f1c569","walletName":"Samsung"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
@@ -344,7 +344,7 @@ const KeeperDeviceHistory = (props) => {
               isPrimaryKeeper ? "primaryKeeper" : "device"
             );
           }
-          // onPressReshare();
+          (ReshareBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
           (ReshareBottomSheet as any).current.snapTo(0);

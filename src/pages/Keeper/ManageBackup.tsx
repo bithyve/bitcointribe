@@ -65,6 +65,9 @@ import firebase from "react-native-firebase";
 import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import ModalHeader from "../../components/ModalHeader";
+import ErrorModalContents from "../../components/ErrorModalContents";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -84,6 +87,8 @@ interface ManageBackupStateTypes {
   selectedLevelId: number;
   selectedKeeperType: string;
   selectedKeeperName: string;
+  errorTitle: string;
+  errorInfo: string;
 }
 
 interface ManageBackupPropsTypes {
@@ -95,7 +100,6 @@ interface ManageBackupPropsTypes {
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
-  overallHealth: any;
   levelHealth: any[];
   currentLevel: any;
   healthLoading: any;
@@ -112,7 +116,7 @@ interface ManageBackupPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   onApprovalStatusChange: any;
-  secureAccount: any;
+  secureAccount: SecureAccount;
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
   metaShares: MetaShare[];
@@ -187,6 +191,8 @@ class ManageBackup extends Component<
       selectedLevelId: 0,
       selectedKeeperType: "",
       selectedKeeperName: "",
+      errorTitle: "",
+      errorInfo: "",
     };
   }
 
@@ -584,6 +590,45 @@ class ManageBackup extends Component<
   };
 
   onPressKeeper = (value, number) => {
+    let { currentLevel, isLevelThreeMetaShareCreated, isLevel3Initialized, isLevelTwoMetaShareCreated, isLevel2Initialized, secureAccount } = this.props;
+    if (
+      currentLevel == 1 &&
+      value.id == 3 && !isLevelThreeMetaShareCreated &&
+      !isLevel3Initialized
+    ) {
+      this.setState({
+        errorTitle: 'Please first complete Level 2',
+        errorInfo: 'Please check if you have completed above levels first and try to complete levels',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else if (
+      currentLevel == 1 && number == 2 && 
+      value.id == 2 && !isLevelTwoMetaShareCreated &&
+      !isLevel2Initialized
+    ) {
+      this.setState({
+        errorTitle: 'Please first complete Primary Keeper Setup',
+        errorInfo: 'Please check if you have completed Primary Keeper Setup first and try to complete Primary Keeper Setup',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else if (
+      currentLevel == 1 && number == 2 && 
+      value.id == 2 && !secureAccount.secureHDWallet.xpubs.secondary && !secureAccount.secureHDWallet.xpubs.bh
+    ) {
+      this.setState({
+        errorTitle: 'Please make sure Primary Keeper setup completed.',
+        errorInfo: 'Please check if you have completed Primary Keeper Setup and check notifications for xPubs.',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else{
+      this.setState({errorTitle: '', errorInfo: ''});
+    }
     let keeper = number == 1 ? value.keeper1 : value.keeper2;
     this.setState({
       selectedKeeper: keeper,
@@ -665,6 +710,33 @@ class ManageBackup extends Component<
       />
     );
   };
+
+  renderErrorModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={(this.refs.ErrorBottomSheet as any)}
+        title={this.state.errorTitle}
+        info={this.state.errorInfo}
+        proceedButtonText={'Got it'}
+        isIgnoreButton={false}
+        onPressProceed={() => this.closeErrorModal()}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }
+
+  closeErrorModal = () => {
+    (this.refs.ErrorBottomSheet as any).snapTo(0)
+  }
+
+  renderErrorModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => this.closeErrorModal()}
+      />
+    )
+  }
 
   render() {
     const {
@@ -1230,11 +1302,6 @@ class ManageBackup extends Component<
                 ) { 
                   getApproval = false;
                   await this.props.generateMetaShare(selectedLevelId);
-                } else if (
-                  this.props.currentLevel == 1 &&
-                  selectedLevelId == 3
-                ) {
-                  alert("Please complete Level 2");
                 }
                 if (getApproval) {
                   this.sendApprovalRequestToPK(type);
@@ -1370,6 +1437,16 @@ class ManageBackup extends Component<
             />
           )}
         />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'ErrorBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+          ]}
+          renderContent={this.renderErrorModalContent}
+          renderHeader={this.renderErrorModalHeader}
+        />
       </View>
     );
   }
@@ -1382,7 +1459,6 @@ const mapStateToProps = (state) => {
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || "",
     metaShares: idx(state, (_) => _.health.service.levelhealth.metaShares),
     s3Service: idx(state, (_) => _.health.service),
-    overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     cloudBackupStatus:
       idx(state, (_) => _.preferences.cloudBackupStatus) || false,
