@@ -61,7 +61,7 @@ export default class RegularAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
-      addressQueryList: {external: string[], internal: string[] };
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -120,7 +120,7 @@ export default class RegularAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
-      addressQueryList: {external: string[], internal: string[] };
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
