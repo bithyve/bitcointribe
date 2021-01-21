@@ -36,7 +36,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
     <View style={styles.headerSectionContainer}>
       <Image
         style={styles.headerAccountSync}
-        source={getAccountSyncIcon( primarySubAccount )}
+        source={getAccountSyncIcon( accountShell.hasAccountSyncCompleted )}
       />
       <Image
         style={styles.headerAccountImage}

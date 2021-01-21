@@ -779,6 +779,11 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ( shell ) => shell.id == action.payload.id
         ).isSyncInProgress = false
 
+        // Updating Account Sync State to shell data model
+        // This will be used to display sync icon on Home Screen
+        state.accountShells.find(
+          ( shell ) => shell.id == action.payload.id
+        ).hasAccountSyncCompleted = true
         return {
           ...state,
         }
