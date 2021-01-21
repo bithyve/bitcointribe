@@ -325,14 +325,17 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
+    console.log('this.props.isBackupProcessing.status', this.props.isBackupProcessing.status);
     // this.props.setCloudBackupStatus({ status: false });
     if (!this.props.isBackupProcessing.status) {
+      console.log('this.props.isBackupProcessing.status INSIDE IF');
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
         dataObject: data,
         callBack: this.setCloudBackupStatus,
         share,
       });
+      console.log('this.props.isBackupProcessing.status INSIDE IF', share);
       cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
     }
   };
@@ -399,15 +402,17 @@ class ManageBackup extends Component<
     if (prevProps.levelHealth != this.props.levelHealth) {
       this.modifyLevelData();
     }
-
-    // if (
-    //   JSON.stringify(prevProps.levelHealth) !==
-    //   JSON.stringify(this.props.levelHealth)
-    // ) {
-      if (
-        prevProps.levelHealth !==
-        this.props.levelHealth
-      ) {
+    console.log('prevProps.levelHealth', JSON.stringify(prevProps.levelHealth));
+    console.log('this.props.levelHealth', JSON.stringify(this.props.levelHealth));
+    if (
+      JSON.stringify(prevProps.levelHealth) !==
+      JSON.stringify(this.props.levelHealth)
+    ) {
+      
+      // if (
+      //   prevProps.levelHealth !==
+      //   this.props.levelHealth
+      // ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -461,6 +466,7 @@ class ManageBackup extends Component<
         }
       }
     }
+    console.log('updateCloudData updateCloudData', secretShare);
     this.cloudData(keeperInfo, currentLevel, secretShare);
   };
 

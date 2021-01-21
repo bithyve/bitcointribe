@@ -223,6 +223,7 @@ const KeeperDeviceHistory = (props) => {
                 isPrimaryKeeper: isPrimaryKeeper,
                 selectedShareId: selectedKeeper.shareId,
                 selectedLevelId,
+                isChange,
               });
               (QrBottomSheet as any).current.snapTo(0);
             }
@@ -243,8 +244,8 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"e6abe8e76c37b186838db2e7","publicKey":"561e88094b6772911f1de843a6712802c80ca76712cbfe91231a09f283b46401","ephemeralAddress":"86c571cd2dce081cbf306d9122bfe5b5cdd1f61f81fde317b2e44d656792dacc","walletName":"Mac"}'
-            : '{"uuid":"a922f84c73d3b2c60bb91eb2","publicKey":"3b2dbd9735c1d6903797cbf6c2ecc4e6316d0369546a72cd8105762f4ac4962b","ephemeralAddress":"fb64a9f693b08501e9dbac4f9f158b7cbc8f1572e2b2108abca8b4b4c0f1c569","walletName":"Samsung"}';
+            ? '{"uuid":"07e90f0cc8bf6a11568ba649","publicKey":"4e850282354478c399a51dff8faadd63a5315afbb1aea11e81f3489976e191f2","ephemeralAddress":"77269b731ad0c86ef9db22e6d53f0b434544a3cdb6418b14985e7a57941f02ae","walletName":"PKReShare"}'
+            : '{"uuid":"da4d6e73ce6be5d4b96f2e3f","publicKey":"12f3de10ae9e6c8c2d83dfc6dce4216c119be76ce693817929377e075491cbbd","ephemeralAddress":"06ed766e89262e0eec838848b235ec0283fafaa107fbb2b509f4eced238dc5d1","walletName":"Mac Pro"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

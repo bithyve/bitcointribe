@@ -1964,6 +1964,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           );
         }
         if (element.notificationType == "reShare") {
+          console.log('element.notificationType', element.notificationType)
           let existingShares: MetaShare[];
           if (Object.keys(UNDER_CUSTODY).length) {
             existingShares = Object.keys(UNDER_CUSTODY).map((tag) => {
@@ -1971,17 +1972,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               return UNDER_CUSTODY[tag].META_SHARE;
             });
           }
-          if (
-            existingShares &&
-            existingShares.findIndex(
-              (value) =>
-                value.shareId == JSON.parse(element.data).selectedShareId
-            ) > -1
-          ) {
-            this.props.autoDownloadShareContact(
-              JSON.parse(element.data).selectedShareId,
-              JSON.parse(element.data).walletId
-            );
+          if(existingShares.length){
+            if (
+              existingShares.findIndex(
+                (value) =>
+                  value.shareId == JSON.parse(element.data).selectedShareId
+              ) == -1
+            ) {
+              console.log('element.notificationType', element.notificationType)
+              this.props.autoDownloadShareContact(
+                JSON.parse(element.data).selectedShareId,
+                JSON.parse(element.data).walletId
+              );
+            }
           }
         }
         if (

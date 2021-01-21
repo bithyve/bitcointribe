@@ -2145,6 +2145,9 @@ function* autoDownloadShareContactWorker({ payload }) {
         TContacts[index].trustedChannel &&
         TContacts[index].trustedChannel.address
       ) {
+        console.log("index", index);
+        console.log("TContacts", TContacts);
+        console.log("TContacts[index].contactsWalletName", TContacts[index].contactsWalletName);
         let res = yield call(
           trustedContactsService.fetchTrustedChannel,
           contactNameArr[index],
@@ -2152,8 +2155,8 @@ function* autoDownloadShareContactWorker({ payload }) {
         );
         let underCustody = { ...UNDER_CUSTODY };
         console.log("data", res.data.data.metaShare);
-        underCustody[TContacts[index].contactsWalletName].META_SHARE =
-          res.data.data.metaShare;
+        underCustody[TContacts[index].contactsWalletName].META_SHARE = res.data.data.metaShare;
+        
         UNDER_CUSTODY = underCustody;
         console.log(
           "UNDER_CUSTODY",
