@@ -151,6 +151,8 @@ export default class Bitcoin {
           }
         } else {
           upToDateTxs.push( tx )
+          if( addressQueryList.external[ tx.address ] ) delete addressQueryList.external[ tx.address ]
+          else if( addressQueryList.internal[ tx.address ] ) delete addressQueryList.internal[ tx.address ]
         }
       } )
 
@@ -159,6 +161,9 @@ export default class Bitcoin {
       const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( addressQueryList.external ) ]
       const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( addressQueryList.internal ) ]
       const ownedArray = [ ...ownedAddresses, ...Object.keys( addressQueryList.external ), ...Object.keys( addressQueryList.internal ) ]
+      console.log( {
+        externalArray, internalArray
+      } )
 
       const accountToAddressMapping = {
         [ requestId ]: {
@@ -384,15 +389,6 @@ export default class Bitcoin {
         confirmedTransactions: 0,
         unconfirmedTransactions: 0,
         transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
-      }
-
-
-      // pop addresses from the query list if tx-conf > 6
-      for( const tx of txsToUpdate ){
-        if( tx.confirmations > 6 ){
-          if( addressQueryList.external[ tx.address ] ) delete addressQueryList.external[ tx.address ]
-          else if( addressQueryList.internal[ tx.address ] ) delete addressQueryList.internal[ tx.address ]
-        }
       }
 
       return {
