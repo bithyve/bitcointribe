@@ -433,6 +433,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber = 1,
     contactName?: string,
+    hardRefresh?: boolean,
   ): Promise<{
     balances: {
       balance: number;
@@ -465,20 +466,37 @@ export default class HDSegwitWallet extends Bitcoin {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
     } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
-
-
     // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
     if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
       nextFreeAddressIndex = 0
     if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
       nextFreeChangeAddressIndex = 0
 
-    const externalAddresses = []
-    const internalAddresses = []
+    // init refresh dependent params
+    let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+    if( hardRefresh ){
+      const hardGapLimit  = 10
+      startingExtIndex = 0
+      closingExtIndex = this.nextFreeAddressIndex + hardGapLimit
+      startingIntIndex = 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + hardGapLimit
+    }
+    else {
+      const softGapLimit = 5
+      startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+      closingExtIndex = this.nextFreeAddressIndex + softGapLimit
+      startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+      closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
+    }
+
+    const externalAddresses :{[address: string]: number}  = {
+    }
+    const externalAddressSet:{[address: string]: number}  = {
+    }
     const ownedAddresses = []
     for (
       let itr = 0;
-      itr < nextFreeAddressIndex + this.derivativeGapLimit;
+      itr < closingExtIndex;
       itr++
     ) {
       const address = this.getAddress(
@@ -486,13 +504,19 @@ export default class HDSegwitWallet extends Bitcoin {
         itr,
         this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
       )
-      externalAddresses.push( address )
+      externalAddresses[ address ] = itr
       ownedAddresses.push( address )
+      if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
     }
 
+
+    const internalAddresses :{[address: string]: number}  = {
+    }
+    const internalAddressSet:{[address: string]: number}  = {
+    }
     for (
       let itr = 0;
-      itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
+      itr < closingIntIndex;
       itr++
     ) {
       const address = this.getAddress(
@@ -500,22 +524,39 @@ export default class HDSegwitWallet extends Bitcoin {
         itr,
         this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
       )
-      internalAddresses.push( address )
+      internalAddresses[ address ] = itr
       ownedAddresses.push( address )
+      if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
     }
 
-    const usedAddresses = [ ...externalAddresses, ...internalAddresses ]
-    this.derivativeAccounts[ accountType ][ accountNumber ][
-      'usedAddresses'
-    ] = usedAddresses
+    const  { confirmedUTXOs, unconfirmedUTXOs, transactions, txIdMap, addressQueryList } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
 
-    // console.log({ derivativeAccUsedAddresses: usedAddresses });
-    const externalAddressSet = externalAddresses
-    const internalAddressSet = internalAddresses
-
-    const  { confirmedUTXOs, transactions, txIdMap } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
-    const addressQL =  {
-      external: [], internal:[]
+    // garner cached params for bal-tx sync
+    let cachedUTXOs =  [  ]
+    if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
+    if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
+    let cachedTxIdMap = txIdMap
+    let cachedTxs = transactions
+    let cachedAQL =  addressQueryList? addressQueryList: {
+      external: {
+      }, internal:{
+      }
+    }
+    if( hardRefresh ){
+      cachedUTXOs = []
+      cachedTxIdMap = {
+      }
+      cachedTxs  = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      }
+      cachedAQL = {
+        external: {
+        }, internal:{
+        }
+      }
     }
 
     const res = await this.fetchBalanceTransactionsByAddresses(
@@ -524,10 +565,10 @@ export default class HDSegwitWallet extends Bitcoin {
       externalAddresses,
       internalAddresses,
       ownedAddresses,
-      confirmedUTXOs,
-      transactions,
-      txIdMap,
-      addressQL,
+      cachedUTXOs,
+      cachedTxs,
+      cachedTxIdMap,
+      cachedAQL,
       this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
         1,
       this.derivativeAccounts[ accountType ][ accountNumber ]
@@ -537,15 +578,18 @@ export default class HDSegwitWallet extends Bitcoin {
       accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
     )
 
+    // update utxo sets
     const confUTXOs = []
+    const unconfUTXOs = []
     for ( const utxo of res.UTXOs ) {
       if ( utxo.status ) {
         if ( utxo.status.confirmed ) confUTXOs.push( utxo )
         else {
-          if ( internalAddresses.includes( utxo.address ) ) {
+          if ( internalAddresses[ utxo.address ] !== undefined ) {
             // defaulting utxo's on the change branch to confirmed
             confUTXOs.push( utxo )
           }
+          else unconfUTXOs.push( utxo )
         }
       } else {
         // utxo's from fallback won't contain status var (defaulting them as confirmed)
@@ -574,9 +618,11 @@ export default class HDSegwitWallet extends Bitcoin {
       lastBalTxSync: latestSyncTime,
       newTransactions,
       confirmedUTXOs: confUTXOs,
+      unconfirmedUTXOs: unconfUTXOs,
       balances: res.balances,
       transactions: res.transactions,
       txIdMap: res.txIdMap,
+      addressQueryList: res.addressQueryList,
       nextFreeAddressIndex: res.nextFreeAddressIndex,
       nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
       receivingAddress: this.getAddress(
@@ -715,6 +761,7 @@ export default class HDSegwitWallet extends Bitcoin {
             nextFreeChangeAddressIndex,
             xpubId,
           } = derivativeAccounts[ accountNumber ]
+          // TODO: re-pipe addressInUse
           const addressInUse = derivativeAccounts[ accountNumber ].usedAddresses
 
           if ( !accountsToResponseMapping[ xpubId ] ) continue
@@ -1463,6 +1510,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
+    // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
     if( hardRefresh ){
       const hardGapLimit  = 10
@@ -1534,10 +1582,11 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
-
+    // garner cached params for bal-tx sync
     let cachedUTXOs =  [ ...this.confirmedUTXOs, ...this.unconfirmedUTXOs ]
     let cachedTxIdMap = this.txIdMap
     let cachedTxs = this.transactions
+    let cachedAQL = this.addressQueryList
     if( hardRefresh ){
       cachedUTXOs = []
       cachedTxIdMap = {
@@ -1547,6 +1596,11 @@ export default class HDSegwitWallet extends Bitcoin {
         confirmedTransactions: 0,
         unconfirmedTransactions: 0,
         transactionDetails: [],
+      }
+      cachedAQL = {
+        external: {
+        }, internal: {
+        }
       }
     }
 
@@ -1567,12 +1621,13 @@ export default class HDSegwitWallet extends Bitcoin {
       cachedUTXOs,
       cachedTxs,
       cachedTxIdMap,
-      this.addressQueryList,
+      cachedAQL,
       this.nextFreeAddressIndex - 1,
       this.nextFreeChangeAddressIndex - 1,
       this.isTest ? 'Test Account' : 'Checking Account',
     )
 
+    // update utxo sets
     const confirmedUTXOs = []
     const unconfirmedUTXOs = []
     for ( const utxo of UTXOs ) {

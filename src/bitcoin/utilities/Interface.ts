@@ -155,12 +155,20 @@ export interface DerivativeAccountElements {
     address: string;
     status?: any;
   }[];
+  unconfirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
   txIdMap?: {[txid: string]: boolean};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
 }
