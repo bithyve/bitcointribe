@@ -70,8 +70,7 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      addressQueryList: {external: string[], internal: string[] };
-
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -145,7 +144,7 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
-      addressQueryList: {external: string[], internal: string[] };
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
