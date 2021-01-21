@@ -28,6 +28,8 @@ import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration } from '../store/actions/preferences'
+import BottomInfoBox from '../components/BottomInfoBox'
+import openLink from '../utils/OpenLink'
 
 const LOADER_MESSAGE_TIME = 2500
 const loaderMessages = [
@@ -267,7 +269,7 @@ export default function Login( props ) {
 
       return (
         <View style={{
-          marginLeft: 'auto' 
+          marginLeft: 'auto'
         }}>
           <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
         </View>
@@ -313,11 +315,11 @@ export default function Login( props ) {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
         }}>
@@ -328,7 +330,7 @@ export default function Login( props ) {
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View style={{
-              alignSelf: 'baseline' 
+              alignSelf: 'baseline'
             }}>
               <View style={styles.passcodeTextInputView}>
                 <View
@@ -383,7 +385,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 2 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -414,7 +416,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 3 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -445,7 +447,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 4 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -493,7 +495,7 @@ export default function Login( props ) {
         </View>
 
         <View style={{
-          marginTop: 'auto', marginBottom: 20 
+          marginTop: 'auto', marginBottom: 20
         }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
@@ -603,7 +605,7 @@ export default function Login( props ) {
           <View style={styles.keyPadRow}>
             <View style={styles.keyPadElementTouchable}>
               <Text style={{
-                flex: 1, padding: 15 
+                flex: 1, padding: 15
               }}></Text>
             </View>
             <TouchableOpacity
@@ -629,6 +631,15 @@ export default function Login( props ) {
               </Text>
             </TouchableOpacity>
           </View>
+
+          <BottomInfoBox
+            title={'Terms of Service'}
+            infoText={
+              'By proceeding to the next step, you agree to our '
+            }
+            linkText={'Terms of Service'}
+            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+          />
         </View>
         <BottomSheet
           onCloseEnd={() => { }}
@@ -681,7 +692,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     alignItems: 'center',
     justifyContent: 'center',
@@ -727,7 +738,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   proceedButtonText: {
