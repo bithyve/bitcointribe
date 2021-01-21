@@ -35,6 +35,12 @@ const menuOptions: MenuOption[] = [
     screenName: 'ChangeCurrency',
   },
   {
+    title: 'Version History',
+    subtitle: 'Version History',
+    imageSource: require('../../../assets/images/icons/icon_versionhistory.png'),
+    screenName: 'VersionHistory',
+  },
+  {
     title: 'Hexa Release',
     subtitle: versionString,
     imageSource: require('../../../assets/images/icons/settings.png'),
@@ -48,6 +54,7 @@ const WalletSettingsContainerScreen: React.FC<Props> = ({
 
   function handleOptionSelection(menuOption: MenuOption) {
     if (menuOption.screenName !== undefined) {
+      console.log("menuOption.screenName",menuOption.screenName);
       navigation.navigate(menuOption.screenName);
     }
   }

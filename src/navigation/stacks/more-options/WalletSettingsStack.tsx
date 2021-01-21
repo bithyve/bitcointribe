@@ -3,10 +3,9 @@ import { createStackNavigator } from "react-navigation-stack";
 import WalletSettingsContainerScreen from "../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen";
 import ManagePasscodeScreen from "../../../pages/ManagePasscodeScreen";
 import ChangeCurrencyScreen from "../../../pages/ChangeCurrencyScreen";
-import SmallNavHeaderCloseButton from "../../../components/navigation/SmallNavHeaderCloseButton";
-import NavStyles from '../../../common/Styles/NavStyles';
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import VersionHistoryScreen from '../../../pages/VersionHistoryScreen';
 
 
 const WalletSettingsStack = createStackNavigator(
@@ -29,6 +28,12 @@ const WalletSettingsStack = createStackNavigator(
       screen: ChangeCurrencyScreen,
       navigationOptions: {
         title: "Change Currency",
+      },
+    },
+    VersionHistory: {
+      screen: VersionHistoryScreen,
+      navigationOptions: {
+        title: "Version History",
       },
     },
   },
