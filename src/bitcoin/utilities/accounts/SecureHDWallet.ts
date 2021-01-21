@@ -80,8 +80,10 @@ export default class SecureHDWallet extends Bitcoin {
   }> = [];
   private txIdMap: {[txid: string]: boolean} = {
   };
-  private addressQueryList: {external: string[], internal: string[] } = {
-    external: [], internal:[]
+  private addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} } = {
+    external: {
+    }, internal:{
+    }
   }
 
   private primaryMnemonic: string;
@@ -138,7 +140,7 @@ export default class SecureHDWallet extends Bitcoin {
         address: string;
         status?: any;
       }>;
-      addressQueryList: {external: string[], internal: string[] };
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       txIdMap: {[txid: string]: boolean};
       twoFASetup: {
         qrData: string;
@@ -447,27 +449,27 @@ export default class SecureHDWallet extends Bitcoin {
       closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
     }
 
-    const externalAddresses = [] // all external addresses(till closingExtIndex)
-    const externalAddressSet = [] // external address range set w/ query list
+    const externalAddresses :{[address: string]: number}  = {
+    }// all external addresses(till closingExtIndex)
+    const externalAddressSet:{[address: string]: number}= {
+    } // external address range set w/ query list
     for ( let itr = 0; itr < closingExtIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr )
-      externalAddresses.push( address )
+      externalAddresses[ address ] = itr
       ownedAddresses.push( address )
-      if( itr >= startingExtIndex ) externalAddressSet.push( address )
+      if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
     }
-    externalAddressSet.push( ...this.addressQueryList.external )
-    ownedAddresses.push( ...this.addressQueryList.external )
 
-    const internalAddresses = [] // all internal addresses(till closingIntIndex)
-    const internalAddressSet = [] // internal address range set
+    const internalAddresses :{[address: string]: number}  = {
+    }// all internal addresses(till closingIntIndex)
+    const internalAddressSet :{[address: string]: number}= {
+    } // internal address range set
     for ( let itr = 0; itr < closingIntIndex; itr++ ) {
       const { address } = this.createSecureMultiSig( itr, true )
-      internalAddresses.push( address )
+      internalAddresses[ address ] = itr
       ownedAddresses.push( address )
-      if( itr >= startingIntIndex ) internalAddressSet.push( address )
+      if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
     }
-    internalAddressSet.push( ...this.addressQueryList.internal )
-    ownedAddresses.push( ...this.addressQueryList.internal )
 
     const batchedDerivativeAddresses = []
 
@@ -538,7 +540,7 @@ export default class SecureHDWallet extends Bitcoin {
       if ( utxo.status ) {
         if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
         else {
-          if ( internalAddresses.includes( utxo.address ) ) {
+          if ( internalAddresses[ utxo.address ] !== undefined ) {
             // defaulting utxo's on the change branch to confirmed
             confirmedUTXOs.push( utxo )
           }
@@ -1596,7 +1598,7 @@ export default class SecureHDWallet extends Bitcoin {
         for ( let itr = 0; itr < startingExtIndex; itr++ ) {
           const { address } = this.createSecureMultiSig( itr )
           if( consumedUTXO.address === address ){
-            this.addressQueryList.external.push( consumedUTXO.address ) // include out of bound(soft-refresh range) ext address
+            this.addressQueryList.external[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) ext address
             found = true
             break
           }
@@ -1607,7 +1609,7 @@ export default class SecureHDWallet extends Bitcoin {
         for ( let itr = 0; itr < startingIntIndex; itr++ ) {
           const { address } = this.createSecureMultiSig( itr, true )
           if( consumedUTXO.address === address ){
-            this.addressQueryList.internal.push( consumedUTXO.address ) // include out of bound(soft-refresh range) int address
+            this.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
             break
           }
         }
