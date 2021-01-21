@@ -98,10 +98,10 @@ export default class Bitcoin {
   };
 
   public fetchBalanceTransactionsByAddresses = async (
-    externalAddressSet: string[], // external range set (soft/hard)
-    internalAddressSet: string[], // internal range set (soft/hard)
-    externalAddresses: string[],  // all external addresses(till nextFreeAddressIndex)
-    internalAddresses: string[],  // all internal addresses(till nextFreeChangeAddressIndex)
+    externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
+    internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
+    externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
+    internalAddresses:  {[address: string]: number},  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
     cachedUTXOs:  Array<{
       txId: string;
@@ -112,10 +112,7 @@ export default class Bitcoin {
     }>,
     cachedTxs: Transactions,
     cachedTxIdMap: {[txid: string]: boolean},
-    addressQueryList: {
-      external: string[];
-      internal: string[];
-    },
+    addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -132,21 +129,38 @@ export default class Bitcoin {
     balances: { balance: number; unconfirmedBalance: number };
     txIdMap:  {[txid: string]: boolean},
     transactions: Transactions;
-    addressQueryList: {
-      external: string[];
-      internal: string[];
-    },
+    addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     nextFreeAddressIndex: number;
     nextFreeChangeAddressIndex: number;
   }> => {
     let res: AxiosResponse
     try {
+      const upToDateTxs: TransactionDetails[] = []
+      const txsToUpdate: TransactionDetails[] = []
+      const newTxs : TransactionDetails[ ]= []
+      cachedTxs.transactionDetails.forEach( ( tx ) => {
+        if( tx.confirmations <= 6 ){
+          txsToUpdate.push( tx )
+
+          if( tx.address ){
+            // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
+            if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
+              if( externalAddresses[ tx.address ] !== undefined ) addressQueryList.external[ tx.address ] = true
+              else addressQueryList.internal[ tx.address ] = true
+            }
+          }
+        } else {
+          upToDateTxs.push( tx )
+        }
+      } )
+
+
       const requestId = uuidv4()
       const accountToAddressMapping = {
         [ requestId ]: {
-          External: externalAddressSet,
-          Internal: internalAddressSet,
-          Owned: ownedAddresses,
+          External: [ ...Object.keys( externalAddressSet ), ...Object.keys( addressQueryList.external ) ],
+          Internal: [ ...Object.keys( internalAddressSet ), ...Object.keys( addressQueryList.internal ) ],
+          Owned: [ ...ownedAddresses, ...Object.keys( addressQueryList.external ), ...Object.keys( addressQueryList.internal ) ],
         },
       }
 
@@ -223,7 +237,7 @@ export default class Bitcoin {
       for( const utxo of UTXOs ){
         if (
           accountType === 'Test Account' &&
-          utxo.address === externalAddresses[ 0 ]
+          externalAddresses[ utxo.address ] === 0
         ) {
           balances.balance += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
           continue
@@ -232,22 +246,11 @@ export default class Bitcoin {
         if ( utxo.status.confirmed ) balances.balance += utxo.value
         else if (
           internalAddressSet.length &&
-        internalAddressSet.includes( utxo.address )
+        internalAddressSet[ utxo.address ] !== undefined
         )
           balances.balance += utxo.value
         else balances.unconfirmedBalance += utxo.value
       }
-
-      const upToDateTxs: TransactionDetails[] = []
-      const txsToUpdate: TransactionDetails[] = []
-      const newTxs : TransactionDetails[ ]= []
-      cachedTxs.transactionDetails.forEach( ( tx ) => {
-        if( tx.confirmations <= 6 ){
-          txsToUpdate.push( tx )
-        } else {
-          upToDateTxs.push( tx )
-        }
-      } )
 
       const addressesInfo = Txs
       // console.log({ addressesInfo });
@@ -362,17 +365,15 @@ export default class Bitcoin {
             }
           } )
 
-          const addressIndex = externalAddresses.indexOf( addressInfo.Address )
-          if ( addressIndex > -1 ) {
+          const addressIndex = externalAddresses[ addressInfo.Address ]
+          if ( addressIndex !== undefined ) {
             lastUsedAddressIndex =
               addressIndex > lastUsedAddressIndex
                 ? addressIndex
                 : lastUsedAddressIndex
           } else {
-            const changeAddressIndex = internalAddresses.indexOf(
-              addressInfo.Address,
-            )
-            if ( changeAddressIndex > -1 ) {
+            const changeAddressIndex = internalAddresses[ addressInfo.Address ]
+            if ( changeAddressIndex !== undefined ) {
               lastUsedChangeAddressIndex =
                 changeAddressIndex > lastUsedChangeAddressIndex
                   ? changeAddressIndex
@@ -389,16 +390,20 @@ export default class Bitcoin {
       }
 
 
-      // update(pop) the query list
-      const nonConfirmedTxs = [ ...newTxs, ...txsToUpdate ] // txs <= 6 confs
-      const updatedQL = this.syncQueryList( addressQueryList, nonConfirmedTxs )
+      // pop addresses from the query list if tx-conf > 6
+      for( const tx of txsToUpdate ){
+        if( tx.confirmations > 6 ){
+          if( addressQueryList.external[ tx.address ] ) delete addressQueryList.external[ tx.address ]
+          else if( addressQueryList.internal[ tx.address ] ) delete addressQueryList.internal[ tx.address ]
+        }
+      }
 
       return {
         UTXOs,
         balances,
         txIdMap,
         transactions,
-        addressQueryList: updatedQL,
+        addressQueryList,
         nextFreeAddressIndex: lastUsedAddressIndex + 1,
         nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
       }
@@ -947,39 +952,6 @@ export default class Bitcoin {
     tx.accountType = accountType
     return tx
   };
-
-
-  public syncQueryList  = ( addressQueryList: {
-    external: string[];
-    internal: string[];
-  }, nonConfirmedTxs: TransactionDetails[] ) => {
-    // pop addresses from the query list based on tx confs
-
-    const updatedQueryList = {
-      external: [],
-      internal: []
-    }
-    for( const tx of nonConfirmedTxs ){
-      let inserted = false
-      for( const extAddr of addressQueryList.external ){
-        if( extAddr === tx.address && tx.confirmations <= 6 ){
-          updatedQueryList.external.push( extAddr )
-          inserted = true
-          break
-        }
-      }
-
-      if( !inserted )
-        for( const intAddr of addressQueryList.internal ){
-          if( intAddr === tx.address && tx.confirmations <= 6 ){
-            updatedQueryList.internal.push( intAddr )
-            break
-          }
-        }
-    }
-
-    return updatedQueryList
-  }
 
   // private ownedAddress = (
   //   address: string,
