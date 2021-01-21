@@ -815,7 +815,7 @@ class ManageBackup extends Component<
             <View>
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>at level {currentLevel}</Text>
+              <Text style={styles.backupInfoText}>at level {currentLevel ? currentLevel : ''}</Text>
             </View>
           </View>
           <View style={{ flex: 1, alignItems: "center", position: "relative", paddingBottom: wp('7%') }}>

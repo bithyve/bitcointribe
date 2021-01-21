@@ -219,7 +219,7 @@ const HomeHeader = ({
               fontSize: RFValue(18),
             }}
           >
-            {currentLevel}
+            {currentLevel ? currentLevel : ''}
           </Text>
         </ImageBackground>
         <TouchableOpacity
