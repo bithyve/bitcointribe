@@ -156,11 +156,15 @@ export default class Bitcoin {
 
 
       const requestId = uuidv4()
+      const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( addressQueryList.external ) ]
+      const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( addressQueryList.internal ) ]
+      const ownedArray = [ ...ownedAddresses, ...Object.keys( addressQueryList.external ), ...Object.keys( addressQueryList.internal ) ]
+
       const accountToAddressMapping = {
         [ requestId ]: {
-          External: [ ...Object.keys( externalAddressSet ), ...Object.keys( addressQueryList.external ) ],
-          Internal: [ ...Object.keys( internalAddressSet ), ...Object.keys( addressQueryList.internal ) ],
-          Owned: [ ...ownedAddresses, ...Object.keys( addressQueryList.external ), ...Object.keys( addressQueryList.internal ) ],
+          External: externalArray,
+          Internal: internalArray,
+          Owned: ownedArray,
         },
       }
 
@@ -245,8 +249,7 @@ export default class Bitcoin {
 
         if ( utxo.status.confirmed ) balances.balance += utxo.value
         else if (
-          internalAddressSet.length &&
-        internalAddressSet[ utxo.address ] !== undefined
+          internalAddressSet[ utxo.address ] !== undefined
         )
           balances.balance += utxo.value
         else balances.unconfirmedBalance += utxo.value
@@ -334,13 +337,7 @@ export default class Bitcoin {
 
                 const transaction = {
                   txid: tx.txid,
-                  confirmations:
-                    accountType === 'Test Account' &&
-                    tx.TransactionType === 'Received' &&
-                    addressInfo.Address === externalAddresses[ 0 ] &&
-                    tx.NumberofConfirmations < 1
-                      ? '-'
-                      : tx.NumberofConfirmations,
+                  confirmations: tx.NumberofConfirmations,
                   status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
                   fee: tx.fee,
                   date: tx.Status.block_time
@@ -418,50 +415,6 @@ export default class Bitcoin {
     }
   };
 
-  public fetchTransactionsByAddress = async (
-    address: string,
-  ): Promise<
-    | {
-        status: number;
-        transactions: {
-          totalTransactions: number;
-          confirmedTransactions: number;
-          unconfirmedTransactions: number;
-          transactionDetails: any[];
-          address: string;
-        };
-        errorMessage?: undefined;
-      }
-    | {
-        status: number;
-        errorMessage: string;
-        transactions?: undefined;
-      }
-  > => {
-    let res: AxiosResponse
-    try {
-      res = await this.fetchAddressInfo( address )
-    } catch ( err ) {
-      return {
-        status: err.response.status,
-        errorMessage: err.response.data,
-      }
-    }
-
-    const { final_n_tx, n_tx, unconfirmed_n_tx, txs } = res.data
-
-    return {
-      status: res.status,
-      transactions: {
-        totalTransactions: final_n_tx,
-        confirmedTransactions: n_tx,
-        unconfirmedTransactions: unconfirmed_n_tx,
-        transactionDetails: txs,
-        address,
-      },
-    }
-  };
-
   public getTxCounts = async ( addresses: string[] ) => {
     const txCounts = {
     }
@@ -495,22 +448,10 @@ export default class Bitcoin {
       return txCounts
     } catch ( err ) {
       // console.log(
-      //  `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
+      //  `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
       //);
-      // console.log('Using Blockcypher fallback');
+      throw new Error( 'Transaction fetching failed' )
 
-      try {
-        for ( const address of addresses ) {
-          const txns = await this.fetchTransactionsByAddress( address )
-          txCounts[ address ] = txns.transactions.totalTransactions
-        }
-        return txCounts
-      } catch ( err ) {
-        // console.log(
-        //  `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
-        //);
-        throw new Error( 'Transaction fetching failed' )
-      }
     }
   };
 
@@ -548,194 +489,6 @@ export default class Bitcoin {
       p2wsh,
       p2sh,
       address: p2sh.address,
-    }
-  };
-
-  public fetchChainInfo = async (): Promise<any> => {
-    // provides transition fee rate (satoshis/kilobyte)
-    // bitcoinfees endpoint: https://bitcoinfees.earn.com/api/v1/fees/recommended (provides time estimates)
-
-    try {
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        const { data } = await bitcoinAxios.get(
-          `${TESTNET.BASE}?token=${config.TOKEN}`,
-        )
-        return data
-      } else {
-        const { data } = await bitcoinAxios.get(
-          `${MAINNET.BASE}?token=${config.TOKEN}`,
-        )
-        return data
-      }
-    } catch ( err ) {
-      throw new Error( 'Failed to fetch chain info' )
-    }
-  };
-
-  public fetchUnspentOutputs = async (
-    address: string,
-  ): Promise<
-    Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>
-  > => {
-    let data
-    if ( this.network === bitcoinJS.networks.testnet ) {
-      const res: AxiosResponse = await bitcoinAxios.get(
-        `${TESTNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${config.TOKEN}`,
-      )
-      data = res.data
-    } else {
-      const res: AxiosResponse = await bitcoinAxios.get(
-        `${MAINNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${config.TOKEN}`,
-      )
-      data = res.data
-    }
-
-    let unspentOutputs = []
-    if ( data.txrefs ) {
-      unspentOutputs.push( ...data.txrefs )
-    }
-    if ( data.unconfirmed_txrefs ) {
-      unspentOutputs.push( ...data.unconfirmed_txrefs )
-    }
-    if ( unspentOutputs.length === 0 ) {
-      return []
-    }
-
-    unspentOutputs = unspentOutputs.map( ( unspent ) => ( {
-      txId: unspent.tx_hash,
-      vout: unspent.tx_output_n,
-      value: unspent.value,
-      address,
-    } ) )
-    return unspentOutputs
-  };
-
-  public blockcypherUTXOFallback = async (
-    addresses: string[],
-  ): Promise<
-    Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>
-  > => {
-    const UTXOs = []
-    // tslint:disable-next-line:forin
-    for ( const address of addresses ) {
-      // console.log(`Fetching utxos corresponding to ${address}`);
-      const utxos = await this.fetchUnspentOutputs( address )
-      UTXOs.push( ...utxos )
-    }
-    return UTXOs
-  };
-
-  public multiFetchUnspentOutputs = async (
-    addresses: string[],
-  ): Promise<{
-    UTXOs: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-      status?: any;
-    }>;
-  }> => {
-    try {
-      let data
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        const res: AxiosResponse = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXO,
-          {
-            addresses
-          },
-        )
-        data = res.data
-      } else {
-        const res: AxiosResponse = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXO,
-          {
-            addresses
-          },
-        )
-        data = res.data
-      }
-      const UTXOs = []
-      for ( const addressSpecificUTXOs of data ) {
-        for ( const utxo of addressSpecificUTXOs ) {
-          const { txid, vout, value, Address, status } = utxo
-          UTXOs.push( {
-            txId: txid,
-            vout,
-            value,
-            address: Address,
-            status,
-          } )
-        }
-      }
-      return {
-        UTXOs
-      }
-    } catch ( err ) {
-      // console.log(`An error occurred while connecting to Esplora: ${err}`);
-      // console.log('Switching to Blockcypher UTXO fallback');
-
-      try {
-        const UTXOs = await this.blockcypherUTXOFallback( addresses )
-        return {
-          UTXOs
-        }
-      } catch ( err ) {
-        // console.log(
-        //  `Blockcypher UTXO fallback failed with the following error: ${err}`,
-        //);
-        throw new Error( 'multi utxo fetch failed' )
-      }
-    }
-  };
-
-  public fetchTransactionDetails = async ( txID: string ): Promise<any> => {
-    try {
-      let data
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        const res: AxiosResponse = await bitcoinAxios.get(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.TXNDETAILS + `/${txID}`,
-        )
-        data = res.data
-      } else {
-        const res: AxiosResponse = await bitcoinAxios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.TXNDETAILS + `/${txID}`,
-        )
-        data = res.data
-      }
-
-      return data
-    } catch ( err ) {
-      // console.log(
-      // `An error occurred while fetching transaction details from Esplora: ${err}`,
-      //);
-      // console.log('Switching to Blockcypher fallback');
-      let data
-      try {
-        if ( this.network === bitcoinJS.networks.testnet ) {
-          const res = await bitcoinAxios.get( `${TESTNET.BASE}/txs/${txID}` )
-          data = res.data
-        } else {
-          const res = await bitcoinAxios.get( `${MAINNET.BASE}/txs/${txID}` )
-          data = res.data
-        }
-        return data
-      } catch ( err ) {
-        // console.log(
-        //  `Blockcypher fetch txn details fallback failed with the following error: ${err}`,
-        //);
-        throw new Error( 'fetch transaction detaisl failed' )
-      }
     }
   };
 
