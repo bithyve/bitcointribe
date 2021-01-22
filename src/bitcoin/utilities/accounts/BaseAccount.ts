@@ -230,33 +230,17 @@ export default class BaseAccount {
   };
 
   public getDerivativeAccBalanceTransactions = async (
-    accountType: string,
-    accountNumber?: number,
+    accountInfo: {
+      accountType: string,
+      accountNumber: number,
+      contactName?: string,
+    }[],
+    hardRefresh?: boolean,
   ): Promise<
     | {
         status: number;
         data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+          synched: boolean
         };
         err?: undefined;
         message?: undefined;
@@ -272,8 +256,8 @@ export default class BaseAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.fetchDerivativeAccBalanceTxs(
-          accountType,
-          accountNumber,
+          accountInfo,
+          hardRefresh,
         ),
       }
     } catch ( err ) {

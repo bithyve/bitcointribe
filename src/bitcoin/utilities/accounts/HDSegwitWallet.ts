@@ -430,36 +430,15 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public fetchDerivativeAccBalanceTxs = async (
-    accountType: string,
-    accountNumber = 1,
-    contactName?: string,
+    accountInfo: {
+      accountType: string,
+      accountNumber: number,
+      contactName?: string,
+    }[],
     hardRefresh?: boolean,
   ): Promise<{
-    balances: {
-      balance: number;
-      unconfirmedBalance: number;
-    };
-    transactions: Transactions;
-  }> => {
-    if ( !this.derivativeAccounts[ accountType ] )
-      throw new Error( `${accountType} does not exists` )
-
-    if ( accountType === TRUSTED_CONTACTS ) {
-      if ( !contactName )
-        throw new Error( `Required param: contactName for ${accountType}` )
-
-      contactName = contactName.toLowerCase().trim()
-      accountNumber = this.trustedContactToDA[ contactName ]
-
-      if ( !accountNumber ) {
-        throw new Error(
-          `No contact derivative account exists for: ${contactName}`,
-        )
-      }
-    } else if ( !this.derivativeAccounts[ accountType ][ accountNumber ] ) {
-      this.generateDerivativeXpub( accountType, accountNumber )
-    }
-
+    synched: boolean
+    }> => {
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
     if( hardRefresh ){
@@ -477,99 +456,128 @@ export default class HDSegwitWallet extends Bitcoin {
       closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
     }
 
-    let {
-      nextFreeAddressIndex,
-      nextFreeChangeAddressIndex,
-    } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
-    // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
-    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
-      nextFreeAddressIndex = 0
-    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
-      nextFreeChangeAddressIndex = 0
-
-    const externalAddresses :{[address: string]: number}  = {
+    const accounts = {
     }
-    const externalAddressSet:{[address: string]: number}  = {
-    }
-    const ownedAddresses = []
-    for (
-      let itr = 0;
-      itr < closingExtIndex;
-      itr++
-    ) {
-      const address = this.getAddress(
-        false,
-        itr,
-        this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
-      )
-      externalAddresses[ address ] = itr
-      ownedAddresses.push( address )
-      if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
-    }
-
-    const internalAddresses :{[address: string]: number}  = {
-    }
-    const internalAddressSet:{[address: string]: number}  = {
-    }
-    for (
-      let itr = 0;
-      itr < closingIntIndex;
-      itr++
-    ) {
-      const address = this.getAddress(
-        true,
-        itr,
-        this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
-      )
-      internalAddresses[ address ] = itr
-      ownedAddresses.push( address )
-      if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
-    }
-
-
-    this.derivativeAccounts[ accountType ][ accountNumber ][
-      'usedAddresses'
-    ] = ownedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
-
-    const  { confirmedUTXOs, unconfirmedUTXOs, transactions, txIdMap, addressQueryList } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
-
-    // garner cached params for bal-tx sync
-    let cachedUTXOs =  [  ]
-    if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
-    if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
-    let cachedTxs = transactions
-    let cachedTxIdMap = txIdMap? txIdMap: {
-    }
-    let cachedAQL =  addressQueryList? addressQueryList: {
-      external: {
-      }, internal:{
+    const accountsTemp: {
+      [accountId: string]: {
+        internalAddresses: {[address: string]: number};
       }
+    } = {
     }
-    if( hardRefresh ){
-      cachedUTXOs = []
-      cachedTxIdMap = {
+    for( let { accountType, accountNumber, contactName } of accountInfo ){
+      // preliminary checks
+      if ( !this.derivativeAccounts[ accountType ] )
+        throw new Error( `${accountType} does not exists` )
+
+      if ( accountType === TRUSTED_CONTACTS ) {
+        if ( !contactName )
+          throw new Error( `Required param: contactName for ${accountType}` )
+
+        contactName = contactName.toLowerCase().trim()
+        accountNumber = this.trustedContactToDA[ contactName ]
+
+        if ( !accountNumber ) {
+          throw new Error(
+            `No contact derivative account exists for: ${contactName}`,
+          )
+        }
       }
-      cachedTxs  = {
-        totalTransactions: 0,
-        confirmedTransactions: 0,
-        unconfirmedTransactions: 0,
-        transactionDetails: [],
+
+      let {
+        nextFreeAddressIndex,
+        nextFreeChangeAddressIndex,
+      } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+      if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
+        nextFreeAddressIndex = 0
+      if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
+        nextFreeChangeAddressIndex = 0
+
+      const externalAddresses :{[address: string]: number}  = {
       }
-      cachedAQL = {
+      const externalAddressSet:{[address: string]: number}  = {
+      }
+      const ownedAddresses = []
+      for (
+        let itr = 0;
+        itr < closingExtIndex;
+        itr++
+      ) {
+        const address = this.getAddress(
+          false,
+          itr,
+          this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
+        )
+        externalAddresses[ address ] = itr
+        ownedAddresses.push( address )
+        if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
+      }
+
+      const internalAddresses :{[address: string]: number}  = {
+      }
+      const internalAddressSet:{[address: string]: number}  = {
+      }
+      for (
+        let itr = 0;
+        itr < closingIntIndex;
+        itr++
+      ) {
+        const address = this.getAddress(
+          true,
+          itr,
+          this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
+        )
+        internalAddresses[ address ] = itr
+        ownedAddresses.push( address )
+        if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
+      }
+
+
+      this.derivativeAccounts[ accountType ][ accountNumber ][
+        'usedAddresses'
+      ] = ownedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
+
+      const  { confirmedUTXOs, unconfirmedUTXOs, transactions, txIdMap, addressQueryList } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+
+      // garner cached params for bal-tx sync
+      let cachedUTXOs =  [  ]
+      if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
+      if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
+      let cachedTxs = transactions
+      let cachedTxIdMap = txIdMap? txIdMap: {
+      }
+      let cachedAQL =  addressQueryList? addressQueryList: {
         external: {
         }, internal:{
         }
       }
-    }
+      if( hardRefresh ){
+        cachedUTXOs = []
+        cachedTxIdMap = {
+        }
+        cachedTxs  = {
+          totalTransactions: 0,
+          confirmedTransactions: 0,
+          unconfirmedTransactions: 0,
+          transactionDetails: [],
+        }
+        cachedAQL = {
+          external: {
+          }, internal:{
+          }
+        }
+      }
 
-    let { xpubId, xpub } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
-    if( !xpubId ){
-      xpubId = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
-      this.derivativeAccounts[ accountType ][ accountNumber ].xpubId = xpubId
-    }
+      let { xpubId, xpub } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      if( !xpubId ){
+        xpubId = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
+        this.derivativeAccounts[ accountType ][ accountNumber ].xpubId = xpubId
+      }
+      accountsTemp[ xpubId ] = {
+        internalAddresses
+      }
 
-    const accounts = {
-      [ xpubId ]: {
+      accounts[ xpubId ] = {
         externalAddressSet,
         internalAddressSet,
         externalAddresses,
@@ -588,65 +596,75 @@ export default class HDSegwitWallet extends Bitcoin {
         primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null
       }
     }
+
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
-    const res = synchedAccounts[ xpubId ]
 
-    // update utxo sets
-    const confUTXOs = []
-    const unconfUTXOs = []
-    for ( const utxo of res.UTXOs ) {
-      if ( utxo.status ) {
-        if ( utxo.status.confirmed ) confUTXOs.push( utxo )
-        else {
-          if ( internalAddresses[ utxo.address ] !== undefined ) {
-            // defaulting utxo's on the change branch to confirmed
-            confUTXOs.push( utxo )
+    for( let { accountType, accountNumber, contactName } of accountInfo ){
+      if ( accountType === TRUSTED_CONTACTS ) {
+        contactName = contactName.toLowerCase().trim()
+        accountNumber = this.trustedContactToDA[ contactName ]
+      }
+      const { xpubId }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      const res = synchedAccounts[ xpubId ]
+      const { internalAddresses } = accountsTemp[ xpubId ]
+
+      // update utxo sets
+      const confUTXOs = []
+      const unconfUTXOs = []
+      for ( const utxo of res.UTXOs ) {
+        if ( utxo.status ) {
+          if ( utxo.status.confirmed ) confUTXOs.push( utxo )
+          else {
+            if ( internalAddresses[ utxo.address ] !== undefined ) {
+              // defaulting utxo's on the change branch to confirmed
+              confUTXOs.push( utxo )
+            }
+            else unconfUTXOs.push( utxo )
           }
-          else unconfUTXOs.push( utxo )
-        }
-      } else {
-        // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confUTXOs.push( utxo )
-      }
-    }
-
-    const lastSyncTime =
-      this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
-    let latestSyncTime =
-      this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
-    const newTransactions: Array<TransactionDetails> = [] // delta transactions
-    for ( const tx of transactions.transactionDetails ) {
-      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
-        if ( tx.blockTime > lastSyncTime ) {
-          newTransactions.push( tx )
-        }
-        if ( tx.blockTime > latestSyncTime ) {
-          latestSyncTime = tx.blockTime
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confUTXOs.push( utxo )
         }
       }
-    }
 
-    this.derivativeAccounts[ accountType ][ accountNumber ] = {
-      ...this.derivativeAccounts[ accountType ][ accountNumber ],
-      lastBalTxSync: latestSyncTime,
-      newTransactions,
-      confirmedUTXOs: confUTXOs,
-      unconfirmedUTXOs: unconfUTXOs,
-      balances: res.balances,
-      transactions: res.transactions,
-      txIdMap: res.txIdMap,
-      addressQueryList: res.addressQueryList,
-      nextFreeAddressIndex: res.nextFreeAddressIndex,
-      nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
-      receivingAddress: this.getAddress(
-        false,
-        res.nextFreeAddressIndex,
-        this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
-      ),
+      const lastSyncTime =
+        this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
+      let latestSyncTime =
+        this.derivativeAccounts[ accountType ][ accountNumber ].lastBalTxSync || 0
+      const newTransactions: Array<TransactionDetails> = [] // delta transactions
+      for ( const tx of res.transactions.transactionDetails ) {
+        if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+          if ( tx.blockTime > lastSyncTime ) {
+            newTransactions.push( tx )
+          }
+          if ( tx.blockTime > latestSyncTime ) {
+            latestSyncTime = tx.blockTime
+          }
+        }
+      }
+
+      this.derivativeAccounts[ accountType ][ accountNumber ] = {
+        ...this.derivativeAccounts[ accountType ][ accountNumber ],
+        lastBalTxSync: latestSyncTime,
+        newTransactions,
+        confirmedUTXOs: confUTXOs,
+        unconfirmedUTXOs: unconfUTXOs,
+        balances: res.balances,
+        transactions: res.transactions,
+        txIdMap: res.txIdMap,
+        addressQueryList: res.addressQueryList,
+        nextFreeAddressIndex: res.nextFreeAddressIndex,
+        nextFreeChangeAddressIndex: res.nextFreeChangeAddressIndex,
+        receivingAddress: this.getAddress(
+          false,
+          res.nextFreeAddressIndex,
+          this.derivativeAccounts[ accountType ][ accountNumber ].xpub,
+        ),
+      }
     }
 
     return {
-      balances: res.balances, transactions: res.transactions
+      synched: true
     }
   };
 
