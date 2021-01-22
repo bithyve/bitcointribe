@@ -40,7 +40,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginTop: wp('4%'),
             }}
           >
-            Collect donations from around the world for causes you promote
+            Collect donations for the causes of your choice - from all over the world.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -54,7 +54,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginBottom: wp('4%'),
             }}
           >
-            Self-manage your Donation Account without worrying about the tech involved
+            Self-manage your Donation Account without worrying about the tech involved.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -85,7 +85,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginTop: wp('4%'),
             }}
           >
-            A web page and embed code for the account generates a new address every few minutes and helps with privacy of your transactions
+            A web page and embed code for the account generates a new address every few minutes, helping with privacy of your transactions without needing any input from you.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -99,7 +99,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginBottom: wp('4%'),
             }}
           >
-           Your supporters can donate by paying to these addresses
+           Your supporters can donate by paying to the addresses these pages generate.
           </Text>
           <View style={styles.viewStyle}>
           <View style={styles.separatorView}/>
