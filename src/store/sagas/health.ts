@@ -1448,7 +1448,7 @@ function* sendApprovalRequestWorker({ payload }) {
   if (keeperTCData && keeperTCData.keeperUUID) {
     let title =
       notificationType == "uploadSecondaryShare"
-        ? "Approval Request for PDF Keeper"
+        ? "Approval Request for Keeper"
         : "Approval Request for Keeper";
     const notification: INotification = {
       notificationType: notificationType,
