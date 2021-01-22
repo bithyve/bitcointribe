@@ -724,13 +724,13 @@ SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   DoubleConversion: cde416483dac037923206447da6e1454df403714
-  EXConstants: f907b3b6ce16e20d1750f22af1e095e924574bcb
-  EXContacts: dbc32dd1e2798cce1beeced230da989931b47890
-  EXFileSystem: 76875135b61708b9afa7e6a89b72a60ba0fdfa20
-  EXImageLoader: 02ca02c9cd5cc8a97b423207a73a791e0a86bea5
-  EXPermissions: 80ac3acbdb145930079810fe5b08c022b3428aa8
-  EXSecureStore: 1b571851e6068b30b8ec097be848a04603c03bae
-  EXSQLite: bda6a286dded0637bb312ee781239dcca163ff4b
+  EXConstants: c2c6d5805520a34f274e09b778404310c52b118f
+  EXContacts: f6535b40c97eed8fd091c2883b4fad102176e434
+  EXFileSystem: 8d1dc2924d62046275c84d70b88fa3aa7daeb116
+  EXImageLoader: 8366cb1a7d207a241a1bfaa4c5ab4859cf72d507
+  EXPermissions: b6d7134b7215c33420318c2bbb5d362c20ac9726
+  EXSecureStore: 7cda998bd7c150b28021cb9c85b0747daa6a5ab5
+  EXSQLite: 98f4062e567a2facc80aa6a064be88fa1a9476b6
   FBLazyVector: 878b59e31113e289e275165efbe4b54fa614d43d
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
   Firebase: 26223c695fe322633274198cb19dca8cb7e54416
@@ -761,19 +761,19 @@ SPEC CHECKSUMS:
   React-jsi: df07aa95b39c5be3e41199921509bfa929ed2b9d
   React-jsiexecutor: b56c03e61c0dd5f5801255f2160a815f4a53d451
   React-jsinspector: 8e68ffbfe23880d3ee9bafa8be2777f60b25cbe2
-  react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
-  react-native-camera: 35854c4f764a4a6cf61c1c3525888b92f0fe4b31
+  react-native-background-timer: 117fffdc9b0d6f144444bb49029f94275a45fdb5
+  react-native-camera: 5c1fbfecf63b802b8ca4a71c60d30a71550fb348
   react-native-config: f309b9ac19456dea12325699af51e0fa0217ce6a
   react-native-contacts: 7b5e16196278636030c3fbbb9505543984b01697
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-in-app-utils: 96cdefc90ad74a79a95d19239a183995a6face0b
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
+  react-native-netinfo: 77d133105df525d4a11f10fcaa8d0b8883ea6429
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
-  react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
-  react-native-sqlite-storage: 418ef4afc5e6df6ce3574c4617e5f0b65cffde55
-  react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
-  react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462
+  react-native-randombytes: 45ae693012df24c9a07a5e578b3b567c01468581
+  react-native-sqlite-storage: ce71689c5a73b79390a1ab213555ae80979a5dc7
+  react-native-udp: ccbd878f0f3b968217fc7e3d5eb5839fcaab8b6c
+  react-native-video: aa527b0acb37f94c4491e70df0274cb26979405d
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
   React-RCTAnimation: 1befece0b5183c22ae01b966f5583f42e69a83c2
   React-RCTBlob: 0b284339cbe4b15705a05e2313a51c6d8b51fa40
@@ -784,15 +784,15 @@ SPEC CHECKSUMS:
   React-RCTText: 65a6de06a7389098ce24340d1d3556015c38f746
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
-  RNCPushNotificationIOS: 61a7c72bd1ebad3568025957d001e0f0e7b32191
-  RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
+  RNCPushNotificationIOS: 5b1cf9ad2aaa107ecb92d5d2d7005ba521b2b97a
+  RNDeviceInfo: e841619c3dac5495a095c5455473579ff04908d4
   RNFBAnalytics: dbe60bec27fa2d4876983581f98a1ebdd46a3c95
   RNFBApp: a9af8372c9c2b2135ffa78817fd2d8baf3ee632e
   RNFBCrashlytics: b02cce65e7059e6f7827fa357cd84df79c6fdd74
   RNFBMessaging: 643ec4102ee0d780f928718c2632bb1e90487f04
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
-  RNLocalize: 7c7aeda16c01db7a0918981c14875c0a53be9b79
+  RNLocalize: ff8b96bffbe096a158f952a170741208f2c18746
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
   RNScreens: 45c457af3d2ee9e08fc01e70da87e653d46b1198
@@ -800,20 +800,20 @@ SPEC CHECKSUMS:
   RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
-  TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
-  UMAppLoader: 61049c8d55590b74e9ae1d5429bf68d96b4a2528
-  UMBarCodeScannerInterface: e5e4c87797d3d01214e25cd1618866caf5d4f17f
-  UMCameraInterface: 415ac060034edecacdbbaa739c223e3f276e0056
-  UMConstantsInterface: 1a52f2d884c95e8829439da13e36b7669a1a8fb4
-  UMCore: d98083b522b08c0a8ba3992bc263c624ae5d887c
-  UMFaceDetectorInterface: 67c6c82451338da01a4bc00ec46365a2a8ea9057
-  UMFileSystemInterface: 303d696ede28102a7e11d111808bd2ed2c5eb62f
-  UMFontInterface: 6edf1ee8bc55d2030766f8cf0a7b20a5d5a913b0
-  UMImageLoaderInterface: 9cdbf3bab6a513bddd88505cb2340fe02d6a11c0
-  UMPermissionsInterface: 019170ad655f464e3f8d23d2a8bcbda2e645cde4
-  UMReactNativeAdapter: 538efe92e781b5d7678cf95b34c46f2d0989a557
-  UMSensorsInterface: cb5bf31d52c4349f0ff9e3c049bbe4df0d80d383
-  UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
+  TcpSockets: 8d839b9b14f6f344d98e4642ded13ab3112b462d
+  UMAppLoader: 98b77b58fac12abab963f79f762ceef008c50505
+  UMBarCodeScannerInterface: e1299aafa3bede8ba674e84199e9f319a0195cad
+  UMCameraInterface: 68da359d6fe7423d7b114b96ea0df268a84da39f
+  UMConstantsInterface: 2569e83b7f70a0844737e1f6c2dfd1bc0c8a34d6
+  UMCore: ef0c10289950b51d0c1dae75c37fba116f2327ac
+  UMFaceDetectorInterface: b0f3be22a524053f29d71c50bfdf51dc9553f7aa
+  UMFileSystemInterface: 29a555288008c9fa9be7d781c84f58ef51d41de6
+  UMFontInterface: 5ece8ea0e3c5753a87a558dcd7e79dcf38a6cab6
+  UMImageLoaderInterface: c440e3cd54c060cb2f9a278a923e28c6fe0ec116
+  UMPermissionsInterface: d6be0aea537754c92648e3d7100c58dd72c01142
+  UMReactNativeAdapter: 5973dd1e4374cd1db4549b6bc714ccbbde9615c0
+  UMSensorsInterface: 7bc27058e00af99695e16f74c092582698be964d
+  UMTaskManagerInterface: 8b337c26b828b3e50d26776966981f4cb2ee76e4
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
 PODFILE CHECKSUM: c98886d7e364f1f4a7318f4d6fdc05272f2195e2
