@@ -79,7 +79,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
         style={styles.useFallbackTouchable}
       >
         <Text style={styles.useFallbackText}>
-                    Use BitHyve node as fallback
+                    Use Hexa node as fallback
         </Text>
         <View style={styles.useFallbackCheckView}>
           {personalNode?.useFallback && (

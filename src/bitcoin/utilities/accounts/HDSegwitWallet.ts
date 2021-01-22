@@ -636,7 +636,7 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }catch( err ){
         if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
-        console.log( 'using BitHyve Node as fallback(sync derivative-accounts)' )
+        console.log( 'using Hexa node as fallback(sync derivative-accounts)' )
 
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(

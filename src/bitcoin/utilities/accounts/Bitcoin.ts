@@ -144,7 +144,7 @@ export default class Bitcoin {
         }
       } catch( err ){
         if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
-        console.log( 'using BitHyve Node as fallback(fetch-balTx)' )
+        console.log( 'using Hexa node as fallback(fetch-balTx)' )
 
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
@@ -745,7 +745,7 @@ export default class Bitcoin {
       )
 
       if( config.USE_ESPLORA_FALLBACK ){
-        console.log( 'using BitHyve Node as fallback(tx-broadcast)' )
+        console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( this.network === bitcoinJS.networks.testnet ) {
             res = await bitcoinAxios.post(
