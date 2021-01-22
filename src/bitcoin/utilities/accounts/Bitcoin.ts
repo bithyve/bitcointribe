@@ -111,7 +111,7 @@ export default class Bitcoin {
       status?: any;
     }>,
     cachedTxs: Transactions,
-    cachedTxIdMap: {[txid: string]: boolean},
+    cachedTxIdMap: {[txid: string]: string[]},
     addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
@@ -127,7 +127,7 @@ export default class Bitcoin {
       status?: any;
     }>;
     balances: { balance: number; unconfirmedBalance: number };
-    txIdMap:  {[txid: string]: boolean},
+    txIdMap:  {[txid: string]: string[]},
     transactions: Transactions;
     addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     nextFreeAddressIndex: number;
@@ -138,6 +138,8 @@ export default class Bitcoin {
       const upToDateTxs: TransactionDetails[] = []
       const txsToUpdate: TransactionDetails[] = []
       const newTxs : TransactionDetails[ ]= []
+
+      // hydrate AQL
       cachedTxs.transactionDetails.forEach( ( tx ) => {
         if( tx.confirmations <= 6 ){
           txsToUpdate.push( tx )
@@ -151,8 +153,6 @@ export default class Bitcoin {
           }
         } else {
           upToDateTxs.push( tx )
-          if( addressQueryList.external[ tx.address ] ) delete addressQueryList.external[ tx.address ]
-          else if( addressQueryList.internal[ tx.address ] ) delete addressQueryList.internal[ tx.address ]
         }
       } )
 
@@ -279,7 +279,7 @@ export default class Bitcoin {
           addressInfo.Transactions.forEach( ( tx ) => {
             if ( !txIdMap[ tx.txid ] ) {
               // check for duplicate tx (fetched against sending and  then again for change address)
-              txIdMap[ tx.txid ] = true
+              txIdMap[ tx.txid ] = [ addressInfo.Address ]
 
               if ( tx.transactionType === 'Self' ) {
                 const outgoingTx = {
@@ -361,6 +361,7 @@ export default class Bitcoin {
                 newTxs.push( transaction )
               }
             } else {
+              if( !txIdMap[ tx.txid ].includes( addressInfo.Address ) ) txIdMap[ tx.txid ].push( addressInfo.Address )
               txsToUpdate.forEach( txToUpdate => {
                 if( txToUpdate.txid === tx.txid ) txToUpdate.confirmations = tx.NumberofConfirmations
               } )
@@ -390,6 +391,17 @@ export default class Bitcoin {
         unconfirmedTransactions: 0,
         transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
       }
+
+      // pop addresses from the query list if tx-conf > 6
+      txsToUpdate.forEach( tx => {
+        if( tx.confirmations > 6 ){
+          const addresses = txIdMap[ tx.txid ]
+          addresses.forEach( address => {
+            if( addressQueryList.external[ address ] ) delete addressQueryList.external[ address ]
+            else if( addressQueryList.internal[ address ] ) delete addressQueryList.internal[ address ]
+          } )
+        }
+      } )
 
       return {
         UTXOs,

@@ -55,7 +55,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      txIdMap: {[txid: string]: boolean};
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -129,7 +129,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      txIdMap: {[txid: string]: boolean};
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -750,34 +750,6 @@ export default class SecureAccount {
         status: 0o3,
         err: err.message,
         message: 'Failed to update donation account preferences',
-      }
-    }
-  };
-
-  public getTransactionDetails = async (
-    txHash: string,
-  ): Promise<
-    | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchTransactionDetails( txHash ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ]
       }
     }
   };

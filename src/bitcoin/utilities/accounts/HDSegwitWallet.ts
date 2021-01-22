@@ -90,7 +90,7 @@ export default class HDSegwitWallet extends Bitcoin {
     address: string;
     status?: any;
   }> = [];
-  private txIdMap: {[txid: string]: boolean} = {
+  private txIdMap: {[txid: string]: string[]} = {
   };
   private addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} } = {
     external: {
@@ -111,7 +111,7 @@ export default class HDSegwitWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      txIdMap: {[txid: string]: boolean};
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
