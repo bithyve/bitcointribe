@@ -41,7 +41,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            Store some sats here not all. Use these stored sats to transact or send to your friends and family
+            Store some sats here, but not all. The sats here are your everyday sats - great for spending online or sending to your friends and family.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -55,7 +55,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Use the Savings Account to store bigger quantities of sats
+            For safely storing larger amounts of sats, you can use your Savings Account. This will keep your bitcoin safe and sound with better security!
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -86,7 +86,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            The Checking Account is a single signature account and the Savings Account is a 2 of 3 multi-signature account
+            Your Checking Account is a single signature account. Your Savings Account is a 2 of 3 multi-signature account, secured by an authenticator. 
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -100,7 +100,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Correspondingly, transactions are cheaper from the Checking Account compared the the Savings Account
+            Transactions from your Checking Account have lower fees compared the the Savings Account - keep bitcoin here for short-term holding or spending. 
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -131,7 +131,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            Caution! The Checking Account does not require 2 Factor Authentication for spending sats. Someone having your phone’s, and your Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account
+            Be careful! Someone having your phone's and Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account. Don't keep sats here you don't expect to use soon.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -146,7 +146,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               paddingBottom: hp('6%'),
             }}
           >
-            Note that due to the security built into the accounts, it is cheaper transacting from the Checking Account compared to the Savings account
+            Reminder: Due to the method we use to secure your Savings account, it is cheaper to send sats from your Checking Account compared to your Savings account.
           </Text>
         </View>
       </ScrollView>

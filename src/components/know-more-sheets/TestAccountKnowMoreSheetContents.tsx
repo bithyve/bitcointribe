@@ -42,7 +42,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
               marginBottom: wp('3%'),
             }}
           >
-            We realise that the world of Bitcoin could seem daunting. We’ve designed the Test Account to demystify some of the aura that Bitcoin has
+            We realise that the world of Bitcoin could seem daunting at first. We’ve designed the Test Account to help demystify Bitcoin without risking your own funds.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -56,7 +56,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
               // marginBottom: wp('15%'),
             }}
           >
-            Learn to use Hexa with the Test Account. Think of this account as the wallet’s Training Wheels!
+            Learn to use Hexa and bitcoin with the Test Account. Think of this account as the wallet’s training wheels!
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -85,7 +85,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
               marginBottom: wp('3%'),
             }}
           >
-            This account is loaded with test sats that you can send to your friend's Test Accounts. This helps you learn to transact using real sats
+            This account is loaded with test sats that you can send to your friend's Test Accounts. This helps you learn to transact using real sats, without sending real money!
             sats.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -100,7 +100,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
               // marginBottom: wp('15%'),
             }}
           >
-            Remember that test sats can only be sent to other wallets that also support test sats
+            Remember that test sats can only be sent to other wallets that also support test sats - don't try to send them to real bitcoin addresses.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -128,7 +128,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            With the Test Account, you can rest assured that, whatever you do, there would not be any harmful, “real world” consequences such as losing your sats or bitcoin.  The test sats have no real value
+            With the Test Account, you can rest assured that, whatever you do, you aren't risking losing your real-world sats or bitcoin. The test sats have no monetary value, so they're risk-free.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -138,7 +138,7 @@ export default function TestAccountKnowMoreSheetContents(props) {
           </View>
           <View style={styles.bottomLinkView}>
             <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0 }}>
-              Let your imagination run wild, try sending test sats to, and receiving sats, from multiple friends in different permutations and combinations
+              Try sending test sats to, and receiving sats from, multiple friends in different increments and values - go crazy!
             </Text>
             <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
               <Text style={styles.toKnowMoreText}>To know more,</Text>
