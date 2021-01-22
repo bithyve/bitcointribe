@@ -8,7 +8,7 @@ import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccoun
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../../common/Colors';
+import Colors from '../../../common/Colors'
 import ButtonBlue from '../../../components/ButtonBlue'
 
 export enum SectionKind {
@@ -22,9 +22,9 @@ const sectionListItemKeyExtractor = ( index ) => index
 function titleForSectionHeader( kind: SectionKind ) {
   switch ( kind ) {
       case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-        return 'Create a Hexa Account'
+        return 'Add a Hexa Account'
       case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Integrate a Service'
+        return 'Add a service'
       case SectionKind.IMPORT_WALLET:
         return 'Import a Wallet'
   }

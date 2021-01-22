@@ -24,7 +24,7 @@ const AddNewAccountStack = createStackNavigator(
             return <View style={{
               width: 1000, // Sort of a hack to get the subtitle all on one line (See: https://github.com/bithyve/hexa/issues/2391)
             }}>
-              <Text style={NavStyles.modalHeaderTitleText}>Add New Account</Text>
+              <Text style={NavStyles.modalHeaderTitleText}>Add New Accounts</Text>
               <Text style={NavStyles.modalHeaderSubtitleText}>Add an account, add a service, or import a wallet</Text>
             </View>
           },

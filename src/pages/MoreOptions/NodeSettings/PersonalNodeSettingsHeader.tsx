@@ -19,8 +19,8 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
 }: Props ) => {
   const subtitleText = useMemo( () => {
     return isConnectionEnabled ?
-      'Disconnect personal node to connect to BitHyve’s node'
-      : 'Disconnect from BitHyve’s node and connect to your own'
+      'Disconnect your own node and connect to Hexa node'
+      : 'Disconnect from Hexa node and connect to your own'
   }, [ isConnectionEnabled ] )
 
   return (

@@ -27,7 +27,7 @@ const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPr
 
         <View style={styles.headerSection}>
           <Text style={BottomSheetStyles.confirmationMessageHeading}>
-            Successfully connected to BitHyve's node
+            Successfully connected to Hexa node
           </Text>
         </View>
 

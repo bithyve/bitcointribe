@@ -105,7 +105,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
         style={styles.useFallbackTouchable}
       >
         <Text style={styles.useFallbackText}>
-                    Use BitHyve node as fallback
+                    Use Hexa node as fallback
         </Text>
         <View style={styles.useFallbackCheckView}>
           {useFallback && (
