@@ -544,7 +544,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <TouchableOpacity
-            onPress={() => (this.refs.RestoreWallet as any).snapTo(1)}
+            onPress={() =>{}}
             style={styles.buttonInnerView}
           >
             <Image
