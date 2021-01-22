@@ -4,8 +4,7 @@ import Colors from '../../../common/Colors'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-
-
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
 
 export type Props = {
   onConfirmPressed: () => void;
