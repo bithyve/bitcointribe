@@ -722,12 +722,15 @@ export function* downloadMetaShareWorker({ payload }) {
 
   let pkShare = {}
   let result;
-  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE) {
+  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE && payload.downloadType !== "recovery") {
     result = yield call(S3Service.downloadSMShare, encryptedKey, otp);
+    console.log("result",result);
+    if (result && result.data) {
+      pkShare = result.data.metaShare;
+    } 
   }
-  if (result) {
-    pkShare = result.data.metaShare;
-  }
+  
+
   if (res.status === 200) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
