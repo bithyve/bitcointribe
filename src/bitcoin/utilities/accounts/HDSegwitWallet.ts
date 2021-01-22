@@ -526,14 +526,20 @@ export default class HDSegwitWallet extends Bitcoin {
       if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
     }
 
+
+    this.derivativeAccounts[ accountType ][ accountNumber ][
+      'usedAddresses'
+    ] = ownedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
+
     const  { confirmedUTXOs, unconfirmedUTXOs, transactions, txIdMap, addressQueryList } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
 
     // garner cached params for bal-tx sync
     let cachedUTXOs =  [  ]
     if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
     if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
-    let cachedTxIdMap = txIdMap
     let cachedTxs = transactions
+    let cachedTxIdMap = txIdMap? txIdMap: {
+    }
     let cachedAQL =  addressQueryList? addressQueryList: {
       external: {
       }, internal:{
