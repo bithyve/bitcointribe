@@ -519,7 +519,26 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    const {
+    const xpubId = crypto.createHash( 'sha256' ).update( this.xpubs.secondary ).digest( 'hex' )
+    const accounts = {
+      [ xpubId ]: {
+        externalAddressSet,
+        internalAddressSet,
+        externalAddresses,
+        internalAddresses,
+        ownedAddresses,
+        cachedUTXOs,
+        cachedTxs,
+        cachedTxIdMap,
+        cachedAQL,
+        lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
+        lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
+        accountType: 'Savings Account',
+      }
+    }
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
+
+    const  {
       UTXOs,
       balances,
       transactions,
@@ -527,20 +546,8 @@ export default class SecureHDWallet extends Bitcoin {
       addressQueryList,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
-    } = await this.fetchBalanceTransactionsByAddresses(
-      externalAddressSet,
-      internalAddressSet,
-      externalAddresses,
-      internalAddresses,
-      ownedAddresses,
-      cachedUTXOs,
-      cachedTxs,
-      cachedTxIdMap,
-      cachedAQL,
-      this.nextFreeAddressIndex - 1,
-      this.nextFreeChangeAddressIndex - 1,
-      'Savings Account',
-    )
+    } = synchedAccounts[ xpubId ]
+
 
     // update utxo sets
     const confirmedUTXOs = []
@@ -636,18 +643,6 @@ export default class SecureHDWallet extends Bitcoin {
       this.generateDerivativeXpub( accountType, accountNumber )
     }
 
-    // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
-
-    let {
-      nextFreeAddressIndex,
-      nextFreeChangeAddressIndex,
-    } = this.derivativeAccounts[ accountType ][ accountNumber ]
-    // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
-    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
-      nextFreeAddressIndex = 0
-    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
-      nextFreeChangeAddressIndex = 0
-
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
     if( hardRefresh ){
@@ -664,6 +659,17 @@ export default class SecureHDWallet extends Bitcoin {
       startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
       closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
     }
+
+    let {
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+    } = this.derivativeAccounts[ accountType ][ accountNumber ]
+    // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
+      nextFreeAddressIndex = 0
+    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
+      nextFreeChangeAddressIndex = 0
+
 
     const externalAddresses :{[address: string]: number}  = {
     }
@@ -704,14 +710,19 @@ export default class SecureHDWallet extends Bitcoin {
       if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
     }
 
+    this.derivativeAccounts[ accountType ][ accountNumber ][
+      'usedAddresses'
+    ] = ownedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
+
     const  { confirmedUTXOs, unconfirmedUTXOs, transactions, txIdMap, addressQueryList } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
 
     // garner cached params for bal-tx sync
     let cachedUTXOs =  [  ]
     if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
     if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
-    let cachedTxIdMap = txIdMap
     let cachedTxs = transactions
+    let cachedTxIdMap = txIdMap? txIdMap: {
+    }
     let cachedAQL =  addressQueryList? addressQueryList: {
       external: {
       }, internal:{
@@ -734,24 +745,34 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    const res = await this.fetchBalanceTransactionsByAddresses(
-      externalAddressSet,
-      internalAddressSet,
-      externalAddresses,
-      internalAddresses,
-      ownedAddresses,
-      cachedUTXOs,
-      cachedTxs,
-      cachedTxIdMap,
-      cachedAQL,
-      this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
-        1,
-      this.derivativeAccounts[ accountType ][ accountNumber ]
-        .nextFreeChangeAddressIndex - 1,
-      accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
-      null,
-      accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
-    )
+    let { xpubId, xpub } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+    if( !xpubId ){
+      xpubId = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
+      this.derivativeAccounts[ accountType ][ accountNumber ].xpubId = xpubId
+    }
+
+    const accounts = {
+      [ xpubId ]: {
+        externalAddressSet,
+        internalAddressSet,
+        externalAddresses,
+        internalAddresses,
+        ownedAddresses,
+        cachedUTXOs,
+        cachedTxs,
+        cachedTxIdMap,
+        cachedAQL,
+        lastUsedAddressIndex: this.derivativeAccounts[ accountType ][ accountNumber ].nextFreeAddressIndex -
+          1,
+        lastUsedChangeAddressIndex: this.derivativeAccounts[ accountType ][ accountNumber ]
+          .nextFreeChangeAddressIndex - 1,
+        accountType: accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
+        contactName: null,
+        primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
+      }
+    }
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
+    const res = synchedAccounts[ xpubId ]
 
     // update utxo sets
     const confUTXOs = []
