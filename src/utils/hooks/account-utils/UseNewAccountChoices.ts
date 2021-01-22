@@ -95,15 +95,15 @@ export default function useNewAccountChoices() {
       serviceAccounts: [
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
-          defaultTitle: 'Swan Bitcoin',
-          defaultDescription: 'Stack Sats with Swan',
-          serviceAccountKind: ServiceAccountKind.SWAN,
-        } ),
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
           defaultTitle: 'Wyre Account',
           defaultDescription: 'Bought using Apple Pay / Credit Card',
           serviceAccountKind: ServiceAccountKind.WYRE,
+        } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
+          defaultTitle: 'Swan Bitcoin',
+          defaultDescription: 'Stack Sats with Swan',
+          serviceAccountKind: ServiceAccountKind.SWAN,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
