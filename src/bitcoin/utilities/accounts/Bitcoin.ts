@@ -10,9 +10,7 @@ import {
   TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes'
 import { v4 as uuidv4 } from 'uuid'
-
-const { API_URLS, REQUEST_TIMEOUT } = config
-const { TESTNET, MAINNET } = API_URLS
+const { REQUEST_TIMEOUT } = config
 
 const bitcoinAxios = axios.create( {
   timeout: REQUEST_TIMEOUT
@@ -84,20 +82,8 @@ export default class Bitcoin {
       network: this.network,
     } );
 
-  public fetchAddressInfo = async ( address: string ): Promise<any> => {
-    // fetches information corresponding to the  supplied address (including txns)
-    if ( this.network === bitcoinJS.networks.testnet ) {
-      return await bitcoinAxios.get(
-        `${TESTNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
-      )
-    } else {
-      return await bitcoinAxios.get(
-        `${MAINNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
-      )
-    }
-  };
-
   public fetchBalanceTransactionsByAddresses = async (
+    accounts: {[xpubId: string]: {
     externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
     internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
     externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
@@ -112,65 +98,81 @@ export default class Bitcoin {
     }>,
     cachedTxs: Transactions,
     cachedTxIdMap: {[txid: string]: string[]},
-    addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
+    cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
     contactName?: string,
     primaryAccType?: string,
-  ): Promise<{
-    UTXOs: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-      status?: any;
-    }>;
-    balances: { balance: number; unconfirmedBalance: number };
-    txIdMap:  {[txid: string]: string[]},
-    transactions: Transactions;
-    addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
-    nextFreeAddressIndex: number;
-    nextFreeChangeAddressIndex: number;
+    }}
+  ): Promise<
+  {
+    synchedAccounts: {
+    [xpubId: string] : {
+      UTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      balances: { balance: number; unconfirmedBalance: number };
+      txIdMap:  {[txid: string]: string[]},
+      transactions: Transactions;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
+    }
+   }
   }> => {
     let res: AxiosResponse
     try {
-      const upToDateTxs: TransactionDetails[] = []
-      const txsToUpdate: TransactionDetails[] = []
-      const newTxs : TransactionDetails[ ]= []
-
-      // hydrate AQL
-      cachedTxs.transactionDetails.forEach( ( tx ) => {
-        if( tx.confirmations <= 6 ){
-          txsToUpdate.push( tx )
-
-          if( tx.address ){
-            // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
-            if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
-              if( externalAddresses[ tx.address ] !== undefined ) addressQueryList.external[ tx.address ] = true
-              else addressQueryList.internal[ tx.address ] = true
-            }
-          }
-        } else {
-          upToDateTxs.push( tx )
-        }
-      } )
-
-
-      const requestId = uuidv4()
-      const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( addressQueryList.external ) ]
-      const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( addressQueryList.internal ) ]
-      const ownedArray = [ ...ownedAddresses, ...Object.keys( addressQueryList.external ), ...Object.keys( addressQueryList.internal ) ]
-      console.log( {
-        externalArray, internalArray
-      } )
-
       const accountToAddressMapping = {
-        [ requestId ]: {
+      }
+      const accountsTemp: {
+        [accountId: string]: {
+          upToDateTxs?: TransactionDetails[];
+          txsToUpdate?: TransactionDetails[];
+          newTxs? : TransactionDetails[]
+        }
+      } = {
+      }
+      for( const accountId of Object.keys( accounts ) ){
+        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs } = accounts[ accountId ]
+        const upToDateTxs: TransactionDetails[] = []
+        const txsToUpdate: TransactionDetails[] = []
+        const newTxs : TransactionDetails[] = []
+
+        // hydrate AQL & split txs(conf & unconf(<=6))
+        cachedTxs.transactionDetails.forEach( ( tx ) => {
+          if( tx.confirmations <= 6 ){
+            txsToUpdate.push( tx )
+            if( tx.address ){
+            // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
+              if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
+                if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
+                else cachedAQL.internal[ tx.address ] = true
+              }
+            }
+          } else upToDateTxs.push( tx )
+        } )
+
+        accountsTemp[ accountId ] = {
+          upToDateTxs, txsToUpdate, newTxs
+        }
+
+        const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
+        const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
+        const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        console.log( {
+          externalArray, internalArray
+        } )
+
+        accountToAddressMapping[ accountId ] = {
           External: externalArray,
           Internal: internalArray,
           Owned: ownedArray,
-        },
+        }
       }
 
       try{
@@ -203,215 +205,227 @@ export default class Bitcoin {
       }
 
       const accountToResponseMapping = res.data
-
-      const { Utxos, Txs } = accountToResponseMapping[ requestId ]
-
-      const UTXOs = cachedUTXOs
-      const balances = {
-        balance: 0,
-        unconfirmedBalance: 0,
+      const synchedAccounts = {
       }
+      for( const accountId of Object.keys( accountToResponseMapping ) ){
+        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, contactName } = accounts[ accountId ]
+        const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
-      if ( Utxos )
-        for ( const addressSpecificUTXOs of Utxos ) {
-          for ( const utxo of addressSpecificUTXOs ) {
-            const { value, Address, status, vout, txid } = utxo
+        const UTXOs = cachedUTXOs
+        const balances = {
+          balance: 0,
+          unconfirmedBalance: 0,
+        }
 
-            let include = true
-            UTXOs.forEach( ( utxo ) => {
-              if( utxo.txId === txid ) {
-                if( status.confirmed && !utxo.status.confirmed ){
+        // (re)categorise UTXOs
+        if ( Utxos )
+          for ( const addressSpecificUTXOs of Utxos ) {
+            for ( const utxo of addressSpecificUTXOs ) {
+              const { value, Address, status, vout, txid } = utxo
+
+              let include = true
+              UTXOs.forEach( ( utxo ) => {
+                if( utxo.txId === txid ) {
+                  if( status.confirmed && !utxo.status.confirmed ){
                   // cached utxo status change(unconf to conf)
-                  utxo.status = status
+                    utxo.status = status
+                  }
+                  include = false
                 }
-                include = false
+              } )
+
+              if( include )
+              {
+                UTXOs.push( {
+                  txId: txid,
+                  vout,
+                  value,
+                  address: Address,
+                  status,
+                } )
+              }
+            }
+          }
+
+        // calculate balance
+        for( const utxo of UTXOs ){
+          if (
+            accountType === 'Test Account' &&
+          externalAddresses[ utxo.address ] === 0
+          ) {
+            balances.balance += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue
+          }
+
+          if ( utxo.status.confirmed ) balances.balance += utxo.value
+          else if (
+            internalAddressSet[ utxo.address ] !== undefined
+          )
+            balances.balance += utxo.value
+          else balances.unconfirmedBalance += utxo.value
+        }
+
+        // process txs
+        const addressesInfo = Txs
+        const txIdMap = cachedTxIdMap? cachedTxIdMap: {
+        }
+        let { lastUsedAddressIndex, lastUsedChangeAddressIndex } = accounts[ accountId ]
+        const { upToDateTxs, txsToUpdate, newTxs } = accountsTemp[ accountId ]
+
+        if ( addressesInfo )
+          for ( const addressInfo of addressesInfo ) {
+            if ( addressInfo.TotalTransactions === 0 ) {
+              continue
+            }
+            // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
+            // transactions.totalTransactions += addressInfo.TotalTransactions
+            // transactions.confirmedTransactions +=
+            //   addressInfo.ConfirmedTransactions
+            // transactions.unconfirmedTransactions +=
+            //   addressInfo.UnconfirmedTransactions
+
+            addressInfo.Transactions.forEach( ( tx ) => {
+              if ( !txIdMap[ tx.txid ] ) {
+              // check for duplicate tx (fetched against sending and  then again for change address)
+                txIdMap[ tx.txid ] = [ addressInfo.Address ]
+
+                if ( tx.transactionType === 'Self' ) {
+                  const outgoingTx = {
+                    txid: tx.txid,
+                    confirmations: tx.NumberofConfirmations,
+                    status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                    fee: tx.fee,
+                    date: tx.Status.block_time
+                      ? new Date( tx.Status.block_time * 1000 ).toUTCString()
+                      : new Date( Date.now() ).toUTCString(),
+                    transactionType: 'Sent',
+                    amount: tx.SentAmount,
+                    accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
+                    primaryAccType,
+                    recipientAddresses: tx.RecipientAddresses,
+                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    address: addressInfo.Address
+                  }
+
+                  const incomingTx = {
+                    txid: tx.txid,
+                    confirmations: tx.NumberofConfirmations,
+                    status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                    fee: tx.fee,
+                    date: tx.Status.block_time
+                      ? new Date( tx.Status.block_time * 1000 ).toUTCString()
+                      : new Date( Date.now() ).toUTCString(),
+                    transactionType: 'Received',
+                    amount: tx.ReceivedAmount,
+                    accountType:
+                    accountType === SUB_PRIMARY_ACCOUNT
+                      ? primaryAccType
+                      : accountType,
+                    primaryAccType,
+                    senderAddresses: tx.SenderAddresses,
+                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    address: addressInfo.Address
+                  }
+                  // console.log({ outgoingTx, incomingTx });
+                  newTxs.push(
+                    ...[ outgoingTx, incomingTx ],
+                  )
+                } else {
+                  let accType = accountType
+                  switch ( accType ) {
+                      case TRUSTED_CONTACTS:
+                        accType = contactName
+                          .split( ' ' )
+                          .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
+                          .join( ' ' )
+                        break
+
+                      case SUB_PRIMARY_ACCOUNT:
+                        accType = primaryAccType
+                        break
+                  }
+
+                  const transaction = {
+                    txid: tx.txid,
+                    confirmations: tx.NumberofConfirmations,
+                    status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
+                    fee: tx.fee,
+                    date: tx.Status.block_time
+                      ? new Date( tx.Status.block_time * 1000 ).toUTCString()
+                      : new Date( Date.now() ).toUTCString(),
+                    transactionType: tx.TransactionType,
+                    amount: tx.Amount,
+                    accountType: accType,
+                    primaryAccType,
+                    recipientAddresses: tx.RecipientAddresses,
+                    senderAddresses: tx.SenderAddresses,
+                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    address: addressInfo.Address
+                  }
+
+                  newTxs.push( transaction )
+                }
+              } else {
+                if( !txIdMap[ tx.txid ].includes( addressInfo.Address ) ) txIdMap[ tx.txid ].push( addressInfo.Address )
+                txsToUpdate.forEach( txToUpdate => {
+                  if( txToUpdate.txid === tx.txid ) txToUpdate.confirmations = tx.NumberofConfirmations
+                } )
               }
             } )
 
-            if( include )
-            {
-              UTXOs.push( {
-                txId: txid,
-                vout,
-                value,
-                address: Address,
-                status,
-              } )
-            }
-
-          }
-        }
-
-      // calculate balance
-      for( const utxo of UTXOs ){
-        if (
-          accountType === 'Test Account' &&
-          externalAddresses[ utxo.address ] === 0
-        ) {
-          balances.balance += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-          continue
-        }
-
-        if ( utxo.status.confirmed ) balances.balance += utxo.value
-        else if (
-          internalAddressSet[ utxo.address ] !== undefined
-        )
-          balances.balance += utxo.value
-        else balances.unconfirmedBalance += utxo.value
-      }
-
-      const addressesInfo = Txs
-      // console.log({ addressesInfo });
-      const txIdMap = cachedTxIdMap? cachedTxIdMap: {
-      }
-      if ( addressesInfo )
-        for ( const addressInfo of addressesInfo ) {
-          if ( addressInfo.TotalTransactions === 0 ) {
-            continue
-          }
-          // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
-          // transactions.totalTransactions += addressInfo.TotalTransactions
-          // transactions.confirmedTransactions +=
-          //   addressInfo.ConfirmedTransactions
-          // transactions.unconfirmedTransactions +=
-          //   addressInfo.UnconfirmedTransactions
-
-          addressInfo.Transactions.forEach( ( tx ) => {
-            if ( !txIdMap[ tx.txid ] ) {
-              // check for duplicate tx (fetched against sending and  then again for change address)
-              txIdMap[ tx.txid ] = [ addressInfo.Address ]
-
-              if ( tx.transactionType === 'Self' ) {
-                const outgoingTx = {
-                  txid: tx.txid,
-                  confirmations: tx.NumberofConfirmations,
-                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fee,
-                  date: tx.Status.block_time
-                    ? new Date( tx.Status.block_time * 1000 ).toUTCString()
-                    : new Date( Date.now() ).toUTCString(),
-                  transactionType: 'Sent',
-                  amount: tx.SentAmount,
-                  accountType:
-                    accountType === SUB_PRIMARY_ACCOUNT
-                      ? primaryAccType
-                      : accountType,
-                  primaryAccType,
-                  recipientAddresses: tx.RecipientAddresses,
-                  blockTime: tx.Status.block_time, // only available when tx is confirmed
-                  address: addressInfo.Address
-                }
-
-                const incomingTx = {
-                  txid: tx.txid,
-                  confirmations: tx.NumberofConfirmations,
-                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fee,
-                  date: tx.Status.block_time
-                    ? new Date( tx.Status.block_time * 1000 ).toUTCString()
-                    : new Date( Date.now() ).toUTCString(),
-                  transactionType: 'Received',
-                  amount: tx.ReceivedAmount,
-                  accountType:
-                    accountType === SUB_PRIMARY_ACCOUNT
-                      ? primaryAccType
-                      : accountType,
-                  primaryAccType,
-                  senderAddresses: tx.SenderAddresses,
-                  blockTime: tx.Status.block_time, // only available when tx is confirmed
-                  address: addressInfo.Address
-                }
-                // console.log({ outgoingTx, incomingTx });
-                newTxs.push(
-                  ...[ outgoingTx, incomingTx ],
-                )
-              } else {
-                let accType = accountType
-                switch ( accType ) {
-                    case TRUSTED_CONTACTS:
-                      accType = contactName
-                        .split( ' ' )
-                        .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
-                        .join( ' ' )
-                      break
-
-                    case SUB_PRIMARY_ACCOUNT:
-                      accType = primaryAccType
-                      break
-                }
-
-                const transaction = {
-                  txid: tx.txid,
-                  confirmations: tx.NumberofConfirmations,
-                  status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                  fee: tx.fee,
-                  date: tx.Status.block_time
-                    ? new Date( tx.Status.block_time * 1000 ).toUTCString()
-                    : new Date( Date.now() ).toUTCString(),
-                  transactionType: tx.TransactionType,
-                  amount: tx.Amount,
-                  accountType: accType,
-                  primaryAccType,
-                  recipientAddresses: tx.RecipientAddresses,
-                  senderAddresses: tx.SenderAddresses,
-                  blockTime: tx.Status.block_time, // only available when tx is confirmed
-                  address: addressInfo.Address
-                }
-
-                newTxs.push( transaction )
-              }
-            } else {
-              if( !txIdMap[ tx.txid ].includes( addressInfo.Address ) ) txIdMap[ tx.txid ].push( addressInfo.Address )
-              txsToUpdate.forEach( txToUpdate => {
-                if( txToUpdate.txid === tx.txid ) txToUpdate.confirmations = tx.NumberofConfirmations
-              } )
-            }
-          } )
-
-          const addressIndex = externalAddresses[ addressInfo.Address ]
-          if ( addressIndex !== undefined ) {
-            lastUsedAddressIndex =
+            const addressIndex = externalAddresses[ addressInfo.Address ]
+            if ( addressIndex !== undefined ) {
+              lastUsedAddressIndex =
               addressIndex > lastUsedAddressIndex
                 ? addressIndex
                 : lastUsedAddressIndex
-          } else {
-            const changeAddressIndex = internalAddresses[ addressInfo.Address ]
-            if ( changeAddressIndex !== undefined ) {
-              lastUsedChangeAddressIndex =
+            } else {
+              const changeAddressIndex = internalAddresses[ addressInfo.Address ]
+              if ( changeAddressIndex !== undefined ) {
+                lastUsedChangeAddressIndex =
                 changeAddressIndex > lastUsedChangeAddressIndex
                   ? changeAddressIndex
                   : lastUsedChangeAddressIndex
+              }
             }
           }
+
+        const transactions: Transactions = {
+          totalTransactions: 0,
+          confirmedTransactions: 0,
+          unconfirmedTransactions: 0,
+          transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
         }
 
-      const transactions: Transactions = {
-        totalTransactions: 0,
-        confirmedTransactions: 0,
-        unconfirmedTransactions: 0,
-        transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
+        // pop addresses from the query list if tx-conf > 6
+        txsToUpdate.forEach( tx => {
+          if( tx.confirmations > 6 ){
+            const addresses = txIdMap[ tx.txid ]
+            addresses.forEach( address => {
+              if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
+              else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+            } )
+          }
+        } )
+
+        synchedAccounts[ accountId ] =  {
+          UTXOs,
+          balances,
+          txIdMap,
+          transactions,
+          addressQueryList: cachedAQL,
+          nextFreeAddressIndex: lastUsedAddressIndex + 1,
+          nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+        }
       }
-
-      // pop addresses from the query list if tx-conf > 6
-      txsToUpdate.forEach( tx => {
-        if( tx.confirmations > 6 ){
-          const addresses = txIdMap[ tx.txid ]
-          addresses.forEach( address => {
-            if( addressQueryList.external[ address ] ) delete addressQueryList.external[ address ]
-            else if( addressQueryList.internal[ address ] ) delete addressQueryList.internal[ address ]
-          } )
-        }
-      } )
 
       return {
-        UTXOs,
-        balances,
-        txIdMap,
-        transactions,
-        addressQueryList,
-        nextFreeAddressIndex: lastUsedAddressIndex + 1,
-        nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+        synchedAccounts
       }
+
     } catch ( err ) {
       // console.log(
       //  `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
