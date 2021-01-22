@@ -28,6 +28,7 @@ import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration } from '../store/actions/preferences'
+import { clearAccountSyncCache } from '../store/actions/accounts'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
 
@@ -132,6 +133,11 @@ export default function Login( props ) {
 
   const dispatch = useDispatch()
 
+  // This will reset the sync status for all shells
+  useEffect( ()=>{
+    dispatch( clearAccountSyncCache() )
+  }, [] )
+
   const { isAuthenticated, authenticationFailed } = useSelector(
     ( state ) => state.setupAndAuth,
   )
@@ -171,10 +177,9 @@ export default function Login( props ) {
         // JSON.parse(
         //   await AsyncStorage.getItem('releaseCases'),
         // );
-        console.log( 'Login>RelayServices.fetchReleases', res.data.releases )
         if (
           res.data.releases.length &&
-          res.data.releases[ 0 ].build != DeviceInfo.getBuildNumber()
+          res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
         ) {
           if (
             releaseCases &&
