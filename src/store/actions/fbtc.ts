@@ -25,14 +25,14 @@ export const accountSync = ( data ) => {
   return {
     type: ACCOUNT_SYNC,
     payload: {
-      data 
+      data
     },
   }
 }
 
 export const ClearAccountSyncData = () => {
   return {
-    type: ACCOUNT_SYNC_CLEAR 
+    type: ACCOUNT_SYNC_CLEAR
   }
 }
 
@@ -40,7 +40,7 @@ export const accountSyncSuccess = data => {
   return {
     type: ACCOUNT_SYNC_SUCCESS,
     payload: {
-      accountSyncDetails: data 
+      accountSyncDetails: data
     },
   }
 }
@@ -50,7 +50,7 @@ export const accountSyncFail = ( data ) => {
   return {
     type: ACCOUNT_SYNC_FAIL,
     payload: {
-      data 
+      data
     }
   }
 }
@@ -60,7 +60,7 @@ export function getQuote( data ) {
   return {
     type: GET_QUOTE,
     payload: {
-      data 
+      data
     },
   }
 }
@@ -69,7 +69,7 @@ export function getQuoteSuccess( data ) {
   return {
     type: GET_QUOTE_SUCCESS,
     payload: {
-      getQuoteDetails: data 
+      getQuoteDetails: data
     },
   }
 }
@@ -78,7 +78,7 @@ export function ClearQuoteDetails() {
   return {
     type: CLEAR_QUOTE_DETAILS,
     payload: {
-      getQuoteDetails: null 
+      getQuoteDetails: null
     },
   }
 }
@@ -98,7 +98,7 @@ export const executeOrder = ( data ) => {
   return {
     type: EXECUTE_ORDER,
     payload: {
-      data 
+      data
     },
   }
 }

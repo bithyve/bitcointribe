@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   StyleSheet,
   View,
@@ -14,81 +14,81 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   ActivityIndicator,
-} from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Fonts from '../../common/Fonts';
-import Colors from '../../common/Colors';
-import QuestionList from '../../common/QuestionList';
-import CommonStyles from '../../common/Styles/Styles';
+} from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Fonts from '../../common/Fonts'
+import Colors from '../../common/Colors'
+import QuestionList from '../../common/QuestionList'
+import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Feather from 'react-native-vector-icons/Feather';
-import { RFValue } from 'react-native-responsive-fontsize';
-import HeaderTitle from '../../components/HeaderTitle';
-import BottomInfoBox from '../../components/BottomInfoBox';
+} from 'react-native-responsive-screen'
+import Feather from 'react-native-vector-icons/Feather'
+import { RFValue } from 'react-native-responsive-fontsize'
+import HeaderTitle from '../../components/HeaderTitle'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
-import { useDispatch, useSelector } from 'react-redux';
-import { initializeSetup } from '../../store/actions/setupAndAuth';
+import { useDispatch, useSelector } from 'react-redux'
+import { initializeSetup } from '../../store/actions/setupAndAuth'
 
-export default function NewWalletQuestionRegenerateShare(props) {
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+export default function NewWalletQuestionRegenerateShare( props ) {
+  const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
+  const [ dropdownBoxList, setDropdownBoxList ] = useState( QuestionList )
+  const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: '',
     question: '',
-  });
-  const [answerInputStyle, setAnswerInputStyle] = useState(styles.inputBox);
-  const [confirmInputStyle, setConfirmAnswerInputStyle] = useState(
+  } )
+  const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
-  );
-  const [confirmAnswer, setConfirmAnswer] = useState('');
-  const [answer, setAnswer] = useState('');
-  let [counter, setCounter] = useState(0);
-  const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
-  const [hideShowAnswer, setHdeShowAnswer] = useState(true);
-  const [ansError, setAnsError] = useState('');
-  const dispatch = useDispatch();
-  const walletName = props.navigation.getParam('walletName');
+  )
+  const [ confirmAnswer, setConfirmAnswer ] = useState( '' )
+  const [ answer, setAnswer ] = useState( '' )
+  let [ counter, setCounter ] = useState( 0 )
+  const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
+  const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
+  const [ ansError, setAnsError ] = useState( '' )
+  const dispatch = useDispatch()
+  const walletName = props.navigation.getParam( 'walletName' )
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   // if (isInitialized) {
   //     props.navigation.navigate('HomeNav');
   // }
   const setConfirm = event => {
-    console.log('event,key', event.key);
-    if (event.text) {
-      if (answer && event.text != answer) {
-        setAnsError('Answers do not match');
-        counter++;
-        setCounter(counter);
-        console.log('counter', counter);
-        if (counter > 3) {
-          console.log('global.ansCounter', counter);
-          setHdeShowAnswer(!hideShowAnswer);
-          counter = 0;
+    console.log( 'event,key', event.key )
+    if ( event.text ) {
+      if ( answer && event.text != answer ) {
+        setAnsError( 'Answers do not match' )
+        counter++
+        setCounter( counter )
+        console.log( 'counter', counter )
+        if ( counter > 3 ) {
+          console.log( 'global.ansCounter', counter )
+          setHdeShowAnswer( !hideShowAnswer )
+          counter = 0
         }
       } else {
-        setAnsError('');
+        setAnsError( '' )
       }
     } else {
-      setAnsError('');
+      setAnsError( '' )
     }
-  };
+  }
   const setBackspace = event => {
-    console.log('event,key', event.nativeEvent.key);
+    console.log( 'event,key', event.nativeEvent.key )
 
-    if (event.nativeEvent.key == 'Backspace') {
-      setAnsError('');
+    if ( event.nativeEvent.key == 'Backspace' ) {
+      setAnsError( '' )
     }
-  };
+  }
 
-  useEffect(() => {
-    if (answer.trim() == confirmAnswer.trim()) {
-      setAnsError('');
+  useEffect( () => {
+    if ( answer.trim() == confirmAnswer.trim() ) {
+      setAnsError( '' )
     }
-  }, [confirmAnswer]);
+  }, [ confirmAnswer ] )
 
   const setButtonVisible = () => {
     //setAnsError('');
@@ -98,8 +98,8 @@ export default function NewWalletQuestionRegenerateShare(props) {
           const security = {
             question: dropdownBoxValue.question,
             answer,
-          };
-          dispatch(initializeSetup(walletName, security));
+          }
+          dispatch( initializeSetup( walletName, security ) )
         }}
         style={styles.buttonView}
       >
@@ -109,18 +109,22 @@ export default function NewWalletQuestionRegenerateShare(props) {
           <ActivityIndicator size="small" />
         )}
       </TouchableOpacity>
-    );
-  };
+    )
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1 
+      }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate('WalletInitialization');
+              props.navigation.navigate( 'WalletInitialization' )
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -134,16 +138,20 @@ export default function NewWalletQuestionRegenerateShare(props) {
         </View>
 
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
+          style={{
+            flex: 1 
+          }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <TouchableOpacity
             activeOpacity={10}
-            style={{ flex: 1 }}
+            style={{
+              flex: 1 
+            }}
             onPress={() => {
-              setDropdownBoxOpenClose(false);
-              Keyboard.dismiss();
+              setDropdownBoxOpenClose( false )
+              Keyboard.dismiss()
             }}
           >
             <ScrollView>
@@ -161,7 +169,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                     : styles.dropdownBox
                 }
                 onPress={() => {
-                  setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                  setDropdownBoxOpenClose( !dropdownBoxOpenClose )
                 }}
               >
                 <Text style={styles.dropdownBoxText}>
@@ -170,7 +178,9 @@ export default function NewWalletQuestionRegenerateShare(props) {
                     : 'Select Question'}
                 </Text>
                 <Ionicons
-                  style={{ marginLeft: 'auto' }}
+                  style={{
+                    marginLeft: 'auto' 
+                  }}
                   name={
                     dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
                   }
@@ -180,11 +190,11 @@ export default function NewWalletQuestionRegenerateShare(props) {
               </TouchableOpacity>
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
-                  {dropdownBoxList.map((value, index) => (
+                  {dropdownBoxList.map( ( value, index ) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setDropdownBoxValue(value);
-                        setDropdownBoxOpenClose(false);
+                        setDropdownBoxValue( value )
+                        setDropdownBoxOpenClose( false )
                       }}
                       style={{
                         ...styles.dropdownBoxModalElementView,
@@ -208,17 +218,19 @@ export default function NewWalletQuestionRegenerateShare(props) {
                               ? Colors.blue
                               : Colors.black,
                           fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(12),
+                          fontSize: RFValue( 12 ),
                         }}
                       >
                         {value.question}
                       </Text>
                     </TouchableOpacity>
-                  ))}
+                  ) )}
                 </View>
               ) : null}
               {dropdownBoxValue.id ? (
-                <View style={{ marginTop: 15 }}>
+                <View style={{
+                  marginTop: 15 
+                }}>
                   <View
                     style={{
                       ...answerInputStyle,
@@ -238,23 +250,25 @@ export default function NewWalletQuestionRegenerateShare(props) {
                       autoCorrect={false}
                       autoCapitalize="none"
                       value={answer}
-                      onChangeText={text => setAnswer(text)}
+                      onChangeText={text => setAnswer( text )}
                       onFocus={() => {
-                        setDropdownBoxOpenClose(false);
-                        setAnswerInputStyle(styles.inputBoxFocused);
+                        setDropdownBoxOpenClose( false )
+                        setAnswerInputStyle( styles.inputBoxFocused )
                       }}
                       onBlur={() => {
-                        setAnswerInputStyle(styles.inputBox);
-                        setDropdownBoxOpenClose(false);
+                        setAnswerInputStyle( styles.inputBox )
+                        setDropdownBoxOpenClose( false )
                       }}
                     />
                     <TouchableWithoutFeedback
                       onPress={() => {
-                        setHdeShowAnswer(!hideShowAnswer);
+                        setHdeShowAnswer( !hideShowAnswer )
                       }}
                     >
                       <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
+                        style={{
+                          marginLeft: 'auto', padding: 10 
+                        }}
                         size={15}
                         color={Colors.blue}
                         name={hideShowAnswer ? 'eye-off' : 'eye'}
@@ -282,7 +296,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                       autoCorrect={false}
                       autoCapitalize="none"
                       onKeyPress={event => {
-                        setBackspace(event);
+                        setBackspace( event )
                       }}
                       onChangeText={text => {
                         if (
@@ -290,28 +304,30 @@ export default function NewWalletQuestionRegenerateShare(props) {
                           text.trim() &&
                           answer.trim()
                         ) {
-                          Keyboard.dismiss();
+                          Keyboard.dismiss()
                         }
-                        setConfirmAnswer(text);
+                        setConfirmAnswer( text )
                       }}
-                      onSubmitEditing={event => setConfirm(event.nativeEvent)}
+                      onSubmitEditing={event => setConfirm( event.nativeEvent )}
                       onFocus={() => {
-                        setDropdownBoxOpenClose(false);
-                        setConfirmAnswerInputStyle(styles.inputBoxFocused);
+                        setDropdownBoxOpenClose( false )
+                        setConfirmAnswerInputStyle( styles.inputBoxFocused )
                       }}
                       onBlur={() => {
-                        setConfirmAnswerInputStyle(styles.inputBox);
-                        setDropdownBoxOpenClose(false);
+                        setConfirmAnswerInputStyle( styles.inputBox )
+                        setDropdownBoxOpenClose( false )
                       }}
                     />
                     <TouchableWithoutFeedback
                       onPress={() => {
-                        setHideShowConfirmAnswer(!hideShowConfirmAnswer);
-                        setDropdownBoxOpenClose(false);
+                        setHideShowConfirmAnswer( !hideShowConfirmAnswer )
+                        setDropdownBoxOpenClose( false )
                       }}
                     >
                       <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
+                        style={{
+                          marginLeft: 'auto', padding: 10 
+                        }}
                         size={15}
                         color={Colors.blue}
                         name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
@@ -320,7 +336,9 @@ export default function NewWalletQuestionRegenerateShare(props) {
                   </View>
                 </View>
               ) : (
-                <View style={{ marginTop: 15 }} />
+                <View style={{
+                  marginTop: 15 
+                }} />
               )}
 
               <View
@@ -334,7 +352,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                   style={{
                     color: Colors.red,
                     fontFamily: Fonts.FiraSansMediumItalic,
-                    fontSize: RFValue(10),
+                    fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
                 >
@@ -347,15 +365,15 @@ export default function NewWalletQuestionRegenerateShare(props) {
               {answer.trim() == confirmAnswer.trim() &&
               confirmAnswer.trim() &&
               answer.trim() ? (
-                setButtonVisible()
-              ) : (
-                <View
-                  style={{
-                    height: wp('13%'),
-                    width: wp('30%'),
-                  }}
-                />
-              )}
+                  setButtonVisible()
+                ) : (
+                  <View
+                    style={{
+                      height: wp( '13%' ),
+                      width: wp( '30%' ),
+                    }}
+                  />
+                )}
               <View style={styles.statusIndicatorView}>
                 <View style={styles.statusIndicatorInactiveView} />
                 <View style={styles.statusIndicatorActiveView} />
@@ -371,10 +389,10 @@ export default function NewWalletQuestionRegenerateShare(props) {
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   dropdownBox: {
     flexDirection: 'row',
     borderColor: Colors.borderColor,
@@ -402,25 +420,29 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: {
+      width: 2, height: 2 
+    },
     backgroundColor: Colors.white,
     alignItems: 'center',
   },
   buttonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15 
+    },
     backgroundColor: Colors.blue,
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
@@ -462,13 +484,15 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: {
+      width: 2, height: 2 
+    },
     backgroundColor: Colors.white,
   },
   modalInputBox: {
     flex: 1,
     height: 50,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
@@ -476,7 +500,7 @@ const styles = StyleSheet.create({
   dropdownBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
   dropdownBoxModal: {
     borderRadius: 10,
@@ -485,7 +509,9 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0, height: 10 
+    },
     backgroundColor: Colors.white,
   },
   dropdownBoxModalElementView: {
@@ -494,4 +520,4 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
   },
-});
+} )

@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import DestinationAccountShellsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountShellsList'
 import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
@@ -10,6 +8,7 @@ import AccountShell from '../../../../common/data/models/AccountShell'
 import { reassignTransactions } from '../../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
 import useCompatibleAccountShells from '../../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells'
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -67,13 +66,10 @@ const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ( { 
       </View>
 
       <View style={styles.proceedButtonContainer}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Confirm & Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
     </View>

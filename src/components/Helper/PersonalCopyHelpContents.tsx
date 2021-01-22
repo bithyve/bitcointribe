@@ -64,8 +64,7 @@ export default function PersonalCopyHelpContents(props) {
               marginRight: wp('7%'),
             }}
           >
-            These Recovery Keys are stored in the form of a pdf. You can store
-            the pdf itself anywhere you like digitally or even print it out.
+            These Recovery Keys are stored in the form of a pdf. You can store the pdf itself anywhere you like digitally or even print it out
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -87,7 +86,7 @@ export default function PersonalCopyHelpContents(props) {
               marginRight: wp('7%'),
             }}
           >
-            The pdf has QR Codes to help you recover your wallet.
+           The pdf has QR Codes to help you recover your wallet
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -136,8 +135,7 @@ export default function PersonalCopyHelpContents(props) {
               marginRight: wp('7%'),
             }}
           >
-            Make sure you delete these pdfs from your phone, once you have
-            shared them via mail, messaging platforms, etc.
+             Make sure you delete these pdfs from your phone, once you have shared them via mail, messaging platforms, etc.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('6%'),
               marginBottom: hp('6%'), }}>
@@ -160,9 +158,7 @@ export default function PersonalCopyHelpContents(props) {
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            If you do not delete the personal copy pdfs from your phone, a
-            hacker in possession of your phone may be able to access all three
-            keys and access your Checking Account.
+            It is not a good idea to have multiple recovery keys on the same device
           </Text>
         
         <AppBottomSheetTouchableWrapper
@@ -213,10 +209,7 @@ export default function PersonalCopyHelpContents(props) {
               marginRight: wp('7%'),
             }}
           >
-            To recover your wallet, you need to scan three of your five Recovery
-            Keys. Having access to two Personal Recovery Keys ensures a faster
-            recovery process as you only need to source one key from a Keeper
-            device or your friend/family member.
+            To recover your wallet, you need to scan three of your five Recovery Keys. Having access to two Personal Recovery Keys ensures a faster recovery process as you only need to source one key from a Keeper device or your friend/family member
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -238,9 +231,7 @@ export default function PersonalCopyHelpContents(props) {
               marginRight: wp('7%'),
             }}
           >
-            If you lose your Personal Keys you would require all the other three
-            Recovery Keys stored on the Keeper Device and saved with Friends/
-            Family members to recover your wallet.
+            If you lose your Personal Keys you would require all the other three Recovery Keys stored on the Keeper Device and saved with Friends/ Family members to recover your wallet
           </Text>
         </View>
       </ScrollView>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Modal } from 'react-native';
 import PropTypes from 'prop-types';
+import Colors from '../../common/Colors';
 
 const Loader = ({ backgroundColor, indicatorColor, isLoading }) => (
   <Modal
@@ -35,5 +36,5 @@ Loader.propTypes = {
 
 Loader.defaultProps = {
   backgroundColor: 'rgba(1,1,1,0.05)',
-  indicatorColor: undefined,
+  indicatorColor: Colors.gray1,
 };

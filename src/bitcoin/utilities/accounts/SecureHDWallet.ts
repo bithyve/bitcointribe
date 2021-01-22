@@ -21,12 +21,14 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
+  SECURE_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 
 const {  HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT 
+  timeout: REQUEST_TIMEOUT
 } )
 
 export default class SecureHDWallet extends Bitcoin {
@@ -56,8 +58,8 @@ export default class SecureHDWallet extends Bitcoin {
   public derivativeAccounts: DerivativeAccounts | DonationDerivativeAccount =
     config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
-  public accountName: String;
-  public accountDescription: String;
+  public accountName: string;
+  public accountDescription: string;
 
   private lastBalTxSync = 0;
   private confirmedUTXOs: Array<{
@@ -91,6 +93,8 @@ export default class SecureHDWallet extends Bitcoin {
   constructor(
     primaryMnemonic: string,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       secondaryMnemonic: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
@@ -132,6 +136,8 @@ export default class SecureHDWallet extends Bitcoin {
   }
 
   public initializeStateVars = ( stateVars ) => {
+    this.accountName = stateVars && stateVars.accountName ? stateVars.accountName: ''
+    this.accountDescription = stateVars && stateVars.accountDescription ? stateVars.accountDescription: ''
     this.secondaryMnemonic =
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
@@ -174,7 +180,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
         ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts 
+          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
         }
         : config.DERIVATIVE_ACC
     this.lastBalTxSync =
@@ -218,7 +224,7 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync( this.primaryMnemonic )
     hash.update( seed )
     return {
-      walletId: hash.digest( 'hex' ) 
+      walletId: hash.digest( 'hex' )
     }
   };
 
@@ -233,21 +239,19 @@ export default class SecureHDWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
-          const donationAcc: DonationDerivativeAccountElements = this
-            .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-          receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
-          break
-
         case SUB_PRIMARY_ACCOUNT:
-          const account = this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][
-            accountNumber
-          ]
+        case WYRE:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const account = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
 
         default:
           receivingAddress = this.receivingAddress
     }
+
+    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
@@ -263,21 +267,21 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync( secondaryMnemonic )
     hash.update( seed )
     return {
-      secondaryID: hash.digest( 'hex' ) 
+      secondaryID: hash.digest( 'hex' )
     }
   };
 
   public removeSecondaryMnemonic = () => {
     this.secondaryMnemonic = null
     return {
-      removed: !this.secondaryMnemonic 
+      removed: !this.secondaryMnemonic
     }
   };
 
   public removeTwoFADetails = () => {
     this.twoFASetup = null
     return {
-      removed: !this.twoFASetup 
+      removed: !this.twoFASetup
     }
   };
 
@@ -299,18 +303,18 @@ export default class SecureHDWallet extends Bitcoin {
     const currentXpub = this.getRecoverableXKey( secondaryMnemonic, path )
     if ( currentXpub !== this.xpubs.secondary ) {
       return {
-        restored: false 
+        restored: false
       }
     }
     this.secondaryMnemonic = secondaryMnemonic
     return {
-      restored: true 
+      restored: true
     }
   };
 
   public getSecondaryXpub = (): { secondaryXpub: string } => {
     return {
-      secondaryXpub: this.xpubs.secondary 
+      secondaryXpub: this.xpubs.secondary
     }
   };
 
@@ -334,7 +338,7 @@ export default class SecureHDWallet extends Bitcoin {
     const secondaryXpub = decrypted
     if ( this.validateXpub( secondaryXpub ) ) {
       return {
-        secondaryXpub 
+        secondaryXpub
       }
     } else {
       throw new Error( 'Secondary Xpub is either tampered or is invalid' )
@@ -364,7 +368,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      isValid: res.data.isValid 
+      isValid: res.data.isValid
     }
   };
 
@@ -491,7 +495,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.balances = balances
     this.transactions = transactions
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -660,7 +664,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -745,17 +749,36 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
+
+      try{
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
+      }catch( err ){
+        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
+        console.log( 'using BitHyve Node as fallback(sync derivative-accounts)' )
+
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
       }
+
 
       const accountsToResponseMapping = res.data
       if ( !Object.keys( accountsToResponseMapping ).length ) return
@@ -940,11 +963,11 @@ export default class SecureHDWallet extends Bitcoin {
               }
             }
 
-          // sort transactions(lastest first) 
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => { 
+          // sort transactions(lastest first)
+          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
             return tx2.blockTime - tx1.blockTime
           } )
-      
+
           const lastSyncTime =
             this.derivativeAccounts[ dAccountType ][ accountNumber ]
               .lastBalTxSync || 0
@@ -985,7 +1008,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       return {
-        synched: true 
+        synched: true
       }
     } catch ( err ) {
       // console.log(
@@ -1012,7 +1035,7 @@ export default class SecureHDWallet extends Bitcoin {
     if ( accountType === DONATION_ACCOUNT ) {
       const { id } = this.derivativeAccounts[ accountType ][ accountNumber ]
       if ( id ) accountDetails = {
-        donationId: id 
+        donationId: id
       }
     }
 
@@ -1112,7 +1135,7 @@ export default class SecureHDWallet extends Bitcoin {
     ).address
 
     return {
-      synched: true 
+      synched: true
     }
   };
 
@@ -1148,36 +1171,46 @@ export default class SecureHDWallet extends Bitcoin {
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
-      accountId, accountNumber 
+      accountId, accountNumber
     }
   };
 
-  public updateDerivativeAccount = async (
+  public updateAccountDetails = (
     account: {
       kind: string,
       instanceNumber: number,
       customDescription: string,
       customDisplayName: string
     }
-  ): Promise<{
+  ): {
     updateSuccessful: boolean;
-  }>  => {
-    if ( account && account.instanceNumber==0 ) {
-      this.accountName = account.customDisplayName
-      this.accountDescription = account.customDescription
-      return { 
-        updateSuccessful: true 
-      }
+  } => {
+    switch( account.kind ){
+        case SECURE_ACCOUNT:
+          if ( !account.instanceNumber ) {
+            // instance num zero represents the parent acc
+            this.accountName = account.customDisplayName
+            this.accountDescription = account.customDescription
+          }
+          else {
+            const subPrimInstance: SubPrimaryDerivativeAccountElements =
+            this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ]
+            subPrimInstance.accountName = account.customDisplayName
+            subPrimInstance.accountDescription = account.customDescription
+          }
+          break
+
+        case DONATION_ACCOUNT:
+          const donationInstance: DonationDerivativeAccountElements =
+              this.derivativeAccounts[ DONATION_ACCOUNT ][ account.instanceNumber ]
+          donationInstance.subject = account.customDisplayName
+          donationInstance.description = account.customDescription
+          break
     }
-    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
 
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
 
-    return { 
-      updateSuccessful: true 
+    return {
+      updateSuccessful: true
     }
   };
 
@@ -1262,7 +1295,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      setupSuccessful, accountId: xpubId, accountNumber 
+      setupSuccessful, accountId: xpubId, accountNumber
     }
   };
 
@@ -1296,12 +1329,39 @@ export default class SecureHDWallet extends Bitcoin {
       if ( prepared ) {
         this.twoFASetup = setupData
         return {
-          setupData 
+          setupData
         }
       } else {
         throw new Error(
           'Something went wrong; unable to prepare secure account',
         )
+      }
+    }
+  };
+
+  public validate2FASetup = async ( token: number ): Promise<{
+    valid: Boolean
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+        HEXA_ID,
+        walletID: this.walletID,
+        token,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    console.log( {
+      res
+    } )
+    const { valid } = res.data
+    if ( !valid ) {
+      throw new Error( '2FA validation failed' )
+    } else {
+      return {
+        valid
       }
     }
   };
@@ -1369,7 +1429,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      updated 
+      updated
     }
   };
 
@@ -1399,7 +1459,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
     const { qrData, secret } = res.data
     this.twoFASetup = {
-      qrData, secret 
+      qrData, secret
     }
     return this.twoFASetup
   };
@@ -1530,7 +1590,7 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return {
-      fee 
+      fee
     }
   };
 
@@ -1583,10 +1643,10 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance 
+      fee, balance: confirmedBalance
     }
     return {
-      inputs, outputs, fee, balance: confirmedBalance 
+      inputs, outputs, fee, balance: confirmedBalance
     }
   };
 
@@ -1680,7 +1740,7 @@ export default class SecureHDWallet extends Bitcoin {
     if ( !defaultPriorityInputs || defaultDebitedAmount > confirmedBalance ) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return {
-        fee: defaultPriorityFee, balance: confirmedBalance 
+        fee: defaultPriorityFee, balance: confirmedBalance
       }
     }
 
@@ -1709,11 +1769,11 @@ export default class SecureHDWallet extends Bitcoin {
           // to previous priority assets
           if ( priority === 'medium' )
             txPrerequisites[ priority ] = {
-              ...txPrerequisites[ 'low' ] 
+              ...txPrerequisites[ 'low' ]
             }
           if ( priority === 'high' )
             txPrerequisites[ priority ] = {
-              ...txPrerequisites[ 'medium' ] 
+              ...txPrerequisites[ 'medium' ]
             }
         } else {
           txPrerequisites[ priority ] = {
@@ -1728,7 +1788,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     // console.log({ txPrerequisites });
     return {
-      txPrerequisites 
+      txPrerequisites
     }
   };
 
@@ -1820,7 +1880,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       return {
-        signedTxb: txb, childIndexArray 
+        signedTxb: txb, childIndexArray
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
@@ -1866,7 +1926,7 @@ export default class SecureHDWallet extends Bitcoin {
       // console.log({ txid });
 
       return {
-        txid 
+        txid
       }
     } catch ( err ) {
       throw new Error( `Unable to transfer: ${err.message}` )
@@ -1915,7 +1975,7 @@ export default class SecureHDWallet extends Bitcoin {
       } )
 
       return {
-        signedTxb: txb 
+        signedTxb: txb
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )

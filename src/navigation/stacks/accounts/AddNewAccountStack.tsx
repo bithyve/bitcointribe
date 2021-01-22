@@ -1,12 +1,14 @@
 import React from 'react'
 import { createStackNavigator } from 'react-navigation-stack'
 import NewAccountSelectionContainerScreen from '../../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen'
-import AddNewHexaAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/AddNewHexaAccountDetailsScreen'
+import NewHexaAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/NewHexaAccountDetailsScreen'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import { View, Text } from 'react-native'
 import NavStyles from '../../../common/Styles/NavStyles'
+import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 
 
 const AddNewAccountStack = createStackNavigator(
@@ -33,12 +35,19 @@ const AddNewAccountStack = createStackNavigator(
         }
       },
     },
-    AddNewHexaAccountDetails: {
-      screen: AddNewHexaAccountDetailsScreen,
+    NewHexaAccountDetails: {
+      screen: NewHexaAccountDetailsScreen,
       navigationOptions: {
         title: 'Account Details'
       }
     },
+    NewWyreAccountDetails: {
+      screen: NewWyreAccountDetailsScreen,
+      navigationOptions: {
+        title: 'Account Details'
+      }
+    },
+
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {

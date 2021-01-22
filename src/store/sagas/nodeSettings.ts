@@ -2,7 +2,7 @@ import axios from 'axios'
 import { put, call, select } from 'redux-saga/effects'
 import config from '../../bitcoin/HexaConfig'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { bitHyveNodeConnectionSucceeded, CONNECT_TO_BIT_HYVE_NODE, personalNodeConfigurationSet, personalNodeConnectionFailed, personalNodeConnectionSucceeded, SAVE_PERSONAL_NODE_CONFIGURATION } from '../actions/nodeSettings'
+import { bitHyveNodeConnectionSucceeded, CONNECT_TO_BIT_HYVE_NODE, personalNodeConfigurationSet, personalNodeConnectionFailed, personalNodeConnectionSucceeded, personalNodePreferenceToggled, RESTORE_PERSONAL_NODE_CONFIGURATION, SAVE_PERSONAL_NODE_CONFIGURATION } from '../actions/nodeSettings'
 import { createWatcher } from '../utils/utilities'
 
 
@@ -44,4 +44,19 @@ function* connectToBitHyveNode() {
 export const connectToBitHyveNodeWatcher = createWatcher(
   connectToBitHyveNode,
   CONNECT_TO_BIT_HYVE_NODE
+)
+
+
+
+function* restorePersonalNodeConfiguration( { payload }: { payload: PersonalNode } ) {
+  yield put( personalNodeConfigurationSet( payload ) )
+  if( payload.isConnectionActive ){
+    yield call( config.connectToPersonalNode, payload )
+    yield put( personalNodePreferenceToggled( true ) )
+  } 
+}
+
+export const restorePersonalNodeConfigurationWatcher = createWatcher(
+  restorePersonalNodeConfiguration,
+  RESTORE_PERSONAL_NODE_CONFIGURATION
 )

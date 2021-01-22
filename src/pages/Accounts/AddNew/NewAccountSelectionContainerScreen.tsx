@@ -2,18 +2,14 @@ import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, SectionList, SafeAreaView } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import { Button } from 'react-native-elements'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import useAccountShellCreationCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { addNewAccountShell } from '../../../store/actions/accounts'
-import { useDispatch } from 'react-redux'
-import { resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors';
+import ButtonBlue from '../../../components/ButtonBlue'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -49,12 +45,6 @@ export interface Props {
 }
 
 const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  useAccountShellCreationCompletionEffect( () => {
-    console.log( 'dispatching resetToHomeAction' )
-    navigation.dispatch( resetToHomeAction() )
-  } )
-
-  const dispatch = useDispatch()
   const newAccountChoices = useNewAccountChoices()
   const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
@@ -73,9 +63,10 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
       switch (
         ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind
       ) {
-          case ServiceAccountKind.FAST_BITCOINS:
-            dispatch( addNewAccountShell( selectedChoice ) )
-            break
+          case ServiceAccountKind.WYRE:
+            navigation.navigate( 'NewWyreAccountDetails', {
+              currentSubAccount: selectedChoice,
+            } )
           default:
             break
       }
@@ -85,17 +76,14 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
-          navigation.navigate( 'AddNewHexaAccountDetails', {
-            currentSubAccountInfo: selectedChoice,
+          navigation.navigate( 'NewHexaAccountDetails', {
+            currentSubAccount: selectedChoice,
           } )
           break
         case SubAccountKind.DONATION_ACCOUNT:
           navigation.navigate( 'AddNewDonationAccountDetails', {
-            currentSubAccountInfo: selectedChoice,
+            currentSubAccount: selectedChoice,
           } )
-          break
-        case SubAccountKind.TRUSTED_CONTACTS:
-          dispatch( addNewAccountShell( selectedChoice ) )
           break
         case SubAccountKind.FULLY_IMPORTED_WALLET:
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
@@ -113,13 +101,10 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const ListFooter: React.FC = () => {
     return (
       <View style={styles.listFooterSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
     )

@@ -60,8 +60,8 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
             style={styles.infoText}
           >
-            Use this account to store, or hold bitcoin and sats. 
-          </Text>
+          Use this account to store, or hold bitcoin and sats        
+            </Text>
           <View
             style={{
               justifyContent: 'center',
@@ -82,7 +82,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
            style={styles.infoText}
           >
-            Be careful while sending sats to your Savings Account. If you end up sending sats from your Checking Account to your Savings Account and then decide to spend sats from your Savings Account, it will cost you much more. 
+            Be careful while sending sats to your Savings Account. If you end up sending sats from your Checking Account to your Savings Account and then decide to spend sats from your Savings Account, it will cost you much more
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -101,9 +101,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={styles.dottedView}
-            />
+          <View style={styles.separatorView}/>
           </View>
         </View>
         <View
@@ -117,7 +115,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
             style={styles.infoText}
           >
-            The account needs you to set up a 2 Factor Authentication (2FA) system. This makes it extremely hard for anyone with malicious intent to steal your bitcoin.
+            The account needs you to set up a 2 Factor Authentication (2FA) system. This makes it extremely hard for anyone with malicious intent to steal your bitcoin
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -132,7 +130,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
             style={styles.infoText}
           >
-            Your 2FA code must be retrieved from your Keeper Device.
+            Your 2FA code must be retrieved from your Keeper Device. Do not ever setup the 2 Factor Authentication on the primary device!
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -151,9 +149,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={styles.dottedView}
-            />
+          <View style={styles.separatorView}/>
           </View>
         </View>
         <View
@@ -165,7 +161,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
             style={styles.infoText}
           >
-            The Savings Account is a 2-of-3 multi signature account where you hold two keys (one on this device and the other on your Keeper Device). BitHyve holds one key.
+            The Savings Account is a 2-of-3 multi signature account where you hold two keys (one on this device and the other on your Keeper Device)
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('6%'), marginBottom: hp('6%') }}>
             <Image
@@ -180,7 +176,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
           <Text
             style={styles.infoText}
           >
-            The key held on the Keeper Device can be used to migrate your funds from Hexa.
+            BitHyve holds the third key which is used only when you sign first and present the correct 2FA code. BitHyve never custodies any of your funds. The key held on the Keeper Device can be used to migrate your funds from Hexa anytime
           </Text>
           
         </View>
@@ -208,7 +204,7 @@ const styles = StyleSheet.create({
   marginLeft: wp('8%'),
   marginRight: wp('8%'),
 },
-dottedView: {
+separatorView: {
   borderStyle: 'dotted',
   borderWidth: 1,
   borderRadius: 1,

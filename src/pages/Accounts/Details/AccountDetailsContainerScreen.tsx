@@ -27,18 +27,18 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell, removeTwoFA } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
 import { DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
+import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 
 export type Props = {
   navigation: any;
@@ -66,17 +66,24 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
-  let derivativeAccountKind: any = primarySubAccount.kind
 
-  if (
-    primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT ||
-    primarySubAccount.kind === SubAccountKind.SECURE_ACCOUNT
-  ) {
-    if ( primarySubAccount.instanceNumber ) {
-      derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
-    }
+  let derivativeAccountKind
+  switch( primarySubAccount.kind ){
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        if ( primarySubAccount.instanceNumber )
+          derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        else derivativeAccountKind = primarySubAccount.kind
+        break
+
+      case SubAccountKind.SERVICE:
+        derivativeAccountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+        break
+
+      default:
+        derivativeAccountKind = primarySubAccount.kind
   }
-
+  
   const derivativeAccountDetails: {
     type: string;
     number: number;
@@ -243,6 +250,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
+  useEffect( ()=>{
+    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
+    const serviceType = primarySubAccount.sourceKind
+    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
+      navigation.navigate( 'TwoFASetup', {
+        twoFASetup:
+          accountsState[ serviceType ].service.secureHDWallet
+            .twoFASetup, 
+      } )
+      // dispatch( removeTwoFA() )    
+    }
+  }, [ primarySubAccount.sourceKind ] )
 
   useEffect( () => {
     // 📝 A slight timeout is needed here in order for the refresh control to
@@ -377,6 +396,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
 const styles = StyleSheet.create( {
   rootContainer: {
+    height: '100%',
   },
 
   scrollViewContainer: {
@@ -386,11 +406,11 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContainer: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
 
   footerSection: {
-    paddingVertical: 38,
+    paddingVertical: 15,
   },
 } )
 

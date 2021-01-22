@@ -28,17 +28,28 @@ const ListStyles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
 
+  disabledListItemTitle: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+
   listItemSubtitle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
-
   listItemContentContainer: {
     paddingVertical: 10,
   },
-
+  container : {
+    paddingHorizontal: 16,
+  },
+  disabledContainer: {
+    paddingHorizontal: 16,
+    backgroundColor: 'rgb(245,245,248)'
+  },
   reorderItemIconImage: {
     width: 44,
     height: 44,
