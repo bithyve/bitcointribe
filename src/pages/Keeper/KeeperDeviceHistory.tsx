@@ -218,13 +218,13 @@ const KeeperDeviceHistory = (props) => {
             setQrScannedData(qrData);
             if (qrData) {
               props.navigation.navigate("KeeperFeatures", {
-                isReshare,
-                qrScannedData: qrData,
-                isPrimaryKeeper: isPrimaryKeeper,
-                selectedShareId: selectedKeeper.shareId,
-                selectedLevelId,
-                isChange,
-              });
+                    isReshare,
+                    qrScannedData : qrData,
+                    isPrimaryKeeper: isPrimaryKeeper,
+                    selectedShareId: selectedKeeper.shareId,
+                    selectedLevelId: selectedLevelId,
+                    isChange,
+                  });
               (QrBottomSheet as any).current.snapTo(0);
             }
           } catch (err) {
@@ -244,8 +244,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"07e90f0cc8bf6a11568ba649","publicKey":"4e850282354478c399a51dff8faadd63a5315afbb1aea11e81f3489976e191f2","ephemeralAddress":"77269b731ad0c86ef9db22e6d53f0b434544a3cdb6418b14985e7a57941f02ae","walletName":"PKReShare"}'
-            : '{"uuid":"da4d6e73ce6be5d4b96f2e3f","publicKey":"12f3de10ae9e6c8c2d83dfc6dce4216c119be76ce693817929377e075491cbbd","ephemeralAddress":"06ed766e89262e0eec838848b235ec0283fafaa107fbb2b509f4eced238dc5d1","walletName":"Mac Pro"}';
+            ? '{"uuid":"06b9d597aa9347fcf45e247a","publicKey":"311408cc66f816c4c02c174ba66b7c92545f23f7dc4e56598c83fa0a1150f6cb","ephemeralAddress":"3428a5fc245fd6def268bffa89e385825f836ed02c8275048cc24fe007b59cd2","walletName":"Primary"}' : '{"uuid":"061bc0d417b7c4ccd506e702","publicKey":"1ed9f7699b24eafde5b26766dd4627a15d3fd590037159ca2576c82ad4306abe","ephemeralAddress":"6e2a6b9c3f559a4d5350983f04d0784e39c6bd5f9741f6280eecc8d904a66b69","walletName":"macpro"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

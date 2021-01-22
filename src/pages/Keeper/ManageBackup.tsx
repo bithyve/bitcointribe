@@ -89,6 +89,7 @@ interface ManageBackupStateTypes {
   selectedKeeperName: string;
   errorTitle: string;
   errorInfo: string;
+  refreshControlLoader: boolean;
 }
 
 interface ManageBackupPropsTypes {
@@ -193,6 +194,7 @@ class ManageBackup extends Component<
       selectedKeeperName: "",
       errorTitle: "",
       errorInfo: "",
+      refreshControlLoader: false,
     };
   }
 
@@ -239,7 +241,10 @@ class ManageBackup extends Component<
   };
 
   componentDidMount = async () => {
-    console.log("keeperInfo", this.props.keeperInfo);
+    // console.log("keeperInfo", this.props.keeperInfo);
+    // console.log("isLevel2Initialized",this.props.isLevel2Initialized);
+    // console.log("isLevelTwoMetaShareCreated",this.props.isLevelTwoMetaShareCreated);
+
     await this.onRefresh();
     this.createNotificationListeners();
     this.modifyLevelData();
@@ -325,24 +330,20 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    console.log('this.props.isBackupProcessing.status', this.props.isBackupProcessing.status);
     // this.props.setCloudBackupStatus({ status: false });
     if (!this.props.isBackupProcessing.status) {
-      console.log('this.props.isBackupProcessing.status INSIDE IF');
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
         dataObject: data,
         callBack: this.setCloudBackupStatus,
         share,
       });
-      console.log('this.props.isBackupProcessing.status INSIDE IF', share);
       cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
     }
   };
 
   setCloudBackupStatus = (share) => {
     try {
-      this.props.setCloudBackupStatus({ status: true });
       if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
         this.updateHealthForCloud();
       } else if (
@@ -374,7 +375,7 @@ class ManageBackup extends Component<
         levelHealth.length &&
         levelHealthVar.status != "accessible"
       ) {
-        console.log("cloudBackupStatus inside if", levelHealthVar);
+        //console.log("cloudBackupStatus inside if", levelHealthVar);
         if (levelHealthVar.shareType == "cloud") {
           levelHealthVar.updatedAt = moment(new Date()).valueOf();
           levelHealthVar.status == "accessible";
@@ -399,20 +400,20 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.levelHealth != this.props.levelHealth) {
-      this.modifyLevelData();
+    const {healthLoading, trustedChannelsSetupSyncing, isBackupProcessing} = this.props;
+    if(prevProps.healthLoading !== this.props.healthLoading || prevProps.trustedChannelsSetupSyncing !== this.props.trustedChannelsSetupSyncing || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status){
+      if(healthLoading || trustedChannelsSetupSyncing || isBackupProcessing.status){
+        this.setState({refreshControlLoader: true})
+      } else if(!healthLoading && !trustedChannelsSetupSyncing && !isBackupProcessing.status){
+        this.setState({refreshControlLoader: false})
+      }
     }
-    console.log('prevProps.levelHealth', JSON.stringify(prevProps.levelHealth));
-    console.log('this.props.levelHealth', JSON.stringify(this.props.levelHealth));
+
     if (
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
-      
-      // if (
-      //   prevProps.levelHealth !==
-      //   this.props.levelHealth
-      // ) {
+      this.modifyLevelData();
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -449,7 +450,10 @@ class ManageBackup extends Component<
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
     if (levelHealth.length > 0) {
+      //console.log("currentLevel,levelHealth",currentLevel,levelHealth)
       let levelInfo = getLevelInfo(levelHealth, currentLevel);
+      //console.log("levelInfo",levelInfo)
+
       if (levelInfo) {
         if (
           levelInfo[2] &&
@@ -459,14 +463,20 @@ class ManageBackup extends Component<
         ) {
           for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
             const element = s3Service.levelhealth.metaSharesKeeper[i];
+          //  console.log("levelInfo",levelInfo[0].shareId)
+         //   console.log("element.shareId",element.shareId)
+
             if (levelInfo[0].shareId == element.shareId) {
               secretShare = element;
+              break;
             }
+
           }
+        //  console.log("secretShare",secretShare)
         }
       }
     }
-    console.log('updateCloudData updateCloudData', secretShare);
+   // console.log('updateCloudData updateCloudData', secretShare);
     this.cloudData(keeperInfo, currentLevel, secretShare);
   };
 
@@ -751,13 +761,12 @@ class ManageBackup extends Component<
       isError,
       selectedLevelId,
       selectedKeeperType,
+      refreshControlLoader
     } = this.state;
     const {
       navigation,
-      healthLoading,
       keeperApproveStatus,
       currentLevel,
-      trustedChannelsSetupSyncing,
     } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -789,7 +798,7 @@ class ManageBackup extends Component<
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={healthLoading || trustedChannelsSetupSyncing}
+              refreshing={refreshControlLoader}
               onRefresh={() => this.onRefresh()}
             />
           }
