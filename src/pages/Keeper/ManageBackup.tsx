@@ -330,7 +330,6 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    // this.props.setCloudBackupStatus({ status: false });
     if (!this.props.isBackupProcessing.status) {
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
@@ -344,6 +343,7 @@ class ManageBackup extends Component<
 
   setCloudBackupStatus = (share) => {
     try {
+      this.props.setCloudBackupStatus({ status: true });
       if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
         this.updateHealthForCloud();
       } else if (
@@ -374,7 +374,6 @@ class ManageBackup extends Component<
         levelHealth.length &&
         levelHealthVar.status != "accessible"
       ) {
-        //console.log("cloudBackupStatus inside if", levelHealthVar);
         if (levelHealthVar.shareType == "cloud") {
           levelHealthVar.updatedAt = moment(new Date()).valueOf();
           levelHealthVar.status == "accessible";
