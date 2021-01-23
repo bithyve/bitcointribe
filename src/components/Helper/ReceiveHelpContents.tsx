@@ -143,7 +143,7 @@ export default function ReceiveHelpContents(props) {
             <Text style={{
               ...styles.infoText, marginLeft: 0, marginRight: 0
             }}>
-             Fees provide additional incentives for the miner to process your transaction, resulting in you receiving your sats faster.
+             Fees provide additional incentives for the miner to process your transaction, resulting in you (or your recipient) receiving your sats faster.
             </Text>
             <View
             style={{
