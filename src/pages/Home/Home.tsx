@@ -9,7 +9,8 @@ import {
   Linking,
   Alert,
   Image,
-  AppState
+  AppState,
+  InteractionManager
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
@@ -772,8 +773,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
       this.handleDeepLinking( unhandledDeepLinkURL )
     }
-    // This will sync balances and transactions for all account shells
-    this.props.autoSyncShells()
+    InteractionManager.runAfterInteractions( () => {
+      // This will sync balances and transactions for all account shells
+      this.props.autoSyncShells()
+    } )
   };
 
   getNewTransactionNotifications = async () => {
