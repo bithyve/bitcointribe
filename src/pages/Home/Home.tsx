@@ -781,7 +781,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    console.log( ':regularAccount', regularAccount )
+    // console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -789,7 +789,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    console.log( ':newTransactionsRegular', newTransactionsRegular )
+    // console.log( ':newTransactionsRegular', newTransactionsRegular )
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
