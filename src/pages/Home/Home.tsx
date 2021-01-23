@@ -680,63 +680,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateCloudData = () => {
-    console.log("inside updateCloudData");
-    let {
-      currentLevel,
-      keeperInfo,
-      levelHealth,
-      isLevel2Initialized,
-      isLevel3Initialized,
-      s3Service,
-    } = this.props;
-    let KPInfo: any[] = [];
-    let secretShare = {};
-    if (levelHealth.length > 0) {
-      let levelHealthVar = levelHealth[levelHealth.length - 1];
-      if (levelHealthVar.levelInfo) {
-        for (let i = 0; i < levelHealthVar.levelInfo.length; i++) {
-          const element = levelHealthVar.levelInfo[i];
-          if (
-            keeperInfo.findIndex((value) => value.shareId == element.shareId) >
-              -1 &&
-            element.status == "accessible"
-          ) {
-            let kpInfoElement =
-              keeperInfo[
-                keeperInfo.findIndex(
-                  (value) => value.shareId == element.shareId
-                )
-              ];
-            let object = {
-              type: kpInfoElement.type,
-              name: kpInfoElement.name,
-              shareId: kpInfoElement.shareId,
-              data: kpInfoElement.data,
-            };
-            KPInfo.push(object);
-          }
-        }
-
-        if (
-          isLevel2Initialized &&
-          !isLevel3Initialized &&
-          levelHealthVar.levelInfo[2].status == "accessible" &&
-          levelHealthVar.levelInfo[3].status == "accessible"
-        ) {
-          for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
-            const element = s3Service.levelhealth.metaSharesKeeper[i];
-            if (levelHealthVar.levelInfo[0].shareId == element.shareId) {
-              secretShare = element;
-            }
-          }
-        }
-      }
-    }
-    this.cloudData(KPInfo, currentLevel, secretShare);
-    // Call icloud update Keeper INfo with KPInfo and currentLevel vars
-  };
-
   getNewTransactionNotifications = async () => {
     const newTransactions = [];
     const { accountsState } = this.props;

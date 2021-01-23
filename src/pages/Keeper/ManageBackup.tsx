@@ -658,9 +658,17 @@ class ManageBackup extends Component<
       this.goToHistory(obj);
       return;
     } else {
-      if (value.id === 2 && number == 1)
-        (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
-      else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+      if (value.id === 2 && number == 1) {
+        if(this.props.currentLevel == 1) {
+          (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+        } else {
+          this.setState({
+            errorTitle: 'Please first complete Level 1',
+            errorInfo: 'Please check if you have completed Level 1 first and try to complete Level 1.',
+          });
+          (this.refs.ErrorBottomSheet as any).snapTo(1);
+        }
+      } else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
     }
   };
 
@@ -1450,7 +1458,7 @@ class ManageBackup extends Component<
           ref={'ErrorBottomSheet'}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '30%' ) : hp( '35%' ),
           ]}
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
