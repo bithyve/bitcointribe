@@ -1964,7 +1964,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           );
         }
         if (element.notificationType == "reShare") {
-          console.log('element.notificationType', element.notificationType)
+          // console.log('element.notificationType', element.notificationType)
+          // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
+
           let existingShares: MetaShare[];
           if (Object.keys(UNDER_CUSTODY).length) {
             existingShares = Object.keys(UNDER_CUSTODY).map((tag) => {
@@ -1973,13 +1975,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             });
           }
           if(existingShares.length){
+            //console.log('existingShares.length', existingShares.length, existingShares)
             if (
               existingShares.findIndex(
                 (value) =>
-                  value.shareId == JSON.parse(element.data).selectedShareId
+                  value.shareId === JSON.parse(element.data).selectedShareId
               ) == -1
             ) {
-              console.log('element.notificationType', element.notificationType)
+              console.log('element.notificationType 1', element.notificationType)
               this.props.autoDownloadShareContact(
                 JSON.parse(element.data).selectedShareId,
                 JSON.parse(element.data).walletId

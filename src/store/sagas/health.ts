@@ -2103,11 +2103,11 @@ function* autoDownloadShareContactWorker({ payload }) {
     let { DECENTRALIZED_BACKUP } = yield select(
       (state) => state.storage.database
     );
-    let UNDER_CUSTODY = DECENTRALIZED_BACKUP.UNDER_CUSTODY;
+    let { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+    
     let existingShares: MetaShare[];
     if (Object.keys(UNDER_CUSTODY).length) {
       existingShares = Object.keys(UNDER_CUSTODY).map((tag) => {
-        console.log(tag);
         return UNDER_CUSTODY[tag].META_SHARE;
       });
     }
@@ -2121,6 +2121,7 @@ function* autoDownloadShareContactWorker({ payload }) {
         }
       }
     }
+    
     if (metaShare) {
       let index;
       const trustedContactsService: TrustedContactsService = yield select(
@@ -2148,27 +2149,25 @@ function* autoDownloadShareContactWorker({ payload }) {
         TContacts[index].trustedChannel &&
         TContacts[index].trustedChannel.address
       ) {
-        console.log("index", index);
-        console.log("TContacts", TContacts);
-        console.log("TContacts[index].contactsWalletName", TContacts[index].contactsWalletName);
+       
         let res = yield call(
           trustedContactsService.fetchTrustedChannel,
           contactNameArr[index],
           TContacts[index].contactsWalletName
         );
-        let underCustody = { ...UNDER_CUSTODY };
-        console.log("data", res.data.data.metaShare);
-        underCustody[TContacts[index].contactsWalletName].META_SHARE = res.data.data.metaShare;
-        
-        UNDER_CUSTODY = underCustody;
-        console.log(
-          "UNDER_CUSTODY",
-          UNDER_CUSTODY[TContacts[index].contactsWalletName]
-        );
+        // console.log("data", res.data.data.metaShare);
+        // console.log("underCustody[TContacts[index].contactsWalletName].META_SHARE", UNDER_CUSTODY[TContacts[index].contactsWalletName].META_SHARE);
+       
         const updatedBackup = {
           ...DECENTRALIZED_BACKUP,
-          UNDER_CUSTODY,
-        };
+          UNDER_CUSTODY: {
+            ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+            [ TContacts[index].contactsWalletName ]: {
+              META_SHARE: res.data.data.metaShare,
+            },
+          },
+        }
+     
         console.log("updatedBackup", updatedBackup);
         yield call(insertDBWorker, {
           payload: {
