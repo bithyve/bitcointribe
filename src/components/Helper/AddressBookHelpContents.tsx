@@ -46,11 +46,7 @@ export default function AddressBookHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            Friends and Family are contacts whom you know and trust, and those
-            whom you transact with routinely. When transacting with Friends and
-            Family, you are not required to ask them for a QR code when sending
-            bitcoin
-          </Text>
+            Friends and Family are people who you trust and end up paying regularly. When sending sats to people on your Friends and Family, you are not required to ask them for a QR code when sending - saving lots of time!
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/FnF_recovery_key_2.png')}
@@ -62,9 +58,7 @@ export default function AddressBookHelpContents(props) {
               ...styles.infoText,
             }}
           >
-            Selecting a contact as Friends and Family creates a secure channel
-            between you and the contact. This secure channel enables easy
-            exchange of information without requiring user action
+            Picking someone to be Friends and Family creates a secure channel between you and them. This means you can pay them - and they can pay you - whenever you want, securely!
           </Text>
           <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('80%'), animated: true });
@@ -88,9 +82,7 @@ export default function AddressBookHelpContents(props) {
               marginTop: wp('10%'),
             }}
           >
-            Secure, encrypted channels are used to communicate your
-            extended public key. An extended public key can be used by a
-            peer to generate new addresses on your behalf.
+            We send your Friends and Family your extended public key for your wallet. An extended public key can be used by someone else to generate new addresses on your behalf.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -100,9 +92,7 @@ export default function AddressBookHelpContents(props) {
           </View>
           <View style={styles.bottomLinkView}>
             <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0, }}>
-              Possessing an extended public key does not allow one to gain
-              possession of funds. This is because the contact does not possess
-              your private key which affirms ownership of funds
+              If someone has your extended public key, your sats are still safe! This is because the contact does not possess your private key, which is needed to move bitcoin out of your wallet.
             </Text>
             <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
               <Text style={styles.toKnowMoreText}>To know more,</Text>

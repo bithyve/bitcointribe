@@ -41,7 +41,7 @@ export default function ReceiveHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            To receive sats or bitcoin, simply share the QR code with whomever it is that you wish to receive the money from. The QR code packs in your bitcoin address to which they send the sats to
+            To receive sats or bitcoin, you share the QR code with the person trying to send you money. Scanning the QR code with their phone camera gives them your bitcoin address.
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -57,7 +57,7 @@ export default function ReceiveHelpContents(props) {
               marginBottom: wp('15%'),
             }}
           >
-            For your privacy, a new address is generated each time you want to receive sats or bitcoin. We do this under cthe hood and you do not have to worry about this!
+            For your privacy, a new address is generated each time you want to receive sats or bitcoin. The app does this on its own - you don't have to do a thing!
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -86,7 +86,7 @@ export default function ReceiveHelpContents(props) {
               marginTop: wp('10%'),
             }}
           >
-            You need to keep in mind the miner’s incentive to process your transaction while receiving sats or bitcoin
+            Depending on the sender's wallet, you may receive a few less sats than you requested - this may be due to the mining fee.
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -99,7 +99,7 @@ export default function ReceiveHelpContents(props) {
           <Text style={{
             ...styles.infoText, marginBottom: wp('15%'),
           }}>
-           Please ensure the sender sends the money with appropriate fees for it to reach you faster
+           If your sender sends the transaction with higher mining fees, it gets to you faster. Make sure they know!
             </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -129,7 +129,7 @@ export default function ReceiveHelpContents(props) {
               marginTop: wp('10%'),
             }}
           >
-            If you prefer, you can increase the fee or even use custom fee
+            When you send sats, our app calculates the fees to get your money to your recipient within a certain window of time - or you can use a custom fee, if you know what you're doing. 
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -143,7 +143,7 @@ export default function ReceiveHelpContents(props) {
             <Text style={{
               ...styles.infoText, marginLeft: 0, marginRight: 0
             }}>
-             This provides additional incentive for the miner to process your transaction, resulting in you receiving your sats faster.
+             Fees provides additional incentives for the miner to process your transaction, resulting in you receiving your sats faster.
             </Text>
             <View
             style={{
