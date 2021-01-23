@@ -96,10 +96,11 @@ class KeeperFeatures extends Component<
       this.setState({ setUpLoader: false });
     }
 
-    if ((prevProp.isLevel2Initialized !== this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
-      (this.props.isLevel2Initialized &&
+    if (
+      (prevProp.isLevel2Initialized !== this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
+      ((this.props.isLevel2Initialized || this.props.isLevel3Initialized) &&
       prevState.setupKeeperClicked !== this.state.setupKeeperClicked &&
-      this.state.setupKeeperClicked)
+      this.state.setupKeeperClicked) || (prevProp.isLevel3Initialized !== this.props.isLevel3Initialized && this.props.isLevel3Initialized)
     ) {
       this.uploadDataOnEFChannel();
     }

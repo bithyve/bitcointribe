@@ -371,7 +371,6 @@ class ManageBackup extends Component<
       }
       // health update for 1st upload to cloud
       if (
-        this.props.cloudBackupStatus &&
         levelHealth.length &&
         levelHealthVar.status != "accessible"
       ) {
@@ -450,9 +449,7 @@ class ManageBackup extends Component<
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
     if (levelHealth.length > 0) {
-      //console.log("currentLevel,levelHealth",currentLevel,levelHealth)
       let levelInfo = getLevelInfo(levelHealth, currentLevel);
-      //console.log("levelInfo",levelInfo)
 
       if (levelInfo) {
         if (
@@ -463,8 +460,6 @@ class ManageBackup extends Component<
         ) {
           for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
             const element = s3Service.levelhealth.metaSharesKeeper[i];
-          //  console.log("levelInfo",levelInfo[0].shareId)
-         //   console.log("element.shareId",element.shareId)
 
             if (levelInfo[0].shareId == element.shareId) {
               secretShare = element;
@@ -472,11 +467,9 @@ class ManageBackup extends Component<
             }
 
           }
-        //  console.log("secretShare",secretShare)
         }
       }
     }
-   // console.log('updateCloudData updateCloudData', secretShare);
     this.cloudData(keeperInfo, currentLevel, secretShare);
   };
 
@@ -1032,7 +1025,7 @@ class ManageBackup extends Component<
                                 }}
                                 onPress={() => {
                                   if (!this.props.cloudBackupStatus.status) {
-                                    this.cloudData();
+                                    this.updateCloudData();
                                   }
                                 }}
                               >
