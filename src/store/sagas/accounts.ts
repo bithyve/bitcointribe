@@ -302,8 +302,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
-  let { serviceType, accountNumber, accountType } = payload
+  let { serviceType, accountNumber, accountType, hardRefresh } = payload
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   if( accountType=='SERVICE' ) accountType='WYRE'
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
@@ -325,10 +324,14 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   const preFetchTransactions =
     derivativeAccounts[ accountType ][ accountNumber ].transactions
 
-  const res = yield call(
-    service.getDerivativeAccBalanceTransactions,
+  const accountsInfo = [ {
     accountType,
     accountNumber
+  } ]
+  const res = yield call(
+    ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
+    accountsInfo,
+    hardRefresh
   )
 
   const postFetchBalances =
@@ -1117,7 +1120,7 @@ export const updateDonationPreferencesWatcher = createWatcher(
 function* refreshAccountShellWorker( { payload } ) {
   const shell: AccountShell = payload.shell
   const { primarySubAccount } = shell
-  const options: { autoSync?: boolean } = payload.options
+  const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
 
   let accountKind
   switch( primarySubAccount.kind ){
@@ -1173,6 +1176,7 @@ function* refreshAccountShellWorker( { payload } ) {
         serviceType: primarySubAccount.sourceKind,
         accountType: accountKind,
         accountNumber: primarySubAccount.instanceNumber,
+        hardRefresh: options.hardRefresh
       }
       yield call( fetchDerivativeAccBalanceTxWorker, {
         payload
@@ -1189,6 +1193,7 @@ function* refreshAccountShellWorker( { payload } ) {
         loader: true,
         syncTrustedDerivative:
           primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
+        hardRefresh: options.hardRefresh
       },
     }
 

@@ -305,7 +305,7 @@ export default class Bitcoin {
                       : accountType,
                     primaryAccType,
                     recipientAddresses: tx.RecipientAddresses,
-                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
                     address: addressInfo.Address
                   }
 
@@ -325,8 +325,7 @@ export default class Bitcoin {
                       : accountType,
                     primaryAccType,
                     senderAddresses: tx.SenderAddresses,
-                    blockTime: tx.Status.block_time, // only available when tx is confirmed
-                    address: addressInfo.Address
+                    blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
                   }
                   // console.log({ outgoingTx, incomingTx });
                   newTxs.push(
@@ -361,7 +360,7 @@ export default class Bitcoin {
                     primaryAccType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
-                    blockTime: tx.Status.block_time, // only available when tx is confirmed
+                    blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
                     address: addressInfo.Address
                   }
 
@@ -409,6 +408,11 @@ export default class Bitcoin {
             } )
           }
         } )
+
+        // sort transactions(lastest first)
+        // transactions.transactionDetails.sort( ( tx1, tx2 ) => {
+        //   return tx2.blockTime - tx1.blockTime
+        // } )
 
         synchedAccounts[ accountId ] =  {
           UTXOs,
