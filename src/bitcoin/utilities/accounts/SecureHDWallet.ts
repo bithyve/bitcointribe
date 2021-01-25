@@ -718,8 +718,8 @@ export default class SecureHDWallet extends Bitcoin {
 
       // garner cached params for bal-tx sync
       let cachedUTXOs =  [  ]
-      if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
-      if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
+      if( confirmedUTXOs ) cachedUTXOs.push( ...confirmedUTXOs )
+      if( unconfirmedUTXOs ) cachedUTXOs.push( ...unconfirmedUTXOs )
       let cachedTxs = transactions? transactions: {
         totalTransactions: 0,
         confirmedTransactions: 0,
@@ -1338,24 +1338,85 @@ export default class SecureHDWallet extends Bitcoin {
     return res.data
   };
 
+  public removeConsumedUTXOs= ( inputs: InputUTXOs[], derivativeAccountDetails?: { type: string; number: number } ) => {
+    const consumedUTXOs: {[txid: string]: InputUTXOs} = {
+    }
+    inputs.forEach( ( input ) => {
+      consumedUTXOs[ input.txId ] = input
+    } )
 
-  public removeConsumedUTXOs= ( consumedUTXOs: InputUTXOs[] ) => {
-    const latestUTXOSet = []
-    let consumedBalance = 0
+    if ( derivativeAccountDetails ) {
+      const updatedUTXOSet = []
+      let consumedBalance = 0
 
-    this.confirmedUTXOs.forEach( confirmedUTXO => {
-      let include = true
-      consumedUTXOs.forEach( consumedUTXO => {
-        if( confirmedUTXO.txId === consumedUTXO.txId ) {
+      const derivativeInstance: DerivativeAccountElements = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][ derivativeAccountDetails.number ]
+
+      derivativeInstance.confirmedUTXOs.forEach( confirmedUTXO => {
+        let include = true
+        if( consumedUTXOs[ confirmedUTXO.txId ] ) {
           include = false
-          consumedBalance += consumedUTXO.value
+          consumedBalance += consumedUTXOs[ confirmedUTXO.txId ].value
         }
+        if( include ) updatedUTXOSet.push( confirmedUTXO )
       } )
 
-      if( include ) latestUTXOSet.push( confirmedUTXO )
-    } )
-    this.balances.balance -= consumedBalance
-    this.confirmedUTXOs = latestUTXOSet
+      derivativeInstance.balances.balance -= consumedBalance
+      derivativeInstance.confirmedUTXOs = updatedUTXOSet
+    } else {
+
+
+      // update primary utxo set and balance (test/reg)
+      const updatedUTXOSet = []
+      let consumedBalance = 0
+
+      this.confirmedUTXOs.forEach( confirmedUTXO => {
+        let include = true
+        if( consumedUTXOs[ confirmedUTXO.txId ] ) {
+          include = false
+          consumedBalance += consumedUTXOs[ confirmedUTXO.txId ].value
+        }
+        if( include ) updatedUTXOSet.push( confirmedUTXO )
+      } )
+
+      this.balances.balance -= consumedBalance
+      this.confirmedUTXOs = updatedUTXOSet
+
+
+      // update derivative utxo set and balance (if derivative utxos are consumed)
+      for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
+        const derivativeAccount = this.derivativeAccounts[ dAccountType ]
+        if ( derivativeAccount.instance.using ) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const updatedUTXOSet = []
+            let consumedBalance = 0
+
+            const derivativeInstance = derivativeAccount[ accountNumber ]
+            if (
+              derivativeInstance.confirmedUTXOs
+            )
+              derivativeInstance.confirmedUTXOs.forEach( ( confirmedUTXO ) => {
+                let include = true
+                if( consumedUTXOs[ confirmedUTXO.txId ] ) {
+                  include = false
+                  consumedBalance += consumedUTXOs[ confirmedUTXO.txId ].value
+                }
+                if( include ) updatedUTXOSet.push( confirmedUTXO )
+              } )
+
+
+            derivativeInstance.balances.balance -= consumedBalance
+            derivativeInstance.confirmedUTXOs = updatedUTXOSet
+          }
+        }
+      }
+    }
+
     this.updateQueryList( consumedUTXOs )
   }
 
