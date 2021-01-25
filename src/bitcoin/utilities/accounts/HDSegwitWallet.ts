@@ -32,11 +32,7 @@ import {
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-
-const { HEXA_ID, REQUEST_TIMEOUT } = config
-const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT
-} )
+const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
   public balances: { balance: number; unconfirmedBalance: number } = {
