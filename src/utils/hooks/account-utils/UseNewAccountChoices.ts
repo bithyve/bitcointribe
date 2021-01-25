@@ -86,7 +86,7 @@ export default function useNewAccountChoices() {
               ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
               : ''
           }`,
-          defaultDescription: 'Directly Accept Donations',
+          defaultDescription: 'Directly accept donations',
           doneeName: '',
           causeName: '',
         } ),
@@ -96,25 +96,25 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Wyre Account',
-          defaultDescription: 'Bought using ApplePay/Debit Card',
+          defaultDescription: 'Bought using ApplePay/Debit card',
           serviceAccountKind: ServiceAccountKind.WYRE,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Swan Bitcoin',
-          defaultDescription: 'Stack Sats with Swan',
+          defaultDescription: 'Stack sats with Swan',
           serviceAccountKind: ServiceAccountKind.SWAN,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'FastBitcoins.com',
-          defaultDescription: 'Use FastBitcoin Vouchers',
+          defaultDescription: 'Use FastBitcoin vouchers',
           serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Collaborative Custody',
-          defaultDescription: 'Multi-sig vault with a co-signer',
+          defaultDescription: 'Multi-sig Vault with a co-signer',
           serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
         } ),
       ],
