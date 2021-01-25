@@ -267,14 +267,15 @@ export const fetchDerivativeAccAddress = (
 }
 
 export const fetchDerivativeAccBalTx = (
-  serviceType,
-  accountType,
-  accountNumber?
+  serviceType: string,
+  accountType: string,
+  accountNumber?: number,
+  hardRefresh?: boolean
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: {
-      serviceType, accountType, accountNumber
+      serviceType, accountType, accountNumber, hardRefresh
     },
   }
 }

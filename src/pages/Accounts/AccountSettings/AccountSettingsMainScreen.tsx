@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native'
+import { useDispatch } from 'react-redux'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { refreshAccountShell } from '../../../store/actions/accounts'
 
 export type Props = {
   navigation: any;
@@ -21,6 +23,12 @@ const listItems: SettingsListItem[] = [
     subtitle: 'Customize display properties',
     screenName: 'EditDisplayProperties',
     imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+  },
+  {
+    title: 'Hard Refresh',
+    subtitle: 'Completely sync the account',
+    screenName: 'Hard Refresh',
+    imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
   },
 
   // 📝 These items are being commented out until their functionality is fully implemented.
@@ -55,6 +63,7 @@ const listItems: SettingsListItem[] = [
 const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
 
 const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dipatch = useDispatch()
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
@@ -62,9 +71,14 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const [ settingsList, setSettingsList ] = useState( listItems )
 
   function handleListItemPressed( listItem: SettingsListItem ) {
-    navigation.navigate( listItem.screenName, {
-      accountShellID,
-    } )
+    if( listItem.screenName === 'Hard Refresh' )
+      dipatch( refreshAccountShell( accountShell, {
+        autoSync: false, hardRefresh: true
+      } ) )
+    else
+      navigation.navigate( listItem.screenName, {
+        accountShellID,
+      } )
   }
 
   useEffect( () =>{
