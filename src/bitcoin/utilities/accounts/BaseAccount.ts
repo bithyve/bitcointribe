@@ -770,7 +770,7 @@ export default class BaseAccount {
       const { txid } = await this.hdWallet.broadcastTransaction( txHex )
       if( txid ){
         // chip consumed utxos
-        this.hdWallet.removeConsumedUTXOs( inputs )
+        this.hdWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
       }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
