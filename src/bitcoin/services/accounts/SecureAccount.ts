@@ -896,7 +896,8 @@ export default class SecureAccount {
               vout: number;
             };
           }>;
-          inputs: InputUTXOs[]
+          inputs: InputUTXOs[],
+          derivativeAccountDetails?: { type: string; number: number },
         };
         err?: undefined;
         message?: undefined;
@@ -938,7 +939,7 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          txHex, childIndexArray, inputs
+          txHex, childIndexArray, inputs, derivativeAccountDetails
         },
       }
     } catch ( err ) {
@@ -958,7 +959,8 @@ export default class SecureAccount {
         vout: number;
       };
     }>,
-    inputs: InputUTXOs[]
+    inputs: InputUTXOs[],
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -983,7 +985,7 @@ export default class SecureAccount {
       )
       if( txid ){
         // chip consumed utxos
-        this.secureHDWallet.removeConsumedUTXOs( inputs )
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
       }
 
       return {
@@ -1046,7 +1048,7 @@ export default class SecureAccount {
       const { txid } = await this.secureHDWallet.broadcastTransaction( txHex )
       if( txid ){
         // chip consumed utxos
-        this.secureHDWallet.removeConsumedUTXOs( inputs )
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
       }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
