@@ -9,7 +9,6 @@ import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes'
-import { v4 as uuidv4 } from 'uuid'
 const { REQUEST_TIMEOUT } = config
 
 const bitcoinAxios = axios.create( {

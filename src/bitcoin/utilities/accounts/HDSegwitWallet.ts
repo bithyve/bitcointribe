@@ -430,7 +430,7 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public fetchDerivativeAccBalanceTxs = async (
-    accountInfo: {
+    accountsInfo: {
       accountType: string,
       accountNumber: number,
       contactName?: string,
@@ -464,12 +464,12 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     } = {
     }
-    for( let { accountType, accountNumber, contactName } of accountInfo ){
+    for( let { accountType, accountNumber, contactName } of accountsInfo ){
       // preliminary checks
       if ( !this.derivativeAccounts[ accountType ] )
         throw new Error( `${accountType} does not exists` )
 
-      if ( accountType === TRUSTED_CONTACTS ) {
+      if ( accountType === TRUSTED_CONTACTS && !accountNumber ) {
         if ( !contactName )
           throw new Error( `Required param: contactName for ${accountType}` )
 
@@ -599,7 +599,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
-    for( let { accountType, accountNumber, contactName } of accountInfo ){
+    for( let { accountType, accountNumber, contactName } of accountsInfo ){
       if ( accountType === TRUSTED_CONTACTS ) {
         contactName = contactName.toLowerCase().trim()
         accountNumber = this.trustedContactToDA[ contactName ]
@@ -670,11 +670,15 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
+    hardRefresh?: boolean
   ): Promise<{
     synched: boolean;
   }> => {
-    const accountsToAddressMapping = {
-    }
+    const accountsInfo :  {
+      accountType: string,
+      accountNumber: number,
+    }[] = []
+
     for ( const dAccountType of accountTypes ) {
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
@@ -684,345 +688,15 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber <= derivativeAccounts.instance.using;
         accountNumber++
       ) {
-        // await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
-        let {
-          nextFreeAddressIndex,
-          nextFreeChangeAddressIndex,
-        } = this.derivativeAccounts[ dAccountType ][ accountNumber ]
-
-        // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
-        if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
-          nextFreeAddressIndex = 0
-        if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
-          nextFreeChangeAddressIndex = 0
-
-        const externalAddresses = []
-        const internalAddresses = []
-        for (
-          let itr = 0;
-          itr < nextFreeAddressIndex + this.derivativeGapLimit;
-          itr++
-        ) {
-          externalAddresses.push(
-            this.getAddress(
-              false,
-              itr,
-              this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
-            ),
-          )
-        }
-
-        for (
-          let itr = 0;
-          itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
-          itr++
-        ) {
-          internalAddresses.push(
-            this.getAddress(
-              true,
-              itr,
-              this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
-            ),
-          )
-        }
-
-        const usedAddresses = [ ...externalAddresses, ...internalAddresses ]
-
-        this.derivativeAccounts[ dAccountType ][ accountNumber ][
-          'usedAddresses'
-        ] = usedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
-        // console.log({ derivativeAccUsedAddresses: usedAddresses });
-
-        const { xpubId } = this.derivativeAccounts[ dAccountType ][ accountNumber ]
-        accountsToAddressMapping[ xpubId ] = {
-          External: externalAddresses,
-          Internal: internalAddresses,
-          Owned: [ ...externalAddresses, ...internalAddresses ],
-        }
+        accountsInfo.push( {
+          accountType: dAccountType, accountNumber
+        } )
       }
     }
 
-    if ( !Object.keys( accountsToAddressMapping ).length ) return
-
-    let res: AxiosResponse
-    try {
-
-      try{
-        if ( this.network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-            accountsToAddressMapping,
-          )
-        } else {
-          res = await bitcoinAxios.post(
-            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-            accountsToAddressMapping,
-          )
-        }
-      }catch( err ){
-        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
-        console.log( 'using Hexa node as fallback(sync derivative-accounts)' )
-
-        if ( this.network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post(
-            config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-            accountsToAddressMapping,
-          )
-        } else {
-          res = await bitcoinAxios.post(
-            config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-            accountsToAddressMapping,
-          )
-        }
-      }
-
-      const accountsToResponseMapping = res.data
-      if ( !Object.keys( accountsToResponseMapping ).length ) return
-
-      for ( const dAccountType of accountTypes ) {
-        const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
-
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccounts.instance.using;
-          accountNumber++
-        ) {
-          const {
-            nextFreeAddressIndex,
-            nextFreeChangeAddressIndex,
-            xpubId,
-          } = derivativeAccounts[ accountNumber ]
-          // TODO: re-pipe addressInUse
-          const addressInUse = derivativeAccounts[ accountNumber ].usedAddresses
-
-          if ( !accountsToResponseMapping[ xpubId ] ) continue
-
-          const { Utxos, Txs } = accountsToResponseMapping[ xpubId ]
-          if ( !Utxos && !Txs ) continue
-
-          const balances = {
-            balance: 0,
-            unconfirmedBalance: 0,
-          }
-          const externalAddresses = []
-          const internalAddresses = []
-          const ownedAddresses = {
-          }
-
-          for (
-            let itr = 0;
-            itr < nextFreeAddressIndex + this.derivativeGapLimit;
-            itr++
-          ) {
-            const address = this.getAddress(
-              false,
-              itr,
-              this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
-            )
-            externalAddresses.push( address )
-            ownedAddresses[ address ] = true
-          }
-
-          for (
-            let itr = 0;
-            itr < nextFreeChangeAddressIndex + this.derivativeGapLimit;
-            itr++
-          ) {
-            const address = this.getAddress(
-              true,
-              itr,
-              this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
-            )
-            internalAddresses.push( address )
-            ownedAddresses[ address ] = true
-          }
-
-          const UTXOs = []
-          if ( Utxos )
-            for ( const addressSpecificUTXOs of Utxos ) {
-              for ( const utxo of addressSpecificUTXOs ) {
-                const { value, Address, status, vout, txid } = utxo
-
-                if ( addressInUse.includes( Address ) ) {
-                  UTXOs.push( {
-                    txId: txid,
-                    vout,
-                    value,
-                    address: Address,
-                    status,
-                  } )
-
-                  if ( status.confirmed ) balances.balance += value
-                  else if ( internalAddresses.includes( Address ) )
-                    balances.balance += value
-                  else balances.unconfirmedBalance += value
-                }
-              }
-            }
-
-          const confirmedUTXOs = []
-
-          for ( const utxo of UTXOs ) {
-            if ( utxo.status ) {
-              if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
-              else {
-                if ( internalAddresses.includes( utxo.address ) ) {
-                  // defaulting utxo's on the change branch to confirmed
-                  confirmedUTXOs.push( utxo )
-                }
-              }
-            } else {
-              // utxo's from fallback won't contain status var (defaulting them as confirmed)
-              confirmedUTXOs.push( utxo )
-            }
-          }
-
-          const transactions: Transactions = {
-            totalTransactions: 0,
-            confirmedTransactions: 0,
-            unconfirmedTransactions: 0,
-            transactionDetails: [],
-          }
-
-          const addressesInfo = Txs
-          const txMap = new Map()
-
-          let lastUsedAddressIndex = nextFreeAddressIndex - 1
-          let lastUsedChangeAddressIndex = nextFreeChangeAddressIndex - 1
-
-          if ( addressesInfo )
-            for ( const addressInfo of addressesInfo ) {
-              if ( addressInfo.TotalTransactions === 0 ) continue
-
-              transactions.totalTransactions += addressInfo.TotalTransactions
-              transactions.confirmedTransactions +=
-                addressInfo.ConfirmedTransactions
-              transactions.unconfirmedTransactions +=
-                addressInfo.UnconfirmedTransactions
-
-              addressInfo.Transactions.forEach( ( tx ) => {
-                if ( !txMap.has( tx.txid ) ) {
-                  // check for duplicate tx (fetched against sending and then again for change address)
-                  txMap.set( tx.txid, true )
-
-                  let accType = dAccountType
-                  switch ( accType ) {
-                      case TRUSTED_CONTACTS:
-                        accType = derivativeAccounts[ accountNumber ].contactName
-                          .split( ' ' )
-                          .map(
-                            ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ),
-                          )
-                          .join( ' ' )
-                        break
-                      case SUB_PRIMARY_ACCOUNT:
-                        accType = 'Checking Account'
-                        break
-                  }
-
-                  const transaction = {
-                    txid: tx.txid,
-                    confirmations: tx.NumberofConfirmations,
-                    status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
-                    fee: tx.fee,
-                    date: tx.Status.block_time
-                      ? new Date( tx.Status.block_time * 1000 ).toUTCString()
-                      : new Date( Date.now() ).toUTCString(),
-                    transactionType: tx.TransactionType,
-                    amount:
-                      tx.TransactionType === 'Sent'
-                        ? tx.Amount + tx.fee
-                        : tx.Amount,
-                    accountType: accType,
-                    recipientAddresses: tx.RecipientAddresses,
-                    senderAddresses: tx.SenderAddresses,
-                    blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
-                  }
-
-                  // over-ride sent transaction's accountType variable for derivative accounts
-                  // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
-                  if ( transaction.transactionType === 'Sent' )
-                    transaction.accountType = 'Checking Account'
-
-                  transactions.transactionDetails.push( transaction )
-                }
-              } )
-
-              const addressIndex = externalAddresses.indexOf(
-                addressInfo.Address,
-              )
-              if ( addressIndex > -1 ) {
-                lastUsedAddressIndex =
-                  addressIndex > lastUsedAddressIndex
-                    ? addressIndex
-                    : lastUsedAddressIndex
-              } else {
-                const changeAddressIndex = internalAddresses.indexOf(
-                  addressInfo.Address,
-                )
-                if ( changeAddressIndex > -1 ) {
-                  lastUsedChangeAddressIndex =
-                    changeAddressIndex > lastUsedChangeAddressIndex
-                      ? changeAddressIndex
-                      : lastUsedChangeAddressIndex
-                }
-              }
-            }
-
-          // sort transactions(lastest first)
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
-            return tx2.blockTime - tx1.blockTime
-          } )
-
-          const lastSyncTime =
-            this.derivativeAccounts[ dAccountType ][ accountNumber ]
-              .lastBalTxSync || 0
-          let latestSyncTime =
-            this.derivativeAccounts[ dAccountType ][ accountNumber ]
-              .lastBalTxSync || 0
-          const newTransactions: Array<TransactionDetails> = [] // delta transactions
-          for ( const tx of transactions.transactionDetails ) {
-            if (
-              tx.status === 'Confirmed' &&
-              tx.transactionType === 'Received'
-            ) {
-              if ( tx.blockTime > lastSyncTime ) {
-                newTransactions.push( tx )
-              }
-              if ( tx.blockTime > latestSyncTime ) {
-                latestSyncTime = tx.blockTime
-              }
-            }
-          }
-
-          this.derivativeAccounts[ dAccountType ][ accountNumber ] = {
-            ...this.derivativeAccounts[ dAccountType ][ accountNumber ],
-            lastBalTxSync: latestSyncTime,
-            newTransactions,
-            confirmedUTXOs,
-            balances,
-            transactions,
-            nextFreeAddressIndex: lastUsedAddressIndex + 1,
-            nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
-            receivingAddress: this.getAddress(
-              false,
-              lastUsedAddressIndex + 1,
-              this.derivativeAccounts[ dAccountType ][ accountNumber ].xpub,
-            ),
-          }
-        }
-      }
-
-      return {
-        synched: true
-      }
-    } catch ( err ) {
-      // console.log(
-      //  `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
-      //);
-      throw new Error( 'Fetching balance-txn by addresses failed' )
-    }
-  };
+    if( accountsInfo.length )
+      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh )
+  }
 
   public syncViaXpubAgent = async (
     accountType: string,
