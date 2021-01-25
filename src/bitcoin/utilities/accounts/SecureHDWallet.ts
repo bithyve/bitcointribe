@@ -1416,7 +1416,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    this.updateQueryList( consumedUTXOs )
+    this.updateQueryList( consumedUTXOs, derivativeAccountDetails )
   }
 
   private updateQueryList = ( consumedUTXOs: {[txid: string]: InputUTXOs}, derivativeAccountDetails?: { type: string; number: number }  ) => {
