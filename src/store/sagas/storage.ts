@@ -20,7 +20,6 @@ import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { updateWalletImage } from '../actions/sss'
-import { startupSync } from '../actions/accounts'
 import { walletCheckIn } from '../actions/trustedContacts'
 // import { timer } from '../../utils'
 
@@ -44,8 +43,8 @@ function* fetchDBWorker() {
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
         payload: {
-          database 
-        } 
+          database
+        }
       } )
       yield put( dbFetched( database ) )
 
@@ -53,7 +52,6 @@ function* fetchDBWorker() {
         // actions post DB fetch
         yield put( walletCheckIn() )
         yield put( updateWalletImage() )
-        yield put( startupSync() )
       }
     } else {
       // DB would be absent during wallet setup
@@ -95,8 +93,8 @@ export function* insertDBWorker( { payload } ) {
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
     yield call( servicesEnricherWorker, {
       payload: {
-        database: updatedDB 
-      } 
+        database: updatedDB
+      }
     } )
   } catch ( err ) {
     console.log( err )
@@ -200,7 +198,7 @@ function* servicesEnricherWorker( { payload } ) {
     if ( migrated ) {
       database.VERSION = DeviceInfo.getVersion()
       yield call( insertDBWorker, {
-        payload: database 
+        payload: database
       } )
     }
   } catch ( err ) {

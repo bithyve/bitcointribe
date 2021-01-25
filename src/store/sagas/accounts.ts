@@ -16,7 +16,6 @@ import {
   failedST2,
   failedST3,
   testcoinsReceived,
-  SYNC_ACCOUNTS,
   accountsSynched,
   settedDonationAccount,
   FETCH_BALANCE_TX,
@@ -29,7 +28,6 @@ import {
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
-  STARTUP_SYNC,
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
@@ -74,7 +72,7 @@ import {
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { setAutoAccountSync, startupSyncLoaded } from '../actions/loaders'
+import { setAutoAccountSync } from '../actions/loaders'
 import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
@@ -82,6 +80,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -204,7 +203,15 @@ export const fetchTransactionsWatcher = createWatcher(
   FETCH_TRANSACTIONS
 )
 
-function* fetchBalanceTxWorker( { payload } ) {
+function* fetchBalanceTxWorker( { payload }: {payload: {
+  serviceType: string,
+  options: {
+    service?;
+    loader?: boolean;
+    hardRefresh?: boolean;
+    shouldNotInsert?: boolean;
+    syncTrustedDerivative?: boolean;
+  }}} ) {
   if ( payload.options.loader )
     yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   const service = payload.options.service
@@ -223,7 +230,7 @@ function* fetchBalanceTxWorker( { payload } ) {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( service.getBalanceTransactions, payload.options.hardRefresh )
+  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh )
   console.log( {
     res
   } )
@@ -242,8 +249,9 @@ function* fetchBalanceTxWorker( { payload } ) {
   ) {
     parentSynched = true
     if (
-      !payload.options.shouldNotInsert &&
-      !payload.options.syncTrustedDerivative
+      payload.serviceType === TEST_ACCOUNT ||
+      ( !payload.options.shouldNotInsert &&
+      !payload.options.syncTrustedDerivative )
     ) {
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
@@ -255,6 +263,7 @@ function* fetchBalanceTxWorker( { payload } ) {
           SERVICES: updatedSERVICES
         }
       } )
+      return
     }
   } else if ( res.status !== 200 ) {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -269,7 +278,9 @@ function* fetchBalanceTxWorker( { payload } ) {
     try {
       yield call( syncDerivativeAccountsWorker, {
         payload: {
-          serviceTypes: [ payload.serviceType ], parentSynched
+          serviceTypes: [ payload.serviceType ],
+          parentSynched,
+          hardRefresh: payload.options.hardRefresh
         },
       } )
     } catch ( err ) {
@@ -361,7 +372,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean} } ) {
   for ( const serviceType of payload.serviceTypes ) {
     console.log( 'Syncing DAs for: ', serviceType )
 
@@ -377,8 +388,9 @@ function* syncDerivativeAccountsWorker( { payload } ) {
     )
 
     const res = yield call(
-      service.syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC
+      ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
+      config.DERIVATIVE_ACC_TO_SYNC,
+      payload.hardRefresh
     )
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -1009,144 +1021,6 @@ function* removeTwoFAWorker() {
 export const removeTwoFAWatcher = createWatcher(
   removeTwoFAWorker,
   REMOVE_TWO_FA
-)
-
-function* accountsSyncWorker( { payload } ) {
-  try {
-    const accounts = yield select( ( state ) => state.accounts )
-
-    const testService = accounts[ TEST_ACCOUNT ].service
-    const regularService = accounts[ REGULAR_ACCOUNT ].service
-    const secureService = accounts[ SECURE_ACCOUNT ].service
-
-    // sequential sync
-    // yield call(fetchBalanceTxWorker,{
-    //   payload: {
-    //     serviceType: REGULAR_ACCOUNT,
-    //     options: {
-    //       service: regularService,
-    //       hardRefresh: payload.hardRefresh,
-    //       shouldNotInsert: true,
-    //     },
-    //   },
-    // });
-
-    // yield call(fetchBalanceTxWorker, {
-    //   payload: {
-    //     serviceType: SECURE_ACCOUNT,
-    //     options: {
-    //       service: secureService,
-    //       hardRefresh: payload.hardRefresh,
-    //       shouldNotInsert: true,
-    //     },
-    //   },
-    // });
-
-    // yield call(fetchBalanceTxWorker, {
-    //   payload: {
-    //     serviceType: TEST_ACCOUNT,
-    //     options: {
-    //       service: testService,
-    //       hardRefresh: payload.hardRefresh,
-    //       shouldNotInsert: true,
-    //     },
-    //   },
-    // });
-
-    // concurrent sync
-    // yield all([
-    //   fetchBalanceTxWorker({
-    //     payload: {
-    //       serviceType: TEST_ACCOUNT,
-    //       options: {
-    //         service: testService,
-    //         hardRefresh: payload.hardRefresh,
-    //         shouldNotInsert: true,
-    //       },
-    //     },
-    //   }),
-    //   fetchBalanceTxWorker({
-    //     payload: {
-    //       serviceType: REGULAR_ACCOUNT,
-    //       options: {
-    //         service: regularService,
-    //         hardRefresh: payload.hardRefresh,
-    //         shouldNotInsert: true,
-    //       },
-    //     },
-    //   }),
-    //   fetchBalanceTxWorker({
-    //     payload: {
-    //       serviceType: SECURE_ACCOUNT,
-    //       options: {
-    //         service: secureService,
-    //         hardRefresh: payload.hardRefresh,
-    //         shouldNotInsert: true,
-    //       },
-    //     },
-    //   }),
-    // ]);
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ TEST_ACCOUNT ]: JSON.stringify( testService ),
-      [ REGULAR_ACCOUNT ]: JSON.stringify( regularService ),
-      [ SECURE_ACCOUNT ]: JSON.stringify( secureService ),
-    }
-
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-    yield put( accountsSynched( true ) )
-  } catch ( err ) {
-    console.log( {
-      err
-    } )
-    yield put( accountsSynched( false ) )
-  }
-}
-
-export const accountsSyncWatcher = createWatcher(
-  accountsSyncWorker,
-  SYNC_ACCOUNTS
-)
-
-function* startupSyncWorker( {} ) {
-  /*
-  Skippiing this entire sync process
-  to improve login performance.
-
-  This will be modified and enhanced in a follow up release.
-  Leaving this here for reference till next release.
-
-  console.log('startupsync started ', Date.now())
-  try {
-    console.log('Synching accounts...');
-    yield call(accountsSyncWorker, { payload });
-  } catch (err) {
-    console.log('Accounts sync failed: ', err);
-  }
-
-  try {
-    console.log('Synching derivative accounts...');
-    yield call(syncDerivativeAccountsWorker, {
-      payload: { serviceTypes: [REGULAR_ACCOUNT, SECURE_ACCOUNT] },
-    });
-  } catch (err) {
-    console.log('Derivative accounts sync failed: ', err);
-  }
-  console.log('startupsync complete ', Date.now())
-  */
-
-  yield put( startupSyncLoaded( true ) )
-}
-
-export const startupSyncWatcher = createWatcher(
-  startupSyncWorker,
-  STARTUP_SYNC
 )
 
 function* setupDonationAccountWorker( { payload } ) {
