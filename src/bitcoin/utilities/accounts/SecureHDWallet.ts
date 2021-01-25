@@ -630,24 +630,6 @@ export default class SecureHDWallet extends Bitcoin {
   ): Promise<{
     synched: boolean
     }> => {
-
-    // init refresh dependent params
-    let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
-    if( hardRefresh ){
-      const hardGapLimit  = 10
-      startingExtIndex = 0
-      closingExtIndex = this.nextFreeAddressIndex + hardGapLimit
-      startingIntIndex = 0
-      closingIntIndex = this.nextFreeChangeAddressIndex + hardGapLimit
-    }
-    else {
-      const softGapLimit = 5
-      startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
-      closingExtIndex = this.nextFreeAddressIndex + softGapLimit
-      startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
-      closingIntIndex = this.nextFreeChangeAddressIndex + softGapLimit
-    }
-
     const accounts = {
     }
     const accountsTemp: {
@@ -672,6 +654,22 @@ export default class SecureHDWallet extends Bitcoin {
       if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
         nextFreeChangeAddressIndex = 0
 
+      // init refresh dependent params
+      let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+      if( hardRefresh ){
+        const hardGapLimit  = 10
+        startingExtIndex = 0
+        closingExtIndex = nextFreeAddressIndex + hardGapLimit
+        startingIntIndex = 0
+        closingIntIndex = nextFreeChangeAddressIndex + hardGapLimit
+      }
+      else {
+        const softGapLimit = 5
+        startingExtIndex = nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+        closingExtIndex = nextFreeAddressIndex + softGapLimit
+        startingIntIndex = nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+        closingIntIndex = nextFreeChangeAddressIndex + softGapLimit
+      }
 
       const externalAddresses :{[address: string]: number}  = {
       }
@@ -722,7 +720,12 @@ export default class SecureHDWallet extends Bitcoin {
       let cachedUTXOs =  [  ]
       if( confirmedUTXOs ) cachedUTXOs.push( confirmedUTXOs )
       if( unconfirmedUTXOs ) cachedUTXOs.push( unconfirmedUTXOs )
-      let cachedTxs = transactions
+      let cachedTxs = transactions? transactions: {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      }
       let cachedTxIdMap = txIdMap? txIdMap: {
       }
       let cachedAQL =  addressQueryList? addressQueryList: {

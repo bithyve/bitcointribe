@@ -221,7 +221,6 @@ export default class Bitcoin {
           for ( const addressSpecificUTXOs of Utxos ) {
             for ( const utxo of addressSpecificUTXOs ) {
               const { value, Address, status, vout, txid } = utxo
-
               let include = true
               UTXOs.forEach( ( utxo ) => {
                 if( utxo.txId === txid ) {
@@ -256,7 +255,7 @@ export default class Bitcoin {
             continue
           }
 
-          if ( utxo.status.confirmed ) balances.balance += utxo.value
+          if ( utxo.status && utxo.status.confirmed ) balances.balance += utxo.value
           else if (
             internalAddressSet[ utxo.address ] !== undefined
           )

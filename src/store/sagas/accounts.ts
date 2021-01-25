@@ -303,8 +303,8 @@ export const fetchBalanceTxWatcher = createWatcher(
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   let { serviceType, accountNumber, accountType, hardRefresh } = payload
+
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
-  if( accountType=='SERVICE' ) accountType='WYRE'
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
 
   if ( !accountNumber ) accountNumber = 1
@@ -319,38 +319,20 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     throw new Error( 'Following derivative account does not exists' )
   }
 
-  const preFetchBalances =
-    derivativeAccounts[ accountType ][ accountNumber ].balances
-  const preFetchTransactions =
-    derivativeAccounts[ accountType ][ accountNumber ].transactions
-
   const accountsInfo = [ {
     accountType,
     accountNumber
   } ]
+
   const res = yield call(
     ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
     accountsInfo,
     hardRefresh
   )
 
-  const postFetchBalances =
-    res.status === 200 ? res.data.balances : preFetchBalances
-  const postFetchTransactions =
-    res.status === 200 ? res.data.transactions : preFetchTransactions
-
   if (
-    res.status === 200 &&
-    JSON.stringify( {
-      preFetchBalances, preFetchTransactions
-    } ) !==
-      JSON.stringify( {
-        postFetchBalances, postFetchTransactions
-      } )
+    res.status === 200
   ) {
-    console.log( {
-      balanceTx: res.data
-    } )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
