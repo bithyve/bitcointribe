@@ -155,6 +155,7 @@ const styles = StyleSheet.create( {
     ...CardStyles.horizontalScrollViewCardContent,
     paddingVertical: 0,
     backgroundColor: 'transparent',
+    justifyContent: 'flex-start',
   },
 
   descriptionTextContainer: {
