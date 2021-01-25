@@ -1366,7 +1366,6 @@ export default class SecureHDWallet extends Bitcoin {
       derivativeInstance.confirmedUTXOs = updatedUTXOSet
     } else {
 
-
       // update primary utxo set and balance (test/reg)
       const updatedUTXOSet = []
       let consumedBalance = 0
@@ -1420,35 +1419,116 @@ export default class SecureHDWallet extends Bitcoin {
     this.updateQueryList( consumedUTXOs )
   }
 
-  private updateQueryList = ( consumedUTXOs: InputUTXOs[] ) => {
+  private updateQueryList = ( consumedUTXOs: {[txid: string]: InputUTXOs}, derivativeAccountDetails?: { type: string; number: number }  ) => {
     // updates query list with out of bound(lower bound) external/internal addresses
     const softGapLimit = 5
-    const startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
-    const startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
 
-    for( const consumedUTXO of consumedUTXOs ){
-      let found = false
-      // is out of bound external address?
-      if( startingExtIndex )
-        for ( let itr = 0; itr < startingExtIndex; itr++ ) {
-          const { address } = this.createSecureMultiSig( itr )
-          if( consumedUTXO.address === address ){
-            this.addressQueryList.external[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) ext address
-            found = true
-            break
-          }
-        }
+    if ( derivativeAccountDetails ) {
+      const derivativeInstance: DerivativeAccountElements = this.derivativeAccounts[
+        derivativeAccountDetails.type
+      ][ derivativeAccountDetails.number ]
 
-      // is out of bound internal address?
-      if( startingIntIndex && !found )
-        for ( let itr = 0; itr < startingIntIndex; itr++ ) {
-          const { address } = this.createSecureMultiSig( itr, true )
-          if( consumedUTXO.address === address ){
-            this.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
-            break
+      // updates query list(derv) with out of bound(lower bound) external/internal addresses
+      const startingExtIndex = derivativeInstance.nextFreeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeAddressIndex - softGapLimit : 0
+      const startingIntIndex = derivativeInstance.nextFreeChangeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeChangeAddressIndex - softGapLimit : 0
+
+      for( const consumedUTXO of Object.values( consumedUTXOs ) ){
+        let found = false
+        // is out of bound external address?
+        if( startingExtIndex )
+          for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+            const { address } = this.createSecureMultiSig( itr )
+            if( consumedUTXO.address === address ){
+              derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
+              found = true
+              break
+            }
           }
-        }
+
+        // is out of bound internal address?
+        if( startingIntIndex && !found )
+          for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+            const { address } = this.createSecureMultiSig( itr, true )
+            if( consumedUTXO.address === address ){
+              derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+              break
+            }
+          }
+      }
+    } else {
+      // updates query list(primary: reg/test) with out of bound(lower bound) external/internal addresses
+      const startingExtIndex = this.nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+      const startingIntIndex = this.nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+
+      for( const consumedUTXO of Object.values( consumedUTXOs ) ){
+        let found = false
+        // is out of bound external address?
+        if( startingExtIndex )
+          for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+            const { address } = this.createSecureMultiSig( itr )
+            if( consumedUTXO.address === address ){
+              this.addressQueryList.external[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) ext address
+              found = true
+              break
+            }
+          }
+
+        // is out of bound internal address?
+        if( startingIntIndex && !found )
+          for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+            const { address } = this.createSecureMultiSig( itr, true )
+            if( consumedUTXO.address === address ){
+              this.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+              break
+            }
+          }
+
+        if( !found )
+        // updates query list(derivative) with out of bound(lower bound) external/internal addresses
+          for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
+            const derivativeAccount = this.derivativeAccounts[ dAccountType ]
+            if ( derivativeAccount.instance.using ) {
+              for (
+                let accountNumber = 1;
+                accountNumber <= derivativeAccount.instance.using;
+                accountNumber++
+              ) {
+                const derivativeInstance: DerivativeAccountElements = derivativeAccount[ accountNumber ]
+
+                const startingExtIndex = derivativeInstance.nextFreeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeAddressIndex - softGapLimit : 0
+                const startingIntIndex = derivativeInstance.nextFreeChangeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeChangeAddressIndex - softGapLimit : 0
+
+                for( const consumedUTXO of Object.values( consumedUTXOs ) ){
+                  let found = false
+                  // is out of bound external address?
+                  if( startingExtIndex )
+                    for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+                      const { address } = this.createSecureMultiSig( itr )
+                      if( consumedUTXO.address === address ){
+                        derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
+                        found = true
+                        break
+                      }
+                    }
+
+                  // is out of bound internal address?
+                  if( startingIntIndex && !found )
+                    for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+                      const { address } = this.createSecureMultiSig( itr, true )
+                      if( consumedUTXO.address === address ){
+                        derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+                        break
+                      }
+                    }
+
+                  if( found ) break
+                }
+              }
+            }
+          }
+      }
     }
+
   }
 
   public sortOutputs = async (
