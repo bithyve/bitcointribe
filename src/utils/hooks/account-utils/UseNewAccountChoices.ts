@@ -96,7 +96,7 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Wyre Account',
-          defaultDescription: 'Bought using Apple Pay / Credit Card',
+          defaultDescription: 'Bought using ApplePay/Debit Card',
           serviceAccountKind: ServiceAccountKind.WYRE,
         } ),
         new ExternalServiceSubAccountInfo( {
