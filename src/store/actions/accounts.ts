@@ -348,7 +348,7 @@ export const remapAccountShells = ( services ) => {
 
 export const refreshAccountShell = (
   shell: AccountShell,
-  options?: { autoSync?: boolean }
+  options: { autoSync?: boolean, hardRefresh?: boolean }
 ) => {
   return {
     type: REFRESH_ACCOUNT_SHELL, payload: {
