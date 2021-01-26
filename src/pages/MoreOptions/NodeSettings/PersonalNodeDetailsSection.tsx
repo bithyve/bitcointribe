@@ -8,6 +8,7 @@ import { Button, Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import Entypo from 'react-native-vector-icons/Entypo'
 import {
   widthPercentageToDP as wp,
@@ -49,48 +50,51 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
       </View>
 
       <View style={styles.bodySection}>
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          value={personalNode?.ipAddress || 'Your Node Address ex: http://11.22.33.44'}
-          numberOfLines={1}
-          disabled
-        />
+        <View style={{
+          marginBottom: 16
+        }}>
+          <Text style={{
+            ...HeadingStyles.labelText, marginBottom: 4
+          }}>
+            Node Address
+          </Text>
 
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          underlineColorAndroid={'transparent'}
-          value={String( personalNode?.portNumber || 'Port Number ex: 8003' )}
-          numberOfLines={1}
-          disabled
-        />
-      </View>
-
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {}}
-        style={styles.useFallbackTouchable}
-      >
-        <Text style={styles.useFallbackText}>
-                    Use BitHyve node as fallback
-        </Text>
-        <View style={styles.useFallbackCheckView}>
-          {personalNode?.useFallback && (
-            <Entypo
-              name="check"
-              size={RFValue( 17 )}
-              color={Colors.green}
-            />
-          )}
+          <Text numberOfLines={1}>{personalNode?.ipAddress || 'No Address Set'}</Text>
         </View>
-      </TouchableOpacity>
+
+        <View style={{
+          marginBottom: 8,
+        }}>
+          <Text style={{
+            ...HeadingStyles.labelText,
+            marginBottom: 4
+          }}>
+            Port Number
+          </Text>
+
+          <Text numberOfLines={1}>{String( personalNode?.portNumber || 'No Port Number Set' )}</Text>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={10}
+          onPress={() => {}}
+          style={styles.useFallbackTouchable}
+        >
+          <Text style={styles.useFallbackText}>
+          Use Hexa node as fallback
+          </Text>
+          <View style={styles.useFallbackCheckView}>
+            {personalNode?.useFallback && (
+              <Entypo
+                name="check"
+                size={RFValue( 17 )}
+                color={Colors.green}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+
+      </View>
 
     </View>
   )
@@ -101,7 +105,7 @@ const styles = StyleSheet.create( {
   },
 
   bodySection: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
     flex: 1,
   },
 
@@ -119,8 +123,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8,
     backgroundColor: Colors.backgroundColor1,
     alignItems: 'center',
-    paddingLeft: 35,
-    paddingRight: 35,
+    paddingLeft: 10,
+    paddingRight: 10,
     marginTop: 10,
     marginBottom: 10,
     height: wp( '13%' ),

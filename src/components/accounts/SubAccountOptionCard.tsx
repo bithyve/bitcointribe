@@ -92,7 +92,6 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         containerStyle={cardContainerStyle}
         wrapperStyle={styles.cardContentWrapper}
       >
-
         {specialTag && (
           <Card.Title
             style={styles.specialTagText}
@@ -136,6 +135,7 @@ const styles = StyleSheet.create( {
     ...StyleSheet.absoluteFillObject,
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
     overflow: 'hidden',
+    elevation: 1,
   },
 
   image: {
@@ -155,6 +155,8 @@ const styles = StyleSheet.create( {
     ...CardStyles.horizontalScrollViewCardContent,
     paddingVertical: 0,
     backgroundColor: 'transparent',
+    justifyContent: 'flex-start',
+    elevation: 2,
   },
 
   descriptionTextContainer: {
