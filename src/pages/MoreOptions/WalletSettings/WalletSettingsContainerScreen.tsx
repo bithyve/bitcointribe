@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Colors from '../../../common/Colors';
-import Fonts from '../../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import React from 'react'
+import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   navigation: any;
@@ -19,94 +19,101 @@ interface MenuOption {
   screenName?: string;
 }
 
-const versionString = `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuildNumber()})`;
+const versionString = `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuildNumber()})`
 
 const menuOptions: MenuOption[] = [
   {
     title: 'Manage Passcode',
     subtitle: 'Change your passcode',
-    imageSource: require('../../../assets/images/icons/managepin.png'),
+    imageSource: require( '../../../assets/images/icons/managepin.png' ),
     screenName: 'ManagePasscode',
   },
   {
     title: 'Change Currency',
     subtitle: 'Choose your currency',
-    imageSource: require('../../../assets/images/icons/country.png'),
+    imageSource: require( '../../../assets/images/icons/country.png' ),
     screenName: 'ChangeCurrency',
   },
+  /*
+  Commenting this option as this is not fully built yet
   {
     title: 'Version History',
     subtitle: 'Version History',
-    imageSource: require('../../../assets/images/icons/icon_versionhistory.png'),
+    imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
     screenName: 'VersionHistory',
   },
+  */
   {
     title: 'Hexa Release',
     subtitle: versionString,
-    imageSource: require('../../../assets/images/icons/settings.png'),
+    imageSource: require( '../../../assets/images/icons/settings.png' ),
   },
-];
+]
 
 
-const WalletSettingsContainerScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
+const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
-  function handleOptionSelection(menuOption: MenuOption) {
-    if (menuOption.screenName !== undefined) {
-      console.log("menuOption.screenName",menuOption.screenName);
-      navigation.navigate(menuOption.screenName);
+  function handleOptionSelection( menuOption: MenuOption ) {
+    if ( menuOption.screenName !== undefined ) {
+      console.log( 'menuOption.screenName', menuOption.screenName )
+      navigation.navigate( menuOption.screenName )
     }
   }
 
   return (
     <View style={styles.modalContainer}>
-      <ScrollView style={{ flex: 1 }}>
-        {menuOptions.map((menuOption) => {
+      <ScrollView style={{
+        flex: 1
+      }}>
+        {menuOptions.map( ( menuOption ) => {
           return (
             <AppBottomSheetTouchableWrapper
-              onPress={() => handleOptionSelection(menuOption)}
+              onPress={() => handleOptionSelection( menuOption )}
               style={styles.selectedContactsView}
             >
               <Image
                 source={menuOption.imageSource}
                 style={{
-                  width: widthPercentageToDP('7%'),
-                  height: widthPercentageToDP('7%'),
+                  width: widthPercentageToDP( '7%' ),
+                  height: widthPercentageToDP( '7%' ),
                   resizeMode: 'contain',
-                  marginLeft: widthPercentageToDP('3%'),
-                  marginRight: widthPercentageToDP('3%'),
+                  marginLeft: widthPercentageToDP( '3%' ),
+                  marginRight: widthPercentageToDP( '3%' ),
                 }}
               />
               <View
-                style={{ justifyContent: 'center', marginRight: 10, flex: 1 }}
+                style={{
+                  justifyContent: 'center', marginRight: 10, flex: 1
+                }}
               >
                 <Text style={styles.titleText}>{menuOption.title}</Text>
                 <Text style={styles.infoText}>{menuOption.subtitle}</Text>
               </View>
 
-              <View style={{ marginLeft: 'auto' }}>
+              <View style={{
+                marginLeft: 'auto'
+              }}>
                 {menuOption.screenName !== undefined && (
                   <Ionicons
                     name="ios-arrow-forward"
                     color={Colors.textColorGrey}
                     size={15}
                     style={{
-                      marginLeft: widthPercentageToDP('3%'),
-                      marginRight: widthPercentageToDP('3%'),
+                      marginLeft: widthPercentageToDP( '3%' ),
+                      marginRight: widthPercentageToDP( '3%' ),
                       alignSelf: 'center',
                     }}
                   />
                 )}
               </View>
             </AppBottomSheetTouchableWrapper>
-          );
-        })}
+          )
+        } )}
       </ScrollView>
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -124,16 +131,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   titleText: {
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,
   },
   infoText: {
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },
-});
+} )
 
-export default WalletSettingsContainerScreen;
+export default WalletSettingsContainerScreen
