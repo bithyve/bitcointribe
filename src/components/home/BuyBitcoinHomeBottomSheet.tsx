@@ -55,9 +55,10 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
       <ListItem
+        onPress={() => { onMenuItemSelected( menuItem ) }}
         containerStyle={ menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container }
         bottomDivider
-        onPress={() => { onMenuItemSelected( menuItem ) }}
+        onLongPress={() => { onMenuItemSelected( menuItem ) }}
         disabled={menuItem.disabled}
       >
         <Image
