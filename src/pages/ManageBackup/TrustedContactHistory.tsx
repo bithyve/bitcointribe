@@ -259,6 +259,7 @@ const TrustedContactHistory = (props) => {
   const renderTrustedContactsContent = useCallback(() => {
     return (
       <TrustedContacts
+        bottomsheetRef={trustedContactsBottomSheet as any}
         LoadContacts={LoadContacts}
         onPressBack={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
@@ -1095,7 +1096,7 @@ const TrustedContactHistory = (props) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+    <View style={{ height: '100%', backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
         style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
       />
@@ -1224,7 +1225,7 @@ const TrustedContactHistory = (props) => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={trustedContactsBottomSheet as any}
-        snapPoints={[-30, hp('85%')]}
+        snapPoints={[-30, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%')]}
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />

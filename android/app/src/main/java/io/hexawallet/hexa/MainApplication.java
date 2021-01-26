@@ -51,15 +51,9 @@ import org.unimodules.adapters.react.ReactModuleRegistryProvider;
 import org.unimodules.core.interfaces.SingletonModule;
 
 import java.util.List;
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
 
-import io.invertase.firebase.RNFirebasePackage;
-import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
-import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
-import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactInstanceManager;
@@ -92,11 +86,7 @@ public class MainApplication extends Application implements ShareApplication, Re
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
 
-            packages.add(new RNFirebaseMessagingPackage());
-            packages.add(new RNFirebaseAnalyticsPackage());
-            packages.add(new RNFirebaseNotificationsPackage());
             packages.add(new PdfPasswordPackage());
-
             // Add unimodules
             List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
                     new ModuleRegistryAdapter(mModuleRegistryProvider)
@@ -119,7 +109,6 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
         SoLoader.init(this, /* native exopackage */ false);
     }
 }

@@ -5,15 +5,14 @@ import {
   TrustedData,
   EphemeralDataElements,
   TrustedDataElements,
-  trustedChannelActions,
   ShareUploadables,
   MetaShare,
   EncDynamicNonPMDD,
 } from '../utilities/Interface'
 
 export default class TrustedContactsService {
-  public static fromJSON = (json: string) => {
-    const { tc } = JSON.parse(json)
+  public static fromJSON = ( json: string ) => {
+    const { tc } = JSON.parse( json )
     const {
       trustedContacts,
       skippedContactsCount,
@@ -22,27 +21,27 @@ export default class TrustedContactsService {
       skippedContactsCount: number;
     } = tc
 
-    return new TrustedContactsService({
+    return new TrustedContactsService( {
       trustedContacts,
       skippedContactsCount,
-    })
+    } )
   };
 
   public static encryptPub = (
     publicKey: string,
     key: string,
-  ): { encryptedPub: string } => TrustedContacts.encryptPub(publicKey, key);
+  ): { encryptedPub: string } => TrustedContacts.encryptPub( publicKey, key );
 
   public static decryptPub = (
     encryptedPub: string,
     key: string,
   ): {
     decryptedPub: string;
-  } => TrustedContacts.decryptPub(encryptedPub, key);
+  } => TrustedContacts.decryptPub( encryptedPub, key );
 
   public tc: TrustedContacts;
-  constructor(stateVars?) {
-    this.tc = new TrustedContacts(stateVars)
+  constructor( stateVars? ) {
+    this.tc = new TrustedContacts( stateVars )
   }
 
   public initializeContact = (
@@ -71,7 +70,7 @@ export default class TrustedContactsService {
           encKey,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -114,7 +113,7 @@ export default class TrustedContactsService {
           isGuardian,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -164,7 +163,7 @@ export default class TrustedContactsService {
           shareUploadables,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -204,7 +203,7 @@ export default class TrustedContactsService {
           publicKey,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -250,7 +249,7 @@ export default class TrustedContactsService {
           shareUploadables,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -286,7 +285,7 @@ export default class TrustedContactsService {
           contactsWalletName,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -335,7 +334,7 @@ export default class TrustedContactsService {
           metaSharesUnderCustody,
         ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -365,7 +364,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.syncLastSeens(),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
@@ -397,9 +396,9 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.syncTrustedChannels(contacts),
+        data: await this.tc.syncTrustedChannels( contacts ),
       }
-    } catch (err) {
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,

@@ -248,7 +248,7 @@ const SecurityQuestionHistory = (props) => {
                 {props.navigation.state.params.selectedTitle}
               </Text>
               <Text style={NavStyles.modalHeaderInfoText}>
-                Last backup{' '}
+              Last confirmed{' '}
                 <Text
                   style={{
                     fontFamily: Fonts.FiraSansMediumItalic,

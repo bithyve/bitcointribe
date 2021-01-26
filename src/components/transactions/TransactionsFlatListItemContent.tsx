@@ -1,89 +1,76 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
-import moment from 'moment';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { TransactionDetails } from '../../bitcoin/utilities/Interface';
-import { FAST_BITCOINS, SUB_PRIMARY_ACCOUNT } from '../../common/constants/serviceTypes';
-import { UsNumberFormat } from '../../common/utilities';
+import React, { useMemo } from 'react'
+import { StyleSheet } from 'react-native'
+import { ListItem, Icon } from 'react-native-elements'
+import TransactionKind from '../../common/data/enums/TransactionKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import moment from 'moment'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 
 export type Props = {
-  transaction: TransactionDetails;
+  transaction: TransactionDescribing;
+  bitcoinUnit?: BitcoinUnit;
+  currencyKind?: CurrencyKind | null;
 };
 
-const TransactionsFlatListItemContent: React.FC<Props> = ({
+const TransactionListItemContent: React.FC<Props> = ( {
   transaction,
-}: Props) => {
-  const transactionKindIconName = useMemo(() => {
-    return `long-arrow-${transaction.transactionType === 'Received' ? 'down' : 'up'}`;
-  }, [transaction.transactionType]);
+  bitcoinUnit = BitcoinUnit.SATS,
+  currencyKind = useCurrencyKind(),
+}: Props ) => {
+  const transactionKindIconName = useMemo( () => {
+    switch ( transaction.transactionType ) {
+        case TransactionKind.RECEIVE:
+          return 'long-arrow-down'
+        case TransactionKind.SEND:
+          return 'long-arrow-up'
+    }
+  }, [ transaction.transactionType ] )
 
-  const transactionKindIconColor = useMemo(() => {
-    return transaction.transactionType === 'Received' ? Colors.green : Colors.red;
-  }, [transaction.transactionType]);
+  const transactionKindIconColor = useMemo( () => {
+    switch ( transaction.transactionType ) {
+        case TransactionKind.RECEIVE:
+          return Colors.green
+        case TransactionKind.SEND:
+          return Colors.red
+    }
+  }, [ transaction.transactionType ] )
 
-
-  const amountTextStyle = useMemo(() => {
+  const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
-    };
-  }, [transaction.transactionType, transactionKindIconColor]);
-
-
-  const formattedDateText = useMemo(() => {
-    return moment(transaction.date).format('DD MMMM YYYY');
-  }, [transaction.date]);
-
-
-  const formattedConfirmationsText = useMemo(() => {
-    return transaction.accountType === 'Test Account' ?
-      transaction.confirmations < 6 ?
-        transaction.confirmations
-        // for testnet faucet tx
-        : transaction.confirmations === -1 ?
-          transaction.confirmations
-          : '6+'
-      : transaction.confirmations < 6 ?
-        transaction.confirmations
-        : '6+';
-  }, [transaction.confirmations]);
-
-
-  const messageText = useMemo(() => {
-    if (transaction.message && transaction.message.length > 0) {
-      return transaction.message;
     }
+  }, [ transaction.transactionType ] )
 
-    return transaction.accountType == FAST_BITCOINS ?
-    'FastBitcoins.com'
-    : transaction.accountType === SUB_PRIMARY_ACCOUNT ?
-    transaction.primaryAccType
-    : transaction.accountType
-  }, [transaction.accountType, transaction.message]);
+  const formattedDateText = useMemo( () => {
+    return moment( transaction.date ).format( 'DD MMMM YYYY' )
+  }, [ transaction.transactionType ] )
 
-
-  // const formattedAmountText = useFormattedAmountText(transaction.amount);
-  const formattedAmountText = useMemo(() => {
-    return UsNumberFormat(transaction.amount);
-  }, [transaction.amount]);
-
+  const confirmationsText = useMemo( () => {
+    return transaction.confirmations > 6 ?
+      '6+'
+      : `${transaction.confirmations}`
+  }, [ transaction.confirmations ] )
 
   return (
     <>
       <Icon
         style={styles.transactionKindIcon}
         name={transactionKindIconName}
-        type={"font-awesome"}
+        type={'font-awesome'}
         color={transactionKindIconColor}
         size={13}
       />
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          {messageText}
+          {transaction.accountType}
         </ListItem.Title>
         <ListItem.Subtitle style={styles.subtitleText}>
           {formattedDateText}
@@ -91,41 +78,44 @@ const TransactionsFlatListItemContent: React.FC<Props> = ({
       </ListItem.Content>
 
       <ListItem.Content style={styles.amountSection}>
-        <Image
-          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-          style={styles.bitcoinImage}
+        <LabeledBalanceDisplay
+          balance={transaction.amount}
+          bitcoinUnit={bitcoinUnit}
+          currencyKind={currencyKind}
+          amountTextStyle={amountTextStyle}
+          currencyImageStyle={styles.bitcoinImage}
+          iconSpacing={2}
+          bitcoinIconColor="gray"
+          textColor="gray"
         />
-        <ListItem.Title style={amountTextStyle}>{formattedAmountText}</ListItem.Title>
-        <ListItem.Subtitle
-          style={styles.confirmationsText}
-        >
-          {formattedConfirmationsText}
-        </ListItem.Subtitle>
       </ListItem.Content>
 
-      <ListItem.Chevron />
+      <ListItem.Content style={styles.confirmationsSection}>
+        <ListItem.Subtitle style={styles.confirmationsText}>
+          {confirmationsText}
+        </ListItem.Subtitle>
+      </ListItem.Content>
     </>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   transactionKindIcon: {
     marginRight: 14,
   },
 
   titleSection: {
     flex: 1,
-    paddingHorizontal: 10,
   },
 
   titleText: {
     color: Colors.blue,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginBottom: 2,
   },
 
   subtitleText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
   },
 
   bitcoinImage: {
@@ -133,7 +123,6 @@ const styles = StyleSheet.create({
     height: 12,
     resizeMode: 'contain',
     alignSelf: 'center',
-    marginRight: 5,
   },
 
   amountSection: {
@@ -141,20 +130,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    marginLeft: 16,
   },
 
-  amountText: {
-    fontFamily: Fonts.OpenSans,
-    fontSize: RFValue(17),
-    marginRight: 5,
+  confirmationsSection: {
+    flex: 0,
+    marginLeft: 4,
   },
 
   confirmationsText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginTop: RFValue( 4 ),
   },
-});
 
-export default TransactionsFlatListItemContent;
+  amountText: {
+    fontFamily: Fonts.OpenSans,
+    fontSize: RFValue( 17 ),
+  },
+} )
+
+export default TransactionListItemContent
