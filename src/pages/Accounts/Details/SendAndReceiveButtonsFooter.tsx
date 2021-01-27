@@ -97,7 +97,7 @@ const styles = StyleSheet.create( {
 
   buttonContainer: {
     minWidth: 150,
-    width: widthPercentageToDP( 50 ),
+    width: widthPercentageToDP( 42 ),
     maxWidth: 400,
     flexDirection: 'row',
     justifyContent: 'center',
