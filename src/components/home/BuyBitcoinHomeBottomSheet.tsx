@@ -4,6 +4,7 @@ import { ListItem } from 'react-native-elements'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import Colors from '../../common/Colors'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -54,24 +55,26 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
 
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
-      <ListItem
+      <TouchableOpacity
         onPress={() => { onMenuItemSelected( menuItem ) }}
-        containerStyle={ menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container }
-        bottomDivider
-        onLongPress={() => { onMenuItemSelected( menuItem ) }}
         disabled={menuItem.disabled}
       >
-        <Image
-          source={menuItem.imageSource}
-          style={ImageStyles.thumbnailImageMedium}
-          resizeMode="contain"
-        />
+        <ListItem
+          containerStyle={menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container}
+          bottomDivider
+        >
+          <Image
+            source={menuItem.imageSource}
+            style={ImageStyles.thumbnailImageMedium}
+            resizeMode="contain"
+          />
 
-        <ListItem.Content style={ListStyles.listItemContentContainer}>
-          <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : ListStyles.listItemTitle }>{menuItem.title}</ListItem.Title>
-          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
+          <ListItem.Content style={ListStyles.listItemContentContainer}>
+            <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : ListStyles.listItemTitle }>{menuItem.title}</ListItem.Title>
+            <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
+          </ListItem.Content>
+        </ListItem>
+      </TouchableOpacity>
     )
   }
 
