@@ -486,9 +486,9 @@ export default class HDSegwitWallet extends Bitcoin {
       }
       else {
         const softGapLimit = 5
-        startingExtIndex = nextFreeAddressIndex - softGapLimit >= 0? this.nextFreeAddressIndex - softGapLimit : 0
+        startingExtIndex = nextFreeAddressIndex - softGapLimit >= 0? nextFreeAddressIndex - softGapLimit : 0
         closingExtIndex = nextFreeAddressIndex + softGapLimit
-        startingIntIndex = nextFreeChangeAddressIndex - softGapLimit >= 0? this.nextFreeChangeAddressIndex - softGapLimit : 0
+        startingIntIndex = nextFreeChangeAddressIndex - softGapLimit >= 0? nextFreeChangeAddressIndex - softGapLimit : 0
         closingIntIndex = nextFreeChangeAddressIndex + softGapLimit
       }
 
@@ -1823,6 +1823,14 @@ export default class HDSegwitWallet extends Bitcoin {
           for ( let itr = 0; itr < startingExtIndex; itr++ ) {
             const address = this.getAddress( false, itr )
             if( consumedUTXO.address === address ){
+              if( !derivativeInstance.addressQueryList )
+              {
+                derivativeInstance.addressQueryList = {
+                  external: {
+                  }, internal: {
+                  }
+                }
+              }
               derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
               found = true
               break
@@ -1834,6 +1842,14 @@ export default class HDSegwitWallet extends Bitcoin {
           for ( let itr = 0; itr < startingIntIndex; itr++ ) {
             const address = this.getAddress( true, itr )
             if( consumedUTXO.address === address ){
+              if( !derivativeInstance.addressQueryList )
+              {
+                derivativeInstance.addressQueryList = {
+                  external: {
+                  }, internal: {
+                  }
+                }
+              }
               derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
               break
             }
@@ -1891,6 +1907,14 @@ export default class HDSegwitWallet extends Bitcoin {
                     for ( let itr = 0; itr < startingExtIndex; itr++ ) {
                       const address = this.getAddress( false, itr )
                       if( consumedUTXO.address === address ){
+                        if( !derivativeInstance.addressQueryList )
+                        {
+                          derivativeInstance.addressQueryList = {
+                            external: {
+                            }, internal: {
+                            }
+                          }
+                        }
                         derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
                         found = true
                         break
@@ -1902,6 +1926,14 @@ export default class HDSegwitWallet extends Bitcoin {
                     for ( let itr = 0; itr < startingIntIndex; itr++ ) {
                       const address = this.getAddress( true, itr )
                       if( consumedUTXO.address === address ){
+                        if( !derivativeInstance.addressQueryList )
+                        {
+                          derivativeInstance.addressQueryList = {
+                            external: {
+                            }, internal: {
+                            }
+                          }
+                        }
                         derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
                         break
                       }
