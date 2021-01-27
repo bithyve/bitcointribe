@@ -256,76 +256,30 @@ const VoucherScanner = ( props ) => {
   }, [ selectedAccount ] )
 
   useEffect( () => {
-    let regularBalance = accounts1[ REGULAR_ACCOUNT ].service
-      ? accounts1[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
-        accounts1[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-      : 0
+    if( accountShells ){
+      let regularBalance = 0
+      let secureBalance = 0
+      accountShells.forEach( ( shell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){ // out of box checking/savings acc
+          switch( shell.primarySubAccount.kind ){
+              case SubAccountKind.REGULAR_ACCOUNT:
+                regularBalance += AccountShell.getTotalBalance( shell )
+                break
 
-    // regular derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      const derivativeAccount =
-        accounts1[ REGULAR_ACCOUNT ].service.hdWallet.derivativeAccounts[
-          dAccountType
-        ]
-      if ( derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            regularBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
+              case SubAccountKind.SECURE_ACCOUNT:
+                secureBalance += AccountShell.getTotalBalance( shell )
+                break
           }
         }
-      }
+      } )
+
+      setBalances( {
+        regularBalance,
+        secureBalance,
+      } )
     }
 
-    let secureBalance = accounts1[ SECURE_ACCOUNT ].service
-      ? accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
-        accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.balances
-          .unconfirmedBalance
-      : 0
-
-    // secure derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      if ( dAccountType === TRUSTED_CONTACTS ) continue
-
-      const derivativeAccount =
-        accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.derivativeAccounts[
-          dAccountType
-        ]
-      if ( derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            secureBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    setBalances( {
-      regularBalance,
-      secureBalance,
-    } )
-  }, [ accounts1 ] )
+  }, [ accountShells ] )
 
   useEffect( () => {
     if ( voucherCode ) {
