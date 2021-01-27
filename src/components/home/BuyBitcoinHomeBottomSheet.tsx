@@ -39,11 +39,11 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: true
   },
   {
-    title: 'Buy using ApplePay or Debit Card',
+    title: 'Buy using ApplePay or Debit Card (COMING SOON)',
     subtitle: 'Powered by Wyre',
     kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-    disabled: false
+    imageSource: require( '../../assets/images/icons/wyre_notext_small_disabled.png' ),
+    disabled: true
   },
 ]
 
@@ -55,9 +55,10 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
       <ListItem
+        onPress={() => { onMenuItemSelected( menuItem ) }}
         containerStyle={ menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container }
         bottomDivider
-        onPress={() => { onMenuItemSelected( menuItem ) }}
+        onLongPress={() => { onMenuItemSelected( menuItem ) }}
         disabled={menuItem.disabled}
       >
         <Image

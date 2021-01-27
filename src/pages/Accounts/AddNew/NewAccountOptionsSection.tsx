@@ -123,20 +123,22 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 
           return (
             <View style={styles.cardShadowContainer}>
-              <View style={styles.cardRootContainer}>
-                <TouchableOpacity
-                  style={styles.cardTouchableContainer}
-                  onPress={() => onOptionSelected( subAccountInfo )}
-                  disabled={isDisabled}
-                >
-                  <SubAccountOptionCard
-                    subAccountInfo={subAccountInfo}
-                    isDisabled={isDisabled}
-                    isSelected={subAccountInfo.id == selectedChoice?.id}
-                    specialTag={specialTagForChoice( subAccountInfo )}
-                  />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={{
+                  ...styles.cardTouchableContainer,
+                  ...styles.cardRootContainer
+                }}
+                onPress={() => onOptionSelected( subAccountInfo )}
+                disabled={isDisabled}
+                activeOpacity={1}
+              >
+                <SubAccountOptionCard
+                  subAccountInfo={subAccountInfo}
+                  isDisabled={isDisabled}
+                  isSelected={subAccountInfo.id == selectedChoice?.id}
+                  specialTag={specialTagForChoice( subAccountInfo )}
+                />
+              </TouchableOpacity>
             </View>
           )
         }}
@@ -168,7 +170,6 @@ const styles = StyleSheet.create( {
     flex: 1,
     width: widthPercentageToDP( 34 ),
     minWidth: 120,
-    marginLeft: 4,
   },
 
   cardTouchableContainer: {
@@ -176,6 +177,7 @@ const styles = StyleSheet.create( {
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
     backgroundColor: 'white',
     overflow: 'hidden',
+    marginLeft: 4,
   },
 } )
 
