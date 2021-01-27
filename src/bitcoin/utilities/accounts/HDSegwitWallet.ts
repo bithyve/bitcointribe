@@ -1816,21 +1816,22 @@ export default class HDSegwitWallet extends Bitcoin {
       const startingExtIndex = derivativeInstance.nextFreeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeAddressIndex - softGapLimit : 0
       const startingIntIndex = derivativeInstance.nextFreeChangeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeChangeAddressIndex - softGapLimit : 0
 
+      if( !derivativeInstance.addressQueryList )
+      {
+        derivativeInstance.addressQueryList = {
+          external: {
+          }, internal: {
+          }
+        }
+      }
+
       for( const consumedUTXO of Object.values( consumedUTXOs ) ){
         let found = false
         // is out of bound external address?
         if( startingExtIndex )
           for ( let itr = 0; itr < startingExtIndex; itr++ ) {
-            const address = this.getAddress( false, itr )
+            const address = this.getAddress( false, itr, derivativeInstance.xpub )
             if( consumedUTXO.address === address ){
-              if( !derivativeInstance.addressQueryList )
-              {
-                derivativeInstance.addressQueryList = {
-                  external: {
-                  }, internal: {
-                  }
-                }
-              }
               derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
               found = true
               break
@@ -1840,17 +1841,10 @@ export default class HDSegwitWallet extends Bitcoin {
         // is out of bound internal address?
         if( startingIntIndex && !found )
           for ( let itr = 0; itr < startingIntIndex; itr++ ) {
-            const address = this.getAddress( true, itr )
+            const address = this.getAddress( true, itr, derivativeInstance.xpub )
             if( consumedUTXO.address === address ){
-              if( !derivativeInstance.addressQueryList )
-              {
-                derivativeInstance.addressQueryList = {
-                  external: {
-                  }, internal: {
-                  }
-                }
-              }
               derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+              found = true
               break
             }
           }
@@ -1880,6 +1874,7 @@ export default class HDSegwitWallet extends Bitcoin {
             const address = this.getAddress( true, itr )
             if( consumedUTXO.address === address ){
               this.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+              found = true
               break
             }
           }
@@ -1900,52 +1895,43 @@ export default class HDSegwitWallet extends Bitcoin {
                 const startingExtIndex = derivativeInstance.nextFreeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeAddressIndex - softGapLimit : 0
                 const startingIntIndex = derivativeInstance.nextFreeChangeAddressIndex - softGapLimit >= 0? derivativeInstance.nextFreeChangeAddressIndex - softGapLimit : 0
 
-                for( const consumedUTXO of Object.values( consumedUTXOs ) ){
-                  let found = false
-                  // is out of bound external address?
-                  if( startingExtIndex )
-                    for ( let itr = 0; itr < startingExtIndex; itr++ ) {
-                      const address = this.getAddress( false, itr )
-                      if( consumedUTXO.address === address ){
-                        if( !derivativeInstance.addressQueryList )
-                        {
-                          derivativeInstance.addressQueryList = {
-                            external: {
-                            }, internal: {
-                            }
-                          }
-                        }
-                        derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
-                        found = true
-                        break
-                      }
+                if( !derivativeInstance.addressQueryList )
+                {
+                  derivativeInstance.addressQueryList = {
+                    external: {
+                    }, internal: {
                     }
-
-                  // is out of bound internal address?
-                  if( startingIntIndex && !found )
-                    for ( let itr = 0; itr < startingIntIndex; itr++ ) {
-                      const address = this.getAddress( true, itr )
-                      if( consumedUTXO.address === address ){
-                        if( !derivativeInstance.addressQueryList )
-                        {
-                          derivativeInstance.addressQueryList = {
-                            external: {
-                            }, internal: {
-                            }
-                          }
-                        }
-                        derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
-                        break
-                      }
-                    }
-
-                  if( found ) break
+                  }
                 }
+
+                // is out of bound external address?
+                if( startingExtIndex )
+                  for ( let itr = 0; itr < startingExtIndex; itr++ ) {
+                    const address = this.getAddress( false, itr, derivativeInstance.xpub )
+                    if( consumedUTXO.address === address ){
+                      derivativeInstance.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
+                      found = true
+                      break
+                    }
+                  }
+
+                // is out of bound internal address?
+                if( startingIntIndex && !found )
+                  for ( let itr = 0; itr < startingIntIndex; itr++ ) {
+                    const address = this.getAddress( true, itr, derivativeInstance.xpub )
+                    if( consumedUTXO.address === address ){
+                      derivativeInstance.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
+                      found = true
+                      break
+                    }
+                  }
+
+                if( found ) break
               }
             }
+            if( found ) break
           }
       }
-
     }
   }
 
