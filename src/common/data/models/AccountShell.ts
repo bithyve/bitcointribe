@@ -31,7 +31,17 @@ export default class AccountShell {
    */
   unit: BitcoinUnit;
 
-  isSyncInProgress = false;
+  /**
+   * Indicates if the accounts in the shell are fetching balances and transactions.
+   * A loader is displayed on the account screen when this is in progress
+   */
+  isSyncInProgress: boolean | false;
+
+  /**
+   * Indicates if the account has completed syncing this happens once per session.
+   * A sync icon is diplayed on the home screen tile if this has not be done
+   */
+  hasAccountSyncCompleted: boolean | false;
 
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };

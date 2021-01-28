@@ -1,6 +1,7 @@
 import { Action } from 'redux'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { paymentDetailsFetched } from './trustedContacts'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS'
@@ -17,6 +18,7 @@ export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX'
 export const FETCH_FEE_AND_EXCHANGE_RATES = 'FETCH_FEE_AND_EXCHANGE_RATES'
 export const STARTUP_SYNC = 'STARTUP_SYNC'
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
+export const CLEAR_ACCOUNT_SYNC_CACHE = 'CLEAR_ACCOUNT_SYNC_CACHE'
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
@@ -185,6 +187,13 @@ export const startupSync = ( restore? ) => {
     type: STARTUP_SYNC, payload: {
       restore
     }
+  }
+}
+
+// To reset hasAccountSyncCompleted status of all shells
+export const clearAccountSyncCache = () => {
+  return {
+    type: CLEAR_ACCOUNT_SYNC_CACHE
   }
 }
 

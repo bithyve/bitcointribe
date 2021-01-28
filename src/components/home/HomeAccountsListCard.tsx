@@ -13,7 +13,7 @@ import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/Use
 import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-
+import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 
 export type Props = {
   accountShell: AccountShell;
@@ -34,6 +34,10 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, }: HeaderProps ) 
 
   return (
     <View style={styles.headerSectionContainer}>
+      <Image
+        style={styles.headerAccountSync}
+        source={getAccountSyncIcon( accountShell.hasAccountSyncCompleted )}
+      />
       <Image
         style={styles.headerAccountImage}
         source={getAvatarForSubAccount( primarySubAccount )}
@@ -122,9 +126,20 @@ const styles = StyleSheet.create( {
     alignItems: 'flex-start',
   },
 
+  headerAccountSync: {
+    width: widthPercentageToDP( 4 ),
+    height: widthPercentageToDP( 4 ),
+    marginRight: widthPercentageToDP( -2 ),
+    marginBottom: widthPercentageToDP( -2 ),
+    marginLeft: widthPercentageToDP( -2 ),
+    marginTop: widthPercentageToDP( -1.7 )
+  },
+
   headerAccountImage: {
     width: widthPercentageToDP( 10 ),
     height: widthPercentageToDP( 10 ),
+    marginTop: 0
+
   },
 
   headerBadgeContainer: {

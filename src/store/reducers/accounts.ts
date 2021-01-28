@@ -38,6 +38,7 @@ import {
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
   ACCOUNT_SHELL_REFRESH_COMPLETED,
   REFRESH_ACCOUNT_SHELL,
+  CLEAR_ACCOUNT_SYNC_CACHE,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
@@ -779,10 +780,23 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ( shell ) => shell.id == action.payload.id
         ).isSyncInProgress = false
 
+        // Updating Account Sync State to shell data model
+        // This will be used to display sync icon on Home Screen
+        state.accountShells.find(
+          ( shell ) => shell.id == action.payload.id
+        ).hasAccountSyncCompleted = true
         return {
           ...state,
         }
 
+      case CLEAR_ACCOUNT_SYNC_CACHE:
+        // This will clear the sync state at the start of each login session
+        // This is required in order to ensure sync icon is shown again for each session
+        state.accountShells.map(
+          ( shell ) => shell.hasAccountSyncCompleted = false )
+        return {
+          ...state,
+        }
       default:
         return state
   }

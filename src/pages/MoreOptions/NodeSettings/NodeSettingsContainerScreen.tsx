@@ -38,7 +38,6 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     // resets personal node preference if there's no active personal node
     if( nodeSettingsState.prefersPersonalNodeConnection && !activePersonalNode )
       dispatch( personalNodePreferenceToggled( false ) )
-    
   }, [] )
 
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )

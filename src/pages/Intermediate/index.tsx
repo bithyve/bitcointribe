@@ -5,7 +5,9 @@ import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
 import { updateLastSeen } from '../../store/actions/preferences'
-var imageBackground = require('../../assets/images/intermediate-bg.png')
+// imageBackground has been replaced with a white image as this
+// could be identified as actually being used in the app
+const imageBackground = require( '../../assets/images/intermediate-bg.png' )
 
 
 
@@ -24,96 +26,99 @@ interface IntermediateStateTypes {
 
 
 class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTypes> {
-    constructor(props) {
-        super(props)
-        this.state = {
-            isLocked: false,
-            canLock: true
-        }
+  constructor( props ) {
+    super( props )
+    this.state = {
+      isLocked: false,
+      canLock: true
     }
+  }
 
     componentDidMount = () => {
-        AppState.addEventListener("change", this.handleAppStateChange);
-        // this.handleLockCheck()
-        this.props.updateLastSeen()
+      AppState.addEventListener( 'change', this.handleAppStateChange )
+      // this.handleLockCheck()
+      this.props.updateLastSeen()
     };
 
 
 
     handleLockCheck = () => {
-        let interval = setInterval(() => {
-            // check if it should be rendered
-            const TIME_OUT = 15000
-            let now: any = new Date()
-            let diff = Math.abs(now - this.props.lastSeen)
-            const { canLock } = this.state
-            if (diff > TIME_OUT) {
-                if (canLock) {
-                    this.setState({
-                        canLock: false
-                    }, () => {
-                        this.props.navigation.push('ReLogin')
-                        clearInterval(interval)
-                    })
-                }
-            } else {
-                this.props.navigation.pop()
-                this.props.updateLastSeen()
-            }
-        }, 3000)
+      const interval = setInterval( () => {
+        // check if it should be rendered
+        const TIME_OUT = 15000
+        const now: any = new Date()
+        const diff = Math.abs( now - this.props.lastSeen )
+        const { canLock } = this.state
+        if ( diff > TIME_OUT ) {
+          if ( canLock ) {
+            this.setState( {
+              canLock: false
+            }, () => {
+              this.props.navigation.push( 'ReLogin' )
+              clearInterval( interval )
+            } )
+          }
+        } else {
+          this.props.navigation.pop()
+          this.props.updateLastSeen()
+        }
+      }, 3000 )
     }
 
 
-    handleAppStateChange = async (nextAppState) => {
-        const TIME_OUT = 15000
-        if ((Platform.OS === 'ios' && nextAppState === 'active') || (Platform.OS === 'android' && nextAppState === 'background')) {
-            let now: any = new Date()
-            let diff = Math.abs(now - this.props.lastSeen)
-            const { canLock } = this.state
-            if (diff > TIME_OUT) {
-                if (canLock) {
-                    this.setState({
-                        canLock: false
-                    }, () => this.props.navigation.push('ReLogin'))
-                }
-            } else {
-                this.props.navigation.pop()
-                this.props.updateLastSeen(new Date())
-            }
+    handleAppStateChange = async ( nextAppState ) => {
+      const TIME_OUT = 15000
+      if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
+        const now: any = new Date()
+        const diff = Math.abs( now - this.props.lastSeen )
+        const { canLock } = this.state
+        if ( diff > TIME_OUT ) {
+          if ( canLock ) {
+            this.setState( {
+              canLock: false
+            }, () => this.props.navigation.push( 'ReLogin' ) )
+          }
+        } else {
+          this.props.navigation.pop()
+          this.props.updateLastSeen( new Date() )
         }
-
+      }
     };
 
 
     componentWillUnmount() {
-        AppState.removeEventListener("change", this.handleAppStateChange);
+      AppState.removeEventListener( 'change', this.handleAppStateChange )
     }
 
 
     render() {
-        return (
-            <ImageBackground source={imageBackground} style={styles.wrapper}>
-                <Loader isLoading={true}/>
-            </ImageBackground>
-        )
+      return (
+        <ImageBackground source={imageBackground} style={styles.wrapper}>
+          <Loader isLoading={true}/>
+        </ImageBackground>
+      )
     }
 }
 
 
 
 
-const styles = StyleSheet.create({
-    wrapper: {
-        flex: 1,
-        backgroundColor: 'white',
-        resizeMode: 'contain'
-    }
-})
+const styles = StyleSheet.create( {
+  wrapper: {
+    flex: 1,
+    backgroundColor: 'white',
+    resizeMode: 'contain'
+  }
+} )
 
 
 
-const mapStateToProps = (state) => {
-    return { applicationStatus: state.preferences.applicationStatus, lastSeen: state.preferences.lastSeen }
+const mapStateToProps = ( state ) => {
+  return {
+    applicationStatus: state.preferences.applicationStatus, lastSeen: state.preferences.lastSeen
+  }
 }
 
-export default connect(mapStateToProps, { updateLastSeen })(withNavigationFocus(Intermediate))
+export default connect( mapStateToProps, {
+  updateLastSeen
+} )( withNavigationFocus( Intermediate ) )
