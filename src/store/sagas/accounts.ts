@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects'
+import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
   FETCH_TRANSACTIONS,
@@ -47,13 +47,16 @@ import {
   accountShellMergeSucceeded,
   accountShellMergeFailed,
   REFRESH_ACCOUNT_SHELL,
+  AUTO_SYNC_SHELLS,
   accountShellOrderedToFront,
   accountShellRefreshCompleted,
+  accountShellRefreshStarted,
   FETCH_FEE_AND_EXCHANGE_RATES,
   exchangeRatesCalculated,
   setAverageTxFee,
   VALIDATE_TWO_FA,
   twoFAValid,
+  clearAccountSyncCache,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -80,7 +83,10 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SyncStatus from '../../common/data/enums/SyncStatus'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
+
+const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -1101,6 +1107,7 @@ export const updateDonationPreferencesWatcher = createWatcher(
 
 function* refreshAccountShellWorker( { payload } ) {
   const shell: AccountShell = payload.shell
+  yield put( accountShellRefreshStarted( shell ) )
   const { primarySubAccount } = shell
   const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
 
@@ -1194,6 +1201,32 @@ function* refreshAccountShellWorker( { payload } ) {
 export const refreshAccountShellWatcher = createWatcher(
   refreshAccountShellWorker,
   REFRESH_ACCOUNT_SHELL
+)
+
+function* autoSyncShellsWorker( { payload } ) {
+  yield call( clearAccountSyncCache )
+  const shells = yield select(
+    ( state ) => state.accounts.accountShells
+  )
+  for( const shell of shells )  {
+    yield call( delay, 5000 )
+    if( shell.syncStatus===SyncStatus.PENDING ) {
+      yield spawn( refreshAccountShellWorker,
+        {
+          payload: {
+            shell: shell,
+            options: {
+              autoSync: true
+            }
+          }
+        }
+      )
+    }
+  }
+}
+export const autoSyncShellsWatcher = createWatcher(
+  autoSyncShellsWorker,
+  AUTO_SYNC_SHELLS
 )
 
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {

@@ -16,6 +16,7 @@ export const CLEAR_TRANSFER = 'CLEAR_TRANSFER'
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX'
 export const FETCH_FEE_AND_EXCHANGE_RATES = 'FETCH_FEE_AND_EXCHANGE_RATES'
 export const CLEAR_ACCOUNT_SYNC_CACHE = 'CLEAR_ACCOUNT_SYNC_CACHE'
+export const AUTO_SYNC_SHELLS = 'AUTO_SYNC_SHELLS'
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
@@ -45,6 +46,7 @@ export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
 export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
+export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 
 export const fetchTransactions = ( serviceType, service? ) => {
@@ -179,10 +181,33 @@ export const accumulativeBalAndTx = () => {
   }
 }
 
-// To reset hasAccountSyncCompleted status of all shells
+export const startupSync = ( restore? ) => {
+  return {
+    type: STARTUP_SYNC, payload: {
+      restore
+    }
+  }
+}
+
+// To reset shell account sync status of all shells
 export const clearAccountSyncCache = () => {
   return {
     type: CLEAR_ACCOUNT_SYNC_CACHE
+  }
+}
+
+// This is called once per login to automatically sync balances and
+// transactions of all shells
+export const autoSyncShells = () => {
+  return {
+    type: AUTO_SYNC_SHELLS
+  }
+}
+export const syncAccounts = ( restore? ) => {
+  return {
+    type: SYNC_ACCOUNTS, payload: {
+      restore
+    }
   }
 }
 
@@ -361,6 +386,13 @@ export const refreshAccountShell = (
 export const accountShellRefreshCompleted = ( payload: AccountShell ) => {
   return {
     type: ACCOUNT_SHELL_REFRESH_COMPLETED,
+    payload,
+  }
+}
+
+export const accountShellRefreshStarted = ( payload: AccountShell ) => {
+  return {
+    type: ACCOUNT_SHELL_REFRESH_STARTED,
     payload,
   }
 }

@@ -65,6 +65,7 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
+  autoSyncShellsWatcher
 } from './sagas/accounts'
 
 import {
@@ -168,6 +169,7 @@ const rootSaga = function* () {
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
+    autoSyncShellsWatcher,
 
     // sss watchers
     initHCWatcher,

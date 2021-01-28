@@ -6,6 +6,7 @@ import SubAccountDescribing from './SubAccountInfo/Interfaces'
 import { Satoshis } from '../typealiases/UnitAliases'
 import TransactionDescribing from './Transactions/Interfaces'
 import { Balances } from '../../../bitcoin/utilities/Interface'
+import SyncStatus from '../enums/SyncStatus'
 
 type ConstructorProps = {
   displayOrder?: number | null;
@@ -41,7 +42,7 @@ export default class AccountShell {
    * Indicates if the account has completed syncing this happens once per session.
    * A sync icon is diplayed on the home screen tile if this has not be done
    */
-  hasAccountSyncCompleted: boolean | false;
+  syncStatus: SyncStatus | null;
 
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };
@@ -67,6 +68,7 @@ export default class AccountShell {
 
     this.displayOrder = displayOrder
     this.unit = unit
+    this.syncStatus = SyncStatus.PENDING
   }
 
   static getUTXOCompatibilityGroup(
