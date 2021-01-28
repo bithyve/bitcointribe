@@ -61,7 +61,6 @@ import CustomBottomTabs, {
 } from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
-  fetchDerivativeAccBalTx,
   autoSyncShells
 } from '../../store/actions/accounts'
 import { trustedChannelActions } from '../../bitcoin/utilities/Interface'
@@ -160,7 +159,6 @@ interface HomePropsTypes {
   uploadRequestedShare: any;
   s3Service: any;
   overallHealth: any;
-  fetchDerivativeAccBalTx: any;
   autoSyncShells: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -2019,7 +2017,6 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    fetchDerivativeAccBalTx,
     autoSyncShells,
     addTransferDetails,
     clearPaymentDetails,

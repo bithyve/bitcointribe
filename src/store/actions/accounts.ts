@@ -181,14 +181,6 @@ export const accumulativeBalAndTx = () => {
   }
 }
 
-export const startupSync = ( restore? ) => {
-  return {
-    type: STARTUP_SYNC, payload: {
-      restore
-    }
-  }
-}
-
 // To reset shell account sync status of all shells
 export const clearAccountSyncCache = () => {
   return {
@@ -201,13 +193,6 @@ export const clearAccountSyncCache = () => {
 export const autoSyncShells = () => {
   return {
     type: AUTO_SYNC_SHELLS
-  }
-}
-export const syncAccounts = ( restore? ) => {
-  return {
-    type: SYNC_ACCOUNTS, payload: {
-      restore
-    }
   }
 }
 
