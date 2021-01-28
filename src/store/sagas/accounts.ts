@@ -125,9 +125,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
   const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet
 
-  console.log( {
-    derivativeAccounts 
-  } )
+  // console.log( { derivativeAccounts } )
   const res = yield call(
     service.getDerivativeAccAddress,
     accountType,
@@ -135,9 +133,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
     null, // contanct name is null(non-TC)
     accountName
   )
-  console.log( {
-    res 
-  } )
+  // console.log( { res } )
 
   if ( res.status === 200 ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
@@ -223,9 +219,7 @@ function* fetchBalanceTxWorker( { payload } ) {
   const res = yield call( service.getBalanceTransactions, {
     restore: payload.options.restore,
   } )
-  console.log( {
-    res 
-  } )
+  // console.log( { res } )
   const postFetchBalances =
     res.status === 200 ? JSON.stringify( res.data.balances ) : preFetchBalances
   const postFetchTransactions =
@@ -290,7 +284,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
+  // console.log( 'fetchDerivativeAccBalanceTxWorker ', payload )
   let { serviceType, accountNumber, accountType } = payload
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
 
@@ -332,9 +326,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
         postFetchBalances, postFetchTransactions 
       } )
   ) {
-    console.log( {
-      balanceTx: res.data 
-    } )
+    // console.log( { balanceTx: res.data } )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
@@ -575,9 +567,7 @@ export const processRecipients = async(
           )
         }
 
-        console.log( {
-          res 
-        } )
+        // console.log( { res } )
         if ( res.status === 200 ) {
           const receivingAddress = res.data.address
           recipient.address = receivingAddress
@@ -675,9 +665,7 @@ function* transferST2Worker( { payload } ) {
   )
   if ( res.status === 200 ) {
     if ( serviceType === SECURE_ACCOUNT ) {
-      console.log( {
-        res 
-      } )
+      // console.log( { res } )
       yield put( executedST2( serviceType, res.data ) )
     } else yield put( executedST2( serviceType, res.data.txid ) )
   } else {
@@ -808,9 +796,7 @@ function* testcoinsWorker( { payload } ) {
     ( state ) => state.accounts[ payload.serviceType ].service
   )
   const res = yield call( service.getTestcoins )
-  console.log( {
-    res 
-  } )
+  // console.log( { res } )
   if ( res.status === 200 ) {
     yield put( testcoinsReceived( payload.serviceType, service ) )
 
@@ -887,9 +873,7 @@ function* feeAndExchangeRatesWorker() {
 
   try {
     const res = yield call( RelayServices.fetchFeeAndExchangeRates )
-    console.log( {
-      res 
-    } )
+    console.log( { res } )
     if ( res.status === 200 ) {
       const { exchangeRates, averageTxFees } = res.data
 
@@ -1128,9 +1112,7 @@ function* setupDonationAccountWorker( { payload } ) {
   )
 
   if ( res.status === 200 ) {
-    console.log( {
-      res 
-    } )
+    console.log( { res } )
     const { setupSuccessful, accountId, accountNumber } = res.data
     if ( !setupSuccessful ) {
       yield put( settedDonationAccount( serviceType, false ) )

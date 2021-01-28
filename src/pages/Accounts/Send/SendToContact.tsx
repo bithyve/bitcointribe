@@ -237,9 +237,7 @@ class SendToContact extends Component<
 
     this.updateSpendableBalance()
     this.amountCalculation()
-    console.log( {
-      averageTxFees
-    } )
+    // console.log( { averageTxFees } )
   };
 
   updateSpendableBalance = () => {
