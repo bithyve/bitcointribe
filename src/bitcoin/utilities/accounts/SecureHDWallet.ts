@@ -13,7 +13,8 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccountElements,
-  SubPrimaryDerivativeAccount,
+  DerivativeAccount,
+  DerivativeAccountElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -1148,23 +1149,25 @@ export default class SecureHDWallet extends Bitcoin {
     let accountId: string
     let accountNumber: number
     switch ( accountType ) {
+        case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
-          const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+        case WYRE:
+          const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
-          const inUse = subPrimaryAccounts.instance.using
+          const inUse = derivativeAcc.instance.using
           accountNumber = inUse + 1
           this.generateDerivativeXpub( accountType, accountNumber )
-          const subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          const derivativeInstance: DerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
-          const updatedSubPrimInstance = {
-            ...subPrimInstance,
+          const updatedDervInstance = {
+            ...derivativeInstance,
             accountName: accountDetails.accountName,
             accountDescription: accountDetails.accountDescription,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber
-          ] = updatedSubPrimInstance
-          accountId = updatedSubPrimInstance.xpubId
+          ] = updatedDervInstance
+          accountId = updatedDervInstance.xpubId
           break
     }
 
