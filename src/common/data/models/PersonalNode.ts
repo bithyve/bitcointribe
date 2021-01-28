@@ -3,6 +3,7 @@ type PersonalNode = {
   ipAddress: string | null;
   portNumber: number | null;
   urlPath: string | null;
+  useFallback: boolean | null;
 };
 
 

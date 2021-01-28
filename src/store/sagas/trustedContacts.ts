@@ -56,7 +56,7 @@ import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
-  if ( recipient.walletID && recipient.FCMs.length )
+  if ( recipient.walletID )
     receivers.push( {
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,

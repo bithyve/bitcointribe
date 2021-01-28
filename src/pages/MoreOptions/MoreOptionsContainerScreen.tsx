@@ -26,16 +26,21 @@ const menuOptions: MenuOption[] = [
     subtitle: 'View and manage your accounts',
     screenName: 'AccountManagement',
   },
+  /*
+  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+  leaving the option here so that it can be enabled in a future release.
+
   {
     title: 'Friends and Family',
     imageSource: require( '../../assets/images/icons/addressbook.png' ),
     subtitle: 'View and manage your contacts',
     screenName: 'FriendsAndFamily',
   },
+  */
   {
     title: 'Node Settings',
     imageSource: require( '../../assets/images/icons/own-node.png' ),
-    subtitle: 'Connect Hexa with your own Bitcoin Node',
+    subtitle: 'Connect Hexa wallet to your own Bitcoin node',
     screenName: 'NodeSettings',
   },
   {

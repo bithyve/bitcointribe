@@ -1,11 +1,10 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { Button } from 'react-native-elements'
 import Colors from '../../../common/Colors'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
 
 export type Props = {
   onConfirmPressed: () => void;
@@ -28,7 +27,7 @@ const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPr
 
         <View style={styles.headerSection}>
           <Text style={BottomSheetStyles.confirmationMessageHeading}>
-            Successfully connected to BitHyve's node
+            Successfully connected to Hexa node
           </Text>
         </View>
 
@@ -46,13 +45,12 @@ const BitHyveNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPr
 
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="OK"
-            titleStyle={ButtonStyles.actionButtonText}
+          <TouchableOpacity
             onPress={onConfirmPressed}
-          />
+            style={ButtonStyles.primaryActionButton}
+          >
+            <Text style={ButtonStyles.actionButtonText}>OK</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -89,7 +87,6 @@ const styles = StyleSheet.create( {
   },
 
   actionButtonContainer: {
-    marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },

@@ -12,10 +12,9 @@ import {
   AppState
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
-import AddModalContents from '../../components/AddModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
@@ -24,7 +23,6 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TRUSTED_CONTACTS,
   FAST_BITCOINS,
 } from '../../common/constants/serviceTypes'
 import { connect } from 'react-redux'
@@ -46,7 +44,7 @@ import { setCurrencyCode } from '../../store/actions/preferences'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
-import firebase from 'react-native-firebase'
+import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import Config from 'react-native-config'
@@ -90,9 +88,16 @@ const releaseNotificationTopic = getReleaseTopic()
 import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import messaging from '@react-native-firebase/messaging'
+import firebase from '@react-native-firebase/app'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
-
 
 export enum BottomSheetState {
   Closed,
@@ -100,7 +105,7 @@ export enum BottomSheetState {
 }
 
 export enum BottomSheetKind {
-  TAB_BAR_ADD_MENU,
+  TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
   CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
@@ -113,7 +118,7 @@ interface HomeStateTypes {
   notificationLoading: boolean;
   notificationData?: any[];
   CurrencyCode: string;
-  balances: any;
+  netBalance: number;
   selectedBottomTab: BottomTab | null;
 
   bottomSheetState: BottomSheetState;
@@ -137,7 +142,10 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
   exchangeRates?: any[];
+
   accountsState: AccountsState;
+  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -189,8 +197,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
-      balances: {
-      },
+      netBalance: 0,
       selectedBottomTab: null,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
@@ -483,40 +490,228 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-
   scheduleNotification = async () => {
-    const channelId = new firebase.notifications.Android.Channel(
-      'Default',
-      'Default',
-      firebase.notifications.Android.Importance.High,
-    )
-    firebase.notifications().android.createChannel( channelId )
-    const notification = new firebase.notifications.Notification()
-      .setTitle( 'We have not seen you in a while!' )
-      .setBody(
-        'Opening your app regularly ensures you get all the notifications and security updates',
-      )
-      .setNotificationId( '1' )
-      .setSound( 'default' )
-      .setData( {
-        title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
-      } )
-      .android.setChannelId( 'reminder' )
-      .android.setPriority( firebase.notifications.Android.Priority.High )
+    PushNotification.cancelAllLocalNotifications()
+    const channelIdRandom = moment().valueOf()
 
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    PushNotification.createChannel(
+      {
+        channelId: `${channelIdRandom}`,
+        channelName: 'reminder',
+        channelDescription: 'A channel to categorise your notifications',
+        playSound: false,
+        soundName: 'default',
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+    )
     const date = new Date()
     date.setHours( date.getHours() + Number( Config.NOTIFICATION_HOUR ) )
 
-    // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
-    await firebase.notifications().scheduleNotification( notification, {
-      fireDate: date.getTime(),
-      //repeatInterval: 'hour',
+    //let date =  new Date(Date.now() + (3 * 60 * 1000));
+    PushNotification.localNotificationSchedule( {
+      channelId: channelIdRandom,
+      vibrate: true,
+      vibration: 300,
+      priority: 'high',
+      showWhen: true,
+      autoCancel: true,
+      soundName: 'default',
+      title: 'We have not seen you in a while!',
+      message: 'Opening your app regularly ensures you get all the notifications and security updates', // (required)
+      date: date,
+      repeatType: 'day',
+      allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     } )
 
-    firebase.notifications().getScheduledNotifications()
+    PushNotification.getScheduledLocalNotifications( ( notiifcations )=>{
+      console.log( 'SCHEDULE notiifcations', notiifcations )
+    } )
+
+  };
+
+  localNotification = async ( notificationDetails ) => {
+    const channelIdRandom = moment().valueOf()
+    PushNotification.createChannel(
+      {
+        channelId: `${channelIdRandom}`,
+        channelName: 'reminder',
+        channelDescription: 'A channel to categorise your notifications',
+        playSound: false,
+        soundName: 'default',
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      ( created ) => console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+    )
+
+    PushNotification.localNotification( {
+      /* Android Only Properties */
+      channelId: `${channelIdRandom}`,
+      showWhen: true, // (optional) default: true
+      autoCancel: true, // (optional) default: true
+      vibrate: true, // (optional) default: true
+      vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
+      priority: 'high', // (optional) set notification priority, default: high
+
+      /* iOS and Android properties */
+      id: notificationDetails.id,
+      title: notificationDetails.title,
+      message: notificationDetails.body,
+      soundName: 'default',
+    } )
+  };
+
+  bootStrapNotifications = async () => {
+    if ( Platform.OS === 'ios' ) {
+      firebase
+        .messaging()
+        .hasPermission()
+        .then( enabled => {
+          if ( enabled ) {
+            this.storeFCMToken()
+            this.scheduleNotification()
+            this.createNotificationListeners()
+          } else {
+            firebase
+              .messaging()
+              .requestPermission( {
+                provisional: true
+              } )
+              .then( () => {
+                this.storeFCMToken()
+                this.scheduleNotification()
+                this.createNotificationListeners()
+              } )
+              .catch( () => {
+                console.log( 'Permission rejected.' )
+              } )
+          }
+        } )
+        .catch()
+    } else {
+      this.storeFCMToken()
+      this.scheduleNotification()
+      this.createNotificationListeners()
+    }
+  };
+
+  storeFCMToken = async () => {
+    const fcmToken = await messaging().getToken()
+    console.log( 'TOKEN', fcmToken )
+    const fcmArray = [ fcmToken ]
+    const fcmTokenFromAsync = this.props.fcmTokenValue
+    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+      this.props.setFCMToken( fcmToken )
+
+      await AsyncStorage.setItem( 'fcmToken', fcmToken )
+      this.props.updateFCMTokens( fcmArray )
+
+      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+        // updates the new FCM token to channels post recovery
+        if ( recovered ) {
+          this.props.postRecoveryChannelSync()
+        }
+      } )
+    }
+  };
+
+  createNotificationListeners = async () => {
+    PushNotification.configure( {
+      onNotification: ( notification ) => {
+        console.log( 'NOTIFICATION:', notification )
+        // process the notification
+        if( notification.data ){
+          this.props.fetchNotifications()
+          this.onNotificationOpen( notification )
+          // (required) Called when a remote is received or opened, or local notification is opened
+          notification.finish( PushNotificationIOS.FetchResult.NoData )
+        }
+      },
+
+      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
+      onAction: ( notification ) => {
+        console.log( 'ACTION:', notification.action )
+        console.log( 'NOTIFICATION:', notification )
+
+        // process the action
+      },
+
+      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
+      onRegistrationError: ( err ) => {
+        console.error( err.message, err )
+      },
+
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      // Should the initial notification be popped automatically
+      // default: true
+      popInitialNotification: true,
+
+      /**
+       * (optional) default: true
+       * - Specified if permissions (ios) and token (android and ios) will requested or not,
+       * - if not, you must call PushNotificationsHandler.requestPermissions() later
+       * - if you are not using remote notification or do not have Firebase installed, use this:
+       *     requestPermissions: Platform.OS === 'ios'
+       */
+      requestPermissions: true,
+    } )
+  };
+
+  onNotificationOpen = async ( item ) => {
+    console.log( 'item', item )
+    const content = JSON.parse( item.data.content )
+    // let asyncNotificationList = notificationListNew;
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem( 'notificationList' ),
+    )
+    if ( !asyncNotificationList ) {
+      asyncNotificationList = []
+    }
+    let readStatus = true
+    if ( content.notificationType == releaseNotificationTopic ) {
+      const releaseCases = this.props.releaseCasesValue
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      if ( releaseCases.ignoreClick ) {
+        readStatus = true
+      } else if ( releaseCases.remindMeLaterClick ) {
+        readStatus = false
+      } else {
+        readStatus = false
+      }
+    }
+    const obj = {
+      type: content.notificationType,
+      isMandatory: false,
+      read: readStatus,
+      title: item.title,
+      time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
+      date: new Date(),
+      info: item.body,
+      notificationId: content.notificationId,
+    }
+    asyncNotificationList.push( obj )
+    // this.props.notificationsUpdated(asyncNotificationList);
+
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify( asyncNotificationList ),
+    )
+    asyncNotificationList.sort( function ( left, right ) {
+      return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
+    } )
+    this.setState( {
+      notificationData: asyncNotificationList,
+      notificationDataChange: !this.state.notificationDataChange,
+    } )
+    this.onPressNotifications()
   };
 
   onAppStateChange = async ( nextAppState ) => {
@@ -541,14 +736,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         },
       )
-    } catch ( error ) { }
+    } catch ( error ) {
+      // do nothing
+    }
   };
 
   componentDidMount = () => {
     const { navigation } = this.props
 
     this.closeBottomSheet()
-    this.getBalances()
+    this.calculateNetBalance()
 
     this.appStateListener = AppState.addEventListener(
       'change',
@@ -580,6 +777,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
+    console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -587,7 +785,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-
+    console.log( ':newTransactionsRegular', newTransactionsRegular )
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
@@ -634,6 +832,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           title: obj.title,
           body: obj.info,
         }
+        console.log( ':asyncNotificationList', asyncNotificationList )
+
         this.localNotification( notificationDetails )
       }
       //this.props.notificationsUpdated(asyncNotificationList);
@@ -653,30 +853,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  localNotification = async ( notificationDetails ) => {
-    const notification = new firebase.notifications.Notification()
-      .setTitle( notificationDetails.title )
-      .setBody( notificationDetails.body )
-      .setNotificationId( notificationDetails.id )
-      .setSound( 'default' )
-      .setData( {
-        title: notificationDetails.title,
-        body: notificationDetails.body,
-      } )
-      .android.setChannelId( 'reminder' )
-      .android.setPriority( firebase.notifications.Android.Priority.High )
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-    const date = new Date()
-    date.setSeconds( date.getSeconds() + 1 )
-    await firebase.notifications().scheduleNotification( notification, {
-      fireDate: date.getTime(),
-    } )
-
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then( () => {} )
-  };
 
   componentDidUpdate = ( prevProps ) => {
     if (
@@ -687,7 +863,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if ( prevProps.accountsState.accountShells !== this.props.accountsState.accountShells ) {
-      this.getBalances()
+      this.calculateNetBalance()
       // this.getNewTransactionNotifications()
     }
 
@@ -878,8 +1054,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if ( splits[ 3 ] !== config.APP_STAGE ) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[ 3 ]
           }`,
         )
       } else {
@@ -1007,268 +1182,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  bootStrapNotifications = async () => {
-    const enabled = await firebase.messaging().hasPermission()
-    if ( !enabled ) {
-      await firebase
-        .messaging()
-        .requestPermission()
-        .then( () => {
-          // User has authorized
-          this.createNotificationListeners()
-          this.storeFCMToken()
-          this.scheduleNotification()
-        } )
-        .catch( () => {} )
-    } else {
-      this.createNotificationListeners()
-      this.storeFCMToken()
-      this.scheduleNotification()
-    }
-  };
+  calculateNetBalance = () => {
+    const { accountShells } = this.props.accountsState
 
-  storeFCMToken = async () => {
-    const fcmToken = await firebase.messaging().getToken()
-    const fcmArray = [ fcmToken ]
-    const fcmTokenFromAsync = this.props.fcmTokenValue
-    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
-      this.props.setFCMToken( fcmToken )
-
-      await AsyncStorage.setItem( 'fcmToken', fcmToken )
-      this.props.updateFCMTokens( fcmArray )
-
-      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-        // updates the new FCM token to channels post recovery
-        if ( recovered ) {
-          this.props.postRecoveryChannelSync()
-        }
-      } )
-    }
-  };
-
-  onNotificationArrives = async ( notification ) => {
-    console.log( '*-* notification has been received ', {
-      notification
+    let totalBalance = 0
+    accountShells.forEach( ( accountShell: AccountShell ) => {
+      if( accountShell.primarySubAccount.sourceKind !== SourceAccountKind.TEST_ACCOUNT )
+        totalBalance += AccountShell.getTotalBalance( accountShell )
     } )
-    this.props.fetchNotifications()
-    const { title, body } = notification
-    const deviceTrayNotification = new firebase.notifications.Notification()
-      .setTitle( title )
-      .setBody( body )
-      .setNotificationId( notification.notificationId )
-      .setSound( 'default' )
-      .android.setPriority( firebase.notifications.Android.Priority.High )
-      .android.setChannelId(
-        notification.android.channelId
-          ? notification.android.channelId
-          : 'foregroundNotification',
-      ) // previously created
-      .android.setAutoCancel( true ) // To remove notification when tapped on it
-
-    const channelId = new firebase.notifications.Android.Channel(
-      notification.android.channelId,
-      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
-      firebase.notifications.Android.Importance.High,
-    )
-    firebase.notifications().android.createChannel( channelId )
-    firebase.notifications().displayNotification( deviceTrayNotification )
-  };
-
-  createNotificationListeners = async () => {
-    /*
-     * Triggered when a particular notification has been received in foreground
-     * */
-    this.firebaseNotificationListener = firebase
-      .notifications()
-      .onNotification( ( notification ) => {
-        this.onNotificationArrives( notification )
-      } )
-
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened( async ( notificationOpen ) => {
-        this.props.fetchNotifications()
-        this.onNotificationOpen( notificationOpen.notification )
-      } )
-
-    /*
-     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-     * */
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification()
-    if ( notificationOpen ) {
-      this.props.fetchNotifications()
-      this.onNotificationOpen( notificationOpen.notification )
-    }
-    /*
-     * Triggered for data only payload in foreground
-     * */
-    firebase.messaging().onMessage( async remoteMessage => {
-      // console.log('A new FCM message arrived!',remoteMessage);
-    } )
-  };
-
-  onNotificationOpen = async ( item ) => {
-    const content = JSON.parse( item._data.content )
-    // let asyncNotificationList = notificationListNew;
-    let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
-    )
-    if ( !asyncNotificationList ) {
-      asyncNotificationList = []
-    }
-    let readStatus = true
-    if ( content.notificationType == releaseNotificationTopic ) {
-      const releaseCases = this.props.releaseCasesValue
-      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
-      if ( releaseCases.ignoreClick ) {
-        readStatus = true
-      } else if ( releaseCases.remindMeLaterClick ) {
-        readStatus = false
-      } else {
-        readStatus = false
-      }
-    }
-    const obj = {
-      type: content.notificationType,
-      isMandatory: false,
-      read: readStatus,
-      title: item.title,
-      time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-      date: new Date(),
-      info: item.body,
-      notificationId: content.notificationId,
-    }
-    asyncNotificationList.push( obj )
-    // this.props.notificationsUpdated(asyncNotificationList);
-
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify( asyncNotificationList ),
-    )
-    asyncNotificationList.sort( function ( left, right ) {
-      return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    } )
-    this.setState( {
-      notificationData: asyncNotificationList,
-      notificationDataChange: !this.state.notificationDataChange,
-    } )
-    this.onPressNotifications()
-  };
-
-  getBalances = () => {
-    const { accountsState } = this.props
-
-    let testBalance = accountsState[ TEST_ACCOUNT ].service
-      ? accountsState[ TEST_ACCOUNT ].service.hdWallet.balances.balance +
-      accountsState[ TEST_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-      : 0
-
-    const testTransactions = accountsState[ TEST_ACCOUNT ].service
-      ? accountsState[ TEST_ACCOUNT ].service.hdWallet.transactions.transactionDetails
-      : []
-
-    if ( !testTransactions.length ) testBalance = 10000 // hardcoding t-balance (till t-faucet saga syncs)
-
-    let regularBalance = accountsState[ REGULAR_ACCOUNT ].service
-      ? accountsState[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
-      accountsState[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-      : 0
-
-
-    // regular derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      const derivativeAccount =
-        accountsState[ REGULAR_ACCOUNT ].service.hdWallet.derivativeAccounts[
-          dAccountType
-        ]
-      if ( derivativeAccount && derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            regularBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    let secureBalance = accountsState[ SECURE_ACCOUNT ].service
-      ? accountsState[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
-      accountsState[ SECURE_ACCOUNT ].service.secureHDWallet.balances
-        .unconfirmedBalance
-      : 0
-
-
-    // secure derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      if ( dAccountType === TRUSTED_CONTACTS ) continue
-
-      const derivativeAccount =
-        accountsState[ SECURE_ACCOUNT ].service.secureHDWallet.derivativeAccounts[
-          dAccountType
-        ]
-
-      if ( derivativeAccount && derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            secureBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    // donation transactions
-    let additionalBalances = 0
-
-    for ( const serviceType of [ REGULAR_ACCOUNT, SECURE_ACCOUNT ] ) {
-      const derivativeAccounts =
-        accountsState[ serviceType ].service[
-          serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts
-
-      for ( const additionAcc of config.EJECTED_ACCOUNTS ) {
-        if ( !derivativeAccounts[ additionAcc ] ) continue
-
-        for (
-          let index = 1;
-          index <= derivativeAccounts[ additionAcc ].instance.using;
-          index++
-        ) {
-          const account = derivativeAccounts[ additionAcc ][ index ]
-
-          if ( account.balances ) {
-            additionalBalances +=
-              account.balances.balance + account.balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    const accumulativeBalance =
-      regularBalance + secureBalance + additionalBalances
 
     this.setState( {
-      balances: {
-        testBalance,
-        regularBalance,
-        secureBalance,
-        accumulativeBalance,
-      },
+      netBalance: totalBalance,
     } )
   };
 
@@ -1327,10 +1251,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.navigation.navigate( 'QRScanner', {
         onCodeScanned: this.processQRData,
       } )
-    } else if ( tab === BottomTab.Add ) {
-      this.openBottomSheet( BottomSheetKind.TAB_BAR_ADD_MENU )
+    } else if ( tab === BottomTab.FriendsAndFamily ) {
+      this.props.navigation.navigate( 'FriendsAndFamily' )
     }
   };
+
+  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+    switch ( menuItem.kind ) {
+        case BuyMenuItemKind.FAST_BITCOINS:
+          this.props.navigation.navigate( 'VoucherScanner' )
+          break
+        case BuyMenuItemKind.SWAN:
+          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          break
+        case BuyMenuItemKind.WYRE:
+          if ( this.props.currentWyreSubAccount ) {
+            this.props.navigation.navigate( 'PlaceWyreOrder', {
+              currentSubAccount: this.props.currentWyreSubAccount
+            } )
+          } else {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Wyre Account',
+              defaultDescription: 'Buy using ApplePay/Debit card',
+              serviceAccountKind: ServiceAccountKind.WYRE,
+            } )
+
+            this.props.navigation.navigate( 'NewWyreAccountDetails', {
+              currentSubAccount: newSubAccount,
+            } )
+          }
+          break
+    }
+  }
 
   processDLRequest = ( key, rejected ) => {
     const { trustedContactRequest, recoveryRequest } = this.state
@@ -1414,8 +1367,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 postAssociation: ( contact ) => {
                   let contactName = ''
                   if ( contact ) {
-                    contactName = `${contact.firstName} ${
-                      contact.lastName ? contact.lastName : ''
+                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
                     }`
                       .toLowerCase()
                       .trim()
@@ -1719,7 +1671,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_ADD_MENU:
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints
@@ -1755,28 +1707,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { custodyRequest } = this.state
 
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_ADD_MENU:
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader title="Add" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
-              <AddModalContents
-                onPressElements={( type ) => {
-                  if ( type == 'buyBitcoins' ) {
-                    navigation.navigate( 'VoucherScanner' )
-                  } else if ( type == 'addContact' ) {
-                    this.setState(
-                      {
-                        isLoadContacts: true,
-                      },
-                      () => {
-                        this.openBottomSheet(
-                          BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK,
-                        )
-                      },
-                    )
-                  }
-                }}
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
               />
             </>
           )
@@ -1919,14 +1856,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const {
-      balances,
-      selectedBottomTab,
+      netBalance,
       notificationData,
       currencyCode,
     } = this.state
 
     const {
-      navigation,
       exchangeRates,
       walletName,
       overallHealth,
@@ -1957,7 +1892,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationData={notificationData}
             walletName={walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
-            balances={balances}
+            netBalance={netBalance}
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
             navigation={this.props.navigation}
@@ -1976,28 +1911,33 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <View
-          style={styles.floatingFriendsAndFamilyButtonContainer}
+          style={styles.floatingActionButtonContainer}
           pointerEvents="box-none"
         >
           <Button
             raised
-            title="Friends & Family"
+            title="Buy"
             icon={
               <Image
-                source={require( '../../assets/images/icons/icon_contact.png' )}
+                source={require( '../../assets/images/icons/icon_buy.png' )}
                 style={{
-                  width: 18, height: 18
+                  width: widthPercentageToDP( 8 ),
+                  height: widthPercentageToDP( 8 ),
+                  marginTop: widthPercentageToDP( -3 ),
+                  marginBottom: widthPercentageToDP( -3 )
                 }}
               />
             }
             buttonStyle={{
-              ...ButtonStyles.floatingActionButton, borderRadius: 9999
+              ...ButtonStyles.floatingActionButton,
+              borderRadius: 9999,
+              paddingHorizontal: widthPercentageToDP( 10 )
             }}
             titleStyle={{
               ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 4,
+              marginLeft: 8,
             }}
-            onPress={() => navigation.navigate( 'FriendsAndFamily' )}
+            onPress={() => this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )}
           />
         </View>
 
@@ -2007,11 +1947,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
 
         <CustomBottomTabs
+          isEnabled={this.props.navigation.isFocused()}
           onSelect={this.handleBottomTabSelection}
-          selectedTab={selectedBottomTab}
           tabBarZIndex={
             this.state.currentBottomSheetKind ==
-              BottomSheetKind.TAB_BAR_ADD_MENU || null
+              BottomSheetKind.TAB_BAR_BUY_MENU || null
               ? 1
               : 0
           }
@@ -2039,6 +1979,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
+    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
@@ -2095,7 +2036,7 @@ const styles = StyleSheet.create( {
     },
   },
 
-  floatingFriendsAndFamilyButtonContainer: {
+  floatingActionButtonContainer: {
     position: 'absolute',
     zIndex: 0,
     bottom: TAB_BAR_HEIGHT,
@@ -2103,6 +2044,6 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
-    padding: heightPercentageToDP( 1 ),
+    padding: heightPercentageToDP( 1.5 ),
   },
 } )

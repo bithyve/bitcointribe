@@ -16,6 +16,8 @@ import {
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccount,
   SubPrimaryDerivativeAccountElements,
+  WyreDerivativeAccount,
+  WyreDerivativeAccountElements,
 } from '../Interface'
 import axios, { AxiosResponse } from 'axios'
 import {
@@ -24,16 +26,14 @@ import {
   SUB_PRIMARY_ACCOUNT,
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
-  SECURE_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import { acc } from 'react-native-reanimated'
 
 const { HEXA_ID, REQUEST_TIMEOUT } = config
 const bitcoinAxios = axios.create( {
-  timeout: REQUEST_TIMEOUT 
+  timeout: REQUEST_TIMEOUT
 } )
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -56,8 +56,8 @@ export default class HDSegwitWallet extends Bitcoin {
   public trustedContactToDA: { [contactName: string]: number } = {
   };
   public feeRates: any;
-  public accountName: String;
-  public accountDescription: String;
+  public accountName: string;
+  public accountDescription: string;
 
   private mnemonic: string;
   private passphrase: string;
@@ -84,6 +84,8 @@ export default class HDSegwitWallet extends Bitcoin {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -123,6 +125,8 @@ export default class HDSegwitWallet extends Bitcoin {
   }
 
   public initializeStateVars = ( stateVars ) => {
+    this.accountName = stateVars && stateVars.accountName ? stateVars.accountName: ''
+    this.accountDescription = stateVars && stateVars.accountDescription ? stateVars.accountDescription: ''
     this.usedAddresses =
       stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : []
     this.nextFreeAddressIndex =
@@ -153,7 +157,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccounts =
       stateVars && stateVars.derivativeAccounts
         ? {
-          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts 
+          ...config.DERIVATIVE_ACC, ...stateVars.derivativeAccounts
         }
         : config.DERIVATIVE_ACC
     this.lastBalTxSync =
@@ -174,7 +178,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getMnemonic = (): { mnemonic: string } => {
     return {
-      mnemonic: this.mnemonic 
+      mnemonic: this.mnemonic
     }
   };
 
@@ -215,21 +219,19 @@ export default class HDSegwitWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
-          const donationAcc: DonationDerivativeAccountElements = this
-            .derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-          receivingAddress = donationAcc ? donationAcc.receivingAddress : ''
-          break
-
         case SUB_PRIMARY_ACCOUNT:
-          const account = this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][
-            accountNumber
-          ]
+        case WYRE:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const account = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
 
         default:
           receivingAddress = this.receivingAddress
     }
+
+    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
@@ -385,7 +387,7 @@ export default class HDSegwitWallet extends Bitcoin {
         )
 
       return {
-        address: account.contactDetails.receivingAddress 
+        address: account.contactDetails.receivingAddress
       }
     } catch ( err ) {
       throw new Error( `Unable to generate receiving address: ${err.message}` )
@@ -537,7 +539,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -623,16 +625,34 @@ export default class HDSegwitWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      if ( this.network === bitcoinJS.networks.testnet ) {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
-      } else {
-        res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-          accountsToAddressMapping,
-        )
+
+      try{
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
+      }catch( err ){
+        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
+        console.log( 'using Hexa node as fallback(sync derivative-accounts)' )
+
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        } else {
+          res = await bitcoinAxios.post(
+            config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountsToAddressMapping,
+          )
+        }
       }
 
       const accountsToResponseMapping = res.data
@@ -827,11 +847,11 @@ export default class HDSegwitWallet extends Bitcoin {
               }
             }
 
-          // sort transactions(lastest first) 
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => { 
+          // sort transactions(lastest first)
+          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
             return tx2.blockTime - tx1.blockTime
           } )
-       
+
           const lastSyncTime =
             this.derivativeAccounts[ dAccountType ][ accountNumber ]
               .lastBalTxSync || 0
@@ -872,7 +892,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
 
       return {
-        synched: true 
+        synched: true
       }
     } catch ( err ) {
       // console.log(
@@ -899,7 +919,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if ( accountType === DONATION_ACCOUNT ) {
       const { id } = this.derivativeAccounts[ accountType ][ accountNumber ]
       if ( id ) accountDetails = {
-        donationId: id 
+        donationId: id
       }
     }
 
@@ -1003,7 +1023,7 @@ export default class HDSegwitWallet extends Bitcoin {
     )
 
     return {
-      synched: true 
+      synched: true
     }
   };
 
@@ -1035,40 +1055,78 @@ export default class HDSegwitWallet extends Bitcoin {
           ] = updatedSubPrimInstance
           accountId = updatedSubPrimInstance.xpubId
           break
+
+        case WYRE:
+          const wyreAccounts: WyreDerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          accountNumber = wyreAccounts.instance.using + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const wyreInstance: WyreDerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const updatedWyreInstance = {
+            ...wyreInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = updatedWyreInstance
+          accountId = updatedWyreInstance.xpubId
+          break
     }
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
-      accountId, accountNumber 
+      accountId, accountNumber
     }
   };
 
-  public updateDerivativeAccount = async (
+  public updateAccountDetails = (
     account: {
       kind: string,
       instanceNumber: number,
       customDescription: string,
       customDisplayName: string
     }
-  ): Promise<{
+  ): {
     updateSuccessful: boolean;
-  }>  => {
-    if ( account && account.instanceNumber==0 ) {
-      this.accountName = account.customDisplayName
-      this.accountDescription = account.customDescription
-      return { 
-        updateSuccessful: true 
-      }
+  } => {
+    switch( account.kind ){
+        case TEST_ACCOUNT:
+          this.accountName = account.customDisplayName
+          this.accountDescription = account.customDescription
+          break
+
+        case REGULAR_ACCOUNT:
+          if( !account.instanceNumber ){
+          // instance num zero represents the parent acc
+            this.accountName = account.customDisplayName
+            this.accountDescription = account.customDescription
+          } else {
+            const subPrimInstance: SubPrimaryDerivativeAccountElements =
+            this.derivativeAccounts[ SUB_PRIMARY_ACCOUNT ][ account.instanceNumber ]
+            subPrimInstance.accountName = account.customDisplayName
+            subPrimInstance.accountDescription = account.customDescription
+          }
+          break
+
+        case DONATION_ACCOUNT:
+          const donationInstance: DonationDerivativeAccountElements =
+              this.derivativeAccounts[ DONATION_ACCOUNT ][ account.instanceNumber ]
+          donationInstance.subject = account.customDisplayName
+          donationInstance.description = account.customDescription
+          break
+        case WYRE:
+          const wyreInstance: WyreDerivativeAccountElements =
+              this.derivativeAccounts[ WYRE ][ account.instanceNumber ]
+
+          wyreInstance.accountName = account.customDisplayName
+          wyreInstance.accountDescription = account.customDescription
+          break
     }
-    const derivativeType = account.kind===DONATION_ACCOUNT ? DONATION_ACCOUNT : SUB_PRIMARY_ACCOUNT
 
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountName = account.customDisplayName
-    this
-      .derivativeAccounts[ derivativeType ][ account.instanceNumber ].accountDescription = account.customDescription
-
-    return { 
-      updateSuccessful: true 
+    return {
+      updateSuccessful: true
     }
   };
 
@@ -1148,7 +1206,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      setupSuccessful, accountId: xpubId, accountNumber 
+      setupSuccessful, accountId: xpubId, accountNumber
     }
   };
 
@@ -1215,7 +1273,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      updated 
+      updated
     }
   };
 
@@ -1440,7 +1498,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.transactions = transactions
     // console.log({ balances, transactions });
     return {
-      balances, transactions 
+      balances, transactions
     }
   };
 
@@ -1505,7 +1563,7 @@ export default class HDSegwitWallet extends Bitcoin {
     // console.log({ inputUTXOs, outputUTXOs, fee });
 
     return {
-      fee 
+      fee
     }
   };
 
@@ -1558,11 +1616,11 @@ export default class HDSegwitWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance 
+      fee, balance: confirmedBalance
     }
 
     return {
-      inputs, outputs, fee, balance: confirmedBalance 
+      inputs, outputs, fee, balance: confirmedBalance
     }
   };
 
@@ -1654,7 +1712,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if ( !defaultPriorityInputs || defaultDebitedAmount > confirmedBalance ) {
       // insufficient input utxos to compensate for output utxos + lowest priority fee
       return {
-        fee: defaultPriorityFee, balance: confirmedBalance 
+        fee: defaultPriorityFee, balance: confirmedBalance
       }
     }
 
@@ -1698,7 +1756,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     // console.log({ txPrerequisites });
     return {
-      txPrerequisites 
+      txPrerequisites
     }
   };
 

@@ -66,8 +66,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            You can designate two of your friends/ family members as keepers of
-            your Recovery Keys, if they have Hexa installed.
+            You can add two of your contacts as Keepers for your Recovery Keys if they have Hexa installed
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -89,8 +88,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Share a QR code or a link with your friends/ family members and ask
-            them to open Hexa to act as your Keepers.
+            Share a QR code or a link with your contacts and ask them to open Hexa to act as your Keepers. The QR will have to be scanned from the HS scanner to be accepted, or the link has to be clicked and it will open in Hexa
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -139,9 +137,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Hexa requires access to your phone’s Address Book to help you
-            designate contacts as Keepers. This does not mean that BitHyve, the
-            company behind Hexa, would have access to your personal information.
+           Hexa requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Hexa, would have access to your personal information
           </Text>
           <View
             style={{
@@ -170,9 +166,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Rest assured that the friends or family members you designate as
-            Keepers would not have any access to your account information,
-            including your bitcoin balance.
+            Rest assured that the friends or family members you designate as Keepers would not have any access to your account information, including your bitcoin balance
           </Text>
 
           <AppBottomSheetTouchableWrapper
@@ -221,9 +215,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Recovery Keys are sent through secure, encrypted channels called
-            ECDH channels. These channels are encrypted end-to-end, enabling
-            only the receiver and sender to decrypt their information.
+            Recovery Keys are sent through secure, encrypted channels called ECDH channels. These channels are encrypted end-to-end, enabling only the receiver and sender to decrypt the information
           </Text>
           <View
             style={{
@@ -252,9 +244,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Creation of ECDH Channels is facilitated by the BitHyve Relay
-            Server. After creation, however, the Relay Server (and others on the
-            internet) is blind to all communications between the two parties.
+            The initial contact creation and communication with Friends & Family needs passing encrypted messages through the backend servers. So sometimes, if the connection fails, it may not work and you may have to try again
           </Text>
         </View>
       </ScrollView>

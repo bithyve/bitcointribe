@@ -51,7 +51,7 @@ const HomeHeader = ( {
   notificationData,
   walletName,
   getCurrencyImageByRegion,
-  balances,
+  netBalance,
   exchangeRates,
   CurrencyCode,
   navigation,
@@ -163,10 +163,10 @@ const HomeHeader = ( {
                 }}
               >
                 {prefersBitcoin
-                  ? UsNumberFormat( balances.accumulativeBalance )
+                  ? UsNumberFormat( netBalance )
                   : exchangeRates && exchangeRates[ CurrencyCode ]
                     ? (
-                      ( balances.accumulativeBalance / SATOSHIS_IN_BTC ) *
+                      ( netBalance / SATOSHIS_IN_BTC ) *
                       exchangeRates[ CurrencyCode ].last
                     ).toFixed( 2 )
                     : 0}

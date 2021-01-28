@@ -40,7 +40,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginTop: wp('4%'),
             }}
           >
-            Your supporters can donate to your causes anonymously.
+            Collect donations for the causes of your choice - from all over the world.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -54,7 +54,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginBottom: wp('4%'),
             }}
           >
-            Source sats and bitcoin from around the world without hassle or worrying about the tech involved.
+            Self-manage your Donation Account without worrying about the tech involved.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -73,11 +73,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={styles.viewStyle}>
-            <View
-              style={{
-                ...styles.separatorViewDotted,
-                ...styles.separatorView,
-              }}
+          <View style={styles.separatorView}/>
             />
           </View>
         </View>
@@ -89,8 +85,7 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginTop: wp('4%'),
             }}
           >
-            Easily share your wallet address across platforms like chats, social
-            media and your website
+            A web page and embed code for the account generates a new address every few minutes, helping with privacy of your transactions without needing any input from you.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -104,15 +99,10 @@ export default function DonationAccountKnowMoreSheetContents(props) {
               marginBottom: wp('4%'),
             }}
           >
-            Your donors simply have to scan a QR code to donate sats or bitcoin
+           Your supporters can donate by paying to the addresses these pages generate.
           </Text>
           <View style={styles.viewStyle}>
-            <View
-              style={{
-                ...styles.separatorViewDotted,
-                ...styles.separatorView,
-              }}
-            />
+          <View style={styles.separatorView}/>
           </View>
         </View>
       </ScrollView>
@@ -180,6 +170,10 @@ const styles = StyleSheet.create({
     height: 0,
     alignSelf: 'center',
     marginBottom: wp('1%'),
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
   },
   helperImage: {
     width: wp('80%'),
@@ -194,11 +188,5 @@ const styles = StyleSheet.create({
   viewStyle: {
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  separatorViewDotted: {
-    borderStyle: 'dotted',
-    borderWidth: 1,
-    borderRadius: 1,
-    borderColor: Colors.white,
   },
 });
