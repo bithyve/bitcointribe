@@ -1,7 +1,6 @@
 import { Action } from 'redux'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
-import { paymentDetailsFetched } from './trustedContacts'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS'
@@ -16,8 +15,6 @@ export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER'
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX'
 export const FETCH_FEE_AND_EXCHANGE_RATES = 'FETCH_FEE_AND_EXCHANGE_RATES'
-export const STARTUP_SYNC = 'STARTUP_SYNC'
-export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
 export const CLEAR_ACCOUNT_SYNC_CACHE = 'CLEAR_ACCOUNT_SYNC_CACHE'
 export const AUTO_SYNC_SHELLS = 'AUTO_SYNC_SHELLS'
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
@@ -61,13 +58,13 @@ export const fetchTransactions = ( serviceType, service? ) => {
 }
 
 export const fetchBalanceTx = (
-  serviceType,
+  serviceType: string,
   options: {
     service?;
-    loader?;
-    restore?;
-    shouldNotInsert?;
-    syncTrustedDerivative?;
+    loader?: boolean;
+    hardRefresh?: boolean;
+    shouldNotInsert?: boolean;
+    syncTrustedDerivative?: boolean;
   } = {
   }
 ) => {
@@ -295,14 +292,15 @@ export const fetchDerivativeAccAddress = (
 }
 
 export const fetchDerivativeAccBalTx = (
-  serviceType,
-  accountType,
-  accountNumber?
+  serviceType: string,
+  accountType: string,
+  accountNumber?: number,
+  hardRefresh?: boolean
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: {
-      serviceType, accountType, accountNumber
+      serviceType, accountType, accountNumber, hardRefresh
     },
   }
 }
@@ -376,7 +374,7 @@ export const remapAccountShells = ( services ) => {
 
 export const refreshAccountShell = (
   shell: AccountShell,
-  options?: { autoSync?: boolean }
+  options: { autoSync?: boolean, hardRefresh?: boolean }
 ) => {
   return {
     type: REFRESH_ACCOUNT_SHELL, payload: {
