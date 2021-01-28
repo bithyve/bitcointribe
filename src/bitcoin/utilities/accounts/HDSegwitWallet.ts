@@ -606,9 +606,8 @@ export default class HDSegwitWallet extends Bitcoin {
         this.derivativeAccounts[ dAccountType ][ accountNumber ][
           'usedAddresses'
         ] = usedAddresses // derv used addresses forms a part of ownedAddresses array during primary-acc sync
-        
-        const xpub = this.generateDerivativeXpub( dAccountType, accountNumber )
-        let xpubId = this.derivativeAccounts[ dAccountType ][ accountNumber ].xpubId
+        let xpub, xpubId
+        ;( { xpub, xpubId } = this.derivativeAccounts[ dAccountType ][ accountNumber ] )
         if ( !xpubId ) {
           xpubId = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
           this.derivativeAccounts[ dAccountType ][ accountNumber ].xpubId = xpubId
