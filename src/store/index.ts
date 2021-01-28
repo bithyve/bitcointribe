@@ -54,7 +54,6 @@ import {
   resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  fetchDerivativeAccAddressWatcher,
   startupSyncWatcher,
   validateTwoFAWatcher,
   removeTwoFAWatcher,
@@ -67,6 +66,7 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
+  addNewSecondarySubAccountWatcher,
 } from './sagas/accounts'
 
 import {
@@ -160,7 +160,6 @@ const rootSaga = function* () {
     validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
-    fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
@@ -169,6 +168,7 @@ const rootSaga = function* () {
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
     addNewAccountShellWatcher,
+    addNewSecondarySubAccountWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
