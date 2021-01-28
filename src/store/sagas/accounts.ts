@@ -82,6 +82,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 
 function* fetchDerivativeAccXpubWorker( { payload } ) {
   const { accountType, accountNumber } = payload
@@ -1397,33 +1398,52 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 }
 
 
-function* addNewSecondarySubAccount( secondarySubAccountInfo: SubAccountDescribing ) {
+function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
+  parentShell: AccountShell}} ) {
+  const { secondarySubAccount, parentShell } = payload
+
   let secondarySubAccountId: string
   let secondarySubAccountInstanceNum: number
 
   const service = yield select(
-    ( state ) => state.accounts[ secondarySubAccountInfo.sourceKind ].service
+    ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
   )
 
-  switch ( secondarySubAccountInfo.kind ) {
+  switch ( secondarySubAccount.kind ) {
       case SubAccountKind.SERVICE:
-        switch( ( secondarySubAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+        switch( ( secondarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
             case ServiceAccountKind.FAST_BITCOINS:
               const fastBitcoinsDetails = {
-                accountName: secondarySubAccountInfo.customDisplayName,
-                accountDescription: secondarySubAccountInfo.customDescription,
+                accountName: secondarySubAccount.customDisplayName,
+                accountDescription: secondarySubAccount.customDescription,
               }
               const fbtcRes = yield call(
-                service.setupDerivativeAccount,
+                ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
                 DerivativeAccountTypes.FAST_BITCOINS,
                 fastBitcoinsDetails
               )
 
               if ( fbtcRes.status === 200 ) {
+                secondarySubAccountId = fbtcRes.data.accountId
+                secondarySubAccountInstanceNum = fbtcRes.data.accountNumber
+
+                secondarySubAccount.id = secondarySubAccountId
+                secondarySubAccount.balances = {
+                  confirmed: 0,
+                  unconfirmed: 0,
+                }
+                secondarySubAccount.transactions = []
+
+                AccountShell.addSecondarySubAccount(
+                  parentShell,
+                  secondarySubAccountId,
+                  secondarySubAccount,
+                )
+
                 const { SERVICES } = yield select( ( state ) => state.storage.database )
                 const updatedSERVICES = {
                   ...SERVICES,
-                  [ secondarySubAccountInfo.sourceKind ]: JSON.stringify( service ),
+                  [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
                 }
                 yield call( insertDBWorker, {
                   payload: {
@@ -1431,8 +1451,6 @@ function* addNewSecondarySubAccount( secondarySubAccountInfo: SubAccountDescribi
                   }
                 } )
 
-                secondarySubAccountId = fbtcRes.data.accountId
-                secondarySubAccountInstanceNum = fbtcRes.data.accountNumber
               } else {
                 console.log( {
                   err: fbtcRes.err

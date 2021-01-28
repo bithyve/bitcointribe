@@ -383,11 +383,14 @@ export const addNewAccountShell = (
 }
 
 export const addNewSecondarySubAccount = (
-  payload: SubAccountDescribing
+  secondarySubAccount: SubAccountDescribing,
+  parentShell: AccountShell
 ) => {
   return {
     type: ADD_NEW_SECONDARY_SUBACCOUNT,
-    payload,
+    payload: {
+      secondarySubAccount, parentShell
+    },
   }
 }
 

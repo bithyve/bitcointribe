@@ -13,23 +13,19 @@ import {
   Linking,
   TextInput,
   KeyboardAvoidingView,
-  Keyboard,
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
 import NavStyles from '../../common/Styles/NavStyles'
-import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   FAST_BITCOINS,
-  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Entypo from 'react-native-vector-icons/Entypo'
@@ -58,7 +54,6 @@ import {
   storeFbtcData,
   clearFbtcVoucher,
 } from '../../store/actions/fbtc'
-import { fetchDerivativeAccAddress } from '../../store/actions/accounts'
 import Config from 'react-native-config'
 import Loader from '../../components/loader'
 import Toast from '../../components/Toast'
@@ -66,6 +61,10 @@ import moment from 'moment'
 import { isEmpty } from '../../common/CommonFunctions'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const VoucherScanner = ( props ) => {
   //const FBTCVoucher = useSelector((state) => state.fbtc.FBTCVoucher);
@@ -219,20 +218,43 @@ const VoucherScanner = ( props ) => {
     }
   }
 
+  const getFastBitcoinsAccount = () => {
+    const accountNumber = 1
+    const receivingAddress = service.getReceivingAddress(
+      FAST_BITCOINS,
+      accountNumber,
+    )
+    if( receivingAddress ){
+      setBitcoinAddress(
+        receivingAddress,
+      )
+    }
+    else{
+      let parentShell: AccountShell
+      accountShells.forEach( ( shell: AccountShell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){ // out of box checking/savings acc
+          if( shell.primarySubAccount.sourceKind === selectedAccount.accountType ) parentShell = shell
+        }
+      } )
+      if( parentShell ){
+        const newSecondarySubAccount = new ExternalServiceSubAccountInfo( {
+          instanceNumber: accountNumber,
+          defaultTitle: 'FastBitcoins.com',
+          defaultDescription: 'Use FastBitcoin vouchers',
+          accountShellID: parentShell.id,
+          serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
+          isTFAEnabled: selectedAccount.accountType === SourceAccountKind.SECURE_ACCOUNT? true: false
+        } )
+        dispatch(
+          addNewSecondarySubAccount( newSecondarySubAccount, parentShell ),
+        )
+      } else console.log( 'Unable to find the parent shell' )
+    }
+  }
+
   useEffect( () => {
     if ( selectedAccount && service ) {
-      const accountNumber = 1
-      const receivingAddress = service.getReceivingAddress(
-        FAST_BITCOINS,
-        accountNumber,
-      )
-      if( receivingAddress )
-        setBitcoinAddress(
-          receivingAddress,
-        )
-      else dispatch(
-        fetchDerivativeAccAddress( selectedAccount.accountType, FAST_BITCOINS ),
-      )
+      getFastBitcoinsAccount()
     }
   }, [ selectedAccount, service ] )
 
