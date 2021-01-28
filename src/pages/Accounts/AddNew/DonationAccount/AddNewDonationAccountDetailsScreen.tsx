@@ -152,7 +152,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
                   checkedColor={Colors.darkGreen}
                   uncheckedColor={Colors.white}
                   checked={isTFAEnabled}
-                  onIconPress={() => setIsTFAEnabled( !isTFAEnabled )}
+                  disabled
                 />
               </View>
             </TouchableOpacity>
@@ -170,11 +170,11 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
           </View>
 
           <View style={styles.footerSection}>
-          <ButtonBlue
-            buttonText="Proceed"
-            handleButtonPress={handleProceedButtonPress}
-            buttonDisable={canProceed === false}
-          />
+            <ButtonBlue
+              buttonText="Proceed"
+              handleButtonPress={handleProceedButtonPress}
+              buttonDisable={canProceed === false}
+            />
           </View>
         </View>
       </ScrollView>
