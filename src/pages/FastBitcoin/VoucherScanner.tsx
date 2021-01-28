@@ -56,18 +56,15 @@ import {
   getQuoteFail,
   executeOrderFail,
   storeFbtcData,
-  storeFbtcVoucher,
   clearFbtcVoucher,
 } from '../../store/actions/fbtc'
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts'
 import Config from 'react-native-config'
 import Loader from '../../components/loader'
-import config from '../../bitcoin/HexaConfig'
 import Toast from '../../components/Toast'
 import moment from 'moment'
 import { isEmpty } from '../../common/CommonFunctions'
 import AccountShell from '../../common/data/models/AccountShell'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 
 const VoucherScanner = ( props ) => {
@@ -81,17 +78,15 @@ const VoucherScanner = ( props ) => {
     : ''
   const [ bitcoinAddress, setBitcoinAddress ] = useState( '' )
   const QuoteDetails = useSelector( ( state ) => state.fbtc.getQuoteDetails )
-  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+
   const executeOrderDetails = useSelector(
     ( state ) => state.fbtc.executeOrderDetails,
   )
   const [ hideShow, setHideShow ] = useState( false )
-  const [ temp, setTemp ] = useState( true )
   const [ isUserRegistered, setIsUserRegistered ] = useState( false )
   const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
   const [ voucherCode, setVoucherCode ] = useState( '' )
   const [ userKey, setUserKey ] = useState( userKey1 )
-  const accounts1 = useSelector( ( state ) => state.accounts )
   const accountsSyncFail = useSelector( ( state ) => state.fbtc.accountSyncFail )
   const accountSyncFailMessage = useSelector(
     ( state ) => state.fbtc.accountSyncFailMessage,
@@ -104,7 +99,6 @@ const VoucherScanner = ( props ) => {
   const executeOrderFailMessage = useSelector(
     ( state ) => state.fbtc.accountSyncFailMessage,
   )
-  const [ exchangeRates, setExchangeRates ] = useState( accounts1.exchangeRates )
   const dispatch = useDispatch()
   const accountSyncDetails = useSelector(
     ( state ) => state.fbtc.accountSyncDetails,
@@ -119,9 +113,6 @@ const VoucherScanner = ( props ) => {
     ( state ) => state.accounts.accountShells,
   )
 
-  useEffect( () => {
-    if ( accounts1.exchangeRates ) setExchangeRates( accounts1.exchangeRates )
-  }, [ accounts1.exchangeRates ] )
   const [ balances, setBalances ] = useState( {
     regularBalance: 0,
     secureBalance: 0,
@@ -174,7 +165,7 @@ const VoucherScanner = ( props ) => {
     image: require( '../../assets/images/icons/icon_regular.png' ),
   } )
   const service = useSelector(
-    ( state ) => state.accounts[ selectedAccount && selectedAccount.accountType ],
+    ( state ) => state.accounts[ selectedAccount && selectedAccount.accountType ].service,
   )
 
   useEffect( () => {
@@ -229,7 +220,7 @@ const VoucherScanner = ( props ) => {
   }
 
   useEffect( () => {
-    if ( service ) {
+    if ( selectedAccount && service ) {
       const accountNumber = 1
       const receivingAddress = service.getReceivingAddress(
         FAST_BITCOINS,
@@ -239,16 +230,11 @@ const VoucherScanner = ( props ) => {
         setBitcoinAddress(
           receivingAddress,
         )
-    }
-  }, [ selectedAccount, service ] )
-
-  useEffect( () => {
-    if ( selectedAccount ) {
-      dispatch(
+      else dispatch(
         fetchDerivativeAccAddress( selectedAccount.accountType, FAST_BITCOINS ),
       )
     }
-  }, [ selectedAccount ] )
+  }, [ selectedAccount, service ] )
 
   useEffect( () => {
     if( accountShells ){
