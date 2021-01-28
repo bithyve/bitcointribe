@@ -1,51 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   AsyncStorage,
   ImageBackground,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { RNCamera } from 'react-native-camera';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import { ScrollView } from 'react-native-gesture-handler';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { RNCamera } from 'react-native-camera'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import { ScrollView } from 'react-native-gesture-handler'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
-export default function QRModal(props) {
-  const [openCameraFlag, setOpenCameraFlag] = useState(false);
+export default function QRModal( props ) {
+  const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
 
-  const barcodeRecognized = async (barcodes) => {
-    if (barcodes.data) {
-      setOpenCameraFlag(false);
-      props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
-      props.onQrScan(getFormattedStringFromQRString(barcodes.data));
+  const barcodeRecognized = async ( barcodes ) => {
+    if ( barcodes.data ) {
+      setOpenCameraFlag( false )
+      props.modalRef ? props.modalRef.current.snapTo( 1 ) : '' // closes modal
+      props.onQrScan( getFormattedStringFromQRString( barcodes.data ) )
     }
-  };
+  }
 
   return (
     <View style={styles.modalContentContainer}>
       <ScrollView style={styles.qrModalScrollView}>
         <View style={styles.modalHeaderTitleView}>
-        <AppBottomSheetTouchableWrapper
-              onPress={() => props.onBackPress()}
-              style={{ width: 30, alignSelf: 'center' }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </AppBottomSheetTouchableWrapper>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onBackPress()}
+            style={{
+              width: 30, alignSelf: 'center'
+            }}
+          >
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={17}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
             <Text style={styles.modalHeaderTitleText}>{props.QRModalHeader}</Text>
           </View>
         </View>
@@ -53,19 +57,19 @@ export default function QRModal(props) {
           {props.isOpenedFlag && openCameraFlag ? (
             <View
               style={{
-                width: wp('90%'),
-                height: wp('90%'),
+                width: wp( '90%' ),
+                height: wp( '90%' ),
                 overflow: 'hidden',
                 borderRadius: 20,
               }}
             >
               <RNCamera
-                ref={(ref) => {
-                  this.cameraRef = ref;
+                ref={( ref ) => {
+                  this.cameraRef = ref
                 }}
                 style={{
-                  width: wp('90%'),
-                  height: wp('90%'),
+                  width: wp( '90%' ),
+                  height: wp( '90%' ),
                 }}
                 onBarCodeRead={barcodeRecognized}
                 captureAudio={false}
@@ -84,8 +88,8 @@ export default function QRModal(props) {
                       borderLeftWidth: 1,
                       borderTopColor: 'white',
                       borderLeftColor: 'white',
-                      height: hp('5%'),
-                      width: hp('5%'),
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
                       borderTopWidth: 1,
                     }}
                   />
@@ -95,8 +99,8 @@ export default function QRModal(props) {
                       borderRightWidth: 1,
                       borderRightColor: 'white',
                       borderTopColor: 'white',
-                      height: hp('5%'),
-                      width: hp('5%'),
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
                       marginLeft: 'auto',
                     }}
                   />
@@ -116,8 +120,8 @@ export default function QRModal(props) {
                       borderLeftWidth: 1,
                       borderBottomColor: 'white',
                       borderLeftColor: 'white',
-                      height: hp('5%'),
-                      width: hp('5%'),
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
                       borderBottomWidth: 1,
                     }}
                   />
@@ -127,8 +131,8 @@ export default function QRModal(props) {
                       borderRightWidth: 1,
                       borderRightColor: 'white',
                       borderBottomColor: 'white',
-                      height: hp('5%'),
-                      width: hp('5%'),
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
                       marginLeft: 'auto',
                     }}
                   />
@@ -136,88 +140,88 @@ export default function QRModal(props) {
               </RNCamera>
             </View>
           ) : (
-              <AppBottomSheetTouchableWrapper
-                onPress={() => {
-                  setTimeout(() => {
-                    setOpenCameraFlag(true);
-                  }, 2);
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                setTimeout( () => {
+                  setOpenCameraFlag( true )
+                }, 2 )
+              }}
+            >
+              <ImageBackground
+                source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
+                style={{
+                  width: wp( '90%' ),
+                  height: wp( '90%' ),
+                  overflow: 'hidden',
+                  borderRadius: 20,
                 }}
               >
-                <ImageBackground
-                  source={require('../../assets/images/icons/iPhone-QR.png')}
+                <View
                   style={{
-                    width: wp('90%'),
-                    height: wp('90%'),
-                    overflow: 'hidden',
-                    borderRadius: 20,
+                    flexDirection: 'row',
+                    paddingTop: 12,
+                    paddingRight: 12,
+                    paddingLeft: 12,
+                    width: '100%',
                   }}
                 >
                   <View
                     style={{
-                      flexDirection: 'row',
-                      paddingTop: 12,
-                      paddingRight: 12,
-                      paddingLeft: 12,
-                      width: '100%',
+                      borderLeftWidth: 1,
+                      borderTopColor: 'white',
+                      borderLeftColor: 'white',
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
+                      borderTopWidth: 1,
                     }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderTopColor: 'white',
-                        borderLeftColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        borderTopWidth: 1,
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderTopWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: 'white',
-                        borderTopColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        marginLeft: 'auto',
-                      }}
-                    />
-                  </View>
+                  />
                   <View
                     style={{
-                      marginTop: 'auto',
-                      flexDirection: 'row',
-                      paddingBottom: 12,
-                      paddingRight: 12,
-                      paddingLeft: 12,
-                      width: '100%',
+                      borderTopWidth: 1,
+                      borderRightWidth: 1,
+                      borderRightColor: 'white',
+                      borderTopColor: 'white',
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
+                      marginLeft: 'auto',
                     }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderBottomColor: 'white',
-                        borderLeftColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        borderBottomWidth: 1,
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderBottomWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: 'white',
-                        borderBottomColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        marginLeft: 'auto',
-                      }}
-                    />
-                  </View>
-                </ImageBackground>
-              </AppBottomSheetTouchableWrapper>
-            )}
+                  />
+                </View>
+                <View
+                  style={{
+                    marginTop: 'auto',
+                    flexDirection: 'row',
+                    paddingBottom: 12,
+                    paddingRight: 12,
+                    paddingLeft: 12,
+                    width: '100%',
+                  }}
+                >
+                  <View
+                    style={{
+                      borderLeftWidth: 1,
+                      borderBottomColor: 'white',
+                      borderLeftColor: 'white',
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
+                      borderBottomWidth: 1,
+                    }}
+                  />
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      borderRightWidth: 1,
+                      borderRightColor: 'white',
+                      borderBottomColor: 'white',
+                      height: hp( '5%' ),
+                      width: hp( '5%' ),
+                      marginLeft: 'auto',
+                    }}
+                  />
+                </View>
+              </ImageBackground>
+            </AppBottomSheetTouchableWrapper>
+          )}
           <View
             style={{
               marginBottom: 30,
@@ -231,7 +235,7 @@ export default function QRModal(props) {
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 marginBottom: 2,
                 fontFamily: Fonts.FiraSansRegular,
               }}
@@ -268,7 +272,9 @@ export default function QRModal(props) {
             </Text>
           </View>
         </View>
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          marginTop: 'auto'
+        }}>
           {props.noteText && <BottomInfoBox
             title={'Note'}
             infoText={
@@ -278,12 +284,12 @@ export default function QRModal(props) {
         </View>
       </ScrollView>
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContentContainer: {
@@ -295,7 +301,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   qrModalImageNTextInputView: {
-    marginTop: hp('2%'),
+    marginTop: hp( '2%' ),
     marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -306,14 +312,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
-    paddingBottom: hp('2%'),
-    paddingTop: hp('2%'),
-    marginLeft: wp('4%'),
-    marginRight: wp('4%'),
+    paddingBottom: hp( '2%' ),
+    paddingTop: hp( '2%' ),
+    marginLeft: wp( '4%' ),
+    marginRight: wp( '4%' ),
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular
   },
-});
+} )

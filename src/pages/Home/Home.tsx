@@ -1271,7 +1271,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'Bought using Apple Pay / Credit Card',
+              defaultDescription: 'Buy using ApplePay/Debit card',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
 
