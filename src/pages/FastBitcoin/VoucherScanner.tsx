@@ -231,19 +231,14 @@ const VoucherScanner = ( props ) => {
   useEffect( () => {
     if ( service ) {
       const accountNumber = 1
-      const { derivativeAccounts } =
-        selectedAccount && selectedAccount.accountType === SECURE_ACCOUNT
-          ? service.service.secureHDWallet
-          : service.service.hdWallet
-
-      if (
-        derivativeAccounts[ FAST_BITCOINS ][ accountNumber ] &&
-        derivativeAccounts[ FAST_BITCOINS ][ accountNumber ].receivingAddress
-      ) {
+      const receivingAddress = service.getReceivingAddress(
+        FAST_BITCOINS,
+        accountNumber,
+      )
+      if( receivingAddress )
         setBitcoinAddress(
-          derivativeAccounts[ FAST_BITCOINS ][ accountNumber ].receivingAddress,
+          receivingAddress,
         )
-      }
     }
   }, [ selectedAccount, service ] )
 

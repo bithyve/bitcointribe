@@ -231,7 +231,6 @@ export default class HDSegwitWallet extends Bitcoin {
           receivingAddress = this.receivingAddress
     }
 
-    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
