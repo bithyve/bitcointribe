@@ -133,9 +133,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
   const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet
 
-  console.log( {
-    derivativeAccounts
-  } )
+  // console.log( { derivativeAccounts } )
   const res = yield call(
     service.getDerivativeAccAddress,
     accountType,
@@ -143,9 +141,7 @@ function* fetchDerivativeAccAddressWorker( { payload } ) {
     null, // contanct name is null(non-TC)
     accountName
   )
-  console.log( {
-    res
-  } )
+  // console.log( { res } )
 
   if ( res.status === 200 ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
@@ -580,9 +576,7 @@ export const processRecipients = async(
           )
         }
 
-        console.log( {
-          res
-        } )
+        // console.log( { res } )
         if ( res.status === 200 ) {
           const receivingAddress = res.data.address
           recipient.address = receivingAddress
@@ -680,9 +674,7 @@ function* transferST2Worker( { payload } ) {
   )
   if ( res.status === 200 ) {
     if ( serviceType === SECURE_ACCOUNT ) {
-      console.log( {
-        res
-      } )
+      // console.log( { res } )
       yield put( executedST2( serviceType, res.data ) )
     } else yield put( executedST2( serviceType, res.data.txid ) )
   } else {
@@ -813,9 +805,7 @@ function* testcoinsWorker( { payload } ) {
     ( state ) => state.accounts[ payload.serviceType ].service
   )
   const res = yield call( service.getTestcoins )
-  console.log( {
-    res
-  } )
+  // console.log( { res } )
   if ( res.status === 200 ) {
     yield put( testcoinsReceived( payload.serviceType, service ) )
 
@@ -1035,9 +1025,7 @@ function* setupDonationAccountWorker( { payload } ) {
   )
 
   if ( res.status === 200 ) {
-    console.log( {
-      res
-    } )
+    // console.log( { res } )
     const { setupSuccessful, accountId, accountNumber } = res.data
     if ( !setupSuccessful ) {
       yield put( settedDonationAccount( serviceType, false ) )
