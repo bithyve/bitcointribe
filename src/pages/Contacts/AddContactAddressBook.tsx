@@ -407,9 +407,9 @@ export default function AddContactAddressBook( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      
+
       <View style={{
-        height: '100%',
+        flex: 1
       }}>
         <View
           style={{
