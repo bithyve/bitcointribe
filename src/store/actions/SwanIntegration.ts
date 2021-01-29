@@ -1,3 +1,4 @@
+export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
 export const FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED = 'FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED'
 
@@ -24,6 +25,15 @@ export enum SwanActionKind {
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
   SYNC_SWAN_ACCOUNT_DATA,
+
+  CLEAR_SWAN_CACHE
+}
+
+
+export const clearSwanCache = ( ) => {
+  return {
+    type: CLEAR_SWAN_CACHE,
+  }
 }
 
 export const fetchSwanAuthenticationUrl = ( data ) =>  {

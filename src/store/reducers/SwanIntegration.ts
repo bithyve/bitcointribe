@@ -1,5 +1,5 @@
-import { $CombinedState } from 'redux'
 import {
+  CLEAR_SWAN_CACHE,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
@@ -81,6 +81,17 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
+      case CLEAR_SWAN_CACHE:
+        return {
+          ...state,
+          isSwanAuthenticationInProgress: false,
+          hasFetchSwanAuthenticationUrlSucceeded: false,
+          swanAuthenticationUrl: null,
+          code_challenge: null,
+          code_verifier: null,
+          nonce: null,
+          state: null
+        }
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,

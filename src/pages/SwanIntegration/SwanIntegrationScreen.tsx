@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import ActionMenuListItem from './ActionMenuListItem'
 import { FlatList } from 'react-native-gesture-handler'
 import useSwanIntegrationState from '../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
-import { fetchSwanAuthenticationUrl, linkSwanWallet, syncSwanWallet, SwanActionKind, addSwanMetadata } from '../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, clearSwanCache, syncSwanWallet, SwanActionKind, addSwanMetadata } from '../../store/actions/SwanIntegration'
 import { addNewAccountShell } from '../../store/actions/accounts'
 import  ExternalServiceSubAccountInfo  from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
@@ -46,12 +46,12 @@ const actionMenuItems: ActionMenuItem[] = [
 const actionItemKeyExtractor = ( item: ActionMenuItem ) => String( item.kind )
 
 
+
 const SwanIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const { hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl } = useSwanIntegrationState()
   const dispatch = useDispatch()
   useEffect( ()=>{
-    dispatch( fetchSwanAuthenticationUrl( {
-    } ) )
+    dispatch( clearSwanCache() )
   }, [] )
 
   useEffect( ()=>{

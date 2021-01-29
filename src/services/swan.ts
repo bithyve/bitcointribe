@@ -1,12 +1,12 @@
 import axios from 'axios'
-import Config from 'react-native-config'
+import Config from '../bitcoin/HexaConfig'
 
-const swanOAuthURL = Config.SWAN_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'//'https://dev-api.swanbitcoin.com/'
+const swanOAuthURL = Config.SWAN_BASE_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'//'https://dev-api.swanbitcoin.com/'
 
 export const redeemAuthCode = ( data ) =>
   axios( {
     method: 'post',
-    url: 'https://login-demo.curity.io/oauth/v2/oauth-token',
+    url: `${swanOAuthURL}/oauth`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
