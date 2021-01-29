@@ -19,6 +19,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
+  clearTrustedContactsCache,
   trustedChannelsSetupSync,
   removeTrustedContact,
   updateAddressBookLocally,
@@ -62,6 +63,7 @@ interface FriendsAndFamilyPropTypes {
   addressBookData: any;
   trustedContactsInfo: any;
   removeTrustedContact: any;
+  clearTrustedContactsCache: any;
 }
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
@@ -113,7 +115,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       this.props.trustedChannelsSetupSync()
       this.updateAddressBook()
     } )
-
+    this.props.clearTrustedContactsCache()
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     } )
@@ -160,7 +162,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     const shouldShow = !this.state.isShowingKnowMoreSheet
 
     this.setState( {
-      isShowingKnowMoreSheet: shouldShow 
+      isShowingKnowMoreSheet: shouldShow
     }, () => {
       if ( shouldShow ) {
         this.helpBottomSheetRef.current?.snapTo( 1 )
@@ -267,7 +269,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           if ( element.isGuardian ) {
             const isRemovable = !element.hasTrustedChannel ? true : false // un-confirmed guardians are removable
             myKeepers.push( {
-              ...element, isRemovable 
+              ...element, isRemovable
             } )
           }
           if ( element.isWard ) {
@@ -275,7 +277,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           }
           if ( !element.isWard && !element.isGuardian ) {
             otherTrustedContact.push( {
-              ...element, isRemovable: true 
+              ...element, isRemovable: true
             } )
           }
         }
@@ -437,11 +439,11 @@ class FriendsAndFamilyScreen extends PureComponent<
             />
           }
           style={{
-            flex: 1, marginBottom: hp( '6%' ) 
+            flex: 1, marginBottom: hp( '6%' )
           }}
         >
           <View style={{
-            marginTop: wp( '2%' ) 
+            marginTop: wp( '2%' )
           }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
@@ -449,10 +451,10 @@ class FriendsAndFamilyScreen extends PureComponent<
             </Text>
 
             <View style={{
-              marginBottom: 15 
+              marginBottom: 15
             }}>
               <View style={{
-                height: 'auto' 
+                height: 'auto'
               }}>
                 {( contactsKeepingUser.length > 0 &&
                   contactsKeepingUser.map( ( item, index ) => {
@@ -466,14 +468,14 @@ class FriendsAndFamilyScreen extends PureComponent<
                       contactsType: 'My Keepers',
                     } )
                   } ) ) || <View style={{
-                  height: wp( '22%' ) + 30 
+                  height: wp( '22%' ) + 30
                 }} />}
               </View>
             </View>
           </View>
 
           <View style={{
-            marginTop: wp( '5%' ) 
+            marginTop: wp( '5%' )
           }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
             <Text style={styles.pageInfoText}>
@@ -481,10 +483,10 @@ class FriendsAndFamilyScreen extends PureComponent<
             </Text>
 
             <View style={{
-              marginBottom: 15 
+              marginBottom: 15
             }}>
               <View style={{
-                height: 'auto' 
+                height: 'auto'
               }}>
                 {( contactsKeptByUser.length > 0 &&
                   contactsKeptByUser.map( ( item, index ) => {
@@ -498,14 +500,14 @@ class FriendsAndFamilyScreen extends PureComponent<
                       contactsType: 'I\'m Keeper of',
                     } )
                   } ) ) || <View style={{
-                  height: wp( '22%' ) + 30 
+                  height: wp( '22%' ) + 30
                 }} />}
               </View>
             </View>
           </View>
 
           <View style={{
-            marginTop: wp( '5%' ) 
+            marginTop: wp( '5%' )
           }}>
             <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
@@ -513,10 +515,10 @@ class FriendsAndFamilyScreen extends PureComponent<
             </Text>
 
             <View style={{
-              marginBottom: 15 
+              marginBottom: 15
             }}>
               <View style={{
-                height: 'auto' 
+                height: 'auto'
               }}>
                 {( otherTrustedContacts.length > 0 &&
                   otherTrustedContacts.map( ( item, index ) => {
@@ -530,7 +532,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                       contactsType: 'Other Contacts',
                     } )
                   } ) ) || <View style={{
-                  height: wp( '22%' ) + 30 
+                  height: wp( '22%' ) + 30
                 }} />}
 
                 <TouchableOpacity
@@ -598,7 +600,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           renderHeader={this.renderHelpHeader}
           onCloseEnd={() => {
             this.setState( {
-              isShowingKnowMoreSheet: false 
+              isShowingKnowMoreSheet: false
             } )
           }}
         />
@@ -628,6 +630,7 @@ export default connect( mapStateToProps, {
   trustedChannelsSetupSync,
   updateAddressBookLocally,
   removeTrustedContact,
+  clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {
