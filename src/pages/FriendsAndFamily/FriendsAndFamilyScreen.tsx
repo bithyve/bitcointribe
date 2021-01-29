@@ -432,7 +432,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={onRefresh}
+              refreshing={showLoader}
               onRefresh={() => {
                 trustedChannelsSetupSync()
               }}
