@@ -9,6 +9,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes'
+import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
 const bitcoinAxios = axios.create( {
@@ -174,6 +175,7 @@ export default class Bitcoin {
         }
       }
 
+      let usedFallBack = false
       try{
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
@@ -187,9 +189,13 @@ export default class Bitcoin {
           )
         }
       } catch( err ){
-        if( !config.USE_ESPLORA_FALLBACK ) throw new Error( err.message )
+        if( !config.USE_ESPLORA_FALLBACK ){
+          Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
+          throw new Error( err.message )
+        }
         console.log( 'using Hexa node as fallback(fetch-balTx)' )
 
+        usedFallBack = true
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
             config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
@@ -424,6 +430,9 @@ export default class Bitcoin {
         }
       }
 
+      if( usedFallBack )
+        Toast( 'We could not connect to your own node.\nRefreshed using the BitHyve node....' )
+
       return {
         synchedAccounts
       }
@@ -613,6 +622,8 @@ export default class Bitcoin {
               },
             )
           }
+
+          Toast( 'We could not connect to your own node.\nSent using the BitHyve node....' )
           return {
             txid: res.data
           }
@@ -620,6 +631,9 @@ export default class Bitcoin {
         // console.log(err.message);
           throw new Error( 'Transaction broadcasting failed' )
         }
+      } else {
+        Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
+        throw new Error( 'Transaction broadcasting failed' )
       }
     }
   };
