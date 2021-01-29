@@ -290,8 +290,6 @@ class SendConfirmation extends Component<
 
       this.sendNotifications()
       this.storeTrustedContactsHistory( transfer.details )
-      this.refreshAccount()
-
 
       this.setState( {
         showLoader: false
@@ -1117,6 +1115,7 @@ class SendConfirmation extends Component<
                 const accountShellID = this.props.navigation.getParam(
                   'accountShellID',
                 )
+                this.refreshAccount()
 
                 navigation.dispatch(
                   resetStackToAccountDetails( {
