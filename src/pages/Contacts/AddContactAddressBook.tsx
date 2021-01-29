@@ -407,9 +407,9 @@ export default function AddContactAddressBook( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      
+
       <View style={{
-        height: '100%',
+        flex : 1
       }}>
         <View
           style={{
@@ -423,7 +423,7 @@ export default function AddContactAddressBook( props ) {
           </Text> */}
         </View>
         <View style={{
-          height: '100%', ...props.style
+          height: '95%', ...props.style
         }}>
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
@@ -498,7 +498,7 @@ export default function AddContactAddressBook( props ) {
             />
           </View>
           <View style={{
-            height: '100%', flexDirection: 'row', position: 'relative'
+            height: '95%', flexDirection: 'row', position: 'relative'
           }}>
             {filterContactData ? (
               <FlatList
