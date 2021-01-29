@@ -1193,11 +1193,11 @@ export const refreshAccountShellWatcher = createWatcher(
 
 function* autoSyncShellsWorker( { payload } ) {
   yield call( clearAccountSyncCache )
+  yield call( delay, 3000 )
   const shells = yield select(
     ( state ) => state.accounts.accountShells
   )
   for( const shell of shells )  {
-    yield call( delay, 5000 )
     if( shell.syncStatus===SyncStatus.PENDING ) {
       yield spawn( refreshAccountShellWorker,
         {
@@ -1210,6 +1210,7 @@ function* autoSyncShellsWorker( { payload } ) {
         }
       )
     }
+    yield call( delay, 4000 )
   }
 }
 export const autoSyncShellsWatcher = createWatcher(
