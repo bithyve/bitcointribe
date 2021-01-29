@@ -68,6 +68,8 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 import ModalHeader from "../../components/ModalHeader";
 import ErrorModalContents from "../../components/ErrorModalContents";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import AccountShell from "../../common/data/models/AccountShell";
+import PersonalNode from "../../common/data/models/PersonalNode";
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -125,6 +127,8 @@ interface ManageBackupPropsTypes {
   autoShareContact: any;
   trustedChannelsSetupSync: any;
   trustedChannelsSetupSyncing: any;
+  accountShells: AccountShell[];
+  activePersonalNode: PersonalNode;
 }
 
 class ManageBackup extends Component<
@@ -305,14 +309,14 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount } = this.props;
+    const { walletName, regularAccount, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(this.props.database);
+    encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -1503,6 +1507,8 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.trustedContacts.loading.trustedChannelsSetupSync
     ),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
+    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
   };
 };
 

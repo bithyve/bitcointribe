@@ -297,12 +297,12 @@ const PersonalCopyHistory = (props) => {
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
-        type == "pdf"
+        type == "pdf" || type == "contact"
           ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf" && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(
         onApprovalStatusChange(
           false,
@@ -493,7 +493,8 @@ const PersonalCopyHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf" ? !keeperApproveStatus.status : false
+              selectedKeeperType == "pdf"  || selectedKeeperType == "contact" 
+              ? !keeperApproveStatus.status : false
             }
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);

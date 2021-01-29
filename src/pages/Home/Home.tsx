@@ -114,6 +114,7 @@ import { AccountsState } from "../../store/reducers/accounts";
 import HomeAccountCardsList from "./HomeAccountCardsList";
 import AccountShell from "../../common/data/models/AccountShell";
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import PersonalNode from "../../common/data/models/PersonalNode";
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -212,6 +213,8 @@ interface HomePropsTypes {
   onApprovalStatusChange: any;
   secureAccount: any;
   autoDownloadShareContact: any;
+  accountShells: AccountShell[];
+  activePersonalNode: PersonalNode;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -613,6 +616,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // }
 
     const { healthCheckInitializedKeeper } = s3Service.levelhealth;
+    console.log("s3Service", s3Service);
+
     console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
     if (!healthCheckInitializedKeeper) {
       initializeHealthSetup();
@@ -635,14 +640,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, s3Service } = this.props;
+    const { walletName, regularAccount, s3Service, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(this.props.database);
+    encryptedCloudDataJson = await CloudData(this.props.database, accountShells,activePersonalNode);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -2362,6 +2367,9 @@ const mapStateToProps = (state) => {
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     keeperApproveStatus: idx(state, (_) => _.health.keeperApproveStatus),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
+    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
+
   };
 };
 

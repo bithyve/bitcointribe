@@ -19,7 +19,8 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import semver from 'semver';
-import { updateWalletImage } from '../actions/sss';
+import { updateWalletImageHealth } from '../actions/health';
+//import { updateWalletImage } from '../actions/sss';
 import KeeperService from '../../bitcoin/services/KeeperService';
 import { startupSync } from '../actions/accounts';
 import { walletCheckIn } from '../actions/trustedContacts';
@@ -53,7 +54,8 @@ function* fetchDBWorker() {
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
         yield put( walletCheckIn() )
-        yield put( updateWalletImage() )
+        yield put( updateWalletImageHealth() )
+        //yield put( updateWalletImage() )
         yield put( startupSync() )
       }
     } else {

@@ -244,7 +244,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"06b9d597aa9347fcf45e247a","publicKey":"311408cc66f816c4c02c174ba66b7c92545f23f7dc4e56598c83fa0a1150f6cb","ephemeralAddress":"3428a5fc245fd6def268bffa89e385825f836ed02c8275048cc24fe007b59cd2","walletName":"Primary"}' : '{"uuid":"061bc0d417b7c4ccd506e702","publicKey":"1ed9f7699b24eafde5b26766dd4627a15d3fd590037159ca2576c82ad4306abe","ephemeralAddress":"6e2a6b9c3f559a4d5350983f04d0784e39c6bd5f9741f6280eecc8d904a66b69","walletName":"macpro"}';
+            ? '{"uuid":"4964b1d02e7c45107be6d21c","publicKey":"458a035b2b6b54b614bcedacddbbc3607a64d58c4d5d254c6fec39637490d909","ephemeralAddress":"2c6c11f4a2131c577bde75bdb639c1923868c89feb38c98049a5e29afaf2e6c9","walletName":"Primary"}' : '{"uuid":"061bc0d417b7c4ccd506e702","publicKey":"1ed9f7699b24eafde5b26766dd4627a15d3fd590037159ca2576c82ad4306abe","ephemeralAddress":"6e2a6b9c3f559a4d5350983f04d0784e39c6bd5f9741f6280eecc8d904a66b69","walletName":"macpro"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
@@ -305,12 +305,12 @@ const KeeperDeviceHistory = (props) => {
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
-        type == "pdf"
+        type == "pdf" || type == "contact"
           ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf" && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(
         onApprovalStatusChange(
           false,
@@ -516,7 +516,7 @@ const KeeperDeviceHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf"
+              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
                 ? !keeperApproveStatus.status
                 : false
             }

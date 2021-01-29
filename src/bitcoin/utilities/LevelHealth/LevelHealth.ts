@@ -1296,8 +1296,8 @@ export default class LevelHealth {
   ): {
     restored: boolean;
   } => {
-    if (Object.keys(metaShares).length !== 3) {
-      throw new Error('Restoration requires a minimum of 3 metaShares');
+    if (!Object.keys(metaShares).length) {
+      throw new Error('Restoration requires metaShares');
     }
 
     this.metaSharesKeeper = metaShares;
@@ -1308,12 +1308,12 @@ export default class LevelHealth {
     this.healthCheckInitializedKeeper = true;
 
     // enriching pdf health variable if restoration is done via Personal Copy
-    if (this.metaSharesKeeper[3]) {
-      this.createQR(3);
-    }
-    if (this.metaSharesKeeper[4]) {
-      this.createQR(4);
-    }
+    // if (this.metaSharesKeeper[3]) {
+    //   this.createQR(3);
+    // }
+    // if (this.metaSharesKeeper[4]) {
+    //   this.createQR(4);
+    // }
 
     // replenishing shareIDs from any of the available shares
     for (const share of metaShares) {

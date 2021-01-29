@@ -132,7 +132,12 @@ export const serviceGenerator2 = async (
 
   // Share generation/restoration
   const s3Service = new S3Service(primaryMnemonic);
+  console.log('s3Service serviceGenerator2',s3Service);
 
+  if (metaShares) {
+    res = s3Service.restoreMetaSharesKeeper(metaShares);
+    if (res.status !== 200) throw new Error('Share restoration failed');
+  }
   // share history initialization
   const createdAt = Date.now();
   const shareHistory = [

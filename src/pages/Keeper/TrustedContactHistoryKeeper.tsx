@@ -1039,6 +1039,7 @@ const TrustedContactHistoryKeeper = (props) => {
   }, [chosenContact, trustedQR]);
 
   const sendApprovalRequestToPK = (type) => {
+    console.log("type",type);
     let PKShareId =
       currentLevel == 2 || currentLevel == 1
         ? levelHealth[1].levelInfo[2].shareId
@@ -1049,12 +1050,12 @@ const TrustedContactHistoryKeeper = (props) => {
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
-        type == "pdf"
+        type == "pdf" || type == "contact"
           ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf" && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),
@@ -1274,7 +1275,7 @@ const TrustedContactHistoryKeeper = (props) => {
           <ApproveSetup
             currentTime ={moment(new Date()).valueOf()}
             isContinueDisabled={
-              selectedKeeperType == "pdf"
+              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
                 ? !keeperApproveStatus.status
                 : false
             }

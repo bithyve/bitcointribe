@@ -145,7 +145,8 @@ import {
   confirmPDFSharedWatcher,
   downloadPdfShareHealthWatcher,
   updatedKeeperInfoWatcher,
-  uploadSMShareWatcher
+  uploadSMShareWatcher,
+  updateWalletImageHealthWatcher
 } from './sagas/health';
 
 import {
@@ -260,6 +261,7 @@ const rootSaga = function* () {
     downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
     fetchWalletImageHealthWatcher,
+    updateWalletImageHealthWatcher,
     uploadEncMetaShareKeeperWatcher,
     sendApprovalRequestWatcher,
     recoverMnemonicHealthWatcher,
