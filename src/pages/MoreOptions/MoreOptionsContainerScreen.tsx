@@ -22,7 +22,7 @@ interface MenuOption {
 const menuOptions: MenuOption[] = [
   {
     title: 'Account Management',
-    imageSource: require( '../../assets/images/icons/icon_hexa.png' ),
+    imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
     subtitle: 'View and manage your accounts',
     screenName: 'AccountManagement',
   },
