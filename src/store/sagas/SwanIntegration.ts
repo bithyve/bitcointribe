@@ -1,11 +1,14 @@
 import { call, put } from 'redux-saga/effects'
 
 import {
+  REDEEM_SWAN_CODE_FOR_TOKEN,
   FETCH_SWAN_AUTHENTICATION_URL,
   fetchSwanAuthenticationUrlSucceeded,
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
+  redeemSwanCodeForToken,
+  redeemSwanCodeForTokenSucceeded,
 } from '../actions/SwanIntegration'
 
 import {
@@ -20,35 +23,93 @@ import { createWatcher } from '../utils/utilities'
 import { generatePKCEParameters } from '../lib/swan'
 import Config from '../../bitcoin/HexaConfig'
 
-const client_id = Config.SWAN_CLIENT_ID || 'demo-web-client'
-const swan_auth_url = 'https://login-demo.curity.io/oauth/v2/oauth-authorize'// Config.SWAN_BASE_URL
-const redirect_uri = 'hexa://dev/swan/success/code/'//'https://oauth.tools/callback/code' //
-
+const client_id = Config.SWAN_CLIENT_ID || 'hexa-dev'
+const swanOAuthURL = Config.SWAN_BASE_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'
+const swan_auth_url = `${swanOAuthURL}/oidc/auth`
+const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'//'http%3A%2F%2Flocalhost%3A15000%2Foidc-client-sample.html'//'https://oauth.tools/callback/code' //
+let count = 0
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
 )
+/*
+http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=d250bf9468e0481aa93e384fb89b4f12&code_challenge=y26-jKwd4dLTPD3KZOJOokVKlYFlLZp2kdNSfzZwQRA&code_challenge_method=S256&response_mode=query
+http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=88561517876-FvC&code_challenge=CFw0kTcC9jczdKveoHGzVPjZC9yr-P1CqK15sotZGWA&code_challenge_method=S256&response_mode=query
 
+
+/*
+auth response
+https://hexawallet.io/dev/swan/?code=5RU6Hfqez8Yo640QMHByc2bOXr0pRXM_cgN9Nz1iitc&state=d250bf9468e0481aa93e384fb89b4f12
+https://hexawallet.io/dev/swan/?code=-emO6cJUmzznR1ObqOhfeG2jSmSXvz6DawhQPNWoBXk&state=75365396958-EJb
+hexa://dev/swan/?code=-emO6cJUmzznR1ObqOhfeG2jSmSXvz6DawhQPNWoBXk&state=75365396958-EJb
+*/
 export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
   const { code_challenge, code_verifier, nonce, state } = generatePKCEParameters()
   const swanAuthenticationUrl = `\
 ${swan_auth_url}?\
-&client_id=${client_id}\
-&state=${state}\
-&scope=openid%20profile%20read\
+client_id=${client_id}\
+&redirect_uri=${redirect_uri}\
 &response_type=code\
+&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal\
+&state=${state}\
 &code_challenge=${code_challenge}\
 &code_challenge_method=S256\
-&prompt=login\
-&ui_locales=en\
-&nonce=${nonce}\
-&redirect_uri=${redirect_uri}\
+&response_mode=query\
 `
+// &redirect_uri=${redirect_uri}\
+// &ui_locales=en\
+// &nonce=${nonce}\
   console.log( {
     code_challenge, code_verifier, nonce, state, swanAuthenticationUrl
   } )
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
+  } ) )
+}
+
+
+export const redeemSawCodeForTokenWatcher = createWatcher(
+  redeemSawCodeForTokenWorker,
+  REDEEM_SWAN_CODE_FOR_TOKEN
+)
+export function* redeemSawCodeForTokenWorker( { payload } ) {
+  /*
+
+  Request
+  http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=33679074916-byV&code_challenge=8JAY1jmIqOj8Jjf5a1ODHbZCuIJ9i0Zs3ZoXlpH7b8c&code_challenge_method=S256&response_mode=query'
+
+  Response
+  https://hexawallet.io/dev/swan/?code=yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV
+
+  */
+  console.log( count++, payload )
+  const data = qs.stringify( {
+    'code': 'yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV',
+    'code_verifier': 'jLm1y0vAqiYS1TcfwMaXAB0opMQloxjb25sGORAMN5BNUWgeOteCkWaqW1HpJCWz',
+    'grant_type': 'authorization_code',
+    'redirect_uri': 'https://hexawallet.io/dev/swan/'
+  } )
+  const config = {
+    method: 'post',
+    url: 'https://dev-api.swanbitcoin.com/oidc/token',
+    headers: {
+      'Authorization': 'Basic aGV4YS1kZXY6ZnNxREFEMFhXb3B1UzRqTkFiYVkxU09Dc2NpT0Uyem0=',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data : data
+  }
+
+  axios( config )
+    .then( function ( response ) {
+      console.log( JSON.stringify( response.data ) )
+    } )
+    .catch( function ( error ) {
+      console.log( error )
+    } )
+
+
+  yield put( redeemSwanCodeForTokenSucceeded( {
+    swanAuthenticatedCode: 'IGotIt'
   } ) )
 }
 

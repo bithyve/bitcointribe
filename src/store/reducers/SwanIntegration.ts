@@ -1,6 +1,7 @@
 import {
   CLEAR_SWAN_CACHE,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
+  REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
@@ -82,15 +83,18 @@ const INITIAL_STATE: SwanIntegrationState = {
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
       case CLEAR_SWAN_CACHE:
+        console.log( '***->clearing cache' )
         return {
           ...state,
-          isSwanAuthenticationInProgress: false,
-          hasFetchSwanAuthenticationUrlSucceeded: false,
+          isSwanAuthenticationInProgress: null,
+          hasFetchSwanAuthenticationUrlSucceeded: null,
           swanAuthenticationUrl: null,
           code_challenge: null,
           code_verifier: null,
           nonce: null,
-          state: null
+          state: null,
+          swanAuthenticatedCode: null,
+          redeemSwanCodeForTokenSucceeded: null
         }
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
@@ -102,6 +106,12 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           code_verifier: action.payload.data.code_verifier,
           nonce: action.payload.data.nonce,
           state: action.payload.data.state
+        }
+      case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
+        return {
+          ...state,
+          redeemSwanCodeForTokenSucceeded: true,
+          swanAuthenticatedCode: action.payload.data.swanAuthenticatedCode
         }
       case LINK_SWAN_WALLET:
         return {

@@ -2,6 +2,9 @@ export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
 export const FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED = 'FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED'
 
+export const REDEEM_SWAN_CODE_FOR_TOKEN = 'REDEEM_SWAN_CODE_FOR_TOKEN'
+export const REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED = 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED'
+
 export const LINK_SWAN_WALLET = 'LINK_SWAN_WALLET'
 export const LINK_SWAN_WALLET_FAILED = 'LINK_SWAN_WALLET_FAILED'
 export const LINK_SWAN_WALLET_SUCCEEDED = 'LINK_SWAN_WALLET_SUCCEEDED'
@@ -19,16 +22,16 @@ export const ADD_SWAN_METADATA_COMPLETED = 'ADD_SWAN_METADATA_COMPLETED'
 
 
 export enum SwanActionKind {
+  CLEAR_SWAN_CACHE,
   FETCH_SWAN_AUTHENTICATION_URL,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
+  REDEEM_SWAN_CODE_FOR_TOKEN,
+  REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
   AUTHENTICATE,
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
-  SYNC_SWAN_ACCOUNT_DATA,
-
-  CLEAR_SWAN_CACHE
+  SYNC_SWAN_ACCOUNT_DATA
 }
-
 
 export const clearSwanCache = ( ) => {
   return {
@@ -53,6 +56,25 @@ export const fetchSwanAuthenticationUrlSucceeded = ( data ) => {
     }
   }
 }
+
+export const redeemSwanCodeForToken = ( data ) => {
+  return {
+    type: REDEEM_SWAN_CODE_FOR_TOKEN,
+    payload : {
+      data
+    }
+  }
+}
+
+export const redeemSwanCodeForTokenSucceeded = ( data ) => {
+  return {
+    type: REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
+    payload : {
+      data
+    }
+  }
+}
+
 export const linkSwanWallet = ( data ) => {
   return {
     type: LINK_SWAN_WALLET,
