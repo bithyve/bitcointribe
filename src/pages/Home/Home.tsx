@@ -95,6 +95,7 @@ import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
@@ -111,6 +112,7 @@ export enum BottomSheetKind {
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
+  SWAN_STATUS_INFO,
   ERROR,
 }
 
@@ -136,6 +138,7 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
+  swanDeepLinkContent: string | null;
 }
 
 interface HomePropsTypes {
@@ -174,6 +177,7 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  swanDeepLinkContent: string | null;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -215,6 +219,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
+      swanDeepLinkContent: null
     }
   }
 
@@ -1013,7 +1018,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( 'Home::handleDeepLinking::URL: ' + url )
 
     const splits = url.split( '/' )
+    console.log( `url length ${splits.length} last param ${splits[ splits.length-1 ]} second last param ${splits[ splits.length-2 ]}` )
+    if ( splits.includes( 'swan' ) ) {
+      this.setState( {
+        swanDeepLinkContent:url
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
 
+    }
     if ( splits[ 5 ] === 'sss' ) {
       const requester = splits[ 4 ]
 
@@ -1671,6 +1684,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.SWAN_STATUS_INFO:
         case BottomSheetKind.TAB_BAR_BUY_MENU:
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
@@ -1710,10 +1724,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="Swan Info" onPress={this.closeBottomSheet} />
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+
+        case BottomSheetKind.SWAN_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="Stack Sats with SwanBitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetSwanInfo
+                navigatingFrom={'home'}
+                swanDeepLinkContent={this.state.swanDeepLinkContent}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
               />
             </>
           )
