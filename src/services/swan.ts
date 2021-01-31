@@ -7,7 +7,7 @@ export const redeemAuthCodeForToken = ( { code_verifier, code } ) => {
     const body = {
       code_verifier, code
     }
-    return BH_AXIOS.post( 'fetchWyreReservation', {
+    return BH_AXIOS.post( 'swanAuth', {
       HEXA_ID,
       ...body
     } )
