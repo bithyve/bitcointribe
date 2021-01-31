@@ -139,6 +139,7 @@ interface HomeStateTypes {
   isLoadContacts: boolean;
   lastActiveTime: string;
   swanDeepLinkContent: string | null;
+  swanFromBuyMenu: boolean | null;
 }
 
 interface HomePropsTypes {
@@ -178,6 +179,7 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   swanDeepLinkContent: string | null;
+  swanFromBuyMenu: boolean | null;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -219,7 +221,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
-      swanDeepLinkContent: null
+      swanDeepLinkContent: null,
+      swanFromBuyMenu: null
     }
   }
 
@@ -1275,7 +1278,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          // this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          this.setState( {
+            swanFromBuyMenu: true
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+          } )
           break
         case BuyMenuItemKind.WYRE:
           if ( this.props.currentWyreSubAccount ) {
