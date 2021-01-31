@@ -7,7 +7,6 @@ import {
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
-  redeemSwanCodeForToken,
   redeemSwanCodeForTokenSucceeded,
 } from '../actions/SwanIntegration'
 
@@ -29,17 +28,7 @@ export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
 )
-/*
-http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=d250bf9468e0481aa93e384fb89b4f12&code_challenge=y26-jKwd4dLTPD3KZOJOokVKlYFlLZp2kdNSfzZwQRA&code_challenge_method=S256&response_mode=query
-http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=88561517876-FvC&code_challenge=CFw0kTcC9jczdKveoHGzVPjZC9yr-P1CqK15sotZGWA&code_challenge_method=S256&response_mode=query
 
-
-/*
-auth response
-https://hexawallet.io/dev/swan/?code=5RU6Hfqez8Yo640QMHByc2bOXr0pRXM_cgN9Nz1iitc&state=d250bf9468e0481aa93e384fb89b4f12
-https://hexawallet.io/dev/swan/?code=-emO6cJUmzznR1ObqOhfeG2jSmSXvz6DawhQPNWoBXk&state=75365396958-EJb
-hexa://dev/swan/?code=-emO6cJUmzznR1ObqOhfeG2jSmSXvz6DawhQPNWoBXk&state=75365396958-EJb
-*/
 export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
   const { code_challenge, code_verifier, nonce, state } = generatePKCEParameters()
   const swanAuthenticationUrl = `\
@@ -65,20 +54,12 @@ client_id=${client_id}\
 }
 
 
-export const redeemSawCodeForTokenWatcher = createWatcher(
-  redeemSawCodeForTokenWorker,
+export const redeemSwanCodeForTokenWatcher = createWatcher(
+  redeemSwanCodeForTokenWorker,
   REDEEM_SWAN_CODE_FOR_TOKEN
 )
-export function* redeemSawCodeForTokenWorker( { payload } ) {
-  /*
+export function* redeemSwanCodeForTokenWorker( { payload } ) {
 
-  Request
-  http://dev-api.swanbitcoin.com/oidc/auth?client_id=hexa-dev&redirect_uri=https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F&response_type=code&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal&state=33679074916-byV&code_challenge=8JAY1jmIqOj8Jjf5a1ODHbZCuIJ9i0Zs3ZoXlpH7b8c&code_challenge_method=S256&response_mode=query'
-
-  Response
-  https://hexawallet.io/dev/swan/?code=yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV
-
-  */
   console.log( count++, payload )
   // 'code': 'yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV',
   // 'code_verifier': 'jLm1y0vAqiYS1TcfwMaXAB0opMQloxjb25sGORAMN5BNUWgeOteCkWaqW1HpJCWz',
