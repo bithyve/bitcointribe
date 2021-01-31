@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 
 import {
   REDEEM_SWAN_CODE_FOR_TOKEN,
@@ -12,10 +12,7 @@ import {
 } from '../actions/SwanIntegration'
 
 import {
-  getSwanAuthToken,
-  linkSwanWallet,
-  syncSwanWallet,
-  redeemAuthCode
+  redeemAuthCodeForToken
 } from '../../services/swan'
 
 import { createWatcher } from '../utils/utilities'
@@ -83,84 +80,18 @@ export function* redeemSawCodeForTokenWorker( { payload } ) {
 
   */
   console.log( count++, payload )
-  const data = qs.stringify( {
-    'code': 'yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV',
-    'code_verifier': 'jLm1y0vAqiYS1TcfwMaXAB0opMQloxjb25sGORAMN5BNUWgeOteCkWaqW1HpJCWz',
-    'grant_type': 'authorization_code',
-    'redirect_uri': 'https://hexawallet.io/dev/swan/'
+  // 'code': 'yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV',
+  // 'code_verifier': 'jLm1y0vAqiYS1TcfwMaXAB0opMQloxjb25sGORAMN5BNUWgeOteCkWaqW1HpJCWz',
+  const { code, code_verifier } = yield select(
+    ( state ) => state.swanIntegration
+  )
+  const swanAuthenticatedCode = yield call( redeemAuthCodeForToken, {
+    code, code_verifier
   } )
-  const config = {
-    method: 'post',
-    url: 'https://dev-api.swanbitcoin.com/oidc/token',
-    headers: {
-      'Authorization': 'Basic aGV4YS1kZXY6ZnNxREFEMFhXb3B1UzRqTkFiYVkxU09Dc2NpT0Uyem0=',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    data : data
-  }
-
-  axios( config )
-    .then( function ( response ) {
-      console.log( JSON.stringify( response.data ) )
-    } )
-    .catch( function ( error ) {
-      console.log( error )
-    } )
-
 
   yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedCode: 'IGotIt'
+    swanAuthenticatedCode
   } ) )
-}
-
-export function* fetchSwanTokenWorker( { payload } ) {
-  // Authentication code is available which needs to be redeemed
-  console.log( 'About to Redeem Authorization Code ', payload.data )
-  try {
-    const result = yield call( redeemAuthCode, payload.data )
-
-    console.log( '***-> result', result )
-    if ( !result || result.status !== 200 ) {
-      const data = {
-        fetchSwanTokenFail: true,
-        fetchSwanTokenFailMessage: 'Swan authentication failed',
-      }
-      //yield put( fetchSwanTokenFailed( data ) )
-    } else {
-      /*
-      If we are here that means authentication was succesful with Swan
-      there are 2 options to consider
-
-      Option 1:
-      User is now athenticated with Swan so they really do have a Swan account
-      we can now create a Swan Account and save:
-      swan xpub,
-      The returned auth token
-      initial linkingStatus as 'NOT_LINKED'
-      isConfirmed  as false
-
-      Option 2:
-      Create the swan account shell as a separate action and reducer
-      and update it when we get the auth token.
-      */
-
-      //yield put( fetchSwanTokenSucceeded( result.data ) )
-      if ( result.error ) {
-        const data = {
-          fetchSwanTokenFail: true,
-          fetchSwanTokenFailMessage: result.message || 'Swan authentication failed',
-        }
-        //yield put( fetchSwanTokenFailed( data ) )
-      }
-    }
-  } catch ( err ) {
-    console.log( 'err', err )
-    const data = {
-      fetchSwanTokenFail: true,
-      fetchSwanTokenFailMessage: 'Swan authentication failed',
-    }
-    //yield put( fetchSwanTokenFailed( data ) )
-  }
 }
 
 function* linkSwanWalletWorker( { payload } ) {
