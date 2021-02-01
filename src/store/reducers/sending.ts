@@ -25,9 +25,21 @@ const INITIAL_STATE: SendingState = {
   amountDesignations: {
   },
   recipientSelectedForSettingAmount: null,
+
+  /*
+  This should change to a new type with 4 stages
+  to start with please call them ST1, ST2, ST3 and ST4
+  Each one can be executed or failed
+  */
   isSendingInProgress: false,
+
   hasSendingFailed: false,
   sendingFailedErrorMessage: null,
+  /*
+  the UI needs to keep track of fees to display on screen
+  Three level of fees priority with time estimate for each
+  fees: {}, // 3 levels of fees and priority
+  */
 }
 
 
