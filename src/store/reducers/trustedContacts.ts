@@ -12,6 +12,7 @@ import {
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
   APPROVE_TRUSTED_CONTACT,
+  CLEAR_TRUSTED_CONTACTS_CACHE
 } from '../actions/trustedContacts'
 import {
   EphemeralData,
@@ -70,6 +71,14 @@ const initialState: {
 
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
+      case CLEAR_TRUSTED_CONTACTS_CACHE:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            approvingTrustedContact: false,
+          },
+        }
       case SERVICES_ENRICHED:
         return {
           ...state,
@@ -83,7 +92,7 @@ export default ( state = initialState, action ) => {
           initializedTrustedContacts: {
             ...state.initializedTrustedContacts,
             [ action.payload.contactName ]: {
-              publicKey: action.payload.publicKey 
+              publicKey: action.payload.publicKey
             },
           },
         }
