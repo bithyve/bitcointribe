@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,100 +8,102 @@ import {
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
-} from 'react-native';
-import ContactList from '../../components/ContactList';
-import Toast from '../../components/Toast';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+} from 'react-native'
+import ContactList from '../../components/ContactList'
+import Toast from '../../components/Toast'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import Loader from '../../components/loader';
+} from 'react-native-responsive-screen'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import Loader from '../../components/loader'
 
-const ContactsListForAssociateContact = (props) => {
-  const [contacts, setContacts] = useState([]);
-  const postAssociation = props.navigation.getParam('postAssociation');
-  const [approvingContact, setApprovingContact] = useState('');
-  const isGuardian = props.navigation.getParam('isGuardian');
-  const dispatch = useDispatch();
+const ContactsListForAssociateContact = ( props ) => {
+  const [ contacts, setContacts ] = useState( [] )
+  const postAssociation = props.navigation.getParam( 'postAssociation' )
+  const [ approvingContact, setApprovingContact ] = useState( '' )
+  const isGuardian = props.navigation.getParam( 'isGuardian' )
+  const dispatch = useDispatch()
   const { approvingTrustedContact } = useSelector(
-    (state) => state.trustedContacts.loading,
-  );
-  const [showLoader, setShowLoader] = useState(false);
-  function selectedContactsList(list) {
-    if (list.length > 0) setContacts([...list]);
+    ( state ) => state.trustedContacts.loading,
+  )
+  const [ showLoader, setShowLoader ] = useState( false )
+  function selectedContactsList( list ) {
+    if ( list.length > 0 ) setContacts( [ ...list ] )
   }
 
-  let trustedContactsInfo = useSelector(
-    (state) => state.trustedContacts.trustedContactsInfo,
-  );
+  const trustedContactsInfo = useSelector(
+    ( state ) => state.trustedContacts.trustedContactsInfo,
+  )
   const trustedContacts: TrustedContactsService = useSelector(
-    (state) => state.trustedContacts.service,
-  );
+    ( state ) => state.trustedContacts.service,
+  )
 
-  const updateTrustedContactsInfo = async (contact?) => {
-    const associatedContact = contact ? contact : contacts[0];
-    setShowLoader(true);
+  const updateTrustedContactsInfo = async ( contact? ) => {
+    const associatedContact = contact ? contact : contacts[ 0 ]
+    setShowLoader( true )
     const selectedContactName = `${associatedContact.firstName} ${
       associatedContact.lastName ? associatedContact.lastName : ''
     }`
       .toLowerCase()
-      .trim();
-    setApprovingContact(selectedContactName);
+      .trim()
+    setApprovingContact( selectedContactName )
 
-    let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
-    if (tcInfo) {
+    let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
+    if ( tcInfo ) {
       if (
-        tcInfo.findIndex((trustedContact) => {
-          if (!trustedContact) return false;
+        tcInfo.findIndex( ( trustedContact ) => {
+          if ( !trustedContact ) return false
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
           }`
             .toLowerCase()
-            .trim();
+            .trim()
 
-          return presentContactName == selectedContactName;
-        }) == -1
+          return presentContactName == selectedContactName
+        } ) == -1
       ) {
-        tcInfo.push(associatedContact);
-        console.log({ con: associatedContact });
-        postAssociation(associatedContact);
+        tcInfo.push( associatedContact )
+        console.log( {
+          con: associatedContact
+        } )
+        postAssociation( associatedContact )
       } else {
-        setShowLoader(false);
-        Toast('Contact already exists');
-        return;
+        setShowLoader( false )
+        Toast( 'Contact already exists' )
+        return
       }
     } else {
-      tcInfo = [];
-      tcInfo[3] = associatedContact;
+      tcInfo = []
+      tcInfo[ 3 ] = associatedContact
 
-      postAssociation(associatedContact);
+      postAssociation( associatedContact )
     }
-    await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
-    dispatch(updateTrustedContactInfoLocally(tcInfo));
-  };
+    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+  }
 
   const { approvedTrustedContacts } = useSelector(
-    (state) => state.trustedContacts,
-  );
+    ( state ) => state.trustedContacts,
+  )
 
-  useEffect(() => {
+  useEffect( () => {
     if (
       approvingContact &&
       approvedTrustedContacts &&
-      approvedTrustedContacts[approvingContact]
+      approvedTrustedContacts[ approvingContact ]
     )
- //     setShowLoader(false);
-      props.navigation.navigate('Home');
-  }, [approvedTrustedContacts, approvingContact]);
+    //     setShowLoader(false);
+      props.navigation.navigate( 'Home' )
+  }, [ approvedTrustedContacts, approvingContact ] )
 
   // const continueNProceed = async () => {
   //   let AssociatedContact = JSON.parse(
@@ -127,19 +129,31 @@ const ContactsListForAssociateContact = (props) => {
   // };
 
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 0 }} />
+    <View style={{
+      flex: 1
+    }}>
+      <SafeAreaView style={{
+        flex: 0
+      }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center'
+        }}>
           <TouchableOpacity
             onPress={() => props.navigation.goBack()}
-            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
+            style={{
+              height: 30, width: 30, justifyContent: 'center'
+            }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <View style={{ flex: 1 }}>
+          <View style={{
+            flex: 1
+          }}>
             <Text style={styles.modalHeaderTitleText}>
               {'Associate a contact'}
             </Text>
@@ -148,29 +162,29 @@ const ContactsListForAssociateContact = (props) => {
           <AppBottomSheetTouchableWrapper
             disabled={approvingTrustedContact}
             onPress={() => {
-              setShowLoader(true);
-              let { skippedContactsCount } = trustedContacts.tc;
-              let data;
-              if (!skippedContactsCount) {
-                skippedContactsCount = 1;
+              setShowLoader( true )
+              let { skippedContactsCount } = trustedContacts.tc
+              let data
+              if ( !skippedContactsCount ) {
+                skippedContactsCount = 1
                 data = {
                   firstName: 'F&F request',
                   lastName: `awaiting ${skippedContactsCount}`,
                   name: `F&F request awaiting ${skippedContactsCount}`,
-                };
+                }
               } else {
                 data = {
                   firstName: 'F&F request',
                   lastName: `awaiting ${skippedContactsCount + 1}`,
                   name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                };
+                }
               }
 
-              updateTrustedContactsInfo(data);
+              updateTrustedContactsInfo( data )
             }}
             style={{
-              height: wp('8%'),
-              width: wp('22%'),
+              height: wp( '8%' ),
+              width: wp( '22%' ),
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: approvingTrustedContact
@@ -187,7 +201,7 @@ const ContactsListForAssociateContact = (props) => {
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: RFValue(12),
+                  fontSize: RFValue( 12 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -201,11 +215,12 @@ const ContactsListForAssociateContact = (props) => {
         Associate a contact from your address book. This will help you remember
         who the request was from
       </Text>
-      
+
       <ContactList
         isTrustedContact={true}
         isShowSkipContact={true}
-        style={{}}
+        style={{
+        }}
         onPressContinue={updateTrustedContactsInfo}
         onSelectContact={selectedContactsList}
         onPressSkip={() => {
@@ -216,10 +231,10 @@ const ContactsListForAssociateContact = (props) => {
       {showLoader ? <Loader isLoading={true} /> : null}
 
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderTitleView: {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
@@ -234,14 +249,14 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalSubheaderText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 20,
   },
-});
-export default ContactsListForAssociateContact;
+} )
+export default ContactsListForAssociateContact

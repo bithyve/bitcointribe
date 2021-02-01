@@ -9,6 +9,8 @@ import CurrentTotalHeader from '../../../../components/account-settings/source-r
 import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList'
 import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import Colors from '../../../../common/Colors';
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 // TODO: Remove these after testing UI.
 const sampleSources: SubAccountDescribing[] = [
@@ -80,13 +82,10 @@ const SelectSubAccountSourcesScreen: React.FC<Props> = ( { navigation, }: Props 
       </View>
 
       <View style={styles.proceedButtonContainer}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Confirm & Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Confirm & Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
     </View>
@@ -103,7 +102,6 @@ const styles = StyleSheet.create( {
     elevation: 2,
     position: 'absolute',
     bottom: 30,
-    alignSelf: 'center',
   },
 } )
 

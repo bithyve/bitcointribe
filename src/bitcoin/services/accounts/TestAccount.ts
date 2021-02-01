@@ -13,6 +13,8 @@ export default class TestAccount extends BaseAccount {
       mnemonic,
       passphrase,
       purpose,
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -33,6 +35,8 @@ export default class TestAccount extends BaseAccount {
       mnemonic: string;
       passphrase: string;
       purpose: number;
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -58,6 +62,8 @@ export default class TestAccount extends BaseAccount {
     } = hdWallet
 
     return new TestAccount( mnemonic, passphrase, purpose, {
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -82,6 +88,8 @@ export default class TestAccount extends BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;

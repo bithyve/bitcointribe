@@ -2,50 +2,62 @@ import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { Button, Input } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
+import ButtonBlue from '../../../components/ButtonBlue'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors'
+import Entypo from 'react-native-vector-icons/Entypo'
+import {
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Fonts from '../../../common/Fonts'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
   portNumber: number;
+  useFallback: boolean;
 }
 
 export type Props = {
-  onSubmit: (formData: PersonalNodeFormData) => void;
+  onSubmit: ( formData: PersonalNodeFormData ) => void;
 };
 
 
-const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
+const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => {
   const activePersonalNode = useActivePersonalNode()
 
-  const [currentIPAddressValue, setCurrentIPAddressValue] = useState(
+  const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState(
     activePersonalNode?.ipAddress || ''
   )
 
-  const [currentPortNumberValue, setCurrentPortNumberValue] = useState(
-    String(activePersonalNode?.portNumber || '')
+  const [ currentPortNumberValue, setCurrentPortNumberValue ] = useState(
+    String( activePersonalNode?.portNumber || '' )
   )
 
-  const ipAddressInputRef = useRef<Input>(null)
+  const [ useFallback, setUseFallbacck ] = useState( activePersonalNode?.useFallback || false )
 
-  const canProceed = useMemo(() => {
+  const ipAddressInputRef = useRef<Input>( null )
+
+  const canProceed = useMemo( () => {
     return (
       currentIPAddressValue.length != 0 &&
-      Boolean(Number(currentPortNumberValue))
+      Boolean( Number( currentPortNumberValue ) )
     )
-  }, [currentIPAddressValue, currentPortNumberValue])
+  }, [ currentIPAddressValue, currentPortNumberValue ] )
 
   function handleProceedButtonPress() {
-    onSubmit({
+    onSubmit( {
       ipAddress: currentIPAddressValue,
-      portNumber: Number(currentPortNumberValue),
-    })
+      portNumber: Number( currentPortNumberValue ),
+      useFallback
+    } )
   }
 
-  useEffect(() => {
+  useEffect( () => {
     ipAddressInputRef.current?.focus()
-  }, [])
+  }, [] )
 
   return (
     <View style={styles.rootContainer}>
@@ -87,14 +99,30 @@ const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
         />
       </View>
 
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => setUseFallbacck( !useFallback )}
+        style={styles.useFallbackTouchable}
+      >
+        <Text style={styles.useFallbackText}>
+                    Use Hexa node as fallback
+        </Text>
+        <View style={styles.useFallbackCheckView}>
+          {useFallback && (
+            <Entypo
+              name="check"
+              size={RFValue( 17 )}
+              color={Colors.green}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+
       <View style={styles.footerSection}>
-        <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          title="Proceed"
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleProceedButtonPress}
-          disabled={canProceed === false}
+        <ButtonBlue
+          buttonText="Proceed"
+          handleButtonPress={handleProceedButtonPress}
+          buttonDisable={canProceed === false}
         />
       </View>
 
@@ -102,7 +130,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ({ onSubmit, }: Props) => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
 
   },
@@ -120,7 +148,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 26,
     alignItems: 'flex-start',
   },
-
-})
+  useFallbackTouchable: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundColor1,
+    alignItems: 'center',
+    paddingLeft: 35,
+    paddingRight: 35,
+    marginTop: 10,
+    marginBottom: 10,
+    height: wp( '13%' ),
+  },
+  useFallbackText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  useFallbackCheckView: {
+    width: wp( '7%' ),
+    height: wp( '7%' ),
+    borderRadius: 7,
+    backgroundColor: Colors.white,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+} )
 
 export default PersonalNodeConnectionForm

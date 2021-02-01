@@ -193,7 +193,7 @@ const VoucherScanner = ( props ) => {
     return ref.current
   }
   const prevFBTCAccount_Data = usePrevious( {
-    FBTCAccount_Data 
+    FBTCAccount_Data
   } )
 
   useEffect( () => {
@@ -532,7 +532,7 @@ const VoucherScanner = ( props ) => {
             setShowLoader( false )
           }, 2 );
           ( RegistrationSuccessBottomSheet as any ).current.snapTo( 1 )
-          
+
           dispatch( ClearAccountSyncData() )
         }
       } )()
@@ -949,22 +949,22 @@ const VoucherScanner = ( props ) => {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack()
             }}
             hitSlop={{
-              top: 20, left: 20, bottom: 20, right: 20 
+              top: 20, left: 20, bottom: 20, right: 20
             }}
             style={styles.backArrowView}
           >
@@ -977,16 +977,16 @@ const VoucherScanner = ( props ) => {
       </View>
       <KeyboardAvoidingView
         style={{
-          flex: 1, paddingTop: wp( '5%' ), position: 'relative' 
+          flex: 1, paddingTop: wp( '5%' ), position: 'relative'
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
         <ScrollView style={{
-          flex: 1 
+          flex: 1
         }}>
           <View style={{
-            height: '100%' 
+            height: '100%'
           }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -997,7 +997,7 @@ const VoucherScanner = ( props ) => {
                   captureAudio={false}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
@@ -1014,15 +1014,15 @@ const VoucherScanner = ( props ) => {
               <TouchableOpacity
                 onPress={() => setOpenCameraFlag( true )}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               >
                 <ImageBackground
-                  source={require( '../../assets/images/icons/iPhone-QR.png' )}
+                  source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
                   style={styles.cameraImage}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
@@ -1074,12 +1074,12 @@ const VoucherScanner = ( props ) => {
                     <Image
                       source={value.image}
                       style={{
-                        width: wp( '8%' ), height: wp( '8%' ) 
+                        width: wp( '8%' ), height: wp( '8%' )
                       }}
                     />
                   )}
                   <View style={{
-                    flex: 1, marginLeft: 10 
+                    flex: 1, marginLeft: 10
                   }}>
                     <Text style={styles.dropDownElementTitleText}>
                       {value.accountName}
@@ -1151,7 +1151,7 @@ const VoucherScanner = ( props ) => {
                 {'Already registered with FastBitcoins?'}
               </Text>
               <View style={{
-                flexDirection: 'row' 
+                flexDirection: 'row'
               }}>
                 <Text
                   style={{
@@ -1204,12 +1204,12 @@ const VoucherScanner = ( props ) => {
             <Image
               source={selectedAccount.image}
               style={{
-                width: wp( '8%' ), height: wp( '8%' ) 
+                width: wp( '8%' ), height: wp( '8%' )
               }}
             />
           )}
           <View style={{
-            flex: 1, marginLeft: 10 
+            flex: 1, marginLeft: 10
           }}>
             <Text style={styles.dropDownElementTitleText}>
               {selectedAccount && selectedAccount.accountName
@@ -1238,7 +1238,7 @@ const VoucherScanner = ( props ) => {
             )}
           </View>
           <View style={{
-            justifyContent: 'center', alignItems: 'center' 
+            justifyContent: 'center', alignItems: 'center'
           }}>
             <Entypo
               name={'dots-three-horizontal'}

@@ -31,19 +31,29 @@ export default class AccountShell {
    */
   unit: BitcoinUnit;
 
-  isSyncInProgress = false;
+  /**
+   * Indicates if the accounts in the shell are fetching balances and transactions.
+   * A loader is displayed on the account screen when this is in progress
+   */
+  isSyncInProgress: boolean | false;
+
+  /**
+   * Indicates if the account has completed syncing this happens once per session.
+   * A sync icon is diplayed on the home screen tile if this has not be done
+   */
+  hasAccountSyncCompleted: boolean | false;
 
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };
 
 
-  constructor({
+  constructor( {
     displayOrder = null,
     unit = BitcoinUnit.BTC,
     primarySubAccount,
     secondarySubAccounts = {
     },
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = uuidV4()
 
     this.primarySubAccount = primarySubAccount
@@ -51,8 +61,8 @@ export default class AccountShell {
 
     this.secondarySubAccounts = secondarySubAccounts
 
-    Object.values(this.secondarySubAccounts).forEach(
-      (s) => (s.accountShellID = this.id),
+    Object.values( this.secondarySubAccounts ).forEach(
+      ( s ) => ( s.accountShellID = this.id ),
     )
 
     this.displayOrder = displayOrder
@@ -65,21 +75,21 @@ export default class AccountShell {
     return shell.primarySubAccount.utxoCompatibilityGroup
   }
 
-  static getSubAccounts(shell: AccountShell): SubAccountDescribing[] {
+  static getSubAccounts( shell: AccountShell ): SubAccountDescribing[] {
     return [
       shell.primarySubAccount,
-      ...Object.values(shell.secondarySubAccounts),
+      ...Object.values( shell.secondarySubAccounts ),
     ]
   }
 
   /**
    * Total balance of all sub-accounts in Satoshis.
    */
-  static getTotalBalance = (shell: AccountShell): Satoshis => {
-    return AccountShell.getSubAccounts(shell).reduce(
-      (accumulated, current) =>
+  static getTotalBalance = ( shell: AccountShell ): Satoshis => {
+    return AccountShell.getSubAccounts( shell ).reduce(
+      ( accumulated, current ) =>
         accumulated +
-        (current.balances.confirmed + current.balances.unconfirmed),
+        ( current.balances.confirmed + current.balances.unconfirmed ),
       0,
     )
   };
@@ -87,11 +97,11 @@ export default class AccountShell {
   /**
    * Spendable balance of all sub-accounts in Satoshis.
    */
-  static getSpendableBalance = (shell: AccountShell): Satoshis => {
+  static getSpendableBalance = ( shell: AccountShell ): Satoshis => {
     return AccountShell
-      .getSubAccounts(shell)
+      .getSubAccounts( shell )
       .reduce(
-        (accumulated, current) => accumulated + current.balances.confirmed,
+        ( accumulated, current ) => accumulated + current.balances.confirmed,
         0
       )
   };
@@ -103,11 +113,11 @@ export default class AccountShell {
     shell: AccountShell,
   ): TransactionDescribing[] => {
     return AccountShell
-      .getSubAccounts(shell)
-      .flatMap(subAccount => subAccount.transactions)
+      .getSubAccounts( shell )
+      .flatMap( subAccount => subAccount.transactions )
   };
 
-  static getVisibility(shell: AccountShell): AccountVisibility {
+  static getVisibility( shell: AccountShell ): AccountVisibility {
     return shell.primarySubAccount.visibility
   }
 
@@ -122,16 +132,17 @@ export default class AccountShell {
   /**
    * Updates primary sub-account w/ latest balance and transactions
    */
-  static updatePrimarySubAccountBalanceTx(
+  static updatePrimarySubAccountDetails(
     shell: AccountShell,
+    accountName: string,
+    accountDescription: string,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
   ) {
-    shell.primarySubAccount = {
-      ...shell.primarySubAccount,
-      balances: newbalance,
-      transactions: newTransactions,
-    }
+    if( accountName ) shell.primarySubAccount.customDisplayName = accountName
+    if( accountDescription ) shell.primarySubAccount.customDescription = accountDescription
+    shell.primarySubAccount.balances = newbalance
+    shell.primarySubAccount.transactions = newTransactions
   }
 
   static addSecondarySubAccount(
@@ -152,7 +163,7 @@ export default class AccountShell {
     newTransactions: TransactionDescribing[],
   ) {
     let secondarySub = shell.secondarySubAccounts[ subAccId ]
-    if (secondarySub) {
+    if ( secondarySub ) {
       secondarySub = {
         ...secondarySub,
         balances: newbalance,

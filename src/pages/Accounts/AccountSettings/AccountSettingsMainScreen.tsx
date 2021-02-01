@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
+import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
   navigation: any;
@@ -57,12 +58,26 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
+  const accountShell = useAccountShellForID( accountShellID )
+  const [ settingsList, setSettingsList ] = useState( listItems )
 
   function handleListItemPressed( listItem: SettingsListItem ) {
     navigation.navigate( listItem.screenName, {
       accountShellID,
     } )
   }
+
+  useEffect( () =>{
+    if( accountShell.primarySubAccount.isTFAEnabled ){
+      const twoFASetting = {
+        title: '2FA Settings',
+        subtitle: 'Reset 2FA or no server response',
+        screenName: 'ResetTwoFAHelp',
+        imageSource: require( '../../../assets/images/icons/icon_merge_blue.png' ),
+      }
+      setSettingsList( [ ...listItems, twoFASetting ] )
+    }
+  }, [ accountShell ] )
 
   const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
     return (
@@ -90,9 +105,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{
-        paddingHorizontal: 14 
+        paddingHorizontal: 14
       }}
-      data={listItems}
+      data={settingsList}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
     />

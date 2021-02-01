@@ -5,6 +5,7 @@ export const PERSONAL_NODE_PREFERENCE_TOGGLED = 'PERSONAL_NODE_PREFERENCE_TOGGLE
 
 export const SAVE_PERSONAL_NODE_CONFIGURATION = 'SAVE_PERSONAL_NODE_CONFIGURATION'
 export const PERSONAL_NODE_CONFIGURATION_SET = 'PERSONAL_NODE_CONFIGURATION_SET'
+export const RESTORE_PERSONAL_NODE_CONFIGURATION = 'RESTORE_PERSONAL_NODE_CONFIGURATION'
 
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
@@ -41,6 +42,14 @@ export const savePersonalNodeConfiguration = ( payload: PersonalNode ): Personal
     payload,
   }
 }
+
+export const restorePersonalNodeConfiguration = ( payload: PersonalNode ) => {
+  return {
+    type: RESTORE_PERSONAL_NODE_CONFIGURATION,
+    payload,
+  }
+}
+
 
 
 export interface PersonalNodeConfigurationSetAction extends Action {
