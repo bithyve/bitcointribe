@@ -452,22 +452,6 @@ export default function AddContactAddressBook( props ) {
               } )
               : null}
           </View>
-          {/* <View style={{ alignItems: 'flex-end' }}>
-            <AppBottomSheetTouchableWrapper
-              style={{ marginRight: 10, padding: 10 }}
-              onPress={() => props.onSkipContinue()}
-            >
-              <Text
-                style={{
-                  fontSize: RFValue(13, 812),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-                onPress={() => props.onSkipContinue()}
-              >
-                Skip Contact
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -607,6 +591,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
     paddingTop: hp( '2%' ),
+    marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
   },
@@ -653,12 +638,12 @@ const styles = StyleSheet.create( {
     padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansRegular
   },
   selectedContactContainer: {
     height: wp( '20%' ),
@@ -683,6 +668,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     borderBottomColor: Colors.borderColor,
     borderBottomWidth: 0.5,
+    marginTop: wp( '5%' ),
     marginLeft: 10,
     marginRight: 10,
     height: 40,

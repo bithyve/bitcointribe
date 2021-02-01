@@ -100,7 +100,7 @@ export default function CheckingAccountKnowMoreSheetContents(props) {
               marginBottom: wp('5%'),
             }}
           >
-            Transactions from your Checking Account have lower fees compared the the Savings Account - keep bitcoin here for short-term holding or spending. 
+            Transactions from your Checking Account have lower fees compared to the Savings Account - keep bitcoin here for short-term holding or spending. 
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
