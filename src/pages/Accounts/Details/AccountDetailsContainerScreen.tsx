@@ -382,6 +382,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
         refreshControl={
           <RefreshControl
             onRefresh={performRefreshOnPullDown}

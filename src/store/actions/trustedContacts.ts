@@ -22,6 +22,13 @@ export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
+export const CLEAR_TRUSTED_CONTACTS_CACHE = 'CLEAR_TRUSTED_CONTACTS_CACHE'
+
+export const clearTrustedContactsCache = () => {
+  return {
+    type: CLEAR_TRUSTED_CONTACTS_CACHE
+  }
+}
 
 export const initializeTrustedContact = ( contactInfo: {
   contactName: string;
