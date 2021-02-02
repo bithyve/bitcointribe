@@ -83,7 +83,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       default:
         derivativeAccountKind = primarySubAccount.kind
   }
-  
+
   const derivativeAccountDetails: {
     type: string;
     number: number;
@@ -257,9 +257,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       navigation.navigate( 'TwoFASetup', {
         twoFASetup:
           accountsState[ serviceType ].service.secureHDWallet
-            .twoFASetup, 
+            .twoFASetup,
       } )
-      // dispatch( removeTwoFA() )    
+      // dispatch( removeTwoFA() )
     }
   }, [ primarySubAccount.sourceKind ] )
 
@@ -380,6 +380,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
         refreshControl={
           <RefreshControl
             onRefresh={performRefreshOnPullDown}

@@ -22,7 +22,7 @@ interface MenuOption {
 const menuOptions: MenuOption[] = [
   {
     title: 'Account Management',
-    imageSource: require( '../../assets/images/icons/icon_hexa.png' ),
+    imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
     subtitle: 'View and manage your accounts',
     screenName: 'AccountManagement',
   },
@@ -43,12 +43,17 @@ const menuOptions: MenuOption[] = [
     subtitle: 'Connect Hexa wallet to your own Bitcoin node',
     screenName: 'NodeSettings',
   },
+  /*
+  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+  leaving the option here so that it can be enabled in a future release.
+
   {
     title: 'Funding Sources',
     imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
     subtitle: 'Buying methods integrated in your wallet',
     screenName: 'FundingSources',
   },
+  */
   {
     title: 'Hexa Community (Telegram)',
     imageSource: require( '../../assets/images/icons/telegram.png' ),
