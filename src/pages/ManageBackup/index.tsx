@@ -810,26 +810,26 @@ export default function ManageBackup( props ) {
   }
 
   useEffect( () => {
-    setAutoHighlightFlagsFromAsync();
-    setSecurityQuestionCreatedData();
-  }, [] );
+    setAutoHighlightFlagsFromAsync()
+    setSecurityQuestionCreatedData()
+  }, [] )
 
   const setSecurityQuestionCreatedData = async() =>{
-    const updatedPageData = [ ...pageData ];
+    const updatedPageData = [ ...pageData ]
     const securityQuestionHistory = JSON.parse(
-      await AsyncStorage.getItem('securityQuestionHistory'),
-    );
-      updatedPageData.forEach( ( data ) => {
-        switch ( data.title ) {
-            case 'Security Questions':
-              data.time = securityQuestionHistory ? securityQuestionHistory.created : 'never';
-              break
+      await AsyncStorage.getItem( 'securityQuestionHistory' ),
+    )
+    updatedPageData.forEach( ( data ) => {
+      switch ( data.title ) {
+          case 'Security Questions':
+            data.time = securityQuestionHistory ? securityQuestionHistory.created : 'never'
+            break
 
-            default:
-              break
-        }
-      } )
-      setPageData( updatedPageData )
+          default:
+            break
+      }
+    } )
+    setPageData( updatedPageData )
   }
 
   useEffect( () => {
@@ -967,9 +967,9 @@ export default function ManageBackup( props ) {
               data.status = overallHealth.qaStatus.stage
               data.time = overallHealth.qaStatus.updatedAt
               const securityQuestionHistory = JSON.parse(
-                await AsyncStorage.getItem('securityQuestionHistory'),
-              );
-              if(overallHealth.qaStatus.updatedAt){
+                await AsyncStorage.getItem( 'securityQuestionHistory' ),
+              )
+              if( overallHealth.qaStatus.updatedAt ){
                 const securityQuestionHistoryUpdated = {
                   ...securityQuestionHistory,
                   confirmed: overallHealth.qaStatus.updatedAt,
@@ -1314,10 +1314,15 @@ export default function ManageBackup( props ) {
   }
 
   const getTime = ( item ) => {
-    return ( item.toString() && item.toString() == '0' ) ||
+    try{
+      return ( item.toString() && item.toString() == '0' ) ||
       item.toString() == 'never'
-      ? 'never'
-      : timeFormatter( moment( new Date() ), item )
+        ? 'never'
+        : timeFormatter( moment( new Date() ), item )
+
+    }catch( err ){
+      return 'never'
+    }
   }
 
   useEffect( () => {
