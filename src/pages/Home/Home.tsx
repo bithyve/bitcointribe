@@ -140,6 +140,7 @@ interface HomeStateTypes {
   lastActiveTime: string;
   swanDeepLinkContent: string | null;
   swanFromBuyMenu: boolean | null;
+  swanFromDeepLink: boolean | null;
 }
 
 interface HomePropsTypes {
@@ -180,6 +181,7 @@ interface HomePropsTypes {
   releaseCasesValue: any;
   swanDeepLinkContent: string | null;
   swanFromBuyMenu: boolean | null;
+  swanFromDeepLink: boolean | null;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -222,7 +224,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
       swanDeepLinkContent: null,
-      swanFromBuyMenu: null
+      swanFromBuyMenu: null,
+      swanFromDeepLink: null,
     }
   }
 
@@ -1024,7 +1027,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( `url length ${splits.length} last param ${splits[ splits.length-1 ]} second last param ${splits[ splits.length-2 ]}` )
     if ( splits.includes( 'swan' ) ) {
       this.setState( {
-        swanDeepLinkContent:url
+        swanDeepLinkContent:url,
+        swanFromDeepLink: true,
+        swanFromBuyMenu: false
       }, () => {
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
@@ -1280,7 +1285,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BuyMenuItemKind.SWAN:
           // this.props.navigation.navigate( 'SwanIntegrationScreen' )
           this.setState( {
-            swanFromBuyMenu: true
+            swanFromBuyMenu: true,
+            swanFromDeepLink: false
           }, () => {
             this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
           } )
@@ -1745,7 +1751,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <>
               <BottomSheetHeader title="Stack Sats with SwanBitcoin" onPress={this.closeBottomSheet} />
               <BottomSheetSwanInfo
-                navigatingFrom={'home'}
+                swanFromDeepLink={this.state.swanFromDeepLink}
+                swanFromBuyMenu={this.state.swanFromBuyMenu}
                 swanDeepLinkContent={this.state.swanDeepLinkContent}
                 onClickSetting={() => {
                   this.closeBottomSheet()

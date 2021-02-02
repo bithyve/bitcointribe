@@ -11,38 +11,55 @@ import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { redeemSwanCodeForToken, clearSwanCache } from '../../../store/actions/SwanIntegration'
+import { clearSwanCache, fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
+import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
+import openLink from '../../../utils/OpenLink'
 
 let boottomSheetRenderCount = 0
 type Props = {
   swanDeepLinkContent: string | null;
-  navigatingFrom: string | null;
+  swanFromDeepLink: boolean | null;
+  swanFromBuyMenu: boolean | null;
   onClickSetting: ()=>any;
 }
 
-const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, navigatingFrom, onClickSetting }: Props ) => {
+const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
   console.log( {
-    boottomSheetRenderCount: boottomSheetRenderCount++
+    boottomSheetRenderCount: boottomSheetRenderCount++,
+    ...{
+      swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu
+    }
   } )
   const dispatch = useDispatch()
+  const { hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenSucceeded } = useSwanIntegrationState()
   useEffect( ()=>{
     dispatch( clearSwanCache() )
-    switch ( navigatingFrom ) {
-        case 'home':
-          dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
-    }
   }, [] )
-  const { redeemSwanCodeForTokenSucceeded, swanAuthenticatedCode } = useSelector(
-    ( state ) => state.swanIntegration
-  )
+
+  useEffect( ()=>{
+    console.log( 'inside use effect', {
+      hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl
+    } )
+    if ( swanFromBuyMenu ) {
+      if( !hasFetchSwanAuthenticationUrlSucceeded ) dispatch( fetchSwanAuthenticationUrl( {
+      } ) )
+
+      if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
+    }
+  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
+
+  if( swanFromDeepLink ) {
+    swanFromDeepLink = false
+    dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
+  }
 
   useEffect( ()=>{
     console.log( {
-      swanAuthenticatedCode, redeemSwanCodeForTokenSucceeded
+      swanAuthenticatedCode, hasRedeemSwanCodeForTokenSucceeded
     } )
-    if( redeemSwanCodeForTokenSucceeded )
-      console.log( 'redeemSwanCodeForTokenSucceeded ', redeemSwanCodeForTokenSucceeded )
-  }, [ redeemSwanCodeForTokenSucceeded, swanAuthenticatedCode ] )
+    if( hasRedeemSwanCodeForTokenSucceeded )
+      console.log( 'hasRedeemSwanCodeForTokenSucceeded ', hasRedeemSwanCodeForTokenSucceeded )
+  }, [ hasRedeemSwanCodeForTokenSucceeded, swanAuthenticatedCode ] )
 
   return ( <View style={{
     ...styles.modalContentContainer
