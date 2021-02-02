@@ -236,56 +236,6 @@ export default class HDSegwitWallet extends Bitcoin {
     return receivingAddress
   };
 
-  public getDerivativeAccXpub = (
-    accountType: string,
-    accountNumber?: number,
-    contactName?: string,
-  ): string => {
-    // generates receiving xpub for derivative accounts
-    if ( accountType === TRUSTED_CONTACTS ) {
-      if ( !contactName )
-        throw new Error( `Required param: contactName for ${accountType}` )
-
-      return this.getTrustedContactDerivativeAccXpub( accountType, contactName )
-    }
-
-    const baseXpub = this.generateDerivativeXpub( accountType, accountNumber )
-    return baseXpub
-  };
-
-  public getTrustedContactDerivativeAccXpub = (
-    accountType: string,
-    contactName: string,
-  ): string => {
-    contactName = contactName.toLowerCase().trim()
-    const trustedAccounts: TrustedContactDerivativeAccount = this
-      .derivativeAccounts[ accountType ]
-    const inUse = trustedAccounts.instance.using
-
-    let accountNumber = this.trustedContactToDA[ contactName ]
-    if ( accountNumber ) {
-      return trustedAccounts[ accountNumber ].xpub
-    }
-
-    // for (let index = 0; index <= inUse; index++) {
-    //   if (
-    //     trustedAccounts[index] &&
-    //     trustedAccounts[index].contactName === contactName
-    //   ) {
-    //     return trustedAccounts[index].xpub;
-    //   }
-    // }
-    accountNumber = inUse + 1
-
-    const baseXpub = this.generateTrustedDerivativeXpub(
-      accountType,
-      accountNumber,
-      contactName,
-    )
-
-    return baseXpub
-  };
-
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
     accountNumber = 1,
@@ -1030,6 +980,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails: { accountName?: string; accountDescription?: string },
+    contactName?: string,
   ): {
     accountId: string;
     accountNumber: number;
@@ -1043,8 +994,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
           const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
-          const inUse = derivativeAcc.instance.using
-          accountNumber = inUse + 1
+          accountNumber = derivativeAcc.instance.using + 1
           this.generateDerivativeXpub( accountType, accountNumber )
           const derivativeInstance: DerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
@@ -1057,6 +1007,32 @@ export default class HDSegwitWallet extends Bitcoin {
             accountNumber
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
+          break
+
+
+        case TRUSTED_CONTACTS:
+          if ( !contactName )
+            throw new Error( `Required param: contactName for ${accountType}` )
+
+          contactName = contactName.toLowerCase().trim()
+          const trustedAccounts: TrustedContactDerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+
+          accountNumber = this.trustedContactToDA[ contactName ]
+          if ( accountNumber ) {
+            console.log( `Derivative account already exist against contact: ${contactName}` )
+            const derivativeInstance: TrustedContactDerivativeAccountElements = this
+              .derivativeAccounts[ accountType ][ accountNumber ]
+            accountId = derivativeInstance.xpubId
+          } else {
+            accountNumber = trustedAccounts.instance.using + 1
+            this.generateDerivativeXpub( accountType, accountNumber )
+            const derivativeInstance: TrustedContactDerivativeAccountElements = this
+              .derivativeAccounts[ accountType ][ accountNumber ]
+            derivativeInstance.contactName = contactName
+            this.trustedContactToDA[ contactName ] = accountNumber
+            accountId = derivativeInstance.xpubId
+          }
           break
     }
 
@@ -1999,20 +1975,6 @@ export default class HDSegwitWallet extends Bitcoin {
     this.xpriv = child.toBase58()
 
     return this.xpriv
-  };
-
-  private generateTrustedDerivativeXpub = (
-    accountType: string,
-    accountNumber = 1,
-    contactName: string,
-  ) => {
-    const xpub = this.generateDerivativeXpub( accountType, accountNumber )
-    this.derivativeAccounts[ accountType ][
-      accountNumber
-    ].contactName = contactName
-    this.trustedContactToDA[ contactName ] = accountNumber
-
-    return xpub
   };
 
   private generateDerivativeXpub = (

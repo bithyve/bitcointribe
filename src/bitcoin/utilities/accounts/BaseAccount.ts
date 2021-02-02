@@ -78,7 +78,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 101, err: err.message, message: ErrMap[ 101 ] 
+        status: 101, err: err.message, message: ErrMap[ 101 ]
       }
     }
   };
@@ -105,7 +105,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 102, err: err.message, message: ErrMap[ 102 ] 
+        status: 102, err: err.message, message: ErrMap[ 102 ]
       }
     }
   };
@@ -146,41 +146,6 @@ export default class BaseAccount {
     derivativeAccountType?: string,
     accountNumber?: number,
   ) => this.hdWallet.getReceivingAddress( derivativeAccountType, accountNumber );
-
-  public getDerivativeAccXpub = (
-    accountType: string,
-    accountNumber?: number,
-    contactName?: string,
-  ):
-    | {
-        status: number;
-        data: string;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeAccXpub(
-          accountType,
-          accountNumber,
-          contactName.toLowerCase().trim(),
-        ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to generate derivative account\'s xpub',
-      }
-    }
-  };
 
   public getDerivativeAccAddress = async (
     accountType: string,
@@ -347,6 +312,7 @@ export default class BaseAccount {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails: { accountName?: string; accountDescription?: string },
+    contactName?: string
   ):
     | {
         status: number;
@@ -366,7 +332,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactName ),
       }
     } catch ( err ) {
       return {
@@ -536,7 +502,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o1, err: err.message, message: ErrMap[ 0o1 ] 
+        status: 0o1, err: err.message, message: ErrMap[ 0o1 ]
       }
     }
   };
@@ -589,7 +555,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o3, err: err.message, message: ErrMap[ 0o3 ] 
+        status: 0o3, err: err.message, message: ErrMap[ 0o3 ]
       }
     }
   };
@@ -617,7 +583,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ] 
+        status: 0o4, err: err.message, message: ErrMap[ 0o4 ]
       }
     }
   };
@@ -648,7 +614,7 @@ export default class BaseAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o5, err: err.message, message: ErrMap[ 0o5 ] 
+        status: 0o5, err: err.message, message: ErrMap[ 0o5 ]
       }
     }
   };
@@ -738,7 +704,7 @@ export default class BaseAccount {
         return {
           status: config.STATUS.SUCCESS,
           data: {
-            txPrerequisites 
+            txPrerequisites
           },
         }
       } else {
@@ -752,7 +718,7 @@ export default class BaseAccount {
       // }
     } catch ( err ) {
       return {
-        status: 106, err: err.message, message: ErrMap[ 106 ] 
+        status: 106, err: err.message, message: ErrMap[ 106 ]
       }
     }
   };
@@ -808,8 +774,8 @@ export default class BaseAccount {
       // console.log({ txid });
       return {
         status: config.STATUS.SUCCESS, data: {
-          txid 
-        } 
+          txid
+        }
       }
     } catch ( err ) {
       return {
