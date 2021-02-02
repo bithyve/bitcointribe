@@ -18,7 +18,7 @@ export type SwanIntegrationState = {
   state: string | null,
   nonce: number | null,
   hasFetchSwanAuthenticationUrlSucceeded: boolean | null,
-  hasFetchSwanAuthenticationCodeSucceeded: boolean | null,
+  hasRedeemSwanCodeForTokenSucceeded: boolen | null,
   swanAuthenticatedCode: string | null,
   isSwanRedeemCodeInProgress: boolean | null,
   swanToken: string | null
@@ -53,7 +53,7 @@ const INITIAL_STATE: SwanIntegrationState = {
   state: null,
   nonce: null,
   hasFetchSwanAuthenticationUrlSucceeded: false,
-  hasFetchSwanAuthenticationCodeSucceeded: false,
+  hasRedeemSwanCodeForTokenSucceeded: false,
   swanAuthenticatedCode: null,
   isSwanRedeemCodeInProgress: false,
   swanToken: null,
@@ -94,7 +94,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           nonce: null,
           state: null,
           swanAuthenticatedCode: null,
-          redeemSwanCodeForTokenSucceeded: null
+          hasRedeemSwanCodeForTokenSucceeded: null
         }
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
@@ -110,7 +110,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
         return {
           ...state,
-          redeemSwanCodeForTokenSucceeded: true,
+          hasRedeemSwanCodeForTokenSucceeded: true,
           swanAuthenticatedCode: action.payload.data.swanAuthenticatedCode
         }
       case LINK_SWAN_WALLET:

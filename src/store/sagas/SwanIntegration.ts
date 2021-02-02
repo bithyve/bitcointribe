@@ -42,9 +42,9 @@ client_id=${client_id}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
-// &redirect_uri=${redirect_uri}\
-// &ui_locales=en\
-// &nonce=${nonce}\
+
+  // &ui_locales=en\
+  // &nonce=${nonce}\
   console.log( {
     code_challenge, code_verifier, nonce, state, swanAuthenticationUrl
   } )
@@ -59,15 +59,17 @@ export const redeemSwanCodeForTokenWatcher = createWatcher(
   REDEEM_SWAN_CODE_FOR_TOKEN
 )
 export function* redeemSwanCodeForTokenWorker( { payload } ) {
-
-  console.log( count++, payload )
-  // 'code': 'yU0zLa-PnsjKzD7vXWc_2zF2Xyut7FrjMTQgqSvnRCp&state=33679074916-byV',
-  // 'code_verifier': 'jLm1y0vAqiYS1TcfwMaXAB0opMQloxjb25sGORAMN5BNUWgeOteCkWaqW1HpJCWz',
-  const { code, code_verifier } = yield select(
+  console.log( '***-> inside redeem ', count++, payload )
+  const splits = payload.data.split( '/' )
+  const code = splits[ splits.length - 1 ].split( '&' )[ 0 ]
+  console.log( {
+    splits, code: code.split( '=' )[ 1 ]
+  } )
+  const { code_verifier } = yield select(
     ( state ) => state.swanIntegration
   )
   const swanAuthenticatedCode = yield call( redeemAuthCodeForToken, {
-    code, code_verifier
+    code: code.split( '=' )[ 1 ], code_verifier
   } )
 
   yield put( redeemSwanCodeForTokenSucceeded( {
