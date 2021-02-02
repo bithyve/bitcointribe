@@ -4,7 +4,7 @@ import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 
-const ListStyles = StyleSheet.create({
+const ListStyles = StyleSheet.create( {
   thumbnailImageSmall: {
     width: 28,
     height: 28,
@@ -45,6 +45,6 @@ const ListStyles = StyleSheet.create({
     shadowColor: Colors.gray2,
     elevation: 10,
   },
-})
+} )
 
 export default ListStyles

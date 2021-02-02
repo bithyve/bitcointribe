@@ -32,13 +32,13 @@ const actionButton = {
 const primaryActionButton = {
   ...actionButton,
   backgroundColor: Colors.blue,
-  
+
 }
 
 const disabledPrimaryActionButton = {
   ...actionButton,
   backgroundColor: Colors.lightBlue,
-  
+
 }
 
 const actionButtonText = {
